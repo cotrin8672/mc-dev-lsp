@@ -1,5 +1,6 @@
 package io.github.mcdev.jdtls.handler
 
+import io.github.mcdev.jdtls.awat.AwAtServiceFacade
 import io.github.mcdev.jdtls.convert.DiagnosticConverter
 import io.github.mcdev.jdtls.mixin.MixinServiceFacade
 import io.github.mcdev.jdtls.project.FileBasedProjectContextService
@@ -16,6 +17,7 @@ import io.github.mcdev.protocol.McdevRequestContext
 class McdevDiagnosticsHandler(
     private val projectService: FileBasedProjectContextService = FileBasedProjectContextService(),
     private val mixinFacade: MixinServiceFacade = MixinServiceFacade(),
+    private val awAtFacade: AwAtServiceFacade = AwAtServiceFacade(),
     private val decoder: ProtocolPayloadDecoder = ProtocolPayloadDecoder(),
 ) {
     fun handle(arguments: List<Any?>): McdevResponseEnvelope<McdevDiagnosticsResponse> =
@@ -38,12 +40,22 @@ class McdevDiagnosticsHandler(
         }
 
         val session = projectService.loadSession(context.workspaceRoot)
-        val diagnostics = mixinFacade.analyzeDiagnostics(
-            session = session,
-            projectContext = session.context,
-            source = context.bufferText,
-            documentUri = context.documentUri,
-        )
+        val awAtFileType = awAtFacade.detectFileType(context.languageId, context.documentUri)
+        val diagnostics = if (awAtFileType != null) {
+            awAtFacade.analyzeDiagnostics(
+                session = session,
+                source = context.bufferText,
+                documentUri = context.documentUri,
+                fileType = awAtFileType,
+            )
+        } else {
+            mixinFacade.analyzeDiagnostics(
+                session = session,
+                projectContext = session.context,
+                source = context.bufferText,
+                documentUri = context.documentUri,
+            )
+        }
         return McdevResponseEnvelope(
             capabilities = setOf("diagnostics"),
             result = McdevDiagnosticsResponse(

@@ -8,6 +8,7 @@ object FixturePaths {
     const val FORGE_BASIC = "$ROOT/forge-basic"
     const val NEOFORGE_BASIC = "$ROOT/neoforge-basic"
     const val BROKEN_DIAGNOSTICS = "$ROOT/broken-diagnostics"
+    const val FABRIC_AW_AT = "$ROOT/fabric-aw-at"
     const val SHARED_CLASSES = "$ROOT/shared/classes"
 
     const val FABRIC_BASIC_BUILD_GRADLE = "$FABRIC_BASIC/build.gradle"
@@ -34,6 +35,12 @@ object FixturePaths {
     const val BROKEN_DIAGNOSTICS_MIXINS_JSON = "$BROKEN_DIAGNOSTICS/mixins.json"
     const val BROKEN_DIAGNOSTICS_MIXIN = "$BROKEN_DIAGNOSTICS/src/main/java/com/example/mixin/BrokenMixin.java"
 
+    const val FABRIC_AW_AT_BUILD_GRADLE = "$FABRIC_AW_AT/build.gradle"
+    const val FABRIC_AW_AT_FABRIC_MOD_JSON = "$FABRIC_AW_AT/fabric.mod.json"
+    const val FABRIC_AW_AT_MAPPINGS = "$FABRIC_AW_AT/mappings.tiny"
+    const val FABRIC_AW_AT_ACCESS_WIDENER = "$FABRIC_AW_AT/src/main/resources/mod.accesswidener"
+    const val FABRIC_AW_AT_ACCESS_TRANSFORMER = "$FABRIC_AW_AT/src/main/resources/mod_at.cfg"
+
     const val SIMPLE_TARGET_CLASS = "$SHARED_CLASSES/com/example/target/SimpleTarget.class"
 
     val ALL_FIXTURE_ROOTS = listOf(
@@ -42,6 +49,7 @@ object FixturePaths {
         FORGE_BASIC,
         NEOFORGE_BASIC,
         BROKEN_DIAGNOSTICS,
+        FABRIC_AW_AT,
     )
 
     val REQUIRED_RESOURCES = listOf(
@@ -64,6 +72,11 @@ object FixturePaths {
         BROKEN_DIAGNOSTICS_FABRIC_MOD_JSON,
         BROKEN_DIAGNOSTICS_MIXINS_JSON,
         BROKEN_DIAGNOSTICS_MIXIN,
+        FABRIC_AW_AT_BUILD_GRADLE,
+        FABRIC_AW_AT_FABRIC_MOD_JSON,
+        FABRIC_AW_AT_MAPPINGS,
+        FABRIC_AW_AT_ACCESS_WIDENER,
+        FABRIC_AW_AT_ACCESS_TRANSFORMER,
         SIMPLE_TARGET_CLASS,
     )
 }

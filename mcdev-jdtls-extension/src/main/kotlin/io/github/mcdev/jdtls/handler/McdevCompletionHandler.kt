@@ -1,5 +1,6 @@
 package io.github.mcdev.jdtls.handler
 
+import io.github.mcdev.jdtls.awat.AwAtServiceFacade
 import io.github.mcdev.jdtls.convert.CompletionConvertContext
 import io.github.mcdev.jdtls.convert.CompletionItemConverter
 import io.github.mcdev.jdtls.mixin.MixinServiceFacade
@@ -16,6 +17,7 @@ import io.github.mcdev.protocol.McdevResponseEnvelope
 class McdevCompletionHandler(
     private val projectService: FileBasedProjectContextService = FileBasedProjectContextService(),
     private val mixinFacade: MixinServiceFacade = MixinServiceFacade(),
+    private val awAtFacade: AwAtServiceFacade = AwAtServiceFacade(),
     private val decoder: ProtocolPayloadDecoder = ProtocolPayloadDecoder(),
 ) {
     fun handle(arguments: List<Any?>): McdevResponseEnvelope<McdevCompletionResponse> =
@@ -35,6 +37,38 @@ class McdevCompletionHandler(
         }
 
         val session = projectService.loadSession(request.context.workspaceRoot)
+        val awAtFileType = awAtFacade.detectFileType(
+            languageId = request.context.languageId,
+            documentUri = request.context.documentUri,
+        )
+        if (awAtFileType != null) {
+            val items = awAtFacade.complete(
+                session = session,
+                source = request.context.bufferText,
+                line = request.context.position.line,
+                character = request.context.position.character,
+                fileType = awAtFileType,
+                documentUri = request.context.documentUri,
+            )
+            return McdevResponseEnvelope(
+                capabilities = setOf("completion"),
+                result = McdevCompletionResponse(
+                    items = CompletionItemConverter.toDtos(
+                        items = items,
+                        annotationContext = null,
+                        source = request.context.bufferText,
+                        convertContext = CompletionConvertContext(
+                            source = request.context.bufferText,
+                            annotationContext = null,
+                            mappingResolver = session.context.mappings.resolver,
+                            sourceNamespace = session.context.mappings.sourceNamespace,
+                            runtimeNamespace = session.context.mappings.runtimeNamespace,
+                        ),
+                    ),
+                ),
+            )
+        }
+
         val options = mixinFacade.toCompletionOptions(
             mixinClassInsert = request.options.mixinClassInsert,
             injectMethodDescriptor = request.options.injectMethodDescriptor,

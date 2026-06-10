@@ -1,5 +1,6 @@
 package io.github.mcdev.jdtls.handler
 
+import io.github.mcdev.jdtls.awat.AwAtServiceFacade
 import io.github.mcdev.jdtls.convert.CodeActionConverter
 import io.github.mcdev.jdtls.mixin.MixinServiceFacade
 import io.github.mcdev.jdtls.project.FileBasedProjectContextService
@@ -16,6 +17,7 @@ import io.github.mcdev.protocol.McdevResponseEnvelope
 class McdevCodeActionHandler(
     private val projectService: FileBasedProjectContextService = FileBasedProjectContextService(),
     private val mixinFacade: MixinServiceFacade = MixinServiceFacade(),
+    private val awAtFacade: AwAtServiceFacade = AwAtServiceFacade(),
     private val decoder: ProtocolPayloadDecoder = ProtocolPayloadDecoder(),
 ) {
     fun handle(arguments: List<Any?>): McdevResponseEnvelope<McdevCodeActionResponse> =
@@ -39,7 +41,28 @@ class McdevCodeActionHandler(
         val mixinConfigContent = mixinConfig?.let { config ->
             runCatching { config.path.readText() }.getOrNull()
         }
-        val filteredFixes = if (request.diagnosticCodes.isEmpty()) {
+        val awAtFileType = awAtFacade.detectFileType(request.context.languageId, request.context.documentUri)
+        val filteredFixes = if (awAtFileType != null) {
+            if (request.diagnosticCodes.isEmpty()) {
+                awAtFacade.codeActions(
+                    session = session,
+                    source = request.context.bufferText,
+                    documentUri = request.context.documentUri,
+                    fileType = awAtFileType,
+                    diagnosticCode = null,
+                )
+            } else {
+                request.diagnosticCodes.flatMap { code ->
+                    awAtFacade.codeActions(
+                        session = session,
+                        source = request.context.bufferText,
+                        documentUri = request.context.documentUri,
+                        fileType = awAtFileType,
+                        diagnosticCode = code,
+                    )
+                }.distinctBy { "${it.kind}:${it.title}" }
+            }
+        } else if (request.diagnosticCodes.isEmpty()) {
             mixinFacade.codeActions(
                 session = session,
                 projectContext = session.context,

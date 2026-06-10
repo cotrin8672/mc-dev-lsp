@@ -1,0 +1,12 @@
+{
+  "schemaVersion": 1,
+  "id": "mcdev-fixture-fabric-aw-at",
+  "version": "1.0.0",
+  "name": "MCDev Fabric AW/AT Fixture",
+  "description": "Fabric mod fixture with Access Widener and Access Transformer files",
+  "authors": ["mcdev"],
+  "license": "MIT",
+  "environment": "*",
+  "entrypoints": {},
+  "accessWidener": "mod.accesswidener"
+}

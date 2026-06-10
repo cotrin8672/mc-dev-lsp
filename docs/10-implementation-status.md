@@ -14,7 +14,7 @@ This file records what exists in the repository after the testing and adapter ex
 
 - Descriptor model, parser, renderer, and member target parser.
 - Tiny v2 parser, SRG parser, namespace-aware lookup model, `MappingResolver`, project mapping context model, and descriptor remapping service.
-- Access Widener and Access Transformer parsers with validation.
+- Access Widener and Access Transformer parsers, context extractors, completion, diagnostics, code actions, and unified `AwAtServiceFacade`.
 - Structured diagnostic and completion domain models.
 - Bytecode indexing, instruction extraction, ordinal calculation, and classpath-backed mixin indexes.
 - Mixin target/method/@At completion, diagnostics, and code actions (config entry, descriptor, accessor, invoker).
@@ -35,6 +35,7 @@ This file records what exists in the repository after the testing and adapter ex
 - `plugin.xml` + `McdevDelegateCommandHandler` registered through `org.eclipse.jdt.ls.core.delegateCommandHandler`.
 - Fat bundle jar embedding `mcdev-core`, `mcdev-protocol`, Gson, and Kotlin stdlib.
 - File-based project context loading, classpath indexing, completion/diagnostics/info/reindex handlers.
+- AW/AT buffer routing in completion, diagnostics, and code action handlers via `AwAtServiceFacade` (languageId or `.accesswidener`/`.aw`/`_at.cfg` extension).
 - Protocol payload decoding and completion/diagnostic DTO conversion (including text edits for mixin class completion).
 - Local OSGi bundle E2E via `scripts/run-osgi-e2e.ps1` (real Mason `jdtls` + headless Neovim).
 - End-to-end completion wiring: `preferredAtTarget` and mapping-aware `@At` insert formatting via `AtTargetInsertFormatter`, mixin import `additionalEdits` via `MixinImportEditBuilder`, and MixinExtras completions through the core `MixinServiceFacade`.
@@ -49,7 +50,7 @@ This file records what exists in the repository after the testing and adapter ex
 
 ### mcdev-test-fixtures
 
-- Fixture projects: `fabric-basic`, `fabric-mixinextras`, `forge-basic`, `neoforge-basic`, `broken-diagnostics`.
+- Fixture projects: `fabric-basic`, `fabric-mixinextras`, `fabric-aw-at`, `forge-basic`, `neoforge-basic`, `broken-diagnostics`.
 - Compiled `SimpleTarget` class bytes and fabric-basic Tiny v2 mappings.
 - Fixture resource loader and mixin config validator tests.
 
@@ -57,20 +58,19 @@ This file records what exists in the repository after the testing and adapter ex
 
 | Module | Tests |
 |--------|------:|
-| mcdev-core | 449 |
-| mcdev-jdtls-extension | 79 |
-| mcdev-test-fixtures | 14 |
+| mcdev-core | ~465 |
+| mcdev-jdtls-extension | ~90 |
+| mcdev-test-fixtures | ~14 |
 | mcdev-protocol | 2 |
 | mcdev-nvim (Lua adapter) | ~15 assertions |
 
-Gradle `test` total: **542** tests across Kotlin/Java modules.
+Gradle `test` total: **~570** tests across Kotlin/Java modules.
 
-Core tests cover descriptor/mapping/bytecode edge cases, mixin and MixinExtras semantics, project context, fixture-backed mapping regression, and mixin E2E flows. Neovim adapter tests cover protocol payload shape, LSP item conversion, Blink/cmp wrapping, command registration, and missing-client errors.
+Core tests cover descriptor/mapping/bytecode edge cases, mixin and MixinExtras semantics, AW/AT completion/diagnostics E2E flows, project context, fixture-backed mapping regression, and mixin E2E flows. JDT LS handler tests cover AW/AT buffer payloads by languageId and file extension. Neovim adapter tests cover protocol payload shape, LSP item conversion, Blink/cmp wrapping, command registration, and missing-client errors.
 
 ## Still To Implement
 
 - `@Overwrite` annotation support (currently unsupported; covered by tests).
-- Access Widener and Access Transformer completion, diagnostics, and code actions.
 - AW/AT buffer request behavior in Neovim adapter.
 - Full expression-context validation for `MIXINEXTRAS:EXPRESSION`.
 - Multi-source-set fixture project.
