@@ -1,0 +1,9 @@
+plugins {
+    id 'org.neoforged.moddev' version '2.0.78'
+    id 'maven-publish'
+}
+
+dependencies {
+    implementation 'net.neoforged:neoforge:21.1.0'
+    annotationProcessor 'org.spongepowered:mixin:0.8.7'
+}

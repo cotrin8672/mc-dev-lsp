@@ -1,0 +1,159 @@
+package io.github.mcdev.core.project
+
+import io.github.mcdev.core.mapping.ProjectMappingContext
+import io.github.mcdev.core.model.MappingNamespace
+import kotlin.test.Test
+import kotlin.test.assertEquals
+import kotlin.test.assertTrue
+import org.junit.jupiter.api.io.TempDir
+import java.nio.file.Path
+
+class InfoServiceTest {
+    @TempDir
+    lateinit var tempDir: Path
+
+    @Test
+    fun formatsCompleteFabricProjectInfo() {
+        val context = ProjectContext(
+            projectId = "fabric",
+            root = tempDir,
+            platform = ModPlatform.FABRIC,
+            classpath = ClasspathSnapshot(
+                dependencyJars = (1..142).map { tempDir.resolve("lib/$it.jar") },
+            ),
+            mappings = ProjectMappingContext(
+                sourceNamespace = MappingNamespace.NAMED,
+                runtimeNamespace = MappingNamespace.INTERMEDIARY,
+                awNamespace = MappingNamespace.NAMED,
+                atNamespace = null,
+                availableNamespaces = setOf(MappingNamespace.NAMED, MappingNamespace.INTERMEDIARY),
+                resolver = EmptyMappingResolver,
+            ),
+            mixinConfigs = listOf(
+                MixinConfigRef(tempDir.resolve("mixins.json")),
+                MixinConfigRef(tempDir.resolve("client.mixins.json")),
+            ),
+            accessWideners = listOf(AccessWidenerRef(tempDir.resolve("mod.accesswidener"))),
+            accessTransformers = emptyList(),
+            minecraftJars = listOf(tempDir.resolve("minecraft.jar")),
+            sourceSets = emptyList(),
+            indexState = ProjectIndexState.READY,
+        )
+
+        val lines = InfoService.formatLines(context, protocolVersion = 1, extensionVersion = "0.1.0")
+
+        assertEquals("Project: fabric", lines[0])
+        assertEquals("Root: $tempDir", lines[1])
+        assertEquals("Platform: Fabric", lines[2])
+        assertEquals("Mappings: named <-> intermediary loaded", lines[3])
+        assertEquals("Source namespace: named", lines[4])
+        assertEquals("Runtime namespace: intermediary", lines[5])
+        assertEquals("Minecraft jar: found", lines[6])
+        assertEquals("Mixin config: 2 files", lines[7])
+        assertEquals("Access Widener: 1 file", lines[8])
+        assertEquals("Access Transformer: none", lines[9])
+        assertEquals("Classpath entries: 142", lines[10])
+        assertEquals("Class index: ready", lines[11])
+        assertEquals("Bytecode index: ready", lines[12])
+        assertEquals("Protocol: 1", lines[13])
+        assertEquals("Extension: 0.1.0", lines[14])
+    }
+
+    @Test
+    fun formatsPartialContextWithNoMappings() {
+        val context = ProjectContextBuilder.empty("partial", tempDir)
+        val lines = InfoService.formatLines(context)
+
+        assertTrue(lines.any { it == "Mappings: none" })
+        assertTrue(lines.any { it == "Mixin config: none" })
+        assertTrue(lines.any { it == "Access Widener: none" })
+        assertTrue(lines.any { it == "Access Transformer: none" })
+        assertTrue(lines.any { it == "Minecraft jar: none" })
+        assertTrue(lines.any { it == "Class index: not ready" })
+    }
+
+    @Test
+    fun formatsUnknownPlatform() {
+        val context = ProjectContextBuilder.empty("unknown-mod", tempDir)
+        val lines = InfoService.formatLines(context)
+        assertTrue(lines.any { it == "Platform: Unknown" })
+    }
+
+    @Test
+    fun formatsPartialMappingsAsPartialStatus() {
+        val context = ProjectContext(
+            projectId = "single-ns",
+            root = tempDir,
+            platform = ModPlatform.UNKNOWN,
+            classpath = ClasspathSnapshot.EMPTY,
+            mappings = ProjectMappingContext(
+                sourceNamespace = MappingNamespace.NAMED,
+                runtimeNamespace = MappingNamespace.NAMED,
+                awNamespace = MappingNamespace.NAMED,
+                atNamespace = null,
+                availableNamespaces = setOf(MappingNamespace.NAMED),
+                resolver = EmptyMappingResolver,
+            ),
+            mixinConfigs = emptyList(),
+            accessWideners = emptyList(),
+            accessTransformers = emptyList(),
+            minecraftJars = emptyList(),
+            sourceSets = emptyList(),
+            indexState = ProjectIndexState.NOT_READY,
+        )
+
+        val lines = InfoService.formatLines(context)
+        assertTrue(lines.any { it == "Mappings: named <-> named partial" })
+    }
+
+    @Test
+    fun formatJoinsLinesWithNewlines() {
+        val context = ProjectContextBuilder.empty("join-test", tempDir)
+        val text = InfoService.format(context)
+        assertTrue(text.contains("\n"))
+        assertEquals(InfoService.formatLines(context).joinToString("\n"), text)
+    }
+
+    @Test
+    fun formatsIndexStates() {
+        val states = mapOf(
+            ProjectIndexState.BUILDING to "building",
+            ProjectIndexState.STALE to "stale",
+            ProjectIndexState.FAILED to "failed",
+        )
+
+        for ((state, label) in states) {
+            val context = ProjectContextBuilder.empty("state", tempDir).copy(indexState = state)
+            val lines = InfoService.formatLines(context)
+            assertTrue(lines.any { it == "Class index: $label" })
+        }
+    }
+
+    @Test
+    fun usesClasspathMinecraftJarsWhenContextListEmpty() {
+        val jar = tempDir.resolve("mc.jar")
+        val context = ProjectContext(
+            projectId = "jar-fallback",
+            root = tempDir,
+            platform = ModPlatform.FABRIC,
+            classpath = ClasspathSnapshot(minecraftJars = listOf(jar)),
+            mappings = ProjectMappingContext(
+                sourceNamespace = MappingNamespace.NAMED,
+                runtimeNamespace = MappingNamespace.INTERMEDIARY,
+                awNamespace = null,
+                atNamespace = null,
+                availableNamespaces = emptySet(),
+                resolver = EmptyMappingResolver,
+            ),
+            mixinConfigs = emptyList(),
+            accessWideners = emptyList(),
+            accessTransformers = emptyList(),
+            minecraftJars = emptyList(),
+            sourceSets = emptyList(),
+            indexState = ProjectIndexState.NOT_READY,
+        )
+
+        val lines = InfoService.formatLines(context)
+        assertTrue(lines.any { it == "Minecraft jar: found" })
+    }
+}

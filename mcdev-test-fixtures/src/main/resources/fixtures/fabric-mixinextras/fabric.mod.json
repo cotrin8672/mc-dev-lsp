@@ -1,0 +1,14 @@
+{
+  "schemaVersion": 1,
+  "id": "mcdev-fixture-fabric-mixinextras",
+  "version": "1.0.0",
+  "name": "MCDev Fabric MixinExtras Fixture",
+  "description": "Fabric fixture with MixinExtras annotations for mcdev semantic tests",
+  "authors": ["mcdev"],
+  "license": "MIT",
+  "environment": "*",
+  "entrypoints": {},
+  "mixins": [
+    "mixins.json"
+  ]
+}

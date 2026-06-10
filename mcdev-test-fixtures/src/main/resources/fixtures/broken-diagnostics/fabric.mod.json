@@ -1,0 +1,14 @@
+{
+  "schemaVersion": 1,
+  "id": "mcdev-fixture-broken-diagnostics",
+  "version": "1.0.0",
+  "name": "MCDev Broken Diagnostics Fixture",
+  "description": "Intentionally invalid mixin fixture for diagnostic tests",
+  "authors": ["mcdev"],
+  "license": "MIT",
+  "environment": "*",
+  "entrypoints": {},
+  "mixins": [
+    "mixins.json"
+  ]
+}

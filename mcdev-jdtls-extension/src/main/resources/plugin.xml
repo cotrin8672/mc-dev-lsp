@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?eclipse version="3.4"?>
+<plugin>
+   <extension point="org.eclipse.jdt.ls.core.delegateCommandHandler">
+      <delegateCommandHandler class="io.github.mcdev.jdtls.McdevDelegateCommandHandler">
+         <command id="mcdev.completion"/>
+         <command id="mcdev.context"/>
+         <command id="mcdev.info"/>
+         <command id="mcdev.reindex"/>
+         <command id="mcdev.definition"/>
+         <command id="mcdev.references"/>
+         <command id="mcdev.codeAction"/>
+      </delegateCommandHandler>
+   </extension>
+</plugin>
