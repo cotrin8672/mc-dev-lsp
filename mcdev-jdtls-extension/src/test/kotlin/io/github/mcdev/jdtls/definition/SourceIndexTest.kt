@@ -79,6 +79,34 @@ class SourceIndexTest {
     }
 
     @Test
+    fun resolvesSameArityOverloadByParameterDescriptor() {
+        val source = """
+            package com.example.target;
+
+            public class OverloadedTarget {
+                public void setValue(int value) {
+                }
+
+                public void setValue(String value) {
+                }
+            }
+        """.trimIndent()
+        val uri = "${JdtlsFixtureSupport.workspaceUri(tempDir)}/src/main/java/com/example/target/OverloadedTarget.java"
+        val index = SourceIndex.fromEntries(listOf(SourceScanEntry(uri, source)))
+        val resolved = index.resolve(
+            McDefinitionTarget(
+                kind = MemberKind.METHOD,
+                ownerInternalName = "com/example/target/OverloadedTarget",
+                ownerFqn = "com.example.target.OverloadedTarget",
+                name = "setValue",
+                descriptor = "(Ljava/lang/String;)V",
+            ),
+        )
+        assertEquals(McdevDefinitionResolution.SOURCE, resolved.resolution)
+        assertEquals(6, resolved.range.start.line)
+    }
+
+    @Test
     fun returnsUnresolvedWhenSourceFileMissing() {
         val index = SourceIndex.fromEntries(emptyList())
         val resolved = index.resolve(

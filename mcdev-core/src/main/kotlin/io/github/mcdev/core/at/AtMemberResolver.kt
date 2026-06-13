@@ -41,23 +41,24 @@ class AtMemberResolver(
         classIndex: ClassIndex,
         mappingContext: ProjectMappingContext?,
     ): AtMemberResolution {
-        val namedMethod = classIndex.getMethods(ownerInternalName).find { it.name == memberName }
-        if (namedMethod != null) {
-            return resolveNamedMethod(namedMethod, memberName, memberDescriptor, mappingContext, ownerInternalName)
+        val namedMethods = classIndex.getMethods(ownerInternalName).filter { it.name == memberName }
+        if (namedMethods.isNotEmpty()) {
+            return resolveNamedMethod(namedMethods, memberName, memberDescriptor, mappingContext, ownerInternalName)
         }
         val namedField = classIndex.getFields(ownerInternalName).find { it.name == memberName }
         if (namedField != null) {
             return resolveNamedField(namedField, memberName, mappingContext, ownerInternalName)
         }
 
-        val targetNamespace = mappingContext?.atNamespace
-        if (targetNamespace != null && mappingContext != null) {
+        val mappings = mappingContext
+        val targetNamespace = mappings?.atNamespace
+        if (targetNamespace != null) {
             resolveByRemappedName(
                 ownerInternalName = ownerInternalName,
                 memberName = memberName,
                 memberDescriptor = memberDescriptor,
                 classIndex = classIndex,
-                mappingContext = mappingContext,
+                mappingContext = mappings,
                 targetNamespace = targetNamespace,
             )?.let { return it }
         }
@@ -65,12 +66,13 @@ class AtMemberResolver(
     }
 
     private fun resolveNamedMethod(
-        method: MethodIndexEntry,
+        methods: List<MethodIndexEntry>,
         memberName: String,
         memberDescriptor: String?,
         mappingContext: ProjectMappingContext?,
         ownerInternalName: String,
     ): AtMemberResolution {
+        val method = selectNamedMethod(methods, memberDescriptor)
         val targetNamespace = mappingContext?.atNamespace
         if (targetNamespace != null && targetNamespace != mappingContext.sourceNamespace) {
             val remapped = insertFormatter.remapMethodForEntry(ownerInternalName, method, mappingContext)
@@ -115,6 +117,15 @@ class AtMemberResolver(
             ),
         )
     }
+
+    private fun selectNamedMethod(
+        methods: List<MethodIndexEntry>,
+        memberDescriptor: String?,
+    ): MethodIndexEntry =
+        when {
+            memberDescriptor != null -> methods.find { it.descriptor == memberDescriptor } ?: methods.first()
+            else -> methods.first()
+        }
 
     private fun resolveNamedField(
         field: FieldIndexEntry,
@@ -166,7 +177,7 @@ class AtMemberResolver(
                     return AtMemberResolution.MappingNotFound(namedName = method.name, kind = MemberKind.METHOD)
                 }
                 if (memberDescriptor != null && expectedDescriptor != null && memberDescriptor != expectedDescriptor) {
-                    return AtMemberResolution.NotFound
+                    continue
                 }
                 return AtMemberResolution.Found(
                     ResolvedAtMember(

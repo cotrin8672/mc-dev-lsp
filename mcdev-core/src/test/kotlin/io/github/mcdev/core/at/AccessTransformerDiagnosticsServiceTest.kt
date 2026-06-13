@@ -1,5 +1,8 @@
 package io.github.mcdev.core.at
 
+import io.github.mcdev.core.mixin.ClassIndexEntry
+import io.github.mcdev.core.mixin.FakeClassIndex
+import io.github.mcdev.core.mixin.MethodIndexEntry
 import kotlin.test.Test
 import kotlin.test.assertTrue
 
@@ -101,6 +104,31 @@ class AccessTransformerDiagnosticsServiceTest {
             AtTestFixtures.fabricMappingContext,
         )
         assertTrue(diagnostics.any { it.code == AtDiagnosticCodes.INVALID_DESCRIPTOR })
+    }
+
+    @Test
+    fun acceptsDescriptorMatchingLaterOverload() {
+        val owner = ClassIndexEntry(
+            simpleName = "OverloadedTarget",
+            packageName = "com.example.target",
+            internalName = "com/example/target/OverloadedTarget",
+        )
+        val classIndex = FakeClassIndex(
+            classes = listOf(owner),
+            methods = mapOf(
+                owner.internalName to listOf(
+                    MethodIndexEntry("setValue", "(I)V", false, "setValue(int): void"),
+                    MethodIndexEntry("setValue", "(Ljava/lang/String;)V", false, "setValue(String): void"),
+                ),
+            ),
+        )
+        val diagnostics = AccessTransformerDiagnosticsService(
+            classIndex = classIndex,
+            mappingContext = AtTestFixtures.fabricMappingContext,
+        ).analyze(
+            AtDiagnosticRequest("public com.example.target.OverloadedTarget setValue(Ljava/lang/String;)V"),
+        )
+        assertTrue(diagnostics.none { it.code == AtDiagnosticCodes.INVALID_DESCRIPTOR })
     }
 
     private fun analyze(

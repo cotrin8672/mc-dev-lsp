@@ -55,12 +55,10 @@ class SourceIndex private constructor(
         }
         val match = when {
             descriptor.isNullOrBlank() -> candidates.singleOrNull() ?: candidates.first()
-            candidates.size == 1 -> candidates.first()
             else -> {
-                val expectedParams = countDescriptorParameters(descriptor)
                 candidates.firstOrNull { candidate ->
-                    countSourceParameters(candidate.groupValues[2]) == expectedParams
-                } ?: candidates.first()
+                    sourceParametersToDescriptor(file, candidate.groupValues[2]) == descriptor.substringBefore(')') + ")"
+                } ?: candidates.singleOrNull() ?: candidates.first()
             }
         }
         val nameStart = match.range.first + match.value.indexOf(methodName)
@@ -120,12 +118,19 @@ class SourceIndex private constructor(
             val files = entries.mapNotNull { entry ->
                 if (!entry.documentUri.endsWith(".java", ignoreCase = true)) return@mapNotNull null
                 val packageName = PACKAGE_PATTERN.find(entry.text)?.groupValues?.get(1).orEmpty()
+                val imports = IMPORT_PATTERN.findAll(entry.text)
+                    .associate { match ->
+                        val fqn = match.groupValues[1]
+                        fqn.substringAfterLast('.') to fqn
+                    }
                 val className = CLASS_PATTERN.find(entry.text)?.groupValues?.get(1) ?: return@mapNotNull null
                 val fqn = if (packageName.isEmpty()) className else "$packageName.$className"
                 IndexedJavaFile(
                     documentUri = entry.documentUri,
                     text = entry.text,
                     fqn = fqn,
+                    packageName = packageName,
+                    imports = imports,
                 )
             }
             return SourceIndex(files)
@@ -140,36 +145,73 @@ class SourceIndex private constructor(
                     Regex.escape(fieldName) + """\s*[;=]""",
             )
 
-        private fun countDescriptorParameters(descriptor: String): Int {
-            if (!descriptor.startsWith("(")) return 0
-            var index = 1
-            var count = 0
-            while (index < descriptor.length && descriptor[index] != ')') {
-                index += skipDescriptorType(descriptor, index)
-                count++
-            }
-            return count
-        }
+        private val IMPORT_PATTERN = Regex("""^\s*import\s+([\w.]+)\s*;""", RegexOption.MULTILINE)
+        private val PARAMETER_MODIFIER_PATTERN = Regex("""\b(?:final|volatile)\s+""")
+        private val ANNOTATION_PATTERN = Regex("""@\w+(?:\([^)]*\))?\s*""")
+        private val JAVA_LANG_TYPES = setOf(
+            "Boolean",
+            "Byte",
+            "Character",
+            "Class",
+            "Double",
+            "Float",
+            "Integer",
+            "Long",
+            "Object",
+            "Short",
+            "String",
+            "Void",
+        )
 
-        private fun skipDescriptorType(descriptor: String, start: Int): Int {
-            return when (descriptor.getOrNull(start)) {
-                'L' -> {
-                    val end = descriptor.indexOf(';', start)
-                    if (end < 0) descriptor.length - start else end - start + 1
-                }
-                '[' -> {
-                    var arrayIndex = start
-                    while (descriptor.getOrNull(arrayIndex) == '[') arrayIndex++
-                    skipDescriptorType(descriptor, arrayIndex) + (arrayIndex - start)
-                }
-                else -> 1
-            }
-        }
-
-        private fun countSourceParameters(parameterList: String): Int {
+        private fun sourceParametersToDescriptor(file: IndexedJavaFile, parameterList: String): String {
             val trimmed = parameterList.trim()
-            if (trimmed.isEmpty()) return 0
-            return trimmed.split(',').count { it.isNotBlank() }
+            if (trimmed.isEmpty()) return "()"
+            return trimmed.split(',')
+                .joinToString(prefix = "(", postfix = ")") { parameter ->
+                    sourceTypeToDescriptor(file, parameterToType(parameter))
+                }
+        }
+
+        private fun parameterToType(parameter: String): String {
+            val cleaned = parameter
+                .replace(ANNOTATION_PATTERN, "")
+                .replace(PARAMETER_MODIFIER_PATTERN, "")
+                .trim()
+            val beforeName = cleaned.substringBeforeLast(' ', cleaned)
+            return beforeName.replace("...", "[]").trim()
+        }
+
+        private fun sourceTypeToDescriptor(file: IndexedJavaFile, rawType: String): String {
+            var type = rawType.substringBefore('<').trim()
+            var arrays = 0
+            while (type.endsWith("[]")) {
+                arrays++
+                type = type.removeSuffix("[]").trim()
+            }
+            val base = when (type) {
+                "void" -> "V"
+                "boolean" -> "Z"
+                "byte" -> "B"
+                "char" -> "C"
+                "short" -> "S"
+                "int" -> "I"
+                "long" -> "J"
+                "float" -> "F"
+                "double" -> "D"
+                else -> objectTypeDescriptor(file, type)
+            }
+            return "[".repeat(arrays) + base
+        }
+
+        private fun objectTypeDescriptor(file: IndexedJavaFile, type: String): String {
+            val fqn = when {
+                type.contains('.') -> type
+                file.imports.containsKey(type) -> file.imports.getValue(type)
+                type in JAVA_LANG_TYPES -> "java.lang.$type"
+                file.packageName.isNotEmpty() -> "${file.packageName}.$type"
+                else -> type
+            }
+            return "L${fqn.replace('.', '/')};"
         }
 
         private fun isInsideComment(text: String, offset: Int): Boolean {
@@ -185,6 +227,8 @@ private data class IndexedJavaFile(
     val documentUri: String,
     val text: String,
     val fqn: String,
+    val packageName: String,
+    val imports: Map<String, String>,
 ) {
     fun rangeFor(range: IntRange): McTextRange {
         val start = offsetToPosition(range.first)
