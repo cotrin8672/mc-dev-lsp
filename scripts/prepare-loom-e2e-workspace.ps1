@@ -1,13 +1,12 @@
 param(
-    [ValidateSet("fabric-basic", "fabric-mixinextras", "fabric-aw-at", "multi-source-set", "forge-basic", "broken-diagnostics")]
-    [string]$Fixture = "fabric-basic"
+    [switch]$RunGenSources
 )
 
 $ErrorActionPreference = "Stop"
 
 $repoRoot = Split-Path -Parent $PSScriptRoot
-$workspaceRoot = Join-Path $repoRoot "build/e2e-workspace"
-$awAtFixtureRoot = "fixtures/fabric-aw-at"
+$workspaceRoot = Join-Path $repoRoot "build/e2e-loom-workspace"
+$fixtureRoot = "fixtures/fabric-loom-e2e"
 
 function Copy-FixtureResource {
     param(
@@ -45,7 +44,7 @@ function Copy-FixtureResource {
 
 function Copy-FixtureTree {
     param(
-        [string]$FixtureRoot,
+        [string]$FixtureRootName,
         [string]$DestinationRoot
     )
 
@@ -63,7 +62,7 @@ function Copy-FixtureTree {
     Add-Type -AssemblyName System.IO.Compression.FileSystem
     $zip = [System.IO.Compression.ZipFile]::OpenRead($sourceJar)
     try {
-        $prefix = "$FixtureRoot/"
+        $prefix = "$FixtureRootName/"
         foreach ($entry in $zip.Entries) {
             if (-not $entry.FullName.StartsWith($prefix)) { continue }
             $relative = $entry.FullName.Substring($prefix.Length).Replace('/', [IO.Path]::DirectorySeparatorChar)
@@ -87,37 +86,45 @@ if (Test-Path -LiteralPath $workspaceRoot) {
 }
 New-Item -ItemType Directory -Path $workspaceRoot -Force | Out-Null
 
-$fixtureRoot = "fixtures/$Fixture"
-Copy-FixtureTree -FixtureRoot $fixtureRoot -DestinationRoot $workspaceRoot
+Copy-FixtureTree -FixtureRootName $fixtureRoot -DestinationRoot $workspaceRoot
 
 $classResource = "fixtures/shared/classes/com/example/target/SimpleTarget.class"
-$classDestination = Join-Path $workspaceRoot "classpath/com/example/target/SimpleTarget.class"
-Copy-FixtureResource -ResourcePath $classResource -Destination $classDestination
+$classpathRoot = Join-Path $workspaceRoot "classpath-staging/com/example/target"
+New-Item -ItemType Directory -Path $classpathRoot -Force | Out-Null
+Copy-FixtureResource `
+    -ResourcePath $classResource `
+    -Destination (Join-Path $classpathRoot "SimpleTarget.class")
 
-if ($Fixture -eq "fabric-basic") {
-    $awAtResources = @(
-        "src/main/resources/mod.accesswidener",
-        "src/main/resources/mod_at.cfg"
-    )
+$loomJarDir = Join-Path $workspaceRoot ".gradle/loom-cache/remapped_working"
+New-Item -ItemType Directory -Path $loomJarDir -Force | Out-Null
+$loomJar = Join-Path $loomJarDir "minecraft-client-mapped.jar"
+if (Test-Path -LiteralPath $loomJar) {
+    Remove-Item -LiteralPath $loomJar -Force
+}
 
-    foreach ($relative in $awAtResources) {
-        $resourcePath = "$awAtFixtureRoot/$relative"
-        $destination = Join-Path $workspaceRoot $relative
-        Copy-FixtureResource -ResourcePath $resourcePath -Destination $destination
-    }
+Push-Location $workspaceRoot
+try {
+    & jar --create --file $loomJar -C "classpath-staging" "com/example/target/SimpleTarget.class"
+    if ($LASTEXITCODE -ne 0) { throw "failed to create loom remapped jar" }
+} finally {
+    Pop-Location
+}
 
-    $fabricModPath = Join-Path $workspaceRoot "fabric.mod.json"
-    if (Test-Path -LiteralPath $fabricModPath) {
-        $fabricMod = Get-Content -LiteralPath $fabricModPath -Raw | ConvertFrom-Json
-        $fabricMod | Add-Member -NotePropertyName "accessWidener" -NotePropertyValue "mod.accesswidener" -Force
-        $fabricMod | ConvertTo-Json -Depth 10 | Set-Content -LiteralPath $fabricModPath -Encoding utf8
+Remove-Item -LiteralPath (Join-Path $workspaceRoot "classpath-staging") -Recurse -Force
+
+if ($RunGenSources -or $env:MCDEV_LOOM_RUN_GEN_SOURCES -eq "1") {
+    Write-Host "MCDEV_LOOM_RUN_GEN_SOURCES is set; attempting gradlew genSources (requires network)"
+    if (-not (Test-Path -LiteralPath (Join-Path $workspaceRoot "gradlew"))) {
+        Write-Warning "gradlew is not bundled in the loom fixture; skipping live genSources"
+    } else {
+        Push-Location $workspaceRoot
+        try {
+            & .\gradlew.bat --no-daemon genSources
+            if ($LASTEXITCODE -ne 0) { throw "gradlew genSources failed" }
+        } finally {
+            Pop-Location
+        }
     }
 }
 
-if ($Fixture -eq "fabric-aw-at") {
-    Copy-FixtureResource `
-        -ResourcePath "fixtures/fabric-basic/src/main/java/com/example/target/SimpleTarget.java" `
-        -Destination (Join-Path $workspaceRoot "src/main/java/com/example/target/SimpleTarget.java")
-}
-
-Write-Host "e2e workspace prepared for $Fixture at $workspaceRoot"
+Write-Host "loom e2e workspace prepared at $workspaceRoot"
