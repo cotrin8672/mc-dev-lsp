@@ -42,6 +42,8 @@ data class McdevLocation(
     val documentUri: String,
     val range: McdevRange,
     val metadata: Map<String, String> = emptyMap(),
+    val resolution: McdevDefinitionResolution = McdevDefinitionResolution.UNRESOLVED,
+    val resolutionMessage: String? = null,
 )
 
 data class McdevInfoRequest(
