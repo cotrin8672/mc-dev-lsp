@@ -45,12 +45,27 @@ mcdev-jdtls-extension/build/libs/io.github.mcdev.jdtls-0.1.0-SNAPSHOT.jar
 
 ## Neovim Setup
 
+Build the JDT LS extension jar first:
+
+```powershell
+gradle :mcdev-jdtls-extension:jar
+```
+
+Then add two pieces to Neovim:
+
+1. load `mcdev-nvim`
+2. pass the extension jar to JDT LS through `init_options.bundles`
+
 `mcdev-nvim` is opt-in. Calling `setup()` records configuration and creates the `:McdevInfo` / `:McdevReindex` commands, but it does not install keymaps and does not enable completion or diagnostics unless configured.
 
+Minimal local-checkout setup:
+
 ```lua
+vim.opt.runtimepath:prepend("/path/to/mc-dev-lsp/mcdev-nvim")
+
 require("mcdev").setup({
   jdtls = {
-    extension_jar = "/path/to/io.github.mcdev.jdtls.jar",
+    extension_jar = "/path/to/mc-dev-lsp/mcdev-jdtls-extension/build/libs/io.github.mcdev.jdtls-0.1.0-SNAPSHOT.jar",
   },
   completion = {
     enable = true,
@@ -62,6 +77,7 @@ local mcdev = require("mcdev")
 
 require("jdtls").start_or_attach({
   cmd = { "jdtls" },
+  root_dir = require("jdtls.setup").find_root({ "build.gradle", "build.gradle.kts", "pom.xml", ".git" }),
   init_options = {
     bundles = {
       mcdev.extension_jar(),
@@ -70,7 +86,73 @@ require("jdtls").start_or_attach({
 })
 ```
 
+With Lazy.nvim, the same setup usually looks like this:
+
+```lua
+local mcdev_root = "/path/to/mc-dev-lsp"
+local mcdev_jar = mcdev_root .. "/mcdev-jdtls-extension/build/libs/io.github.mcdev.jdtls-0.1.0-SNAPSHOT.jar"
+
+return {
+  {
+    name = "mcdev-nvim",
+    dir = mcdev_root .. "/mcdev-nvim",
+    lazy = false,
+    config = function()
+      require("mcdev").setup({
+        jdtls = {
+          extension_jar = mcdev_jar,
+        },
+        completion = {
+          enable = true,
+          source = "blink", -- blink | cmp | omnifunc
+        },
+        diagnostics = {
+          enable = true,
+        },
+      })
+    end,
+  },
+  {
+    "mfussenegger/nvim-jdtls",
+    dependencies = { "mcdev-nvim" },
+    ft = "java",
+    config = function()
+      local jdtls = require("jdtls")
+      local mcdev = require("mcdev")
+
+      jdtls.start_or_attach({
+        cmd = { "jdtls" },
+        root_dir = jdtls.setup.find_root({ "build.gradle", "build.gradle.kts", "pom.xml", ".git" }),
+        init_options = {
+          bundles = {
+            mcdev.extension_jar(),
+          },
+        },
+      })
+    end,
+  },
+}
+```
+
 Use your normal Neovim keymap layer for navigation and code actions. The current JDT LS bundle exposes mcdev navigation through `workspace/executeCommand` commands (`mcdev.definition`, `mcdev.references`); it does not contribute to JDT LS `textDocument/definition` directly.
+
+Example navigation keymap:
+
+```lua
+vim.keymap.set("n", "gd", function()
+  require("mcdev.navigation").definition(0, nil, function(locations, err)
+    if err then
+      vim.notify(tostring(err), vim.log.levels.WARN)
+      return
+    end
+    if locations and locations[1] then
+      vim.lsp.util.show_document(locations[1], "utf-8", { focus = true })
+      return
+    end
+    vim.lsp.buf.definition()
+  end)
+end)
+```
 
 See [docs/lazy-nvim.md](docs/lazy-nvim.md) for a complete Lazy.nvim configuration.
 
