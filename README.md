@@ -22,7 +22,8 @@ The repository follows the design dossier in [docs](docs/README.md). Kotlin owns
 
 ## User documentation
 
-- [Installation](docs/installation.md) — prerequisites, prebuilt jar, build from source
+- [Installation](docs/installation.md) — prerequisites, Mason, prebuilt jar, build from source
+- [Mason setup](docs/mason.md) — install the JDT LS extension bundle through a custom Mason registry
 - [Lazy.nvim setup](docs/lazy-nvim.md) — full Lazy spec with mcdev-nvim and jdtls bundles
 - [Troubleshooting](docs/troubleshooting.md) — bundle loading, workspace root, AW/AT buffers, diagnostics
 - [Contributing](docs/contributing.md) — architecture boundaries and the no-Lua-semantics rule
@@ -45,7 +46,26 @@ mcdev-jdtls-extension/build/libs/io.github.mcdev.jdtls-0.1.0-SNAPSHOT.jar
 
 ## Neovim Setup
 
-Build the JDT LS extension jar first:
+Install the JDT LS extension jar through the mcdev Mason registry, or build it locally.
+
+Mason registry setup:
+
+```lua
+require("mason").setup({
+  registries = {
+    "github:cotrin8672/mc-dev-lsp",
+    "github:mason-org/mason-registry",
+  },
+})
+```
+
+Then install:
+
+```vim
+:MasonInstall mcdev-jdtls-extension
+```
+
+For local development, build the jar directly:
 
 ```powershell
 gradle :mcdev-jdtls-extension:jar
@@ -54,7 +74,7 @@ gradle :mcdev-jdtls-extension:jar
 Then add two pieces to Neovim:
 
 1. load `mcdev-nvim`
-2. pass the extension jar to JDT LS through `init_options.bundles`
+2. pass the resolved extension jar to JDT LS through `init_options.bundles`
 
 `mcdev-nvim` is opt-in. Calling `setup()` records configuration and creates the `:McdevInfo` / `:McdevReindex` commands, but it does not install keymaps and does not enable completion or diagnostics unless configured.
 
@@ -64,33 +84,26 @@ Minimal local-checkout setup:
 vim.opt.runtimepath:prepend("/path/to/mc-dev-lsp/mcdev-nvim")
 
 require("mcdev").setup({
-  jdtls = {
-    extension_jar = "/path/to/mc-dev-lsp/mcdev-jdtls-extension/build/libs/io.github.mcdev.jdtls-0.1.0-SNAPSHOT.jar",
-  },
   completion = {
     enable = true,
     source = "blink", -- blink | cmp | omnifunc
   },
 })
 
-local mcdev = require("mcdev")
-
-require("jdtls").start_or_attach({
+local config = {
   cmd = { "jdtls" },
   root_dir = require("jdtls.setup").find_root({ "build.gradle", "build.gradle.kts", "pom.xml", ".git" }),
-  init_options = {
-    bundles = {
-      mcdev.extension_jar(),
-    },
-  },
-})
+}
+
+if require("mcdev.jdtls").extend_config(config) then
+  require("jdtls").start_or_attach(config)
+end
 ```
 
 With Lazy.nvim, the same setup usually looks like this:
 
 ```lua
 local mcdev_root = "/path/to/mc-dev-lsp"
-local mcdev_jar = mcdev_root .. "/mcdev-jdtls-extension/build/libs/io.github.mcdev.jdtls-0.1.0-SNAPSHOT.jar"
 
 return {
   {
@@ -99,9 +112,6 @@ return {
     lazy = false,
     config = function()
       require("mcdev").setup({
-        jdtls = {
-          extension_jar = mcdev_jar,
-        },
         completion = {
           enable = true,
           source = "blink", -- blink | cmp | omnifunc
@@ -118,17 +128,15 @@ return {
     ft = "java",
     config = function()
       local jdtls = require("jdtls")
-      local mcdev = require("mcdev")
 
-      jdtls.start_or_attach({
+      local config = {
         cmd = { "jdtls" },
         root_dir = jdtls.setup.find_root({ "build.gradle", "build.gradle.kts", "pom.xml", ".git" }),
-        init_options = {
-          bundles = {
-            mcdev.extension_jar(),
-          },
-        },
-      })
+      }
+
+      if require("mcdev.jdtls").extend_config(config) then
+        jdtls.start_or_attach(config)
+      end
     end,
   },
 }

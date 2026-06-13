@@ -11,6 +11,7 @@ local convert = require("mcdev.convert")
 local navigation = require("mcdev.navigation")
 local diagnostics = require("mcdev.diagnostics")
 local code_action = require("mcdev.code_action")
+local jdtls_helper = require("mcdev.jdtls")
 
 mcdev.setup({
   jdtls = {
@@ -24,6 +25,49 @@ mcdev.setup({
 })
 
 helpers.assert_eq(mcdev.extension_jar(), "build/libs/io.github.mcdev.jdtls.jar")
+
+local original_jdtls_options = vim.deepcopy(config.options.jdtls)
+local mason_root = vim.fn.tempname()
+local mason_jar = mason_root .. "/share/mcdev-jdtls-extension/io.github.mcdev.jdtls.jar"
+vim.fn.mkdir(vim.fn.fnamemodify(mason_jar, ":h"), "p")
+vim.fn.writefile({}, mason_jar)
+config.options.jdtls.extension_jar = nil
+config.options.jdtls.mason = {
+  enabled = true,
+  package = "mcdev-jdtls-extension",
+  jar = "io.github.mcdev.jdtls.jar",
+  root = mason_root,
+}
+helpers.assert_eq(mcdev.extension_jar(), mason_jar)
+
+local jdtls_config = {
+  init_options = {
+    bundles = { "existing.jar" },
+  },
+}
+helpers.assert_eq(jdtls_helper.extend_config(jdtls_config), jdtls_config)
+helpers.assert_eq(#jdtls_config.init_options.bundles, 2)
+helpers.assert_eq(jdtls_config.init_options.bundles[2], mason_jar)
+jdtls_helper.extend_config(jdtls_config)
+helpers.assert_eq(#jdtls_config.init_options.bundles, 2)
+
+local original_lsp_start = vim.lsp.start
+local started_config = nil
+vim.lsp.start = function(start_opts)
+  started_config = start_opts
+  return 42
+end
+helpers.assert_eq(jdtls_helper.start_or_attach({
+  root_dir = "/project",
+  cmd = { "jdtls" },
+  init_options = {
+    bundles = { "debug.jar" },
+  },
+}), 42)
+helpers.assert_eq(started_config.init_options.bundles[1], "debug.jar")
+helpers.assert_eq(started_config.init_options.bundles[2], mason_jar)
+vim.lsp.start = original_lsp_start
+config.options.jdtls = original_jdtls_options
 
 local item = completion.to_lsp_item({
   label = "setScreen(Screen): void",

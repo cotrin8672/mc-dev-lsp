@@ -2,6 +2,14 @@ local config = require("mcdev.config")
 
 local M = {}
 
+local function path_join(...)
+  return table.concat({ ... }, "/")
+end
+
+local function readable(path)
+  return path and vim.fn.filereadable(path) == 1
+end
+
 local function default_jdtls_cmd()
   local mason_cmd = vim.fn.stdpath("data") .. "/mason/bin/jdtls"
   if vim.fn.executable(mason_cmd) == 1 then
@@ -13,12 +21,84 @@ local function default_jdtls_cmd()
   return nil
 end
 
+local function mason_root()
+  if vim.env.MASON and vim.env.MASON ~= "" then
+    return vim.env.MASON
+  end
+  return vim.fn.stdpath("data") .. "/mason"
+end
+
+local function mason_candidates(opts)
+  local mason = opts or config.options.jdtls.mason or {}
+  local package = mason.package or "mcdev-jdtls-extension"
+  local jar = mason.jar or "io.github.mcdev.jdtls.jar"
+  local root = mason.root or mason_root()
+  return {
+    path_join(root, "share", package, jar),
+    path_join(root, "packages", package, jar),
+  }
+end
+
+function M.resolve_extension_jar(opts)
+  opts = opts or {}
+  local explicit = opts.extension_jar or config.options.jdtls.extension_jar
+  if explicit and explicit ~= "" then
+    return explicit
+  end
+
+  if readable(vim.env.MCDEV_JDTLS_EXTENSION_JAR) then
+    return vim.env.MCDEV_JDTLS_EXTENSION_JAR
+  end
+
+  local mason = opts.mason or config.options.jdtls.mason or {}
+  if mason.enabled == false then
+    return explicit
+  end
+
+  for _, candidate in ipairs(mason_candidates(mason)) do
+    if readable(candidate) then
+      return candidate
+    end
+  end
+
+  return explicit
+end
+
+local function missing_jar_message()
+  local mason = config.options.jdtls.mason or {}
+  local package = mason.package or "mcdev-jdtls-extension"
+  return "mcdev: extension jar is not configured or readable; install with :MasonInstall "
+    .. package
+    .. " or set jdtls.extension_jar"
+end
+
+function M.extend_config(jdtls_config, opts)
+  jdtls_config = jdtls_config or {}
+  opts = opts or {}
+  local extension_jar = M.resolve_extension_jar(opts)
+  if not readable(extension_jar) then
+    vim.notify(missing_jar_message(), vim.log.levels.ERROR)
+    return nil
+  end
+
+  jdtls_config.init_options = jdtls_config.init_options or {}
+  local bundles = jdtls_config.init_options.bundles or {}
+  for _, bundle in ipairs(bundles) do
+    if bundle == extension_jar then
+      return jdtls_config
+    end
+  end
+  table.insert(bundles, extension_jar)
+  jdtls_config.init_options.bundles = bundles
+  return jdtls_config
+end
+
 function M.start_or_attach(opts)
   opts = opts or {}
   local root_dir = opts.root_dir or vim.fn.getcwd()
-  local extension_jar = opts.extension_jar or config.options.jdtls.extension_jar
+  local extension_jar = M.resolve_extension_jar(opts)
   if not extension_jar or vim.fn.filereadable(extension_jar) ~= 1 then
-    vim.notify("mcdev: extension jar is not configured or readable", vim.log.levels.ERROR)
+    vim.notify(missing_jar_message(), vim.log.levels.ERROR)
     return nil
   end
 
@@ -34,17 +114,34 @@ function M.start_or_attach(opts)
     cmd = { jdtls_cmd, "-data", data_dir }
   end
 
-  local init_options = vim.tbl_deep_extend("force", opts.init_options or {}, {
-    bundles = { extension_jar },
-  })
+  local init_options = vim.deepcopy(opts.init_options or {})
+  init_options.bundles = init_options.bundles or {}
+  local has_bundle = false
+  for _, bundle in ipairs(init_options.bundles) do
+    if bundle == extension_jar then
+      has_bundle = true
+      break
+    end
+  end
+  if not has_bundle then
+    table.insert(init_options.bundles, extension_jar)
+  end
 
-  return vim.lsp.start(vim.tbl_extend("force", {
+  local start_opts = vim.tbl_extend("force", {
     name = "jdtls",
     cmd = cmd,
     root_dir = root_dir,
     init_options = init_options,
     capabilities = vim.lsp.protocol.make_client_capabilities(),
-  }, opts))
+  }, opts)
+  start_opts.cmd = cmd
+  start_opts.root_dir = root_dir
+  start_opts.init_options = init_options
+  start_opts.extension_jar = nil
+  start_opts.data_dir = nil
+  start_opts.mason = nil
+
+  return vim.lsp.start(start_opts)
 end
 
 return M

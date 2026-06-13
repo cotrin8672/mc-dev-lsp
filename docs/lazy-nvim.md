@@ -1,8 +1,25 @@
 # Lazy.nvim Setup
 
-This is a complete Lazy.nvim example for mcdev with Mason `jdtls`, `nvim-jdtls`, and blink.cmp.
+This is a complete Lazy.nvim example for mcdev with Mason `jdtls`, the mcdev Mason registry, `nvim-jdtls`, and blink.cmp.
 
-Adjust paths to match your checkout. On Windows, use forward slashes or escaped backslashes in Lua strings.
+Install the extension bundle first:
+
+```lua
+require("mason").setup({
+  registries = {
+    "github:cotrin8672/mc-dev-lsp",
+    "github:mason-org/mason-registry",
+  },
+})
+```
+
+```vim
+:MasonInstall mcdev-jdtls-extension
+```
+
+If Nix, a system package, or a local build owns the jar, set `jdtls.extension_jar` explicitly in `require("mcdev").setup()`.
+
+Adjust the plugin checkout path to match your machine. On Windows, use forward slashes or escaped backslashes in Lua strings.
 
 `mcdev-nvim` does not enable editor behavior by default. The example below explicitly enables completion and wires blink.cmp. Navigation and code actions remain user keymap choices.
 
@@ -10,7 +27,6 @@ Adjust paths to match your checkout. On Windows, use forward slashes or escaped 
 
 ```lua
 local mcdev_root = "C:/Users/you/ghq/github.com/cotrin8672/mc-dev-lsp"
-local mcdev_jar = mcdev_root .. "/mcdev-jdtls-extension/build/libs/io.github.mcdev.jdtls-0.1.0-SNAPSHOT.jar"
 
 return {
   -- mcdev Neovim plugin (local checkout)
@@ -20,9 +36,6 @@ return {
     lazy = false,
     config = function()
       require("mcdev").setup({
-        jdtls = {
-          extension_jar = mcdev_jar,
-        },
         completion = {
           enable = true,
           source = "blink",
@@ -43,7 +56,6 @@ return {
     ft = "java",
     config = function()
       local jdtls = require("jdtls")
-      local mcdev = require("mcdev")
 
       local mason_jdtls = vim.fn.stdpath("data") .. "/mason/bin/jdtls"
       local jdtls_cmd = vim.fn.executable(mason_jdtls) == 1 and mason_jdtls or "jdtls"
@@ -52,14 +64,11 @@ return {
       local config = {
         cmd = { jdtls_cmd, "-data", data_dir },
         root_dir = jdtls.setup.find_root({ "build.gradle", "build.gradle.kts", "pom.xml", ".git" }),
-        init_options = {
-          bundles = {
-            mcdev.extension_jar(),
-          },
-        },
       }
 
-      jdtls.start_or_attach(config)
+      if require("mcdev.jdtls").extend_config(config) then
+        jdtls.start_or_attach(config)
+      end
     end,
   },
 
@@ -85,23 +94,19 @@ return {
 }
 ```
 
-## Alternative: mcdev.jdtls helper
+## Alternative: mcdev.jdtls starter
 
-The repository includes a thin `mcdev.jdtls` helper that picks Mason `jdtls`, validates the extension jar, and injects `init_options.bundles`:
+The repository includes a thin `mcdev.jdtls` starter that picks Mason `jdtls`, validates the extension jar, and injects `init_options.bundles`:
 
 ```lua
-require("mcdev").setup({
-  jdtls = {
-    extension_jar = mcdev_jar,
-  },
-})
+require("mcdev").setup()
 
 require("mcdev.jdtls").start_or_attach({
   root_dir = vim.fn.getcwd(),
 })
 ```
 
-Use this for E2E workspaces or minimal configs. For normal mod development, prefer `nvim-jdtls` with `root_dir` detection as shown above.
+Use this for E2E workspaces or minimal configs. For normal mod development, prefer `nvim-jdtls` with `root_dir` detection and `require("mcdev.jdtls").extend_config(config)` as shown above.
 
 ## nvim-cmp instead of blink.cmp
 

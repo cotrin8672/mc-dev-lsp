@@ -1,0 +1,17 @@
+---
+# yaml-language-server: $schema=https://github.com/mason-org/registry-schema/releases/latest/download/package.schema.json
+name: mcdev-jdtls-extension
+description: JDT LS extension bundle for Minecraft modding semantic support in Neovim.
+homepage: https://github.com/cotrin8672/mc-dev-lsp
+licenses:
+  - proprietary
+languages:
+  - Java
+categories:
+  - LSP
+source:
+  id: pkg:github/cotrin8672/mc-dev-lsp@v0.1.0
+  asset:
+    file: io.github.mcdev.jdtls-{{ version | strip_prefix "v" }}.jar:io.github.mcdev.jdtls.jar
+share:
+  mcdev-jdtls-extension/io.github.mcdev.jdtls.jar: io.github.mcdev.jdtls.jar

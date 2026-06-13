@@ -3,6 +3,11 @@ local M = {}
 M.options = {
   jdtls = {
     extension_jar = nil,
+    mason = {
+      enabled = true,
+      package = "mcdev-jdtls-extension",
+      jar = "io.github.mcdev.jdtls.jar",
+    },
   },
   completion = {
     enable = false,

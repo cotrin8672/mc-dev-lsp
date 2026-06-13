@@ -47,6 +47,8 @@ The explicit non-goals are:
 
 - [Installation](installation.md)
   Prerequisites, prebuilt jar setup, and build from source.
+- [Mason Setup](mason.md)
+  Install the JDT LS extension bundle through the mcdev Mason registry.
 - [Lazy.nvim Setup](lazy-nvim.md)
   Full Lazy.nvim spec with mcdev-nvim path and jdtls bundles.
 - [Troubleshooting](troubleshooting.md)
@@ -107,4 +109,3 @@ Quick fixes are not limited to the current Java file. They must be able to updat
 - fix handler method signatures
 
 All workspace edits must be deterministic, minimal, and test-covered.
-

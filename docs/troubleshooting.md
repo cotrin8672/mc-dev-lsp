@@ -6,15 +6,16 @@ Error messages are designed to be actionable. If you see a generic failure, chec
 
 ## Extension bundle not loading
 
-### `mcdev: extension jar is not configured or readable`
+### `mcdev: extension jar is not configured or readable; install with :MasonInstall mcdev-jdtls-extension or set jdtls.extension_jar`
 
-`require("mcdev").setup()` was not called, or `jdtls.extension_jar` points to a missing file.
+mcdev could not resolve a readable JDT LS extension jar from explicit config, `MCDEV_JDTLS_EXTENSION_JAR`, or Mason.
 
 Fix:
 
-1. Build the jar: `gradle :mcdev-jdtls-extension:jar`
-2. Set an **absolute** path in setup.
-3. Confirm readability: `:lua print(vim.fn.filereadable(require('mcdev').extension_jar()))` should print `1`.
+1. Add the mcdev Mason registry and run `:MasonInstall mcdev-jdtls-extension`.
+2. Or build the jar: `gradle :mcdev-jdtls-extension:jar`
+3. If Mason does not own the jar, set an **absolute** path in `jdtls.extension_jar`.
+4. Confirm readability: `:lua print(vim.fn.filereadable(require('mcdev').extension_jar()))` should print `1`.
 
 ### `Java language server doesn't support the command 'mcdev.info'`
 
@@ -30,11 +31,9 @@ Checklist:
 Example bundle injection:
 
 ```lua
-init_options = {
-  bundles = {
-    require("mcdev").extension_jar(),
-  },
-},
+if require("mcdev.jdtls").extend_config(config) then
+  require("jdtls").start_or_attach(config)
+end
 ```
 
 ### `jdtls client did not initialize within 120s`

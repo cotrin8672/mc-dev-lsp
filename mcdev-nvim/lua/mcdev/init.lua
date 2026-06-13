@@ -53,7 +53,7 @@ function M.setup(opts)
 end
 
 function M.extension_jar()
-  return config.options.jdtls.extension_jar
+  return require("mcdev.jdtls").resolve_extension_jar()
 end
 
 function M.options()
