@@ -2,8 +2,11 @@ package io.github.mcdev.core.awat
 
 import io.github.mcdev.core.aw.AwDiagnosticCodes
 import io.github.mcdev.core.at.AtDiagnosticCodes
+import io.github.mcdev.core.codeaction.AddAtMethodDescriptorFix
+import io.github.mcdev.core.codeaction.RemoveDuplicateAccessWidenerEntryFix
 import io.github.mcdev.fixtures.FixturePaths
 import kotlin.test.Test
+import kotlin.test.assertIs
 import kotlin.test.assertTrue
 
 class AwAtServiceFacadeE2ETest {
@@ -97,6 +100,55 @@ class AwAtServiceFacadeE2ETest {
             AwAtE2ETestSupport.requestAtOffset(source, source.length, AwAtFileType.ACCESS_TRANSFORMER),
         )
         assertTrue(items.any { it.insertText == "method_1(Ljava/lang/String;FF)V" && it.metadata.source == "at.member.method" })
+    }
+
+    @Test
+    fun completesAccessWidenerMethodDescriptorSlotFromFixture() {
+        val source = """
+            accessWidener v2 named
+            accessible method com/example/target/SimpleTarget draw (Ljava/lang/Str
+        """.trimIndent()
+        val items = facade.complete(
+            AwAtE2ETestSupport.requestAtOffset(source, source.length, AwAtFileType.ACCESS_WIDENER),
+        )
+        assertTrue(items.any { it.insertText == "(Ljava/lang/String;FF)V" && it.metadata.source == "aw.descriptor" })
+    }
+
+    @Test
+    fun completesAccessTransformerFieldWithIntermediaryInsertText() {
+        val source = "public com.example.target.SimpleTarget cou"
+        val items = facade.complete(
+            AwAtE2ETestSupport.requestAtOffset(source, source.length, AwAtFileType.ACCESS_TRANSFORMER),
+        )
+        assertTrue(items.any { it.insertText == "field_1" && it.metadata.source == "at.member.field" })
+    }
+
+    @Test
+    fun codeActionsOffersRemoveDuplicateFixForAccessWidener() {
+        val source = """
+            accessWidener v2 named
+            accessible class com/example/target/SimpleTarget
+            accessible class com/example/target/SimpleTarget
+        """.trimIndent()
+        val fixes = facade.codeActions(
+            AwAtE2ETestSupport.requestAtOffset(source, 0, AwAtFileType.ACCESS_WIDENER),
+            AwDiagnosticCodes.DUPLICATE_ENTRY,
+        )
+        assertIs<RemoveDuplicateAccessWidenerEntryFix>(fixes.first())
+    }
+
+    @Test
+    fun codeActionsOffersAddDescriptorFixForMissingMethodDescriptor() {
+        val source = "public com.example.target.SimpleTarget draw"
+        val localFacade = AwAtServiceFacade(
+            classIndex = AwAtE2ETestSupport.simpleTargetClassIndex(),
+            mappingContext = null,
+        )
+        val fixes = localFacade.codeActions(
+            AwAtE2ETestSupport.requestAtOffset(source, 0, AwAtFileType.ACCESS_TRANSFORMER),
+            AtDiagnosticCodes.MISSING_METHOD_DESCRIPTOR,
+        )
+        assertIs<AddAtMethodDescriptorFix>(fixes.first())
     }
 
     @Test

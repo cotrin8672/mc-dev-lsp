@@ -1,11 +1,13 @@
 package io.github.mcdev.core.aw
 
+import io.github.mcdev.core.codeaction.FixAccessWidenerDescriptorFix
 import io.github.mcdev.core.codeaction.GenerateAccessWidenerEntryFix
 import io.github.mcdev.core.codeaction.RemoveDuplicateAccessWidenerEntryFix
 import io.github.mcdev.core.codeaction.RemapAccessWidenerEntryFix
 import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertIs
+import kotlin.test.assertNotNull
 import kotlin.test.assertTrue
 
 class AccessWidenerCodeActionServiceTest {
@@ -90,7 +92,21 @@ class AccessWidenerCodeActionServiceTest {
         """.trimIndent()
         val diagnostics = diagnostics(source)
         val fixes = service.fixesForDiagnostics(diagnostics, "file:///mod.accesswidener", source, classIndex)
-        assertTrue(fixes.isNotEmpty())
+        assertIs<FixAccessWidenerDescriptorFix>(fixes.first())
+    }
+
+    @Test
+    fun applyDescriptorFixReplacesWrongMethodDescriptor() {
+        val source = """
+        accessWidener v2 named
+        accessible method net/minecraft/client/MinecraftClient setScreen ()V
+        """.trimIndent()
+        val diagnostics = diagnostics(source)
+        val fix = service.fixesForDiagnostics(diagnostics, "file:///mod.accesswidener", source, classIndex)
+            .filterIsInstance<FixAccessWidenerDescriptorFix>()
+            .first()
+        val edit = assertNotNull(service.applyDescriptorFix(fix, source))
+        assertTrue(edit.edits.single().newText.contains("(Lnet/minecraft/client/gui/screen/Screen;)V"))
     }
 
     private fun diagnostics(

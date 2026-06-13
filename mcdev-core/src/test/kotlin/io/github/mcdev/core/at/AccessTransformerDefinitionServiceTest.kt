@@ -1,0 +1,61 @@
+package io.github.mcdev.core.at
+
+import io.github.mcdev.core.awat.AwAtE2ETestSupport
+import io.github.mcdev.core.awat.AwAtFileType
+import io.github.mcdev.core.model.MemberKind
+import io.github.mcdev.fixtures.FixturePaths
+import kotlin.test.Test
+import kotlin.test.assertEquals
+import kotlin.test.assertTrue
+
+class AccessTransformerDefinitionServiceTest {
+    private val service = AccessTransformerDefinitionService(
+        classIndex = AwAtE2ETestSupport.simpleTargetClassIndex(),
+        mappingContext = AwAtE2ETestSupport.fabricAwAtMappingContext(),
+    )
+
+    @Test
+    fun resolvesOwnerToClassDefinition() {
+        val source = AwAtE2ETestSupport.loadFixtureText(FixturePaths.FABRIC_AW_AT_ACCESS_TRANSFORMER)
+        val marker = "public com.example.target.Simple"
+        val offset = source.indexOf(marker) + marker.length
+        val request = AwAtE2ETestSupport.requestAtOffset(source, offset, AwAtFileType.ACCESS_TRANSFORMER)
+        val targets = service.definitionsAt(request.bufferText, request.line, request.character)
+        assertEquals(1, targets.size)
+        assertEquals(MemberKind.CLASS, targets.first().kind)
+        assertEquals(AwAtE2ETestSupport.SIMPLE_TARGET_INTERNAL, targets.first().ownerInternalName)
+    }
+
+    @Test
+    fun resolvesFieldMemberToFieldDefinition() {
+        val source = AwAtE2ETestSupport.loadFixtureText(FixturePaths.FABRIC_AW_AT_ACCESS_TRANSFORMER)
+        val marker = "public com.example.target.SimpleTarget counter"
+        val offset = source.indexOf(marker) + marker.indexOf("counter") + 3
+        val request = AwAtE2ETestSupport.requestAtOffset(source, offset, AwAtFileType.ACCESS_TRANSFORMER)
+        val targets = service.definitionsAt(request.bufferText, request.line, request.character)
+        assertEquals(1, targets.size)
+        assertEquals(MemberKind.FIELD, targets.first().kind)
+        assertEquals("counter", targets.first().name)
+    }
+
+    @Test
+    fun resolvesMethodMemberToMethodDefinition() {
+        val source = AwAtE2ETestSupport.loadFixtureText(FixturePaths.FABRIC_AW_AT_ACCESS_TRANSFORMER)
+        val marker = "protected com.example.target.SimpleTarget draw"
+        val offset = source.indexOf(marker) + marker.indexOf("draw") + 2
+        val request = AwAtE2ETestSupport.requestAtOffset(source, offset, AwAtFileType.ACCESS_TRANSFORMER)
+        val targets = service.definitionsAt(request.bufferText, request.line, request.character)
+        assertEquals(1, targets.size)
+        assertEquals(MemberKind.METHOD, targets.first().kind)
+        assertEquals("draw", targets.first().name)
+        assertTrue(targets.first().descriptor!!.contains("Ljava/lang/String;"))
+    }
+
+    @Test
+    fun returnsEmptyOnModifierSlot() {
+        val source = "pub"
+        val request = AwAtE2ETestSupport.requestAtOffset(source, source.length, AwAtFileType.ACCESS_TRANSFORMER)
+        val targets = service.definitionsAt(request.bufferText, request.line, request.character)
+        assertTrue(targets.isEmpty())
+    }
+}

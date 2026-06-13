@@ -2,16 +2,23 @@ package io.github.mcdev.core.awat
 
 import io.github.mcdev.core.at.AccessTransformerCodeActionService
 import io.github.mcdev.core.at.AccessTransformerCompletionService
+import io.github.mcdev.core.at.AccessTransformerDefinitionService
+import io.github.mcdev.core.at.AccessTransformerReferenceService
 import io.github.mcdev.core.at.AtContextExtractor
 import io.github.mcdev.core.at.AtDiagnosticRequest
 import io.github.mcdev.core.at.AccessTransformerDiagnosticsService
 import io.github.mcdev.core.aw.AccessWidenerCodeActionService
 import io.github.mcdev.core.aw.AccessWidenerCompletionService
+import io.github.mcdev.core.aw.AccessWidenerDefinitionService
 import io.github.mcdev.core.aw.AccessWidenerDiagnosticRequest
 import io.github.mcdev.core.aw.AccessWidenerDiagnosticsService
+import io.github.mcdev.core.aw.AccessWidenerReferenceService
 import io.github.mcdev.core.aw.AwContextExtractor
 import io.github.mcdev.core.codeaction.McFix
 import io.github.mcdev.core.completion.McCompletionItem
+import io.github.mcdev.core.definition.McDefinitionTarget
+import io.github.mcdev.core.definition.McReferenceLocation
+import io.github.mcdev.core.definition.SourceScanEntry
 import io.github.mcdev.core.diagnostics.McDiagnostic
 import io.github.mcdev.core.mapping.ProjectMappingContext
 import io.github.mcdev.core.mixin.ClassIndex
@@ -33,6 +40,10 @@ class AwAtServiceFacade(
     private val atCompletion: AccessTransformerCompletionService = AccessTransformerCompletionService(classIndex),
     private val atDiagnostics: AccessTransformerDiagnosticsService = AccessTransformerDiagnosticsService(classIndex, mappingContext),
     private val atCodeActions: AccessTransformerCodeActionService = AccessTransformerCodeActionService(classIndex, mappingContext),
+    private val awDefinitions: AccessWidenerDefinitionService = AccessWidenerDefinitionService(classIndex, mappingContext),
+    private val atDefinitions: AccessTransformerDefinitionService = AccessTransformerDefinitionService(classIndex, mappingContext),
+    private val awReferences: AccessWidenerReferenceService = AccessWidenerReferenceService(classIndex, mappingContext),
+    private val atReferences: AccessTransformerReferenceService = AccessTransformerReferenceService(classIndex),
 ) {
     fun complete(request: AwAtFacadeRequest): List<McCompletionItem> =
         when (request.fileType) {
@@ -66,6 +77,32 @@ class AwAtServiceFacade(
                     classIndex = classIndex,
                 ),
             )
+        }
+
+    fun definitionsAt(request: AwAtFacadeRequest): List<McDefinitionTarget> =
+        when (request.fileType) {
+            AwAtFileType.ACCESS_WIDENER -> awDefinitions.definitionsAt(
+                request.bufferText,
+                request.line,
+                request.character,
+            )
+            AwAtFileType.ACCESS_TRANSFORMER -> atDefinitions.definitionsAt(
+                request.bufferText,
+                request.line,
+                request.character,
+            )
+        }
+
+    fun findReferences(
+        target: McDefinitionTarget,
+        sources: List<SourceScanEntry>,
+    ): List<McReferenceLocation> =
+        sources.flatMap { entry ->
+            when (AwAtBufferSupport.detectFileType("", entry.documentUri)) {
+                AwAtFileType.ACCESS_WIDENER -> awReferences.findReferences(target, entry)
+                AwAtFileType.ACCESS_TRANSFORMER -> atReferences.findReferences(target, entry)
+                null -> emptyList()
+            }
         }
 
     fun codeActions(
