@@ -1,5 +1,6 @@
 package com.example.target;
 
+// Simulated Loom genSources output (attached to remapped jar, not mod sources)
 public class SimpleTarget {
     private int counter;
 

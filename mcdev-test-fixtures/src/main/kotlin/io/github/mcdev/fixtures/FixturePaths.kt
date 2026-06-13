@@ -9,6 +9,8 @@ object FixturePaths {
     const val NEOFORGE_BASIC = "$ROOT/neoforge-basic"
     const val BROKEN_DIAGNOSTICS = "$ROOT/broken-diagnostics"
     const val FABRIC_AW_AT = "$ROOT/fabric-aw-at"
+    const val MULTI_SOURCE_SET = "$ROOT/multi-source-set"
+    const val FABRIC_LOOM_E2E = "$ROOT/fabric-loom-e2e"
     const val SHARED_CLASSES = "$ROOT/shared/classes"
 
     const val FABRIC_BASIC_BUILD_GRADLE = "$FABRIC_BASIC/build.gradle"
@@ -41,6 +43,22 @@ object FixturePaths {
     const val FABRIC_AW_AT_ACCESS_WIDENER = "$FABRIC_AW_AT/src/main/resources/mod.accesswidener"
     const val FABRIC_AW_AT_ACCESS_TRANSFORMER = "$FABRIC_AW_AT/src/main/resources/mod_at.cfg"
 
+    const val MULTI_SOURCE_SET_BUILD_GRADLE = "$MULTI_SOURCE_SET/build.gradle"
+    const val MULTI_SOURCE_SET_FABRIC_MOD_JSON = "$MULTI_SOURCE_SET/fabric.mod.json"
+    const val MULTI_SOURCE_SET_MIXINS_JSON = "$MULTI_SOURCE_SET/mixins.json"
+    const val MULTI_SOURCE_SET_MAIN_MIXIN = "$MULTI_SOURCE_SET/src/main/java/com/example/mixin/MainMixin.java"
+    const val MULTI_SOURCE_SET_CLIENT_MIXIN = "$MULTI_SOURCE_SET/src/client/java/com/example/mixin/ClientMixin.java"
+    const val MULTI_SOURCE_SET_ACCESS_WIDENER = "$MULTI_SOURCE_SET/src/main/resources/mod.accesswidener"
+
+    const val FABRIC_LOOM_E2E_BUILD_GRADLE = "$FABRIC_LOOM_E2E/build.gradle"
+    const val FABRIC_LOOM_E2E_FABRIC_MOD_JSON = "$FABRIC_LOOM_E2E/fabric.mod.json"
+    const val FABRIC_LOOM_E2E_MIXINS_JSON = "$FABRIC_LOOM_E2E/mixins.json"
+    const val FABRIC_LOOM_E2E_MAPPINGS = "$FABRIC_LOOM_E2E/mappings.tiny"
+    const val FABRIC_LOOM_E2E_EXAMPLE_MIXIN = "$FABRIC_LOOM_E2E/src/main/java/com/example/mixin/ExampleMixin.java"
+    const val FABRIC_LOOM_E2E_MAPPED_SOURCE = "$FABRIC_LOOM_E2E/mapped-sources/com/example/target/SimpleTarget.java"
+    const val FABRIC_LOOM_E2E_PROJECT = "$FABRIC_LOOM_E2E/.project"
+    const val FABRIC_LOOM_E2E_CLASSPATH = "$FABRIC_LOOM_E2E/.classpath"
+
     const val SIMPLE_TARGET_CLASS = "$SHARED_CLASSES/com/example/target/SimpleTarget.class"
 
     val ALL_FIXTURE_ROOTS = listOf(
@@ -50,6 +68,8 @@ object FixturePaths {
         NEOFORGE_BASIC,
         BROKEN_DIAGNOSTICS,
         FABRIC_AW_AT,
+        MULTI_SOURCE_SET,
+        FABRIC_LOOM_E2E,
     )
 
     val REQUIRED_RESOURCES = listOf(
@@ -77,6 +97,20 @@ object FixturePaths {
         FABRIC_AW_AT_MAPPINGS,
         FABRIC_AW_AT_ACCESS_WIDENER,
         FABRIC_AW_AT_ACCESS_TRANSFORMER,
+        MULTI_SOURCE_SET_BUILD_GRADLE,
+        MULTI_SOURCE_SET_FABRIC_MOD_JSON,
+        MULTI_SOURCE_SET_MIXINS_JSON,
+        MULTI_SOURCE_SET_MAIN_MIXIN,
+        MULTI_SOURCE_SET_CLIENT_MIXIN,
+        MULTI_SOURCE_SET_ACCESS_WIDENER,
+        FABRIC_LOOM_E2E_BUILD_GRADLE,
+        FABRIC_LOOM_E2E_FABRIC_MOD_JSON,
+        FABRIC_LOOM_E2E_MIXINS_JSON,
+        FABRIC_LOOM_E2E_MAPPINGS,
+        FABRIC_LOOM_E2E_EXAMPLE_MIXIN,
+        FABRIC_LOOM_E2E_MAPPED_SOURCE,
+        FABRIC_LOOM_E2E_PROJECT,
+        FABRIC_LOOM_E2E_CLASSPATH,
         SIMPLE_TARGET_CLASS,
     )
 }

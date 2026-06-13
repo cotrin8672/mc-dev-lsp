@@ -1,0 +1,14 @@
+{
+  "schemaVersion": 1,
+  "id": "mcdev-fixture-multi-source-set",
+  "version": "1.0.0",
+  "name": "MCDev Multi Source Set Fixture",
+  "description": "Fabric mod fixture with main and client source sets",
+  "authors": ["mcdev"],
+  "license": "MIT",
+  "environment": "*",
+  "entrypoints": {},
+  "mixins": [
+    "mixins.json"
+  ]
+}
