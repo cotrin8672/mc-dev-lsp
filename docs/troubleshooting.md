@@ -185,7 +185,7 @@ protocol.request(protocol.commands.context, { context = protocol.context() }, fu
 end)
 ```
 
-By default `mcdev-nvim` only records configuration and creates `:McdevInfo` / `:McdevReindex`. Completion, diagnostics, navigation, and code actions are opt-in. Enable `diagnostics.enable = true` or call `mcdev.context` explicitly if you want mcdev diagnostics published into Neovim.
+By default `mcdev-nvim` records configuration, creates `:McdevInfo` / `:McdevReindex`, and registers completion adapters when possible. Diagnostics, navigation keymaps, and code-action keymaps are opt-in. Enable `diagnostics.enable = true` or call `mcdev.context` explicitly if you want mcdev diagnostics published into Neovim.
 
 ### Code actions
 

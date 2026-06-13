@@ -1,6 +1,6 @@
 # Lazy.nvim Setup
 
-This is a complete Lazy.nvim example for mcdev with Mason `jdtls`, the mcdev Mason registry, `nvim-jdtls`, and blink.cmp.
+This is a complete Lazy.nvim example for mcdev with Mason `jdtls`, the mcdev Mason registry, and `nvim-jdtls`.
 
 Install the extension bundle first:
 
@@ -21,7 +21,7 @@ If Nix, a system package, or a local build owns the jar, set `jdtls.extension_ja
 
 Adjust the plugin checkout path to match your machine. On Windows, use forward slashes or escaped backslashes in Lua strings.
 
-`mcdev-nvim` does not enable editor behavior by default. The example below explicitly enables completion and wires blink.cmp. Navigation and code actions remain user keymap choices.
+Completion is enabled by default. mcdev registers available blink.cmp / nvim-cmp adapters automatically and falls back to omnifunc. Navigation and code actions remain user keymap choices.
 
 ## Full spec
 
@@ -36,10 +36,6 @@ return {
     lazy = false,
     config = function()
       require("mcdev").setup({
-        completion = {
-          enable = true,
-          source = "blink",
-        },
         mappings = {
           preferred_at_target = "descriptor",
           mixin_class_insert = "import",
@@ -55,41 +51,8 @@ return {
     dependencies = { "mcdev-nvim" },
     ft = "java",
     config = function()
-      local jdtls = require("jdtls")
-
-      local mason_jdtls = vim.fn.stdpath("data") .. "/mason/bin/jdtls"
-      local jdtls_cmd = vim.fn.executable(mason_jdtls) == 1 and mason_jdtls or "jdtls"
-      local data_dir = vim.fn.stdpath("cache") .. "/mcdev-jdtls"
-
-      local config = {
-        cmd = { jdtls_cmd, "-data", data_dir },
-        root_dir = jdtls.setup.find_root({ "build.gradle", "build.gradle.kts", "pom.xml", ".git" }),
-      }
-
-      if require("mcdev.jdtls").extend_config(config) then
-        jdtls.start_or_attach(config)
-      end
+      require("mcdev.jdtls").start_or_attach()
     end,
-  },
-
-  -- blink.cmp with mcdev source
-  {
-    "Saghen/blink.cmp",
-    dependencies = { "mcdev-nvim" },
-    opts = {
-      sources = {
-        default = { "lsp", "mcdev" },
-        providers = {
-          mcdev = {
-            name = "mcdev",
-            module = "mcdev.blink",
-            enabled = function()
-              return require("mcdev.buffer").is_mcdev_buffer(0)
-            end,
-          },
-        },
-      },
-    },
   },
 }
 ```
@@ -100,17 +63,24 @@ The repository includes a thin `mcdev.jdtls` starter that picks Mason `jdtls`, v
 
 ```lua
 require("mcdev").setup()
-
-require("mcdev.jdtls").start_or_attach({
-  root_dir = vim.fn.getcwd(),
-})
+require("mcdev.jdtls").start_or_attach()
 ```
 
-Use this for E2E workspaces or minimal configs. For normal mod development, prefer `nvim-jdtls` with `root_dir` detection and `require("mcdev.jdtls").extend_config(config)` as shown above.
+If you already have a detailed `nvim-jdtls` setup, keep it and add mcdev before `start_or_attach`:
+
+```lua
+local config = require("my.java.jdtls").config()
+
+if require("mcdev.jdtls").extend_config(config) then
+  require("jdtls").start_or_attach(config)
+end
+```
+
+`extend_config(config)` only appends `init_options.bundles`; it does not change your command, root detection, settings, or capabilities.
 
 ## nvim-cmp instead of blink.cmp
 
-If you use nvim-cmp, set `completion.source = "cmp"` in `require("mcdev").setup()` and register the mcdev source after cmp loads:
+mcdev tries to register nvim-cmp automatically when it is available. If your completion manager loads after mcdev and you need explicit registration:
 
 ```lua
 {
@@ -129,7 +99,7 @@ If you use nvim-cmp, set `completion.source = "cmp"` in `require("mcdev").setup(
 }
 ```
 
-Blink and cmp share the same `mcdev.completion` command path. Do not implement separate semantic behavior in each adapter.
+Blink, cmp, and omnifunc share the same `mcdev.completion` command path. Do not implement separate semantic behavior in each adapter.
 
 ## Navigation and code actions
 

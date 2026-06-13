@@ -76,28 +76,15 @@ Then add two pieces to Neovim:
 1. load `mcdev-nvim`
 2. pass the resolved extension jar to JDT LS through `init_options.bundles`
 
-`mcdev-nvim` is opt-in. Calling `setup()` records configuration and creates the `:McdevInfo` / `:McdevReindex` commands, but it does not install keymaps and does not enable completion or diagnostics unless configured.
+`mcdev-nvim` keeps setup small. Calling `setup()` records configuration, creates the `:McdevInfo` / `:McdevReindex` commands, and registers completion adapters when possible. It does not install navigation or code-action keymaps unless configured.
 
 Minimal local-checkout setup:
 
 ```lua
 vim.opt.runtimepath:prepend("/path/to/mc-dev-lsp/mcdev-nvim")
 
-require("mcdev").setup({
-  completion = {
-    enable = true,
-    source = "blink", -- blink | cmp | omnifunc
-  },
-})
-
-local config = {
-  cmd = { "jdtls" },
-  root_dir = require("jdtls.setup").find_root({ "build.gradle", "build.gradle.kts", "pom.xml", ".git" }),
-}
-
-if require("mcdev.jdtls").extend_config(config) then
-  require("jdtls").start_or_attach(config)
-end
+require("mcdev").setup()
+require("mcdev.jdtls").start_or_attach()
 ```
 
 With Lazy.nvim, the same setup usually looks like this:
@@ -112,10 +99,6 @@ return {
     lazy = false,
     config = function()
       require("mcdev").setup({
-        completion = {
-          enable = true,
-          source = "blink", -- blink | cmp | omnifunc
-        },
         diagnostics = {
           enable = true,
         },
@@ -129,10 +112,7 @@ return {
     config = function()
       local jdtls = require("jdtls")
 
-      local config = {
-        cmd = { "jdtls" },
-        root_dir = jdtls.setup.find_root({ "build.gradle", "build.gradle.kts", "pom.xml", ".git" }),
-      }
+      local config = require("my.java.jdtls").config()
 
       if require("mcdev.jdtls").extend_config(config) then
         jdtls.start_or_attach(config)

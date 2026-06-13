@@ -11,31 +11,53 @@ local function setup_completion()
     return
   end
 
-  if opts.source == "omnifunc" then
+  local function setup_omnifunc()
     vim.api.nvim_create_autocmd("FileType", {
+      group = vim.api.nvim_create_augroup("mcdev-completion", { clear = true }),
       callback = function(args)
         if buffer.is_mcdev_buffer(args.buf) then
           vim.bo[args.buf].omnifunc = "v:lua.require'mcdev.omnifunc'.complete"
         end
       end,
     })
-    return
   end
 
-  if opts.source == "blink" then
+  local function setup_blink()
     local ok, blink_cmp = pcall(require, "blink.cmp")
     if ok and blink_cmp.add_source then
       blink_cmp.add_source("mcdev", require("mcdev.blink").new())
+      return true
     end
+    return false
+  end
+
+  local function setup_cmp()
+    local ok, cmp = pcall(require, "cmp")
+    if ok and cmp.register_source then
+      cmp.register_source("mcdev", require("mcdev.cmp").new())
+      return true
+    end
+    return false
+  end
+
+  if opts.source == "blink" then
+    setup_blink()
     return
   end
 
   if opts.source == "cmp" then
-    local ok, cmp = pcall(require, "cmp")
-    if ok and cmp.register_source then
-      cmp.register_source("mcdev", require("mcdev.cmp").new())
-    end
+    setup_cmp()
+    return
   end
+
+  if opts.source == "omnifunc" then
+    setup_omnifunc()
+    return
+  end
+
+  setup_blink()
+  setup_cmp()
+  setup_omnifunc()
 end
 
 function M.setup(opts)

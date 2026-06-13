@@ -21,6 +21,28 @@ local function default_jdtls_cmd()
   return nil
 end
 
+local function default_root_dir()
+  local markers = { "gradlew", "build.gradle", "build.gradle.kts", "pom.xml", ".git" }
+  local ok, jdtls_setup = pcall(require, "jdtls.setup")
+  if ok and jdtls_setup.find_root then
+    local root = jdtls_setup.find_root(markers)
+    if root and root ~= "" then
+      return root
+    end
+  end
+
+  if vim.fs and vim.fs.root then
+    local bufname = vim.api.nvim_buf_get_name(0)
+    local start = bufname ~= "" and bufname or vim.fn.getcwd()
+    local root = vim.fs.root(start, markers)
+    if root and root ~= "" then
+      return root
+    end
+  end
+
+  return vim.fn.getcwd()
+end
+
 local function mason_root()
   if vim.env.MASON and vim.env.MASON ~= "" then
     return vim.env.MASON
@@ -95,7 +117,7 @@ end
 
 function M.start_or_attach(opts)
   opts = opts or {}
-  local root_dir = opts.root_dir or vim.fn.getcwd()
+  local root_dir = opts.root_dir or default_root_dir()
   local extension_jar = M.resolve_extension_jar(opts)
   if not extension_jar or vim.fn.filereadable(extension_jar) ~= 1 then
     vim.notify(missing_jar_message(), vim.log.levels.ERROR)

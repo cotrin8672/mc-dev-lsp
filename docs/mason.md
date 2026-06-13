@@ -40,12 +40,7 @@ vim.fn.stdpath("data") .. "/mason"
 With Mason, `extension_jar` can usually be omitted:
 
 ```lua
-require("mcdev").setup({
-  completion = {
-    enable = true,
-    source = "blink",
-  },
-})
+require("mcdev").setup()
 ```
 
 Add the bundle to your existing `nvim-jdtls` config:
@@ -53,10 +48,7 @@ Add the bundle to your existing `nvim-jdtls` config:
 ```lua
 local jdtls = require("jdtls")
 
-local config = {
-  cmd = { "jdtls" },
-  root_dir = jdtls.setup.find_root({ "gradlew", "build.gradle", "build.gradle.kts", "pom.xml", ".git" }),
-}
+local config = require("my.java.jdtls").config()
 
 if require("mcdev.jdtls").extend_config(config) then
   jdtls.start_or_attach(config)
@@ -64,6 +56,13 @@ end
 ```
 
 `extend_config(config)` only appends the mcdev jar to `config.init_options.bundles`. It does not change `cmd`, `root_dir`, `settings`, `capabilities`, or other JDT LS options.
+
+For a minimal setup, mcdev can start JDT LS itself and infer the workspace root:
+
+```lua
+require("mcdev").setup()
+require("mcdev.jdtls").start_or_attach()
+```
 
 ## External Package Managers
 

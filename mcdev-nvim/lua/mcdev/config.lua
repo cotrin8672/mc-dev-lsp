@@ -10,8 +10,8 @@ M.options = {
     },
   },
   completion = {
-    enable = false,
-    source = "blink",
+    enable = true,
+    source = "auto",
   },
   diagnostics = {
     enable = false,

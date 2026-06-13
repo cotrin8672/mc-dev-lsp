@@ -12,7 +12,7 @@ mcdev runs as an OSGi bundle inside JDT LS. Neovim talks to it through `workspac
 | **Neovim 0.10+** | Uses `vim.lsp` APIs used by `mcdev-nvim`. |
 | **JDT LS** | Install through Mason (`:MasonInstall jdtls`) or provide your own `jdtls` on `PATH`. |
 | **nvim-jdtls** | Recommended for starting and attaching JDT LS to Gradle/Maven mod projects. |
-| **Completion plugin** | Optional. [blink.cmp](https://github.com/Saghen/blink.cmp), [nvim-cmp](https://github.com/hrsh7th/nvim-cmp), or omnifunc can be wired explicitly. |
+| **Completion plugin** | Optional. mcdev registers available blink.cmp / nvim-cmp adapters automatically and falls back to omnifunc. |
 
 Optional for building from source:
 
@@ -38,34 +38,40 @@ Then install the extension bundle:
 :MasonInstall mcdev-jdtls-extension
 ```
 
-Configure mcdev and append the resolved jar to your existing `nvim-jdtls` config:
+Minimal setup:
+
+```lua
+require("mcdev").setup()
+require("mcdev.jdtls").start_or_attach()
+```
+
+This starts Mason `jdtls` when available, resolves the mcdev extension jar, and infers the workspace root from Gradle/Maven/Git markers.
+
+If you already own an `nvim-jdtls` config, append mcdev to that config before starting JDT LS:
+
+```lua
+local config = require("my.java.jdtls").config()
+
+if require("mcdev.jdtls").extend_config(config) then
+  require("jdtls").start_or_attach(config)
+end
+```
+
+`extend_config(config)` only appends the mcdev bundle to `config.init_options.bundles`; it does not change your JDT LS command, root detection, settings, or capabilities.
+
+Optional behavior can still be configured:
 
 ```lua
 require("mcdev").setup({
-  completion = {
-    enable = true,
-    source = "blink", -- blink | cmp | omnifunc
-  },
   mappings = {
     preferred_at_target = "descriptor",
     mixin_class_insert = "import", -- import | fqn
     inject_method_descriptor = "auto", -- auto | always | never
   },
 })
-
-local jdtls = require("jdtls")
-
-local config = {
-  cmd = { vim.fn.stdpath("data") .. "/mason/bin/jdtls" },
-  root_dir = jdtls.setup.find_root({ "gradlew", "build.gradle", "build.gradle.kts", "pom.xml", ".git" }),
-}
-
-if require("mcdev.jdtls").extend_config(config) then
-  jdtls.start_or_attach(config)
-end
 ```
 
-`extend_config(config)` only appends the mcdev bundle to `config.init_options.bundles`; it does not change your JDT LS command, root detection, settings, or capabilities.
+Set `completion.enable = false` only if you do not want mcdev to register completion adapters.
 
 ## External jar path
 
@@ -85,16 +91,12 @@ Use this path for Nix, system packages, or local builds.
 
 3. Configure mcdev with the jar path and pass the jar to JDT LS through `init_options.bundles`.
 
-   `mcdev-nvim` is opt-in. `setup()` alone does not install keymaps or enable completion/diagnostics. Enable only the pieces you want:
+   `mcdev-nvim` does not install navigation or code-action keymaps. Completion is enabled by default; diagnostics are opt-in.
 
    ```lua
    require("mcdev").setup({
      jdtls = {
        extension_jar = "/absolute/path/to/io.github.mcdev.jdtls-0.1.0-SNAPSHOT.jar",
-     },
-     completion = {
-       enable = true,
-       source = "blink", -- blink | cmp | omnifunc
      },
      mappings = {
        preferred_at_target = "descriptor",
@@ -103,16 +105,10 @@ Use this path for Nix, system packages, or local builds.
      },
    })
 
-   local config = {
-     cmd = { vim.fn.stdpath("data") .. "/mason/bin/jdtls" },
-   }
-
-   if require("mcdev.jdtls").extend_config(config) then
-     require("jdtls").start_or_attach(config)
-   end
+   require("mcdev.jdtls").start_or_attach()
    ```
 
-4. Wire completion, diagnostics, navigation, and code actions through your own Neovim plugin config or keymaps. The Lazy.nvim example shows blink.cmp source wiring.
+4. Wire navigation and code actions through your own keymaps if you want mcdev-specific commands before normal LSP fallbacks.
 
 5. Open a Minecraft mod workspace (Fabric, Forge, or NeoForge Gradle project) and run `:McdevInfo` in a Java buffer.
 
