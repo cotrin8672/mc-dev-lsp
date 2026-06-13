@@ -2,7 +2,16 @@ package io.github.mcdev.jdtls.protocol
 
 import io.github.mcdev.protocol.McdevCodeActionRequest
 import io.github.mcdev.protocol.McdevCompletionRequest
+import io.github.mcdev.core.diagnostics.McTextPosition
+import io.github.mcdev.core.diagnostics.McTextRange
+import io.github.mcdev.core.definition.McDefinitionTarget
+import io.github.mcdev.core.model.MemberKind
+import io.github.mcdev.jdtls.convert.DefinitionConverter
+import io.github.mcdev.jdtls.definition.ResolvedDefinition
 import io.github.mcdev.protocol.McdevDefinitionRequest
+import io.github.mcdev.protocol.McdevDefinitionResolution
+import io.github.mcdev.protocol.McdevDefinitionResponse
+import io.github.mcdev.protocol.McdevResponseEnvelope
 import io.github.mcdev.protocol.McdevProtocol
 import io.github.mcdev.protocol.McdevReferencesRequest
 import io.github.mcdev.protocol.McdevRequestContext
@@ -113,6 +122,34 @@ class ProtocolPayloadDecoderTest {
         val encoded = decoder.encodeToMap(original)
         val restored = decoder.decodeFromMap(encoded, McdevDefinitionRequest::class.java)
         assertEquals(original, restored)
+    }
+
+    @Test
+    fun encodeDefinitionResponseUsesLowercaseResolutionWireValues() {
+        val target = McDefinitionTarget(
+            kind = MemberKind.CLASS,
+            ownerInternalName = "com/example/target/SimpleTarget",
+            ownerFqn = "com.example.target.SimpleTarget",
+        )
+        val envelope = McdevResponseEnvelope(
+            capabilities = setOf("definition"),
+            result = McdevDefinitionResponse(
+                locations = listOf(
+                    DefinitionConverter.toLocation(
+                        ResolvedDefinition(
+                            target = target,
+                            documentUri = "file:///mapped-sources/SimpleTarget.java",
+                            range = McTextRange(McTextPosition(3, 0), McTextPosition(3, 20)),
+                            resolution = McdevDefinitionResolution.SOURCE,
+                        ),
+                    ),
+                ),
+            ),
+        )
+        val encoded = decoder.encodeToMap(envelope)
+        @Suppress("UNCHECKED_CAST")
+        val locations = ((encoded["result"] as Map<String, Any?>)["locations"] as List<Map<String, Any?>>)
+        assertEquals("source", locations.single()["resolution"])
     }
 
     @Test

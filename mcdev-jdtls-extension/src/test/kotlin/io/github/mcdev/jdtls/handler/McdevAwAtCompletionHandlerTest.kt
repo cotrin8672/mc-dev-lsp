@@ -87,6 +87,56 @@ class McdevAwAtCompletionHandlerTest {
     }
 
     @Test
+    fun returnsAccessWidenerDescriptorCompletionsAtDescriptorSlot() {
+        val handler = createHandler()
+        val source = """
+            accessWidener v2 named
+            accessible method com/example/target/SimpleTarget draw (Ljava/lang/Str
+        """.trimIndent()
+        val (line, character) = JdtlsFixtureSupport.offsetToPosition(source, source.length)
+        val response = handler.handle(
+            listOf(
+                completionPayload(
+                    workspaceRoot = JdtlsFixtureSupport.workspaceUri(tempDir),
+                    source = source,
+                    line = line,
+                    character = character,
+                    languageId = "accesswidener",
+                    documentUri = "${JdtlsFixtureSupport.workspaceUri(tempDir)}/mod.accesswidener",
+                ),
+            ),
+        )
+        val completion = assertIs<McdevCompletionResponse>(response.result)
+        assertTrue(completion.items.any { it.insertText == "(Ljava/lang/String;FF)V" })
+        assertTrue(completion.items.any { it.metadata["source"] == "aw.descriptor" })
+    }
+
+    @Test
+    fun returnsAccessTransformerFieldCompletionsWithIntermediaryInsertText() {
+        val handler = createHandler()
+        val source = "public com.example.target.SimpleTarget cou"
+        val response = handler.handle(
+            listOf(
+                completionPayload(
+                    workspaceRoot = JdtlsFixtureSupport.workspaceUri(tempDir),
+                    source = source,
+                    line = 0,
+                    character = source.length,
+                    languageId = "accesstransformer",
+                    documentUri = "${JdtlsFixtureSupport.workspaceUri(tempDir)}/mod_at.cfg",
+                ),
+            ),
+        )
+        val completion = assertIs<McdevCompletionResponse>(response.result)
+        assertTrue(
+            completion.items.any {
+                (it.insertText == "field_1" || it.insertText == "counter") &&
+                    it.metadata["source"] == "at.member.field"
+            },
+        )
+    }
+
+    @Test
     fun returnsAccessTransformerMemberCompletionsWithMappedInsertText() {
         val handler = createHandler()
         val source = "public com.example.target.SimpleTarget dr"

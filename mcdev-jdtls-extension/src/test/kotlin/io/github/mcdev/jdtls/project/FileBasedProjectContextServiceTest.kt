@@ -8,6 +8,7 @@ import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertTrue
 import org.junit.jupiter.api.io.TempDir
+import java.nio.file.Files
 import java.nio.file.Path
 
 class FileBasedProjectContextServiceTest {
@@ -69,5 +70,57 @@ class FileBasedProjectContextServiceTest {
         val context = service.buildProjectContext(tempDir)
         assertEquals(0, context.classpath.entryCount)
         assertEquals(ProjectIndexState.NOT_READY, context.indexState)
+    }
+
+    @Test
+    fun discoversLoomRemappedJarsInEnhancedClasspath() {
+        val loomDir = tempDir.resolve(".gradle/loom-cache/remapped_working")
+        Files.createDirectories(loomDir)
+        Files.writeString(loomDir.resolve("minecraft-client-mapped.jar"), "fake")
+        val context = service.buildProjectContext(tempDir)
+        assertTrue(context.classpath.minecraftJars.isNotEmpty())
+        assertTrue(
+            context.classpath.minecraftJars.any {
+                it.fileName.toString().contains("minecraft")
+            },
+        )
+    }
+
+    @Test
+    fun discoversMappedSourcesForLoomFixture() {
+        JdtlsFixtureSupport.copyFixture(FixturePaths.FABRIC_LOOM_E2E, tempDir)
+        val context = service.buildProjectContext(tempDir)
+        val main = context.sourceSets.single { it.name == "main" }
+        assertTrue(
+            main.sourceDirectories.any {
+                it.endsWith("mapped-sources")
+            },
+        )
+        assertTrue(
+            main.sourceDirectories.none {
+                it.endsWith(
+                    "mapped-sources${java.io.File.separator}com${java.io.File.separator}example" +
+                        "${java.io.File.separator}target",
+                )
+            },
+        )
+    }
+
+    @Test
+    fun discoversMainAndClientSourceSetsFromFixture() {
+        JdtlsFixtureSupport.copyFixture(FixturePaths.MULTI_SOURCE_SET, tempDir)
+        val context = service.buildProjectContext(tempDir)
+        assertEquals(2, context.sourceSets.size)
+        assertEquals(setOf("main", "client"), context.sourceSets.map { it.name }.toSet())
+        assertTrue(
+            context.sourceSets.single { it.name == "main" }.sourceDirectories.any {
+                it.endsWith("src${java.io.File.separator}main${java.io.File.separator}java")
+            },
+        )
+        assertTrue(
+            context.sourceSets.single { it.name == "client" }.sourceDirectories.any {
+                it.endsWith("src${java.io.File.separator}client${java.io.File.separator}java")
+            },
+        )
     }
 }

@@ -13,12 +13,16 @@ object JdtlsFixtureSupport {
         resources.forEach { resourcePath ->
             val relative = resourcePath.removePrefix("$fixtureRoot/")
             val destination = targetDir.resolve(relative)
-            destination.parent?.createDirectories()
-            Files.copy(
-                FixtureResourceLoader.openStream(resourcePath),
-                destination,
-            )
+            copyFixtureResource(resourcePath, destination)
         }
+    }
+
+    fun copyFixtureResource(resourcePath: String, destination: Path) {
+        destination.parent?.createDirectories()
+        Files.copy(
+            FixtureResourceLoader.openStream(resourcePath),
+            destination,
+        )
     }
 
     fun installClasspathClasses(targetDir: Path) {
@@ -31,6 +35,30 @@ object JdtlsFixtureSupport {
             FixtureResourceLoader.openStream(classResource),
             destination,
         )
+    }
+
+    fun installLoomRemappedJar(targetDir: Path) {
+        val loomDir = targetDir.resolve(".gradle/loom-cache/remapped_working").createDirectories()
+        val staging = targetDir.resolve("classpath-staging/com/example/target").createDirectories()
+        Files.copy(
+            FixtureResourceLoader.openStream(FixturePaths.SIMPLE_TARGET_CLASS),
+            staging.resolve("SimpleTarget.class"),
+        )
+        val jar = loomDir.resolve("minecraft-client-mapped.jar")
+        val process = ProcessBuilder(
+            "jar",
+            "--create",
+            "--file",
+            jar.toString(),
+            "-C",
+            targetDir.resolve("classpath-staging").toString(),
+            "com/example/target/SimpleTarget.class",
+        )
+            .directory(targetDir.toFile())
+            .redirectErrorStream(true)
+            .start()
+        val exitCode = process.waitFor()
+        check(exitCode == 0) { "failed to create loom remapped jar: ${process.inputStream.bufferedReader().readText()}" }
     }
 
     fun workspaceUri(root: Path): String = UriPathSupport.pathToUri(root)

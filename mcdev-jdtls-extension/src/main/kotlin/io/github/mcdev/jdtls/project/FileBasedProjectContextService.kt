@@ -6,6 +6,7 @@ import io.github.mcdev.core.project.ProjectContextBuilder
 import io.github.mcdev.core.project.ProjectContextInput
 import io.github.mcdev.core.project.ProjectIndexState
 import io.github.mcdev.core.project.SourceSetContext
+import io.github.mcdev.jdtls.java.JdtClasspathBridge
 import java.nio.file.Files
 import java.nio.file.Path
 import kotlin.io.path.exists
@@ -41,7 +42,7 @@ class FileBasedProjectContextService(
 
     fun buildProjectContext(root: Path): ProjectContext {
         val gradleContents = readGradleContents(root)
-        val classpath = discoverClasspath(root)
+        val classpath = discoverEnhancedClasspath(root)
         val sourceSets = discoverSourceSets(root)
         val indexState = if (classpath.entryCount > 0) ProjectIndexState.READY else ProjectIndexState.NOT_READY
         return ProjectContextBuilder.build(
@@ -67,16 +68,43 @@ class FileBasedProjectContextService(
     }
 
     private fun discoverSourceSets(root: Path): List<SourceSetContext> {
-        val javaDir = root.resolve("src/main/java")
-        val resourcesDir = root.resolve("src/main/resources")
-        if (!javaDir.exists() && !resourcesDir.exists()) return emptyList()
-        return listOf(
-            SourceSetContext(
+        val sourceSets = mutableListOf<SourceSetContext>()
+        val mainJavaDir = root.resolve("src/main/java")
+        val mainResourcesDir = root.resolve("src/main/resources")
+        val mappedSourcesDir = root.resolve("mapped-sources")
+        if (mainJavaDir.exists() || mainResourcesDir.exists() || mappedSourcesDir.exists()) {
+            sourceSets += SourceSetContext(
                 name = "main",
-                sourceDirectories = listOfNotNull(javaDir.takeIf { it.exists() }),
-                resourceDirectories = listOfNotNull(resourcesDir.takeIf { it.exists() }),
+                sourceDirectories = listOfNotNull(
+                    mainJavaDir.takeIf { it.exists() },
+                    mappedSourcesDir.takeIf { it.exists() },
+                ),
+                resourceDirectories = listOfNotNull(mainResourcesDir.takeIf { it.exists() }),
                 outputDirectory = root.resolve("build/classes/java/main"),
-            ),
+            )
+        }
+        val clientJavaDir = root.resolve("src/client/java")
+        val clientResourcesDir = root.resolve("src/client/resources")
+        if (clientJavaDir.exists() || clientResourcesDir.exists()) {
+            sourceSets += SourceSetContext(
+                name = "client",
+                sourceDirectories = listOfNotNull(clientJavaDir.takeIf { it.exists() }),
+                resourceDirectories = listOfNotNull(clientResourcesDir.takeIf { it.exists() }),
+                outputDirectory = root.resolve("build/classes/java/client"),
+            )
+        }
+        return sourceSets
+    }
+
+    private fun discoverEnhancedClasspath(root: Path): ClasspathSnapshot {
+        val base = discoverClasspath(root)
+        val withLoom = JdtClasspathBridge.mergeClasspath(
+            base,
+            JdtClasspathBridge.discoverLoomRemappedJars(root),
+        )
+        return JdtClasspathBridge.mergeWithJdtClasspath(
+            withLoom,
+            UriPathSupport.pathToUri(root),
         )
     }
 

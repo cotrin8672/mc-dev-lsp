@@ -37,6 +37,17 @@ class McdevInfoHandlerTest {
     }
 
     @Test
+    fun reportsAccessWidenerDiscoveryForAwAtFixture() {
+        JdtlsFixtureSupport.copyFixture(FixturePaths.FABRIC_AW_AT, tempDir)
+        JdtlsFixtureSupport.installClasspathClasses(tempDir)
+        val handler = McdevInfoHandler(projectService = FileBasedProjectContextService())
+        val response = handler.handle(listOf(contextPayload()))
+        val info = assertIs<McdevInfoResponse>(response.result)
+        assertTrue(info.lines.any { it == "Access Widener: 1 file" })
+        assertTrue(info.lines.any { it == "Access Transformer: 1 file" })
+    }
+
+    @Test
     fun reportsClasspathEntryCount() {
         val handler = createHandler()
         val response = handler.handle(listOf(contextPayload()))

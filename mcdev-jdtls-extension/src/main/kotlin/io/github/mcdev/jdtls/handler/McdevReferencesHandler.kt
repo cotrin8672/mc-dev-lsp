@@ -1,5 +1,6 @@
 package io.github.mcdev.jdtls.handler
 
+import io.github.mcdev.jdtls.awat.AwAtServiceFacade
 import io.github.mcdev.jdtls.convert.DefinitionConverter
 import io.github.mcdev.jdtls.mixin.MixinServiceFacade
 import io.github.mcdev.jdtls.project.FileBasedProjectContextService
@@ -15,6 +16,7 @@ import io.github.mcdev.protocol.McdevResponseEnvelope
 class McdevReferencesHandler(
     private val projectService: FileBasedProjectContextService = FileBasedProjectContextService(),
     private val mixinFacade: MixinServiceFacade = MixinServiceFacade(),
+    private val awAtFacade: AwAtServiceFacade = AwAtServiceFacade(),
     private val decoder: ProtocolPayloadDecoder = ProtocolPayloadDecoder(),
 ) {
     fun handle(arguments: List<Any?>): McdevResponseEnvelope<McdevReferencesResponse> =
@@ -34,12 +36,27 @@ class McdevReferencesHandler(
         }
 
         val session = projectService.loadSession(request.context.workspaceRoot)
-        val definitionTargets = mixinFacade.definitions(
-            session = session,
-            source = request.context.bufferText,
-            line = request.context.position.line,
-            character = request.context.position.character,
+        val awAtFileType = awAtFacade.detectFileType(
+            request.context.languageId,
+            request.context.documentUri,
         )
+        val definitionTargets = if (awAtFileType != null) {
+            awAtFacade.definitions(
+                session = session,
+                source = request.context.bufferText,
+                line = request.context.position.line,
+                character = request.context.position.character,
+                fileType = awAtFileType,
+                documentUri = request.context.documentUri,
+            )
+        } else {
+            mixinFacade.definitions(
+                session = session,
+                source = request.context.bufferText,
+                line = request.context.position.line,
+                character = request.context.position.character,
+            )
+        }
         if (definitionTargets.isEmpty()) {
             return McdevResponseEnvelope(
                 capabilities = setOf("references"),
@@ -47,13 +64,23 @@ class McdevReferencesHandler(
             )
         }
 
-        val sources = mixinFacade.collectSourceEntries(
+        val javaSources = mixinFacade.collectSourceEntries(
             projectContext = session.context,
             currentDocumentUri = request.context.documentUri,
             currentBufferText = request.context.bufferText,
         )
+        val awAtSources = awAtFacade.collectAwAtEntries(
+            projectContext = session.context,
+            currentDocumentUri = request.context.documentUri,
+            currentBufferText = request.context.bufferText,
+        )
+        val sources = (javaSources + awAtSources).distinctBy { it.documentUri }
         val references = definitionTargets.flatMap { target ->
-            mixinFacade.references(session, target, sources)
+            val mixinRefs = mixinFacade.references(session, target, sources)
+            val awAtRefs = awAtFacade.references(session, target, awAtSources)
+            (mixinRefs + awAtRefs).distinctBy { ref ->
+                "${ref.documentUri}:${ref.range.start.line}:${ref.range.start.character}"
+            }
         }
         return McdevResponseEnvelope(
             capabilities = setOf("references"),

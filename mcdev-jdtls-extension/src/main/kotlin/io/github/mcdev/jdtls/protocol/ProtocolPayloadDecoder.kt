@@ -1,8 +1,13 @@
 package io.github.mcdev.jdtls.protocol
 
 import com.google.gson.Gson
+import com.google.gson.GsonBuilder
 import com.google.gson.JsonElement
 import com.google.gson.JsonObject
+import com.google.gson.TypeAdapter
+import com.google.gson.stream.JsonReader
+import com.google.gson.stream.JsonWriter
+import io.github.mcdev.protocol.McdevDefinitionResolution
 import io.github.mcdev.protocol.McdevClientInfo
 import io.github.mcdev.protocol.McdevCodeActionRequest
 import io.github.mcdev.protocol.McdevCompletionOptions
@@ -19,7 +24,7 @@ import io.github.mcdev.protocol.McdevReindexRequest
 import io.github.mcdev.protocol.McdevRequestContext
 
 class ProtocolPayloadDecoder(
-    private val gson: Gson = Gson(),
+    private val gson: Gson = createGson(),
 ) {
     fun decodeCompletionRequest(arguments: List<Any?>): McdevCompletionRequest {
         val root = decodeRoot(arguments)
@@ -169,3 +174,23 @@ class ProtocolPayloadDecoder(
 }
 
 class ProtocolDecodeException(message: String) : RuntimeException(message)
+
+private fun createGson(): Gson =
+    GsonBuilder()
+        .registerTypeAdapter(McdevDefinitionResolution::class.java, McdevDefinitionResolutionAdapter())
+        .create()
+
+private class McdevDefinitionResolutionAdapter : TypeAdapter<McdevDefinitionResolution>() {
+    override fun write(out: JsonWriter, value: McdevDefinitionResolution?) {
+        if (value == null) {
+            out.nullValue()
+            return
+        }
+        out.value(value.name.lowercase())
+    }
+
+    override fun read(reader: JsonReader): McdevDefinitionResolution {
+        val raw = reader.nextString()
+        return McdevDefinitionResolution.valueOf(raw.uppercase())
+    }
+}

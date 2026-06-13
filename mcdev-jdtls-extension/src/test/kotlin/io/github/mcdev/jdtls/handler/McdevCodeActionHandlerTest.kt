@@ -1,6 +1,7 @@
 package io.github.mcdev.jdtls.handler
 
 import io.github.mcdev.core.mixin.MixinDiagnosticCodes
+import io.github.mcdev.core.mixinextras.MixinExtrasDiagnosticCodes
 import io.github.mcdev.fixtures.FixturePaths
 import io.github.mcdev.fixtures.FixtureResourceLoader
 import io.github.mcdev.jdtls.project.FileBasedProjectContextService
@@ -70,6 +71,84 @@ class McdevCodeActionHandlerTest {
     }
 
     @Test
+    fun returnsAmbiguousInjectMethodDescriptorFix() {
+        val handler = createHandler()
+        val source = """
+            package com.example.mixin;
+            import com.example.target.SimpleTarget;
+            import org.spongepowered.asm.mixin.Mixin;
+            import org.spongepowered.asm.mixin.injection.At;
+            import org.spongepowered.asm.mixin.injection.Inject;
+            import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
+            @Mixin(SimpleTarget.class)
+            public abstract class AmbiguousMixin {
+                @Inject(method = "draw", at = @At("HEAD"))
+                private void mcdev${"$"}onDraw(CallbackInfo ci) {}
+            }
+        """.trimIndent()
+        val response = handler.handle(
+            listOf(
+                codeActionPayload(
+                    source = source,
+                    fileName = "AmbiguousMixin.java",
+                    diagnosticCodes = listOf(MixinDiagnosticCodes.AMBIGUOUS_INJECT_METHOD),
+                ),
+            ),
+        )
+        val result = assertIs<McdevCodeActionResponse>(response.result)
+        assertTrue(result.actions.isNotEmpty())
+        assertTrue(result.actions.any { it.kind == "quickfix.mixin.methodDescriptor" })
+        assertTrue(
+            result.actions.any { action ->
+                action.edits.any { workspaceEdit ->
+                    workspaceEdit.edits.any { textEdit -> textEdit.newText.contains("draw(") }
+                }
+            },
+        )
+    }
+
+    @Test
+    fun returnsMixinExtrasFixHandlerSignatureThroughHandler() {
+        JdtlsFixtureSupport.copyFixture(FixturePaths.FABRIC_MIXINEXTRAS, tempDir)
+        JdtlsFixtureSupport.installClasspathClasses(tempDir)
+        val handler = McdevCodeActionHandler(projectService = FileBasedProjectContextService())
+        val source = """
+            package com.example.mixin;
+            import com.example.target.SimpleTarget;
+            import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
+            import com.llamalad7.mixinextras.injector.wrapoperation.WrapOperation;
+            import org.spongepowered.asm.mixin.Mixin;
+            import org.spongepowered.asm.mixin.injection.At;
+            @Mixin(SimpleTarget.class)
+            public abstract class BadMixinExtras {
+                @WrapOperation(method = "draw(Ljava/lang/String;FF)V", at = @At(value = "INVOKE", target = "Ljava/lang/String;length()I"))
+                private void mcdev${"$"}wrapLength(String instance, Operation<Integer> original) {
+                    original.call(instance);
+                }
+            }
+        """.trimIndent()
+        val response = handler.handle(
+            listOf(
+                codeActionPayload(
+                    source = source,
+                    fileName = "BadMixinExtras.java",
+                    diagnosticCodes = listOf(MixinExtrasDiagnosticCodes.WRONG_RETURN_TYPE),
+                ),
+            ),
+        )
+        val result = assertIs<McdevCodeActionResponse>(response.result)
+        assertTrue(result.actions.isNotEmpty())
+        assertTrue(result.actions.any { it.kind == "quickfix.mixinextras.fixHandlerSignature" })
+        assertTrue(
+            result.actions.any { action ->
+                action.edits.any { workspaceEdit ->
+                    workspaceEdit.edits.any { textEdit -> textEdit.newText.contains("Operation<") }
+                }
+            },
+        )
+    }
+
+    @Test
     fun codeActionEditsIncludeWorkspaceDocumentUri() {
         val handler = createHandler()
         val source = """
@@ -101,11 +180,12 @@ class McdevCodeActionHandlerTest {
         source: String,
         diagnosticCodes: List<String> = emptyList(),
         workspaceRoot: String = JdtlsFixtureSupport.workspaceUri(tempDir),
+        fileName: String = "UnlistedMixin.java",
     ): Map<String, Any?> = mapOf(
         "context" to mapOf(
             "protocolVersion" to McdevProtocol.VERSION,
             "workspaceRoot" to workspaceRoot,
-            "documentUri" to "$workspaceRoot/src/main/java/com/example/mixin/UnlistedMixin.java",
+            "documentUri" to "$workspaceRoot/src/main/java/com/example/mixin/$fileName",
             "languageId" to "java",
             "position" to mapOf("line" to 0, "character" to 0),
             "bufferText" to source,

@@ -1,5 +1,7 @@
 package io.github.mcdev.jdtls.handler
 
+import io.github.mcdev.core.at.AccessTransformerCodeActionService
+import io.github.mcdev.core.aw.AccessWidenerCodeActionService
 import io.github.mcdev.jdtls.awat.AwAtServiceFacade
 import io.github.mcdev.jdtls.convert.CodeActionConverter
 import io.github.mcdev.jdtls.mixin.MixinServiceFacade
@@ -89,6 +91,11 @@ class McdevCodeActionHandler(
                     fixes = filteredFixes,
                     source = request.context.bufferText,
                     mixinConfigContent = mixinConfigContent,
+                    awCodeActionService = AccessWidenerCodeActionService(),
+                    atCodeActionService = AccessTransformerCodeActionService(
+                        classIndex = session.classIndex,
+                        mappingContext = session.context.mappings,
+                    ),
                 ),
             ),
         )

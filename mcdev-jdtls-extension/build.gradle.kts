@@ -126,12 +126,21 @@ tasks.register("checkBundle") {
             check(
                 entries.any { it.startsWith("kotlin/") },
             ) { "kotlin stdlib classes are missing from bundle jar" }
+            check(
+                entries.any { it.startsWith("io/github/mcdev/protocol/") },
+            ) { "mcdev-protocol classes are missing from bundle jar" }
+            check(
+                entries.any { it.startsWith("com/google/gson/") },
+            ) { "gson classes are missing from bundle jar" }
+            val pluginXml = jar.getInputStream(jar.getJarEntry("plugin.xml")!!).bufferedReader().readText()
+            check("mcdev.definition" in pluginXml) { "plugin.xml is missing mcdev.definition command" }
+            check("mcdev.references" in pluginXml) { "plugin.xml is missing mcdev.references command" }
         }
     }
 }
 
 tasks.test {
     useJUnitPlatform()
-    dependsOn(tasks.named("eclipseStubClasses"))
+    dependsOn(tasks.named("eclipseStubClasses"), tasks.named("checkBundle"))
     classpath = sourceSets.test.get().runtimeClasspath
 }

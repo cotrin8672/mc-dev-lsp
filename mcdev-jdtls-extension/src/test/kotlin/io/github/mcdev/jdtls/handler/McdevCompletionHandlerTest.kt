@@ -211,6 +211,71 @@ class McdevCompletionHandlerTest {
     }
 
     @Test
+    fun injectMethodCompletionHonorsAlwaysDescriptorOption() {
+        val handler = createHandler()
+        val source = """
+            package com.example.mixin;
+            import com.example.target.SimpleTarget;
+            import org.spongepowered.asm.mixin.Mixin;
+            import org.spongepowered.asm.mixin.injection.At;
+            import org.spongepowered.asm.mixin.injection.Inject;
+            import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
+            @Mixin(SimpleTarget.class)
+            public abstract class DescriptorMixin {
+                @Inject(method = "dra", at = @At("HEAD"))
+                private void mcdev${"$"}onDraw(CallbackInfo ci) {}
+            }
+        """.trimIndent()
+        val (line, character) = JdtlsFixtureSupport.memberCursorPosition(source, "dra")
+        val payload = completionPayload(
+            workspaceRoot = JdtlsFixtureSupport.workspaceUri(tempDir),
+            source = source,
+            line = line,
+            character = character,
+            injectMethodDescriptor = "always",
+        )
+        val response = handler.handle(listOf(payload))
+        val completion = assertIs<McdevCompletionResponse>(response.result)
+        assertTrue(completion.items.any { it.metadata["source"] == "mixin.injectMethod" })
+        assertTrue(completion.items.any { it.insertText.contains("(Ljava/lang/String;FF)V") })
+    }
+
+    @Test
+    fun atTargetCompletionEndToEndWithoutFacadeOverride() {
+        val handler = createHandler()
+        val source = """
+            package com.example.mixin;
+            import com.example.target.SimpleTarget;
+            import org.spongepowered.asm.mixin.Mixin;
+            import org.spongepowered.asm.mixin.injection.At;
+            import org.spongepowered.asm.mixin.injection.Inject;
+            import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
+            @Mixin(SimpleTarget.class)
+            public abstract class AtTargetMixin {
+                @Inject(method = "draw(Ljava/lang/String;FF)V", at = @At(value = "INVOKE", target = "L"))
+                private void mcdev${"$"}onDraw(String text, float x, float y, CallbackInfo ci) {}
+            }
+        """.trimIndent()
+        val marker = "target = \"L"
+        val (line, character) = JdtlsFixtureSupport.offsetToPosition(source, source.indexOf(marker) + marker.length)
+        val response = handler.handle(
+            listOf(
+                completionPayload(
+                    workspaceRoot = JdtlsFixtureSupport.workspaceUri(tempDir),
+                    source = source,
+                    line = line,
+                    character = character,
+                ),
+            ),
+        )
+        val completion = assertIs<McdevCompletionResponse>(response.result)
+        assertTrue(completion.items.isNotEmpty())
+        assertTrue(completion.items.any { it.metadata["source"] == "mixin.atTarget" })
+        assertTrue(completion.items.any { it.label.contains("length") })
+        assertNotNull(completion.items.first { it.metadata["source"] == "mixin.atTarget" }.edit)
+    }
+
+    @Test
     fun fqnInsertModeReturnsQualifiedClassName() {
         val handler = createHandler()
         val source = FixtureResourceLoader.loadText(FixturePaths.FABRIC_BASIC_EXAMPLE_MIXIN)
@@ -242,6 +307,7 @@ class McdevCompletionHandlerTest {
         source: String,
         line: Int,
         character: Int,
+        injectMethodDescriptor: String = "auto",
     ): Map<String, Any?> = mapOf(
         "protocolVersion" to McdevProtocol.VERSION,
         "workspaceRoot" to workspaceRoot,
@@ -254,7 +320,7 @@ class McdevCompletionHandlerTest {
         "options" to mapOf(
             "preferredAtTarget" to "descriptor",
             "mixinClassInsert" to "import",
-            "injectMethodDescriptor" to "auto",
+            "injectMethodDescriptor" to injectMethodDescriptor,
         ),
     )
 }

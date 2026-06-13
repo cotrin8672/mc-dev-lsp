@@ -1,6 +1,8 @@
 package io.github.mcdev.jdtls.convert
 
+import io.github.mcdev.core.codeaction.AddAtMethodDescriptorFix
 import io.github.mcdev.core.codeaction.AddMixinConfigEntryFix
+import io.github.mcdev.core.codeaction.RemoveDuplicateAccessWidenerEntryFix
 import io.github.mcdev.core.codeaction.GenerateAccessorMethodFix
 import io.github.mcdev.core.codeaction.GenerateInvokerMethodFix
 import io.github.mcdev.core.codeaction.McTextEdit
@@ -228,6 +230,67 @@ class ConverterTest {
     }
 
     @Test
+    fun codeActionConverterMapsRemoveDuplicateAccessWidenerFix() {
+        val source = """
+            accessWidener v2 named
+            accessible class com/example/target/SimpleTarget
+            accessible class com/example/target/SimpleTarget
+        """.trimIndent()
+        val fix = RemoveDuplicateAccessWidenerEntryFix(
+            title = "Remove duplicate access widener entry",
+            documentUri = "file:///mod.accesswidener",
+            lineNumber = 3,
+        )
+        val dto = CodeActionConverter.toDto(fix, source, mixinConfigContent = null)
+        assertNotNull(dto)
+        assertEquals("quickfix.aw.removeDuplicate", dto?.kind)
+        assertEquals(1, dto!!.edits.single().edits.size)
+    }
+
+    @Test
+    fun codeActionConverterMapsAddAtMethodDescriptorFix() {
+        val source = "public com.example.target.SimpleTarget draw"
+        val fix = AddAtMethodDescriptorFix(
+            title = "Add method descriptor",
+            documentUri = "file:///mod_at.cfg",
+            line = 1,
+            memberName = "draw",
+            descriptor = "(Ljava/lang/String;FF)V",
+        )
+        val dto = CodeActionConverter.toDto(fix, source, mixinConfigContent = null)
+        assertNotNull(dto)
+        assertEquals("quickfix.at.addDescriptor", dto?.kind)
+        assertTrue(dto!!.edits.first().edits.first().newText.contains("draw(Ljava/lang/String;FF)V"))
+    }
+
+    @Test
+    fun codeActionConverterMapsMixinExtrasFixHandlerSignature() {
+        val source = """
+            @WrapOperation(method = "draw(Ljava/lang/String;FF)V", at = @At(value = "INVOKE", target = "Ljava/lang/String;length()I"))
+            private void mcdevWrapLength(String instance, Operation<Integer> original) {
+                original.call(instance);
+            }
+        """.trimIndent()
+        val openBrace = source.indexOf('{') + 1
+        val fix = io.github.mcdev.core.codeaction.WorkspaceEditFix(
+            title = "Fix WrapOperation handler signature",
+            kind = "quickfix.mixinextras.fixHandlerSignature",
+            documentUri = "file:///BadMixinExtras.java",
+            edits = listOf(
+                McTextEdit(
+                    openBrace,
+                    openBrace,
+                    "\n    private int mcdevWrapLength(String instance, Operation<Integer> original) {\n        return original.call(instance);\n    }\n",
+                ),
+            ),
+        )
+        val dto = CodeActionConverter.toDto(fix, source, mixinConfigContent = null)
+        assertNotNull(dto)
+        assertEquals("quickfix.mixinextras.fixHandlerSignature", dto?.kind)
+        assertTrue(dto!!.edits.first().edits.first().newText.contains("Operation<Integer>"))
+    }
+
+    @Test
     fun codeActionConverterMapsInvokerGenerateFix() {
         val source = "@Mixin(MinecraftClient.class) class M { }"
         val openBrace = source.indexOf('{') + 1
@@ -246,32 +309,47 @@ class ConverterTest {
 
     @Test
     fun definitionConverterMapsClassTargetMetadata() {
+        val target = McDefinitionTarget(
+            kind = MemberKind.CLASS,
+            ownerInternalName = "com/example/target/SimpleTarget",
+            ownerFqn = "com.example.target.SimpleTarget",
+        )
         val location = DefinitionConverter.toLocation(
-            McDefinitionTarget(
-                kind = MemberKind.CLASS,
-                ownerInternalName = "com/example/target/SimpleTarget",
-                ownerFqn = "com.example.target.SimpleTarget",
+            io.github.mcdev.jdtls.definition.ResolvedDefinition(
+                target = target,
+                documentUri = "file:///project/SimpleTarget.java",
+                range = McTextRange(McTextPosition(2, 0), McTextPosition(2, 20)),
+                resolution = io.github.mcdev.protocol.McdevDefinitionResolution.SOURCE,
             ),
         )
         assertEquals("class", location.metadata["kind"])
         assertEquals("com/example/target/SimpleTarget", location.metadata["owner"])
         assertEquals("com.example.target.SimpleTarget", location.metadata["fqn"])
+        assertEquals(io.github.mcdev.protocol.McdevDefinitionResolution.SOURCE, location.resolution)
+        assertEquals("file:///project/SimpleTarget.java", location.documentUri)
     }
 
     @Test
     fun definitionConverterMapsFieldTargetMetadata() {
+        val target = McDefinitionTarget(
+            kind = MemberKind.FIELD,
+            ownerInternalName = "com/example/target/SimpleTarget",
+            ownerFqn = "com.example.target.SimpleTarget",
+            name = "counter",
+            descriptor = "I",
+        )
         val location = DefinitionConverter.toLocation(
-            McDefinitionTarget(
-                kind = MemberKind.FIELD,
-                ownerInternalName = "com/example/target/SimpleTarget",
-                ownerFqn = "com.example.target.SimpleTarget",
-                name = "counter",
-                descriptor = "I",
+            io.github.mcdev.jdtls.definition.ResolvedDefinition(
+                target = target,
+                documentUri = "file:///project/SimpleTarget.java",
+                range = McTextRange(McTextPosition(3, 16), McTextPosition(3, 23)),
+                resolution = io.github.mcdev.protocol.McdevDefinitionResolution.SOURCE,
             ),
         )
         assertEquals("field", location.metadata["kind"])
         assertEquals("counter", location.metadata["name"])
         assertEquals("I", location.metadata["descriptor"])
+        assertEquals(io.github.mcdev.protocol.McdevDefinitionResolution.SOURCE, location.resolution)
     }
 
     private fun annotationContext(

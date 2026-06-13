@@ -51,6 +51,27 @@ class McdevAwAtDiagnosticsHandlerTest {
     }
 
     @Test
+    fun reportsNamespaceMismatchForIntermediaryOwnerInNamedAw() {
+        val handler = createHandler()
+        val source = """
+            accessWidener v2 named
+            accessible class com/example/target/class_1
+        """.trimIndent()
+        val response = handler.handle(listOf(contextPayload(source, "accesswidener", "mod.accesswidener")))
+        val diagnostics = assertIs<McdevDiagnosticsResponse>(response.result).diagnostics
+        assertTrue(diagnostics.any { it.code == AwDiagnosticCodes.NAMESPACE_MISMATCH })
+    }
+
+    @Test
+    fun reportsMissingMethodDescriptorForAccessTransformerBuffer() {
+        val handler = createHandler()
+        val source = "public com.example.target.SimpleTarget draw"
+        val response = handler.handle(listOf(contextPayload(source, "accesstransformer", "mod_at.cfg")))
+        val diagnostics = assertIs<McdevDiagnosticsResponse>(response.result).diagnostics
+        assertTrue(diagnostics.any { it.code == AtDiagnosticCodes.MISSING_METHOD_DESCRIPTOR })
+    }
+
+    @Test
     fun detectsAccessTransformerBufferByFileExtension() {
         val handler = createHandler()
         val source = """

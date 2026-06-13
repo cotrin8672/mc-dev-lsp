@@ -1,6 +1,8 @@
 package io.github.mcdev.jdtls.handler
 
+import io.github.mcdev.jdtls.awat.AwAtServiceFacade
 import io.github.mcdev.jdtls.convert.DefinitionConverter
+import io.github.mcdev.jdtls.definition.DefinitionResolutionService
 import io.github.mcdev.jdtls.mixin.MixinServiceFacade
 import io.github.mcdev.jdtls.project.FileBasedProjectContextService
 import io.github.mcdev.jdtls.protocol.ProtocolDecodeException
@@ -15,6 +17,8 @@ import io.github.mcdev.protocol.McdevResponseEnvelope
 class McdevDefinitionHandler(
     private val projectService: FileBasedProjectContextService = FileBasedProjectContextService(),
     private val mixinFacade: MixinServiceFacade = MixinServiceFacade(),
+    private val awAtFacade: AwAtServiceFacade = AwAtServiceFacade(),
+    private val definitionResolver: DefinitionResolutionService = DefinitionResolutionService(),
     private val decoder: ProtocolPayloadDecoder = ProtocolPayloadDecoder(),
 ) {
     fun handle(arguments: List<Any?>): McdevResponseEnvelope<McdevDefinitionResponse> =
@@ -34,16 +38,36 @@ class McdevDefinitionHandler(
         }
 
         val session = projectService.loadSession(request.context.workspaceRoot)
-        val targets = mixinFacade.definitions(
-            session = session,
-            source = request.context.bufferText,
-            line = request.context.position.line,
-            character = request.context.position.character,
+        val awAtFileType = awAtFacade.detectFileType(
+            request.context.languageId,
+            request.context.documentUri,
+        )
+        val targets = if (awAtFileType != null) {
+            awAtFacade.definitions(
+                session = session,
+                source = request.context.bufferText,
+                line = request.context.position.line,
+                character = request.context.position.character,
+                fileType = awAtFileType,
+                documentUri = request.context.documentUri,
+            )
+        } else {
+            mixinFacade.definitions(
+                session = session,
+                source = request.context.bufferText,
+                line = request.context.position.line,
+                character = request.context.position.character,
+            )
+        }
+        val resolved = definitionResolver.resolveAll(
+            targets = targets,
+            projectContext = session.context,
+            workspaceRootUri = request.context.workspaceRoot,
         )
         return McdevResponseEnvelope(
             capabilities = setOf("definition"),
             result = McdevDefinitionResponse(
-                locations = DefinitionConverter.toLocations(targets),
+                locations = DefinitionConverter.toLocations(resolved),
             ),
         )
     }

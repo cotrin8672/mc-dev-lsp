@@ -2,8 +2,10 @@ package io.github.mcdev.jdtls.handler
 
 import io.github.mcdev.fixtures.FixturePaths
 import io.github.mcdev.fixtures.FixtureResourceLoader
+import io.github.mcdev.jdtls.awat.AwAtServiceFacade
 import io.github.mcdev.jdtls.project.FileBasedProjectContextService
 import io.github.mcdev.jdtls.support.JdtlsFixtureSupport
+import io.github.mcdev.protocol.McdevDefinitionResolution
 import io.github.mcdev.protocol.McdevDefinitionResponse
 import io.github.mcdev.protocol.McdevErrorCode
 import io.github.mcdev.protocol.McdevProtocol
@@ -28,9 +30,13 @@ class McdevDefinitionHandlerTest {
         )
         val result = assertIs<McdevDefinitionResponse>(response.result)
         assertEquals(1, result.locations.size)
-        assertEquals("class", result.locations.first().metadata["kind"])
-        assertEquals("com/example/target/SimpleTarget", result.locations.first().metadata["owner"])
-        assertEquals("com.example.target.SimpleTarget", result.locations.first().metadata["fqn"])
+        val location = result.locations.first()
+        assertEquals("class", location.metadata["kind"])
+        assertEquals("com/example/target/SimpleTarget", location.metadata["owner"])
+        assertEquals("com.example.target.SimpleTarget", location.metadata["fqn"])
+        assertEquals(McdevDefinitionResolution.SOURCE, location.resolution)
+        assertTrue(location.documentUri.contains("SimpleTarget.java"))
+        assertEquals(2, location.range.start.line)
     }
 
     @Test
@@ -52,8 +58,84 @@ class McdevDefinitionHandlerTest {
         )
         val result = assertIs<McdevDefinitionResponse>(response.result)
         assertEquals(1, result.locations.size)
-        assertEquals("field", result.locations.first().metadata["kind"])
-        assertEquals("counter", result.locations.first().metadata["name"])
+        val location = result.locations.first()
+        assertEquals("field", location.metadata["kind"])
+        assertEquals("counter", location.metadata["name"])
+        assertEquals(McdevDefinitionResolution.SOURCE, location.resolution)
+        assertTrue(location.documentUri.contains("SimpleTarget.java"))
+        assertEquals(3, location.range.start.line)
+    }
+
+    @Test
+    fun resolvesAccessWidenerOwnerToClassDefinition() {
+        val handler = createAwAtHandler()
+        val source = FixtureResourceLoader.loadText(FixturePaths.FABRIC_AW_AT_ACCESS_WIDENER)
+        val marker = "accessible class com/example/target/Simple"
+        val offset = source.indexOf(marker) + marker.length
+        val (line, character) = JdtlsFixtureSupport.offsetToPosition(source, offset)
+        val response = handler.handle(
+            listOf(
+                definitionPayload(
+                    source = source,
+                    line = line,
+                    character = character,
+                    languageId = "accesswidener",
+                    documentUri = "${JdtlsFixtureSupport.workspaceUri(tempDir)}/src/main/resources/mod.accesswidener",
+                ),
+            ),
+        )
+        val result = assertIs<McdevDefinitionResponse>(response.result)
+        assertEquals(1, result.locations.size)
+        val location = result.locations.first()
+        assertEquals("class", location.metadata["kind"])
+        assertEquals("com/example/target/SimpleTarget", location.metadata["owner"])
+        assertEquals(McdevDefinitionResolution.SOURCE, location.resolution)
+        assertTrue(location.documentUri.contains("SimpleTarget.java"))
+    }
+
+    @Test
+    fun resolvesAccessTransformerMemberToFieldDefinition() {
+        val handler = createAwAtHandler()
+        val source = FixtureResourceLoader.loadText(FixturePaths.FABRIC_AW_AT_ACCESS_TRANSFORMER)
+        val marker = "public com.example.target.SimpleTarget counter"
+        val offset = source.indexOf(marker) + marker.indexOf("counter") + 3
+        val (line, character) = JdtlsFixtureSupport.offsetToPosition(source, offset)
+        val response = handler.handle(
+            listOf(
+                definitionPayload(
+                    source = source,
+                    line = line,
+                    character = character,
+                    languageId = "accesstransformer",
+                    documentUri = "${JdtlsFixtureSupport.workspaceUri(tempDir)}/src/main/resources/mod_at.cfg",
+                ),
+            ),
+        )
+        val result = assertIs<McdevDefinitionResponse>(response.result)
+        assertEquals(1, result.locations.size)
+        val location = result.locations.first()
+        assertEquals("field", location.metadata["kind"])
+        assertEquals("counter", location.metadata["name"])
+        assertEquals(McdevDefinitionResolution.SOURCE, location.resolution)
+        assertTrue(location.documentUri.contains("SimpleTarget.java"))
+        assertEquals(3, location.range.start.line)
+    }
+
+    @Test
+    fun resolvesLoomMixinTargetFromMappedSources() {
+        JdtlsFixtureSupport.copyFixture(FixturePaths.FABRIC_LOOM_E2E, tempDir)
+        JdtlsFixtureSupport.installLoomRemappedJar(tempDir)
+        val handler = McdevDefinitionHandler(projectService = FileBasedProjectContextService())
+        val source = FixtureResourceLoader.loadText(FixturePaths.FABRIC_LOOM_E2E_EXAMPLE_MIXIN)
+        val mixinLine = source.lineSequence().toList().indexOfFirst { it.contains("@Mixin") }
+        require(mixinLine >= 0)
+        val response = handler.handle(listOf(definitionPayload(source, mixinLine, 8)))
+        val result = assertIs<McdevDefinitionResponse>(response.result)
+        val location = result.locations.single()
+        assertEquals("class", location.metadata["kind"])
+        assertEquals(McdevDefinitionResolution.SOURCE, location.resolution)
+        assertTrue(location.documentUri.contains("mapped-sources"), location.documentUri)
+        assertTrue(location.documentUri.contains("SimpleTarget.java"), location.documentUri)
     }
 
     @Test
@@ -91,17 +173,32 @@ class McdevDefinitionHandlerTest {
         return McdevDefinitionHandler(projectService = FileBasedProjectContextService())
     }
 
+    private fun createAwAtHandler(): McdevDefinitionHandler {
+        JdtlsFixtureSupport.copyFixture(FixturePaths.FABRIC_AW_AT, tempDir)
+        JdtlsFixtureSupport.copyFixtureResource(
+            "${FixturePaths.FABRIC_BASIC}/src/main/java/com/example/target/SimpleTarget.java",
+            tempDir.resolve("src/main/java/com/example/target/SimpleTarget.java"),
+        )
+        JdtlsFixtureSupport.installClasspathClasses(tempDir)
+        return McdevDefinitionHandler(
+            projectService = FileBasedProjectContextService(),
+            awAtFacade = AwAtServiceFacade(),
+        )
+    }
+
     private fun definitionPayload(
         source: String,
         line: Int,
         character: Int,
         workspaceRoot: String = JdtlsFixtureSupport.workspaceUri(tempDir),
+        languageId: String = "java",
+        documentUri: String = "$workspaceRoot/src/main/java/com/example/mixin/ExampleMixin.java",
     ): Map<String, Any?> = mapOf(
         "context" to mapOf(
             "protocolVersion" to McdevProtocol.VERSION,
             "workspaceRoot" to workspaceRoot,
-            "documentUri" to "$workspaceRoot/src/main/java/com/example/mixin/ExampleMixin.java",
-            "languageId" to "java",
+            "documentUri" to documentUri,
+            "languageId" to languageId,
             "position" to mapOf("line" to line, "character" to character),
             "bufferText" to source,
             "client" to mapOf("name" to "mcdev.nvim", "version" to "0.1.0"),
