@@ -77,6 +77,52 @@ class MixinReferenceServiceTest {
     }
 
     @Test
+    fun doesNotMatchInjectMethodNameByPrefix() {
+        val source = """
+            @Mixin(SimpleTarget.class)
+            abstract class ExampleMixin {
+                @Inject(method = "setScreen", at = @At("HEAD"))
+                private void onSetScreen() {}
+            }
+        """.trimIndent()
+        val target = McDefinitionTarget(
+            kind = MemberKind.METHOD,
+            ownerInternalName = "com/example/target/SimpleTarget",
+            ownerFqn = "com.example.target.SimpleTarget",
+            name = "set",
+            descriptor = "()V",
+        )
+        val references = service.findReferences(
+            target,
+            listOf(SourceScanEntry("file:///Mixin.java", source)),
+        )
+        assertTrue(references.none { it.metadata["source"] == "mixin.inject" })
+    }
+
+    @Test
+    fun matchesInjectMethodDescriptorExactly() {
+        val source = """
+            @Mixin(SimpleTarget.class)
+            abstract class ExampleMixin {
+                @Inject(method = "draw(Ljava/lang/String;FF)V", at = @At("HEAD"))
+                private void onDraw() {}
+            }
+        """.trimIndent()
+        val target = McDefinitionTarget(
+            kind = MemberKind.METHOD,
+            ownerInternalName = "com/example/target/SimpleTarget",
+            ownerFqn = "com.example.target.SimpleTarget",
+            name = "draw",
+            descriptor = "(Ljava/lang/String;FF)V",
+        )
+        val references = service.findReferences(
+            target,
+            listOf(SourceScanEntry("file:///Mixin.java", source)),
+        )
+        assertTrue(references.any { it.metadata["source"] == "mixin.inject" })
+    }
+
+    @Test
     fun findsReferencesAcrossMultipleSources() {
         val first = SourceScanEntry("file:///A.java", """@Mixin(SimpleTarget.class) class A {}""")
         val second = SourceScanEntry("file:///B.java", """@Mixin(targets = "com.example.target.SimpleTarget") class B {}""")
@@ -112,6 +158,44 @@ class MixinReferenceServiceTest {
         )
         assertEquals(1, references.size)
         assertEquals("mixin.accessor", references.first().metadata["source"])
+    }
+
+    @Test
+    fun findsAccessWidenerMethodReferences() {
+        val source = """
+            accessWidener v2 named
+            accessible method com/example/target/SimpleTarget draw (Ljava/lang/String;FF)V
+        """.trimIndent()
+        val target = McDefinitionTarget(
+            kind = MemberKind.METHOD,
+            ownerInternalName = "com/example/target/SimpleTarget",
+            ownerFqn = "com.example.target.SimpleTarget",
+            name = "draw",
+            descriptor = "(Ljava/lang/String;FF)V",
+        )
+        val references = service.findReferences(
+            target,
+            listOf(SourceScanEntry("file:///mod.accesswidener", source)),
+        )
+        assertTrue(references.any { it.metadata["source"] == "aw.method" })
+    }
+
+    @Test
+    fun findsAccessTransformerFieldReferences() {
+        val source = "public com.example.target.SimpleTarget counter"
+        val target = McDefinitionTarget(
+            kind = MemberKind.FIELD,
+            ownerInternalName = "com/example/target/SimpleTarget",
+            ownerFqn = "com.example.target.SimpleTarget",
+            name = "counter",
+            descriptor = "I",
+        )
+        val references = service.findReferences(
+            target,
+            listOf(SourceScanEntry("file:///mod_at.cfg", source)),
+        )
+        assertEquals(1, references.size)
+        assertEquals("at.field", references.first().metadata["source"])
     }
 
     @Test

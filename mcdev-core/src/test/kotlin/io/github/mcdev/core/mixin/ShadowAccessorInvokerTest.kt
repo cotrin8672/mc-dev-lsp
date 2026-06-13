@@ -28,6 +28,19 @@ class ShadowAccessorInvokerTest {
     }
 
     @Test
+    fun shadowFieldStaticMismatchProducesDiagnostic() {
+        val decl = ShadowMemberDeclaration(
+            "currentScreen",
+            false,
+            "Lnet/minecraft/client/gui/screen/Screen;",
+            true,
+            range,
+        )
+        val diagnostics = shadowService.validate(listOf("net/minecraft/client/MinecraftClient"), decl)
+        assertEquals(MixinDiagnosticCodes.SHADOW_STATIC_MISMATCH, diagnostics.first().code)
+    }
+
+    @Test
     fun shadowFieldValidationFailsForDescriptorMismatch() {
         val decl = ShadowMemberDeclaration("currentScreen", false, "I", false, range)
         val diagnostics = shadowService.validate(listOf("net/minecraft/client/MinecraftClient"), decl)

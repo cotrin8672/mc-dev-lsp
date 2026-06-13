@@ -52,6 +52,9 @@ class MixinReferenceService {
             }
         }
 
+        findAwClassReferences(target, entry, results)
+        findAtClassReferences(target, entry, results)
+
         return results.distinctBy { "${it.documentUri}:${it.range.start.line}:${it.range.start.character}" }
     }
 
@@ -83,6 +86,9 @@ class MixinReferenceService {
                 results += locationForMatch(entry.documentUri, entry.text, match.range, "mixin.atTarget")
             }
 
+        findAwFieldReferences(target, entry, results)
+        findAtFieldReferences(target, entry, results)
+
         return results
     }
 
@@ -109,9 +115,16 @@ class MixinReferenceService {
 
         Regex("""method\s*=\s*"([^"]*)"""")
             .findAll(entry.text)
-            .filter { it.groupValues[1].startsWith(methodName) }
+            .filter { methodAnnotationMatches(it.groupValues[1], methodName, target.descriptor) }
             .forEach { match ->
                 results += locationForMatch(entry.documentUri, entry.text, match.range, "mixin.inject")
+            }
+
+        Regex("""@Overwrite(?:\s*\([^)]*\))?\s+(?:private|protected|public)?\s*(?:static\s+)?(?:[\w.<>\[\]]+\s+)?(\w+)\s*\(""")
+            .findAll(entry.text)
+            .filter { it.groupValues[1] == methodName }
+            .forEach { match ->
+                results += locationForMatch(entry.documentUri, entry.text, match.range, "mixin.overwrite")
             }
 
         val descriptor = target.descriptor
@@ -124,7 +137,129 @@ class MixinReferenceService {
                 }
         }
 
+        findAwMethodReferences(target, entry, results)
+        findAtMethodReferences(target, entry, results)
+
         return results
+    }
+
+    private fun methodAnnotationMatches(value: String, methodName: String, descriptor: String?): Boolean {
+        if (value == methodName) return true
+        if (!descriptor.isNullOrBlank() && value == "$methodName$descriptor") return true
+        if (descriptor.isNullOrBlank() && value.startsWith("$methodName(")) return true
+        return false
+    }
+
+    private fun findAwClassReferences(
+        target: McDefinitionTarget,
+        entry: SourceScanEntry,
+        results: MutableList<McReferenceLocation>,
+    ) {
+        val owner = target.ownerInternalName
+        val ownerDot = owner.replace('/', '.')
+        Regex("""(accessible|extendable|mutable|natural)\s+class\s+(\S+)""")
+            .findAll(entry.text)
+            .filter { it.groupValues[2] == owner || it.groupValues[2] == ownerDot }
+            .forEach { match ->
+                results += locationForMatch(entry.documentUri, entry.text, match.range, "aw.class")
+            }
+        Regex("""(accessible|extendable|mutable|natural)\s+(method|field)\s+(\S+)\s+""")
+            .findAll(entry.text)
+            .filter { it.groupValues[3] == owner || it.groupValues[3] == ownerDot }
+            .forEach { match ->
+                results += locationForMatch(entry.documentUri, entry.text, match.range, "aw.owner")
+            }
+    }
+
+    private fun findAtClassReferences(
+        target: McDefinitionTarget,
+        entry: SourceScanEntry,
+        results: MutableList<McReferenceLocation>,
+    ) {
+        val fqn = target.ownerFqn ?: target.ownerInternalName.replace('/', '.')
+        Regex("""(public|protected|private|default)\s+([\w.]+)(?:\s+\S+)?\s*$""", RegexOption.MULTILINE)
+            .findAll(entry.text)
+            .filter { it.groupValues[2] == fqn }
+            .forEach { match ->
+                results += locationForMatch(entry.documentUri, entry.text, match.range, "at.class")
+            }
+    }
+
+    private fun findAwFieldReferences(
+        target: McDefinitionTarget,
+        entry: SourceScanEntry,
+        results: MutableList<McReferenceLocation>,
+    ) {
+        val fieldName = target.name ?: return
+        val owner = target.ownerInternalName
+        val ownerDot = owner.replace('/', '.')
+        val descriptor = target.descriptor
+        Regex("""(accessible|extendable|mutable|natural)\s+field\s+(\S+)\s+(\w+)\s+(\S+)""")
+            .findAll(entry.text)
+            .filter {
+                it.groupValues[3] == fieldName &&
+                    (it.groupValues[2] == owner || it.groupValues[2] == ownerDot) &&
+                    (descriptor == null || it.groupValues[4] == descriptor)
+            }
+            .forEach { match ->
+                results += locationForMatch(entry.documentUri, entry.text, match.range, "aw.field")
+            }
+    }
+
+    private fun findAtFieldReferences(
+        target: McDefinitionTarget,
+        entry: SourceScanEntry,
+        results: MutableList<McReferenceLocation>,
+    ) {
+        val fieldName = target.name ?: return
+        val fqn = target.ownerFqn ?: target.ownerInternalName.replace('/', '.')
+        Regex("""(public|protected|private|default)\s+([\w.]+)\s+(\w+)\s*$""", RegexOption.MULTILINE)
+            .findAll(entry.text)
+            .filter { it.groupValues[2] == fqn && it.groupValues[3] == fieldName }
+            .forEach { match ->
+                results += locationForMatch(entry.documentUri, entry.text, match.range, "at.field")
+            }
+    }
+
+    private fun findAwMethodReferences(
+        target: McDefinitionTarget,
+        entry: SourceScanEntry,
+        results: MutableList<McReferenceLocation>,
+    ) {
+        val methodName = target.name ?: return
+        val owner = target.ownerInternalName
+        val ownerDot = owner.replace('/', '.')
+        val descriptor = target.descriptor
+        Regex("""(accessible|extendable|mutable|natural)\s+method\s+(\S+)\s+(\w+)\s+(\S+)""")
+            .findAll(entry.text)
+            .filter {
+                it.groupValues[3] == methodName &&
+                    (it.groupValues[2] == owner || it.groupValues[2] == ownerDot) &&
+                    (descriptor == null || it.groupValues[4] == descriptor)
+            }
+            .forEach { match ->
+                results += locationForMatch(entry.documentUri, entry.text, match.range, "aw.method")
+            }
+    }
+
+    private fun findAtMethodReferences(
+        target: McDefinitionTarget,
+        entry: SourceScanEntry,
+        results: MutableList<McReferenceLocation>,
+    ) {
+        val methodName = target.name ?: return
+        val fqn = target.ownerFqn ?: target.ownerInternalName.replace('/', '.')
+        val descriptor = target.descriptor
+        Regex("""(public|protected|private|default)\s+([\w.]+)\s+(\S+)\s*$""", RegexOption.MULTILINE)
+            .findAll(entry.text)
+            .filter {
+                it.groupValues[2] == fqn &&
+                    it.groupValues[3].startsWith(methodName) &&
+                    (descriptor == null || it.groupValues[3] == "$methodName$descriptor")
+            }
+            .forEach { match ->
+                results += locationForMatch(entry.documentUri, entry.text, match.range, "at.method")
+            }
     }
 
     private fun locationForMatch(

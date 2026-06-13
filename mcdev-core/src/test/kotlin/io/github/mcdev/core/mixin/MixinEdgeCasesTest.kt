@@ -116,10 +116,68 @@ class MixinEdgeCasesTest {
     }
 
     @Test
-    fun overwriteAnnotationIsUnsupported() {
-        assertNull(MixinAnnotation.fromSimpleName("Overwrite"))
-        val source = """@Overwrite public void tick() {}"""
-        assertNull(AnnotationContextExtractor.extractAtOffset(source, source.indexOf("Overwrite") + 3))
+    fun overwriteAnnotationIsRecognized() {
+        assertEquals(MixinAnnotation.OVERWRITE, MixinAnnotation.fromSimpleName("Overwrite"))
+    }
+
+    @Test
+    fun overwriteContextDetectedOnMethodName() {
+        val source = """
+            @Mixin(MinecraftClient.class)
+            class ExampleMixin {
+                @Overwrite
+                public void tick() {}
+            }
+        """.trimIndent()
+        val offset = source.indexOf("tick")
+        val context = AnnotationContextExtractor.extractAtOffset(source, offset)
+        assertNotNull(context)
+        assertEquals(MixinAnnotation.OVERWRITE, context.annotation)
+        assertEquals(AnnotationSlot.OVERWRITE_METHOD, context.slot)
+    }
+
+    @Test
+    fun overwriteValidationPassesForMatchingTargetMethod() {
+        val source = """
+            @Mixin(MinecraftClient.class)
+            class ExampleMixin {
+                @Overwrite
+                public void tick() {}
+            }
+        """.trimIndent()
+        val diagnostics = diagnosticsService.analyze(
+            MixinDiagnosticRequest(
+                source = source,
+                documentUri = "file:///Mixin.java",
+                mixinClassName = null,
+                mixinPackage = null,
+                mixinConfigContent = null,
+                mixinConfigPath = null,
+            ),
+        )
+        assertTrue(diagnostics.none { it.code == MixinDiagnosticCodes.OVERWRITE_TARGET_NOT_FOUND })
+    }
+
+    @Test
+    fun overwriteValidationReportsMissingTargetMethod() {
+        val source = """
+            @Mixin(MinecraftClient.class)
+            class ExampleMixin {
+                @Overwrite
+                public void missingMethod() {}
+            }
+        """.trimIndent()
+        val diagnostics = diagnosticsService.analyze(
+            MixinDiagnosticRequest(
+                source = source,
+                documentUri = "file:///Mixin.java",
+                mixinClassName = null,
+                mixinPackage = null,
+                mixinConfigContent = null,
+                mixinConfigPath = null,
+            ),
+        )
+        assertTrue(diagnostics.any { it.code == MixinDiagnosticCodes.OVERWRITE_TARGET_NOT_FOUND })
     }
 
     @Test

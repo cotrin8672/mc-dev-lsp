@@ -173,6 +173,32 @@ class MixinDiagnosticsE2ETest {
     }
 
     @Test
+    fun reportsAmbiguousInjectMethodForSimpleTargetOverload() {
+        val source = """
+            @Mixin(com.example.target.SimpleTarget.class)
+            class M {
+                @Inject(method = "draw", at = @At("HEAD"))
+                void m() {}
+            }
+        """.trimIndent()
+        val diagnostics = simpleFacade.diagnose(MixinE2ETestSupport.requestAt(source, "draw"))
+        assertTrue(diagnostics.any { it.code == MixinDiagnosticCodes.AMBIGUOUS_INJECT_METHOD })
+    }
+
+    @Test
+    fun reportsShadowStaticMismatchForSimpleTargetField() {
+        val source = """
+            @Mixin(com.example.target.SimpleTarget.class)
+            class M {
+                @Shadow
+                private static int counter;
+            }
+        """.trimIndent()
+        val diagnostics = simpleFacade.diagnose(MixinE2ETestSupport.requestAt(source, "counter"))
+        assertTrue(diagnostics.any { it.code == MixinDiagnosticCodes.SHADOW_STATIC_MISMATCH })
+    }
+
+    @Test
     fun fabricBasicExampleMixinHasNoUnresolvedInjectMethod() {
         val source = MixinE2ETestSupport.loadFixtureText(FixturePaths.FABRIC_BASIC_EXAMPLE_MIXIN)
         val diagnostics = simpleFacade.diagnose(MixinE2ETestSupport.requestAt(source, "draw"))

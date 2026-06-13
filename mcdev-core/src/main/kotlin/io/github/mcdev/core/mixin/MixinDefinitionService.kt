@@ -69,6 +69,10 @@ class MixinDefinitionService(
                 AnnotationSlot.SHADOW_MEMBER -> resolveShadowMemberAtOffset(source, offsetFromContext(context))
                 else -> emptyList()
             }
+            MixinAnnotation.OVERWRITE -> when (context.slot) {
+                AnnotationSlot.OVERWRITE_METHOD -> resolveOverwriteMethodAtOffset(source, offsetFromContext(context))
+                else -> emptyList()
+            }
             MixinAnnotation.ACCESSOR -> when (context.slot) {
                 AnnotationSlot.ACCESSOR_VALUE -> resolveAccessorTarget(source, context)
                 else -> emptyList()
@@ -105,6 +109,19 @@ class MixinDefinitionService(
         )
     }
 
+    private fun resolveOverwriteMethodAtOffset(source: String, offset: Int): List<McDefinitionTarget> {
+        val declaration = findOverwriteMethodAtOffset(source, offset) ?: return emptyList()
+        val mixinTargets = MixinTargetResolver.resolveTargetsFromSource(source, classIndex)
+        if (mixinTargets.isEmpty()) return emptyList()
+        return resolveMemberInTargets(
+            mixinTargets = mixinTargets,
+            name = declaration.name,
+            isMethod = true,
+            descriptor = declaration.descriptor,
+            sourceRange = declaration.range,
+        )
+    }
+
     private fun resolveShadowMemberAtOffset(source: String, offset: Int): List<McDefinitionTarget> {
         val declaration = findShadowMemberAtOffset(source, offset) ?: return emptyList()
         val mixinTargets = MixinTargetResolver.resolveTargetsFromSource(source, classIndex)
@@ -123,6 +140,10 @@ class MixinDefinitionService(
     private fun resolveFromMemberDeclaration(source: String, offset: Int): List<McDefinitionTarget> {
         findShadowMemberAtOffset(source, offset)?.let { declaration ->
             return resolveShadowMemberAtOffset(source, offset)
+        }
+
+        findOverwriteMethodAtOffset(source, offset)?.let { declaration ->
+            return resolveOverwriteMethodAtOffset(source, offset)
         }
 
         MixinMemberDeclarationParser.parseAccessorDeclarations(source).forEach { declaration ->
@@ -280,6 +301,45 @@ class MixinDefinitionService(
         MixinMemberDeclarationParser.parseShadowDeclarations(source).forEach { declaration ->
             val nameRange = memberNameRange(source, declaration.range, declaration.name) ?: return@forEach
             if (offset in nameRange.first until nameRange.last) return declaration
+        }
+        return null
+    }
+
+    private fun findOverwriteMethodAtOffset(source: String, offset: Int): OverwriteMethodDeclaration? {
+        OverwriteValidationService.parseOverwriteDeclarations(source).forEach { declaration ->
+            val nameRange = memberNameRange(source, declaration.range, declaration.name) ?: return@forEach
+            if (offset in nameRange.first until nameRange.last) return declaration
+            val bodyStart = source.indexOf('{', nameRange.last)
+            if (bodyStart >= 0 && offset >= bodyStart) {
+                val bodyEnd = findMatchingBrace(source, bodyStart) ?: source.length
+                if (offset <= bodyEnd) return declaration
+            }
+        }
+        return null
+    }
+
+    private fun findMatchingBrace(source: String, openIndex: Int): Int? {
+        if (source.getOrNull(openIndex) != '{') return null
+        var depth = 0
+        var inString = false
+        var i = openIndex
+        while (i < source.length) {
+            when {
+                inString -> {
+                    if (source[i] == '\\') {
+                        i += 2
+                        continue
+                    }
+                    if (source[i] == '"') inString = false
+                }
+                source[i] == '"' -> inString = true
+                source[i] == '{' -> depth++
+                source[i] == '}' -> {
+                    depth--
+                    if (depth == 0) return i
+                }
+            }
+            i++
         }
         return null
     }

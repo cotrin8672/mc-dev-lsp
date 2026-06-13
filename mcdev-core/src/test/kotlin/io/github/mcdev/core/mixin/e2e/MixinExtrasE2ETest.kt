@@ -199,13 +199,25 @@ class MixinExtrasE2ETest {
     }
 
     @Test
-    fun diagnoseExpressionContextWarningThroughFacade() {
+    fun diagnoseExpressionContextMissingExpressionThroughFacade() {
         val source = wrapMixin("""
             @ModifyExpressionValue(method = "draw(Ljava/lang/String;FF)V", at = @At(value = "MIXINEXTRAS:EXPRESSION"))
             private float mcdevModifyX(float original) { return original; }
         """)
         val diagnostics = facade.diagnose(MixinE2ETestSupport.requestAt(source, "mcdevModifyX"))
-        assertTrue(diagnostics.any { it.code == MixinExtrasDiagnosticCodes.UNSUPPORTED_EXPRESSION_CONTEXT })
+        assertTrue(diagnostics.any { it.code == MixinExtrasDiagnosticCodes.MISSING_EXPRESSION_ANNOTATION })
+    }
+
+    @Test
+    fun diagnoseExpressionContextValidatesInferredInvokeTypeThroughFacade() {
+        val source = wrapMixin("""
+            @ModifyExpressionValue(method = "draw(Ljava/lang/String;FF)V", at = @At(value = "MIXINEXTRAS:EXPRESSION"))
+            @Expression("text.length()")
+            private int mcdevModifyX(int original) { return original; }
+        """)
+        val diagnostics = facade.diagnose(MixinE2ETestSupport.requestAt(source, "mcdevModifyX"))
+        assertTrue(diagnostics.none { it.code == MixinExtrasDiagnosticCodes.UNSUPPORTED_EXPRESSION_CONTEXT })
+        assertTrue(diagnostics.none { it.code == MixinExtrasDiagnosticCodes.WRONG_RETURN_TYPE })
     }
 
     @Test

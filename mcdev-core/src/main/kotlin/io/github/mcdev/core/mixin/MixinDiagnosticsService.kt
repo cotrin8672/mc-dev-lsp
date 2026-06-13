@@ -20,6 +20,7 @@ class MixinDiagnosticsService(
     private val bytecodeIndex: BytecodeIndex,
     private val configEditor: MixinConfigEditor = MixinConfigEditor(),
     private val atTargetFormatter: AtTargetCompletionService = AtTargetCompletionService(),
+    private val overwriteValidation: OverwriteValidationService = OverwriteValidationService(classIndex),
 ) {
     fun analyze(request: MixinDiagnosticRequest): List<McDiagnostic> {
         val diagnostics = mutableListOf<McDiagnostic>()
@@ -27,6 +28,7 @@ class MixinDiagnosticsService(
         diagnostics += analyzeMixinConfig(request)
         diagnostics += analyzeInjectMethods(request)
         diagnostics += analyzeAtTargets(request)
+        diagnostics += analyzeOverwriteMethods(request)
         return diagnostics
     }
 
@@ -231,6 +233,13 @@ class MixinDiagnosticsService(
             }
         }
         return results
+    }
+
+    private fun analyzeOverwriteMethods(request: MixinDiagnosticRequest): List<McDiagnostic> {
+        val mixinTargets = findMixinTargetsFromSource(request.source)
+        if (mixinTargets.isEmpty()) return emptyList()
+        return OverwriteValidationService.parseOverwriteDeclarations(request.source)
+            .flatMap { declaration -> overwriteValidation.validate(mixinTargets, declaration) }
     }
 
     private fun findMixinTargetsFromSource(source: String): List<String> =

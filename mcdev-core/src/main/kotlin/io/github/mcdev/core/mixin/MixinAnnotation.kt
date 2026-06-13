@@ -17,6 +17,7 @@ enum class MixinAnnotation(val simpleName: String) {
     WRAP_OPERATION("WrapOperation"),
     WRAP_WITH_CONDITION("WrapWithCondition"),
     WRAP_METHOD("WrapMethod"),
+    OVERWRITE("Overwrite"),
     AT("At"),
     ;
 
@@ -36,6 +37,7 @@ enum class AnnotationSlot {
     ACCESSOR_VALUE,
     INVOKER_VALUE,
     SHADOW_MEMBER,
+    OVERWRITE_METHOD,
     PREFIX,
     REMAP,
 }

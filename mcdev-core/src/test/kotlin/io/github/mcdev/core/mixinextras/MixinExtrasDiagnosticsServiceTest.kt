@@ -6,7 +6,10 @@ import kotlin.test.assertEquals
 import kotlin.test.assertTrue
 
 class MixinExtrasDiagnosticsServiceTest {
-    private val service = MixinExtrasDiagnosticsService(MixinExtrasTestFixtures.classIndex)
+    private val service = MixinExtrasDiagnosticsService(
+        MixinExtrasTestFixtures.classIndex,
+        MixinExtrasTestFixtures.bytecodeIndex,
+    )
 
     @Test
     fun noDiagnosticsForValidWrapOperationHandler() {
@@ -102,16 +105,47 @@ class MixinExtrasDiagnosticsServiceTest {
     }
 
     @Test
-    fun expressionAtValueProducesLimitedValidationWarning() {
+    fun expressionAtValueWithoutExpressionAnnotationProducesError() {
         val source = """
             @Mixin(com.example.target.SimpleTarget.class)
             abstract class ExampleMixin {
                 @ModifyExpressionValue(method = "draw(Ljava/lang/String;FF)V", at = @At(value = "MIXINEXTRAS:EXPRESSION"))
+                private int mcdev${'$'}handler(int original) { return original; }
+            }
+        """.trimIndent()
+        val diagnostics = analyze(source)
+        assertTrue(diagnostics.any { it.code == MixinExtrasDiagnosticCodes.MISSING_EXPRESSION_ANNOTATION })
+        assertTrue(diagnostics.none { it.code == MixinExtrasDiagnosticCodes.UNSUPPORTED_EXPRESSION_CONTEXT })
+    }
+
+    @Test
+    fun expressionAtValueValidatesHandlerAgainstInferredInvokeType() {
+        val source = """
+            @Mixin(com.example.target.SimpleTarget.class)
+            abstract class ExampleMixin {
+                @ModifyExpressionValue(method = "draw(Ljava/lang/String;FF)V", at = @At(value = "MIXINEXTRAS:EXPRESSION"))
+                @Expression("text.length()")
+                private int mcdev${'$'}handler(int original) { return original; }
+            }
+        """.trimIndent()
+        val diagnostics = analyze(source)
+        assertTrue(diagnostics.none { it.code == MixinExtrasDiagnosticCodes.UNSUPPORTED_EXPRESSION_CONTEXT })
+        assertTrue(diagnostics.none { it.code == MixinExtrasDiagnosticCodes.WRONG_RETURN_TYPE })
+    }
+
+    @Test
+    fun expressionAtValueReportsWrongReturnTypeWhenInferredTypeDiffers() {
+        val source = """
+            @Mixin(com.example.target.SimpleTarget.class)
+            abstract class ExampleMixin {
+                @ModifyExpressionValue(method = "draw(Ljava/lang/String;FF)V", at = @At(value = "MIXINEXTRAS:EXPRESSION"))
+                @Expression("text.length()")
                 private float mcdev${'$'}handler(float original) { return original; }
             }
         """.trimIndent()
         val diagnostics = analyze(source)
-        assertTrue(diagnostics.any { it.code == MixinExtrasDiagnosticCodes.UNSUPPORTED_EXPRESSION_CONTEXT })
+        assertTrue(diagnostics.any { it.code == MixinExtrasDiagnosticCodes.WRONG_RETURN_TYPE })
+        assertTrue(diagnostics.none { it.code == MixinExtrasDiagnosticCodes.UNSUPPORTED_EXPRESSION_CONTEXT })
     }
 
     @Test

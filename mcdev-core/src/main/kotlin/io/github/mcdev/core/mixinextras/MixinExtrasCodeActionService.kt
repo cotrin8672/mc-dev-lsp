@@ -62,7 +62,7 @@ class MixinExtrasCodeActionService(
         site: MixinExtrasAnnotationSite,
         mixinTargets: List<String>,
     ): WorkspaceEditFix? {
-        val stub = signatureService.generateHandlerStub(site, mixinTargets) ?: return null
+        val stub = signatureService.generateHandlerStub(source, site, mixinTargets) ?: return null
         val insertOffset = findInsertOffset(source, site)
         val title = when (site.annotation) {
             MixinExtrasAnnotation.WRAP_OPERATION -> "Generate WrapOperation handler"
@@ -88,7 +88,7 @@ class MixinExtrasCodeActionService(
         mixinTargets: List<String>,
     ): WorkspaceEditFix? {
         val handler = site.handlerMethod ?: return null
-        val stub = signatureService.generateHandlerStub(site, mixinTargets, handler.methodName) ?: return null
+        val stub = signatureService.generateHandlerStub(source, site, mixinTargets, handler.methodName) ?: return null
         val title = when (site.annotation) {
             MixinExtrasAnnotation.WRAP_OPERATION -> "Fix WrapOperation handler signature"
             MixinExtrasAnnotation.MODIFY_EXPRESSION_VALUE -> "Fix ModifyExpressionValue handler signature"

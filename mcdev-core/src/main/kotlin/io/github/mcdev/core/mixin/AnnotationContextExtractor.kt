@@ -26,12 +26,33 @@ object AnnotationContextExtractor {
         val mixinTargets = resolveMixinTargets(source, cursorOffset)
         val annotationStart = findEnclosingAnnotationStart(source, cursorOffset) ?: return null
         val annotation = parseAnnotationName(source, annotationStart) ?: return null
-        val bodyStart = source.indexOf('(', annotationStart).takeIf { it >= 0 } ?: return null
-        if (cursorOffset <= bodyStart) {
-            return buildClassSlotContext(source, annotation, annotationStart, bodyStart, cursorOffset, mixinTargets)
+        val annotationEndWithoutParens = skipAnnotationName(source, annotationStart)
+        val parenStart = source.indexOf('(', annotationStart).takeIf { it in annotationStart until annotationEndWithoutParens + 1 }
+        val bodyStart = parenStart ?: annotationEndWithoutParens
+        val bodyEnd = if (parenStart != null) {
+            findMatchingParen(source, parenStart) ?: source.length
+        } else {
+            annotationEndWithoutParens
         }
-        val bodyEnd = findMatchingParen(source, bodyStart) ?: source.length
-        val annotationEnd = bodyEnd + 1
+        val annotationEnd = if (parenStart != null) bodyEnd + 1 else annotationEndWithoutParens
+        if (cursorOffset <= bodyStart) {
+            if (annotation == MixinAnnotation.MIXIN) {
+                return buildClassSlotContext(source, annotation, annotationStart, bodyStart, cursorOffset, mixinTargets)
+            }
+            if (annotation == MixinAnnotation.OVERWRITE) {
+                return AnnotationContext(
+                    annotation = annotation,
+                    slot = AnnotationSlot.OVERWRITE_METHOD,
+                    partialValue = "",
+                    valueStartOffset = bodyEnd,
+                    valueEndOffset = bodyEnd,
+                    annotationStartOffset = annotationStart,
+                    annotationEndOffset = annotationEnd,
+                    mixinTargetInternalNames = mixinTargets,
+                )
+            }
+            return null
+        }
         val slotContext = findSlotAtCursor(source, annotation, bodyStart, bodyEnd, cursorOffset)
             ?: if (annotation == MixinAnnotation.MIXIN && cursorOffset in (bodyStart + 1)..bodyEnd) {
                 buildClassSlotContext(source, annotation, annotationStart, bodyStart, cursorOffset, mixinTargets)
@@ -79,13 +100,21 @@ object AnnotationContextExtractor {
                 nameEnd++
             }
             val name = source.substring(at + 1, nameEnd)
-            if (MixinAnnotation.fromSimpleName(name) != null) {
-                val paren = source.indexOf('(', at)
-                if (paren < 0 || paren > cursorOffset) {
+            val annotation = MixinAnnotation.fromSimpleName(name)
+            if (annotation != null) {
+                val immediateParen = if (source.getOrNull(nameEnd) == '(') nameEnd else -1
+                if (immediateParen < 0) {
+                    if (annotationSupportsBareForm(annotation) && cursorOffset >= at) {
+                        return at
+                    }
                     searchFrom = at - 1
                     continue
                 }
-                val close = findMatchingParen(source, paren)
+                if (immediateParen > cursorOffset) {
+                    searchFrom = at - 1
+                    continue
+                }
+                val close = findMatchingParen(source, immediateParen)
                 if (close == null || cursorOffset <= close) {
                     return at
                 }
@@ -93,6 +122,18 @@ object AnnotationContextExtractor {
             searchFrom = at - 1
         }
         return null
+    }
+
+    private fun annotationSupportsBareForm(annotation: MixinAnnotation): Boolean =
+        annotation == MixinAnnotation.SHADOW || annotation == MixinAnnotation.OVERWRITE
+
+    private fun skipAnnotationName(source: String, atOffset: Int): Int {
+        if (source.getOrNull(atOffset) != '@') return atOffset
+        var end = atOffset + 1
+        while (end < source.length && (source[end].isLetterOrDigit() || source[end] == '_')) {
+            end++
+        }
+        return end
     }
 
     private fun parseAnnotationName(source: String, atOffset: Int): MixinAnnotation? {
@@ -166,6 +207,17 @@ object AnnotationContextExtractor {
             return AnnotationContext(
                 annotation = annotation,
                 slot = AnnotationSlot.SHADOW_MEMBER,
+                partialValue = "",
+                valueStartOffset = bodyEnd,
+                valueEndOffset = bodyEnd,
+                annotationStartOffset = 0,
+                annotationEndOffset = 0,
+            )
+        }
+        if (annotation == MixinAnnotation.OVERWRITE && cursorOffset > bodyStart) {
+            return AnnotationContext(
+                annotation = annotation,
+                slot = AnnotationSlot.OVERWRITE_METHOD,
                 partialValue = "",
                 valueStartOffset = bodyEnd,
                 valueEndOffset = bodyEnd,

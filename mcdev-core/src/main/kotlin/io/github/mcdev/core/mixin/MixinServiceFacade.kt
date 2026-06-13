@@ -43,7 +43,7 @@ class MixinServiceFacade(
         classIndex,
         bytecodeIndex,
     ),
-    private val mixinExtrasDiagnostics: MixinExtrasDiagnosticsService = MixinExtrasDiagnosticsService(classIndex),
+    private val mixinExtrasDiagnostics: MixinExtrasDiagnosticsService = MixinExtrasDiagnosticsService(classIndex, bytecodeIndex),
     private val mixinExtrasCodeActions: MixinExtrasCodeActionService = MixinExtrasCodeActionService(classIndex),
     private val expressionSupport: ExpressionSupport = ExpressionSupport(),
 ) {

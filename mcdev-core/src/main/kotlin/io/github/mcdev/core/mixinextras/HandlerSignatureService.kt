@@ -7,12 +7,14 @@ import io.github.mcdev.core.descriptor.MemberTargetParser
 import io.github.mcdev.core.descriptor.parseMethodDescriptor
 import io.github.mcdev.core.diagnostics.McTextPosition
 import io.github.mcdev.core.diagnostics.McTextRange
+import io.github.mcdev.core.mixin.BytecodeIndex
 import io.github.mcdev.core.mixin.ClassIndex
 import io.github.mcdev.core.mixin.MethodIndexEntry
 import io.github.mcdev.core.mixin.MixinTargetResolver
 
 class HandlerSignatureService(
     private val classIndex: ClassIndex,
+    private val bytecodeIndex: BytecodeIndex? = null,
 ) {
     fun resolveTargetMethod(
         mixinTargets: List<String>,
@@ -32,10 +34,14 @@ class HandlerSignatureService(
             ?: matches.first()
     }
 
-    fun expectedSignature(site: MixinExtrasAnnotationSite, mixinTargets: List<String>): HandlerSignatureSpec? {
+    fun expectedSignature(
+        source: String,
+        site: MixinExtrasAnnotationSite,
+        mixinTargets: List<String>,
+    ): HandlerSignatureSpec? {
         val targetMethod = resolveTargetMethod(mixinTargets, site.methodAttribute) ?: return null
         return when (site.annotation) {
-            MixinExtrasAnnotation.MODIFY_EXPRESSION_VALUE -> expectedModifyExpressionValue(site, targetMethod)
+            MixinExtrasAnnotation.MODIFY_EXPRESSION_VALUE -> expectedModifyExpressionValue(source, site, targetMethod, mixinTargets)
             MixinExtrasAnnotation.MODIFY_RETURN_VALUE -> expectedModifyReturnValue(targetMethod)
             MixinExtrasAnnotation.WRAP_OPERATION -> expectedWrapOperation(site, targetMethod)
             MixinExtrasAnnotation.WRAP_WITH_CONDITION -> expectedWrapWithCondition(site, targetMethod)
@@ -45,12 +51,13 @@ class HandlerSignatureService(
     }
 
     fun generateHandlerStub(
+        source: String,
         site: MixinExtrasAnnotationSite,
         mixinTargets: List<String>,
         methodName: String = "mcdevHandler",
         indent: String = "    ",
     ): String? {
-        val spec = expectedSignature(site, mixinTargets) ?: return null
+        val spec = expectedSignature(source, site, mixinTargets) ?: return null
         val params = spec.parameters.joinToString(", ") { "${it.readableType} ${it.name}" }
         val callArgs = spec.operationCallArgs.joinToString(", ")
         val body = when (site.annotation) {
@@ -77,11 +84,12 @@ class HandlerSignatureService(
     }
 
     fun validateHandler(
+        source: String,
         site: MixinExtrasAnnotationSite,
         mixinTargets: List<String>,
         handler: HandlerMethodDeclaration,
     ): List<HandlerValidationIssue> {
-        val expected = expectedSignature(site, mixinTargets) ?: return emptyList()
+        val expected = expectedSignature(source, site, mixinTargets) ?: return emptyList()
         val issues = mutableListOf<HandlerValidationIssue>()
         if (handler.returnTypeDescriptor != null && handler.returnTypeDescriptor != expected.returnTypeDescriptor) {
             issues += HandlerValidationIssue(
@@ -162,10 +170,12 @@ class HandlerSignatureService(
     }
 
     private fun expectedModifyExpressionValue(
+        source: String,
         site: MixinExtrasAnnotationSite,
         targetMethod: MethodIndexEntry,
+        mixinTargets: List<String>,
     ): HandlerSignatureSpec {
-        val expressionType = inferExpressionValueType(site, targetMethod)
+        val expressionType = inferExpressionValueType(source, site, targetMethod, mixinTargets)
         return HandlerSignatureSpec(
             returnTypeDescriptor = expressionType,
             readableReturnType = OperationSignatureRenderer.readableType(expressionType),
@@ -295,8 +305,23 @@ class HandlerSignatureService(
         )
     }
 
-    private fun inferExpressionValueType(site: MixinExtrasAnnotationSite, targetMethod: MethodIndexEntry): String {
+    private fun inferExpressionValueType(
+        source: String,
+        site: MixinExtrasAnnotationSite,
+        targetMethod: MethodIndexEntry,
+        mixinTargets: List<String>,
+    ): String {
         val atValue = site.atValue?.uppercase()
+        if (atValue == "MIXINEXTRAS:EXPRESSION" && bytecodeIndex != null) {
+            ExpressionContextResolver.inferExpressionValueType(
+                source = source,
+                site = site,
+                targetMethod = targetMethod,
+                mixinTargets = mixinTargets,
+                bytecodeIndex = bytecodeIndex,
+                classIndex = classIndex,
+            )?.let { return it }
+        }
         if (atValue == "CONSTANT") {
             val args = site.atTarget.orEmpty()
             return when {
@@ -428,8 +453,17 @@ class HandlerSignatureService(
 
         fun parseHandlerMethod(source: String, startOffset: Int): HandlerMethodDeclaration? {
             var offset = startOffset
-            while (offset < source.length && source[offset].isWhitespace()) {
-                offset++
+            while (offset < source.length) {
+                while (offset < source.length && source[offset].isWhitespace()) {
+                    offset++
+                }
+                if (offset >= source.length) return null
+                if (source[offset] == '@') {
+                    val annotationEnd = skipAnnotation(source, offset) ?: return null
+                    offset = annotationEnd
+                    continue
+                }
+                break
             }
             if (offset >= source.length) return null
             val slice = source.substring(offset)
@@ -501,6 +535,16 @@ class HandlerSignatureService(
                 i++
             }
             return McTextPosition(line, character)
+        }
+
+        private fun skipAnnotation(source: String, atOffset: Int): Int? {
+            if (source.getOrNull(atOffset) != '@') return null
+            var end = atOffset + 1
+            while (end < source.length && (source[end].isLetterOrDigit() || source[end] == '_')) {
+                end++
+            }
+            if (source.getOrNull(end) != '(') return end
+            return findMatchingParen(source, end)?.plus(1) ?: end
         }
 
         private fun findMatchingParen(source: String, openIndex: Int): Int? {
