@@ -27,6 +27,7 @@ mcdev.info
 ```
 
 Do not design around arbitrary custom LSP methods unless JDT LS support is confirmed for the specific integration point.
+The current JDT LS bundle exposes mcdev navigation through commands. It does not contribute to JDT LS `textDocument/definition` or `textDocument/references`.
 
 ## Why Commands First
 
@@ -156,6 +157,7 @@ Remap AT entry to SRG
 ## Neovim Setup Shape
 
 The user controls whether to build the extension jar or point to an existing binary.
+The Neovim plugin is opt-in: `setup()` stores configuration and creates commands, but it must not install keymaps or editor integrations unless the user explicitly enables them.
 
 Recommended config:
 
@@ -175,6 +177,8 @@ require("mcdev").setup({
   },
 })
 ```
+
+Defaults keep `completion.enable`, `diagnostics.enable`, `navigation.enable`, and `code_action.enable` disabled. Users can wire their own keymaps and completion provider setup around the thin `mcdev.*` adapters.
 
 Example `nvim-jdtls` integration:
 
@@ -281,4 +285,3 @@ mcdev: bytecode index is not ready
 ```
 
 Do not say generic `completion failed` unless no structured error is available.
-

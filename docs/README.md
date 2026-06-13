@@ -40,6 +40,21 @@ The explicit non-goals are:
   A practical checklist for future agents so they can work without drifting from the goal.
 - [09 Decisions And Risks](09-decisions-and-risks.md)
   Records architectural decisions, known risks, and the rules for changing the design.
+- [10 Implementation Status](10-implementation-status.md)
+  Records what is implemented, what remains, and verification commands.
+
+## User Guides
+
+- [Installation](installation.md)
+  Prerequisites, prebuilt jar setup, and build from source.
+- [Lazy.nvim Setup](lazy-nvim.md)
+  Full Lazy.nvim spec with mcdev-nvim path and jdtls bundles.
+- [Troubleshooting](troubleshooting.md)
+  Bundle loading, workspace root, AW/AT buffers, McdevInfo, and diagnostics.
+- [Contributing](contributing.md)
+  Where semantics live, handler layer boundaries, and the no-Lua-semantics rule.
+- [Local OSGi Bundle E2E](local-osgi-e2e.md)
+  Verify the extension bundle in real Mason `jdtls`.
 
 ## One-Sentence Mission
 

@@ -63,6 +63,27 @@ Open `src/main/java/com/example/mixin/ExampleMixin.java`, place the cursor insid
 
 You should see Fabric project state and a ready bytecode index.
 
+## Loom-style definition E2E
+
+Validates JDT source attachment (`resolution=jdt`) for targets that live in `mapped-sources/` rather than mod `src/main/java`:
+
+```powershell
+powershell -NoProfile -ExecutionPolicy Bypass -File scripts/run-osgi-loom-e2e.ps1
+```
+
+Fixture matrix (all standard fixtures):
+
+```powershell
+powershell -NoProfile -ExecutionPolicy Bypass -File scripts/run-osgi-e2e-matrix.ps1
+```
+
+Optional live Loom `genSources` (requires network and a bundled Gradle wrapper):
+
+```powershell
+$env:MCDEV_LOOM_RUN_GEN_SOURCES = "1"
+powershell -NoProfile -ExecutionPolicy Bypass -File scripts/run-osgi-loom-e2e.ps1
+```
+
 ## Environment overrides
 
 | Variable | Purpose |
@@ -71,6 +92,7 @@ You should see Fabric project state and a ready bytecode index.
 | `JDTLS_PLUGINS_DIR` | Compile-time path to JDT LS plugins when building the extension |
 | `MCDEV_BUNDLE_JAR` | Used by the headless E2E script |
 | `MCDEV_E2E_WORKSPACE` | Used by the headless E2E script |
+| `MCDEV_LOOM_RUN_GEN_SOURCES` | When `1`, attempt `gradlew genSources` during loom workspace prep |
 
 ## What this proves
 
