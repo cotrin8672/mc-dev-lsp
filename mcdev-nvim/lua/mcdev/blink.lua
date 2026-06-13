@@ -1,4 +1,5 @@
 local completion = require("mcdev.completion")
+local buffer = require("mcdev.buffer")
 
 local M = {}
 
@@ -11,8 +12,7 @@ function M:get_trigger_characters()
 end
 
 function M:enabled()
-  local ft = vim.bo.filetype
-  return ft == "java" or ft == "json" or ft == "accesswidener" or ft == "cfg"
+  return buffer.is_mcdev_buffer(0)
 end
 
 function M:get_completions(_, callback)

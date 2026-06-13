@@ -5,8 +5,18 @@ M.options = {
     extension_jar = nil,
   },
   completion = {
-    enable = true,
+    enable = false,
     source = "blink",
+  },
+  diagnostics = {
+    enable = false,
+    debounce_ms = 300,
+  },
+  navigation = {
+    enable = false,
+  },
+  code_action = {
+    enable = false,
   },
   mappings = {
     preferred_at_target = "descriptor",

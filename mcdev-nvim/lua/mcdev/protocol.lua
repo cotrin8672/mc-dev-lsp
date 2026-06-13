@@ -1,4 +1,5 @@
 local config = require("mcdev.config")
+local buffer = require("mcdev.buffer")
 
 local M = {}
 
@@ -17,8 +18,8 @@ local function document_uri(bufnr)
   return vim.uri_from_bufnr(bufnr)
 end
 
-local function workspace_root()
-  local clients = vim.lsp.get_clients({ bufnr = 0 })
+local function workspace_root(bufnr)
+  local clients = vim.lsp.get_clients({ bufnr = bufnr or 0 })
   for _, client in ipairs(clients) do
     if client.name == "jdtls" and client.config and client.config.root_dir then
       return vim.uri_from_fname(client.config.root_dir)
@@ -42,9 +43,9 @@ function M.context(bufnr, position)
   position = position or vim.api.nvim_win_get_cursor(0)
   return {
     protocolVersion = M.VERSION,
-    workspaceRoot = workspace_root(),
+    workspaceRoot = workspace_root(bufnr),
     documentUri = document_uri(bufnr),
-    languageId = vim.bo[bufnr].filetype,
+    languageId = buffer.effective_language_id(bufnr),
     position = {
       line = position[1] - 1,
       character = position[2],
@@ -57,8 +58,9 @@ function M.context(bufnr, position)
   }
 end
 
-function M.request(command, payload, callback)
-  local client = M.active_jdtls_client(0)
+function M.request(command, payload, callback, bufnr)
+  bufnr = bufnr or 0
+  local client = M.active_jdtls_client(bufnr)
   if not client then
     local message = "mcdev: no active JDT LS client for this buffer"
     if callback then
@@ -76,7 +78,7 @@ function M.request(command, payload, callback)
     if callback then
       callback(result, err)
     end
-  end, 0)
+  end, bufnr)
 end
 
 function M.build_completion_payload(bufnr, position)
@@ -95,9 +97,56 @@ function M.build_completion_payload(bufnr, position)
   }
 end
 
-function M.completion(callback)
-  local payload = M.build_completion_payload()
-  M.request(M.commands.completion, payload, callback)
+function M.completion(callback, bufnr, position)
+  bufnr = bufnr or vim.api.nvim_get_current_buf()
+  position = position or vim.api.nvim_win_get_cursor(0)
+  local payload = M.build_completion_payload(bufnr, position)
+  M.request(M.commands.completion, payload, callback, bufnr)
+end
+
+function M.build_code_action_payload(bufnr, range, diagnostic_codes)
+  bufnr = bufnr or vim.api.nvim_get_current_buf()
+  local position = range and { range.start.line + 1, range.start.character }
+    or vim.api.nvim_win_get_cursor(0)
+  local resolved_range = range or {
+    start = {
+      line = position[1] - 1,
+      character = position[2],
+    },
+    ["end"] = {
+      line = position[1] - 1,
+      character = position[2],
+    },
+  }
+  return {
+    context = M.context(bufnr, position),
+    range = resolved_range,
+    diagnosticCodes = diagnostic_codes or {},
+  }
+end
+
+function M.definition(bufnr, position, callback)
+  bufnr = bufnr or vim.api.nvim_get_current_buf()
+  position = position or vim.api.nvim_win_get_cursor(0)
+  M.request(M.commands.definition, { context = M.context(bufnr, position) }, callback, bufnr)
+end
+
+function M.references(bufnr, position, callback)
+  bufnr = bufnr or vim.api.nvim_get_current_buf()
+  position = position or vim.api.nvim_win_get_cursor(0)
+  M.request(M.commands.references, { context = M.context(bufnr, position) }, callback, bufnr)
+end
+
+function M.diagnostics(bufnr, position, callback)
+  bufnr = bufnr or vim.api.nvim_get_current_buf()
+  position = position or vim.api.nvim_win_get_cursor(0)
+  M.request(M.commands.context, { context = M.context(bufnr, position) }, callback, bufnr)
+end
+
+function M.code_action(bufnr, range, diagnostic_codes, callback)
+  bufnr = bufnr or vim.api.nvim_get_current_buf()
+  local payload = M.build_code_action_payload(bufnr, range, diagnostic_codes)
+  M.request(M.commands.code_action, payload, callback, bufnr)
 end
 
 function M.info()

@@ -1,4 +1,5 @@
 local completion = require("mcdev.completion")
+local buffer = require("mcdev.buffer")
 
 local source = {}
 
@@ -7,8 +8,7 @@ function source.new()
 end
 
 function source:is_available()
-  local ft = vim.bo.filetype
-  return ft == "java" or ft == "json" or ft == "accesswidener" or ft == "cfg"
+  return buffer.is_mcdev_buffer(0)
 end
 
 function source:complete(_, callback)
