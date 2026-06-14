@@ -24,29 +24,29 @@ class MixinDiagnosticsService(
 ) {
     fun analyze(request: MixinDiagnosticRequest): List<McDiagnostic> {
         val diagnostics = mutableListOf<McDiagnostic>()
-        diagnostics += analyzeMixinTargets(request)
+        val model = MixinSemanticModelParser.parse(request.source)
+        diagnostics += analyzeMixinTargets(request, model)
         diagnostics += analyzeMixinConfig(request)
-        diagnostics += analyzeInjectMethods(request)
-        diagnostics += analyzeAtTargets(request)
+        diagnostics += analyzeInjectMethods(request, model)
+        diagnostics += analyzeAtTargets(request, model)
         diagnostics += analyzeOverwriteMethods(request)
         return diagnostics
     }
 
-    private fun analyzeMixinTargets(request: MixinDiagnosticRequest): List<McDiagnostic> {
+    private fun analyzeMixinTargets(request: MixinDiagnosticRequest, model: MixinClassModel): List<McDiagnostic> {
         val results = mutableListOf<McDiagnostic>()
         AnnotationContextExtractor.findAnnotationOffsets(request.source, MixinAnnotation.MIXIN).forEach { atOffset ->
             val end = AnnotationContextExtractor.annotationEndOffset(request.source, atOffset)
             val range = offsetRange(request.source, atOffset, end)
-            val targets = AnnotationContextExtractor.parseMixinTargetValues(request.source, atOffset)
             results += duplicateMixinTargetDiagnostics(request.source, atOffset, range)
-            for (target in targets) {
-                if (MixinTargetResolver.resolveTarget(target, classIndex) == null) {
+            for (target in model.targets) {
+                if (MixinTargetResolver.resolveTarget(target.internalName, classIndex) == null) {
                     results += McDiagnostic(
                         code = MixinDiagnosticCodes.UNRESOLVED_MIXIN_TARGET,
                         severity = McSeverity.ERROR,
-                        message = "Unresolved @Mixin target: $target",
-                        range = range,
-                        metadata = mapOf("target" to target),
+                        message = "Unresolved @Mixin target: ${target.internalName}",
+                        range = target.range,
+                        metadata = mapOf("target" to target.internalName),
                     )
                 }
             }
@@ -128,116 +128,107 @@ class MixinDiagnosticsService(
         }
     }
 
-    private fun analyzeInjectMethods(request: MixinDiagnosticRequest): List<McDiagnostic> {
+    private fun analyzeInjectMethods(request: MixinDiagnosticRequest, model: MixinClassModel): List<McDiagnostic> {
         val results = mutableListOf<McDiagnostic>()
         val mixinTargets = findMixinTargetsFromSource(request.source)
-        findInjectorAnnotationSpans(request.source).forEach { injector ->
-            val methodMatch = INJECT_METHOD_PATTERN.find(injector.body) ?: return@forEach
-            val methodValue = methodMatch.groupValues[1]
-            val range = offsetRange(
-                request.source,
-                injector.bodyStart + methodMatch.range.first,
-                injector.bodyStart + methodMatch.range.last + 1,
-            )
-            val name = methodValue.substringBefore('(')
-            val descriptorSuffix = methodValue.substringAfter('(', "")
-            if (mixinTargets.isEmpty()) return@forEach
-            val allMatches = mutableListOf<MethodIndexEntry>()
-            for (owner in mixinTargets) {
-                allMatches += classIndex.getMethods(owner).filter { it.name == name }
-            }
-            when {
-                allMatches.isEmpty() -> {
-                    results += McDiagnostic(
-                        code = MixinDiagnosticCodes.UNRESOLVED_INJECT_METHOD,
-                        severity = McSeverity.ERROR,
-                        message = "Unresolved injector method: $methodValue",
-                        range = range,
-                        metadata = mapOf("method" to methodValue),
-                    )
+        model.injectors.forEach { injector ->
+            injector.methodSelectors.forEach { selector ->
+                val methodValue = selector.value
+                val range = selector.range
+                val name = selector.name
+                val descriptor = selector.descriptor
+                if (mixinTargets.isEmpty()) return@forEach
+                val allMatches = mutableListOf<MethodIndexEntry>()
+                for (owner in mixinTargets) {
+                    allMatches += classIndex.getMethods(owner).filter { it.name == name }
                 }
-                descriptorSuffix.isNotEmpty() -> {
-                    val fullDescriptor = "($descriptorSuffix"
-                    val found = allMatches.any { it.descriptor == fullDescriptor || methodValue.endsWith(it.descriptor) }
-                    if (!found) {
+                when {
+                    allMatches.isEmpty() -> {
                         results += McDiagnostic(
-                            code = MixinDiagnosticCodes.DESCRIPTOR_MISMATCH,
+                            code = MixinDiagnosticCodes.UNRESOLVED_INJECT_METHOD,
                             severity = McSeverity.ERROR,
-                            message = "Injector method descriptor mismatch: $methodValue",
+                            message = "Unresolved injector method: $methodValue",
                             range = range,
+                            metadata = mapOf("method" to methodValue),
                         )
                     }
-                }
-                allMatches.size > 1 -> {
-                    results += McDiagnostic(
-                        code = MixinDiagnosticCodes.AMBIGUOUS_INJECT_METHOD,
-                        severity = McSeverity.WARNING,
-                        message = "Ambiguous injector method '$name'; add descriptor",
-                        range = range,
-                        metadata = mapOf("method" to name, "count" to allMatches.size.toString()),
-                    )
+                    descriptor != null -> {
+                        val found = allMatches.any { it.descriptor == descriptor }
+                        if (!found) {
+                            results += McDiagnostic(
+                                code = MixinDiagnosticCodes.DESCRIPTOR_MISMATCH,
+                                severity = McSeverity.ERROR,
+                                message = "Injector method descriptor mismatch: $methodValue",
+                                range = range,
+                            )
+                        }
+                    }
+                    allMatches.size > 1 -> {
+                        results += McDiagnostic(
+                            code = MixinDiagnosticCodes.AMBIGUOUS_INJECT_METHOD,
+                            severity = McSeverity.WARNING,
+                            message = "Ambiguous injector method '$name'; add descriptor",
+                            range = range,
+                            metadata = mapOf("method" to name, "count" to allMatches.size.toString()),
+                        )
+                    }
                 }
             }
         }
         return results
     }
 
-    private fun analyzeAtTargets(request: MixinDiagnosticRequest): List<McDiagnostic> {
+    private fun analyzeAtTargets(request: MixinDiagnosticRequest, model: MixinClassModel): List<McDiagnostic> {
         val results = mutableListOf<McDiagnostic>()
         val mixinTargets = findMixinTargetsFromSource(request.source)
-        val injectors = findInjectorAnnotationSpans(request.source)
-        findAtAnnotationSpans(request.source).forEach { at ->
-            val body = at.body
-            val value = AT_VALUE_PATTERN.find(body)?.groupValues?.get(1)
-                ?: AT_SHORT_VALUE_PATTERN.find(body)?.groupValues?.get(1)
-                ?: return@forEach
-            val owner = mixinTargets.firstOrNull()
-            val containingInjector = findContainingInjector(at.atOffset, injectors)
-            val injectMethod = containingInjector?.methodName
-            val injectMethodDescriptor = containingInjector?.methodDescriptor
-            val ordinalMatch = AT_ORDINAL_PATTERN.find(body)
-            if (ordinalMatch != null && value == "RETURN" && owner != null && injectMethod != null) {
-                val ordinal = ordinalMatch.groupValues[1].toIntOrNull()
-                if (ordinal != null) {
-                    val count = bytecodeIndex.getReturnOrdinalCount(owner, injectMethod, injectMethodDescriptor)
-                    if (ordinal >= count) {
+        model.injectors.forEach { injector ->
+            injector.atSelectors.forEach { at ->
+                val value = at.value
+                val owner = mixinTargets.firstOrNull()
+                val injectMethods = injector.methodSelectors.ifEmpty { listOf(null) }
+                for (injectMethodSelector in injectMethods) {
+                    val injectMethod = injectMethodSelector?.name
+                    val injectMethodDescriptor = injectMethodSelector?.descriptor
+                    if (at.ordinal != null && value == "RETURN" && owner != null && injectMethod != null) {
+                        val count = bytecodeIndex.getReturnOrdinalCount(owner, injectMethod, injectMethodDescriptor)
+                        if (at.ordinal >= count) {
+                            results += McDiagnostic(
+                                code = MixinDiagnosticCodes.ORDINAL_OUT_OF_RANGE,
+                                severity = McSeverity.ERROR,
+                                message = "Ordinal ${at.ordinal} out of range for RETURN (max ${count - 1})",
+                                range = at.ordinalRange ?: at.range,
+                            )
+                        }
+                    }
+                }
+                val targetValue = at.target ?: return@forEach
+                val range = at.targetRange ?: at.range
+                if (targetValue.isEmpty()) return@forEach
+                val parsed = MemberTargetParser.parse(targetValue)
+                if (parsed is io.github.mcdev.core.descriptor.DescriptorParseResult.Failure) {
+                    results += McDiagnostic(
+                        code = MixinDiagnosticCodes.INVALID_AT_TARGET_DESCRIPTOR,
+                        severity = McSeverity.ERROR,
+                        message = "Invalid @At target descriptor: $targetValue",
+                        range = range,
+                    )
+                    return@forEach
+                }
+                for (injectMethodSelector in injectMethods) {
+                    val injectMethod = injectMethodSelector?.name
+                    val injectMethodDescriptor = injectMethodSelector?.descriptor
+                    if (owner == null || injectMethod == null) continue
+                    val candidates = bytecodeIndex.getAtTargetCandidates(owner, injectMethod, injectMethodDescriptor, value)
+                    if (candidates.none { atTargetFormatter.formatTarget(it) == targetValue }) {
                         results += McDiagnostic(
-                            code = MixinDiagnosticCodes.ORDINAL_OUT_OF_RANGE,
+                            code = MixinDiagnosticCodes.UNRESOLVED_AT_TARGET,
                             severity = McSeverity.ERROR,
-                            message = "Ordinal $ordinal out of range for RETURN (max ${count - 1})",
-                            range = offsetRange(
-                                request.source,
-                                at.bodyStart + ordinalMatch.range.first,
-                                at.bodyStart + ordinalMatch.range.last + 1,
-                            ),
+                            message = "Unresolved @At target: $targetValue",
+                            range = range,
+                            metadata = mapOf("target" to targetValue, "atValue" to value),
                         )
                     }
                 }
-            }
-            val targetMatch = AT_TARGET_PATTERN.find(body) ?: return@forEach
-            val targetValue = targetMatch.groupValues[1]
-            val range = quotedValueRange(request.source, body, at.bodyStart, targetMatch)
-            if (targetValue.isEmpty()) return@forEach
-            val parsed = MemberTargetParser.parse(targetValue)
-            if (parsed is io.github.mcdev.core.descriptor.DescriptorParseResult.Failure) {
-                results += McDiagnostic(
-                    code = MixinDiagnosticCodes.INVALID_AT_TARGET_DESCRIPTOR,
-                    severity = McSeverity.ERROR,
-                    message = "Invalid @At target descriptor: $targetValue",
-                    range = range,
-                )
-                return@forEach
-            }
-            if (owner == null || injectMethod == null) return@forEach
-            val candidates = bytecodeIndex.getAtTargetCandidates(owner, injectMethod, injectMethodDescriptor, value)
-            if (candidates.none { atTargetFormatter.formatTarget(it) == targetValue }) {
-                results += McDiagnostic(
-                    code = MixinDiagnosticCodes.UNRESOLVED_AT_TARGET,
-                    severity = McSeverity.ERROR,
-                    message = "Unresolved @At target: $targetValue",
-                    range = range,
-                    metadata = mapOf("target" to targetValue, "atValue" to value),
-                )
             }
         }
         return results
@@ -246,7 +237,7 @@ class MixinDiagnosticsService(
     private fun analyzeOverwriteMethods(request: MixinDiagnosticRequest): List<McDiagnostic> {
         val mixinTargets = findMixinTargetsFromSource(request.source)
         if (mixinTargets.isEmpty()) return emptyList()
-        return OverwriteValidationService.parseOverwriteDeclarations(request.source)
+        return MixinMemberDeclarationParser.parseOverwriteDeclarations(request.source)
             .flatMap { declaration -> overwriteValidation.validate(mixinTargets, declaration) }
     }
 

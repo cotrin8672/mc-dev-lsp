@@ -5,8 +5,6 @@ import io.github.mcdev.core.completion.McCompletionItem
 import io.github.mcdev.core.completion.McCompletionKind
 import io.github.mcdev.core.completion.McCompletionMetadata
 import io.github.mcdev.core.diagnostics.McDiagnostic
-import io.github.mcdev.core.diagnostics.McTextPosition
-import io.github.mcdev.core.diagnostics.McTextRange
 import io.github.mcdev.core.mixinextras.ExpressionSupport
 import io.github.mcdev.core.mixinextras.MixinExtrasCodeActionService
 import io.github.mcdev.core.mixinextras.MixinExtrasCompletionService
@@ -293,140 +291,17 @@ class MixinServiceFacade(
         val mixinTargets = MixinTargetResolver.resolveTargetsFromSource(source, classIndex)
         if (mixinTargets.isEmpty()) return emptyList()
         val diagnostics = mutableListOf<McDiagnostic>()
-        MixinSourceMemberParser.parseShadowDeclarations(source).forEach { declaration ->
-            val prefix = MixinSourceMemberParser.findShadowPrefix(source)
-            val remap = MixinSourceMemberParser.findShadowRemap(source)
+        MixinMemberDeclarationParser.parseShadowDeclarations(source).forEach { declaration ->
+            val prefix = MixinMemberDeclarationParser.findShadowPrefix(source)
+            val remap = MixinMemberDeclarationParser.findShadowRemap(source)
             diagnostics += shadowValidation.validate(mixinTargets, declaration, prefix, remap)
         }
-        MixinSourceMemberParser.parseAccessorDeclarations(source).forEach { declaration ->
+        MixinMemberDeclarationParser.parseAccessorDeclarations(source).forEach { declaration ->
             diagnostics += accessorService.validate(mixinTargets, declaration)
         }
-        MixinSourceMemberParser.parseInvokerDeclarations(source).forEach { declaration ->
+        MixinMemberDeclarationParser.parseInvokerDeclarations(source).forEach { declaration ->
             diagnostics += invokerService.validate(mixinTargets, declaration)
         }
         return diagnostics
-    }
-}
-
-private object MixinSourceMemberParser {
-    private val shadowFieldPattern = Regex(
-        """@Shadow(?:\s*\([^)]*\))?\s+(?:private|protected|public)?\s*(?:static\s+)?([\w.<>\[\]]+)\s+(\w+)\s*;""",
-    )
-    private val shadowMethodPattern = Regex(
-        """@Shadow(?:\s*\([^)]*\))?\s+(?:private|protected|public)?\s*(?:static\s+)?(?:abstract\s+)?([\w.<>\[\]]+)\s+(\w+)\s*\(([^)]*)\)\s*;""",
-    )
-    private val accessorPattern = Regex(
-        """@Accessor(?:\s*\(\s*"([^"]*)"\s*\))?\s+(?:private|protected|public)?\s*(?:static\s+)?(?:abstract\s+)?([\w.<>\[\]]+)\s+(\w+)\s*\(([^)]*)\)\s*;""",
-    )
-    private val invokerPattern = Regex(
-        """@Invoker(?:\s*\(\s*"([^"]*)"\s*\))?\s+(?:private|protected|public)?\s*(?:static\s+)?(?:abstract\s+)?([\w.<>\[\]]+)\s+(\w+)\s*\(([^)]*)\)\s*;""",
-    )
-
-    fun parseShadowDeclarations(source: String): List<ShadowMemberDeclaration> {
-        val results = mutableListOf<ShadowMemberDeclaration>()
-        shadowFieldPattern.findAll(source).forEach { match ->
-            results += ShadowMemberDeclaration(
-                name = match.groupValues[2],
-                isMethod = false,
-                descriptor = javaTypeToDescriptor(match.groupValues[1]),
-                isStatic = match.value.contains("static"),
-                range = offsetRange(source, match.range.first, match.range.last + 1),
-            )
-        }
-        shadowMethodPattern.findAll(source).forEach { match ->
-            results += ShadowMemberDeclaration(
-                name = match.groupValues[2],
-                isMethod = true,
-                descriptor = methodSignatureToDescriptor(match.groupValues[1], match.groupValues[3]),
-                isStatic = match.value.contains("static"),
-                range = offsetRange(source, match.range.first, match.range.last + 1),
-            )
-        }
-        return results
-    }
-
-    fun parseAccessorDeclarations(source: String): List<AccessorMethodDeclaration> =
-        accessorPattern.findAll(source).map { match ->
-            AccessorMethodDeclaration(
-                methodName = match.groupValues[3],
-                returnTypeDescriptor = javaTypeToDescriptor(match.groupValues[2]),
-                parameterDescriptors = parseParameterTypes(match.groupValues[4]),
-                explicitFieldName = match.groupValues[1].ifEmpty { null },
-                range = offsetRange(source, match.range.first, match.range.last + 1),
-            )
-        }.toList()
-
-    fun parseInvokerDeclarations(source: String): List<InvokerMethodDeclaration> =
-        invokerPattern.findAll(source).map { match ->
-            InvokerMethodDeclaration(
-                methodName = match.groupValues[3],
-                parameterDescriptors = parseParameterTypes(match.groupValues[4]),
-                returnTypeDescriptor = javaTypeToDescriptor(match.groupValues[2]),
-                explicitTargetName = match.groupValues[1].ifEmpty { null },
-                range = offsetRange(source, match.range.first, match.range.last + 1),
-            )
-        }.toList()
-
-    fun findShadowPrefix(source: String): String? =
-        Regex("""prefix\s*=\s*"([^"]*)"""").find(source)?.groupValues?.get(1)
-
-    fun findShadowRemap(source: String): Boolean =
-        Regex("""remap\s*=\s*(true|false)""").find(source)?.groupValues?.get(1) != "false"
-
-    private fun parseParameterTypes(params: String): List<String> =
-        params.split(',')
-            .map { it.trim() }
-            .filter { it.isNotEmpty() }
-            .map { javaTypeToDescriptor(it.substringBeforeLast(' ').ifEmpty { it }) }
-
-    private fun javaTypeToDescriptor(type: String): String {
-        val trimmed = type.trim()
-        val arrayDepth = Regex("""\[\]""").findAll(trimmed).count() + if (trimmed.endsWith("...")) 1 else 0
-        val normalized = trimmed
-            .removeSuffix("...")
-            .replace("[]", "")
-            .substringBefore('<')
-            .trim()
-        val descriptor = when (normalized) {
-            "void" -> "V"
-            "boolean" -> "Z"
-            "byte" -> "B"
-            "char" -> "C"
-            "short" -> "S"
-            "int" -> "I"
-            "long" -> "J"
-            "float" -> "F"
-            "double" -> "D"
-            "String" -> "Ljava/lang/String;"
-            "Object" -> "Ljava/lang/Object;"
-            "Class" -> "Ljava/lang/Class;"
-            else -> "L${normalized.replace('.', '/')};"
-        }
-        return "[".repeat(arrayDepth) + descriptor
-    }
-
-    private fun methodSignatureToDescriptor(returnType: String, params: String): String =
-        "(${parseParameterTypes(params).joinToString("")})${javaTypeToDescriptor(returnType)}"
-
-    private fun offsetRange(source: String, start: Int, end: Int): McTextRange {
-        val startPos = offsetToPosition(source, start)
-        val endPos = offsetToPosition(source, end)
-        return McTextRange(startPos, endPos)
-    }
-
-    private fun offsetToPosition(source: String, offset: Int): McTextPosition {
-        var line = 0
-        var character = 0
-        var i = 0
-        while (i < offset && i < source.length) {
-            if (source[i] == '\n') {
-                line++
-                character = 0
-            } else {
-                character++
-            }
-            i++
-        }
-        return McTextPosition(line, character)
     }
 }

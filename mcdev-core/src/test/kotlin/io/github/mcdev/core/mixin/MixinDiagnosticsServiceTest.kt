@@ -100,6 +100,28 @@ class MixinDiagnosticsServiceTest {
     }
 
     @Test
+    fun analyzesInjectMethodArray() {
+        val source = """
+            @Mixin(MinecraftClient.class)
+            class M {
+                @Inject(
+                    method = {
+                        "tick",
+                        "missing"
+                    },
+                    at = @At("HEAD")
+                )
+                void m() {}
+            }
+        """.trimIndent()
+        val diagnostics = analyze(source)
+        assertTrue(diagnostics.any {
+            it.code == MixinDiagnosticCodes.UNRESOLVED_INJECT_METHOD &&
+                it.metadata["method"] == "missing"
+        })
+    }
+
+    @Test
     fun reportsDescriptorMismatchForInjectMethod() {
         val source = """
             @Mixin(MinecraftClient.class)
@@ -123,6 +145,28 @@ class MixinDiagnosticsServiceTest {
         """.trimIndent()
         val diagnostics = analyze(source)
         assertTrue(diagnostics.any { it.code == MixinDiagnosticCodes.UNRESOLVED_AT_TARGET })
+    }
+
+    @Test
+    fun analyzesAtArraySeparately() {
+        val source = """
+            @Mixin(MinecraftClient.class)
+            class M {
+                @Inject(
+                    method = "tick",
+                    at = {
+                        @At("HEAD"),
+                        @At(value = "INVOKE", target = "Lmissing/Class;draw()V")
+                    }
+                )
+                void m() {}
+            }
+        """.trimIndent()
+        val diagnostics = analyze(source)
+        assertTrue(diagnostics.any {
+            it.code == MixinDiagnosticCodes.UNRESOLVED_AT_TARGET &&
+                it.metadata["target"] == "Lmissing/Class;draw()V"
+        })
     }
 
     @Test

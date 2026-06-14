@@ -65,11 +65,10 @@ class MixinReferenceService {
         val fieldName = target.name ?: return emptyList()
         val results = mutableListOf<McReferenceLocation>()
 
-        Regex("""@Shadow(?:\s*\([^)]*\))?\s+(?:private|protected|public)?\s*(?:static\s+)?[\w.<>\[\]]+\s+(\w+)\s*;""")
-            .findAll(entry.text)
-            .filter { it.groupValues[1] == fieldName }
-            .forEach { match ->
-                results += locationForMatch(entry.documentUri, entry.text, match.range, "mixin.shadow")
+        MixinMemberDeclarationParser.parseShadowDeclarations(entry.text)
+            .filter { !it.isMethod && it.name == fieldName }
+            .forEach { declaration ->
+                results += locationForRange(entry.documentUri, declaration.range, "mixin.shadow")
             }
 
         Regex("""@Accessor\s*\(\s*"([^"]*)"\s*\)""")
@@ -99,11 +98,10 @@ class MixinReferenceService {
         val methodName = target.name ?: return emptyList()
         val results = mutableListOf<McReferenceLocation>()
 
-        Regex("""@Shadow(?:\s*\([^)]*\))?\s+(?:private|protected|public)?\s*(?:static\s+)?(?:abstract\s+)?[\w.<>\[\]]+\s+(\w+)\s*\([^)]*\)\s*;""")
-            .findAll(entry.text)
-            .filter { it.groupValues[1] == methodName }
-            .forEach { match ->
-                results += locationForMatch(entry.documentUri, entry.text, match.range, "mixin.shadow")
+        MixinMemberDeclarationParser.parseShadowDeclarations(entry.text)
+            .filter { it.isMethod && it.name == methodName }
+            .forEach { declaration ->
+                results += locationForRange(entry.documentUri, declaration.range, "mixin.shadow")
             }
 
         Regex("""@Invoker\s*\(\s*"([^"]*)"\s*\)""")
@@ -120,11 +118,10 @@ class MixinReferenceService {
                 results += locationForMatch(entry.documentUri, entry.text, match.range, "mixin.inject")
             }
 
-        Regex("""@Overwrite(?:\s*\([^)]*\))?\s+(?:private|protected|public)?\s*(?:static\s+)?(?:[\w.<>\[\]]+\s+)?(\w+)\s*\(""")
-            .findAll(entry.text)
-            .filter { it.groupValues[1] == methodName }
-            .forEach { match ->
-                results += locationForMatch(entry.documentUri, entry.text, match.range, "mixin.overwrite")
+        MixinMemberDeclarationParser.parseOverwriteDeclarations(entry.text)
+            .filter { it.name == methodName }
+            .forEach { declaration ->
+                results += locationForRange(entry.documentUri, declaration.range, "mixin.overwrite")
             }
 
         val descriptor = target.descriptor
@@ -271,6 +268,17 @@ class MixinReferenceService {
         McReferenceLocation(
             documentUri = documentUri,
             range = offsetRange(text, range.first, range.last + 1),
+            metadata = mapOf("source" to source),
+        )
+
+    private fun locationForRange(
+        documentUri: String,
+        range: McTextRange,
+        source: String,
+    ): McReferenceLocation =
+        McReferenceLocation(
+            documentUri = documentUri,
+            range = range,
             metadata = mapOf("source" to source),
         )
 
