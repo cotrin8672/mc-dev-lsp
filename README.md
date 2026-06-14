@@ -81,7 +81,6 @@ return {
     name = "mcdev-nvim",
     -- Mason installs the JDT LS bundle. lazy.nvim loads this Lua plugin.
     dir = "/path/to/mc-dev-lsp/mcdev-nvim",
-    lazy = false,
     opts = {
       insert = {
         at_target = "smart",

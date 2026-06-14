@@ -50,7 +50,6 @@ return {
     name = "mcdev-nvim",
     -- Local checkout layout. Mason installs the JDT LS bundle, not this Lua plugin.
     dir = "C:/Users/you/ghq/github.com/cotrin8672/mc-dev-lsp/mcdev-nvim",
-    lazy = false,
     opts = {
       insert = {
         at_target = "smart",
