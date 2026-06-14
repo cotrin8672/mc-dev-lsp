@@ -15,4 +15,5 @@ data class ProjectContext(
     val minecraftJars: List<Path>,
     val sourceSets: List<SourceSetContext>,
     val indexState: ProjectIndexState,
+    val mappingFiles: List<Path> = emptyList(),
 )

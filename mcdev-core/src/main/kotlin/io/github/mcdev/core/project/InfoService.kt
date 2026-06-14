@@ -14,6 +14,7 @@ object InfoService {
         lines += "Root: ${context.root}"
         lines += "Platform: ${formatPlatform(context.platform)}"
         lines += formatMappingsLine(context)
+        lines += formatMappingSourceLine(context)
         lines += "Source namespace: ${formatNamespace(context.mappings.sourceNamespace)}"
         lines += "Runtime namespace: ${formatNamespace(context.mappings.runtimeNamespace)}"
         lines += formatMinecraftJarLine(context)
@@ -21,6 +22,7 @@ object InfoService {
         lines += formatAccessWidenerLine(context)
         lines += formatAccessTransformerLine(context)
         lines += "Classpath entries: ${context.classpath.entryCount}"
+        lines += "Source sets: ${context.sourceSets.size}"
         lines += "Class index: ${formatIndexState(context.indexState)}"
         lines += "Bytecode index: ${formatIndexState(context.indexState)}"
         lines += "Protocol: $protocolVersion"
@@ -54,6 +56,16 @@ object InfoService {
         val runtime = formatNamespace(context.mappings.runtimeNamespace)
         val status = if (available.size >= 2) "loaded" else "partial"
         return "Mappings: $source <-> $runtime $status"
+    }
+
+    private fun formatMappingSourceLine(context: ProjectContext): String {
+        if (context.mappingFiles.isNotEmpty()) {
+            return "Mapping source: ${context.mappingFiles.size} file(s)"
+        }
+        if (context.mappings.availableNamespaces.isEmpty()) {
+            return "Mapping source: none (no supported mapping files discovered)"
+        }
+        return "Mapping source: provided"
     }
 
     private fun formatMinecraftJarLine(context: ProjectContext): String {

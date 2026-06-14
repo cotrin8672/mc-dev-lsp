@@ -27,7 +27,12 @@ object ProjectContextBuilder {
                 PlatformDetector.detectFromRoot(input.root)
             }
 
-        val mappings = input.mappings ?: MappingDiscoveryService.discoverMappingContext(input.root, platform)
+        val discoveredMappingFiles = if (input.mappings == null) {
+            MappingDiscoveryService.discoverMappingFiles(input.root)
+        } else {
+            emptyList()
+        }
+        val mappings = input.mappings ?: MappingDiscoveryService.buildMappingContext(discoveredMappingFiles, platform)
         val mixinConfigs = input.mixinConfigs ?: MixinConfigDiscoveryService.discover(input.root)
         val accessWideners = input.accessWideners ?: AwAtDiscoveryService.discoverAccessWideners(input.root)
         val accessTransformers = input.accessTransformers ?: AwAtDiscoveryService.discoverAccessTransformers(input.root)
@@ -45,6 +50,7 @@ object ProjectContextBuilder {
             minecraftJars = minecraftJars,
             sourceSets = input.sourceSets,
             indexState = input.indexState,
+            mappingFiles = discoveredMappingFiles,
         )
     }
 

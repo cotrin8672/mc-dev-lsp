@@ -46,17 +46,19 @@ class InfoServiceTest {
         assertEquals("Root: $tempDir", lines[1])
         assertEquals("Platform: Fabric", lines[2])
         assertEquals("Mappings: named <-> intermediary loaded", lines[3])
-        assertEquals("Source namespace: named", lines[4])
-        assertEquals("Runtime namespace: intermediary", lines[5])
-        assertEquals("Minecraft jar: found", lines[6])
-        assertEquals("Mixin config: 2 files", lines[7])
-        assertEquals("Access Widener: 1 file", lines[8])
-        assertEquals("Access Transformer: none", lines[9])
-        assertEquals("Classpath entries: 142", lines[10])
-        assertEquals("Class index: ready", lines[11])
-        assertEquals("Bytecode index: ready", lines[12])
-        assertEquals("Protocol: 1", lines[13])
-        assertEquals("Extension: 0.1.0", lines[14])
+        assertEquals("Mapping source: provided", lines[4])
+        assertEquals("Source namespace: named", lines[5])
+        assertEquals("Runtime namespace: intermediary", lines[6])
+        assertEquals("Minecraft jar: found", lines[7])
+        assertEquals("Mixin config: 2 files", lines[8])
+        assertEquals("Access Widener: 1 file", lines[9])
+        assertEquals("Access Transformer: none", lines[10])
+        assertEquals("Classpath entries: 142", lines[11])
+        assertEquals("Source sets: 0", lines[12])
+        assertEquals("Class index: ready", lines[13])
+        assertEquals("Bytecode index: ready", lines[14])
+        assertEquals("Protocol: 1", lines[15])
+        assertEquals("Extension: 0.1.0", lines[16])
     }
 
     @Test
@@ -65,6 +67,7 @@ class InfoServiceTest {
         val lines = InfoService.formatLines(context)
 
         assertTrue(lines.any { it == "Mappings: none" })
+        assertTrue(lines.any { it == "Mapping source: none (no supported mapping files discovered)" })
         assertTrue(lines.any { it == "Mixin config: none" })
         assertTrue(lines.any { it == "Access Widener: none" })
         assertTrue(lines.any { it == "Access Transformer: none" })
@@ -155,5 +158,33 @@ class InfoServiceTest {
 
         val lines = InfoService.formatLines(context)
         assertTrue(lines.any { it == "Minecraft jar: found" })
+    }
+
+    @Test
+    fun formatsDiscoveredMappingSourceAndSourceSetCount() {
+        val mappingFile = tempDir.resolve("mappings.tiny")
+        val context = ProjectContextBuilder.empty("mapped", tempDir).copy(
+            mappings = ProjectMappingContext(
+                sourceNamespace = MappingNamespace.NAMED,
+                runtimeNamespace = MappingNamespace.INTERMEDIARY,
+                awNamespace = MappingNamespace.NAMED,
+                atNamespace = null,
+                availableNamespaces = setOf(MappingNamespace.NAMED, MappingNamespace.INTERMEDIARY),
+                resolver = EmptyMappingResolver,
+            ),
+            mappingFiles = listOf(mappingFile),
+            sourceSets = listOf(
+                SourceSetContext(
+                    name = "main",
+                    sourceDirectories = listOf(tempDir.resolve("src/main/java")),
+                    resourceDirectories = emptyList(),
+                    outputDirectory = null,
+                ),
+            ),
+        )
+
+        val lines = InfoService.formatLines(context)
+        assertTrue(lines.any { it == "Mapping source: 1 file(s)" })
+        assertTrue(lines.any { it == "Source sets: 1" })
     }
 }

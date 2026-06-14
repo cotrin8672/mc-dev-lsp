@@ -81,6 +81,7 @@ class ProjectContextBuilderTest {
         assertEquals(1, context.minecraftJars.size)
         assertEquals(ProjectIndexState.READY, context.indexState)
         assertEquals(1, context.sourceSets.size)
+        assertEquals(1, context.mappingFiles.size)
     }
 
     @Test
