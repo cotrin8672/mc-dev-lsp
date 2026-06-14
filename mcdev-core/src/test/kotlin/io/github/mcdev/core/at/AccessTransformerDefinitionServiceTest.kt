@@ -52,6 +52,19 @@ class AccessTransformerDefinitionServiceTest {
     }
 
     @Test
+    fun methodDefinitionDoesNotFallbackWhenDescriptorMismatches() {
+        val source = "protected com.example.target.SimpleTarget draw()V"
+        val marker = "draw"
+        val request = AwAtE2ETestSupport.requestAtOffset(
+            source,
+            source.indexOf(marker) + marker.length,
+            AwAtFileType.ACCESS_TRANSFORMER,
+        )
+        val targets = service.definitionsAt(request.bufferText, request.line, request.character)
+        assertTrue(targets.isEmpty())
+    }
+
+    @Test
     fun returnsEmptyOnModifierSlot() {
         val source = "pub"
         val request = AwAtE2ETestSupport.requestAtOffset(source, source.length, AwAtFileType.ACCESS_TRANSFORMER)

@@ -42,6 +42,18 @@ object McdevCommandRegistry {
             implemented = true,
         ),
         CommandRegistration(
+            id = McdevCommands.RELOAD_PROJECT_CONTEXT,
+            title = "Minecraft Development Reload Project Context",
+            description = "Clears cached project context and rebuilds project context and indexes.",
+            implemented = true,
+        ),
+        CommandRegistration(
+            id = McdevCommands.DUMP_CONTEXT,
+            title = "Minecraft Development Dump Context",
+            description = "Returns structured project context details for observability and debugging.",
+            implemented = true,
+        ),
+        CommandRegistration(
             id = McdevCommands.DEFINITION,
             title = "Minecraft Development Definition",
             description = "Resolves mixin and modding symbol definitions.",
@@ -51,6 +63,12 @@ object McdevCommandRegistry {
             id = McdevCommands.REFERENCES,
             title = "Minecraft Development References",
             description = "Finds mixin and modding symbol references.",
+            implemented = true,
+        ),
+        CommandRegistration(
+            id = McdevCommands.HOVER,
+            title = "Minecraft Development Hover",
+            description = "Returns mixin and modding symbol hover details.",
             implemented = true,
         ),
         CommandRegistration(

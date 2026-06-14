@@ -100,6 +100,20 @@ class MixinDefinitionServiceTest {
     }
 
     @Test
+    fun invokerDefinitionDoesNotFallbackToWrongOverload() {
+        val source = """
+            @Mixin(com.example.target.SimpleTarget.class)
+            abstract class ExampleMixin {
+                @Invoker("draw")
+                abstract void invokeDraw();
+            }
+        """.trimIndent()
+        val request = MixinE2ETestSupport.requestInAnnotationValue(source, "@Invoker", "draw")
+        val targets = simpleService.definitionsAt(request.bufferText, request.line, request.character)
+        assertTrue(targets.isEmpty())
+    }
+
+    @Test
     fun resolvesAtTargetInvokeMember() {
         val source = """
             @Mixin(com.example.target.SimpleTarget.class)

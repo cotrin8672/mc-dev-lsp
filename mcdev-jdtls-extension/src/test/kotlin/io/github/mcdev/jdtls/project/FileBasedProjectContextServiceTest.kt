@@ -4,6 +4,7 @@ import io.github.mcdev.core.project.ModPlatform
 import io.github.mcdev.core.project.ProjectIndexState
 import io.github.mcdev.fixtures.FixturePaths
 import io.github.mcdev.jdtls.support.JdtlsFixtureSupport
+import kotlin.io.path.createDirectories
 import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertTrue
@@ -122,5 +123,84 @@ class FileBasedProjectContextServiceTest {
                 it.endsWith("src${java.io.File.separator}client${java.io.File.separator}java")
             },
         )
+    }
+
+    @Test
+    fun discoversArchitecturyStyleSourceSetsInSortedOrder() {
+        createArchitecturyStyleLayout(tempDir)
+        val context = service.buildProjectContext(tempDir)
+        assertEquals(
+            listOf("common", "fabric", "forge", "neoforge", "testmod"),
+            context.sourceSets.map { it.name },
+        )
+        context.sourceSets.forEach { sourceSet ->
+            assertTrue(
+                sourceSet.sourceDirectories.any {
+                    it.endsWith(
+                        "src${java.io.File.separator}${sourceSet.name}${java.io.File.separator}java",
+                    )
+                },
+            )
+            assertTrue(
+                sourceSet.resourceDirectories.any {
+                    it.endsWith(
+                        "src${java.io.File.separator}${sourceSet.name}${java.io.File.separator}resources",
+                    )
+                },
+            )
+            assertEquals(
+                tempDir.resolve("build/classes/java/${sourceSet.name}"),
+                sourceSet.outputDirectory,
+            )
+        }
+    }
+
+    @Test
+    fun preservesMappedSourcesOnMainSourceSetOnly() {
+        createArchitecturyStyleLayout(tempDir)
+        tempDir.resolve("mapped-sources").createDirectories()
+        val context = service.buildProjectContext(tempDir)
+        val common = context.sourceSets.single { it.name == "common" }
+        assertTrue(common.sourceDirectories.none { it.endsWith("mapped-sources") })
+        Files.createDirectories(tempDir.resolve("src/main/java"))
+        val withMain = service.buildProjectContext(tempDir)
+        val mainSourceSet = withMain.sourceSets.single { it.name == "main" }
+        assertTrue(mainSourceSet.sourceDirectories.any { it.endsWith("mapped-sources") })
+        assertTrue(withMain.sourceSets.none { it.name != "main" && it.sourceDirectories.any { dir -> dir.endsWith("mapped-sources") } })
+    }
+
+    @Test
+    fun discoversGeneratedOutputsAndSourceSetProjectOutputs() {
+        createArchitecturyStyleLayout(tempDir)
+        val commonClasses = tempDir.resolve("build/classes/java/common").createDirectories()
+        val fabricClasses = tempDir.resolve("build/classes/java/fabric").createDirectories()
+        val generatedMainSources = tempDir.resolve("build/generated/sources/annotationProcessor/java/main")
+            .createDirectories()
+        val generatedCommonResources = tempDir.resolve("build/generated/resources/common")
+            .createDirectories()
+        Files.writeString(generatedMainSources.resolve("Example.java"), "class Example {}")
+        Files.writeString(generatedCommonResources.resolve("pack.mcmeta"), "{}")
+
+        val context = service.buildProjectContext(tempDir)
+        assertEquals(
+            listOf(commonClasses, fabricClasses).map { it.toString() }.sorted(),
+            context.classpath.projectOutputs.map { it.toString() }.sorted(),
+        )
+        assertEquals(
+            listOf(generatedMainSources, generatedCommonResources).map { it.toString() }.sorted(),
+            context.classpath.generatedOutputs.map { it.toString() }.sorted(),
+        )
+        assertTrue(context.classpath.entryCount >= 4)
+    }
+
+    private fun createArchitecturyStyleLayout(root: Path) {
+        listOf("common", "fabric", "forge", "neoforge", "testmod").forEach { name ->
+            root.resolve("src/$name/java/com/example/$name").createDirectories()
+            root.resolve("src/$name/resources").createDirectories()
+            Files.writeString(
+                root.resolve("src/$name/java/com/example/$name/${name.replaceFirstChar { it.uppercase() }}Mod.java"),
+                "package com.example.$name; class ${name.replaceFirstChar { it.uppercase() }}Mod {}",
+            )
+        }
     }
 }

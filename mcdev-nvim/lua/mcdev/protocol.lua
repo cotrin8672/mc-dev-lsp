@@ -8,8 +8,11 @@ M.commands = {
   completion = "mcdev.completion",
   definition = "mcdev.definition",
   references = "mcdev.references",
+  hover = "mcdev.hover",
   code_action = "mcdev.codeAction",
   reindex = "mcdev.reindex",
+  reload_project_context = "mcdev.reloadProjectContext",
+  dump_context = "mcdev.dumpContext",
   context = "mcdev.context",
   info = "mcdev.info",
 }
@@ -193,6 +196,12 @@ function M.references(bufnr, position, callback)
   M.request(M.commands.references, { context = M.context(bufnr, position) }, callback, bufnr)
 end
 
+function M.hover(bufnr, position, callback)
+  bufnr = bufnr or vim.api.nvim_get_current_buf()
+  position = position or vim.api.nvim_win_get_cursor(0)
+  M.request(M.commands.hover, { context = M.context(bufnr, position) }, callback, bufnr)
+end
+
 function M.diagnostics(bufnr, position, callback)
   bufnr = bufnr or vim.api.nvim_get_current_buf()
   position = position or vim.api.nvim_win_get_cursor(0)
@@ -223,6 +232,35 @@ function M.reindex()
       vim.notify(tostring(err), vim.log.levels.WARN)
     else
       vim.notify("mcdev: reindex requested")
+    end
+  end)
+end
+
+function M.reload_project_context()
+  M.request(M.commands.reload_project_context, { context = M.context() }, function(result, err)
+    if err then
+      vim.notify(tostring(err), vim.log.levels.WARN)
+      return
+    end
+    local envelope = result or {}
+    local payload = envelope.result or {}
+    vim.notify(payload.status or "mcdev: project context reloaded")
+  end)
+end
+
+function M.dump_context()
+  M.request(M.commands.dump_context, { context = M.context() }, function(result, err)
+    if err then
+      vim.notify(tostring(err), vim.log.levels.WARN)
+      return
+    end
+    local envelope = result or {}
+    local payload = envelope.result or {}
+    local lines = payload.lines or {}
+    if #lines > 0 then
+      vim.notify(table.concat(lines, "\n"))
+    else
+      vim.notify(vim.inspect(payload))
     end
   end)
 end

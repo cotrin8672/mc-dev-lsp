@@ -156,24 +156,7 @@ object AwContextExtractor {
             while (index < line.length && line[index].isWhitespace()) index++
             if (index >= line.length) break
             val start = index
-            if (line[index] == '(') {
-                var depth = 0
-                while (index < line.length) {
-                    when (line[index]) {
-                        '(' -> depth++
-                        ')' -> {
-                            depth--
-                            if (depth == 0) {
-                                index++
-                                break
-                            }
-                        }
-                    }
-                    index++
-                }
-            } else {
-                while (index < line.length && !line[index].isWhitespace()) index++
-            }
+            while (index < line.length && !line[index].isWhitespace()) index++
             val text = line.substring(start, index)
             tokens += AwLineToken(
                 startOffset = lineStartOffset + start,

@@ -135,6 +135,11 @@ tasks.register("checkBundle") {
             val pluginXml = jar.getInputStream(jar.getJarEntry("plugin.xml")!!).bufferedReader().readText()
             check("mcdev.definition" in pluginXml) { "plugin.xml is missing mcdev.definition command" }
             check("mcdev.references" in pluginXml) { "plugin.xml is missing mcdev.references command" }
+            check("mcdev.hover" in pluginXml) { "plugin.xml is missing mcdev.hover command" }
+            check("mcdev.reloadProjectContext" in pluginXml) {
+                "plugin.xml is missing mcdev.reloadProjectContext command"
+            }
+            check("mcdev.dumpContext" in pluginXml) { "plugin.xml is missing mcdev.dumpContext command" }
         }
     }
 }

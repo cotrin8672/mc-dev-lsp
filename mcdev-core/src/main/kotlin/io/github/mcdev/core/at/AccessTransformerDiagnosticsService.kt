@@ -159,6 +159,32 @@ class AccessTransformerDiagnosticsService(
             is AtMemberResolution.Found -> {
                 return validateFoundMember(entry, resolution, range)
             }
+            is AtMemberResolution.DescriptorMismatch -> {
+                return listOf(
+                    McDiagnostic(
+                        code = AtDiagnosticCodes.INVALID_DESCRIPTOR,
+                        severity = McSeverity.ERROR,
+                        message = "Descriptor '${resolution.descriptor}' does not match '${resolution.method.descriptor}'",
+                        range = range,
+                        metadata = mapOf("line" to entry.line.toString()),
+                    ),
+                )
+            }
+            is AtMemberResolution.MissingDescriptor -> {
+                return listOf(
+                    McDiagnostic(
+                        code = AtDiagnosticCodes.MISSING_METHOD_DESCRIPTOR,
+                        severity = McSeverity.ERROR,
+                        message = "Missing descriptor for method '${resolution.namedName}'",
+                        range = range,
+                        metadata = mapOf(
+                            "owner" to entry.owner,
+                            "member" to resolution.namedName,
+                            "line" to entry.line.toString(),
+                        ),
+                    ),
+                )
+            }
         }
     }
 

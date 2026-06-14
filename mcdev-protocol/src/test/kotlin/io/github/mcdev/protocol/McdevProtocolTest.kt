@@ -14,6 +14,13 @@ class McdevProtocolTest {
     }
 
     @Test
+    fun projectContextObservabilityCommandsUseStableIds() {
+        assertEquals("mcdev.reloadProjectContext", McdevCommands.RELOAD_PROJECT_CONTEXT)
+        assertEquals("mcdev.dumpContext", McdevCommands.DUMP_CONTEXT)
+        assertEquals("mcdev.hover", McdevCommands.HOVER)
+    }
+
+    @Test
     fun completionItemPreservesDisplayAndInsertionSeparately() {
         val item = McdevCompletionItemDto(
             label = "setScreen(Screen): void",

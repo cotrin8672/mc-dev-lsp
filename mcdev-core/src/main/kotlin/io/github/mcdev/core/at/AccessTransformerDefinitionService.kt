@@ -104,8 +104,8 @@ class AccessTransformerDefinitionService(
             .filter { it.name == memberName }
             .let { methods ->
                 val method = when {
-                    descriptor != null -> methods.find { it.descriptor == descriptor } ?: methods.firstOrNull()
-                    else -> methods.singleOrNull() ?: methods.firstOrNull()
+                    descriptor != null -> methods.find { it.descriptor == descriptor }
+                    else -> methods.singleOrNull()
                 }
                 if (method != null) {
                     return listOf(
@@ -124,8 +124,8 @@ class AccessTransformerDefinitionService(
             .filter { it.name == memberName }
             .let { fields ->
                 val field = when {
-                    descriptor != null -> fields.find { it.descriptor == descriptor } ?: fields.firstOrNull()
-                    else -> fields.singleOrNull() ?: fields.firstOrNull()
+                    descriptor != null -> fields.find { it.descriptor == descriptor }
+                    else -> fields.singleOrNull()
                 }
                 if (field != null) {
                     return listOf(

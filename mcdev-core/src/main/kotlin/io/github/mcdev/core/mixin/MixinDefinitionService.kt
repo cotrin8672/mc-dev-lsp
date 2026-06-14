@@ -162,7 +162,12 @@ class MixinDefinitionService(
                 val methodName = declaration.explicitTargetName
                     ?: invokerService.inferTargetName(declaration)
                     ?: return emptyList()
-                return resolveMethodInTargets(mixinTargets, methodName, declaration.range)
+                return resolveMethodInTargets(
+                    mixinTargets,
+                    methodName,
+                    declaration.range,
+                    descriptor = descriptorFromInvokerDeclaration(declaration),
+                )
             }
         }
 
@@ -190,7 +195,8 @@ class MixinDefinitionService(
         } ?: return emptyList()
         val mixinTargets = resolveMixinTargets(source, context)
         val range = offsetRange(source, context.valueStartOffset, context.valueEndOffset)
-        return resolveMethodInTargets(mixinTargets, methodName, range)
+        val descriptor = findInvokerDeclarationNear(source, context)?.let(::descriptorFromInvokerDeclaration)
+        return resolveMethodInTargets(mixinTargets, methodName, range, descriptor)
     }
 
     private fun resolveAtTarget(
@@ -240,10 +246,15 @@ class MixinDefinitionService(
         mixinTargets: List<String>,
         methodName: String,
         sourceRange: McTextRange,
+        descriptor: String? = null,
     ): List<McDefinitionTarget> {
         for (owner in mixinTargets) {
             val methods = classIndex.getMethods(owner).filter { it.name == methodName }
-            val method = methods.singleOrNull() ?: methods.firstOrNull() ?: continue
+            val method = if (descriptor != null) {
+                methods.find { it.descriptor == descriptor }
+            } else {
+                methods.singleOrNull()
+            } ?: continue
             return listOf(
                 McDefinitionTarget(
                     kind = MemberKind.METHOD,
@@ -271,10 +282,7 @@ class MixinDefinitionService(
                 classIndex.getMethods(candidate).any { it.name == name }
             } ?: return emptyList()
             val methods = classIndex.getMethods(owner).filter { it.name == name }
-            val method = methods.find { it.descriptor == descriptor }
-                ?: methods.singleOrNull()
-                ?: methods.firstOrNull()
-                ?: return emptyList()
+            val method = methods.find { it.descriptor == descriptor } ?: return emptyList()
             listOf(
                 McDefinitionTarget(
                     kind = MemberKind.METHOD,
@@ -383,6 +391,11 @@ class MixinDefinitionService(
         return if (name.startsWith(prefix)) name.removePrefix(prefix) else name
     }
 
+    private fun descriptorFromInvokerDeclaration(declaration: InvokerMethodDeclaration): String? {
+        val returnType = declaration.returnTypeDescriptor ?: return null
+        return "(${declaration.parameterDescriptors.joinToString("")})$returnType"
+    }
+
     private fun offsetRange(source: String, startOffset: Int, endOffset: Int): McTextRange =
         McTextRange(
             start = offsetToPosition(source, startOffset),
@@ -472,10 +485,10 @@ internal object MixinMemberDeclarationParser {
         """@Shadow(?:\s*\([^)]*\))?\s+(?:private|protected|public)?\s*(?:static\s+)?(?:abstract\s+)?([\w.<>\[\]]+)\s+(\w+)\s*\(([^)]*)\)\s*;""",
     )
     private val accessorPattern = Regex(
-        """@Accessor(?:\s*\(\s*"([^"]*)"\s*\))?\s+([\w.<>\[\]]+)\s+(\w+)\s*\(([^)]*)\)\s*;""",
+        """@Accessor(?:\s*\(\s*"([^"]*)"\s*\))?\s+(?:private|protected|public)?\s*(?:static\s+)?(?:abstract\s+)?([\w.<>\[\]]+)\s+(\w+)\s*\(([^)]*)\)\s*;""",
     )
     private val invokerPattern = Regex(
-        """@Invoker(?:\s*\(\s*"([^"]*)"\s*\))?\s+([\w.<>\[\]]+)\s+(\w+)\s*\(([^)]*)\)\s*;""",
+        """@Invoker(?:\s*\(\s*"([^"]*)"\s*\))?\s+(?:private|protected|public)?\s*(?:static\s+)?(?:abstract\s+)?([\w.<>\[\]]+)\s+(\w+)\s*\(([^)]*)\)\s*;""",
     )
 
     fun parseShadowDeclarations(source: String): List<ShadowMemberDeclaration> {
@@ -532,8 +545,15 @@ internal object MixinMemberDeclarationParser {
             .filter { it.isNotEmpty() }
             .map { javaTypeToDescriptor(it.substringBeforeLast(' ').ifEmpty { it }) }
 
-    private fun javaTypeToDescriptor(type: String): String =
-        when (type) {
+    private fun javaTypeToDescriptor(type: String): String {
+        val trimmed = type.trim()
+        val arrayDepth = Regex("""\[\]""").findAll(trimmed).count() + if (trimmed.endsWith("...")) 1 else 0
+        val normalized = trimmed
+            .removeSuffix("...")
+            .replace("[]", "")
+            .substringBefore('<')
+            .trim()
+        val descriptor = when (normalized) {
             "void" -> "V"
             "boolean" -> "Z"
             "byte" -> "B"
@@ -543,8 +563,13 @@ internal object MixinMemberDeclarationParser {
             "long" -> "J"
             "float" -> "F"
             "double" -> "D"
-            else -> "L${type.replace('.', '/')};"
+            "String" -> "Ljava/lang/String;"
+            "Object" -> "Ljava/lang/Object;"
+            "Class" -> "Ljava/lang/Class;"
+            else -> "L${normalized.replace('.', '/')};"
         }
+        return "[".repeat(arrayDepth) + descriptor
+    }
 
     private fun methodSignatureToDescriptor(returnType: String, params: String): String =
         "(${parseParameterTypes(params).joinToString("")})${javaTypeToDescriptor(returnType)}"

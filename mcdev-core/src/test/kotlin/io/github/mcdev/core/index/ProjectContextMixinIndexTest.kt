@@ -24,7 +24,7 @@ class ProjectContextMixinIndexTest {
         val candidates = bytecodeIndex.getAtTargetCandidates(
             MixinE2ETestSupport.SIMPLE_TARGET_INTERNAL,
             "draw",
-            null,
+            "(Ljava/lang/String;FF)V",
             "RETURN",
         )
         assertTrue(candidates.isNotEmpty())
@@ -39,7 +39,7 @@ class ProjectContextMixinIndexTest {
             bytecodeIndex.getReturnOrdinalCount(
                 MixinE2ETestSupport.SIMPLE_TARGET_INTERNAL,
                 "draw",
-                null,
+                "(Ljava/lang/String;FF)V",
             ) >= 1,
         )
     }

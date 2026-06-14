@@ -66,7 +66,7 @@ class BytecodeAtTargetAdapter(
         val methods = memberIndex.methodsByOwner[ownerInternalName].orEmpty().filter { it.name == methodName }
         return when (methods.size) {
             1 -> methods.first().descriptor
-            else -> methods.firstOrNull()?.descriptor
+            else -> null
         }
     }
 }

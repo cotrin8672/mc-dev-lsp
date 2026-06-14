@@ -70,7 +70,7 @@ class MixinCodeActionServiceTest {
     }
 
     @Test
-    fun producesAddDescriptorFixForAmbiguousMethod() {
+    fun doesNotGuessDescriptorForAmbiguousMethod() {
         val source = """
             @Mixin(MinecraftClient.class)
             class M {
@@ -94,8 +94,7 @@ class MixinCodeActionServiceTest {
             mixinPackage = null,
             classIndex = FakeClassIndex(),
         )
-        assertEquals(1, fixes.size)
-        assertTrue(fixes.first().title.contains("descriptor"))
+        assertTrue(fixes.isEmpty())
     }
 
     @Test

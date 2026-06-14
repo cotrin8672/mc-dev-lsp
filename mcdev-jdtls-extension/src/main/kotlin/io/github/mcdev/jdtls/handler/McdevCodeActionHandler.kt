@@ -6,7 +6,6 @@ import io.github.mcdev.jdtls.awat.AwAtServiceFacade
 import io.github.mcdev.jdtls.convert.CodeActionConverter
 import io.github.mcdev.jdtls.mixin.MixinServiceFacade
 import io.github.mcdev.jdtls.project.FileBasedProjectContextService
-import kotlin.io.path.readText
 import io.github.mcdev.jdtls.protocol.ProtocolDecodeException
 import io.github.mcdev.jdtls.protocol.ProtocolPayloadDecoder
 import io.github.mcdev.protocol.McdevCodeActionRequest
@@ -39,10 +38,10 @@ class McdevCodeActionHandler(
         }
 
         val session = projectService.loadSession(request.context.workspaceRoot)
-        val mixinConfig = session.context.mixinConfigs.firstOrNull()
-        val mixinConfigContent = mixinConfig?.let { config ->
-            runCatching { config.path.readText() }.getOrNull()
-        }
+        val mixinConfigContent = mixinFacade.selectedMixinConfigContent(
+            projectContext = session.context,
+            source = request.context.bufferText,
+        )
         val awAtFileType = awAtFacade.detectFileType(request.context.languageId, request.context.documentUri)
         val filteredFixes = if (awAtFileType != null) {
             if (request.diagnosticCodes.isEmpty()) {

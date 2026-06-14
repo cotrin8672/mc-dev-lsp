@@ -15,10 +15,11 @@ import io.github.mcdev.core.mixin.MixinServiceFacade as CoreMixinServiceFacade
 import io.github.mcdev.core.diagnostics.McDiagnostic
 import io.github.mcdev.core.mixin.BytecodeIndex
 import io.github.mcdev.core.mixin.ClassIndex
+import io.github.mcdev.core.project.MixinConfigDiscoveryService
+import io.github.mcdev.core.project.MixinConfigRef
 import io.github.mcdev.core.project.ProjectContext
 import io.github.mcdev.jdtls.project.McdevProjectSession
 import io.github.mcdev.jdtls.project.UriPathSupport
-import kotlin.io.path.readText
 
 class MixinServiceFacade(
     private val facadeFactory: (ClassIndex, BytecodeIndex) -> CoreMixinServiceFacade = { classIndex, bytecodeIndex ->
@@ -55,21 +56,24 @@ class MixinServiceFacade(
         projectContext: ProjectContext,
         source: String,
         documentUri: String,
-    ): List<McDiagnostic> {
-        val mixinConfig = projectContext.mixinConfigs.firstOrNull()
-        return facade(session).diagnose(
-            MixinFacadeRequest(
-                bufferText = source,
-                line = 0,
-                character = 0,
-                documentUri = documentUri,
-                mixinClassName = extractMixinClassName(source),
-                mixinPackage = extractPackageName(source) ?: mixinConfig?.packageName,
-                mixinConfigContent = mixinConfig?.let { runCatching { it.path.readText() }.getOrNull() },
-                mixinConfigPath = mixinConfig?.path?.toString(),
-            ),
+    ): List<McDiagnostic> =
+        facade(session).diagnose(buildFacadeRequest(projectContext, source, documentUri))
+
+    fun selectedMixinConfig(
+        projectContext: ProjectContext,
+        source: String,
+    ): MixinConfigRef? =
+        MixinConfigDiscoveryService.selectForMixin(
+            configs = projectContext.mixinConfigs,
+            mixinClassName = extractMixinClassName(source),
+            mixinPackage = extractPackageName(source),
         )
-    }
+
+    fun selectedMixinConfigContent(
+        projectContext: ProjectContext,
+        source: String,
+    ): String? =
+        selectedMixinConfig(projectContext, source)?.path?.let(MixinConfigDiscoveryService::readContent)
 
     fun codeActions(
         session: McdevProjectSession,
@@ -79,7 +83,6 @@ class MixinServiceFacade(
         diagnosticCode: String? = null,
     ): List<McFix> {
         val request = buildFacadeRequest(
-            session = session,
             projectContext = projectContext,
             source = source,
             documentUri = documentUri,
@@ -148,20 +151,20 @@ class MixinServiceFacade(
         facadeFactory(session.classIndex, session.bytecodeIndex)
 
     private fun buildFacadeRequest(
-        session: McdevProjectSession,
         projectContext: ProjectContext,
         source: String,
         documentUri: String,
     ): MixinFacadeRequest {
-        val mixinConfig = projectContext.mixinConfigs.firstOrNull()
+        val mixinConfig = selectedMixinConfig(projectContext, source)
+        val mixinPackage = extractPackageName(source) ?: mixinConfig?.packageName
         return MixinFacadeRequest(
             bufferText = source,
             line = 0,
             character = 0,
             documentUri = documentUri,
             mixinClassName = extractMixinClassName(source),
-            mixinPackage = extractPackageName(source) ?: mixinConfig?.packageName,
-            mixinConfigContent = mixinConfig?.let { runCatching { it.path.readText() }.getOrNull() },
+            mixinPackage = mixinPackage,
+            mixinConfigContent = mixinConfig?.path?.let(MixinConfigDiscoveryService::readContent),
             mixinConfigPath = mixinConfig?.path?.toString(),
         )
     }

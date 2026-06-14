@@ -56,15 +56,7 @@ class McdevAwAtCodeActionHandlerTest {
             ),
         )
         val result = assertIs<McdevCodeActionResponse>(response.result)
-        assertTrue(result.actions.isNotEmpty())
-        assertTrue(result.actions.any { it.title.contains("descriptor", ignoreCase = true) })
-        assertTrue(
-            result.actions.any { action ->
-                action.edits.any { workspaceEdit ->
-                    workspaceEdit.edits.any { textEdit -> textEdit.newText.contains("draw(") }
-                }
-            },
-        )
+        assertTrue(result.actions.none { it.title.contains("descriptor", ignoreCase = true) })
     }
 
     private fun createHandler(): McdevCodeActionHandler {

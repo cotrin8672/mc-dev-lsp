@@ -1,6 +1,7 @@
 local config = require("mcdev.config")
 local navigation = require("mcdev.navigation")
 local code_action = require("mcdev.code_action")
+local hover = require("mcdev.hover")
 
 local M = {}
 
@@ -36,6 +37,11 @@ end
 
 function M.setup(bufnr)
   bufnr = bufnr or 0
+  local completion_opts = config.options.completion or {}
+  if completion_opts.omnifunc ~= false then
+    vim.bo[bufnr].omnifunc = "v:lua.require'mcdev.omnifunc'.complete"
+  end
+
   local nav_opts = config.options.navigation or {}
   if nav_opts.enable then
     vim.keymap.set("n", "gd", function()
@@ -49,6 +55,10 @@ function M.setup(bufnr)
         goto_location(locations, err, "references")
       end)
     end, { buffer = bufnr, desc = "Mcdev find references" })
+
+    vim.keymap.set("n", "K", function()
+      hover.show(bufnr)
+    end, { buffer = bufnr, desc = "Mcdev hover" })
   end
 
   local code_action_opts = config.options.code_action or {}

@@ -34,13 +34,11 @@ class MixinDiagnosticsService(
 
     private fun analyzeMixinTargets(request: MixinDiagnosticRequest): List<McDiagnostic> {
         val results = mutableListOf<McDiagnostic>()
-        val pattern = Regex("""@Mixin\s*\(([^)]*)\)""")
-        pattern.findAll(request.source).forEach { match ->
-            val body = match.groupValues[1]
-            val range = offsetRange(request.source, match.range.first, match.range.last + 1)
-            val targets = AnnotationContextExtractor.parseMixinTargetValues(request.source, match.range.first)
-            results += duplicateMixinTargetDiagnostics(request.source, match.range.first, range)
-            if (targets.isEmpty() && !body.contains(".class")) return@forEach
+        AnnotationContextExtractor.findAnnotationOffsets(request.source, MixinAnnotation.MIXIN).forEach { atOffset ->
+            val end = AnnotationContextExtractor.annotationEndOffset(request.source, atOffset)
+            val range = offsetRange(request.source, atOffset, end)
+            val targets = AnnotationContextExtractor.parseMixinTargetValues(request.source, atOffset)
+            results += duplicateMixinTargetDiagnostics(request.source, atOffset, range)
             for (target in targets) {
                 if (MixinTargetResolver.resolveTarget(target, classIndex) == null) {
                     results += McDiagnostic(
@@ -49,19 +47,6 @@ class MixinDiagnosticsService(
                         message = "Unresolved @Mixin target: $target",
                         range = range,
                         metadata = mapOf("target" to target),
-                    )
-                }
-            }
-            val classRefs = Regex("""([\w.]+)\s*\.class""").findAll(body)
-            for (ref in classRefs) {
-                val fqn = ref.groupValues[1]
-                if (MixinTargetResolver.resolveTarget(fqn, classIndex) == null) {
-                    results += McDiagnostic(
-                        code = MixinDiagnosticCodes.UNRESOLVED_MIXIN_TARGET,
-                        severity = McSeverity.ERROR,
-                        message = "Unresolved @Mixin target: $fqn",
-                        range = range,
-                        metadata = mapOf("target" to fqn),
                     )
                 }
             }
@@ -127,20 +112,33 @@ class MixinDiagnosticsService(
                 code = MixinDiagnosticCodes.DUPLICATE_MIXIN_CONFIG_ENTRY,
                 severity = McSeverity.WARNING,
                 message = "Duplicate mixin config entry: $dup",
-                range = McTextRange(McTextPosition(0, 0), McTextPosition(0, 0)),
+                range = configEntryRange(configContent, dup),
                 metadata = mapOf("mixinClass" to dup),
             )
         }
     }
 
+    private fun configEntryRange(configContent: String, mixinClassName: String): McTextRange {
+        val quoted = "\"$mixinClassName\""
+        val start = configContent.indexOf(quoted)
+        return if (start >= 0) {
+            offsetRange(configContent, start + 1, start + quoted.length - 1)
+        } else {
+            McTextRange(McTextPosition(0, 0), McTextPosition(0, 0))
+        }
+    }
+
     private fun analyzeInjectMethods(request: MixinDiagnosticRequest): List<McDiagnostic> {
         val results = mutableListOf<McDiagnostic>()
-        val pattern = Regex("""@(Inject|Redirect|ModifyArg|ModifyArgs|ModifyVariable|ModifyConstant)\s*\(([^)]*)\)""")
         val mixinTargets = findMixinTargetsFromSource(request.source)
-        pattern.findAll(request.source).forEach { match ->
-            val methodMatch = Regex("""method\s*=\s*"([^"]+)""").find(match.groupValues[2]) ?: return@forEach
+        findInjectorAnnotationSpans(request.source).forEach { injector ->
+            val methodMatch = INJECT_METHOD_PATTERN.find(injector.body) ?: return@forEach
             val methodValue = methodMatch.groupValues[1]
-            val range = offsetRange(request.source, methodMatch.range.first, methodMatch.range.last + 1)
+            val range = offsetRange(
+                request.source,
+                injector.bodyStart + methodMatch.range.first,
+                injector.bodyStart + methodMatch.range.last + 1,
+            )
             val name = methodValue.substringBefore('(')
             val descriptorSuffix = methodValue.substringAfter('(', "")
             if (mixinTargets.isEmpty()) return@forEach
@@ -187,28 +185,38 @@ class MixinDiagnosticsService(
     private fun analyzeAtTargets(request: MixinDiagnosticRequest): List<McDiagnostic> {
         val results = mutableListOf<McDiagnostic>()
         val mixinTargets = findMixinTargetsFromSource(request.source)
-        val injectMethod = findFirstInjectMethod(request.source)
-        AnnotationContextExtractor.extractAtAnnotationBodies(request.source).forEach { body ->
-            val value = Regex("""value\s*=\s*"([^"]+)""").find(body)?.groupValues?.get(1) ?: return@forEach
+        val injectors = findInjectorAnnotationSpans(request.source)
+        findAtAnnotationSpans(request.source).forEach { at ->
+            val body = at.body
+            val value = AT_VALUE_PATTERN.find(body)?.groupValues?.get(1)
+                ?: AT_SHORT_VALUE_PATTERN.find(body)?.groupValues?.get(1)
+                ?: return@forEach
             val owner = mixinTargets.firstOrNull()
-            val ordinalMatch = Regex("""ordinal\s*=\s*(\d+)""").find(body)
-            if (ordinalMatch != null && value == "RETURN" && owner != null) {
+            val containingInjector = findContainingInjector(at.atOffset, injectors)
+            val injectMethod = containingInjector?.methodName
+            val injectMethodDescriptor = containingInjector?.methodDescriptor
+            val ordinalMatch = AT_ORDINAL_PATTERN.find(body)
+            if (ordinalMatch != null && value == "RETURN" && owner != null && injectMethod != null) {
                 val ordinal = ordinalMatch.groupValues[1].toIntOrNull()
                 if (ordinal != null) {
-                    val count = bytecodeIndex.getReturnOrdinalCount(owner, injectMethod ?: "", null)
+                    val count = bytecodeIndex.getReturnOrdinalCount(owner, injectMethod, injectMethodDescriptor)
                     if (ordinal >= count) {
                         results += McDiagnostic(
                             code = MixinDiagnosticCodes.ORDINAL_OUT_OF_RANGE,
                             severity = McSeverity.ERROR,
                             message = "Ordinal $ordinal out of range for RETURN (max ${count - 1})",
-                            range = McTextRange(McTextPosition(0, 0), McTextPosition(0, 0)),
+                            range = offsetRange(
+                                request.source,
+                                at.bodyStart + ordinalMatch.range.first,
+                                at.bodyStart + ordinalMatch.range.last + 1,
+                            ),
                         )
                     }
                 }
             }
-            val targetMatch = Regex("""target\s*=\s*"([^"]+)""").find(body) ?: return@forEach
+            val targetMatch = AT_TARGET_PATTERN.find(body) ?: return@forEach
             val targetValue = targetMatch.groupValues[1]
-            val range = McTextRange(McTextPosition(0, 0), McTextPosition(0, 0))
+            val range = quotedValueRange(request.source, body, at.bodyStart, targetMatch)
             if (targetValue.isEmpty()) return@forEach
             val parsed = MemberTargetParser.parse(targetValue)
             if (parsed is io.github.mcdev.core.descriptor.DescriptorParseResult.Failure) {
@@ -220,8 +228,8 @@ class MixinDiagnosticsService(
                 )
                 return@forEach
             }
-            if (owner == null) return@forEach
-            val candidates = bytecodeIndex.getAtTargetCandidates(owner, injectMethod ?: "", null, value)
+            if (owner == null || injectMethod == null) return@forEach
+            val candidates = bytecodeIndex.getAtTargetCandidates(owner, injectMethod, injectMethodDescriptor, value)
             if (candidates.none { atTargetFormatter.formatTarget(it) == targetValue }) {
                 results += McDiagnostic(
                     code = MixinDiagnosticCodes.UNRESOLVED_AT_TARGET,
@@ -245,8 +253,110 @@ class MixinDiagnosticsService(
     private fun findMixinTargetsFromSource(source: String): List<String> =
         MixinTargetResolver.resolveTargetsFromSource(source, classIndex)
 
-    private fun findFirstInjectMethod(source: String): String? =
-        Regex("""method\s*=\s*"([^"(]+)""").find(source)?.groupValues?.get(1)
+    private data class InjectorAnnotationSpan(
+        val start: Int,
+        val end: Int,
+        val bodyStart: Int,
+        val body: String,
+        val methodName: String?,
+        val methodDescriptor: String?,
+    )
+
+    private data class AtAnnotationSpan(
+        val atOffset: Int,
+        val bodyStart: Int,
+        val bodyEnd: Int,
+        val body: String,
+    )
+
+    private fun findInjectorAnnotationSpans(source: String): List<InjectorAnnotationSpan> {
+        val results = mutableListOf<InjectorAnnotationSpan>()
+        AnnotationContextExtractor.findInjectorAnnotationOffsets(source).forEach { atOffset ->
+            val parenStart = source.indexOf('(', atOffset)
+            if (parenStart < 0) return@forEach
+            val close = findMatchingParen(source, parenStart) ?: return@forEach
+            val bodyStart = parenStart + 1
+            val body = source.substring(bodyStart, close)
+            val methodValue = INJECT_METHOD_PATTERN.find(body)?.groupValues?.get(1)
+            val (methodName, methodDescriptor) = methodValue?.let(::parseInjectMethodValue) ?: (null to null)
+            results += InjectorAnnotationSpan(
+                start = atOffset,
+                end = close + 1,
+                bodyStart = bodyStart,
+                body = body,
+                methodName = methodName,
+                methodDescriptor = methodDescriptor,
+            )
+        }
+        return results
+    }
+
+    private fun findAtAnnotationSpans(source: String): List<AtAnnotationSpan> {
+        val results = mutableListOf<AtAnnotationSpan>()
+        AnnotationContextExtractor.findAnnotationOffsets(source, MixinAnnotation.AT).forEach { at ->
+            val paren = source.indexOf('(', at)
+            if (paren < 0) return@forEach
+            val close = findMatchingParen(source, paren) ?: return@forEach
+            results += AtAnnotationSpan(
+                atOffset = at,
+                bodyStart = paren + 1,
+                bodyEnd = close,
+                body = source.substring(paren + 1, close),
+            )
+        }
+        return results
+    }
+
+    private fun findContainingInjector(
+        atOffset: Int,
+        injectors: List<InjectorAnnotationSpan>,
+    ): InjectorAnnotationSpan? =
+        injectors
+            .filter { atOffset in it.start until it.end }
+            .maxByOrNull { it.start }
+
+    private fun parseInjectMethodValue(methodValue: String): Pair<String?, String?> {
+        val parenIndex = methodValue.indexOf('(')
+        if (parenIndex < 0) return methodValue to null
+        return methodValue.substring(0, parenIndex) to methodValue.substring(parenIndex)
+    }
+
+    private fun quotedValueRange(
+        source: String,
+        body: String,
+        bodyStart: Int,
+        match: MatchResult,
+    ): McTextRange {
+        val openQuote = bodyStart + match.range.first + match.value.indexOf('"')
+        val closeQuote = bodyStart + match.range.last
+        return offsetRange(source, openQuote + 1, closeQuote)
+    }
+
+    private fun findMatchingParen(source: String, openIndex: Int): Int? {
+        if (source.getOrNull(openIndex) != '(') return null
+        var depth = 0
+        var inString = false
+        var i = openIndex
+        while (i < source.length) {
+            when {
+                inString -> {
+                    if (source[i] == '\\') {
+                        i += 2
+                        continue
+                    }
+                    if (source[i] == '"') inString = false
+                }
+                source[i] == '"' -> inString = true
+                source[i] == '(' -> depth++
+                source[i] == ')' -> {
+                    depth--
+                    if (depth == 0) return i
+                }
+            }
+            i++
+        }
+        return null
+    }
 
     private fun offsetRange(source: String, start: Int, end: Int): McTextRange {
         val startPos = offsetToPosition(source, start)
@@ -268,5 +378,13 @@ class MixinDiagnosticsService(
             i++
         }
         return McTextPosition(line, character)
+    }
+
+    private companion object {
+        val INJECT_METHOD_PATTERN = Regex("""method\s*=\s*"([^"]+)"""")
+        val AT_VALUE_PATTERN = Regex("""value\s*=\s*"([^"]+)"""")
+        val AT_SHORT_VALUE_PATTERN = Regex(""""([^"]+)"""")
+        val AT_ORDINAL_PATTERN = Regex("""ordinal\s*=\s*(\d+)""")
+        val AT_TARGET_PATTERN = Regex("""target\s*=\s*"([^"]+)"""")
     }
 }

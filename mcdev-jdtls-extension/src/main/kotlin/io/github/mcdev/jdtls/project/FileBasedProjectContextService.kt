@@ -67,33 +67,46 @@ class FileBasedProjectContextService(
         return files.filter { it.isRegularFile() }.map { it.readText() }
     }
 
-    private fun discoverSourceSets(root: Path): List<SourceSetContext> {
-        val sourceSets = mutableListOf<SourceSetContext>()
-        val mainJavaDir = root.resolve("src/main/java")
-        val mainResourcesDir = root.resolve("src/main/resources")
-        val mappedSourcesDir = root.resolve("mapped-sources")
-        if (mainJavaDir.exists() || mainResourcesDir.exists() || mappedSourcesDir.exists()) {
-            sourceSets += SourceSetContext(
-                name = "main",
-                sourceDirectories = listOfNotNull(
-                    mainJavaDir.takeIf { it.exists() },
-                    mappedSourcesDir.takeIf { it.exists() },
-                ),
-                resourceDirectories = listOfNotNull(mainResourcesDir.takeIf { it.exists() }),
-                outputDirectory = root.resolve("build/classes/java/main"),
+    private fun discoverSourceSets(root: Path): List<SourceSetContext> =
+        discoverGradleSourceSetNames(root).map { name ->
+            val sourceSetRoot = root.resolve("src").resolve(name)
+            val javaDir = sourceSetRoot.resolve("java")
+            val resourcesDir = sourceSetRoot.resolve("resources")
+            val sourceDirectories = buildList {
+                if (javaDir.exists()) {
+                    add(javaDir)
+                }
+                if (name == "main") {
+                    val mappedSourcesDir = root.resolve("mapped-sources")
+                    if (mappedSourcesDir.exists()) {
+                        add(mappedSourcesDir)
+                    }
+                }
+            }
+            SourceSetContext(
+                name = name,
+                sourceDirectories = sourceDirectories,
+                resourceDirectories = listOfNotNull(resourcesDir.takeIf { it.exists() }),
+                outputDirectory = root.resolve("build/classes/java/$name"),
             )
         }
-        val clientJavaDir = root.resolve("src/client/java")
-        val clientResourcesDir = root.resolve("src/client/resources")
-        if (clientJavaDir.exists() || clientResourcesDir.exists()) {
-            sourceSets += SourceSetContext(
-                name = "client",
-                sourceDirectories = listOfNotNull(clientJavaDir.takeIf { it.exists() }),
-                resourceDirectories = listOfNotNull(clientResourcesDir.takeIf { it.exists() }),
-                outputDirectory = root.resolve("build/classes/java/client"),
-            )
+
+    private fun discoverGradleSourceSetNames(root: Path): List<String> {
+        val srcRoot = root.resolve("src")
+        if (!srcRoot.exists() || !Files.isDirectory(srcRoot)) {
+            return emptyList()
         }
-        return sourceSets
+        return Files.list(srcRoot).use { stream ->
+            stream
+                .filter { Files.isDirectory(it) }
+                .map { it.fileName.toString() }
+                .filter { name ->
+                    val sourceSetRoot = srcRoot.resolve(name)
+                    sourceSetRoot.resolve("java").exists() || sourceSetRoot.resolve("resources").exists()
+                }
+                .sorted()
+                .toList()
+        }
     }
 
     private fun discoverEnhancedClasspath(root: Path): ClasspathSnapshot {
@@ -110,22 +123,26 @@ class FileBasedProjectContextService(
 
     private fun discoverClasspath(root: Path): ClasspathSnapshot {
         val projectOutputs = linkedSetOf<Path>()
+        val generatedOutputs = linkedSetOf<Path>()
         val dependencyJars = linkedSetOf<Path>()
         val minecraftJars = linkedSetOf<Path>()
         val timestamps = linkedMapOf<Path, Long>()
 
-        val outputCandidates = listOf(
-            root.resolve("build/classes/java/main"),
-            root.resolve("build/classes"),
+        discoverGradleSourceSetNames(root).forEach { name ->
+            addClasspathDirectory(root.resolve("build/classes/java/$name"), projectOutputs, timestamps)
+        }
+        if (projectOutputs.isEmpty()) {
+            addClasspathDirectory(root.resolve("build/classes"), projectOutputs, timestamps)
+        }
+        listOf(
             root.resolve("bin/main"),
             root.resolve("out/production/classes"),
             root.resolve("classpath"),
-        )
-        outputCandidates.forEach { path ->
-            if (path.exists() && Files.isDirectory(path)) {
-                projectOutputs.add(path)
-                timestamps[path] = Files.getLastModifiedTime(path).toMillis()
-            }
+        ).forEach { path ->
+            addClasspathDirectory(path, projectOutputs, timestamps)
+        }
+        discoverGeneratedOutputDirs(root).forEach { path ->
+            addClasspathDirectory(path, generatedOutputs, timestamps)
         }
 
         val jarRoots = listOf(
@@ -151,10 +168,47 @@ class FileBasedProjectContextService(
         }
 
         return ClasspathSnapshot(
-            projectOutputs = projectOutputs.toList(),
-            dependencyJars = dependencyJars.toList(),
-            minecraftJars = minecraftJars.toList(),
+            projectOutputs = projectOutputs.toList().sortedBy { it.toString() },
+            dependencyJars = dependencyJars.toList().sortedBy { it.toString() },
+            minecraftJars = minecraftJars.toList().sortedBy { it.toString() },
+            generatedOutputs = generatedOutputs.toList().sortedBy { it.toString() },
             entryTimestamps = timestamps,
         )
+    }
+
+    private fun discoverGeneratedOutputDirs(root: Path): List<Path> {
+        val generated = linkedSetOf<Path>()
+        listOf(
+            root.resolve("build/generated/sources"),
+            root.resolve("build/generated/resources"),
+        ).forEach { base ->
+            if (!base.exists() || !Files.isDirectory(base)) {
+                return@forEach
+            }
+            Files.walk(base).use { stream ->
+                stream
+                    .filter { Files.isDirectory(it) && it != base }
+                    .forEach { dir ->
+                        val hasChildDirectory = Files.list(dir).use { children ->
+                            children.anyMatch(Files::isDirectory)
+                        }
+                        if (!hasChildDirectory) {
+                            generated.add(dir)
+                        }
+                    }
+            }
+        }
+        return generated.toList().sortedBy { it.toString() }
+    }
+
+    private fun addClasspathDirectory(
+        path: Path,
+        target: MutableSet<Path>,
+        timestamps: MutableMap<Path, Long>,
+    ) {
+        if (path.exists() && Files.isDirectory(path)) {
+            target.add(path)
+            timestamps[path] = Files.getLastModifiedTime(path).toMillis()
+        }
     }
 }

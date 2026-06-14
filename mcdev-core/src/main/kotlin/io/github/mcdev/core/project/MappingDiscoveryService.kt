@@ -4,7 +4,7 @@ import io.github.mcdev.core.mapping.MappingParseResult
 import io.github.mcdev.core.mapping.ProjectMappingContext
 import io.github.mcdev.core.mapping.SrgParser
 import io.github.mcdev.core.mapping.TinyV2Parser
-import io.github.mcdev.core.mapping.asResolver
+import io.github.mcdev.core.mapping.asCompositeResolver
 import io.github.mcdev.core.model.MappingNamespace
 import java.nio.file.Files
 import java.nio.file.Path
@@ -17,7 +17,8 @@ object MappingDiscoveryService {
     private val MAPPING_EXTENSIONS = setOf("tiny", "srg", "tsrg")
     fun discoverMappingFiles(root: Path): List<Path> {
         if (!root.exists()) return emptyList()
-        return Files.walk(root).use { stream ->
+        val normalizedRoot = root.toAbsolutePath().normalize()
+        return Files.walk(normalizedRoot).use { stream ->
             stream
                 .filter { Files.isRegularFile(it) }
                 .filter { path ->
@@ -25,7 +26,10 @@ object MappingDiscoveryService {
                     extension in MAPPING_EXTENSIONS ||
                         (path.name.endsWith(".tiny") && extension.isEmpty())
                 }
-                .filter { path -> !ProjectPathFilters.isUnderExcludedDirectory(path) }
+                .filter { path ->
+                    val relativePath = normalizedRoot.relativize(path.toAbsolutePath().normalize())
+                    !ProjectPathFilters.isExcludedFromMappingDiscovery(relativePath)
+                }
                 .sorted()
                 .toList()
         }
@@ -50,11 +54,7 @@ object MappingDiscoveryService {
 
         val mergedNamespaces = parsedSets.flatMap { it.namespaces }.distinct()
         val availableNamespaces = mergedNamespaces.toSet()
-        val resolver = if (parsedSets.size == 1) {
-            parsedSets.first().asResolver()
-        } else {
-            parsedSets.first().asResolver()
-        }
+        val resolver = parsedSets.asCompositeResolver()
 
         val sourceNamespace = defaultSourceNamespace(platform, availableNamespaces)
         val runtimeNamespace = defaultRuntimeNamespace(platform, availableNamespaces, sourceNamespace)

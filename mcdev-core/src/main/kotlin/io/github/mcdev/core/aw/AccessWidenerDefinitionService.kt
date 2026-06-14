@@ -77,8 +77,8 @@ class AccessWidenerDefinitionService(
             AccessWidenerKind.METHOD -> {
                 val methods = classIndex.getMethods(resolvedOwner).filter { it.name == name }
                 val method = when {
-                    descriptor != null -> methods.find { it.descriptor == descriptor } ?: methods.firstOrNull()
-                    else -> methods.singleOrNull() ?: methods.firstOrNull()
+                    descriptor != null -> methods.find { it.descriptor == descriptor }
+                    else -> methods.singleOrNull()
                 } ?: return emptyList()
                 listOf(
                     McDefinitionTarget(
@@ -94,8 +94,8 @@ class AccessWidenerDefinitionService(
             AccessWidenerKind.FIELD -> {
                 val fields = classIndex.getFields(resolvedOwner).filter { it.name == name }
                 val field = when {
-                    descriptor != null -> fields.find { it.descriptor == descriptor } ?: fields.firstOrNull()
-                    else -> fields.singleOrNull() ?: fields.firstOrNull()
+                    descriptor != null -> fields.find { it.descriptor == descriptor }
+                    else -> fields.singleOrNull()
                 } ?: return emptyList()
                 listOf(
                     McDefinitionTarget(

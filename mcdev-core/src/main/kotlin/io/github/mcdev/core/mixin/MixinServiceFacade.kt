@@ -169,14 +169,35 @@ class MixinServiceFacade(
     private fun completeAtTarget(source: String, context: AnnotationContext): List<McCompletionItem> {
         val owners = resolveMixinTargets(source, context)
         val owner = owners.firstOrNull() ?: return emptyList()
-        val methodName = context.injectMethodName
+        val methodTarget = parseMethodTarget(
+            context.injectMethodName
             ?: findEnclosingInjectorMethod(source, context.valueStartOffset)
-            ?: return emptyList()
+            ?: return emptyList(),
+        )
         val atValue = context.atValue
             ?: findAtValueInAnnotationBody(source, context.annotationStartOffset, context.annotationEndOffset)
             ?: return emptyList()
-        val candidates = bytecodeIndex.getAtTargetCandidates(owner, methodName, null, atValue)
+        val candidates = bytecodeIndex.getAtTargetCandidates(
+            owner,
+            methodTarget.name,
+            methodTarget.descriptor,
+            atValue,
+        )
         return atTargetCompletion.complete(context, candidates)
+    }
+
+    private data class MethodTarget(
+        val name: String,
+        val descriptor: String?,
+    )
+
+    private fun parseMethodTarget(value: String): MethodTarget {
+        val paren = value.indexOf('(')
+        return if (paren > 0) {
+            MethodTarget(value.substring(0, paren), value.substring(paren))
+        } else {
+            MethodTarget(value, null)
+        }
     }
 
     private fun findAtValueInAnnotationBody(source: String, annotationStart: Int, annotationEnd: Int): String? {
@@ -201,7 +222,7 @@ class MixinServiceFacade(
         val bodyStart = match.range.last
         val bodyEnd = findMatchingParen(source, bodyStart) ?: return null
         val body = source.substring(bodyStart, bodyEnd + 1)
-        val methodMatch = Regex("""method\s*=\s*"([^"(]+)""").find(body) ?: return null
+        val methodMatch = Regex("method\\s*=\\s*\"([^\"]+)\"").find(body) ?: return null
         return methodMatch.groupValues[1]
     }
 
@@ -295,10 +316,10 @@ private object MixinSourceMemberParser {
         """@Shadow(?:\s*\([^)]*\))?\s+(?:private|protected|public)?\s*(?:static\s+)?(?:abstract\s+)?([\w.<>\[\]]+)\s+(\w+)\s*\(([^)]*)\)\s*;""",
     )
     private val accessorPattern = Regex(
-        """@Accessor(?:\s*\(\s*"([^"]*)"\s*\))?\s+([\w.<>\[\]]+)\s+(\w+)\s*\(([^)]*)\)\s*;""",
+        """@Accessor(?:\s*\(\s*"([^"]*)"\s*\))?\s+(?:private|protected|public)?\s*(?:static\s+)?(?:abstract\s+)?([\w.<>\[\]]+)\s+(\w+)\s*\(([^)]*)\)\s*;""",
     )
     private val invokerPattern = Regex(
-        """@Invoker(?:\s*\(\s*"([^"]*)"\s*\))?\s+([\w.<>\[\]]+)\s+(\w+)\s*\(([^)]*)\)\s*;""",
+        """@Invoker(?:\s*\(\s*"([^"]*)"\s*\))?\s+(?:private|protected|public)?\s*(?:static\s+)?(?:abstract\s+)?([\w.<>\[\]]+)\s+(\w+)\s*\(([^)]*)\)\s*;""",
     )
 
     fun parseShadowDeclarations(source: String): List<ShadowMemberDeclaration> {
@@ -358,8 +379,15 @@ private object MixinSourceMemberParser {
             .filter { it.isNotEmpty() }
             .map { javaTypeToDescriptor(it.substringBeforeLast(' ').ifEmpty { it }) }
 
-    private fun javaTypeToDescriptor(type: String): String =
-        when (type) {
+    private fun javaTypeToDescriptor(type: String): String {
+        val trimmed = type.trim()
+        val arrayDepth = Regex("""\[\]""").findAll(trimmed).count() + if (trimmed.endsWith("...")) 1 else 0
+        val normalized = trimmed
+            .removeSuffix("...")
+            .replace("[]", "")
+            .substringBefore('<')
+            .trim()
+        val descriptor = when (normalized) {
             "void" -> "V"
             "boolean" -> "Z"
             "byte" -> "B"
@@ -369,8 +397,13 @@ private object MixinSourceMemberParser {
             "long" -> "J"
             "float" -> "F"
             "double" -> "D"
-            else -> "L${type.replace('.', '/')};"
+            "String" -> "Ljava/lang/String;"
+            "Object" -> "Ljava/lang/Object;"
+            "Class" -> "Ljava/lang/Class;"
+            else -> "L${normalized.replace('.', '/')};"
         }
+        return "[".repeat(arrayDepth) + descriptor
+    }
 
     private fun methodSignatureToDescriptor(returnType: String, params: String): String =
         "(${parseParameterTypes(params).joinToString("")})${javaTypeToDescriptor(returnType)}"

@@ -9,8 +9,11 @@ object McdevCommands {
     const val COMPLETION: String = "mcdev.completion"
     const val DEFINITION: String = "mcdev.definition"
     const val REFERENCES: String = "mcdev.references"
+    const val HOVER: String = "mcdev.hover"
     const val CODE_ACTION: String = "mcdev.codeAction"
     const val REINDEX: String = "mcdev.reindex"
+    const val RELOAD_PROJECT_CONTEXT: String = "mcdev.reloadProjectContext"
+    const val DUMP_CONTEXT: String = "mcdev.dumpContext"
     const val CONTEXT: String = "mcdev.context"
     const val INFO: String = "mcdev.info"
 }
@@ -46,6 +49,60 @@ data class McdevResponseEnvelope<T>(
     val capabilities: Set<String> = emptySet(),
     val result: T? = null,
     val error: McdevError? = null,
+)
+
+data class McdevReloadProjectContextRequest(
+    val context: McdevRequestContext,
+)
+
+data class McdevReloadProjectContextResponse(
+    val status: String,
+    val indexState: String,
+    val classpathEntries: Int,
+    val lines: List<String>,
+)
+
+data class McdevDumpContextRequest(
+    val context: McdevRequestContext,
+)
+
+data class McdevDumpContextResponse(
+    val lines: List<String>,
+    val projectId: String,
+    val root: String,
+    val platform: String,
+    val mappings: McdevMappingContextDto,
+    val classpath: McdevClasspathDto,
+    val sourceSets: List<McdevSourceSetDto>,
+    val mixinConfigs: List<String>,
+    val accessWideners: List<String>,
+    val accessTransformers: List<String>,
+    val minecraftJars: List<String>,
+    val indexState: String,
+)
+
+data class McdevMappingContextDto(
+    val sourceNamespace: String,
+    val runtimeNamespace: String,
+    val awNamespace: String?,
+    val atNamespace: String?,
+    val availableNamespaces: List<String>,
+)
+
+data class McdevClasspathDto(
+    val entryCount: Int,
+    val projectOutputs: List<String>,
+    val dependencyJars: List<String>,
+    val minecraftJars: List<String>,
+    val generatedOutputs: List<String>,
+    val capturedAt: Long,
+)
+
+data class McdevSourceSetDto(
+    val name: String,
+    val sourceDirectories: List<String>,
+    val resourceDirectories: List<String>,
+    val outputDirectory: String?,
 )
 
 data class McdevError(

@@ -7,8 +7,11 @@
          <command id="mcdev.context"/>
          <command id="mcdev.info"/>
          <command id="mcdev.reindex"/>
+         <command id="mcdev.reloadProjectContext"/>
+         <command id="mcdev.dumpContext"/>
          <command id="mcdev.definition"/>
          <command id="mcdev.references"/>
+         <command id="mcdev.hover"/>
          <command id="mcdev.codeAction"/>
       </delegateCommandHandler>
    </extension>

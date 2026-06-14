@@ -29,6 +29,14 @@ sealed interface AtMemberResolution {
         val namedName: String,
         val kind: MemberKind,
     ) : AtMemberResolution
+    data class DescriptorMismatch(
+        val namedName: String,
+        val descriptor: String,
+        val method: MethodIndexEntry,
+    ) : AtMemberResolution
+    data class MissingDescriptor(
+        val namedName: String,
+    ) : AtMemberResolution
 }
 
 class AtMemberResolver(
@@ -73,6 +81,12 @@ class AtMemberResolver(
         ownerInternalName: String,
     ): AtMemberResolution {
         val method = selectNamedMethod(methods, memberDescriptor)
+            ?: return if (memberDescriptor != null) {
+                val onlyMethod = methods.singleOrNull() ?: return AtMemberResolution.NotFound
+                AtMemberResolution.DescriptorMismatch(memberName, memberDescriptor, onlyMethod)
+            } else {
+                AtMemberResolution.MissingDescriptor(memberName)
+            }
         val targetNamespace = mappingContext?.atNamespace
         if (targetNamespace != null && targetNamespace != mappingContext.sourceNamespace) {
             val remapped = insertFormatter.remapMethodForEntry(ownerInternalName, method, mappingContext)
@@ -121,10 +135,10 @@ class AtMemberResolver(
     private fun selectNamedMethod(
         methods: List<MethodIndexEntry>,
         memberDescriptor: String?,
-    ): MethodIndexEntry =
+    ): MethodIndexEntry? =
         when {
-            memberDescriptor != null -> methods.find { it.descriptor == memberDescriptor } ?: methods.first()
-            else -> methods.first()
+            memberDescriptor != null -> methods.find { it.descriptor == memberDescriptor }
+            else -> methods.singleOrNull()
         }
 
     private fun resolveNamedField(

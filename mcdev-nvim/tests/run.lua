@@ -11,6 +11,7 @@ local convert = require("mcdev.convert")
 local navigation = require("mcdev.navigation")
 local diagnostics = require("mcdev.diagnostics")
 local code_action = require("mcdev.code_action")
+local hover = require("mcdev.hover")
 local jdtls_helper = require("mcdev.jdtls")
 
 mcdev.setup({
@@ -92,6 +93,9 @@ helpers.assert_true(item.label ~= item.insertText, "label must differ from inser
 local payload = protocol.build_completion_payload(0, { 1, 5 })
 helpers.assert_not_nil(payload.context)
 helpers.assert_eq(payload.context.protocolVersion, protocol.VERSION)
+helpers.assert_eq(protocol.commands.reload_project_context, "mcdev.reloadProjectContext")
+helpers.assert_eq(protocol.commands.dump_context, "mcdev.dumpContext")
+helpers.assert_eq(protocol.commands.hover, "mcdev.hover")
 helpers.assert_eq(payload.trigger.kind, "manual")
 helpers.assert_eq(payload.options.preferredAtTarget, "smart")
 helpers.assert_eq(payload.options.mixinClassInsert, "import")
@@ -166,10 +170,13 @@ completion_module.complete = original_complete
 local commands = vim.api.nvim_get_commands({})
 helpers.assert_not_nil(commands.McdevInfo)
 helpers.assert_not_nil(commands.McdevReindex)
+helpers.assert_not_nil(commands.McdevReloadProjectContext)
+helpers.assert_not_nil(commands.McdevDumpContext)
 
 helpers.assert_eq(mcdev.options().insert.at_target, "smart")
 helpers.assert_eq(mcdev.options().insert.mixin_class_import, true)
 helpers.assert_eq(mcdev.options().insert.inject_method_descriptor, "auto")
+helpers.assert_eq(mcdev.options().completion.omnifunc, true)
 
 local function has_buffer_keymap(bufnr, mode, lhs)
   for _, map in ipairs(vim.api.nvim_buf_get_keymap(bufnr, mode)) do
@@ -220,6 +227,18 @@ with_named_buffer("/project/src/main/java/com/example/mixin/ExampleMixin.java", 
   helpers.assert_true(buffer.is_mcdev_buffer(bufnr))
   local payload = protocol.build_completion_payload(bufnr, { 1, 8 })
   helpers.assert_eq(payload.context.languageId, "java")
+  require("mcdev.attach").setup(bufnr)
+  helpers.assert_eq(vim.bo[bufnr].omnifunc, "v:lua.require'mcdev.omnifunc'.complete")
+end)
+
+with_named_buffer("/project/src/main/java/com/example/mixin/NoOmnifuncMixin.java", "java", {
+  "@Mixin(SimpleTarget.class)",
+}, function(bufnr)
+  local original_completion_options = vim.deepcopy(config.options.completion)
+  config.options.completion.omnifunc = false
+  require("mcdev.attach").setup(bufnr)
+  helpers.assert_eq(vim.bo[bufnr].omnifunc, "")
+  config.options.completion = original_completion_options
 end)
 
 with_named_buffer("/project/src/main/resources/mod.aw", "plaintext", {
@@ -417,6 +436,26 @@ navigation.definition(0, { 1, 1 }, function(_, err)
 end)
 helpers.assert_eq(nav_error, "mcdev: no active JDT LS client for this buffer")
 vim.lsp.get_clients = original_get_clients
+
+local hover_result = nil
+protocol_module = package.loaded["mcdev.protocol"]
+local original_hover = protocol_module.hover
+protocol_module.hover = function(_, _, callback)
+  callback({
+    result = {
+      contents = {
+        "```mcdev\nclass com.example.target.SimpleTarget\n```",
+      },
+    },
+  }, nil)
+end
+hover.hover(0, { 1, 1 }, function(result, err)
+  helpers.assert_nil(err)
+  hover_result = result
+end)
+helpers.assert_not_nil(hover_result)
+helpers.assert_eq(hover_result.contents[1], "```mcdev\nclass com.example.target.SimpleTarget\n```")
+protocol_module.hover = original_hover
 
 with_named_buffer("/project/src/main/resources/mod.accesswidener", "accesswidener", {
   "accessWidener v2 named",

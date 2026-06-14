@@ -210,6 +210,84 @@ class AnnotationContextExtractorTest {
     }
 
     @Test
+    fun parsesMixinValueClassTarget() {
+        val source = """@Mixin(value = SimpleTarget.class) class M {}"""
+        val targets = AnnotationContextExtractor.parseMixinTargetValues(source, 0)
+        assertEquals(listOf("SimpleTarget"), targets)
+    }
+
+    @Test
+    fun extractsFullyQualifiedMixinClassSlot() {
+        val source = "@org.spongepowered.asm.mixin.Mixin(net.minecraft.client.MinecraftClient.class)\nclass M {}"
+        val offset = source.indexOf("MinecraftClient") + "MinecraftClient".length
+        val context = AnnotationContextExtractor.extractAtOffset(source, offset)
+        assertNotNull(context)
+        assertEquals(MixinAnnotation.MIXIN, context.annotation)
+        assertEquals(AnnotationSlot.CLASS, context.slot)
+        assertEquals("MinecraftClient", context.partialValue)
+    }
+
+    @Test
+    fun extractsFullyQualifiedMixinArrayClassSlot() {
+        val source = "@org.spongepowered.asm.mixin.Mixin({ net.minecraft.client.GameRenderer.class }) class M {}"
+        val offset = source.indexOf("GameRenderer") + "GameRenderer".length
+        val context = AnnotationContextExtractor.extractAtOffset(source, offset)
+        assertNotNull(context)
+        assertEquals(MixinAnnotation.MIXIN, context.annotation)
+        assertEquals(AnnotationSlot.CLASS, context.slot)
+    }
+
+    @Test
+    fun parsesFullyQualifiedMixinClassTarget() {
+        val source = "@org.spongepowered.asm.mixin.Mixin(com.example.client.MinecraftClient.class) class M {}"
+        val targets = AnnotationContextExtractor.parseMixinTargetValues(source, 0)
+        assertEquals(listOf("com/example/client/MinecraftClient"), targets)
+    }
+
+    @Test
+    fun parsesFullyQualifiedMixinArrayTargets() {
+        val source = """@org.spongepowered.asm.mixin.Mixin({ com.example.A.class, com.example.B.class }) class M {}"""
+        val targets = AnnotationContextExtractor.parseMixinTargetValues(source, 0)
+        assertEquals(listOf("com/example/A", "com/example/B"), targets)
+    }
+
+    @Test
+    fun resolvesMixinTargetsFromFullyQualifiedAnnotationOnInterface() {
+        val padding = "// comment\n".repeat(80)
+        val source = "$padding@org.spongepowered.asm.mixin.Mixin(MinecraftClient.class)\ninterface ExampleMixin {}"
+        val targets = AnnotationContextExtractor.resolveMixinTargets(source, source.length)
+        assertEquals(listOf("MinecraftClient"), targets)
+    }
+
+    @Test
+    fun extractsFullyQualifiedInjectMethodSlot() {
+        val source = """
+            @Mixin(MinecraftClient.class)
+            class M {
+                @org.spongepowered.asm.mixin.injection.Inject(method = "ti", at = @org.spongepowered.asm.mixin.injection.At("HEAD"))
+                private void onTick() {}
+            }
+        """.trimIndent()
+        val partial = "ti"
+        val offset = source.indexOf("method = \"$partial\"") + "method = \"".length + partial.length
+        val context = AnnotationContextExtractor.extractAtOffset(source, offset)
+        assertNotNull(context)
+        assertEquals(MixinAnnotation.INJECT, context.annotation)
+        assertEquals(AnnotationSlot.METHOD, context.slot)
+        assertEquals(partial, context.partialValue)
+    }
+
+    @Test
+    fun extractsFullyQualifiedAtValueSlot() {
+        val source = """@Inject(method = "tick", at = @org.spongepowered.asm.mixin.injection.At(value = "INVOKE", target = "Lnet/minecraft/"))"""
+        val offset = source.indexOf("INVOKE") + "IN".length
+        val context = AnnotationContextExtractor.extractAtOffset(source, offset)
+        assertNotNull(context)
+        assertEquals(MixinAnnotation.AT, context.annotation)
+        assertEquals(AnnotationSlot.VALUE, context.slot)
+    }
+
+    @Test
     fun fqnToInternalConversion() {
         assertEquals("net/minecraft/client/MinecraftClient", AnnotationContextExtractor.fqnToInternal("net.minecraft.client.MinecraftClient"))
     }

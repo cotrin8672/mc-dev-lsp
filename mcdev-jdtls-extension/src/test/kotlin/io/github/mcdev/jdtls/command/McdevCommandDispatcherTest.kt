@@ -7,7 +7,9 @@ import io.github.mcdev.jdtls.handler.McdevCodeActionHandler
 import io.github.mcdev.jdtls.handler.McdevCompletionHandler
 import io.github.mcdev.jdtls.handler.McdevDefinitionHandler
 import io.github.mcdev.jdtls.handler.McdevDiagnosticsHandler
+import io.github.mcdev.jdtls.handler.McdevHoverHandler
 import io.github.mcdev.jdtls.handler.McdevInfoHandler
+import io.github.mcdev.jdtls.handler.McdevProjectContextHandler
 import io.github.mcdev.jdtls.handler.McdevReferencesHandler
 import io.github.mcdev.jdtls.handler.McdevReindexHandler
 import io.github.mcdev.jdtls.mixin.MixinServiceFacade
@@ -18,10 +20,13 @@ import io.github.mcdev.protocol.McdevCodeActionResponse
 import io.github.mcdev.protocol.McdevCompletionResponse
 import io.github.mcdev.protocol.McdevDefinitionResponse
 import io.github.mcdev.protocol.McdevDiagnosticsResponse
+import io.github.mcdev.protocol.McdevDumpContextResponse
 import io.github.mcdev.protocol.McdevErrorCode
+import io.github.mcdev.protocol.McdevHoverResponse
 import io.github.mcdev.protocol.McdevInfoResponse
 import io.github.mcdev.protocol.McdevProtocol
 import io.github.mcdev.protocol.McdevReferencesResponse
+import io.github.mcdev.protocol.McdevReloadProjectContextResponse
 import io.github.mcdev.protocol.McdevReindexResponse
 import kotlin.test.Test
 import kotlin.test.assertEquals
@@ -74,6 +79,27 @@ class McdevCommandDispatcherTest {
         val response = dispatcher.execute(McdevCommands.REINDEX, listOf(contextPayload("")))
         val result = assertIs<McdevReindexResponse>(response.result)
         assertEquals("reindex complete", result.status)
+    }
+
+    @Test
+    fun reloadProjectContextReturnsStructuredStatus() {
+        val dispatcher = createDispatcher()
+        val response = dispatcher.execute(McdevCommands.RELOAD_PROJECT_CONTEXT, listOf(contextPayload("")))
+        val result = assertIs<McdevReloadProjectContextResponse>(response.result)
+        assertEquals("project context reloaded", result.status)
+        assertEquals("ready", result.indexState)
+        assertTrue(result.lines.any { it.startsWith("Project:") })
+    }
+
+    @Test
+    fun dumpContextReturnsStructuredProjectDetails() {
+        val dispatcher = createDispatcher()
+        val response = dispatcher.execute(McdevCommands.DUMP_CONTEXT, listOf(contextPayload("")))
+        val result = assertIs<McdevDumpContextResponse>(response.result)
+        assertEquals("fabric", result.platform)
+        assertEquals("ready", result.indexState)
+        assertTrue(result.classpath.entryCount >= 1)
+        assertTrue(result.lines.any { it.startsWith("Platform: Fabric") })
     }
 
     @Test
@@ -133,13 +159,30 @@ class McdevCommandDispatcherTest {
     }
 
     @Test
+    fun hoverReturnsMixinClassDetails() {
+        val dispatcher = createDispatcher()
+        val source = FixtureResourceLoader.loadText(FixturePaths.FABRIC_BASIC_EXAMPLE_MIXIN)
+        val (line, character) = JdtlsFixtureSupport.mixinCursorPosition(source, "SimpleTarget")
+        val response = dispatcher.execute(
+            McdevCommands.HOVER,
+            listOf(definitionPayload(source, line, character)),
+        )
+        val result = assertIs<McdevHoverResponse>(response.result)
+        assertTrue(result.contents.any { it.contains("com.example.target.SimpleTarget") })
+        assertTrue(result.contents.any { it.contains("owner: com/example/target/SimpleTarget") })
+    }
+
+    @Test
     fun registryListsImplementedCommands() {
         assertTrue(McdevCommandRegistry.implementedCommandIds.contains(McdevCommands.COMPLETION))
         assertTrue(McdevCommandRegistry.implementedCommandIds.contains(McdevCommands.CONTEXT))
         assertTrue(McdevCommandRegistry.implementedCommandIds.contains(McdevCommands.INFO))
         assertTrue(McdevCommandRegistry.implementedCommandIds.contains(McdevCommands.REINDEX))
+        assertTrue(McdevCommandRegistry.implementedCommandIds.contains(McdevCommands.RELOAD_PROJECT_CONTEXT))
+        assertTrue(McdevCommandRegistry.implementedCommandIds.contains(McdevCommands.DUMP_CONTEXT))
         assertTrue(McdevCommandRegistry.implementedCommandIds.contains(McdevCommands.DEFINITION))
         assertTrue(McdevCommandRegistry.implementedCommandIds.contains(McdevCommands.REFERENCES))
+        assertTrue(McdevCommandRegistry.implementedCommandIds.contains(McdevCommands.HOVER))
         assertTrue(McdevCommandRegistry.implementedCommandIds.contains(McdevCommands.CODE_ACTION))
     }
 
@@ -182,9 +225,11 @@ class McdevCommandDispatcherTest {
             diagnosticsHandler = McdevDiagnosticsHandler(projectService = projectService, mixinFacade = mixinFacade),
             infoHandler = McdevInfoHandler(projectService = projectService),
             reindexHandler = McdevReindexHandler(projectService = projectService),
+            projectContextHandler = McdevProjectContextHandler(projectService = projectService),
             codeActionHandler = McdevCodeActionHandler(projectService = projectService, mixinFacade = mixinFacade),
             definitionHandler = McdevDefinitionHandler(projectService = projectService, mixinFacade = mixinFacade),
             referencesHandler = McdevReferencesHandler(projectService = projectService, mixinFacade = mixinFacade),
+            hoverHandler = McdevHoverHandler(projectService = projectService, mixinFacade = mixinFacade),
         )
     }
 

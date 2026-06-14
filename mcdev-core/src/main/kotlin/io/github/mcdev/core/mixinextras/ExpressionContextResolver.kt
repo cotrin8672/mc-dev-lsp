@@ -14,7 +14,7 @@ data class ExpressionContext(
 object ExpressionContextResolver {
     private val definitionPattern = Regex("""@Definition\s*\(\s*id\s*=\s*"([^"]*)"\s*\)""")
     private val expressionPattern = Regex("""@Expression\s*\(\s*"([^"]*)"\s*\)""")
-    private val invokeExpressionPattern = Regex("""^(?:this\.)?(\w+)\.(\w+)\s*\(([^)]*)\)\s*$""")
+    private val invokeExpressionPattern = Regex("""^(?:this\.)?([\w.]+)\.(\w+)\s*\(([^)]*)\)\s*$""")
     private val bareInvokePattern = Regex("""^(\w+)\s*\(([^)]*)\)\s*$""")
     private val fieldAccessPattern = Regex("""^(?:this\.)?(\w+)\.(\w+)\s*$""")
 
@@ -57,12 +57,14 @@ object ExpressionContextResolver {
         classIndex: ClassIndex,
     ): String? {
         invokeExpressionPattern.matchEntire(expression)?.let { match ->
+            val receiver = match.groupValues[1]
             val methodName = match.groupValues[2]
-            return inferInvokeReturnType(ownerInternalName, targetMethod, methodName, bytecodeIndex)
+            val receiverOwner = resolveExpressionOwner(receiver, classIndex)
+            return inferInvokeReturnType(ownerInternalName, targetMethod, methodName, receiverOwner, bytecodeIndex)
         }
         bareInvokePattern.matchEntire(expression)?.let { match ->
             val methodName = match.groupValues[1]
-            return inferInvokeReturnType(ownerInternalName, targetMethod, methodName, bytecodeIndex)
+            return inferInvokeReturnType(ownerInternalName, targetMethod, methodName, null, bytecodeIndex)
         }
         fieldAccessPattern.matchEntire(expression)?.let { match ->
             val fieldName = match.groupValues[2]
@@ -75,6 +77,7 @@ object ExpressionContextResolver {
         ownerInternalName: String,
         targetMethod: MethodIndexEntry,
         methodName: String,
+        receiverOwner: String?,
         bytecodeIndex: BytecodeIndex,
     ): String? {
         val candidates = bytecodeIndex.getAtTargetCandidates(
@@ -84,9 +87,16 @@ object ExpressionContextResolver {
             "INVOKE",
         )
         val match = candidates.filter {
-            it.kind == AtTargetKind.INVOKE && it.name == methodName
+            it.kind == AtTargetKind.INVOKE &&
+                it.name == methodName &&
+                (receiverOwner == null || it.owner == receiverOwner)
         }.firstOrNull() ?: return null
         return methodReturnDescriptor(match.descriptor)
+    }
+
+    private fun resolveExpressionOwner(receiver: String, classIndex: ClassIndex): String? {
+        if (!receiver.contains('.')) return null
+        return classIndex.findClassByFqn(receiver)?.internalName ?: receiver.replace('.', '/')
     }
 
     private fun inferFieldType(

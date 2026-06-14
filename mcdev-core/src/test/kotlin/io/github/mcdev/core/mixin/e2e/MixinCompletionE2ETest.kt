@@ -150,6 +150,34 @@ class MixinCompletionE2ETest {
     }
 
     @Test
+    fun atTargetCompletionUsesDescriptorQualifiedInjectMethod() {
+        val source = """
+            @Mixin(com.example.target.SimpleTarget.class)
+            class M {
+                @Inject(method = "draw(Ljava/lang/String;FF)V", at = @At(value = "INVOKE", target = ""))
+                void m() {}
+            }
+        """.trimIndent()
+        val quote = source.indexOf("target = \"") + "target = \"".length
+        val items = simpleFacade.complete(MixinE2ETestSupport.requestAtOffset(source, quote))
+        assertTrue(items.any { it.insertText == "Ljava/lang/String;length()I" })
+    }
+
+    @Test
+    fun atTargetCompletionDoesNotUseWrongOverloadWhenDescriptorDiffers() {
+        val source = """
+            @Mixin(com.example.target.SimpleTarget.class)
+            class M {
+                @Inject(method = "draw(I)V", at = @At(value = "INVOKE", target = ""))
+                void m() {}
+            }
+        """.trimIndent()
+        val quote = source.indexOf("target = \"") + "target = \"".length
+        val items = simpleFacade.complete(MixinE2ETestSupport.requestAtOffset(source, quote))
+        assertTrue(items.isEmpty())
+    }
+
+    @Test
     fun completesShadowPrefixAttribute() {
         val source = """
             @Mixin(MinecraftClient.class)

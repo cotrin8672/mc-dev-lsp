@@ -13,6 +13,12 @@ function M.setup(opts)
   vim.api.nvim_create_user_command("McdevReindex", function()
     protocol.reindex()
   end, {})
+  vim.api.nvim_create_user_command("McdevReloadProjectContext", function()
+    protocol.reload_project_context()
+  end, {})
+  vim.api.nvim_create_user_command("McdevDumpContext", function()
+    protocol.dump_context()
+  end, {})
 end
 
 function M.extension_jar()
@@ -25,6 +31,7 @@ end
 
 M.navigation = require("mcdev.navigation")
 M.code_action = require("mcdev.code_action")
+M.hover = require("mcdev.hover")
 M.diagnostics = diagnostics
 M.convert = require("mcdev.convert")
 M.attach = require("mcdev.attach")

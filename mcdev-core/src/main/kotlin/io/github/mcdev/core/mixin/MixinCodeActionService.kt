@@ -138,9 +138,10 @@ class MixinCodeActionService(
         classIndex: ClassIndex,
     ): List<McFix> {
         val mixinTargets = findMixinTargets(source, classIndex)
-        val method = mixinTargets.firstNotNullOfOrNull { owner ->
-            classIndex.getMethods(owner).find { it.name == methodName }
-        } ?: return emptyList()
+        val method = mixinTargets.flatMap { owner -> classIndex.getMethods(owner) }
+            .filter { it.name == methodName }
+            .singleOrNull()
+            ?: return emptyList()
         val stub = (invokerService ?: InvokerService(classIndex)).generateMethodStub(method)
         val insertOffset = findClassBodyInsertOffset(source)
         return listOf(
@@ -162,7 +163,7 @@ class MixinCodeActionService(
         if (classIndex == null) return null
         val owners = findMixinTargets(source, classIndex)
         val methods = owners.flatMap { classIndex.getMethods(it) }.filter { it.name == methodName }
-        return methods.firstOrNull()?.descriptor
+        return methods.singleOrNull()?.descriptor
     }
 
     private fun findMixinTargets(source: String, classIndex: ClassIndex): List<String> =

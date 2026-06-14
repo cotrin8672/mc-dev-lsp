@@ -14,6 +14,9 @@ M.options = {
     mixin_class_import = true,
     inject_method_descriptor = "auto",
   },
+  completion = {
+    omnifunc = true,
+  },
 }
 
 local function merge(base, override)

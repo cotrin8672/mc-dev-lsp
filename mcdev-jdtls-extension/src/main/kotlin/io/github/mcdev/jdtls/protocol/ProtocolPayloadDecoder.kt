@@ -15,11 +15,14 @@ import io.github.mcdev.protocol.McdevCompletionRequest
 import io.github.mcdev.protocol.McdevCompletionTrigger
 import io.github.mcdev.protocol.McdevDefinitionRequest
 import io.github.mcdev.protocol.McdevDiagnosticsRequest
+import io.github.mcdev.protocol.McdevDumpContextRequest
+import io.github.mcdev.protocol.McdevHoverRequest
 import io.github.mcdev.protocol.McdevInfoRequest
 import io.github.mcdev.protocol.McdevPosition
 import io.github.mcdev.protocol.McdevProtocol
 import io.github.mcdev.protocol.McdevRange
 import io.github.mcdev.protocol.McdevReferencesRequest
+import io.github.mcdev.protocol.McdevReloadProjectContextRequest
 import io.github.mcdev.protocol.McdevReindexRequest
 import io.github.mcdev.protocol.McdevRequestContext
 
@@ -57,6 +60,12 @@ class ProtocolPayloadDecoder(
     fun decodeReindexRequest(arguments: List<Any?>): McdevReindexRequest =
         McdevReindexRequest(context = decodeContextRequest(arguments))
 
+    fun decodeReloadProjectContextRequest(arguments: List<Any?>): McdevReloadProjectContextRequest =
+        McdevReloadProjectContextRequest(context = decodeContextRequest(arguments))
+
+    fun decodeDumpContextRequest(arguments: List<Any?>): McdevDumpContextRequest =
+        McdevDumpContextRequest(context = decodeContextRequest(arguments))
+
     fun decodeCodeActionRequest(arguments: List<Any?>): McdevCodeActionRequest {
         val root = decodeRoot(arguments)
         val rangeObject = root.getAsJsonObjectOrEmpty("range")
@@ -79,6 +88,9 @@ class ProtocolPayloadDecoder(
 
     fun decodeReferencesRequest(arguments: List<Any?>): McdevReferencesRequest =
         McdevReferencesRequest(context = decodeContextRequest(arguments))
+
+    fun decodeHoverRequest(arguments: List<Any?>): McdevHoverRequest =
+        McdevHoverRequest(context = decodeContextRequest(arguments))
 
     fun encodeToMap(value: Any): Map<String, Any?> =
         gson.fromJson(gson.toJsonTree(value), Map::class.java) as Map<String, Any?>

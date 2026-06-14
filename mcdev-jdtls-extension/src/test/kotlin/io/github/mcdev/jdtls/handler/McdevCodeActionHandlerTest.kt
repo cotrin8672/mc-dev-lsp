@@ -9,6 +9,8 @@ import io.github.mcdev.jdtls.support.JdtlsFixtureSupport
 import io.github.mcdev.protocol.McdevCodeActionResponse
 import io.github.mcdev.protocol.McdevErrorCode
 import io.github.mcdev.protocol.McdevProtocol
+import kotlin.io.path.createDirectories
+import kotlin.io.path.writeText
 import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertIs
@@ -96,15 +98,7 @@ class McdevCodeActionHandlerTest {
             ),
         )
         val result = assertIs<McdevCodeActionResponse>(response.result)
-        assertTrue(result.actions.isNotEmpty())
-        assertTrue(result.actions.any { it.kind == "quickfix.mixin.methodDescriptor" })
-        assertTrue(
-            result.actions.any { action ->
-                action.edits.any { workspaceEdit ->
-                    workspaceEdit.edits.any { textEdit -> textEdit.newText.contains("draw(") }
-                }
-            },
-        )
+        assertTrue(result.actions.none { it.kind == "quickfix.mixin.methodDescriptor" })
     }
 
     @Test
@@ -168,6 +162,88 @@ class McdevCodeActionHandlerTest {
         )
         val action = assertIs<McdevCodeActionResponse>(response.result).actions.first()
         assertTrue(action.edits.first().documentUri.contains("mixins.json"))
+    }
+
+    @Test
+    fun codeActionTargetsSelectedMixinConfigWhenEarlierConfigIsWrong() {
+        val handler = createHandlerWithTwoMixinConfigs()
+        val source = """
+            package com.example.mixin;
+            import com.example.target.SimpleTarget;
+            import org.spongepowered.asm.mixin.Mixin;
+            @Mixin(SimpleTarget.class)
+            public abstract class UnlistedMixin {}
+        """.trimIndent()
+        val response = handler.handle(
+            listOf(
+                codeActionPayload(
+                    source = source,
+                    diagnosticCodes = listOf(MixinDiagnosticCodes.MIXIN_CLASS_NOT_LISTED_IN_CONFIG),
+                ),
+            ),
+        )
+        val action = assertIs<McdevCodeActionResponse>(response.result).actions.first()
+        assertTrue(action.edits.first().documentUri.contains("mixins.json"))
+        assertTrue(!action.edits.first().documentUri.contains("aaa-wrong.mixins.json"))
+    }
+
+    @Test
+    fun codeActionUsesConfigThatListsMixinClass() {
+        val handler = createHandlerWithListedMixinConfig()
+        val source = """
+            package com.example.mixin;
+            import com.example.target.SimpleTarget;
+            import org.spongepowered.asm.mixin.Mixin;
+            @Mixin(SimpleTarget.class)
+            public abstract class ListedMixin {}
+        """.trimIndent()
+        val response = handler.handle(
+            listOf(
+                codeActionPayload(
+                    source = source,
+                    fileName = "ListedMixin.java",
+                    diagnosticCodes = listOf(MixinDiagnosticCodes.MIXIN_CLASS_NOT_LISTED_IN_CONFIG),
+                ),
+            ),
+        )
+        val result = assertIs<McdevCodeActionResponse>(response.result)
+        assertTrue(result.actions.isEmpty())
+    }
+
+    private fun createHandlerWithTwoMixinConfigs(): McdevCodeActionHandler {
+        val handler = createHandler()
+        val resources = tempDir.resolve("src/main/resources").createDirectories()
+        resources.resolve("aaa-wrong.mixins.json").writeText(
+            """
+            {
+              "package": "com.other.mixin",
+              "mixins": ["OtherMixin"]
+            }
+            """.trimIndent(),
+        )
+        return handler
+    }
+
+    private fun createHandlerWithListedMixinConfig(): McdevCodeActionHandler {
+        val handler = createHandler()
+        val resources = tempDir.resolve("src/main/resources").createDirectories()
+        resources.resolve("aaa-wrong.mixins.json").writeText(
+            """
+            {
+              "package": "com.other.mixin",
+              "mixins": ["OtherMixin"]
+            }
+            """.trimIndent(),
+        )
+        resources.resolve("zzz-listed.mixins.json").writeText(
+            """
+            {
+              "package": "com.example.mixin",
+              "mixins": ["ListedMixin"]
+            }
+            """.trimIndent(),
+        )
+        return handler
     }
 
     private fun createHandler(): McdevCodeActionHandler {

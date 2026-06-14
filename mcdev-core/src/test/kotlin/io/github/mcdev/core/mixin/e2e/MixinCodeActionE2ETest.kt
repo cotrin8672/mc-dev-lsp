@@ -47,7 +47,7 @@ class MixinCodeActionE2ETest {
     }
 
     @Test
-    fun producesAddDescriptorFixForAmbiguousInjectMethod() {
+    fun doesNotGuessDescriptorForAmbiguousInjectMethod() {
         val source = """
             @Mixin(MinecraftClient.class)
             class M {
@@ -59,26 +59,20 @@ class MixinCodeActionE2ETest {
             MixinE2ETestSupport.requestAt(source, "render"),
             MixinDiagnosticCodes.AMBIGUOUS_INJECT_METHOD,
         )
-        assertEquals(1, fixes.size)
-        val fix = fixes.first() as AddMethodDescriptorFix
-        assertEquals("render", fix.methodName)
-        assertTrue(fix.descriptor.startsWith("("))
+        assertTrue(fixes.isEmpty())
     }
 
     @Test
     fun applyMethodDescriptorFixUpdatesSource() {
-        val source = """
-            @Mixin(MinecraftClient.class)
-            class M {
-                @Inject(method = "render", at = @At("HEAD"))
-                void m() {}
-            }
-        """.trimIndent()
-        val fixes = facade.codeActions(
-            MixinE2ETestSupport.requestAt(source, "render"),
-            MixinDiagnosticCodes.AMBIGUOUS_INJECT_METHOD,
+        val source = """@Inject(method = "render", at = @At("HEAD"))"""
+        val fix = AddMethodDescriptorFix(
+            title = "Add descriptor to method target",
+            documentUri = "file:///Mixin.java",
+            startOffset = source.indexOf("render"),
+            endOffset = source.indexOf("render") + "render".length,
+            methodName = "render",
+            descriptor = "(FJZ)V",
         )
-        val fix = fixes.first() as AddMethodDescriptorFix
         val edit = codeActionService.applyMethodDescriptorFix(fix, source)
         assertTrue(edit.edits.first().newText.contains("render("))
     }

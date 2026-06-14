@@ -38,6 +38,15 @@ data class McdevReferencesResponse(
     val locations: List<McdevLocation>,
 )
 
+data class McdevHoverRequest(
+    val context: McdevRequestContext,
+)
+
+data class McdevHoverResponse(
+    val contents: List<String>,
+    val range: McdevRange? = null,
+)
+
 data class McdevLocation(
     val documentUri: String,
     val range: McdevRange,

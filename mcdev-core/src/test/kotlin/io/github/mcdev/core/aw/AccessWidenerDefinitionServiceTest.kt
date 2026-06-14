@@ -40,6 +40,22 @@ class AccessWidenerDefinitionServiceTest {
     }
 
     @Test
+    fun methodDefinitionDoesNotFallbackWhenDescriptorMismatches() {
+        val source = """
+            accessWidener v2 named
+            accessible method com/example/target/SimpleTarget draw ()V
+        """.trimIndent()
+        val marker = "draw"
+        val request = AwAtE2ETestSupport.requestAtOffset(
+            source,
+            source.indexOf(marker) + marker.length,
+            AwAtFileType.ACCESS_WIDENER,
+        )
+        val targets = service.definitionsAt(request.bufferText, request.line, request.character)
+        assertTrue(targets.isEmpty())
+    }
+
+    @Test
     fun resolvesFieldNameToFieldDefinition() {
         val source = AwAtE2ETestSupport.loadFixtureText(FixturePaths.FABRIC_AW_AT_ACCESS_WIDENER)
         val marker = "mutable field com/example/target/SimpleTarget counter"
