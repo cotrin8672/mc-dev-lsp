@@ -163,6 +163,8 @@ end)
 
 The current JDT LS bundle exposes mcdev navigation through `mcdev.definition` / `mcdev.references` commands. It does not extend JDT LS `textDocument/definition` directly.
 
+mcdev hover currently uses the `mcdev.hover` command over `workspace/executeCommand`, not standard `textDocument/hover`. When `navigation.enable` is true, the Neovim adapter binds `K` to that custom hover UI. Keep using `vim.lsp.buf.hover()` separately if you also want the standard JDT LS hover behavior.
+
 ## AW and AT filetypes
 
 JDT LS may not attach to Access Widener or Access Transformer buffers. mcdev still works when:

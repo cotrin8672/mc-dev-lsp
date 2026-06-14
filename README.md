@@ -36,7 +36,11 @@ This project targets Java 21 and Kotlin JVM target 21.
 gradle test
 gradle :mcdev-jdtls-extension:jar
 gradle :mcdev-jdtls-extension:checkBundle
+nvim --headless -u mcdev-nvim/tests/minimal_init.lua -c "luafile mcdev-nvim/tests/run.lua" -c qa
+powershell -NoProfile -ExecutionPolicy Bypass -File scripts/check-layout.ps1
 ```
+
+The `CI` GitHub Actions workflow runs `gradle test --no-daemon`, the headless Neovim adapter tests, and `scripts/check-layout.ps1` on Linux and Windows for pull requests and pushes to `main`.
 
 The JDT LS extension jar is produced as:
 
@@ -155,6 +159,8 @@ nvim-cmp:
 ```
 
 Use your normal Neovim keymap layer for navigation and code actions. The current JDT LS bundle exposes mcdev navigation through `workspace/executeCommand` commands (`mcdev.definition`, `mcdev.references`); it does not contribute to JDT LS `textDocument/definition` directly.
+
+mcdev hover is currently implemented as a custom `workspace/executeCommand` request through the `mcdev.hover` command. When mcdev navigation support is enabled, the Neovim adapter binds `K` to that custom hover UI. It is not yet integrated into standard `textDocument/hover`.
 
 Example navigation keymap:
 
