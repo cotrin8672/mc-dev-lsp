@@ -46,45 +46,11 @@ mcdev-jdtls-extension/build/libs/io.github.mcdev.jdtls-0.1.0-SNAPSHOT.jar
 
 ## Neovim Setup
 
-Install the JDT LS extension jar through the mcdev Mason registry, or build it locally.
+Mason owns the `jdtls` executable and the `mcdev-jdtls-extension` bundle. Add
+the mcdev registry to Mason, then install `jdtls` and `mcdev-jdtls-extension`
+from your Mason layer. mcdev does not run Mason installs by itself.
 
-Mason registry setup:
-
-```lua
-require("mason").setup({
-  registries = {
-    "github:cotrin8672/mc-dev-lsp",
-    "github:mason-org/mason-registry",
-  },
-})
-```
-
-Install `jdtls` and `mcdev-jdtls-extension` through your Mason layer. mcdev registers the custom registry in documentation examples, but package installation remains a Mason configuration choice.
-
-For local development, build the jar directly:
-
-```powershell
-gradle :mcdev-jdtls-extension:jar
-```
-
-Then add two pieces to Neovim:
-
-1. load `mcdev-nvim`
-2. pass the resolved extension jar to JDT LS through `init_options.bundles`
-
-`mcdev-nvim` keeps setup small. Calling `setup()` records configuration, creates the `:McdevInfo` / `:McdevReindex` commands, and enables diagnostics. Completion sources and navigation/code-action keymaps are wired explicitly in your editor configuration.
-
-Minimal local-checkout setup:
-
-```lua
-vim.opt.runtimepath:prepend("/path/to/mc-dev-lsp/mcdev-nvim")
-
-require("mcdev").setup()
-require("mcdev.jdtls").start_or_attach()
-```
-
-With Lazy.nvim and `nvim-jdtls`, keep your normal JDT LS config and let mcdev
-append only its extension bundle before `jdtls.start_or_attach(config)`:
+With lazy.nvim, a minimal setup looks like this:
 
 ```lua
 return {
@@ -97,20 +63,37 @@ return {
       },
     },
   },
+
+  -- Optional example with mason-tool-installer. Use Mason UI or another
+  -- ensure-installed layer if that is how your config manages tools.
+  {
+    "WhoIsSethDaniel/mason-tool-installer.nvim",
+    dependencies = { "mason-org/mason.nvim" },
+    opts = {
+      ensure_installed = {
+        "jdtls",
+        "mcdev-jdtls-extension",
+      },
+    },
+  },
+
   {
     name = "mcdev-nvim",
+    -- Mason installs the JDT LS bundle. lazy.nvim loads this Lua plugin.
     dir = "/path/to/mc-dev-lsp/mcdev-nvim",
     lazy = false,
-    config = function()
-      require("mcdev").setup({
-        insert = {
-          at_target = "smart",
-          mixin_class_import = true,
-          inject_method_descriptor = "auto",
-        },
-      })
+    opts = {
+      insert = {
+        at_target = "smart",
+        mixin_class_import = true,
+        inject_method_descriptor = "auto",
+      },
+    },
+    config = function(_, opts)
+      require("mcdev").setup(opts)
     end,
   },
+
   {
     "mfussenegger/nvim-jdtls",
     dependencies = { "mcdev-nvim" },
@@ -127,11 +110,50 @@ return {
 }
 ```
 
-Install `jdtls` and `mcdev-jdtls-extension` through Mason before opening a Java
-buffer, for example with `:MasonInstall jdtls mcdev-jdtls-extension` or your
-ensure-installed layer. `extend_config(config)` only appends the mcdev jar to
-`config.init_options.bundles`; it does not change your `cmd`, `root_dir`,
+`extend_config(config)` only appends the Mason-installed mcdev bundle to
+`config.init_options.bundles`; it does not change your JDT LS `cmd`, `root_dir`,
 `settings`, or `capabilities`.
+
+### Completion Sources
+
+mcdev completion is a separate source because it uses the `mcdev.completion`
+command, not plain `textDocument/completion`.
+
+Blink:
+
+```lua
+{
+  "saghen/blink.cmp",
+  dependencies = { "mcdev-nvim" },
+  opts = {
+    sources = {
+      default = { "lsp", "path", "snippets", "mcdev" },
+      providers = {
+        mcdev = require("mcdev.blink").source(),
+      },
+    },
+  },
+}
+```
+
+nvim-cmp:
+
+```lua
+{
+  "hrsh7th/nvim-cmp",
+  dependencies = { "mcdev-nvim" },
+  config = function()
+    local cmp = require("cmp")
+    cmp.register_source("mcdev", require("mcdev.cmp").source())
+    cmp.setup({
+      sources = {
+        { name = "nvim_lsp" },
+        { name = "mcdev" },
+      },
+    })
+  end,
+}
+```
 
 Use your normal Neovim keymap layer for navigation and code actions. The current JDT LS bundle exposes mcdev navigation through `workspace/executeCommand` commands (`mcdev.definition`, `mcdev.references`); it does not contribute to JDT LS `textDocument/definition` directly.
 

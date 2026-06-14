@@ -24,17 +24,42 @@ Diagnostics are enabled by default. Completion adapters are exposed as sources f
 ```lua
 return {
   {
+    "mason-org/mason.nvim",
+    opts = {
+      registries = {
+        "github:cotrin8672/mc-dev-lsp",
+        "github:mason-org/mason-registry",
+      },
+    },
+  },
+
+  -- Optional example. Use Mason UI or another ensure-installed layer if you
+  -- already manage tools elsewhere.
+  {
+    "WhoIsSethDaniel/mason-tool-installer.nvim",
+    dependencies = { "mason-org/mason.nvim" },
+    opts = {
+      ensure_installed = {
+        "jdtls",
+        "mcdev-jdtls-extension",
+      },
+    },
+  },
+
+  {
     name = "mcdev-nvim",
+    -- Local checkout layout. Mason installs the JDT LS bundle, not this Lua plugin.
     dir = "C:/Users/you/ghq/github.com/cotrin8672/mc-dev-lsp/mcdev-nvim",
     lazy = false,
-    config = function()
-      require("mcdev").setup({
-        insert = {
-          at_target = "smart",
-          mixin_class_import = true,
-          inject_method_descriptor = "auto",
-        },
-      })
+    opts = {
+      insert = {
+        at_target = "smart",
+        mixin_class_import = true,
+        inject_method_descriptor = "auto",
+      },
+    },
+    config = function(_, opts)
+      require("mcdev").setup(opts)
     end,
   },
 
@@ -43,7 +68,12 @@ return {
     dependencies = { "mcdev-nvim" },
     ft = "java",
     config = function()
-      require("mcdev.jdtls").start_or_attach()
+      local jdtls = require("jdtls")
+      local config = require("my.java.jdtls").config()
+
+      if require("mcdev.jdtls").extend_config(config) then
+        jdtls.start_or_attach(config)
+      end
     end,
   },
 }
@@ -99,13 +129,13 @@ nvim-cmp:
   dependencies = { "mcdev-nvim" },
   config = function()
     local cmp = require("cmp")
+    cmp.register_source("mcdev", require("mcdev.cmp").source())
     cmp.setup({
       sources = {
         { name = "nvim_lsp" },
         { name = "mcdev" },
       },
     })
-    cmp.register_source("mcdev", require("mcdev.cmp").source())
   end,
 }
 ```
