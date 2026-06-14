@@ -4,6 +4,7 @@ import io.github.mcdev.core.mixin.ClassIndexEntry
 import io.github.mcdev.core.mixin.FakeClassIndex
 import io.github.mcdev.core.mixin.MethodIndexEntry
 import kotlin.test.Test
+import kotlin.test.assertFalse
 import kotlin.test.assertTrue
 
 class AccessTransformerDiagnosticsServiceTest {
@@ -131,10 +132,66 @@ class AccessTransformerDiagnosticsServiceTest {
         assertTrue(diagnostics.none { it.code == AtDiagnosticCodes.INVALID_DESCRIPTOR })
     }
 
+    @Test
+    fun reportsInvalidDescriptorWhenOverloadedMethodsExistButDescriptorMatchesNone() {
+        val diagnostics = AccessTransformerDiagnosticsService(
+            classIndex = overloadedClassIndex(),
+            mappingContext = AtTestFixtures.fabricMappingContext,
+        ).analyze(
+            AtDiagnosticRequest("public com.example.target.OverloadedTarget setValue(ZZ)V"),
+        )
+
+        assertTrue(diagnostics.any { it.code == AtDiagnosticCodes.INVALID_DESCRIPTOR })
+        assertFalse(diagnostics.any { it.code == AtDiagnosticCodes.UNRESOLVED_MEMBER })
+    }
+
+    @Test
+    fun reportsUnknownMethodOnlyWhenMethodNameItselfDoesNotExist() {
+        val diagnostics = AccessTransformerDiagnosticsService(
+            classIndex = overloadedClassIndex(),
+            mappingContext = AtTestFixtures.fabricMappingContext,
+        ).analyze(
+            AtDiagnosticRequest("public com.example.target.OverloadedTarget missing(ZZ)V"),
+        )
+
+        assertTrue(diagnostics.any { it.code == AtDiagnosticCodes.UNRESOLVED_MEMBER })
+        assertFalse(diagnostics.any { it.code == AtDiagnosticCodes.INVALID_DESCRIPTOR })
+    }
+
+    @Test
+    fun reportsMissingMethodDescriptorWhenDescriptorIsOmittedAndOverloadsExist() {
+        val diagnostics = AccessTransformerDiagnosticsService(
+            classIndex = overloadedClassIndex(),
+            mappingContext = AtTestFixtures.fabricMappingContext,
+        ).analyze(
+            AtDiagnosticRequest("public com.example.target.OverloadedTarget setValue"),
+        )
+
+        assertTrue(diagnostics.any { it.code == AtDiagnosticCodes.MISSING_METHOD_DESCRIPTOR })
+        assertFalse(diagnostics.any { it.code == AtDiagnosticCodes.INVALID_DESCRIPTOR })
+    }
+
     private fun analyze(
         source: String,
         mappingContext: io.github.mcdev.core.mapping.ProjectMappingContext = AtTestFixtures.fabricMappingContext,
     ) = AccessTransformerDiagnosticsService(AtTestFixtures.classIndex, mappingContext).analyze(
         AtDiagnosticRequest(source = source),
     )
+
+    private fun overloadedClassIndex(): FakeClassIndex {
+        val owner = ClassIndexEntry(
+            simpleName = "OverloadedTarget",
+            packageName = "com.example.target",
+            internalName = "com/example/target/OverloadedTarget",
+        )
+        return FakeClassIndex(
+            classes = listOf(owner),
+            methods = mapOf(
+                owner.internalName to listOf(
+                    MethodIndexEntry("setValue", "(I)V", false, "setValue(int): void"),
+                    MethodIndexEntry("setValue", "(Ljava/lang/String;)V", false, "setValue(String): void"),
+                ),
+            ),
+        )
+    }
 }

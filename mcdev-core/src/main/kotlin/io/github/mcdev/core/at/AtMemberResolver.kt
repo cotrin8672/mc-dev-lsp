@@ -32,7 +32,7 @@ sealed interface AtMemberResolution {
     data class DescriptorMismatch(
         val namedName: String,
         val descriptor: String,
-        val method: MethodIndexEntry,
+        val candidates: List<MethodIndexEntry>,
     ) : AtMemberResolution
     data class MissingDescriptor(
         val namedName: String,
@@ -82,8 +82,7 @@ class AtMemberResolver(
     ): AtMemberResolution {
         val method = selectNamedMethod(methods, memberDescriptor)
             ?: return if (memberDescriptor != null) {
-                val onlyMethod = methods.singleOrNull() ?: return AtMemberResolution.NotFound
-                AtMemberResolution.DescriptorMismatch(memberName, memberDescriptor, onlyMethod)
+                AtMemberResolution.DescriptorMismatch(memberName, memberDescriptor, methods)
             } else {
                 AtMemberResolution.MissingDescriptor(memberName)
             }

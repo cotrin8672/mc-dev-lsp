@@ -160,13 +160,19 @@ class AccessTransformerDiagnosticsService(
                 return validateFoundMember(entry, resolution, range)
             }
             is AtMemberResolution.DescriptorMismatch -> {
+                val expectedDescriptors = resolution.candidates.joinToString(", ") { it.descriptor }
                 return listOf(
                     McDiagnostic(
                         code = AtDiagnosticCodes.INVALID_DESCRIPTOR,
                         severity = McSeverity.ERROR,
-                        message = "Descriptor '${resolution.descriptor}' does not match '${resolution.method.descriptor}'",
+                        message = "Descriptor '${resolution.descriptor}' does not match any descriptor for '${resolution.namedName}'",
                         range = range,
-                        metadata = mapOf("line" to entry.line.toString()),
+                        metadata = mapOf(
+                            "line" to entry.line.toString(),
+                            "member" to resolution.namedName,
+                            "descriptor" to resolution.descriptor,
+                            "expectedDescriptors" to expectedDescriptors,
+                        ),
                     ),
                 )
             }

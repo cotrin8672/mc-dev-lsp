@@ -10,6 +10,8 @@ import io.github.mcdev.core.codeaction.WorkspaceEditFix
 import io.github.mcdev.core.diagnostics.McDiagnostic
 import io.github.mcdev.core.mapping.ProjectMappingContext
 import io.github.mcdev.core.mixin.ClassIndex
+import io.github.mcdev.core.mixin.FieldIndexEntry
+import io.github.mcdev.core.mixin.MethodIndexEntry
 import io.github.mcdev.core.model.MemberKind
 
 class AccessTransformerCodeActionService(
@@ -46,13 +48,20 @@ class AccessTransformerCodeActionService(
                 AtDiagnosticCodes.SRG_MAPPING_NOT_FOUND,
                 -> {
                     val line = diagnostic.metadata["line"]?.toIntOrNull() ?: continue
-                    listOf(
-                        RemapAccessTransformerEntryFix(
-                            title = "Remap AT entry namespace",
-                            documentUri = documentUri,
-                            line = line,
-                        ),
-                    )
+                    if (
+                        diagnostic.code == AtDiagnosticCodes.WRONG_NAMESPACE &&
+                        remapEntryOnLine(source, line, classIndex, mappingContext) == null
+                    ) {
+                        emptyList()
+                    } else {
+                        listOf(
+                            RemapAccessTransformerEntryFix(
+                                title = "Remap AT entry namespace",
+                                documentUri = documentUri,
+                                line = line,
+                            ),
+                        )
+                    }
                 }
                 AtDiagnosticCodes.DUPLICATE_ENTRY -> {
                     val line = diagnostic.metadata["line"]?.toIntOrNull() ?: continue
@@ -196,7 +205,12 @@ class AccessTransformerCodeActionService(
                 }
             }
             is AtMemberResolution.WrongNamespace -> {
-                val method = classIndex.getMethods(ownerInternalName).find { it.name == resolution.namedName }
+                val method = resolveMethodForRemap(
+                    ownerInternalName = ownerInternalName,
+                    name = resolution.namedName,
+                    descriptor = entry.descriptor,
+                    classIndex = classIndex,
+                )
                 if (method != null) {
                     val insert = insertFormatter.remapMethodForEntry(ownerInternalName, method, mappingContext!!)
                     val descriptor = insert.insertText.substringAfter('(', missingDelimiterValue = "").let {
@@ -207,7 +221,12 @@ class AccessTransformerCodeActionService(
                         descriptor = descriptor,
                     )
                 }
-                val field = classIndex.getFields(ownerInternalName).find { it.name == resolution.namedName }
+                val field = resolveFieldForRemap(
+                    ownerInternalName = ownerInternalName,
+                    name = resolution.namedName,
+                    descriptor = entry.descriptor,
+                    classIndex = classIndex,
+                )
                 if (field != null) {
                     val insert = insertFormatter.remapFieldForEntry(ownerInternalName, field, mappingContext!!)
                     return entry.copy(name = insert.insertText, descriptor = null)
@@ -215,6 +234,50 @@ class AccessTransformerCodeActionService(
                 null
             }
             else -> null
+        }
+    }
+
+    private fun remapEntryOnLine(
+        source: String,
+        line: Int,
+        classIndex: ClassIndex,
+        mappingContext: ProjectMappingContext?,
+    ): AccessTransformerEntry? {
+        if (mappingContext?.atNamespace == null) return null
+        val parseResult = AccessTransformerParser.parse(source)
+        if (parseResult !is AccessTransformerParseResult.Success) return null
+        val entry = parseResult.file.entries.find { it.line == line } ?: return null
+        val ownerEntry = classIndex.findClassByFqn(entry.owner)
+            ?: classIndex.findClass(entry.owner.replace('.', '/'))
+            ?: return null
+        return remapEntry(entry, ownerEntry.internalName, classIndex, mappingContext)
+    }
+
+    private fun resolveMethodForRemap(
+        ownerInternalName: String,
+        name: String,
+        descriptor: String?,
+        classIndex: ClassIndex,
+    ): MethodIndexEntry? {
+        val candidates = classIndex.getMethods(ownerInternalName).filter { it.name == name }
+        return if (descriptor != null) {
+            candidates.find { it.descriptor == descriptor }
+        } else {
+            candidates.singleOrNull()
+        }
+    }
+
+    private fun resolveFieldForRemap(
+        ownerInternalName: String,
+        name: String,
+        descriptor: String?,
+        classIndex: ClassIndex,
+    ): FieldIndexEntry? {
+        val candidates = classIndex.getFields(ownerInternalName).filter { it.name == name }
+        return if (descriptor != null) {
+            candidates.find { it.descriptor == descriptor }
+        } else {
+            candidates.singleOrNull()
         }
     }
 
