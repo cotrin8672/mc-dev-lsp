@@ -83,10 +83,20 @@ require("mcdev").setup()
 require("mcdev.jdtls").start_or_attach()
 ```
 
-With Lazy.nvim, the same setup usually looks like this:
+With Lazy.nvim and `nvim-jdtls`, keep your normal JDT LS config and let mcdev
+append only its extension bundle before `jdtls.start_or_attach(config)`:
 
 ```lua
 return {
+  {
+    "mason-org/mason.nvim",
+    opts = {
+      registries = {
+        "github:cotrin8672/mc-dev-lsp",
+        "github:mason-org/mason-registry",
+      },
+    },
+  },
   {
     name = "mcdev-nvim",
     dir = "/path/to/mc-dev-lsp/mcdev-nvim",
@@ -107,7 +117,6 @@ return {
     ft = "java",
     config = function()
       local jdtls = require("jdtls")
-
       local config = require("my.java.jdtls").config()
 
       if require("mcdev.jdtls").extend_config(config) then
@@ -117,6 +126,12 @@ return {
   },
 }
 ```
+
+Install `jdtls` and `mcdev-jdtls-extension` through Mason before opening a Java
+buffer, for example with `:MasonInstall jdtls mcdev-jdtls-extension` or your
+ensure-installed layer. `extend_config(config)` only appends the mcdev jar to
+`config.init_options.bundles`; it does not change your `cmd`, `root_dir`,
+`settings`, or `capabilities`.
 
 Use your normal Neovim keymap layer for navigation and code actions. The current JDT LS bundle exposes mcdev navigation through `workspace/executeCommand` commands (`mcdev.definition`, `mcdev.references`); it does not contribute to JDT LS `textDocument/definition` directly.
 
