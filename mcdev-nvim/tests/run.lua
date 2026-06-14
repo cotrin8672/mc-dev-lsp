@@ -17,9 +17,9 @@ mcdev.setup({
   jdtls = {
     extension_jar = "build/libs/io.github.mcdev.jdtls.jar",
   },
-  mappings = {
-    preferred_at_target = "descriptor",
-    mixin_class_insert = "import",
+  insert = {
+    at_target = "smart",
+    mixin_class_import = true,
     inject_method_descriptor = "auto",
   },
 })
@@ -93,7 +93,7 @@ local payload = protocol.build_completion_payload(0, { 1, 5 })
 helpers.assert_not_nil(payload.context)
 helpers.assert_eq(payload.context.protocolVersion, protocol.VERSION)
 helpers.assert_eq(payload.trigger.kind, "manual")
-helpers.assert_eq(payload.options.preferredAtTarget, "descriptor")
+helpers.assert_eq(payload.options.preferredAtTarget, "smart")
 helpers.assert_eq(payload.options.mixinClassInsert, "import")
 helpers.assert_eq(payload.options.injectMethodDescriptor, "auto")
 helpers.assert_not_nil(payload.context.client)
@@ -119,7 +119,7 @@ protocol.request("mcdev.completion", payload, function(_, err)
 end)
 helpers.assert_eq(callback_error, "mcdev: no active JDT LS client for this buffer")
 
-local blink_adapter = blink.new()
+local blink_adapter = blink.source()
 helpers.assert_eq(#blink_adapter:get_trigger_characters(), 3)
 
 local completion_module = package.loaded["mcdev.completion"]
@@ -154,7 +154,7 @@ helpers.assert_eq(blink_result.items[1].label, "tick(): void")
 helpers.assert_eq(blink_result.items[1].insertText, "tick")
 
 local cmp_result = nil
-local cmp_source = cmp.new()
+local cmp_source = cmp.source()
 cmp_source:complete({}, function(items)
   cmp_result = items
 end)
@@ -167,11 +167,9 @@ local commands = vim.api.nvim_get_commands({})
 helpers.assert_not_nil(commands.McdevInfo)
 helpers.assert_not_nil(commands.McdevReindex)
 
-helpers.assert_eq(mcdev.options().completion.enable, true)
-helpers.assert_eq(mcdev.options().completion.source, "auto")
-helpers.assert_eq(mcdev.options().diagnostics.enable, false)
-helpers.assert_eq(mcdev.options().navigation.enable, false)
-helpers.assert_eq(mcdev.options().code_action.enable, false)
+helpers.assert_eq(mcdev.options().insert.at_target, "smart")
+helpers.assert_eq(mcdev.options().insert.mixin_class_import, true)
+helpers.assert_eq(mcdev.options().insert.inject_method_descriptor, "auto")
 
 local function has_buffer_keymap(bufnr, mode, lhs)
   for _, map in ipairs(vim.api.nvim_buf_get_keymap(bufnr, mode)) do
@@ -254,6 +252,46 @@ with_named_buffer("/other-project/src/main/java/com/example/mixin/ExampleMixin.j
   end
   local ctx = protocol.context(bufnr, { 1, 1 })
   helpers.assert_true(ctx.workspaceRoot:find("other%-project", 1, false) ~= nil, ctx.workspaceRoot)
+  vim.lsp.get_clients = original_get_clients
+end)
+
+with_named_buffer("/project/src/main/resources/mod.accesswidener", "accesswidener", {
+  "accessWidener v2 named",
+  "acc",
+}, function(bufnr)
+  local requested_command = nil
+  local requested_bufnr = nil
+  local fallback_client = {
+    name = "jdtls",
+    config = { root_dir = "/project" },
+    request = function(method, params, callback, request_bufnr)
+      requested_command = params.command
+      requested_bufnr = request_bufnr
+      callback(nil, { result = { items = {} } })
+    end,
+  }
+  vim.lsp.get_clients = function(opts)
+    if opts and opts.bufnr == bufnr then
+      return {}
+    end
+    if opts and opts.name == "jdtls" then
+      return { fallback_client }
+    end
+    return {}
+  end
+
+  local ctx = protocol.context(bufnr, { 2, 4 })
+  helpers.assert_true(ctx.workspaceRoot:find("/project", 1, true) ~= nil, ctx.workspaceRoot)
+  helpers.assert_eq(protocol.active_jdtls_client(bufnr), fallback_client)
+
+  local request_result = nil
+  protocol.request("mcdev.completion", { context = ctx }, function(result, err)
+    helpers.assert_nil(err)
+    request_result = result
+  end, bufnr)
+  helpers.assert_not_nil(request_result)
+  helpers.assert_eq(requested_command, "mcdev.completion")
+  helpers.assert_eq(requested_bufnr, bufnr)
   vim.lsp.get_clients = original_get_clients
 end)
 

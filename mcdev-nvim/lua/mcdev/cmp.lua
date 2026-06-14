@@ -3,9 +3,11 @@ local buffer = require("mcdev.buffer")
 
 local source = {}
 
-function source.new()
+function source.source()
   return setmetatable({}, { __index = source })
 end
+
+source.new = source.source
 
 function source:is_available()
   return buffer.is_mcdev_buffer(0)

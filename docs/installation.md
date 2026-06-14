@@ -12,7 +12,7 @@ mcdev runs as an OSGi bundle inside JDT LS. Neovim talks to it through `workspac
 | **Neovim 0.10+** | Uses `vim.lsp` APIs used by `mcdev-nvim`. |
 | **JDT LS** | Install through Mason (`:MasonInstall jdtls`) or provide your own `jdtls` on `PATH`. |
 | **nvim-jdtls** | Recommended for starting and attaching JDT LS to Gradle/Maven mod projects. |
-| **Completion plugin** | Optional. mcdev registers available blink.cmp / nvim-cmp adapters automatically and falls back to omnifunc. |
+| **Completion plugin** | Optional. mcdev exposes blink.cmp / nvim-cmp / omnifunc adapters as explicit sources. |
 
 Optional for building from source:
 
@@ -32,11 +32,7 @@ require("mason").setup({
 })
 ```
 
-Then install the extension bundle:
-
-```vim
-:MasonInstall mcdev-jdtls-extension
-```
+Install `jdtls` and `mcdev-jdtls-extension` through your Mason layer, such as Mason UI, `:MasonInstall`, or an ensure-installed plugin. mcdev only resolves installed packages; it does not install them.
 
 Minimal setup:
 
@@ -63,15 +59,15 @@ Optional behavior can still be configured:
 
 ```lua
 require("mcdev").setup({
-  mappings = {
-    preferred_at_target = "descriptor",
-    mixin_class_insert = "import", -- import | fqn
+  insert = {
+    at_target = "smart",
+    mixin_class_import = true,
     inject_method_descriptor = "auto", -- auto | always | never
   },
 })
 ```
 
-Set `completion.enable = false` only if you do not want mcdev to register completion adapters.
+Diagnostics are enabled by default. Register completion sources in your completion UI; see [lazy.nvim setup](lazy-nvim.md#completion-sources).
 
 ## External jar path
 
@@ -91,16 +87,16 @@ Use this path for Nix, system packages, or local builds.
 
 3. Configure mcdev with the jar path and pass the jar to JDT LS through `init_options.bundles`.
 
-   `mcdev-nvim` does not install navigation or code-action keymaps. Completion is enabled by default; diagnostics are opt-in.
+   `mcdev-nvim` does not install navigation or code-action keymaps. Diagnostics are enabled by default.
 
    ```lua
    require("mcdev").setup({
      jdtls = {
        extension_jar = "/absolute/path/to/io.github.mcdev.jdtls-0.1.0-SNAPSHOT.jar",
      },
-     mappings = {
-       preferred_at_target = "descriptor",
-       mixin_class_insert = "import", -- import | fqn
+     insert = {
+       at_target = "smart",
+       mixin_class_import = true,
        inject_method_descriptor = "auto", -- auto | always | never
      },
    })

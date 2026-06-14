@@ -3,6 +3,10 @@ package io.github.mcdev.jdtls.convert
 import io.github.mcdev.core.codeaction.McTextEdit
 import io.github.mcdev.core.completion.McCompletionItem
 import io.github.mcdev.core.completion.McCompletionKind
+import io.github.mcdev.core.descriptor.DescriptorParseResult
+import io.github.mcdev.core.descriptor.DescriptorRenderer
+import io.github.mcdev.core.descriptor.MemberTarget
+import io.github.mcdev.core.descriptor.MemberTargetParser
 import io.github.mcdev.core.mapping.MappingResolver
 import io.github.mcdev.core.mixin.AnnotationContext
 import io.github.mcdev.core.mixin.AnnotationContextExtractor
@@ -23,10 +27,11 @@ data class CompletionConvertContext(
     val source: String,
     val annotationContext: AnnotationContext?,
     val classInsertMode: MixinClassInsertMode = MixinClassInsertMode.IMPORT,
-    val preferredAtTarget: String = "descriptor",
+    val preferredAtTarget: String = "smart",
     val mappingResolver: MappingResolver? = null,
     val sourceNamespace: MappingNamespace = MappingNamespace.NAMED,
     val runtimeNamespace: MappingNamespace = MappingNamespace.INTERMEDIARY,
+    val siblingItems: List<McCompletionItem> = emptyList(),
 )
 
 object CompletionItemConverter {
@@ -75,7 +80,8 @@ object CompletionItemConverter {
             source = source,
             annotationContext = annotationContext,
         ),
-    ): List<McdevCompletionItemDto> = items.map { toDto(it, annotationContext, source, convertContext) }
+    ): List<McdevCompletionItemDto> =
+        items.map { toDto(it, annotationContext, source, convertContext.copy(siblingItems = items)) }
 
     private fun resolveInsertText(item: McCompletionItem, context: CompletionConvertContext): String {
         if (context.preferredAtTarget.equals("descriptor", ignoreCase = true) &&
@@ -90,7 +96,72 @@ object CompletionItemConverter {
                 to = context.runtimeNamespace,
             )
         }
+        if (context.preferredAtTarget.equals("smart", ignoreCase = true) &&
+            item.metadata.source == "mixin.atTarget" &&
+            context.mappingResolver != null
+        ) {
+            return smartAtTargetInsertText(item, context)
+        }
         return item.insertText
+    }
+
+    private fun smartAtTargetInsertText(item: McCompletionItem, context: CompletionConvertContext): String {
+        val target = remappedMemberTarget(item, context) ?: return item.insertText
+        val siblingTargets = context.siblingItems
+            .asSequence()
+            .filter { it.metadata.source == "mixin.atTarget" }
+            .mapNotNull { remappedMemberTarget(it, context) }
+            .toList()
+        val sameNameCount = siblingTargets.count { it.name == target.name }
+        val sameSignatureCount = siblingTargets.count {
+            it.name == target.name && it.descriptor == target.descriptor
+        }
+        return when {
+            target.kind == AtTargetKind.RETURN || target.kind == AtTargetKind.CONSTANT -> item.insertText
+            sameNameCount <= 1 -> target.name
+            sameSignatureCount <= 1 -> target.name + target.separator + target.descriptor
+            else -> target.fullText
+        }
+    }
+
+    private data class RemappedAtTarget(
+        val kind: AtTargetKind,
+        val name: String,
+        val descriptor: String,
+        val separator: String,
+        val fullText: String,
+    )
+
+    private fun remappedMemberTarget(
+        item: McCompletionItem,
+        context: CompletionConvertContext,
+    ): RemappedAtTarget? {
+        val candidate = atTargetCandidateFromItem(item) ?: return null
+        val fullText = atTargetInsertFormatter.formatInsert(
+            candidate = candidate,
+            resolver = context.mappingResolver,
+            from = context.sourceNamespace,
+            to = context.runtimeNamespace,
+        )
+        return when (val parsed = MemberTargetParser.parse(fullText)) {
+            is DescriptorParseResult.Success -> when (val target = parsed.value) {
+                is MemberTarget.Method -> RemappedAtTarget(
+                    kind = candidate.kind,
+                    name = target.name,
+                    descriptor = DescriptorRenderer.toDescriptor(target.descriptor),
+                    separator = "",
+                    fullText = fullText,
+                )
+                is MemberTarget.Field -> RemappedAtTarget(
+                    kind = candidate.kind,
+                    name = target.name,
+                    descriptor = DescriptorRenderer.toDescriptor(target.descriptor),
+                    separator = ":",
+                    fullText = fullText,
+                )
+            }
+            is DescriptorParseResult.Failure -> null
+        }
     }
 
     private fun buildAdditionalEdits(

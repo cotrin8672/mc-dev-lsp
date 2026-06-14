@@ -9,23 +9,9 @@ M.options = {
       jar = "io.github.mcdev.jdtls.jar",
     },
   },
-  completion = {
-    enable = true,
-    source = "auto",
-  },
-  diagnostics = {
-    enable = false,
-    debounce_ms = 300,
-  },
-  navigation = {
-    enable = false,
-  },
-  code_action = {
-    enable = false,
-  },
-  mappings = {
-    preferred_at_target = "descriptor",
-    mixin_class_insert = "import",
+  insert = {
+    at_target = "smart",
+    mixin_class_import = true,
     inject_method_descriptor = "auto",
   },
 }

@@ -3,9 +3,11 @@ local buffer = require("mcdev.buffer")
 
 local M = {}
 
-function M.new()
+function M.source()
   return setmetatable({}, { __index = M })
 end
+
+M.new = M.source
 
 function M:get_trigger_characters()
   return { '"', "@", "." }

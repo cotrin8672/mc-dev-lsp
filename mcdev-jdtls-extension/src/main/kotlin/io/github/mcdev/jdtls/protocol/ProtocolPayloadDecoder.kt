@@ -38,7 +38,7 @@ class ProtocolPayloadDecoder(
                 character = triggerObject.getNullableString("character"),
             ),
             options = McdevCompletionOptions(
-                preferredAtTarget = optionsObject.getStringOrDefault("preferredAtTarget", "descriptor"),
+                preferredAtTarget = optionsObject.getStringOrDefault("preferredAtTarget", "smart"),
                 mixinClassInsert = optionsObject.getStringOrDefault("mixinClassInsert", "import"),
                 injectMethodDescriptor = optionsObject.getStringOrDefault("injectMethodDescriptor", "auto"),
             ),

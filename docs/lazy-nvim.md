@@ -2,7 +2,7 @@
 
 This is a complete Lazy.nvim example for mcdev with Mason `jdtls`, the mcdev Mason registry, and `nvim-jdtls`.
 
-Install the extension bundle first:
+Register the mcdev Mason registry before the core Mason registry:
 
 ```lua
 require("mason").setup({
@@ -13,39 +13,31 @@ require("mason").setup({
 })
 ```
 
-```vim
-:MasonInstall mcdev-jdtls-extension
-```
+Install packages through your Mason layer, for example Mason UI, `:MasonInstall`, or an ensure-installed plugin. mcdev only resolves already-installed Mason packages; it does not install them.
 
 If Nix, a system package, or a local build owns the jar, set `jdtls.extension_jar` explicitly in `require("mcdev").setup()`.
 
-Adjust the plugin checkout path to match your machine. On Windows, use forward slashes or escaped backslashes in Lua strings.
-
-Completion is enabled by default. mcdev registers available blink.cmp / nvim-cmp adapters automatically and falls back to omnifunc. Navigation and code actions remain user keymap choices.
+Diagnostics are enabled by default. Completion adapters are exposed as sources for your completion UI; mcdev does not register them globally. Navigation and code actions remain user keymap choices.
 
 ## Full spec
 
 ```lua
-local mcdev_root = "C:/Users/you/ghq/github.com/cotrin8672/mc-dev-lsp"
-
 return {
-  -- mcdev Neovim plugin (local checkout)
   {
     name = "mcdev-nvim",
-    dir = mcdev_root .. "/mcdev-nvim",
+    dir = "C:/Users/you/ghq/github.com/cotrin8672/mc-dev-lsp/mcdev-nvim",
     lazy = false,
     config = function()
       require("mcdev").setup({
-        mappings = {
-          preferred_at_target = "descriptor",
-          mixin_class_insert = "import",
+        insert = {
+          at_target = "smart",
+          mixin_class_import = true,
           inject_method_descriptor = "auto",
         },
       })
     end,
   },
 
-  -- JDT LS client
   {
     "mfussenegger/nvim-jdtls",
     dependencies = { "mcdev-nvim" },
@@ -78,9 +70,28 @@ end
 
 `extend_config(config)` only appends `init_options.bundles`; it does not change your command, root detection, settings, or capabilities.
 
-## nvim-cmp instead of blink.cmp
+## Completion Sources
 
-mcdev tries to register nvim-cmp automatically when it is available. If your completion manager loads after mcdev and you need explicit registration:
+Register the mcdev source in your completion UI.
+
+Blink:
+
+```lua
+{
+  "saghen/blink.cmp",
+  dependencies = { "mcdev-nvim" },
+  opts = {
+    sources = {
+      default = { "lsp", "path", "snippets", "mcdev" },
+      providers = {
+        mcdev = require("mcdev.blink").source(),
+      },
+    },
+  },
+}
+```
+
+nvim-cmp:
 
 ```lua
 {
@@ -94,7 +105,7 @@ mcdev tries to register nvim-cmp automatically when it is available. If your com
         { name = "mcdev" },
       },
     })
-    cmp.register_source("mcdev", require("mcdev.cmp").new())
+    cmp.register_source("mcdev", require("mcdev.cmp").source())
   end,
 }
 ```
@@ -128,23 +139,9 @@ The current JDT LS bundle exposes mcdev navigation through `mcdev.definition` / 
 JDT LS may not attach to Access Widener or Access Transformer buffers. mcdev still works when:
 
 1. A JDT LS client is running for the mod project workspace.
-2. The buffer filetype or extension is recognized by `mcdev.buffer`.
+2. The file extension is recognized by `mcdev.buffer`: `.accesswidener`, `.aw`, `_at.cfg`, `accesstransformer.cfg`, or `.at`.
 
-Recommended filetype settings:
-
-```lua
-vim.filetype.add({
-  extension = {
-    accesswidener = "accesswidener",
-    aw = "accesswidener",
-    at = "accesstransformer",
-  },
-  pattern = {
-    [".-_at%.cfg"] = "accesstransformer",
-    ["accesstransformer%.cfg"] = "accesstransformer",
-  },
-})
-```
+You do not need to add global Neovim filetype rules for mcdev itself. If you want syntax highlighting or other plugins to see custom filetypes, configure that separately in your editor layer.
 
 Open AW/AT files from the same workspace root JDT LS uses so `workspaceRoot` resolves correctly.
 

@@ -56,7 +56,7 @@ enum class InjectMethodDescriptorMode {
 data class MixinCompletionOptions(
     val classInsertMode: MixinClassInsertMode = MixinClassInsertMode.IMPORT,
     val injectMethodDescriptorMode: InjectMethodDescriptorMode = InjectMethodDescriptorMode.AUTO,
-    val preferredAtTarget: String = "descriptor",
+    val preferredAtTarget: String = "smart",
 )
 
 data class AnnotationContext(

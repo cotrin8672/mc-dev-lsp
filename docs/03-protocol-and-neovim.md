@@ -157,7 +157,7 @@ Remap AT entry to SRG
 ## Neovim Setup Shape
 
 The user controls whether to build the extension jar or point to an existing binary.
-The Neovim plugin should be usable with a minimal `setup()` call. It may register completion adapters automatically, but it must not install navigation or code-action keymaps unless the user explicitly enables them.
+The Neovim plugin should be usable with a minimal `setup()` call. It exposes completion adapters as sources for the user's completion UI, but it must not install completion UI configuration, navigation keymaps, or code-action keymaps.
 
 Recommended config:
 
@@ -166,15 +166,15 @@ require("mcdev").setup({
   jdtls = {
     extension_jar = "/path/to/io.github.mcdev.jdtls.jar",
   },
-  mappings = {
-    preferred_at_target = "descriptor",
-    mixin_class_insert = "import", -- import | fqn
+  insert = {
+    at_target = "smart",
+    mixin_class_import = true,
     inject_method_descriptor = "auto", -- auto | always | never
   },
 })
 ```
 
-Defaults enable completion adapter registration and keep `diagnostics.enable`, `navigation.enable`, and `code_action.enable` disabled. Users can wire their own keymaps around the thin `mcdev.*` adapters.
+Defaults enable diagnostics publication. Completion sources, navigation, and code actions remain explicit user choices around the thin `mcdev.*` adapters.
 
 Example `nvim-jdtls` integration:
 

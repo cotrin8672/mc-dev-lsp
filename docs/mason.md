@@ -17,11 +17,7 @@ require("mason").setup({
 })
 ```
 
-Then install the extension bundle:
-
-```vim
-:MasonInstall mcdev-jdtls-extension
-```
+Install `jdtls` and `mcdev-jdtls-extension` through your Mason setup. That can be Mason UI, `:MasonInstall`, or an ensure-installed plugin. mcdev does not trigger installation; it only resolves the installed jar.
 
 The installed jar is resolved from:
 

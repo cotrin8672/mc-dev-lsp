@@ -6,13 +6,13 @@ Error messages are designed to be actionable. If you see a generic failure, chec
 
 ## Extension bundle not loading
 
-### `mcdev: extension jar is not configured or readable; install with :MasonInstall mcdev-jdtls-extension or set jdtls.extension_jar`
+### `mcdev: extension jar is not configured or readable`
 
 mcdev could not resolve a readable JDT LS extension jar from explicit config, `MCDEV_JDTLS_EXTENSION_JAR`, or Mason.
 
 Fix:
 
-1. Add the mcdev Mason registry and run `:MasonInstall mcdev-jdtls-extension`.
+1. Add the mcdev Mason registry and ensure Mason installs `jdtls` and `mcdev-jdtls-extension`.
 2. Or build the jar: `gradle :mcdev-jdtls-extension:jar`
 3. If Mason does not own the jar, set an **absolute** path in `jdtls.extension_jar`.
 4. Confirm readability: `:lua print(vim.fn.filereadable(require('mcdev').extension_jar()))` should print `1`.
@@ -43,7 +43,7 @@ JDT LS failed to start or attach.
 Checklist:
 
 1. Java 21 is on `PATH`: `java -version`
-2. Mason `jdtls` runs outside mcdev: `:lua print(vim.fn.executable(vim.fn.stdpath("data") .. "/mason/bin/jdtls"))`
+2. Mason `jdtls` runs outside mcdev: `:lua print(vim.fn.executable(vim.fn.stdpath("data") .. "/mason/bin/jdtls") == 1 or vim.fn.executable(vim.fn.stdpath("data") .. "/mason/bin/jdtls.cmd") == 1)`
 3. The workspace root contains `build.gradle`, `build.gradle.kts`, or `pom.xml`
 4. Clear a stale JDT LS data dir if needed: `vim.fn.stdpath("cache") .. "/mcdev-jdtls"`
 
@@ -96,7 +96,7 @@ AW and AT files are not Java. JDT LS may not attach to them as normal documents.
 mcdev still requires:
 
 1. A running JDT LS client for the **same workspace**.
-2. Correct filetype or extension detection.
+2. Correct extension detection, or custom filetype detection if your editor layer changes these buffers.
 
 Verify detection:
 
@@ -110,7 +110,7 @@ Expected `languageId` values sent to the extension:
 - `accesswidener` for Access Widener files
 - `accesstransformer` for Access Transformer files
 
-Add filetype mappings if needed (see [lazy.nvim setup](lazy-nvim.md#aw-and-at-filetypes)).
+mcdev recognizes the standard AW/AT extensions directly. Add Neovim filetype mappings only if you want syntax highlighting or other editor plugins to treat those buffers specially.
 
 ### Stale AW/AT content
 
@@ -185,7 +185,7 @@ protocol.request(protocol.commands.context, { context = protocol.context() }, fu
 end)
 ```
 
-By default `mcdev-nvim` records configuration, creates `:McdevInfo` / `:McdevReindex`, and registers completion adapters when possible. Diagnostics, navigation keymaps, and code-action keymaps are opt-in. Enable `diagnostics.enable = true` or call `mcdev.context` explicitly if you want mcdev diagnostics published into Neovim.
+By default `mcdev-nvim` records configuration, creates `:McdevInfo` / `:McdevReindex`, and publishes mcdev diagnostics. Completion sources, navigation keymaps, and code-action keymaps are explicit user choices in your editor configuration.
 
 ### Code actions
 

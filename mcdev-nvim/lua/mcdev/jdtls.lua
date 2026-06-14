@@ -11,9 +11,16 @@ local function readable(path)
 end
 
 local function default_jdtls_cmd()
-  local mason_cmd = vim.fn.stdpath("data") .. "/mason/bin/jdtls"
-  if vim.fn.executable(mason_cmd) == 1 then
-    return mason_cmd
+  local mason_bin = vim.fn.stdpath("data") .. "/mason/bin"
+  local candidates = {
+    path_join(mason_bin, "jdtls"),
+    path_join(mason_bin, "jdtls.cmd"),
+    path_join(mason_bin, "jdtls.bat"),
+  }
+  for _, candidate in ipairs(candidates) do
+    if vim.fn.executable(candidate) == 1 then
+      return candidate
+    end
   end
   if vim.fn.executable("jdtls") == 1 then
     return "jdtls"
@@ -89,7 +96,7 @@ end
 local function missing_jar_message()
   local mason = config.options.jdtls.mason or {}
   local package = mason.package or "mcdev-jdtls-extension"
-  return "mcdev: extension jar is not configured or readable; install with :MasonInstall "
+  return "mcdev: extension jar is not configured or readable; ensure Mason installs "
     .. package
     .. " or set jdtls.extension_jar"
 end

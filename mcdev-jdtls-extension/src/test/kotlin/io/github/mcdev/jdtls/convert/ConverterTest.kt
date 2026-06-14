@@ -142,6 +142,39 @@ class ConverterTest {
     }
 
     @Test
+    fun completionConverterUsesShortAtTargetInsertTextWhenSmartTargetIsUnambiguous() {
+        val mappingsText = FixtureResourceLoader.loadText(FixturePaths.FABRIC_BASIC_MAPPINGS)
+        val resolver = assertIs<MappingParseResult.Success>(TinyV2Parser.parse(mappingsText)).mappings.asResolver()
+        val item = McCompletionItem(
+            label = "draw(String, float, float): void",
+            detail = "SimpleTarget",
+            documentation = "Lcom/example/target/SimpleTarget;draw(Ljava/lang/String;FF)V",
+            filterText = "draw",
+            insertText = "Lcom/example/target/SimpleTarget;draw(Ljava/lang/String;FF)V",
+            kind = McCompletionKind.METHOD,
+            sortKey = "0400_draw",
+            metadata = McCompletionMetadata(
+                source = "mixin.atTarget",
+                owner = "com/example/target/SimpleTarget",
+                name = "draw",
+                descriptor = "(Ljava/lang/String;FF)V",
+            ),
+        )
+        val dto = CompletionItemConverter.toDtos(
+            items = listOf(item),
+            annotationContext = null,
+            source = "",
+            convertContext = CompletionConvertContext(
+                source = "",
+                annotationContext = null,
+                preferredAtTarget = "smart",
+                mappingResolver = resolver,
+            ),
+        ).single()
+        assertEquals("method_1", dto.insertText)
+    }
+
+    @Test
     fun completionConverterBuildsTextEditFromAnnotationOffsets() {
         val source = "@Mixin(Simple)"
         val context = annotationContext(source, valueStart = 7, valueEnd = 13)

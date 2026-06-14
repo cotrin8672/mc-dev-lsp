@@ -55,7 +55,7 @@ This file records what exists in the repository after the full product completio
 - AW/AT buffer detection (`mcdev.buffer`) and languageId routing for all protocol requests.
 - Definition and references navigation helpers via `mcdev.definition` / `mcdev.references`; no keymaps are installed by default.
 - Code action helper with workspace edit application; no `<leader>ca` keymap is installed by default.
-- Opt-in diagnostics publication via `mcdev.context` with debounced autocmds and `mcdev` diagnostic namespace.
+- Diagnostics publication via `mcdev.context` with debounced autocmds and `mcdev` diagnostic namespace, enabled by default.
 - Shared DTO converters (`mcdev.convert`) for locations, diagnostics, and code actions.
 - `mcdev.jdtls` helper for Mason `jdtls` startup with bundle injection.
 - Headless Lua adapter tests with mocked JDT LS client absence handling, AW/AT payload checks, navigation, diagnostics, and code action conversion.

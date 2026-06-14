@@ -59,11 +59,7 @@ require("mason").setup({
 })
 ```
 
-Then install:
-
-```vim
-:MasonInstall mcdev-jdtls-extension
-```
+Install `jdtls` and `mcdev-jdtls-extension` through your Mason layer. mcdev registers the custom registry in documentation examples, but package installation remains a Mason configuration choice.
 
 For local development, build the jar directly:
 
@@ -76,7 +72,7 @@ Then add two pieces to Neovim:
 1. load `mcdev-nvim`
 2. pass the resolved extension jar to JDT LS through `init_options.bundles`
 
-`mcdev-nvim` keeps setup small. Calling `setup()` records configuration, creates the `:McdevInfo` / `:McdevReindex` commands, and registers completion adapters when possible. It does not install navigation or code-action keymaps unless configured.
+`mcdev-nvim` keeps setup small. Calling `setup()` records configuration, creates the `:McdevInfo` / `:McdevReindex` commands, and enables diagnostics. Completion sources and navigation/code-action keymaps are wired explicitly in your editor configuration.
 
 Minimal local-checkout setup:
 
@@ -90,17 +86,17 @@ require("mcdev.jdtls").start_or_attach()
 With Lazy.nvim, the same setup usually looks like this:
 
 ```lua
-local mcdev_root = "/path/to/mc-dev-lsp"
-
 return {
   {
     name = "mcdev-nvim",
-    dir = mcdev_root .. "/mcdev-nvim",
+    dir = "/path/to/mc-dev-lsp/mcdev-nvim",
     lazy = false,
     config = function()
       require("mcdev").setup({
-        diagnostics = {
-          enable = true,
+        insert = {
+          at_target = "smart",
+          mixin_class_import = true,
+          inject_method_descriptor = "auto",
         },
       })
     end,

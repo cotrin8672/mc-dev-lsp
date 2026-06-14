@@ -1,4 +1,3 @@
-local config = require("mcdev.config")
 local buffer = require("mcdev.buffer")
 local convert = require("mcdev.convert")
 local protocol = require("mcdev.protocol")
@@ -8,6 +7,7 @@ local M = {}
 M.namespace = vim.api.nvim_create_namespace("mcdev")
 
 local debounce_timers = {}
+local debounce_ms = 300
 
 function M.publish(bufnr, diagnostics)
   local vim_diagnostics = {}
@@ -42,13 +42,9 @@ function M.refresh(bufnr)
 end
 
 function M.setup_autocmds()
-  local debounce_ms = config.options.diagnostics.debounce_ms or 300
   vim.api.nvim_create_autocmd({ "BufEnter", "TextChanged", "TextChangedI" }, {
     callback = function(args)
       local bufnr = args.buf
-      if not config.options.diagnostics.enable then
-        return
-      end
       if not buffer.is_mcdev_buffer(bufnr) then
         return
       end

@@ -1,71 +1,12 @@
 local config = require("mcdev.config")
 local protocol = require("mcdev.protocol")
-local buffer = require("mcdev.buffer")
 local diagnostics = require("mcdev.diagnostics")
 
 local M = {}
 
-local function setup_completion()
-  local opts = config.options.completion
-  if not opts.enable then
-    return
-  end
-
-  local function setup_omnifunc()
-    vim.api.nvim_create_autocmd("FileType", {
-      group = vim.api.nvim_create_augroup("mcdev-completion", { clear = true }),
-      callback = function(args)
-        if buffer.is_mcdev_buffer(args.buf) then
-          vim.bo[args.buf].omnifunc = "v:lua.require'mcdev.omnifunc'.complete"
-        end
-      end,
-    })
-  end
-
-  local function setup_blink()
-    local ok, blink_cmp = pcall(require, "blink.cmp")
-    if ok and blink_cmp.add_source then
-      blink_cmp.add_source("mcdev", require("mcdev.blink").new())
-      return true
-    end
-    return false
-  end
-
-  local function setup_cmp()
-    local ok, cmp = pcall(require, "cmp")
-    if ok and cmp.register_source then
-      cmp.register_source("mcdev", require("mcdev.cmp").new())
-      return true
-    end
-    return false
-  end
-
-  if opts.source == "blink" then
-    setup_blink()
-    return
-  end
-
-  if opts.source == "cmp" then
-    setup_cmp()
-    return
-  end
-
-  if opts.source == "omnifunc" then
-    setup_omnifunc()
-    return
-  end
-
-  setup_blink()
-  setup_cmp()
-  setup_omnifunc()
-end
-
 function M.setup(opts)
   config.setup(opts or {})
-  setup_completion()
-  if config.options.diagnostics.enable then
-    diagnostics.setup_autocmds()
-  end
+  diagnostics.setup_autocmds()
   vim.api.nvim_create_user_command("McdevInfo", function()
     protocol.info()
   end, {})

@@ -12,7 +12,7 @@ data class McdevCompletionTrigger(
 )
 
 data class McdevCompletionOptions(
-    val preferredAtTarget: String = "descriptor",
+    val preferredAtTarget: String = "smart",
     val mixinClassInsert: String = "import",
     val injectMethodDescriptor: String = "auto",
 )

@@ -18,24 +18,80 @@ local function document_uri(bufnr)
   return vim.uri_from_bufnr(bufnr)
 end
 
-local function workspace_root(bufnr)
-  local clients = vim.lsp.get_clients({ bufnr = bufnr or 0 })
-  for _, client in ipairs(clients) do
-    if client.name == "jdtls" and client.config and client.config.root_dir then
-      return vim.uri_from_fname(client.config.root_dir)
-    end
+local root_markers = { "gradlew", "build.gradle", "build.gradle.kts", "pom.xml", ".git" }
+
+local function normalize_path(path)
+  if not path or path == "" then
+    return nil
   end
-  return vim.uri_from_fname(vim.fn.getcwd())
+  local normalized = vim.fs and vim.fs.normalize and vim.fs.normalize(path) or path:gsub("\\", "/")
+  return normalized:gsub("/+$", "")
+end
+
+local function comparable_path(path)
+  local normalized = normalize_path(path)
+  if not normalized then
+    return nil
+  end
+  if package.config:sub(1, 1) == "\\" then
+    return normalized:lower()
+  end
+  return normalized
+end
+
+local function client_root(client)
+  return client and client.config and normalize_path(client.config.root_dir) or nil
+end
+
+local function buffer_path(bufnr)
+  bufnr = bufnr or vim.api.nvim_get_current_buf()
+  return normalize_path(vim.api.nvim_buf_get_name(bufnr))
+end
+
+local function path_under(root, path)
+  local normalized_root = comparable_path(root)
+  local normalized_path = comparable_path(path)
+  if not normalized_root or not normalized_path then
+    return false
+  end
+  return normalized_path == normalized_root
+    or normalized_path:sub(1, #normalized_root + 1) == normalized_root .. "/"
+end
+
+local function inferred_workspace_root(bufnr)
+  local path = buffer_path(bufnr)
+  local start = path or vim.fn.getcwd()
+  if vim.fs and vim.fs.root then
+    return normalize_path(vim.fs.root(start, root_markers))
+  end
+  return normalize_path(vim.fn.getcwd())
 end
 
 function M.active_jdtls_client(bufnr)
-  local clients = vim.lsp.get_clients({ bufnr = bufnr or 0 })
+  bufnr = bufnr or 0
+  local clients = vim.lsp.get_clients({ bufnr = bufnr })
   for _, client in ipairs(clients) do
     if client.name == "jdtls" then
       return client
     end
   end
+
+  local path = buffer_path(bufnr)
+  local inferred_root = inferred_workspace_root(bufnr)
+  for _, client in ipairs(vim.lsp.get_clients({ name = "jdtls" })) do
+    local root = client_root(client)
+    if path_under(root, path) or comparable_path(root) == comparable_path(inferred_root) then
+      return client
+    end
+  end
+
   return nil
+end
+
+local function workspace_root(bufnr)
+  local client = M.active_jdtls_client(bufnr)
+  local root = client_root(client) or inferred_workspace_root(bufnr) or vim.fn.getcwd()
+  return vim.uri_from_fname(root)
 end
 
 function M.context(bufnr, position)
@@ -82,7 +138,7 @@ function M.request(command, payload, callback, bufnr)
 end
 
 function M.build_completion_payload(bufnr, position)
-  local opts = config.options.mappings
+  local opts = config.options.insert
   return {
     context = M.context(bufnr, position),
     trigger = {
@@ -90,8 +146,8 @@ function M.build_completion_payload(bufnr, position)
       character = nil,
     },
     options = {
-      preferredAtTarget = opts.preferred_at_target,
-      mixinClassInsert = opts.mixin_class_insert,
+      preferredAtTarget = opts.at_target,
+      mixinClassInsert = opts.mixin_class_import and "import" or "fqn",
       injectMethodDescriptor = opts.inject_method_descriptor,
     },
   }
