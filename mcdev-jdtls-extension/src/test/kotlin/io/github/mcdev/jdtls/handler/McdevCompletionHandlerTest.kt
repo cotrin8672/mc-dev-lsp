@@ -316,6 +316,58 @@ class McdevCompletionHandlerTest {
     }
 
     @Test
+    fun returnsImportedItemMixinInjectMethodCompletion() {
+        val minecraftDir = tempDir.resolve("src/main/java/net/minecraft/world/item")
+        val otherDir = tempDir.resolve("src/main/java/com/example/other")
+        Files.createDirectories(minecraftDir)
+        Files.createDirectories(otherDir)
+        Files.writeString(
+            minecraftDir.resolve("Item.java"),
+            """
+                package net.minecraft.world.item;
+                public class Item {
+                    public boolean isFoil() { return false; }
+                }
+            """.trimIndent(),
+        )
+        Files.writeString(
+            otherDir.resolve("Item.java"),
+            """
+                package com.example.other;
+                public class Item {
+                    public void otherOnly() {}
+                }
+            """.trimIndent(),
+        )
+        val handler = McdevCompletionHandler(projectService = FileBasedProjectContextService())
+        val source = """
+            package com.example.mixin;
+            import net.minecraft.world.item.Item;
+            import org.spongepowered.asm.mixin.Mixin;
+            import org.spongepowered.asm.mixin.injection.Inject;
+            @Mixin(Item.class)
+            public abstract class ItemMixin {
+                @Inject(method = "
+            }
+        """.trimIndent()
+        val marker = "method = \""
+        val (line, character) = JdtlsFixtureSupport.offsetToPosition(source, source.indexOf(marker) + marker.length)
+        val response = handler.handle(
+            listOf(
+                completionPayload(
+                    workspaceRoot = JdtlsFixtureSupport.workspaceUri(tempDir),
+                    source = source,
+                    line = line,
+                    character = character,
+                ),
+            ),
+        )
+        val completion = assertIs<McdevCompletionResponse>(response.result)
+        assertTrue(completion.items.any { it.insertText == "isFoil" })
+        assertFalse(completion.items.any { it.insertText == "otherOnly" })
+    }
+
+    @Test
     fun sourceOnlyMixinTargetSkipsMethodsWithUnresolvedDescriptors() {
         val targetDir = tempDir.resolve("src/main/java/com/example/target")
         Files.createDirectories(targetDir)

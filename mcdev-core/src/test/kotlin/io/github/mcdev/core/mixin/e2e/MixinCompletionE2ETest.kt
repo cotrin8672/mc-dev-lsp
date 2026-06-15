@@ -75,6 +75,35 @@ class MixinCompletionE2ETest {
     }
 
     @Test
+    fun completesImportedItemMixinInjectMethod() {
+        val classIndex = io.github.mcdev.core.mixin.FakeClassIndex(
+            classes = io.github.mcdev.core.mixin.FakeClassIndex.defaultClasses() + listOf(
+                io.github.mcdev.core.mixin.ClassIndexEntry("Item", "net.minecraft.world.item", "net/minecraft/world/item/Item"),
+                io.github.mcdev.core.mixin.ClassIndexEntry("Item", "com.example.other", "com/example/other/Item"),
+            ),
+            methods = io.github.mcdev.core.mixin.FakeClassIndex.defaultMethods() + mapOf(
+                "net/minecraft/world/item/Item" to listOf(
+                    io.github.mcdev.core.mixin.MethodIndexEntry("isFoil", "()Z", false, "isFoil(): boolean"),
+                ),
+            ),
+        )
+        val facade = io.github.mcdev.core.mixin.MixinServiceFacade(classIndex, io.github.mcdev.core.mixin.FakeBytecodeIndex())
+        val source = """
+            import net.minecraft.world.item.Item;
+
+            @Mixin(Item.class)
+            class ItemMixin {
+                @Inject(method = "
+            }
+        """.trimIndent()
+        val quote = source.indexOf("method = \"") + "method = \"".length
+
+        val items = facade.complete(MixinE2ETestSupport.requestAtOffset(source, quote))
+
+        assertTrue(items.any { it.insertText == "isFoil" })
+    }
+
+    @Test
     fun injectMethodCompletionLabelUsesReadableSignature() {
         val source = """
             @Mixin(MinecraftClient.class)

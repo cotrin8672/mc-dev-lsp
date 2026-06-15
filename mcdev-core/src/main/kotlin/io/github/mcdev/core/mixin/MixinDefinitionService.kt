@@ -302,7 +302,7 @@ class MixinDefinitionService(
         val rawTargets = context.mixinTargetInternalNames.ifEmpty {
             AnnotationContextExtractor.resolveRawMixinTargets(source, context.valueStartOffset)
         }
-        return MixinTargetResolver.resolveTargets(rawTargets, classIndex)
+        return MixinTargetResolver.resolveTargets(rawTargets, classIndex, JavaTypeDescriptorResolver.importsFor(source))
     }
 
     private fun findShadowMemberAtOffset(source: String, offset: Int): ShadowMemberDeclaration? {

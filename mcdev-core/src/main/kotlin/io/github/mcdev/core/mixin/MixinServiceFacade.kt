@@ -120,15 +120,15 @@ class MixinServiceFacade(
             MixinAnnotation.MODIFY_ARGS,
             MixinAnnotation.MODIFY_VARIABLE,
             MixinAnnotation.MODIFY_CONSTANT,
-            -> injectMethodCompletion.complete(context, options)
-            in mixinExtrasMethodAnnotations -> completeMixinExtrasMethod(context, options)
+            -> injectMethodCompletion.complete(context.withResolvedMixinTargets(source), options)
+            in mixinExtrasMethodAnnotations -> completeMixinExtrasMethod(source, context, options)
             MixinAnnotation.AT -> when (context.slot) {
                 AnnotationSlot.VALUE -> {
                     val expressionItems = expressionSupport.completeAtValue(context)
                     if (expressionItems.isNotEmpty()) expressionItems else atValueCompletion.complete(context)
                 }
                 AnnotationSlot.TARGET -> {
-                    val extrasItems = mixinExtrasCompletion.complete(context, options)
+                    val extrasItems = mixinExtrasCompletion.complete(context.withResolvedMixinTargets(source), options)
                     if (extrasItems.isNotEmpty()) extrasItems else completeAtTarget(source, context)
                 }
                 else -> emptyList()
@@ -149,19 +149,21 @@ class MixinServiceFacade(
             } else {
                 emptyList()
             }
-            MixinAnnotation.SHADOW -> completeShadow(context)
+            MixinAnnotation.SHADOW -> completeShadow(source, context)
             else -> emptyList()
         }
 
     private fun completeMixinExtrasMethod(
+        source: String,
         context: AnnotationContext,
         options: MixinCompletionOptions,
     ): List<McCompletionItem> {
-        val extrasItems = mixinExtrasCompletion.complete(context, options)
+        val resolvedContext = context.withResolvedMixinTargets(source)
+        val extrasItems = mixinExtrasCompletion.complete(resolvedContext, options)
         if (extrasItems.isNotEmpty() || context.annotation != MixinAnnotation.MODIFY_RECEIVER) {
             return extrasItems
         }
-        return injectMethodCompletion.complete(context, options)
+        return injectMethodCompletion.complete(resolvedContext, options)
     }
 
     private fun completeAtTarget(source: String, context: AnnotationContext): List<McCompletionItem> {
@@ -208,7 +210,7 @@ class MixinServiceFacade(
         val rawTargets = context.mixinTargetInternalNames.ifEmpty {
             AnnotationContextExtractor.resolveRawMixinTargets(source, context.valueStartOffset)
         }
-        return MixinTargetResolver.resolveTargets(rawTargets, classIndex)
+        return MixinTargetResolver.resolveTargets(rawTargets, classIndex, JavaTypeDescriptorResolver.importsFor(source))
     }
 
     private fun findEnclosingInjectorMethod(source: String, cursorOffset: Int): String? {
@@ -250,10 +252,13 @@ class MixinServiceFacade(
         return null
     }
 
-    private fun completeShadow(context: AnnotationContext): List<McCompletionItem> {
+    private fun AnnotationContext.withResolvedMixinTargets(source: String): AnnotationContext =
+        copy(mixinTargetInternalNames = resolveMixinTargets(source, this))
+
+    private fun completeShadow(source: String, context: AnnotationContext): List<McCompletionItem> {
         if (context.slot != AnnotationSlot.SHADOW_MEMBER) return emptyList()
         val prefix = context.partialValue
-        val targets = context.mixinTargetInternalNames
+        val targets = resolveMixinTargets(source, context)
         val fields = shadowValidation.completeFields(targets, prefix, context.shadowPrefix)
         val methods = shadowValidation.completeMethods(targets, prefix, context.shadowPrefix)
         val fieldItems = fields.map { field ->

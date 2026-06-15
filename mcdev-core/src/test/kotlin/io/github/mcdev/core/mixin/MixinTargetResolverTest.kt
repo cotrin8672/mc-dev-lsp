@@ -36,4 +36,24 @@ class MixinTargetResolverTest {
             MixinTargetResolver.resolveTargetsFromSource(source, classIndex),
         )
     }
+
+    @Test
+    fun resolvesImportedSimpleClassLiteralWhenSimpleNameIsAmbiguous() {
+        val classIndex = FakeClassIndex(
+            classes = FakeClassIndex.defaultClasses() + listOf(
+                ClassIndexEntry("Item", "net.minecraft.world.item", "net/minecraft/world/item/Item"),
+                ClassIndexEntry("Item", "com.example.other", "com/example/other/Item"),
+            ),
+        )
+        val source = """
+            import net.minecraft.world.item.Item;
+            @Mixin(Item.class)
+            class ItemMixin {}
+        """.trimIndent()
+
+        assertEquals(
+            listOf("net/minecraft/world/item/Item"),
+            MixinTargetResolver.resolveTargetsFromSource(source, classIndex),
+        )
+    }
 }
