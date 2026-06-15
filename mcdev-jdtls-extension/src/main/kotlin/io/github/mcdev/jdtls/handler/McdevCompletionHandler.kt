@@ -85,6 +85,7 @@ class McdevCompletionHandler(
             line = request.context.position.line,
             character = request.context.position.character,
             options = options,
+            documentUri = request.context.documentUri,
         )
         return McdevResponseEnvelope(
             capabilities = setOf("completion"),

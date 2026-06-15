@@ -1,11 +1,11 @@
 package io.github.mcdev.core.mixin
 
-internal data class JavaSourceImports(
+data class JavaSourceImports(
     val packageName: String?,
     val explicit: Map<String, String>,
 )
 
-internal object JavaTypeDescriptorResolver {
+object JavaTypeDescriptorResolver {
     private val primitives = mapOf(
         "void" to "V",
         "boolean" to "Z",
@@ -66,6 +66,12 @@ internal object JavaTypeDescriptorResolver {
     fun methodDescriptor(returnType: String, parameterTypes: List<String>, imports: JavaSourceImports): String =
         "(${parameterTypes.joinToString("") { descriptor(it, imports) }})${descriptor(returnType, imports)}"
 
+    fun methodDescriptorOrNull(returnType: String, parameterTypes: List<String>, imports: JavaSourceImports): String? {
+        val parameterDescriptors = parameterTypes.map { descriptorOrNull(it, imports) ?: return null }
+        val returnDescriptor = descriptorOrNull(returnType, imports) ?: return null
+        return "(${parameterDescriptors.joinToString("")})$returnDescriptor"
+    }
+
     fun descriptor(rawType: String, imports: JavaSourceImports): String {
         val (base, arrayDepth) = normalize(rawType)
         primitives[base]?.let { return "[".repeat(arrayDepth) + it }
@@ -75,10 +81,22 @@ internal object JavaTypeDescriptorResolver {
         return "[".repeat(arrayDepth) + "L${fqnToInternalName(fqn)};"
     }
 
+    fun descriptorOrNull(rawType: String, imports: JavaSourceImports): String? {
+        val (base, arrayDepth) = normalize(rawType)
+        primitives[base]?.let { return "[".repeat(arrayDepth) + it }
+        val erased = eraseGeneric(base)
+        primitives[erased]?.let { return "[".repeat(arrayDepth) + it }
+        val fqn = resolveClassNameOrNull(erased, imports) ?: return null
+        return "[".repeat(arrayDepth) + "L${fqnToInternalName(fqn)};"
+    }
+
     fun parameterTypes(rawParams: String, imports: JavaSourceImports): List<String> =
         splitTopLevel(rawParams, ',')
             .mapNotNull { parameterType(it) }
             .map { descriptor(it, imports) }
+
+    fun rawParameterTypes(rawParams: String): List<String> =
+        splitTopLevel(rawParams, ',').mapNotNull { parameterType(it) }
 
     fun splitTopLevel(value: String, delimiter: Char): List<String> {
         val results = mutableListOf<String>()
@@ -177,6 +195,15 @@ internal object JavaTypeDescriptorResolver {
         if (normalized in javaLang) return "java.lang.$normalized"
         if ('.' in normalized) return normalized
         return imports.packageName?.let { "$it.$normalized" } ?: normalized
+    }
+
+    private fun resolveClassNameOrNull(type: String, imports: JavaSourceImports): String? {
+        val normalized = type.trim()
+        imports.explicit[normalized]?.let { return it }
+        wellKnown[normalized]?.let { return it }
+        if (normalized in javaLang) return "java.lang.$normalized"
+        if ('.' in normalized) return normalized
+        return null
     }
 
     private fun fqnToInternalName(fqn: String): String {

@@ -62,6 +62,19 @@ class MixinCompletionE2ETest {
     }
 
     @Test
+    fun completesInjectMethodAtEmptyOpenQuote() {
+        val source = """
+            @Mixin(MinecraftClient.class)
+            class M {
+                @Inject(method = "
+            }
+        """.trimIndent()
+        val quote = source.indexOf("method = \"") + "method = \"".length
+        val items = fakeFacade.complete(MixinE2ETestSupport.requestAtOffset(source, quote))
+        assertTrue(items.any { it.insertText == "tick" })
+    }
+
+    @Test
     fun injectMethodCompletionLabelUsesReadableSignature() {
         val source = """
             @Mixin(MinecraftClient.class)

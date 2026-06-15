@@ -10,7 +10,7 @@ languages:
 categories:
   - LSP
 source:
-  id: pkg:github/cotrin8672/mc-dev-lsp@v0.2.0
+  id: pkg:github/cotrin8672/mc-dev-lsp@v0.3.0
   asset:
     file: io.github.mcdev.jdtls-{{ version | strip_prefix "v" }}.jar:io.github.mcdev.jdtls.jar
 share:

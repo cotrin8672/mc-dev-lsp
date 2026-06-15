@@ -13,10 +13,12 @@ import io.github.mcdev.protocol.McdevErrorCode
 import io.github.mcdev.protocol.McdevProtocol
 import kotlin.test.Test
 import kotlin.test.assertEquals
+import kotlin.test.assertFalse
 import kotlin.test.assertIs
 import kotlin.test.assertNotNull
 import kotlin.test.assertTrue
 import org.junit.jupiter.api.io.TempDir
+import java.nio.file.Files
 import java.nio.file.Path
 
 class McdevCompletionHandlerTest {
@@ -238,6 +240,121 @@ class McdevCompletionHandlerTest {
         val completion = assertIs<McdevCompletionResponse>(response.result)
         assertTrue(completion.items.any { it.metadata["source"] == "mixin.injectMethod" })
         assertTrue(completion.items.any { it.insertText.contains("(Ljava/lang/String;FF)V") })
+    }
+
+    @Test
+    fun returnsInjectMethodCompletionsAtEmptyOpenQuote() {
+        val handler = createHandler()
+        val source = """
+            package com.example.mixin;
+            import com.example.target.SimpleTarget;
+            import org.spongepowered.asm.mixin.Mixin;
+            import org.spongepowered.asm.mixin.injection.Inject;
+            @Mixin(SimpleTarget.class)
+            public abstract class OpenQuoteMixin {
+                @Inject(method = "
+            }
+        """.trimIndent()
+        val marker = "method = \""
+        val (line, character) = JdtlsFixtureSupport.offsetToPosition(source, source.indexOf(marker) + marker.length)
+        val response = handler.handle(
+            listOf(
+                completionPayload(
+                    workspaceRoot = JdtlsFixtureSupport.workspaceUri(tempDir),
+                    source = source,
+                    line = line,
+                    character = character,
+                ),
+            ),
+        )
+        val completion = assertIs<McdevCompletionResponse>(response.result)
+        assertTrue(completion.items.any { it.metadata["source"] == "mixin.injectMethod" })
+        assertTrue(completion.items.any { it.insertText.startsWith("draw") })
+    }
+
+    @Test
+    fun returnsInjectMethodCompletionsFromSourceOnlyMixinTarget() {
+        val targetDir = tempDir.resolve("src/main/java/com/example/target")
+        Files.createDirectories(targetDir)
+        Files.writeString(
+            targetDir.resolve("SourceOnlyTarget.java"),
+            """
+                package com.example.target;
+                public class SourceOnlyTarget {
+                    public void pulse() {}
+                    public int measure(String label) { return label.length(); }
+                }
+            """.trimIndent(),
+        )
+        val handler = McdevCompletionHandler(projectService = FileBasedProjectContextService())
+        val source = """
+            package com.example.mixin;
+            import com.example.target.SourceOnlyTarget;
+            import org.spongepowered.asm.mixin.Mixin;
+            import org.spongepowered.asm.mixin.injection.Inject;
+            @Mixin(SourceOnlyTarget.class)
+            public abstract class SourceOnlyMixin {
+                @Inject(method = "
+            }
+        """.trimIndent()
+        val marker = "method = \""
+        val (line, character) = JdtlsFixtureSupport.offsetToPosition(source, source.indexOf(marker) + marker.length)
+        val response = handler.handle(
+            listOf(
+                completionPayload(
+                    workspaceRoot = JdtlsFixtureSupport.workspaceUri(tempDir),
+                    source = source,
+                    line = line,
+                    character = character,
+                ),
+            ),
+        )
+        val completion = assertIs<McdevCompletionResponse>(response.result)
+        assertTrue(completion.items.any { it.metadata["source"] == "mixin.injectMethod" })
+        assertTrue(completion.items.any { it.insertText == "pulse" })
+        assertTrue(completion.items.any { it.insertText == "measure" })
+    }
+
+    @Test
+    fun sourceOnlyMixinTargetSkipsMethodsWithUnresolvedDescriptors() {
+        val targetDir = tempDir.resolve("src/main/java/com/example/target")
+        Files.createDirectories(targetDir)
+        Files.writeString(
+            targetDir.resolve("SourceOnlyTarget.java"),
+            """
+                package com.example.target;
+                public class SourceOnlyTarget {
+                    public void pulse() {}
+                    public void broken(MissingType value) {}
+                }
+            """.trimIndent(),
+        )
+        val handler = McdevCompletionHandler(projectService = FileBasedProjectContextService())
+        val source = """
+            package com.example.mixin;
+            import com.example.target.SourceOnlyTarget;
+            import org.spongepowered.asm.mixin.Mixin;
+            import org.spongepowered.asm.mixin.injection.Inject;
+            @Mixin(SourceOnlyTarget.class)
+            public abstract class SourceOnlyMixin {
+                @Inject(method = "
+            }
+        """.trimIndent()
+        val marker = "method = \""
+        val (line, character) = JdtlsFixtureSupport.offsetToPosition(source, source.indexOf(marker) + marker.length)
+        val response = handler.handle(
+            listOf(
+                completionPayload(
+                    workspaceRoot = JdtlsFixtureSupport.workspaceUri(tempDir),
+                    source = source,
+                    line = line,
+                    character = character,
+                ),
+            ),
+        )
+        val completion = assertIs<McdevCompletionResponse>(response.result)
+        assertTrue(completion.items.any { it.insertText == "pulse" })
+        assertFalse(completion.items.any { it.insertText == "broken" })
     }
 
     @Test

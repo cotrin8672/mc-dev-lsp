@@ -236,19 +236,19 @@ with_buffer(mixin_file, "java", nil, function(bufnr)
       "",
       "@Mixin(SimpleTarget.class)",
       "public abstract class ExampleMixin {",
-      "    @Inject(method = \"dra\", at = @At(\"HEAD\"))",
+      "    @Inject(method = \"",
       "    private void mcdev$onDraw(CallbackInfo ci) {}",
       "}",
     }
     vim.api.nvim_buf_set_lines(bufnr, 0, -1, false, inject_source)
     local inject_line = nil
     for index, line in ipairs(inject_source) do
-      if line:find("method = \"dra", 1, true) then
+      if line:find("method = \"", 1, true) then
         inject_line = index
         break
       end
     end
-    helpers.assert_not_nil(inject_line, "@Inject draw partial line not found")
+    helpers.assert_not_nil(inject_line, "@Inject method open quote line not found")
     local inject_context = build_context(bufnr, { inject_line, 22 })
     local inject_result, inject_err = mcdev_command("mcdev.completion", {
       context = inject_context,

@@ -40,13 +40,15 @@ class MixinServiceFacade(
         line: Int,
         character: Int,
         options: MixinCompletionOptions,
+        documentUri: String = "file:///Mixin.java",
     ): List<McCompletionItem> =
         completeOverride?.invoke(session, source, line, character, options)
-            ?: facade(session).complete(
+            ?: facade(session, source = source, documentUri = documentUri).complete(
                 MixinFacadeRequest(
                     bufferText = source,
                     line = line,
                     character = character,
+                    documentUri = documentUri,
                 ),
                 options,
             )
@@ -149,6 +151,17 @@ class MixinServiceFacade(
 
     private fun facade(session: McdevProjectSession): CoreMixinServiceFacade =
         facadeFactory(session.classIndex, session.bytecodeIndex)
+
+    private fun facade(session: McdevProjectSession, source: String, documentUri: String): CoreMixinServiceFacade =
+        facadeFactory(
+            SourceBackedClassIndex(
+                delegate = session.classIndex,
+                session = session,
+                currentDocumentUri = documentUri,
+                currentBufferText = source,
+            ),
+            session.bytecodeIndex,
+        )
 
     private fun buildFacadeRequest(
         projectContext: ProjectContext,
