@@ -14,6 +14,9 @@ data class ShadowMemberDeclaration(
     val descriptor: String,
     val isStatic: Boolean,
     val range: McTextRange,
+    val parseSource: ParseSource = ParseSource.HAND_WRITTEN,
+    val confidence: ParseConfidence = ParseConfidence.HIGH,
+    val warnings: List<String> = emptyList(),
 )
 
 class ShadowValidationService(

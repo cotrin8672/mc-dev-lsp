@@ -2,6 +2,7 @@ package io.github.mcdev.core.mixin
 
 import kotlin.test.Test
 import kotlin.test.assertEquals
+import kotlin.test.assertTrue
 
 class MixinMemberDeclarationParserTest {
     @Test
@@ -107,5 +108,113 @@ class MixinMemberDeclarationParserTest {
         val declaration = MixinMemberDeclarationParser.parseShadowDeclarations(source).single()
 
         assertEquals("Lcom/example/Outer\$Inner;", declaration.descriptor)
+    }
+
+    @Test
+    fun resolvesSamePackageTypeThroughClassIndex() {
+        val source = """
+            package com.example.mixin;
+
+            class ExampleMixin {
+                @Invoker("foo")
+                abstract void invokeFoo(LocalValue value);
+            }
+        """.trimIndent()
+        val classIndex = FakeClassIndex(
+            classes = FakeClassIndex.defaultClasses() + ClassIndexEntry(
+                "LocalValue",
+                "com.example.mixin",
+                "com/example/mixin/LocalValue",
+            ),
+        )
+
+        val declaration = MixinMemberDeclarationParser.parseInvokerDeclarations(source, classIndex).single()
+
+        assertEquals(listOf("Lcom/example/mixin/LocalValue;"), declaration.parameterDescriptors)
+    }
+
+    @Test
+    fun resolvesWildcardImportThroughClassIndex() {
+        val source = """
+            import com.example.items.*;
+
+            class ExampleMixin {
+                @Invoker("foo")
+                abstract void invokeFoo(ItemStack stack);
+            }
+        """.trimIndent()
+        val classIndex = FakeClassIndex(
+            classes = FakeClassIndex.defaultClasses() + ClassIndexEntry(
+                "ItemStack",
+                "com.example.items",
+                "com/example/items/ItemStack",
+            ),
+        )
+
+        val declaration = MixinMemberDeclarationParser.parseInvokerDeclarations(source, classIndex).single()
+
+        assertEquals(listOf("Lcom/example/items/ItemStack;"), declaration.parameterDescriptors)
+    }
+
+    @Test
+    fun treatsAmbiguousWildcardImportAsUnresolved() {
+        val source = """
+            import com.example.alpha.*;
+            import com.example.beta.*;
+
+            class ExampleMixin {
+                @Invoker("foo")
+                abstract void invokeFoo(Widget widget);
+            }
+        """.trimIndent()
+        val classIndex = FakeClassIndex(
+            classes = FakeClassIndex.defaultClasses() + listOf(
+                ClassIndexEntry("Widget", "com.example.alpha", "com/example/alpha/Widget"),
+                ClassIndexEntry("Widget", "com.example.beta", "com/example/beta/Widget"),
+            ),
+        )
+
+        val declarations = MixinMemberDeclarationParser.parseInvokerDeclarations(source, classIndex)
+        val diagnostics = MixinMemberDeclarationParser.parseDeclarationDiagnostics(source, classIndex)
+
+        assertTrue(declarations.isEmpty())
+        assertTrue(diagnostics.any { it.code == MixinDiagnosticCodes.UNRESOLVED_HANDLER_DESCRIPTOR })
+    }
+
+    @Test
+    fun doesNotCreateFakeDescriptorForUnknownSimpleType() {
+        val source = """
+            package com.example.mixin;
+
+            class ExampleMixin {
+                @Invoker("foo")
+                abstract void invokeFoo(UnknownType value);
+            }
+        """.trimIndent()
+
+        val declarations = MixinMemberDeclarationParser.parseInvokerDeclarations(source, FakeClassIndex())
+        val diagnostics = MixinMemberDeclarationParser.parseDeclarationDiagnostics(source, FakeClassIndex())
+
+        assertTrue(declarations.isEmpty())
+        assertTrue(diagnostics.any {
+            it.code == MixinDiagnosticCodes.UNRESOLVED_JAVA_TYPE &&
+                it.metadata["normalizedType"] == "UnknownType"
+        })
+    }
+
+    @Test
+    fun recordsHandWrittenParserMetadata() {
+        val source = """
+            class ExampleMixin {
+                @Invoker("foo")
+                abstract void invokeFoo(String value);
+            }
+        """.trimIndent()
+
+        val declaration = MixinMemberDeclarationParser.parseInvokerDeclarations(source).single()
+
+        assertEquals(ParseSource.HAND_WRITTEN, declaration.parseSource)
+        assertEquals(ParseConfidence.HIGH, declaration.confidence)
+        assertTrue(declaration.warnings.isEmpty())
     }
 }

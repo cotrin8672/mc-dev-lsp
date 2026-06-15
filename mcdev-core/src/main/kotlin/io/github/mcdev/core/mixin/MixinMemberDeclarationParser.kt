@@ -2,29 +2,46 @@ package io.github.mcdev.core.mixin
 
 import io.github.mcdev.core.diagnostics.McTextPosition
 import io.github.mcdev.core.diagnostics.McTextRange
+import io.github.mcdev.core.diagnostics.McDiagnostic
+import io.github.mcdev.core.diagnostics.McSeverity
+
+enum class ParseSource {
+    HAND_WRITTEN,
+    JDT_AST,
+    FALLBACK_REGEX,
+}
+
+enum class ParseConfidence {
+    HIGH,
+    MEDIUM,
+    LOW,
+}
 
 internal object MixinMemberDeclarationParser {
-    fun parseShadowDeclarations(source: String): List<ShadowMemberDeclaration> {
-        val imports = JavaTypeDescriptorResolver.importsFor(source)
+    fun parseShadowDeclarations(source: String, classIndex: ClassIndex? = null): List<ShadowMemberDeclaration> {
+        val context = resolutionContext(source, classIndex)
         return parseAnnotatedMembers(source, "Shadow").mapNotNull { member ->
             val declaration = member.declaration ?: return@mapNotNull null
             if (declaration.isMethod) {
+                val descriptor = JavaTypeDescriptorResolver.methodDescriptorOrNull(
+                    declaration.returnType,
+                    declaration.parameterTypes,
+                    context,
+                ) ?: return@mapNotNull null
                 ShadowMemberDeclaration(
                     name = declaration.name,
                     isMethod = true,
-                    descriptor = JavaTypeDescriptorResolver.methodDescriptor(
-                        declaration.returnType,
-                        declaration.parameterTypes,
-                        imports,
-                    ),
+                    descriptor = descriptor,
                     isStatic = declaration.modifiers.contains("static"),
                     range = offsetRange(source, member.start, member.end),
                 )
             } else {
+                val descriptor = JavaTypeDescriptorResolver.descriptorOrNull(declaration.returnType, context)
+                    ?: return@mapNotNull null
                 ShadowMemberDeclaration(
                     name = declaration.name,
                     isMethod = false,
-                    descriptor = JavaTypeDescriptorResolver.descriptor(declaration.returnType, imports),
+                    descriptor = descriptor,
                     isStatic = declaration.modifiers.contains("static"),
                     range = offsetRange(source, member.start, member.end),
                 )
@@ -32,53 +49,79 @@ internal object MixinMemberDeclarationParser {
         }
     }
 
-    fun parseAccessorDeclarations(source: String): List<AccessorMethodDeclaration> {
-        val imports = JavaTypeDescriptorResolver.importsFor(source)
+    fun parseAccessorDeclarations(source: String, classIndex: ClassIndex? = null): List<AccessorMethodDeclaration> {
+        val context = resolutionContext(source, classIndex)
         return parseAnnotatedMembers(source, "Accessor").mapNotNull { member ->
             val declaration = member.declaration?.takeIf { it.isMethod } ?: return@mapNotNull null
+            val returnDescriptor = JavaTypeDescriptorResolver.descriptorOrNull(declaration.returnType, context)
+                ?: return@mapNotNull null
+            val parameterDescriptors = declaration.parameterTypes.map {
+                JavaTypeDescriptorResolver.descriptorOrNull(it, context) ?: return@mapNotNull null
+            }
             AccessorMethodDeclaration(
                 methodName = declaration.name,
-                returnTypeDescriptor = JavaTypeDescriptorResolver.descriptor(declaration.returnType, imports),
-                parameterDescriptors = declaration.parameterTypes.map {
-                    JavaTypeDescriptorResolver.descriptor(it, imports)
-                },
+                returnTypeDescriptor = returnDescriptor,
+                parameterDescriptors = parameterDescriptors,
                 explicitFieldName = member.stringValue,
                 range = offsetRange(source, member.start, member.end),
             )
         }
     }
 
-    fun parseInvokerDeclarations(source: String): List<InvokerMethodDeclaration> {
-        val imports = JavaTypeDescriptorResolver.importsFor(source)
+    fun parseInvokerDeclarations(source: String, classIndex: ClassIndex? = null): List<InvokerMethodDeclaration> {
+        val context = resolutionContext(source, classIndex)
         return parseAnnotatedMembers(source, "Invoker").mapNotNull { member ->
             val declaration = member.declaration?.takeIf { it.isMethod } ?: return@mapNotNull null
+            val parameterDescriptors = declaration.parameterTypes.map {
+                JavaTypeDescriptorResolver.descriptorOrNull(it, context) ?: return@mapNotNull null
+            }
+            val returnDescriptor = JavaTypeDescriptorResolver.descriptorOrNull(declaration.returnType, context)
+                ?: return@mapNotNull null
             InvokerMethodDeclaration(
                 methodName = declaration.name,
-                parameterDescriptors = declaration.parameterTypes.map {
-                    JavaTypeDescriptorResolver.descriptor(it, imports)
-                },
-                returnTypeDescriptor = JavaTypeDescriptorResolver.descriptor(declaration.returnType, imports),
+                parameterDescriptors = parameterDescriptors,
+                returnTypeDescriptor = returnDescriptor,
                 explicitTargetName = member.stringValue,
                 range = offsetRange(source, member.start, member.end),
             )
         }
     }
 
-    fun parseOverwriteDeclarations(source: String): List<OverwriteMethodDeclaration> {
-        val imports = JavaTypeDescriptorResolver.importsFor(source)
+    fun parseOverwriteDeclarations(source: String, classIndex: ClassIndex? = null): List<OverwriteMethodDeclaration> {
+        val context = resolutionContext(source, classIndex)
         return parseAnnotatedMembers(source, "Overwrite").mapNotNull { member ->
             val declaration = member.declaration?.takeIf { it.isMethod } ?: return@mapNotNull null
+            val descriptor = JavaTypeDescriptorResolver.methodDescriptorOrNull(
+                declaration.returnType,
+                declaration.parameterTypes,
+                context,
+            ) ?: return@mapNotNull null
             OverwriteMethodDeclaration(
                 name = declaration.name,
-                descriptor = JavaTypeDescriptorResolver.methodDescriptor(
-                    declaration.returnType,
-                    declaration.parameterTypes,
-                    imports,
-                ),
+                descriptor = descriptor,
                 isStatic = declaration.modifiers.contains("static"),
                 range = offsetRange(source, member.start, member.end),
             )
         }
+    }
+
+    fun parseDeclarationDiagnostics(source: String, classIndex: ClassIndex? = null): List<McDiagnostic> {
+        val context = resolutionContext(source, classIndex)
+        val diagnostics = mutableListOf<McDiagnostic>()
+        for (annotation in listOf("Shadow", "Accessor", "Invoker", "Overwrite")) {
+            parseAnnotatedMembers(source, annotation).forEach { member ->
+                val declaration = member.declaration ?: return@forEach
+                val range = offsetRange(source, member.start, member.end)
+                declaration.referencedTypes().forEach { rawType ->
+                    when (val result = JavaTypeDescriptorResolver.descriptorOrDiagnostic(rawType, context)) {
+                        is TypeDescriptorResult.Resolved -> Unit
+                        is TypeDescriptorResult.Unresolved -> diagnostics += unresolvedTypeDiagnostic(result, range)
+                        is TypeDescriptorResult.Ambiguous -> diagnostics += ambiguousTypeDiagnostic(result, range)
+                    }
+                }
+            }
+        }
+        return diagnostics.distinctBy { "${it.code}:${it.message}:${it.range.start.line}:${it.range.start.character}" }
     }
 
     fun findShadowPrefix(source: String): String? =
@@ -106,6 +149,40 @@ internal object MixinMemberDeclarationParser {
         val parameterTypes: List<String>,
         val modifiers: Set<String>,
         val isMethod: Boolean,
+    ) {
+        fun referencedTypes(): List<String> = listOf(returnType) + parameterTypes
+    }
+
+    private fun resolutionContext(source: String, classIndex: ClassIndex?): JavaTypeResolutionContext =
+        JavaTypeResolutionContext(
+            imports = JavaTypeDescriptorResolver.importsFor(source),
+            lookup = classIndex?.let(::ClassIndexJavaTypeLookup),
+        )
+
+    private fun unresolvedTypeDiagnostic(
+        result: TypeDescriptorResult.Unresolved,
+        range: McTextRange,
+    ) = McDiagnostic(
+        code = MixinDiagnosticCodes.UNRESOLVED_JAVA_TYPE,
+        severity = McSeverity.ERROR,
+        message = "Unresolved Java type in Mixin member declaration: ${result.normalizedType}",
+        range = range,
+        metadata = mapOf("type" to result.rawType, "normalizedType" to result.normalizedType),
+    )
+
+    private fun ambiguousTypeDiagnostic(
+        result: TypeDescriptorResult.Ambiguous,
+        range: McTextRange,
+    ) = McDiagnostic(
+        code = MixinDiagnosticCodes.UNRESOLVED_HANDLER_DESCRIPTOR,
+        severity = McSeverity.ERROR,
+        message = "Ambiguous Java type in Mixin member declaration: ${result.normalizedType}",
+        range = range,
+        metadata = mapOf(
+            "type" to result.rawType,
+            "normalizedType" to result.normalizedType,
+            "candidates" to result.candidates.joinToString(","),
+        ),
     )
 
     private fun parseAnnotatedMembers(source: String, annotationSimpleName: String): List<AnnotatedMember> {

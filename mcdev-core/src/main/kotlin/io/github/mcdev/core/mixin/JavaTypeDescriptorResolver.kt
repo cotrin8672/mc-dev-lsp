@@ -3,7 +3,56 @@ package io.github.mcdev.core.mixin
 data class JavaSourceImports(
     val packageName: String?,
     val explicit: Map<String, String>,
+    val wildcardPackages: List<String> = emptyList(),
 )
+
+data class JavaTypeResolutionContext(
+    val imports: JavaSourceImports,
+    val lookup: JavaTypeLookup? = null,
+)
+
+interface JavaTypeLookup {
+    fun findInternalNameByQualifiedName(fqcn: String): String?
+
+    fun findInPackage(packageName: String, simpleName: String): TypeLookupResult
+
+    fun findInWildcardImports(imports: List<String>, simpleName: String): TypeLookupResult
+}
+
+class ClassIndexJavaTypeLookup(
+    private val classIndex: ClassIndex,
+) : JavaTypeLookup {
+    override fun findInternalNameByQualifiedName(fqcn: String): String? =
+        classIndex.findClassByFqn(fqcn)?.internalName
+
+    override fun findInPackage(packageName: String, simpleName: String): TypeLookupResult =
+        classIndex.findClassByFqn("$packageName.$simpleName")
+            ?.let { TypeLookupResult.Found(it.internalName) }
+            ?: TypeLookupResult.NotFound
+
+    override fun findInWildcardImports(imports: List<String>, simpleName: String): TypeLookupResult {
+        val matches = imports.mapNotNull { pkg ->
+            classIndex.findClassByFqn("$pkg.$simpleName")?.internalName
+        }.distinct()
+        return when (matches.size) {
+            0 -> TypeLookupResult.NotFound
+            1 -> TypeLookupResult.Found(matches.single())
+            else -> TypeLookupResult.Ambiguous(matches)
+        }
+    }
+}
+
+sealed interface TypeLookupResult {
+    data class Found(val internalName: String) : TypeLookupResult
+    data class Ambiguous(val internalNames: List<String>) : TypeLookupResult
+    data object NotFound : TypeLookupResult
+}
+
+sealed interface TypeDescriptorResult {
+    data class Resolved(val descriptor: String) : TypeDescriptorResult
+    data class Unresolved(val rawType: String, val normalizedType: String) : TypeDescriptorResult
+    data class Ambiguous(val rawType: String, val normalizedType: String, val candidates: List<String>) : TypeDescriptorResult
+}
 
 object JavaTypeDescriptorResolver {
     private val primitives = mapOf(
@@ -54,21 +103,34 @@ object JavaTypeDescriptorResolver {
             ?.groupValues
             ?.get(1)
         val explicit = linkedMapOf<String, String>()
-        Regex("""(?m)^\s*import\s+(?!static\b)([\w.]+)\s*;""")
+        val wildcards = mutableListOf<String>()
+        Regex("""(?m)^\s*import\s+(?!static\b)([\w.]+(?:\.\*)?)\s*;""")
             .findAll(source)
             .forEach { match ->
                 val fqn = match.groupValues[1]
-                explicit[fqn.substringAfterLast('.')] = fqn
+                if (fqn.endsWith(".*")) {
+                    wildcards += fqn.removeSuffix(".*")
+                } else {
+                    explicit[fqn.substringAfterLast('.')] = fqn
+                }
             }
-        return JavaSourceImports(packageName, explicit)
+        return JavaSourceImports(packageName, explicit, wildcards)
     }
 
     fun methodDescriptor(returnType: String, parameterTypes: List<String>, imports: JavaSourceImports): String =
         "(${parameterTypes.joinToString("") { descriptor(it, imports) }})${descriptor(returnType, imports)}"
 
     fun methodDescriptorOrNull(returnType: String, parameterTypes: List<String>, imports: JavaSourceImports): String? {
-        val parameterDescriptors = parameterTypes.map { descriptorOrNull(it, imports) ?: return null }
-        val returnDescriptor = descriptorOrNull(returnType, imports) ?: return null
+        return methodDescriptorOrNull(returnType, parameterTypes, JavaTypeResolutionContext(imports))
+    }
+
+    fun methodDescriptorOrNull(
+        returnType: String,
+        parameterTypes: List<String>,
+        context: JavaTypeResolutionContext,
+    ): String? {
+        val parameterDescriptors = parameterTypes.map { descriptorOrNull(it, context) ?: return null }
+        val returnDescriptor = descriptorOrNull(returnType, context) ?: return null
         return "(${parameterDescriptors.joinToString("")})$returnDescriptor"
     }
 
@@ -82,12 +144,25 @@ object JavaTypeDescriptorResolver {
     }
 
     fun descriptorOrNull(rawType: String, imports: JavaSourceImports): String? {
+        return descriptorOrNull(rawType, JavaTypeResolutionContext(imports))
+    }
+
+    fun descriptorOrNull(rawType: String, context: JavaTypeResolutionContext): String? =
+        when (val result = descriptorOrDiagnostic(rawType, context)) {
+            is TypeDescriptorResult.Resolved -> result.descriptor
+            else -> null
+        }
+
+    fun descriptorOrDiagnostic(rawType: String, context: JavaTypeResolutionContext): TypeDescriptorResult {
         val (base, arrayDepth) = normalize(rawType)
-        primitives[base]?.let { return "[".repeat(arrayDepth) + it }
+        primitives[base]?.let { return TypeDescriptorResult.Resolved("[".repeat(arrayDepth) + it) }
         val erased = eraseGeneric(base)
-        primitives[erased]?.let { return "[".repeat(arrayDepth) + it }
-        val fqn = resolveClassNameOrNull(erased, imports) ?: return null
-        return "[".repeat(arrayDepth) + "L${fqnToInternalName(fqn)};"
+        primitives[erased]?.let { return TypeDescriptorResult.Resolved("[".repeat(arrayDepth) + it) }
+        return when (val resolved = resolveInternalNameOrNull(erased, context)) {
+            is TypeLookupResult.Found -> TypeDescriptorResult.Resolved("[".repeat(arrayDepth) + "L${resolved.internalName};")
+            is TypeLookupResult.Ambiguous -> TypeDescriptorResult.Ambiguous(rawType, erased, resolved.internalNames)
+            TypeLookupResult.NotFound -> TypeDescriptorResult.Unresolved(rawType, erased)
+        }
     }
 
     fun parameterTypes(rawParams: String, imports: JavaSourceImports): List<String> =
@@ -202,9 +277,51 @@ object JavaTypeDescriptorResolver {
         imports.explicit[normalized]?.let { return it }
         wellKnown[normalized]?.let { return it }
         if (normalized in javaLang) return "java.lang.$normalized"
-        if ('.' in normalized) return normalized
+        if ('.' in normalized && isKnownPackage(normalized)) return normalized
         return null
     }
+
+    private fun resolveInternalNameOrNull(type: String, context: JavaTypeResolutionContext): TypeLookupResult {
+        val normalized = type.trim()
+        if (normalized.isEmpty()) return TypeLookupResult.NotFound
+        val imports = context.imports
+        val lookup = context.lookup
+
+        if ('.' in normalized) {
+            lookup?.findInternalNameByQualifiedName(normalized)?.let { return TypeLookupResult.Found(it) }
+            if (isKnownPackage(normalized)) return TypeLookupResult.Found(fqnToInternalName(normalized))
+            return TypeLookupResult.NotFound
+        }
+
+        imports.explicit[normalized]?.let { return TypeLookupResult.Found(fqnToInternalName(it)) }
+        if (normalized in javaLang) return TypeLookupResult.Found("java/lang/$normalized")
+
+        if (lookup != null && imports.packageName != null) {
+            when (val samePackage = lookup.findInPackage(imports.packageName, normalized)) {
+                is TypeLookupResult.Found -> return samePackage
+                is TypeLookupResult.Ambiguous -> return samePackage
+                TypeLookupResult.NotFound -> Unit
+            }
+        }
+
+        if (lookup != null && imports.wildcardPackages.isNotEmpty()) {
+            when (val wildcard = lookup.findInWildcardImports(imports.wildcardPackages, normalized)) {
+                is TypeLookupResult.Found -> return wildcard
+                is TypeLookupResult.Ambiguous -> return wildcard
+                TypeLookupResult.NotFound -> Unit
+            }
+        }
+
+        wellKnown[normalized]?.let { return TypeLookupResult.Found(fqnToInternalName(it)) }
+        return TypeLookupResult.NotFound
+    }
+
+    private fun isKnownPackage(fqn: String): Boolean =
+        fqn.startsWith("java.") ||
+            fqn.startsWith("javax.") ||
+            fqn.startsWith("org.spongepowered.") ||
+            fqn.startsWith("net.minecraft.") ||
+            fqn.startsWith("com.mojang.")
 
     private fun fqnToInternalName(fqn: String): String {
         val parts = fqn.split('.')

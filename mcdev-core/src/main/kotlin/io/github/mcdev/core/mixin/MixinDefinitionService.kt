@@ -146,7 +146,7 @@ class MixinDefinitionService(
             return resolveOverwriteMethodAtOffset(source, offset)
         }
 
-        MixinMemberDeclarationParser.parseAccessorDeclarations(source).forEach { declaration ->
+        MixinMemberDeclarationParser.parseAccessorDeclarations(source, classIndex).forEach { declaration ->
             val nameRange = memberNameRange(source, declaration.range, declaration.methodName) ?: return@forEach
             if (offset in nameRange.first until nameRange.last) {
                 val mixinTargets = MixinTargetResolver.resolveTargetsFromSource(source, classIndex)
@@ -155,7 +155,7 @@ class MixinDefinitionService(
             }
         }
 
-        MixinMemberDeclarationParser.parseInvokerDeclarations(source).forEach { declaration ->
+        MixinMemberDeclarationParser.parseInvokerDeclarations(source, classIndex).forEach { declaration ->
             val nameRange = memberNameRange(source, declaration.range, declaration.methodName) ?: return@forEach
             if (offset in nameRange.first until nameRange.last) {
                 val mixinTargets = MixinTargetResolver.resolveTargetsFromSource(source, classIndex)
@@ -178,8 +178,10 @@ class MixinDefinitionService(
         source: String,
         context: AnnotationContext,
     ): List<McDefinitionTarget> {
+        val declaration = findAccessorDeclarationNear(source, context)
+        if (declaration == null && hasMemberParseFailureNear(source, context)) return emptyList()
         val fieldName = context.partialValue.trim('"').ifEmpty {
-            findAccessorDeclarationNear(source, context)?.let { accessorService.inferFieldName(it) }
+            declaration?.let { accessorService.inferFieldName(it) }
         } ?: return emptyList()
         val mixinTargets = resolveMixinTargets(source, context)
         val range = offsetRange(source, context.valueStartOffset, context.valueEndOffset)
@@ -190,12 +192,14 @@ class MixinDefinitionService(
         source: String,
         context: AnnotationContext,
     ): List<McDefinitionTarget> {
+        val declaration = findInvokerDeclarationNear(source, context)
+        if (declaration == null && hasMemberParseFailureNear(source, context)) return emptyList()
         val methodName = context.partialValue.trim('"').ifEmpty {
-            findInvokerDeclarationNear(source, context)?.let { invokerService.inferTargetName(it) }
+            declaration?.let { invokerService.inferTargetName(it) }
         } ?: return emptyList()
         val mixinTargets = resolveMixinTargets(source, context)
         val range = offsetRange(source, context.valueStartOffset, context.valueEndOffset)
-        val descriptor = findInvokerDeclarationNear(source, context)?.let(::descriptorFromInvokerDeclaration)
+        val descriptor = declaration?.let(::descriptorFromInvokerDeclaration)
         return resolveMethodInTargets(mixinTargets, methodName, range, descriptor)
     }
 
@@ -306,7 +310,7 @@ class MixinDefinitionService(
     }
 
     private fun findShadowMemberAtOffset(source: String, offset: Int): ShadowMemberDeclaration? {
-        MixinMemberDeclarationParser.parseShadowDeclarations(source).forEach { declaration ->
+        MixinMemberDeclarationParser.parseShadowDeclarations(source, classIndex).forEach { declaration ->
             val nameRange = memberNameRange(source, declaration.range, declaration.name) ?: return@forEach
             if (offset in nameRange.first until nameRange.last) return declaration
         }
@@ -314,7 +318,7 @@ class MixinDefinitionService(
     }
 
     private fun findOverwriteMethodAtOffset(source: String, offset: Int): OverwriteMethodDeclaration? {
-        MixinMemberDeclarationParser.parseOverwriteDeclarations(source).forEach { declaration ->
+        MixinMemberDeclarationParser.parseOverwriteDeclarations(source, classIndex).forEach { declaration ->
             val nameRange = memberNameRange(source, declaration.range, declaration.name) ?: return@forEach
             if (offset in nameRange.first until nameRange.last) return declaration
             val bodyStart = source.indexOf('{', nameRange.last)
@@ -356,7 +360,7 @@ class MixinDefinitionService(
         source: String,
         context: AnnotationContext,
     ): AccessorMethodDeclaration? =
-        MixinMemberDeclarationParser.parseAccessorDeclarations(source)
+        MixinMemberDeclarationParser.parseAccessorDeclarations(source, classIndex)
             .firstOrNull { declaration ->
                 declaration.range.start.line >= lineAtOffset(source, context.annotationStartOffset)
             }
@@ -365,10 +369,16 @@ class MixinDefinitionService(
         source: String,
         context: AnnotationContext,
     ): InvokerMethodDeclaration? =
-        MixinMemberDeclarationParser.parseInvokerDeclarations(source)
+        MixinMemberDeclarationParser.parseInvokerDeclarations(source, classIndex)
             .firstOrNull { declaration ->
                 declaration.range.start.line >= lineAtOffset(source, context.annotationStartOffset)
             }
+
+    private fun hasMemberParseFailureNear(source: String, context: AnnotationContext): Boolean {
+        val annotationLine = lineAtOffset(source, context.annotationStartOffset)
+        return MixinMemberDeclarationParser.parseDeclarationDiagnostics(source, classIndex)
+            .any { diagnostic -> diagnostic.range.start.line >= annotationLine }
+    }
 
     private fun memberNameRange(
         source: String,

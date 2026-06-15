@@ -14,6 +14,9 @@ data class AccessorMethodDeclaration(
     val parameterDescriptors: List<String>,
     val explicitFieldName: String?,
     val range: io.github.mcdev.core.diagnostics.McTextRange,
+    val parseSource: ParseSource = ParseSource.HAND_WRITTEN,
+    val confidence: ParseConfidence = ParseConfidence.HIGH,
+    val warnings: List<String> = emptyList(),
 )
 
 enum class AccessorKind {

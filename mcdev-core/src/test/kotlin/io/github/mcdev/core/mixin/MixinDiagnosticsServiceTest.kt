@@ -100,6 +100,24 @@ class MixinDiagnosticsServiceTest {
     }
 
     @Test
+    fun reportsUnresolvedJavaTypeInInvokerDeclaration() {
+        val source = """
+            @Mixin(MinecraftClient.class)
+            class M {
+                @Invoker("setScreen")
+                abstract void invokeSetScreen(UnknownScreen screen);
+            }
+        """.trimIndent()
+
+        val diagnostics = analyze(source)
+
+        assertTrue(diagnostics.any {
+            it.code == MixinDiagnosticCodes.UNRESOLVED_JAVA_TYPE &&
+                it.metadata["normalizedType"] == "UnknownScreen"
+        })
+    }
+
+    @Test
     fun analyzesInjectMethodArray() {
         val source = """
             @Mixin(MinecraftClient.class)

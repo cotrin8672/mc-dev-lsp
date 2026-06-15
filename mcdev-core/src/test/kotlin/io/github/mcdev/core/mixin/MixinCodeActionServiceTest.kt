@@ -140,4 +140,27 @@ class MixinCodeActionServiceTest {
         )
         assertTrue(fixes.any { it.title.contains("Invoker") })
     }
+
+    @Test
+    fun doesNotOfferQuickfixForUnresolvedHandlerDescriptor() {
+        val diagnostic = McDiagnostic(
+            code = MixinDiagnosticCodes.UNRESOLVED_HANDLER_DESCRIPTOR,
+            severity = McSeverity.ERROR,
+            message = "ambiguous type",
+            range = McTextRange(McTextPosition(0, 0), McTextPosition(0, 0)),
+            metadata = mapOf("type" to "Widget"),
+        )
+
+        val fixes = service.fixesForDiagnostics(
+            listOf(diagnostic),
+            documentUri = "file:///Mixin.java",
+            source = "@Mixin(MinecraftClient.class) class M { }",
+            mixinConfigContent = null,
+            mixinConfigPath = null,
+            mixinPackage = null,
+            classIndex = FakeClassIndex(),
+        )
+
+        assertTrue(fixes.isEmpty())
+    }
 }

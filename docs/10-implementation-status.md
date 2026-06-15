@@ -26,6 +26,23 @@ This file records what exists in the repository after the full product completio
 - `@Constant` string/int hint generation for CONSTANT `@At` completion items.
 - Duplicate `@Mixin` target diagnostics (class array, string targets, and mixin config entries).
 - Mixin definition and references services with AW/AT cross-reference scanning.
+- Current Mixin member parsing for `@Shadow`, `@Accessor`, `@Invoker`, and `@Overwrite` is a strengthened hand-written parser.
+  It supports common multiline declarations, parameter annotations, generic erasure, arrays, varargs, explicit imports,
+  `java.lang` types, same-package and wildcard imports when the class index confirms them, and selected well-known
+  Mixin/Minecraft types. It does not fabricate descriptors for unresolved simple names.
+
+### Mixin parser limitations
+
+The current Mixin member parser is **not** based on JDT AST or JDT type bindings. It is intentionally treated as a
+hand-written fallback parser with parse source/confidence metadata, not as a Java semantic parser.
+
+Known limits:
+
+- unresolved simple names produce `MIXIN_UNRESOLVED_JAVA_TYPE` or `MIXIN_UNRESOLVED_HANDLER_DESCRIPTOR` instead of a
+  fake descriptor;
+- wildcard imports resolve only when the class index confirms a single candidate;
+- ambiguous wildcard imports are left unresolved;
+- definition and quickfix paths must not continue with an unresolved handler descriptor.
 
 ### mcdev-protocol
 
@@ -105,6 +122,8 @@ All nine acceptance conditions from [00-product-goals.md](00-product-goals.md) a
 ## Still To Implement
 
 - Optional live `gradlew genSources` Loom E2E (`MCDEV_LOOM_RUN_GEN_SOURCES=1`) against real downloaded Minecraft sources.
+- JDT AST/binding-based Mixin member parser in the JDT LS extension. The planned shape is a core-owned parser model plus
+  a JDT-side adapter that uses AST/bindings when available and logs when it falls back to the hand-written parser.
 
 ## Verification Commands
 

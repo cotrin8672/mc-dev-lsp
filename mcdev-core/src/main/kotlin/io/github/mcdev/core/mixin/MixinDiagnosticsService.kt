@@ -29,6 +29,7 @@ class MixinDiagnosticsService(
         diagnostics += analyzeMixinConfig(request)
         diagnostics += analyzeInjectMethods(request, model)
         diagnostics += analyzeAtTargets(request, model)
+        diagnostics += MixinMemberDeclarationParser.parseDeclarationDiagnostics(request.source, classIndex)
         diagnostics += analyzeOverwriteMethods(request)
         return diagnostics
     }
@@ -237,7 +238,7 @@ class MixinDiagnosticsService(
     private fun analyzeOverwriteMethods(request: MixinDiagnosticRequest): List<McDiagnostic> {
         val mixinTargets = findMixinTargetsFromSource(request.source)
         if (mixinTargets.isEmpty()) return emptyList()
-        return MixinMemberDeclarationParser.parseOverwriteDeclarations(request.source)
+        return MixinMemberDeclarationParser.parseOverwriteDeclarations(request.source, classIndex)
             .flatMap { declaration -> overwriteValidation.validate(mixinTargets, declaration) }
     }
 

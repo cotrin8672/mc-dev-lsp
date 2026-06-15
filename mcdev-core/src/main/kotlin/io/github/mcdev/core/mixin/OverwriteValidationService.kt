@@ -10,6 +10,9 @@ data class OverwriteMethodDeclaration(
     val descriptor: String,
     val isStatic: Boolean,
     val range: io.github.mcdev.core.diagnostics.McTextRange,
+    val parseSource: ParseSource = ParseSource.HAND_WRITTEN,
+    val confidence: ParseConfidence = ParseConfidence.HIGH,
+    val warnings: List<String> = emptyList(),
 )
 
 class OverwriteValidationService(

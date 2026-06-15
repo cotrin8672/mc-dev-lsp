@@ -197,6 +197,10 @@ Acceptance:
 
 ## WP-11 JDT LS Integration
 
+Status note: Java annotation context and command routing exist today, but the Mixin member parser used by core services
+is still the hand-written fallback parser. A JDT AST/binding-backed Mixin member parser remains a future WP-11 extension
+task and must live on the JDT LS side so `mcdev-core` stays free of JDT dependencies.
+
 Deliverables:
 
 - bundle activator
@@ -271,4 +275,3 @@ Acceptance:
 - user can configure a local build artifact
 - contributor can identify where semantic logic belongs
 - common failures are documented
-

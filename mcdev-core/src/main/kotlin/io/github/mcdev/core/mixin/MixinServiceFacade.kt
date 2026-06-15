@@ -296,15 +296,15 @@ class MixinServiceFacade(
         val mixinTargets = MixinTargetResolver.resolveTargetsFromSource(source, classIndex)
         if (mixinTargets.isEmpty()) return emptyList()
         val diagnostics = mutableListOf<McDiagnostic>()
-        MixinMemberDeclarationParser.parseShadowDeclarations(source).forEach { declaration ->
+        MixinMemberDeclarationParser.parseShadowDeclarations(source, classIndex).forEach { declaration ->
             val prefix = MixinMemberDeclarationParser.findShadowPrefix(source)
             val remap = MixinMemberDeclarationParser.findShadowRemap(source)
             diagnostics += shadowValidation.validate(mixinTargets, declaration, prefix, remap)
         }
-        MixinMemberDeclarationParser.parseAccessorDeclarations(source).forEach { declaration ->
+        MixinMemberDeclarationParser.parseAccessorDeclarations(source, classIndex).forEach { declaration ->
             diagnostics += accessorService.validate(mixinTargets, declaration)
         }
-        MixinMemberDeclarationParser.parseInvokerDeclarations(source).forEach { declaration ->
+        MixinMemberDeclarationParser.parseInvokerDeclarations(source, classIndex).forEach { declaration ->
             diagnostics += invokerService.validate(mixinTargets, declaration)
         }
         return diagnostics

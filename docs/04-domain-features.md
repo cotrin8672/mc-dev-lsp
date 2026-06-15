@@ -2,6 +2,17 @@
 
 ## Mixin
 
+### Member Parser Status
+
+`@Shadow`, `@Accessor`, `@Invoker`, and `@Overwrite` member declarations are currently parsed by a strengthened
+hand-written parser. The parser handles common multiline declarations, parameter annotations, generic erasure, arrays,
+varargs, explicit imports, `java.lang` types, selected well-known Mixin/Minecraft types, and class-index-confirmed
+same-package or wildcard imports.
+
+This parser is not JDT AST/binding based yet. Unresolved or ambiguous Java types are reported as diagnostics instead of
+being converted to guessed JVM descriptors, and definition/code-action paths are expected to stop when the handler
+descriptor cannot be resolved safely.
+
 ### Supported Annotations
 
 Core Mixin annotations:
@@ -488,4 +499,3 @@ class         -> mixin config / AW / AT entries
 ```
 
 Reference search can be approximate initially only if diagnostics and completion remain exact. The target goal is exact project-local semantic references.
-
