@@ -13,6 +13,7 @@ local diagnostics = require("mcdev.diagnostics")
 local code_action = require("mcdev.code_action")
 local hover = require("mcdev.hover")
 local jdtls_helper = require("mcdev.jdtls")
+local health = require("mcdev.health")
 
 mcdev.setup({
   jdtls = {
@@ -96,6 +97,7 @@ helpers.assert_eq(payload.context.protocolVersion, protocol.VERSION)
 helpers.assert_eq(protocol.commands.reload_project_context, "mcdev.reloadProjectContext")
 helpers.assert_eq(protocol.commands.dump_context, "mcdev.dumpContext")
 helpers.assert_eq(protocol.commands.hover, "mcdev.hover")
+helpers.assert_eq(protocol.commands.diagnostics, "mcdev.diagnostics")
 helpers.assert_eq(payload.trigger.kind, "manual")
 helpers.assert_eq(payload.options.preferredAtTarget, "smart")
 helpers.assert_eq(payload.options.mixinClassInsert, "import")
@@ -124,7 +126,7 @@ end)
 helpers.assert_eq(callback_error, "mcdev: no active JDT LS client for this buffer")
 
 local blink_adapter = blink.source()
-helpers.assert_eq(#blink_adapter:get_trigger_characters(), 3)
+helpers.assert_eq(#blink_adapter:get_trigger_characters(), 5)
 
 local completion_module = package.loaded["mcdev.completion"]
 local original_complete = completion_module.complete
@@ -148,11 +150,12 @@ completion_module.complete = function(callback)
     },
   })
 end
-blink_adapter:get_completions({}, function(result)
+blink_adapter:get_completions({ bufnr = 0, cursor = { 1, 5 } }, function(result)
   blink_result = result
 end)
 helpers.assert_not_nil(blink_result)
 helpers.assert_eq(blink_result.is_incomplete_forward, true)
+helpers.assert_eq(blink_result.is_incomplete_backward, true)
 helpers.assert_eq(#blink_result.items, 1)
 helpers.assert_eq(blink_result.items[1].label, "tick(): void")
 helpers.assert_eq(blink_result.items[1].insertText, "tick")
@@ -163,8 +166,9 @@ cmp_source:complete({}, function(items)
   cmp_result = items
 end)
 helpers.assert_not_nil(cmp_result)
-helpers.assert_eq(#cmp_result, 1)
-helpers.assert_eq(cmp_result[1].insertText, "tick")
+helpers.assert_eq(#cmp_result.items, 1)
+helpers.assert_eq(cmp_result.items[1].insertText, "tick")
+helpers.assert_eq(cmp_result.isIncomplete, true)
 completion_module.complete = original_complete
 
 local commands = vim.api.nvim_get_commands({})
@@ -172,11 +176,21 @@ helpers.assert_not_nil(commands.McdevInfo)
 helpers.assert_not_nil(commands.McdevReindex)
 helpers.assert_not_nil(commands.McdevReloadProjectContext)
 helpers.assert_not_nil(commands.McdevDumpContext)
+helpers.assert_not_nil(commands.McdevHealth)
+helpers.assert_not_nil(commands.McdevDebugCompletion)
+helpers.assert_not_nil(commands.McdevDebugDiagnostics)
+helpers.assert_not_nil(commands.McdevDiagnosticsRefresh)
+helpers.assert_not_nil(commands.McdevDiagnosticsStop)
+helpers.assert_not_nil(commands.McdevDiagnosticsStart)
+helpers.assert_not_nil(commands.McdevDiagnosticsStatus)
 
 helpers.assert_eq(mcdev.options().insert.at_target, "smart")
 helpers.assert_eq(mcdev.options().insert.mixin_class_import, true)
 helpers.assert_eq(mcdev.options().insert.inject_method_descriptor, "auto")
 helpers.assert_eq(mcdev.options().completion.omnifunc, true)
+helpers.assert_eq(mcdev.options().diagnostics.enabled, false)
+helpers.assert_eq(mcdev.options().diagnostics.events[1], "BufWritePost")
+helpers.assert_eq(diagnostics.running, false)
 
 local function has_buffer_keymap(bufnr, mode, lhs)
   for _, map in ipairs(vim.api.nvim_buf_get_keymap(bufnr, mode)) do
@@ -312,6 +326,45 @@ with_named_buffer("/project/src/main/resources/mod.accesswidener", "accesswidene
   helpers.assert_eq(requested_command, "mcdev.completion")
   helpers.assert_eq(requested_bufnr, bufnr)
   vim.lsp.get_clients = original_get_clients
+end)
+
+with_named_buffer("/project/src/main/java/com/example/mixin/DiagnosticsMixin.java", "java", {
+  "@Mixin(SimpleTarget.class)",
+}, function(bufnr)
+  local protocol_module = package.loaded["mcdev.protocol"]
+  local original_diagnostics = protocol_module.diagnostics
+  local requests = 0
+  protocol_module.diagnostics = function(_, _, callback)
+    requests = requests + 1
+    callback({ result = { diagnostics = {} } }, nil)
+  end
+
+  vim.api.nvim_buf_call(bufnr, function()
+    vim.cmd("doautocmd TextChangedI")
+  end)
+  helpers.assert_eq(requests, 0)
+
+  diagnostics.start({ events = { "TextChangedI" }, debounce_ms = 1, insert_mode = false })
+  local original_get_mode = vim.api.nvim_get_mode
+  vim.api.nvim_get_mode = function()
+    return { mode = "i" }
+  end
+  vim.api.nvim_buf_call(bufnr, function()
+    vim.cmd("doautocmd TextChangedI")
+  end)
+  vim.api.nvim_get_mode = original_get_mode
+  vim.wait(30)
+  helpers.assert_eq(requests, 0)
+
+  diagnostics.stop()
+  diagnostics.start({ events = { "BufWritePost" }, debounce_ms = 1, insert_mode = false })
+  vim.api.nvim_buf_call(bufnr, function()
+    vim.cmd("doautocmd BufWritePost")
+  end)
+  vim.wait(30)
+  helpers.assert_eq(requests, 1)
+  diagnostics.stop()
+  protocol_module.diagnostics = original_diagnostics
 end)
 
 with_named_buffer("/project/META-INF/accesstransformer.cfg", "plaintext", {
@@ -536,6 +589,7 @@ helpers.assert_not_nil(mcdev.navigation)
 helpers.assert_not_nil(mcdev.code_action)
 helpers.assert_not_nil(mcdev.diagnostics)
 helpers.assert_not_nil(mcdev.convert)
+helpers.assert_true(#health.lines(0) > 0)
 
 print("mcdev-nvim adapter tests passed")
 vim.cmd("qa!")

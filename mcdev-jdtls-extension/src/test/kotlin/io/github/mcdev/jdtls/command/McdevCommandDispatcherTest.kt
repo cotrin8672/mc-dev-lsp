@@ -62,7 +62,19 @@ class McdevCommandDispatcherTest {
     }
 
     @Test
-    fun contextReturnsDiagnosticsEnvelope() {
+    fun diagnosticsReturnsDiagnosticsEnvelope() {
+        val dispatcher = createDispatcher()
+        val source = FixtureResourceLoader.loadText(FixturePaths.BROKEN_DIAGNOSTICS_MIXIN)
+        val response = dispatcher.execute(
+            McdevCommands.DIAGNOSTICS,
+            listOf(contextPayload(source)),
+        )
+        val diagnostics = assertIs<McdevDiagnosticsResponse>(response.result)
+        assertTrue(diagnostics.diagnostics.isNotEmpty())
+    }
+
+    @Test
+    fun contextAliasReturnsDiagnosticsEnvelope() {
         val dispatcher = createDispatcher()
         val source = FixtureResourceLoader.loadText(FixturePaths.BROKEN_DIAGNOSTICS_MIXIN)
         val response = dispatcher.execute(
@@ -175,6 +187,7 @@ class McdevCommandDispatcherTest {
     @Test
     fun registryListsImplementedCommands() {
         assertTrue(McdevCommandRegistry.implementedCommandIds.contains(McdevCommands.COMPLETION))
+        assertTrue(McdevCommandRegistry.implementedCommandIds.contains(McdevCommands.DIAGNOSTICS))
         assertTrue(McdevCommandRegistry.implementedCommandIds.contains(McdevCommands.CONTEXT))
         assertTrue(McdevCommandRegistry.implementedCommandIds.contains(McdevCommands.INFO))
         assertTrue(McdevCommandRegistry.implementedCommandIds.contains(McdevCommands.REINDEX))

@@ -67,7 +67,7 @@ require("mcdev").setup({
 })
 ```
 
-Diagnostics are enabled by default. Register completion sources in your completion UI; see [lazy.nvim setup](lazy-nvim.md#completion-sources).
+Diagnostics are disabled by default. Enable on-save diagnostics explicitly, and register completion sources in your completion UI; see [lazy.nvim setup](lazy-nvim.md#completion-sources).
 
 ## External jar path
 
@@ -87,7 +87,7 @@ Use this path for Nix, system packages, or local builds.
 
 3. Configure mcdev with the jar path and pass the jar to JDT LS through `init_options.bundles`.
 
-   `mcdev-nvim` does not install navigation or code-action keymaps. Diagnostics are enabled by default.
+   `mcdev-nvim` does not install navigation or code-action keymaps. Diagnostics are opt-in and should normally run on `BufWritePost`.
 
    ```lua
    require("mcdev").setup({

@@ -4,6 +4,7 @@
    <extension point="org.eclipse.jdt.ls.core.delegateCommandHandler">
       <delegateCommandHandler class="io.github.mcdev.jdtls.McdevDelegateCommandHandler">
          <command id="mcdev.completion"/>
+         <command id="mcdev.diagnostics"/>
          <command id="mcdev.context"/>
          <command id="mcdev.info"/>
          <command id="mcdev.reindex"/>

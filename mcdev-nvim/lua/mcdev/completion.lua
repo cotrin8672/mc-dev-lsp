@@ -1,6 +1,9 @@
 local protocol = require("mcdev.protocol")
 
 local M = {}
+M.last_request = nil
+M.last_response_count = nil
+M.last_error = nil
 
 local kind_map = {
   class = vim.lsp.protocol.CompletionItemKind.Class,
@@ -25,9 +28,30 @@ function M.to_lsp_item(item)
   }
 end
 
-function M.complete(callback)
+local function changedtick(bufnr)
+  if not vim.api.nvim_buf_is_valid(bufnr) then
+    return nil
+  end
+  return vim.api.nvim_buf_get_changedtick(bufnr)
+end
+
+function M.complete(callback, bufnr, position)
+  bufnr = bufnr or vim.api.nvim_get_current_buf()
+  position = position or vim.api.nvim_win_get_cursor(0)
+  local request_tick = changedtick(bufnr)
+  M.last_request = {
+    bufnr = bufnr,
+    position = position,
+    changedtick = request_tick,
+  }
+  M.last_error = nil
   protocol.completion(function(envelope, err)
     if err then
+      M.last_error = tostring(err)
+      callback({ isIncomplete = false, items = {} })
+      return
+    end
+    if request_tick ~= changedtick(bufnr) then
       callback({ isIncomplete = false, items = {} })
       return
     end
@@ -36,8 +60,9 @@ function M.complete(callback)
     for _, item in ipairs(result.items or {}) do
       table.insert(items, M.to_lsp_item(item))
     end
-    callback({ isIncomplete = false, items = items })
-  end)
+    M.last_response_count = #items
+    callback({ isIncomplete = result.isIncomplete or false, items = items })
+  end, bufnr, position)
 end
 
 return M

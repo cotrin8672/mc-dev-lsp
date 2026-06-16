@@ -29,6 +29,7 @@ class McdevCommandDispatcher(
         try {
             when (command) {
                 McdevCommands.COMPLETION -> completionHandler.handle(arguments)
+                McdevCommands.DIAGNOSTICS -> diagnosticsHandler.handle(arguments)
                 McdevCommands.CONTEXT -> diagnosticsHandler.handle(arguments)
                 McdevCommands.INFO -> infoHandler.handle(arguments)
                 McdevCommands.REINDEX -> reindexHandler.handle(arguments)

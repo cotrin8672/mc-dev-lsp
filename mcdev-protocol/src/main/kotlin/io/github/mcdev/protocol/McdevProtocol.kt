@@ -11,6 +11,7 @@ object McdevCommands {
     const val REFERENCES: String = "mcdev.references"
     const val HOVER: String = "mcdev.hover"
     const val CODE_ACTION: String = "mcdev.codeAction"
+    const val DIAGNOSTICS: String = "mcdev.diagnostics"
     const val REINDEX: String = "mcdev.reindex"
     const val RELOAD_PROJECT_CONTEXT: String = "mcdev.reloadProjectContext"
     const val DUMP_CONTEXT: String = "mcdev.dumpContext"

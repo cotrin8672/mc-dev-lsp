@@ -24,9 +24,15 @@ object McdevCommandRegistry {
             implemented = true,
         ),
         CommandRegistration(
-            id = McdevCommands.CONTEXT,
+            id = McdevCommands.DIAGNOSTICS,
             title = "Minecraft Development Diagnostics",
             description = "Analyzes the current buffer and returns structured mixin diagnostics.",
+            implemented = true,
+        ),
+        CommandRegistration(
+            id = McdevCommands.CONTEXT,
+            title = "Minecraft Development Diagnostics (Compatibility)",
+            description = "Compatibility alias for mcdev.diagnostics.",
             implemented = true,
         ),
         CommandRegistration(

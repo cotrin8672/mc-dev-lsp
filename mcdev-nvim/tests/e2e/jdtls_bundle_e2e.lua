@@ -306,8 +306,8 @@ with_buffer(aw_file, "plaintext", {
     "accessible class com/example/missing/Missing",
   })
   local diagnostics_context = build_context(bufnr, { 2, 21 })
-  local diagnostics_result, diagnostics_err = mcdev_command("mcdev.context", { context = diagnostics_context })
-  helpers.assert_nil(diagnostics_err, "AW mcdev.context failed: " .. vim.inspect(diagnostics_err))
+  local diagnostics_result, diagnostics_err = mcdev_command("mcdev.diagnostics", { context = diagnostics_context })
+  helpers.assert_nil(diagnostics_err, "AW mcdev.diagnostics failed: " .. vim.inspect(diagnostics_err))
   local diagnostics = diagnostics_result.result and diagnostics_result.result.diagnostics or {}
   helpers.assert_true(
     vim.tbl_filter(function(diagnostic)
@@ -323,10 +323,10 @@ with_buffer(at_file, "accesstransformer", {
   "public com.example.target.SimpleTarget draw",
 }, function(bufnr)
   local missing_descriptor_context = build_context(bufnr, { 1, 39 })
-  local at_diagnostics_result, at_diagnostics_err = mcdev_command("mcdev.context", {
+  local at_diagnostics_result, at_diagnostics_err = mcdev_command("mcdev.diagnostics", {
     context = missing_descriptor_context,
   })
-  helpers.assert_nil(at_diagnostics_err, "AT mcdev.context failed: " .. vim.inspect(at_diagnostics_err))
+  helpers.assert_nil(at_diagnostics_err, "AT mcdev.diagnostics failed: " .. vim.inspect(at_diagnostics_err))
   local at_diagnostics = at_diagnostics_result.result and at_diagnostics_result.result.diagnostics or {}
   local missing_descriptor = vim.tbl_filter(function(diagnostic)
     return diagnostic.code == "AT_MISSING_METHOD_DESCRIPTOR"

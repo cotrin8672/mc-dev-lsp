@@ -10,6 +10,7 @@ M.commands = {
   references = "mcdev.references",
   hover = "mcdev.hover",
   code_action = "mcdev.codeAction",
+  diagnostics = "mcdev.diagnostics",
   reindex = "mcdev.reindex",
   reload_project_context = "mcdev.reloadProjectContext",
   dump_context = "mcdev.dumpContext",
@@ -205,7 +206,7 @@ end
 function M.diagnostics(bufnr, position, callback)
   bufnr = bufnr or vim.api.nvim_get_current_buf()
   position = position or vim.api.nvim_win_get_cursor(0)
-  M.request(M.commands.context, { context = M.context(bufnr, position) }, callback, bufnr)
+  M.request(M.commands.diagnostics, { context = M.context(bufnr, position) }, callback, bufnr)
 end
 
 function M.code_action(bufnr, range, diagnostic_codes, callback)

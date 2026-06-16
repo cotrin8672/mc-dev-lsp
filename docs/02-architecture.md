@@ -359,8 +359,9 @@ mcdev.completion
 mcdev.definition
 mcdev.references
 mcdev.codeAction
+mcdev.diagnostics
 mcdev.reindex
-mcdev.context
+mcdev.context (compatibility alias for diagnostics)
 mcdev.info
 ```
 
@@ -488,4 +489,3 @@ bytecode missing
 ```
 
 Do not hide these silently.
-

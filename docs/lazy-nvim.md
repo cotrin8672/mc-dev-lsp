@@ -17,7 +17,7 @@ Install packages through your Mason layer, for example Mason UI, `:MasonInstall`
 
 If Nix, a system package, or a local build owns the jar, set `jdtls.extension_jar` explicitly in `require("mcdev").setup()`.
 
-Diagnostics are enabled by default. Completion adapters are exposed as sources for your completion UI; mcdev does not register them globally. Navigation and code actions remain user keymap choices.
+Diagnostics are disabled by default and should normally run on save when enabled. Completion adapters are exposed as sources for your completion UI; mcdev does not register them globally. Navigation and code actions remain user keymap choices.
 
 ## Full spec
 
@@ -55,6 +55,12 @@ return {
         at_target = "smart",
         mixin_class_import = true,
         inject_method_descriptor = "auto",
+      },
+      diagnostics = {
+        enabled = true,
+        events = { "BufWritePost" },
+        debounce_ms = 1000,
+        insert_mode = false,
       },
     },
     config = function(_, opts)
@@ -113,7 +119,12 @@ Blink:
     sources = {
       default = { "lsp", "path", "snippets", "mcdev" },
       providers = {
-        mcdev = require("mcdev.blink").source(),
+        mcdev = {
+          name = "mcdev",
+          module = "mcdev.blink",
+          async = true,
+          timeout_ms = 5000,
+        },
       },
     },
   },
@@ -128,7 +139,7 @@ nvim-cmp:
   dependencies = { "mcdev-nvim" },
   config = function()
     local cmp = require("cmp")
-    cmp.register_source("mcdev", require("mcdev.cmp").source())
+    cmp.register_source("mcdev", require("mcdev.cmp").new())
     cmp.setup({
       sources = {
         { name = "nvim_lsp" },

@@ -7,7 +7,7 @@ The repository follows the design dossier in [docs](docs/README.md). Kotlin owns
 ## Features
 
 - **Completion** — Mixin targets, inject methods, `@At` bytecode targets, MixinExtras handlers, Access Widener, and Access Transformer slots with readable labels and exact insertion text
-- **Diagnostics** — Mixin, MixinExtras, AW, and AT issues with stable diagnostic codes via `mcdev.context`
+- **Diagnostics** — Mixin, MixinExtras, AW, and AT issues with stable diagnostic codes via `mcdev.diagnostics`
 - **Code actions** — Mixin config entries, descriptor fixes, handler signature generation, AW/AT entry generation and remapping
 - **Definition and references** — Mixin target navigation through `mcdev.definition` and `mcdev.references`; Neovim keymaps are always user-defined
 - **Project introspection** — `:McdevInfo` and `:McdevReindex` for platform, mappings, configs, and index state
@@ -132,7 +132,12 @@ Blink:
     sources = {
       default = { "lsp", "path", "snippets", "mcdev" },
       providers = {
-        mcdev = require("mcdev.blink").source(),
+        mcdev = {
+          name = "mcdev",
+          module = "mcdev.blink",
+          async = true,
+          timeout_ms = 5000,
+        },
       },
     },
   },
@@ -147,7 +152,7 @@ nvim-cmp:
   dependencies = { "mcdev-nvim" },
   config = function()
     local cmp = require("cmp")
-    cmp.register_source("mcdev", require("mcdev.cmp").source())
+    cmp.register_source("mcdev", require("mcdev.cmp").new())
     cmp.setup({
       sources = {
         { name = "nvim_lsp" },
@@ -159,6 +164,21 @@ nvim-cmp:
 ```
 
 Use your normal Neovim keymap layer for navigation and code actions. The current JDT LS bundle exposes mcdev navigation through `workspace/executeCommand` commands (`mcdev.definition`, `mcdev.references`); it does not contribute to JDT LS `textDocument/definition` directly.
+
+Diagnostics are off by default in `mcdev-nvim` to avoid sending JDT LS work on every edit. Enable them explicitly when you want on-save publication:
+
+```lua
+require("mcdev").setup({
+  diagnostics = {
+    enabled = true,
+    events = { "BufWritePost" },
+    debounce_ms = 1000,
+    insert_mode = false,
+  },
+})
+```
+
+Use `:McdevDiagnosticsRefresh` for a manual refresh, `:McdevDiagnosticsStatus` to inspect the current state, `:McdevHealth` when completion does not appear, and `:McdevDebugCompletion` to see the raw completion response.
 
 mcdev hover is currently implemented as a custom `workspace/executeCommand` request through the `mcdev.hover` command. When mcdev navigation support is enabled, the Neovim adapter binds `K` to that custom hover UI. It is not yet integrated into standard `textDocument/hover`.
 

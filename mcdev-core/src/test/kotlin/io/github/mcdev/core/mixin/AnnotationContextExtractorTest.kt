@@ -140,6 +140,40 @@ class AnnotationContextExtractorTest {
     }
 
     @Test
+    fun extractsShadowMemberPrefixAfterBareAnnotation() {
+        val source = """
+            @Mixin(Item.class)
+            class ItemMixin {
+                @Shadow public boolean is
+            }
+        """.trimIndent()
+        val start = source.indexOf("is")
+        val context = AnnotationContextExtractor.extractAtOffset(source, start + "is".length)
+        assertNotNull(context)
+        assertEquals(MixinAnnotation.SHADOW, context.annotation)
+        assertEquals(AnnotationSlot.SHADOW_MEMBER, context.slot)
+        assertEquals("is", context.partialValue)
+        assertEquals(start, context.valueStartOffset)
+        assertEquals(start + "is".length, context.valueEndOffset)
+    }
+
+    @Test
+    fun extractsShadowMemberPrefixAfterConfiguredAnnotation() {
+        val source = """
+            @Mixin(Item.class)
+            class ItemMixin {
+                @Shadow(remap = true) public boolean is
+            }
+        """.trimIndent()
+        val start = source.indexOf("is")
+        val context = AnnotationContextExtractor.extractAtOffset(source, start + "is".length)
+        assertNotNull(context)
+        assertEquals(MixinAnnotation.SHADOW, context.annotation)
+        assertEquals(AnnotationSlot.SHADOW_MEMBER, context.slot)
+        assertEquals("is", context.partialValue)
+    }
+
+    @Test
     fun extractsRedirectMethodSlot() {
         val source = """@Redirect(method = "tick", at = @At("HEAD"))"""
         val idx = source.indexOf("tick")

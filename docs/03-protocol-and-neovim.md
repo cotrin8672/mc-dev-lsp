@@ -22,8 +22,9 @@ mcdev.definition
 mcdev.references
 mcdev.hover
 mcdev.codeAction
+mcdev.diagnostics
 mcdev.reindex
-mcdev.context
+mcdev.context (compatibility alias for diagnostics)
 mcdev.info
 ```
 
@@ -177,7 +178,7 @@ require("mcdev").setup({
 })
 ```
 
-Defaults enable diagnostics publication. Completion sources, navigation, and code actions remain explicit user choices around the thin `mcdev.*` adapters.
+Defaults do not publish diagnostics. Enable on-save diagnostics explicitly; completion sources, navigation, and code actions remain explicit user choices around the thin `mcdev.*` adapters.
 
 Example `nvim-jdtls` integration:
 

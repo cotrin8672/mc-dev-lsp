@@ -17,6 +17,14 @@ M.options = {
   completion = {
     omnifunc = true,
   },
+  diagnostics = {
+    enabled = false,
+    events = { "BufWritePost" },
+    debounce_ms = 1000,
+    insert_mode = false,
+    in_flight_policy = "drop",
+    stale_result_policy = "drop",
+  },
 }
 
 local function merge(base, override)

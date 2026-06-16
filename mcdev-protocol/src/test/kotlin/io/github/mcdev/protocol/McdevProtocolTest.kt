@@ -18,6 +18,7 @@ class McdevProtocolTest {
         assertEquals("mcdev.reloadProjectContext", McdevCommands.RELOAD_PROJECT_CONTEXT)
         assertEquals("mcdev.dumpContext", McdevCommands.DUMP_CONTEXT)
         assertEquals("mcdev.hover", McdevCommands.HOVER)
+        assertEquals("mcdev.diagnostics", McdevCommands.DIAGNOSTICS)
     }
 
     @Test

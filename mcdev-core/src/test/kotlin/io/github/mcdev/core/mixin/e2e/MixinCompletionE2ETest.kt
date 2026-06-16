@@ -104,6 +104,40 @@ class MixinCompletionE2ETest {
     }
 
     @Test
+    fun completesImportedItemShadowMethodAtDeclarationName() {
+        val classIndex = io.github.mcdev.core.mixin.FakeClassIndex(
+            classes = io.github.mcdev.core.mixin.FakeClassIndex.defaultClasses() + listOf(
+                io.github.mcdev.core.mixin.ClassIndexEntry("Item", "net.minecraft.world.item", "net/minecraft/world/item/Item"),
+                io.github.mcdev.core.mixin.ClassIndexEntry("Item", "com.example.other", "com/example/other/Item"),
+            ),
+            methods = io.github.mcdev.core.mixin.FakeClassIndex.defaultMethods() + mapOf(
+                "net/minecraft/world/item/Item" to listOf(
+                    io.github.mcdev.core.mixin.MethodIndexEntry("isFoil", "()Z", false, "isFoil(): boolean"),
+                    io.github.mcdev.core.mixin.MethodIndexEntry("getCount", "()I", false, "getCount(): int"),
+                ),
+                "com/example/other/Item" to listOf(
+                    io.github.mcdev.core.mixin.MethodIndexEntry("otherOnly", "()V", false, "otherOnly(): void"),
+                ),
+            ),
+        )
+        val facade = io.github.mcdev.core.mixin.MixinServiceFacade(classIndex, io.github.mcdev.core.mixin.FakeBytecodeIndex())
+        val source = """
+            import net.minecraft.world.item.Item;
+
+            @Mixin(Item.class)
+            class ItemMixin {
+                @Shadow public boolean is
+            }
+        """.trimIndent()
+
+        val items = facade.complete(MixinE2ETestSupport.requestAt(source, "is"))
+
+        assertTrue(items.any { it.insertText == "isFoil" })
+        assertTrue(items.none { it.insertText == "getCount" })
+        assertTrue(items.none { it.insertText == "otherOnly" })
+    }
+
+    @Test
     fun injectMethodCompletionLabelUsesReadableSignature() {
         val source = """
             @Mixin(MinecraftClient.class)

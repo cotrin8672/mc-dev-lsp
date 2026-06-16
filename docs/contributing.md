@@ -49,7 +49,7 @@ Handler classes follow the naming pattern `Mcdev*Handler`:
 
 ```text
 McdevCompletionHandler
-McdevDiagnosticsHandler   (serves mcdev.context)
+McdevDiagnosticsHandler   (serves mcdev.diagnostics, with mcdev.context as a compatibility alias)
 McdevDefinitionHandler
 McdevReferencesHandler
 McdevCodeActionHandler

@@ -146,7 +146,7 @@ The Neovim plugin and extension jar are incompatible versions. Rebuild the exten
 
 ### How diagnostics work
 
-Mixin and AW/AT diagnostics are computed by the extension through the `mcdev.context` command (same handler as structured diagnostics requests). The response includes stable diagnostic codes such as:
+Mixin and AW/AT diagnostics are computed by the extension through the `mcdev.diagnostics` command. `mcdev.context` remains as a compatibility alias. The response includes stable diagnostic codes such as:
 
 - `MIXIN_CLASS_NOT_LISTED_IN_CONFIG`
 - `UNRESOLVED_AT_TARGET`
@@ -162,9 +162,9 @@ When publishing mcdev diagnostics into Neovim's `vim.diagnostic` API, use a dedi
 ```lua
 local mcdev_ns = vim.api.nvim_create_namespace("mcdev")
 
--- Example: fetch and publish after mcdev.context
+-- Example: fetch and publish after mcdev.diagnostics
 local protocol = require("mcdev.protocol")
-protocol.request(protocol.commands.context, { context = protocol.context() }, function(result)
+protocol.request(protocol.commands.diagnostics, { context = protocol.context() }, function(result)
   if not result or not result.result then return end
   local diags = {}
   for _, d in ipairs(result.result.diagnostics or {}) do
@@ -185,7 +185,7 @@ protocol.request(protocol.commands.context, { context = protocol.context() }, fu
 end)
 ```
 
-By default `mcdev-nvim` records configuration, creates `:McdevInfo` / `:McdevReindex`, and publishes mcdev diagnostics. Completion sources, navigation keymaps, and code-action keymaps are explicit user choices in your editor configuration.
+By default `mcdev-nvim` records configuration and creates commands such as `:McdevInfo`, `:McdevReindex`, `:McdevHealth`, and `:McdevDebugCompletion`; diagnostics publication is opt-in. Enable diagnostics with `events = { "BufWritePost" }` for on-save refresh, or use `:McdevDiagnosticsRefresh` manually. Do not put `TextChangedI` in the default diagnostics events unless you explicitly accept per-edit requests.
 
 ### Code actions
 

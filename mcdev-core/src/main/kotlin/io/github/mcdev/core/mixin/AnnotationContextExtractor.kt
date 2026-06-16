@@ -114,6 +114,12 @@ object AnnotationContextExtractor {
                 if (close == null || cursorOffset <= close) {
                     return at
                 }
+                if (
+                    annotationSupportsBareForm(annotation) &&
+                    isCursorInAnnotatedMemberDeclaration(source, close + 1, cursorOffset)
+                ) {
+                    return at
+                }
             }
             searchFrom = at - 1
         }
@@ -122,6 +128,12 @@ object AnnotationContextExtractor {
 
     private fun annotationSupportsBareForm(annotation: MixinAnnotation): Boolean =
         annotation == MixinAnnotation.SHADOW || annotation == MixinAnnotation.OVERWRITE
+
+    private fun isCursorInAnnotatedMemberDeclaration(source: String, annotationEnd: Int, cursorOffset: Int): Boolean {
+        if (cursorOffset < annotationEnd || cursorOffset > source.length) return false
+        val between = source.substring(annotationEnd, cursorOffset)
+        return between.none { it == ';' || it == '{' || it == '}' }
+    }
 
     private fun skipAnnotationName(source: String, atOffset: Int): Int {
         if (source.getOrNull(atOffset) != '@') return atOffset
@@ -202,28 +214,41 @@ object AnnotationContextExtractor {
         }
 
         if (annotation == MixinAnnotation.SHADOW && cursorOffset > bodyStart) {
-            return AnnotationContext(
-                annotation = annotation,
-                slot = AnnotationSlot.SHADOW_MEMBER,
-                partialValue = "",
-                valueStartOffset = bodyEnd,
-                valueEndOffset = bodyEnd,
-                annotationStartOffset = 0,
-                annotationEndOffset = 0,
-            )
+            return buildBareMemberContext(source, annotation, AnnotationSlot.SHADOW_MEMBER, bodyEnd, cursorOffset)
         }
         if (annotation == MixinAnnotation.OVERWRITE && cursorOffset > bodyStart) {
-            return AnnotationContext(
-                annotation = annotation,
-                slot = AnnotationSlot.OVERWRITE_METHOD,
-                partialValue = "",
-                valueStartOffset = bodyEnd,
-                valueEndOffset = bodyEnd,
-                annotationStartOffset = 0,
-                annotationEndOffset = 0,
-            )
+            return buildBareMemberContext(source, annotation, AnnotationSlot.OVERWRITE_METHOD, bodyEnd, cursorOffset)
         }
         return null
+    }
+
+    private fun buildBareMemberContext(
+        source: String,
+        annotation: MixinAnnotation,
+        slot: AnnotationSlot,
+        annotationBodyEnd: Int,
+        cursorOffset: Int,
+    ): AnnotationContext {
+        val safeCursor = cursorOffset.coerceIn(0, source.length)
+        val tokenStart = javaIdentifierStartBefore(source, safeCursor)
+        val start = if (tokenStart >= annotationBodyEnd) tokenStart else safeCursor
+        return AnnotationContext(
+            annotation = annotation,
+            slot = slot,
+            partialValue = source.substring(start, safeCursor),
+            valueStartOffset = start,
+            valueEndOffset = safeCursor,
+            annotationStartOffset = 0,
+            annotationEndOffset = 0,
+        )
+    }
+
+    private fun javaIdentifierStartBefore(source: String, cursorOffset: Int): Int {
+        var index = cursorOffset.coerceIn(0, source.length)
+        while (index > 0 && isJavaIdentifierPart(source[index - 1])) {
+            index--
+        }
+        return index
     }
 
     private fun readShorthandValue(source: String, start: Int, bodyEnd: Int): ValueInfo? {
@@ -264,6 +289,8 @@ object AnnotationContextExtractor {
     }
 
     private fun isJavaIdentifierStart(ch: Char): Boolean = ch.isLetter() || ch == '_'
+
+    private fun isJavaIdentifierPart(ch: Char): Boolean = ch.isLetterOrDigit() || ch == '_' || ch == '$'
 
     private fun buildContextForShorthand(
         annotation: MixinAnnotation,
