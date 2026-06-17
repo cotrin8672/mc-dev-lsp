@@ -3,31 +3,102 @@ package io.github.mcdev.core.mixin
 import io.github.mcdev.core.diagnostics.McTextPosition
 import io.github.mcdev.core.diagnostics.McTextRange
 
-internal data class MixinClassModel(
+data class MixinClassModel(
+    val sourceUri: String = "",
+    val packageName: String = "",
+    val qualifiedName: String = "",
+    val typeKind: JavaTypeKind = JavaTypeKind.CLASS,
     val targets: List<MixinTargetRef>,
+    val members: List<MixinMemberModel> = emptyList(),
     val injectors: List<InjectorModel>,
+    val parseSource: ParseSource = ParseSource.HAND_WRITTEN_FALLBACK,
+    val confidence: ParseConfidence = ParseConfidence.MEDIUM,
+    val warnings: List<String> = emptyList(),
 )
 
-internal data class MixinTargetRef(
+enum class JavaTypeKind {
+    CLASS,
+    INTERFACE,
+    ENUM,
+    ANNOTATION,
+    RECORD,
+    UNKNOWN,
+}
+
+enum class JavaModifier {
+    PUBLIC,
+    PROTECTED,
+    PRIVATE,
+    ABSTRACT,
+    STATIC,
+    FINAL,
+    SYNCHRONIZED,
+    NATIVE,
+    STRICTFP,
+    TRANSIENT,
+    VOLATILE,
+}
+
+enum class MixinMemberAnnotationKind {
+    ACCESSOR,
+    INVOKER,
+    SHADOW,
+    OVERWRITE,
+}
+
+enum class InjectorKind {
+    INJECT,
+    REDIRECT,
+    MODIFY_ARG,
+    MODIFY_ARGS,
+    MODIFY_VARIABLE,
+    MODIFY_CONSTANT,
+    MODIFY_EXPRESSION_VALUE,
+    MODIFY_RETURN_VALUE,
+    MODIFY_RECEIVER,
+    WRAP_OPERATION,
+    WRAP_WITH_CONDITION,
+    WRAP_METHOD,
+}
+
+data class MixinTargetRef(
     val internalName: String,
     val range: McTextRange,
 )
 
-internal data class InjectorModel(
+data class MixinMemberModel(
+    val annotationKind: MixinMemberAnnotationKind,
+    val javaName: String,
+    val explicitTargetName: String?,
+    val returnDescriptor: String?,
+    val parameterDescriptors: List<String>,
+    val methodDescriptor: String?,
+    val modifiers: Set<JavaModifier>,
+    val range: McTextRange,
+    val annotationRange: McTextRange,
+    val nameRange: McTextRange,
+    val parseSource: ParseSource,
+    val confidence: ParseConfidence,
+    val warnings: List<String>,
+)
+
+data class InjectorModel(
     val annotation: MixinAnnotation,
+    val annotationKind: InjectorKind = annotation.toInjectorKind(),
     val methodSelectors: List<MethodSelector>,
     val atSelectors: List<AtSelectorModel>,
+    val handlerMethodDescriptor: String? = null,
     val range: McTextRange,
 )
 
-internal data class MethodSelector(
+data class MethodSelector(
     val value: String,
     val name: String,
     val descriptor: String?,
     val range: McTextRange,
 )
 
-internal data class AtSelectorModel(
+data class AtSelectorModel(
     val value: String,
     val target: String?,
     val ordinal: Int?,
@@ -36,7 +107,7 @@ internal data class AtSelectorModel(
     val ordinalRange: McTextRange?,
 )
 
-internal object MixinSemanticModelParser {
+object MixinSemanticModelParser {
     private val injectorAnnotations = setOf(
         MixinAnnotation.INJECT,
         MixinAnnotation.REDIRECT,
@@ -52,10 +123,119 @@ internal object MixinSemanticModelParser {
         MixinAnnotation.WRAP_METHOD,
     )
 
-    fun parse(source: String): MixinClassModel =
+    fun parse(
+        source: String,
+        sourceUri: String = "",
+        parseSource: ParseSource = ParseSource.HAND_WRITTEN_FALLBACK,
+        confidence: ParseConfidence = ParseConfidence.MEDIUM,
+        warnings: List<String> = emptyList(),
+    ): MixinClassModel =
         MixinClassModel(
+            sourceUri = sourceUri,
+            packageName = parsePackageName(source).orEmpty(),
+            qualifiedName = parseQualifiedName(source).orEmpty(),
             targets = parseMixinTargets(source),
+            members = parseMixinMembers(source, parseSource, confidence),
             injectors = parseInjectors(source),
+            parseSource = parseSource,
+            confidence = confidence,
+            warnings = warnings,
+        )
+
+    private fun parsePackageName(source: String): String? =
+        Regex("""^\s*package\s+([\w.]+)\s*;""", RegexOption.MULTILINE).find(source)?.groupValues?.get(1)
+
+    private fun parseQualifiedName(source: String): String? {
+        val typeName = Regex("""\b(class|interface|enum|record)\s+(\w+)""").find(source)?.groupValues?.get(2)
+            ?: return null
+        val pkg = parsePackageName(source)
+        return if (pkg.isNullOrBlank()) typeName else "$pkg.$typeName"
+    }
+
+    private fun parseMixinMembers(
+        source: String,
+        parseSource: ParseSource,
+        confidence: ParseConfidence,
+    ): List<MixinMemberModel> {
+        val members = mutableListOf<MixinMemberModel>()
+        MixinMemberDeclarationParser.parseShadowDeclarations(source).forEach { declaration ->
+            members += declaration.toModel(MixinMemberAnnotationKind.SHADOW, parseSource, confidence)
+        }
+        MixinMemberDeclarationParser.parseAccessorDeclarations(source).forEach { declaration ->
+            val descriptor = "(${declaration.parameterDescriptors.joinToString("")})${declaration.returnTypeDescriptor ?: "V"}"
+            members += MixinMemberModel(
+                annotationKind = MixinMemberAnnotationKind.ACCESSOR,
+                javaName = declaration.methodName,
+                explicitTargetName = declaration.explicitFieldName,
+                returnDescriptor = declaration.returnTypeDescriptor,
+                parameterDescriptors = declaration.parameterDescriptors,
+                methodDescriptor = descriptor,
+                modifiers = emptySet(),
+                range = declaration.range,
+                annotationRange = declaration.range,
+                nameRange = declaration.range,
+                parseSource = parseSource,
+                confidence = confidence,
+                warnings = declaration.warnings,
+            )
+        }
+        MixinMemberDeclarationParser.parseInvokerDeclarations(source).forEach { declaration ->
+            val descriptor = "(${declaration.parameterDescriptors.joinToString("")})${declaration.returnTypeDescriptor ?: "V"}"
+            members += MixinMemberModel(
+                annotationKind = MixinMemberAnnotationKind.INVOKER,
+                javaName = declaration.methodName,
+                explicitTargetName = declaration.explicitTargetName,
+                returnDescriptor = declaration.returnTypeDescriptor,
+                parameterDescriptors = declaration.parameterDescriptors,
+                methodDescriptor = descriptor,
+                modifiers = emptySet(),
+                range = declaration.range,
+                annotationRange = declaration.range,
+                nameRange = declaration.range,
+                parseSource = parseSource,
+                confidence = confidence,
+                warnings = declaration.warnings,
+            )
+        }
+        MixinMemberDeclarationParser.parseOverwriteDeclarations(source).forEach { declaration ->
+            members += MixinMemberModel(
+                annotationKind = MixinMemberAnnotationKind.OVERWRITE,
+                javaName = declaration.name,
+                explicitTargetName = declaration.name,
+                returnDescriptor = declaration.descriptor.substringAfter(')', ""),
+                parameterDescriptors = emptyList(),
+                methodDescriptor = declaration.descriptor,
+                modifiers = if (declaration.isStatic) setOf(JavaModifier.STATIC) else emptySet(),
+                range = declaration.range,
+                annotationRange = declaration.range,
+                nameRange = declaration.range,
+                parseSource = parseSource,
+                confidence = confidence,
+                warnings = declaration.warnings,
+            )
+        }
+        return members
+    }
+
+    private fun ShadowMemberDeclaration.toModel(
+        annotationKind: MixinMemberAnnotationKind,
+        parseSource: ParseSource,
+        confidence: ParseConfidence,
+    ): MixinMemberModel =
+        MixinMemberModel(
+            annotationKind = annotationKind,
+            javaName = name,
+            explicitTargetName = name,
+            returnDescriptor = if (isMethod) descriptor.substringAfter(')', "") else descriptor,
+            parameterDescriptors = emptyList(),
+            methodDescriptor = descriptor.takeIf { isMethod },
+            modifiers = if (isStatic) setOf(JavaModifier.STATIC) else emptySet(),
+            range = range,
+            annotationRange = range,
+            nameRange = range,
+            parseSource = parseSource,
+            confidence = confidence,
+            warnings = warnings,
         )
 
     private fun parseMixinTargets(source: String): List<MixinTargetRef> {
@@ -353,3 +533,20 @@ internal object MixinSemanticModelParser {
         return McTextPosition(line, character)
     }
 }
+
+private fun MixinAnnotation.toInjectorKind(): InjectorKind =
+    when (this) {
+        MixinAnnotation.INJECT -> InjectorKind.INJECT
+        MixinAnnotation.REDIRECT -> InjectorKind.REDIRECT
+        MixinAnnotation.MODIFY_ARG -> InjectorKind.MODIFY_ARG
+        MixinAnnotation.MODIFY_ARGS -> InjectorKind.MODIFY_ARGS
+        MixinAnnotation.MODIFY_VARIABLE -> InjectorKind.MODIFY_VARIABLE
+        MixinAnnotation.MODIFY_CONSTANT -> InjectorKind.MODIFY_CONSTANT
+        MixinAnnotation.MODIFY_EXPRESSION_VALUE -> InjectorKind.MODIFY_EXPRESSION_VALUE
+        MixinAnnotation.MODIFY_RETURN_VALUE -> InjectorKind.MODIFY_RETURN_VALUE
+        MixinAnnotation.MODIFY_RECEIVER -> InjectorKind.MODIFY_RECEIVER
+        MixinAnnotation.WRAP_OPERATION -> InjectorKind.WRAP_OPERATION
+        MixinAnnotation.WRAP_WITH_CONDITION -> InjectorKind.WRAP_WITH_CONDITION
+        MixinAnnotation.WRAP_METHOD -> InjectorKind.WRAP_METHOD
+        else -> InjectorKind.INJECT
+    }

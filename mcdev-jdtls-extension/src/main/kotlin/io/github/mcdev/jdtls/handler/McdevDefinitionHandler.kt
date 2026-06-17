@@ -57,6 +57,7 @@ class McdevDefinitionHandler(
                 source = request.context.bufferText,
                 line = request.context.position.line,
                 character = request.context.position.character,
+                documentUri = request.context.documentUri,
             )
         }
         val resolved = definitionResolver.resolveAll(

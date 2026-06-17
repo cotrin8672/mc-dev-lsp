@@ -13,6 +13,7 @@ import io.github.mcdev.protocol.McdevError
 import io.github.mcdev.protocol.McdevErrorCode
 import io.github.mcdev.protocol.McdevProtocol
 import io.github.mcdev.protocol.McdevResponseEnvelope
+import io.github.mcdev.protocol.McdevWarning
 
 class McdevCompletionHandler(
     private val projectService: FileBasedProjectContextService = FileBasedProjectContextService(),
@@ -79,6 +80,7 @@ class McdevCompletionHandler(
             line = request.context.position.line,
             character = request.context.position.character,
         )
+        val semanticModel = mixinFacade.semanticModel(request.context.bufferText, request.context.documentUri)
         val items = mixinFacade.complete(
             session = session,
             source = request.context.bufferText,
@@ -86,6 +88,7 @@ class McdevCompletionHandler(
             character = request.context.position.character,
             options = options,
             documentUri = request.context.documentUri,
+            semanticModel = semanticModel,
         )
         return McdevResponseEnvelope(
             capabilities = setOf("completion"),
@@ -103,6 +106,12 @@ class McdevCompletionHandler(
                         sourceNamespace = session.context.mappings.sourceNamespace,
                         runtimeNamespace = session.context.mappings.runtimeNamespace,
                     ),
+                ),
+                warnings = semanticModel.warnings.map {
+                    McdevWarning(code = "MIXIN_PARSE_FALLBACK", message = it)
+                } + McdevWarning(
+                    code = "MIXIN_PARSE_SOURCE",
+                    message = semanticModel.parseSource.name,
                 ),
             ),
         )

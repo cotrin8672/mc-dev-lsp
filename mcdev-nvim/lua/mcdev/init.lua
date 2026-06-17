@@ -59,5 +59,6 @@ M.hover = require("mcdev.hover")
 M.diagnostics = diagnostics
 M.convert = require("mcdev.convert")
 M.attach = require("mcdev.attach")
+M.lsp = require("mcdev.lsp")
 
 return M

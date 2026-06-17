@@ -26,15 +26,13 @@ This file records what exists in the repository after the full product completio
 - `@Constant` string/int hint generation for CONSTANT `@At` completion items.
 - Duplicate `@Mixin` target diagnostics (class array, string targets, and mixin config entries).
 - Mixin definition and references services with AW/AT cross-reference scanning.
-- Current Mixin member parsing for `@Shadow`, `@Accessor`, `@Invoker`, and `@Overwrite` is a strengthened hand-written parser.
-  It supports common multiline declarations, parameter annotations, generic erasure, arrays, varargs, explicit imports,
-  `java.lang` types, same-package and wildcard imports when the class index confirms them, and selected well-known
-  Mixin/Minecraft types. It does not fabricate descriptors for unresolved simple names.
+- JDT LS runtime builds a JDT AST/binding-backed Mixin semantic model for `@Mixin`, `@Shadow`, `@Accessor`, `@Invoker`, and `@Overwrite` when JDT AST APIs are available. The strengthened hand-written parser remains as the visible fallback path for non-JDT runtimes and tests.
 
-### Mixin parser limitations
+### Mixin parser fallback behavior
 
-The current Mixin member parser is **not** based on JDT AST or JDT type bindings. It is intentionally treated as a
-hand-written fallback parser with parse source/confidence metadata, not as a Java semantic parser.
+The hand-written parser is treated as a fallback parser with parse source/confidence metadata. JDT LS completion,
+diagnostics, and definition paths pass a semantic model through the core facade and report fallback warnings in completion
+debug output when JDT AST extraction is unavailable.
 
 Known limits:
 
@@ -58,6 +56,7 @@ Known limits:
 - Protocol payload decoding and completion/diagnostic DTO conversion (including text edits for mixin class completion).
 - Mixin and AW/AT definition and references handlers (`mcdev.definition`, `mcdev.references`) with tiered `DefinitionResolutionService` (`SourceIndex` then `JdtReflectionBridge` fallback, `resolution=source|jdt|bytecode_only|unresolved`).
 - JDT classpath merge via `JdtClasspathBridge` and Loom remapped jar discovery under `.gradle/loom-cache/remapped_working`.
+- JDT AST semantic model extraction for `@Mixin`, `@Shadow`, `@Accessor`, `@Invoker`, and `@Overwrite`, wired into completion, diagnostics, and definition paths.
 - Local OSGi bundle E2E via `scripts/run-osgi-e2e.ps1` and fixture matrix via `scripts/run-osgi-e2e-matrix.ps1` (real Mason `jdtls` + headless Neovim), including definition URI assertions (`SimpleTarget.java` line 2), references, and code actions.
 - Loom-style OSGi E2E via `scripts/run-osgi-loom-e2e.ps1` with Eclipse `.classpath` source attachment to remapped jar and `mapped-sources/` (asserts `resolution=jdt` when JDT resolves attached sources).
 - End-to-end completion wiring: `preferredAtTarget` and mapping-aware `@At` insert formatting via `AtTargetInsertFormatter`, mixin import `additionalEdits` via `MixinImportEditBuilder`, and MixinExtras completions through the core `MixinServiceFacade`.
@@ -68,6 +67,7 @@ Known limits:
 - Setup API, extension jar accessor, active JDT LS client detection, request wrapper.
 - Completion payload construction matching `McdevCompletionRequest` shape.
 - Blink, nvim-cmp, and omnifunc adapter shims preserving label vs insertText.
+- Standard-LSP-first wrappers for definition, references, hover, and code actions, with mcdev command fallback.
 - Commands for `:McdevInfo` and `:McdevReindex`.
 - AW/AT buffer detection (`mcdev.buffer`) and languageId routing for all protocol requests.
 - Definition and references navigation helpers via `mcdev.definition` / `mcdev.references`; no keymaps are installed by default.
@@ -122,8 +122,6 @@ All nine acceptance conditions from [00-product-goals.md](00-product-goals.md) a
 ## Still To Implement
 
 - Optional live `gradlew genSources` Loom E2E (`MCDEV_LOOM_RUN_GEN_SOURCES=1`) against real downloaded Minecraft sources.
-- JDT AST/binding-based Mixin member parser in the JDT LS extension. The planned shape is a core-owned parser model plus
-  a JDT-side adapter that uses AST/bindings when available and logs when it falls back to the hand-written parser.
 
 ## Verification Commands
 

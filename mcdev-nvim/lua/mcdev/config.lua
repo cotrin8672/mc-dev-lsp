@@ -17,6 +17,9 @@ M.options = {
   completion = {
     omnifunc = true,
   },
+  standard_lsp = {
+    prefer = true,
+  },
   diagnostics = {
     enabled = false,
     events = { "BufWritePost" },

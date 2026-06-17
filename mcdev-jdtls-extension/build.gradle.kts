@@ -133,6 +133,7 @@ tasks.register("checkBundle") {
                 entries.any { it.startsWith("com/google/gson/") },
             ) { "gson classes are missing from bundle jar" }
             val pluginXml = jar.getInputStream(jar.getJarEntry("plugin.xml")!!).bufferedReader().readText()
+            check("mcdev.diagnostics" in pluginXml) { "plugin.xml is missing mcdev.diagnostics command" }
             check("mcdev.definition" in pluginXml) { "plugin.xml is missing mcdev.definition command" }
             check("mcdev.references" in pluginXml) { "plugin.xml is missing mcdev.references command" }
             check("mcdev.hover" in pluginXml) { "plugin.xml is missing mcdev.hover command" }

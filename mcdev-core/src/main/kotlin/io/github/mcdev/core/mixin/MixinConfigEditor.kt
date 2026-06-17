@@ -6,6 +6,7 @@ import com.google.gson.JsonArray
 import com.google.gson.JsonElement
 import com.google.gson.JsonObject
 import com.google.gson.JsonParser
+import io.github.mcdev.core.project.MixinConfigDiscoveryService
 
 data class MixinConfigEntry(
     val path: String,
@@ -13,6 +14,7 @@ data class MixinConfigEntry(
     val mixins: List<String>,
     val client: List<String>,
     val server: List<String>,
+    val common: List<String> = emptyList(),
 )
 
 data class MixinConfigEditResult(
@@ -25,11 +27,18 @@ class MixinConfigEditor {
     private val gson: Gson = GsonBuilder().setPrettyPrinting().create()
 
     fun parse(content: String, path: String = ""): MixinConfigEntry {
-        val root = JsonParser.parseString(content)
+        val root = JsonParser.parseString(MixinConfigDiscoveryService.normalizeJsonContent(content))
         return when {
             root.isJsonObject -> parseObject(root.asJsonObject, path)
-            root.isJsonArray -> MixinConfigEntry(path, null, root.asJsonArray.mapNotNull { it.asStringOrNull() }, emptyList(), emptyList())
-            else -> MixinConfigEntry(path, null, emptyList(), emptyList(), emptyList())
+            root.isJsonArray -> MixinConfigEntry(
+                path,
+                null,
+                root.asJsonArray.mapNotNull { it.asStringOrNull() },
+                emptyList(),
+                emptyList(),
+                emptyList(),
+            )
+            else -> MixinConfigEntry(path, null, emptyList(), emptyList(), emptyList(), emptyList())
         }
     }
 
@@ -37,7 +46,8 @@ class MixinConfigEditor {
         val config = parse(content)
         return config.mixins.contains(mixinClassName) ||
             config.client.contains(mixinClassName) ||
-            config.server.contains(mixinClassName)
+            config.server.contains(mixinClassName) ||
+            config.common.contains(mixinClassName)
     }
 
     fun addEntry(
@@ -45,7 +55,7 @@ class MixinConfigEditor {
         mixinClassName: String,
         arrayName: String = "mixins",
     ): MixinConfigEditResult {
-        val rootElement = JsonParser.parseString(content)
+        val rootElement = JsonParser.parseString(MixinConfigDiscoveryService.normalizeJsonContent(content))
         val root = when {
             rootElement.isJsonObject -> rootElement.asJsonObject
             rootElement.isJsonArray -> {
@@ -69,7 +79,7 @@ class MixinConfigEditor {
 
     fun listMixinClasses(content: String): List<String> {
         val config = parse(content)
-        return (config.mixins + config.client + config.server).distinct().sorted()
+        return (config.mixins + config.client + config.server + config.common).distinct().sorted()
     }
 
     private fun parseObject(obj: JsonObject, path: String): MixinConfigEntry {
@@ -80,6 +90,7 @@ class MixinConfigEditor {
             mixins = readArray(obj, "mixins"),
             client = readArray(obj, "client"),
             server = readArray(obj, "server"),
+            common = readArray(obj, "common"),
         )
     }
 

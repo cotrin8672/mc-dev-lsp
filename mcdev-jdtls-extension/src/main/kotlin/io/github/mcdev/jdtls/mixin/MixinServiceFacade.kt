@@ -7,6 +7,7 @@ import io.github.mcdev.core.definition.SourceScanEntry
 import io.github.mcdev.core.mixin.InjectMethodDescriptorMode
 import io.github.mcdev.core.mixin.MixinClassInsertMode
 import io.github.mcdev.core.mixin.MixinCompletionOptions
+import io.github.mcdev.core.mixin.MixinClassModel
 import io.github.mcdev.core.mixin.MixinDefinitionService
 import io.github.mcdev.core.mixin.MixinFacadeRequest
 import io.github.mcdev.core.mixin.MixinReferenceService
@@ -26,6 +27,7 @@ class MixinServiceFacade(
         CoreMixinServiceFacade(classIndex, bytecodeIndex)
     },
     private val referenceService: MixinReferenceService = MixinReferenceService(),
+    private val semanticModelParser: JdtMixinSemanticModelParser = JdtMixinSemanticModelParser(),
     private val completeOverride: ((
         session: McdevProjectSession,
         source: String,
@@ -42,6 +44,17 @@ class MixinServiceFacade(
         options: MixinCompletionOptions,
         documentUri: String = "file:///Mixin.java",
     ): List<McCompletionItem> =
+        complete(session, source, line, character, options, documentUri, semanticModel(source, documentUri))
+
+    fun complete(
+        session: McdevProjectSession,
+        source: String,
+        line: Int,
+        character: Int,
+        options: MixinCompletionOptions,
+        documentUri: String,
+        semanticModel: MixinClassModel,
+    ): List<McCompletionItem> =
         completeOverride?.invoke(session, source, line, character, options)
             ?: facade(session, source = source, documentUri = documentUri).complete(
                 MixinFacadeRequest(
@@ -49,6 +62,7 @@ class MixinServiceFacade(
                     line = line,
                     character = character,
                     documentUri = documentUri,
+                    semanticModel = semanticModel,
                 ),
                 options,
             )
@@ -97,9 +111,10 @@ class MixinServiceFacade(
         source: String,
         line: Int,
         character: Int,
+        documentUri: String = "file:///Mixin.java",
     ): List<McDefinitionTarget> =
         MixinDefinitionService(session.classIndex, session.bytecodeIndex)
-            .definitionsAt(source, line, character)
+            .definitionsAt(source, line, character, semanticModel(source, documentUri))
 
     fun references(
         session: McdevProjectSession,
@@ -170,6 +185,7 @@ class MixinServiceFacade(
     ): MixinFacadeRequest {
         val mixinConfig = selectedMixinConfig(projectContext, source)
         val mixinPackage = extractPackageName(source) ?: mixinConfig?.packageName
+        val semanticModel = semanticModel(source, documentUri)
         return MixinFacadeRequest(
             bufferText = source,
             line = 0,
@@ -179,6 +195,7 @@ class MixinServiceFacade(
             mixinPackage = mixinPackage,
             mixinConfigContent = mixinConfig?.path?.let(MixinConfigDiscoveryService::readContent),
             mixinConfigPath = mixinConfig?.path?.toString(),
+            semanticModel = semanticModel,
         )
     }
 
@@ -187,4 +204,7 @@ class MixinServiceFacade(
 
     private fun extractPackageName(source: String): String? =
         Regex("""^\s*package\s+([\w.]+)\s*;""", RegexOption.MULTILINE).find(source)?.groupValues?.get(1)
+
+    fun semanticModel(source: String, documentUri: String): MixinClassModel =
+        semanticModelParser.parse(source, documentUri)
 }

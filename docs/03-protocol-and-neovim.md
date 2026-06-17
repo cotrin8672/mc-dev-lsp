@@ -29,7 +29,7 @@ mcdev.info
 ```
 
 Do not design around arbitrary custom LSP methods unless JDT LS support is confirmed for the specific integration point.
-The current JDT LS bundle exposes mcdev navigation and hover through commands. It does not contribute to JDT LS `textDocument/definition`, `textDocument/references`, or `textDocument/hover`.
+The current JDT LS bundle exposes mcdev navigation and hover through commands. The Neovim adapter prefers standard `textDocument/definition`, `textDocument/references`, `textDocument/hover`, and `textDocument/codeAction` results when JDT LS provides them, then falls back to mcdev commands when the standard result is empty.
 
 `mcdev.hover` is a custom `workspace/executeCommand` request. The Neovim adapter binds `K` to this command when navigation support is enabled, so the current hover UI is mcdev-specific rather than the standard LSP hover provider. A future standard hover provider should keep `mcdev.hover` as a compatibility and debug command.
 

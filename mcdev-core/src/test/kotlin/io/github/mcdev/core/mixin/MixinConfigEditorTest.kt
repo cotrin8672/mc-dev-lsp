@@ -48,14 +48,31 @@ class MixinConfigEditorTest {
 
     @Test
     fun containsEntryChecksAllArrays() {
-        val content = """{ "mixins": [], "client": ["ClientMixin"] }"""
+        val content = """{ "mixins": [], "client": ["ClientMixin"], "common": ["CommonMixin"] }"""
         assertTrue(editor.containsEntry(content, "ClientMixin"))
+        assertTrue(editor.containsEntry(content, "CommonMixin"))
         assertFalse(editor.containsEntry(content, "MissingMixin"))
     }
 
     @Test
     fun listMixinClassesReturnsSortedDistinctEntries() {
-        val content = """{ "mixins": ["B", "A"], "client": ["A", "C"] }"""
-        assertEquals(listOf("A", "B", "C"), editor.listMixinClasses(content))
+        val content = """{ "mixins": ["B", "A"], "client": ["A", "C"], "common": ["D"] }"""
+        assertEquals(listOf("A", "B", "C", "D"), editor.listMixinClasses(content))
+    }
+
+    @Test
+    fun parsesJson5CommentsAndTrailingCommas() {
+        val content = """
+            {
+              // json5-style comment
+              "package": "example.mixin",
+              "mixins": ["AlphaMixin",],
+              "common": ["CommonMixin",],
+            }
+        """.trimIndent()
+        val config = editor.parse(content, "mod.mixins.json5")
+        assertEquals("example.mixin", config.packageName)
+        assertEquals(listOf("AlphaMixin"), config.mixins)
+        assertEquals(listOf("CommonMixin"), config.common)
     }
 }

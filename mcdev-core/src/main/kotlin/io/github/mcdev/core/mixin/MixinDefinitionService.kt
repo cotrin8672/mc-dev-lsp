@@ -12,23 +12,28 @@ class MixinDefinitionService(
     private val accessorService: AccessorService = AccessorService(classIndex),
     private val invokerService: InvokerService = InvokerService(classIndex),
 ) {
-    fun definitionsAt(source: String, line: Int, character: Int): List<McDefinitionTarget> {
+    fun definitionsAt(
+        source: String,
+        line: Int,
+        character: Int,
+        semanticModel: MixinClassModel? = null,
+    ): List<McDefinitionTarget> {
         val offset = AnnotationContextExtractor.toOffset(source, line, character) ?: return emptyList()
-        return definitionsAtOffset(source, offset)
+        return definitionsAtOffset(source, offset, semanticModel)
     }
 
-    fun definitionsAtOffset(source: String, offset: Int): List<McDefinitionTarget> {
+    fun definitionsAtOffset(source: String, offset: Int, semanticModel: MixinClassModel? = null): List<McDefinitionTarget> {
         if (offset < 0 || offset > source.length) return emptyList()
 
         val context = AnnotationContextExtractor.extractAtOffset(source, offset)
         if (context != null) {
-            val fromContext = resolveFromAnnotationContext(source, context)
+            val fromContext = resolveFromAnnotationContext(source, context, semanticModel)
             if (fromContext.isNotEmpty()) return fromContext
         }
 
         resolveAtTargetStringAtOffset(source, offset)?.let { return it }
 
-        return resolveFromMemberDeclaration(source, offset)
+        return resolveFromMemberDeclaration(source, offset, semanticModel)
     }
 
     private fun resolveAtTargetStringAtOffset(source: String, offset: Int): List<McDefinitionTarget>? {
@@ -57,6 +62,7 @@ class MixinDefinitionService(
     private fun resolveFromAnnotationContext(
         source: String,
         context: AnnotationContext,
+        semanticModel: MixinClassModel?,
     ): List<McDefinitionTarget> =
         when (context.annotation) {
             MixinAnnotation.MIXIN -> when (context.slot) {
@@ -74,11 +80,11 @@ class MixinDefinitionService(
                 else -> emptyList()
             }
             MixinAnnotation.ACCESSOR -> when (context.slot) {
-                AnnotationSlot.ACCESSOR_VALUE -> resolveAccessorTarget(source, context)
+                AnnotationSlot.ACCESSOR_VALUE -> resolveAccessorTarget(source, context, semanticModel)
                 else -> emptyList()
             }
             MixinAnnotation.INVOKER -> when (context.slot) {
-                AnnotationSlot.INVOKER_VALUE -> resolveInvokerTarget(source, context)
+                AnnotationSlot.INVOKER_VALUE -> resolveInvokerTarget(source, context, semanticModel)
                 else -> emptyList()
             }
             MixinAnnotation.AT -> when (context.slot) {
@@ -137,7 +143,58 @@ class MixinDefinitionService(
         )
     }
 
-    private fun resolveFromMemberDeclaration(source: String, offset: Int): List<McDefinitionTarget> {
+    private fun resolveFromMemberDeclaration(
+        source: String,
+        offset: Int,
+        semanticModel: MixinClassModel?,
+    ): List<McDefinitionTarget> {
+        semanticModel?.members?.firstOrNull { member ->
+            offset in positionToOffset(source, member.nameRange.start) until positionToOffset(source, member.nameRange.end)
+        }?.let { member ->
+            val mixinTargets = resolveMixinTargets(source, null, semanticModel)
+            return when (member.annotationKind) {
+                MixinMemberAnnotationKind.SHADOW,
+                MixinMemberAnnotationKind.OVERWRITE,
+                -> resolveMemberInTargets(
+                    mixinTargets = mixinTargets,
+                    name = member.explicitTargetName ?: member.javaName,
+                    isMethod = member.methodDescriptor != null,
+                    descriptor = member.methodDescriptor ?: member.returnDescriptor.orEmpty(),
+                    sourceRange = member.nameRange,
+                )
+                MixinMemberAnnotationKind.ACCESSOR -> {
+                    val declaration = AccessorMethodDeclaration(
+                        methodName = member.javaName,
+                        returnTypeDescriptor = member.returnDescriptor,
+                        parameterDescriptors = member.parameterDescriptors,
+                        explicitFieldName = member.explicitTargetName,
+                        range = member.range,
+                        parseSource = member.parseSource,
+                        confidence = member.confidence,
+                        warnings = member.warnings,
+                    )
+                    accessorService.inferFieldName(declaration)?.let {
+                        resolveFieldInTargets(mixinTargets, it, member.nameRange)
+                    }.orEmpty()
+                }
+                MixinMemberAnnotationKind.INVOKER -> {
+                    val declaration = InvokerMethodDeclaration(
+                        methodName = member.javaName,
+                        parameterDescriptors = member.parameterDescriptors,
+                        returnTypeDescriptor = member.returnDescriptor,
+                        explicitTargetName = member.explicitTargetName,
+                        range = member.range,
+                        parseSource = member.parseSource,
+                        confidence = member.confidence,
+                        warnings = member.warnings,
+                    )
+                    val targetName = declaration.explicitTargetName ?: invokerService.inferTargetName(declaration)
+                    targetName?.let {
+                        resolveMethodInTargets(mixinTargets, it, member.nameRange, member.methodDescriptor)
+                    }.orEmpty()
+                }
+            }
+        }
         findShadowMemberAtOffset(source, offset)?.let { declaration ->
             return resolveShadowMemberAtOffset(source, offset)
         }
@@ -177,13 +234,14 @@ class MixinDefinitionService(
     private fun resolveAccessorTarget(
         source: String,
         context: AnnotationContext,
+        semanticModel: MixinClassModel?,
     ): List<McDefinitionTarget> {
         val declaration = findAccessorDeclarationNear(source, context)
         if (declaration == null && hasMemberParseFailureNear(source, context)) return emptyList()
         val fieldName = context.partialValue.trim('"').ifEmpty {
             declaration?.let { accessorService.inferFieldName(it) }
         } ?: return emptyList()
-        val mixinTargets = resolveMixinTargets(source, context)
+        val mixinTargets = resolveMixinTargets(source, context, semanticModel)
         val range = offsetRange(source, context.valueStartOffset, context.valueEndOffset)
         return resolveFieldInTargets(mixinTargets, fieldName, range)
     }
@@ -191,13 +249,14 @@ class MixinDefinitionService(
     private fun resolveInvokerTarget(
         source: String,
         context: AnnotationContext,
+        semanticModel: MixinClassModel?,
     ): List<McDefinitionTarget> {
         val declaration = findInvokerDeclarationNear(source, context)
         if (declaration == null && hasMemberParseFailureNear(source, context)) return emptyList()
         val methodName = context.partialValue.trim('"').ifEmpty {
             declaration?.let { invokerService.inferTargetName(it) }
         } ?: return emptyList()
-        val mixinTargets = resolveMixinTargets(source, context)
+        val mixinTargets = resolveMixinTargets(source, context, semanticModel)
         val range = offsetRange(source, context.valueStartOffset, context.valueEndOffset)
         val descriptor = declaration?.let(::descriptorFromInvokerDeclaration)
         return resolveMethodInTargets(mixinTargets, methodName, range, descriptor)
@@ -302,10 +361,18 @@ class MixinDefinitionService(
             resolveFieldInTargets(mixinTargets, name, sourceRange)
         }
 
-    private fun resolveMixinTargets(source: String, context: AnnotationContext): List<String> {
-        val rawTargets = context.mixinTargetInternalNames.ifEmpty {
+    private fun resolveMixinTargets(
+        source: String,
+        context: AnnotationContext?,
+        semanticModel: MixinClassModel? = null,
+    ): List<String> {
+        semanticModel?.targets
+            ?.mapNotNull { target -> MixinTargetResolver.resolveTarget(target.internalName, classIndex) ?: target.internalName.takeIf { '/' in it } }
+            ?.takeIf { it.isNotEmpty() }
+            ?.let { return it }
+        val rawTargets = context?.mixinTargetInternalNames?.ifEmpty {
             AnnotationContextExtractor.resolveRawMixinTargets(source, context.valueStartOffset)
-        }
+        } ?: AnnotationContextExtractor.resolveRawMixinTargets(source, 0)
         return MixinTargetResolver.resolveTargets(rawTargets, classIndex, JavaTypeDescriptorResolver.importsFor(source))
     }
 

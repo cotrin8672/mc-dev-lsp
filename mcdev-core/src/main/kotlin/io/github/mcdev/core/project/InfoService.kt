@@ -19,12 +19,15 @@ object InfoService {
         lines += "Runtime namespace: ${formatNamespace(context.mappings.runtimeNamespace)}"
         lines += formatMinecraftJarLine(context)
         lines += formatMixinConfigLine(context)
+        lines += formatMixinConfigReasonLine(context)
         lines += formatAccessWidenerLine(context)
         lines += formatAccessTransformerLine(context)
         lines += "Classpath entries: ${context.classpath.entryCount}"
+        lines += formatClasspathReasonLine(context)
         lines += "Source sets: ${context.sourceSets.size}"
         lines += "Class index: ${formatIndexState(context.indexState)}"
         lines += "Bytecode index: ${formatIndexState(context.indexState)}"
+        lines += formatMappingReasonLine(context)
         lines += "Protocol: $protocolVersion"
         lines += "Extension: $extensionVersion"
 
@@ -81,6 +84,27 @@ object InfoService {
             else -> "Mixin config: $count files"
         }
     }
+
+    private fun formatMixinConfigReasonLine(context: ProjectContext): String =
+        if (context.mixinConfigs.isNotEmpty()) {
+            "Mixin config search: ${context.mixinConfigs.joinToString { it.path.toString() }}"
+        } else {
+            "Mixin config search: none found under ${context.root}"
+        }
+
+    private fun formatClasspathReasonLine(context: ProjectContext): String =
+        if (context.classpath.entryCount > 0) {
+            "Classpath source: project outputs=${context.classpath.projectOutputs.size}, dependencies=${context.classpath.dependencyJars.size}, minecraft=${context.classpath.minecraftJars.size}"
+        } else {
+            "Classpath source: empty (no project outputs, dependency jars, or minecraft jars discovered)"
+        }
+
+    private fun formatMappingReasonLine(context: ProjectContext): String =
+        if (context.mappings.availableNamespaces.isNotEmpty()) {
+            "Mapping namespaces: ${context.mappings.availableNamespaces.joinToString { formatNamespace(it) }}"
+        } else {
+            "Mapping namespaces: none (searched project mapping files and known Gradle mapping caches)"
+        }
 
     private fun formatAccessWidenerLine(context: ProjectContext): String {
         val count = context.accessWideners.size

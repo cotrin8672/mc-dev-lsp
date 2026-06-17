@@ -13,6 +13,7 @@ data class MixinDiagnosticRequest(
     val mixinPackage: String?,
     val mixinConfigContent: String?,
     val mixinConfigPath: String?,
+    val semanticModel: MixinClassModel? = null,
 )
 
 class MixinDiagnosticsService(
@@ -24,7 +25,7 @@ class MixinDiagnosticsService(
 ) {
     fun analyze(request: MixinDiagnosticRequest): List<McDiagnostic> {
         val diagnostics = mutableListOf<McDiagnostic>()
-        val model = MixinSemanticModelParser.parse(request.source)
+        val model = request.semanticModel ?: MixinSemanticModelParser.parse(request.source, request.documentUri)
         diagnostics += analyzeMixinTargets(request, model)
         diagnostics += analyzeMixinConfig(request)
         diagnostics += analyzeInjectMethods(request, model)
@@ -88,7 +89,7 @@ class MixinDiagnosticsService(
         val mixinName = request.mixinClassName ?: return emptyList()
         val configContent = request.mixinConfigContent ?: return emptyList()
         val config = configEditor.parse(configContent, request.mixinConfigPath.orEmpty())
-        val listed = config.mixins + config.client + config.server
+        val listed = config.mixins + config.client + config.server + config.common
         if (mixinName !in listed) {
             val classDecl = Regex("""\bclass\s+(\w+)""").find(request.source)
             val range = classDecl?.let {

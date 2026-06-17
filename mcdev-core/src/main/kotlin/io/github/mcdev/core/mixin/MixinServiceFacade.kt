@@ -20,6 +20,7 @@ data class MixinFacadeRequest(
     val mixinPackage: String? = null,
     val mixinConfigContent: String? = null,
     val mixinConfigPath: String? = null,
+    val semanticModel: MixinClassModel? = null,
 )
 
 class MixinServiceFacade(
@@ -60,7 +61,7 @@ class MixinServiceFacade(
         val offset = AnnotationContextExtractor.toOffset(request.bufferText, request.line, request.character)
             ?: return emptyList()
         val context = AnnotationContextExtractor.extractAtOffset(request.bufferText, offset) ?: return emptyList()
-        return routeCompletion(request.bufferText, context, options)
+        return routeCompletion(request, context, options)
     }
 
     fun diagnose(request: MixinFacadeRequest): List<McDiagnostic> {
@@ -73,9 +74,10 @@ class MixinServiceFacade(
                 mixinPackage = request.mixinPackage,
                 mixinConfigContent = request.mixinConfigContent,
                 mixinConfigPath = request.mixinConfigPath,
+                semanticModel = request.semanticModel,
             ),
         )
-        diagnostics += analyzeMemberDeclarations(request.bufferText)
+        diagnostics += analyzeMemberDeclarations(request)
         diagnostics += mixinExtrasDiagnostics.analyze(
             MixinExtrasDiagnosticRequest(
                 source = request.bufferText,
@@ -108,11 +110,12 @@ class MixinServiceFacade(
     }
 
     private fun routeCompletion(
-        source: String,
+        request: MixinFacadeRequest,
         context: AnnotationContext,
         options: MixinCompletionOptions,
-    ): List<McCompletionItem> =
-        when (context.annotation) {
+    ): List<McCompletionItem> {
+        val source = request.bufferText
+        return when (context.annotation) {
             MixinAnnotation.MIXIN -> mixinTargetCompletion.complete(context, options)
             MixinAnnotation.INJECT,
             MixinAnnotation.REDIRECT,
@@ -120,22 +123,22 @@ class MixinServiceFacade(
             MixinAnnotation.MODIFY_ARGS,
             MixinAnnotation.MODIFY_VARIABLE,
             MixinAnnotation.MODIFY_CONSTANT,
-            -> injectMethodCompletion.complete(context.withResolvedMixinTargets(source), options)
-            in mixinExtrasMethodAnnotations -> completeMixinExtrasMethod(source, context, options)
+            -> injectMethodCompletion.complete(context.withResolvedMixinTargets(request), options)
+            in mixinExtrasMethodAnnotations -> completeMixinExtrasMethod(request, context, options)
             MixinAnnotation.AT -> when (context.slot) {
                 AnnotationSlot.VALUE -> {
                     val expressionItems = expressionSupport.completeAtValue(context)
                     if (expressionItems.isNotEmpty()) expressionItems else atValueCompletion.complete(context)
                 }
                 AnnotationSlot.TARGET -> {
-                    val extrasItems = mixinExtrasCompletion.complete(context.withResolvedMixinTargets(source), options)
-                    if (extrasItems.isNotEmpty()) extrasItems else completeAtTarget(source, context)
+                    val extrasItems = mixinExtrasCompletion.complete(context.withResolvedMixinTargets(request), options)
+                    if (extrasItems.isNotEmpty()) extrasItems else completeAtTarget(request, context)
                 }
                 else -> emptyList()
             }
             MixinAnnotation.ACCESSOR -> if (context.slot == AnnotationSlot.ACCESSOR_VALUE) {
                 accessorService.completeFields(
-                    mixinTargets = resolveMixinTargets(source, context),
+                    mixinTargets = resolveMixinTargets(request, context),
                     prefix = context.partialValue.trim('"'),
                 )
             } else {
@@ -143,22 +146,23 @@ class MixinServiceFacade(
             }
             MixinAnnotation.INVOKER -> if (context.slot == AnnotationSlot.INVOKER_VALUE) {
                 invokerService.completeMethods(
-                    mixinTargets = resolveMixinTargets(source, context),
+                    mixinTargets = resolveMixinTargets(request, context),
                     prefix = context.partialValue.trim('"'),
                 )
             } else {
                 emptyList()
             }
-            MixinAnnotation.SHADOW -> completeShadow(source, context)
+            MixinAnnotation.SHADOW -> completeShadow(request, context)
             else -> emptyList()
         }
+    }
 
     private fun completeMixinExtrasMethod(
-        source: String,
+        request: MixinFacadeRequest,
         context: AnnotationContext,
         options: MixinCompletionOptions,
     ): List<McCompletionItem> {
-        val resolvedContext = context.withResolvedMixinTargets(source)
+        val resolvedContext = context.withResolvedMixinTargets(request)
         val extrasItems = mixinExtrasCompletion.complete(resolvedContext, options)
         if (extrasItems.isNotEmpty() || context.annotation != MixinAnnotation.MODIFY_RECEIVER) {
             return extrasItems
@@ -166,8 +170,9 @@ class MixinServiceFacade(
         return injectMethodCompletion.complete(resolvedContext, options)
     }
 
-    private fun completeAtTarget(source: String, context: AnnotationContext): List<McCompletionItem> {
-        val owners = resolveMixinTargets(source, context)
+    private fun completeAtTarget(request: MixinFacadeRequest, context: AnnotationContext): List<McCompletionItem> {
+        val source = request.bufferText
+        val owners = resolveMixinTargets(request, context)
         val owner = owners.firstOrNull() ?: return emptyList()
         val methodTarget = parseMethodTarget(
             context.injectMethodName
@@ -206,7 +211,15 @@ class MixinServiceFacade(
         return Regex("""value\s*=\s*"([^"]*)"""").find(body)?.groupValues?.get(1)
     }
 
-    private fun resolveMixinTargets(source: String, context: AnnotationContext): List<String> {
+    private fun resolveMixinTargets(request: MixinFacadeRequest, context: AnnotationContext): List<String> {
+        val source = request.bufferText
+        request.semanticModel?.targets
+            ?.mapNotNull {
+                MixinTargetResolver.resolveTarget(it.internalName, classIndex)
+                    ?: it.internalName.takeIf { name -> '/' in name }
+            }
+            ?.takeIf { it.isNotEmpty() }
+            ?.let { return it }
         val rawTargets = context.mixinTargetInternalNames.ifEmpty {
             AnnotationContextExtractor.resolveRawMixinTargets(source, context.valueStartOffset)
         }
@@ -252,13 +265,13 @@ class MixinServiceFacade(
         return null
     }
 
-    private fun AnnotationContext.withResolvedMixinTargets(source: String): AnnotationContext =
-        copy(mixinTargetInternalNames = resolveMixinTargets(source, this))
+    private fun AnnotationContext.withResolvedMixinTargets(request: MixinFacadeRequest): AnnotationContext =
+        copy(mixinTargetInternalNames = resolveMixinTargets(request, this))
 
-    private fun completeShadow(source: String, context: AnnotationContext): List<McCompletionItem> {
+    private fun completeShadow(request: MixinFacadeRequest, context: AnnotationContext): List<McCompletionItem> {
         if (context.slot != AnnotationSlot.SHADOW_MEMBER) return emptyList()
         val prefix = context.partialValue
-        val targets = resolveMixinTargets(source, context)
+        val targets = resolveMixinTargets(request, context)
         val fields = shadowValidation.completeFields(targets, prefix, context.shadowPrefix)
         val methods = shadowValidation.completeMethods(targets, prefix, context.shadowPrefix)
         val fieldItems = fields.map { field ->
@@ -292,21 +305,80 @@ class MixinServiceFacade(
         return fieldItems + methodItems
     }
 
-    private fun analyzeMemberDeclarations(source: String): List<McDiagnostic> {
+    private fun analyzeMemberDeclarations(request: MixinFacadeRequest): List<McDiagnostic> {
+        val source = request.bufferText
         val mixinTargets = MixinTargetResolver.resolveTargetsFromSource(source, classIndex)
         if (mixinTargets.isEmpty()) return emptyList()
         val diagnostics = mutableListOf<McDiagnostic>()
-        MixinMemberDeclarationParser.parseShadowDeclarations(source, classIndex).forEach { declaration ->
+        semanticShadowDeclarations(request).forEach { declaration ->
             val prefix = MixinMemberDeclarationParser.findShadowPrefix(source)
             val remap = MixinMemberDeclarationParser.findShadowRemap(source)
             diagnostics += shadowValidation.validate(mixinTargets, declaration, prefix, remap)
         }
-        MixinMemberDeclarationParser.parseAccessorDeclarations(source, classIndex).forEach { declaration ->
+        semanticAccessorDeclarations(request).forEach { declaration ->
             diagnostics += accessorService.validate(mixinTargets, declaration)
         }
-        MixinMemberDeclarationParser.parseInvokerDeclarations(source, classIndex).forEach { declaration ->
+        semanticInvokerDeclarations(request).forEach { declaration ->
             diagnostics += invokerService.validate(mixinTargets, declaration)
         }
         return diagnostics
+    }
+
+    private fun semanticShadowDeclarations(request: MixinFacadeRequest): List<ShadowMemberDeclaration> {
+        val members = request.semanticModel?.members
+            ?.filter { it.annotationKind == MixinMemberAnnotationKind.SHADOW }
+            .orEmpty()
+        if (members.isEmpty()) return MixinMemberDeclarationParser.parseShadowDeclarations(request.bufferText, classIndex)
+        return members.mapNotNull { member ->
+            val descriptor = member.methodDescriptor ?: member.returnDescriptor ?: return@mapNotNull null
+            ShadowMemberDeclaration(
+                name = member.javaName,
+                isMethod = member.methodDescriptor != null,
+                descriptor = descriptor,
+                isStatic = JavaModifier.STATIC in member.modifiers,
+                range = member.range,
+                parseSource = member.parseSource,
+                confidence = member.confidence,
+                warnings = member.warnings,
+            )
+        }
+    }
+
+    private fun semanticAccessorDeclarations(request: MixinFacadeRequest): List<AccessorMethodDeclaration> {
+        val members = request.semanticModel?.members
+            ?.filter { it.annotationKind == MixinMemberAnnotationKind.ACCESSOR }
+            .orEmpty()
+        if (members.isEmpty()) return MixinMemberDeclarationParser.parseAccessorDeclarations(request.bufferText, classIndex)
+        return members.mapNotNull { member ->
+            AccessorMethodDeclaration(
+                methodName = member.javaName,
+                returnTypeDescriptor = member.returnDescriptor ?: return@mapNotNull null,
+                parameterDescriptors = member.parameterDescriptors,
+                explicitFieldName = member.explicitTargetName,
+                range = member.range,
+                parseSource = member.parseSource,
+                confidence = member.confidence,
+                warnings = member.warnings,
+            )
+        }
+    }
+
+    private fun semanticInvokerDeclarations(request: MixinFacadeRequest): List<InvokerMethodDeclaration> {
+        val members = request.semanticModel?.members
+            ?.filter { it.annotationKind == MixinMemberAnnotationKind.INVOKER }
+            .orEmpty()
+        if (members.isEmpty()) return MixinMemberDeclarationParser.parseInvokerDeclarations(request.bufferText, classIndex)
+        return members.mapNotNull { member ->
+            InvokerMethodDeclaration(
+                methodName = member.javaName,
+                parameterDescriptors = member.parameterDescriptors,
+                returnTypeDescriptor = member.returnDescriptor ?: return@mapNotNull null,
+                explicitTargetName = member.explicitTargetName,
+                range = member.range,
+                parseSource = member.parseSource,
+                confidence = member.confidence,
+                warnings = member.warnings,
+            )
+        }
     }
 }

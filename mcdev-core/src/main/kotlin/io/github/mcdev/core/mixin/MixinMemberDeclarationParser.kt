@@ -6,6 +6,7 @@ import io.github.mcdev.core.diagnostics.McDiagnostic
 import io.github.mcdev.core.diagnostics.McSeverity
 
 enum class ParseSource {
+    HAND_WRITTEN_FALLBACK,
     HAND_WRITTEN,
     JDT_AST,
     FALLBACK_REGEX,

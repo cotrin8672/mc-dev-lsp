@@ -5,12 +5,22 @@ local bundle_jar = vim.env.MCDEV_BUNDLE_JAR
 local workspace = vim.env.MCDEV_E2E_WORKSPACE
 local jdtls_cmd = vim.env.JDTLS_CMD
 local fixture = vim.env.MCDEV_E2E_FIXTURE or "fabric-basic"
+local progress_log = vim.fn.getcwd() .. "/build/e2e-progress.log"
+
+local function log_step(message)
+  vim.fn.mkdir(vim.fn.fnamemodify(progress_log, ":h"), "p")
+  vim.fn.writefile({ os.date("%Y-%m-%d %H:%M:%S ") .. message }, progress_log, "a")
+end
+
+vim.fn.writefile({}, progress_log)
+log_step("starting osgi bundle e2e for " .. fixture)
 
 helpers.assert_not_nil(bundle_jar, "MCDEV_BUNDLE_JAR is required")
 helpers.assert_not_nil(workspace, "MCDEV_E2E_WORKSPACE is required")
 helpers.assert_not_nil(jdtls_cmd, "JDTLS_CMD is required")
 helpers.assert_true(vim.fn.filereadable(bundle_jar) == 1, "bundle jar must exist: " .. bundle_jar)
 helpers.assert_true(vim.fn.isdirectory(workspace) == 1, "workspace must exist: " .. workspace)
+log_step("environment validated")
 
 local fixture_specs = {
   ["fabric-basic"] = {
@@ -43,6 +53,7 @@ local fixture_spec = fixture_specs[fixture] or fixture_specs["fabric-basic"]
 local mixin_file = fixture_spec.mixin and (workspace .. "/" .. fixture_spec.mixin) or nil
 local aw_file = fixture_spec.aw and (workspace .. "/" .. fixture_spec.aw) or nil
 local at_file = fixture_spec.at and (workspace .. "/" .. fixture_spec.at) or nil
+log_step("fixture paths built")
 
 if mixin_file then
   helpers.assert_true(vim.fn.filereadable(mixin_file) == 1, fixture .. " mixin file must exist: " .. mixin_file)
@@ -53,6 +64,7 @@ end
 if at_file then
   helpers.assert_true(vim.fn.filereadable(at_file) == 1, fixture .. " AT file must exist: " .. at_file)
 end
+log_step("fixture files validated")
 
 local function workspace_uri(path)
   return vim.uri_from_fname(path)
@@ -60,12 +72,19 @@ end
 
 local data_dir = vim.fn.stdpath("cache") .. "/mcdev-osgi-e2e-jdtls"
 vim.fn.mkdir(data_dir, "p")
+log_step("data dir prepared")
 
 local workspace_root_uri = workspace_uri(workspace)
+log_step("workspace uri built")
+local jdtls_launch_cmd = { jdtls_cmd, "-data", data_dir }
+if vim.fn.has("win32") == 1 and jdtls_cmd:lower():sub(-4) == ".cmd" then
+  jdtls_launch_cmd = { "cmd.exe", "/C", (jdtls_cmd:gsub("\\", "/")), "-data", (data_dir:gsub("\\", "/")) }
+end
+log_step("jdtls launch cmd: " .. table.concat(jdtls_launch_cmd, " "))
 
-local client_id = vim.lsp.start({
+local client_id = vim.lsp.start_client({
   name = "jdtls",
-  cmd = { jdtls_cmd, "-data", data_dir },
+  cmd = jdtls_launch_cmd,
   root_dir = workspace,
   workspace_folders = {
     {
@@ -83,6 +102,7 @@ local client_id = vim.lsp.start({
 })
 
 helpers.assert_not_nil(client_id, "failed to start jdtls client")
+log_step("started jdtls client " .. tostring(client_id))
 
 local initialized = vim.wait(180000, function()
   local client = vim.lsp.get_client_by_id(client_id)
@@ -100,8 +120,10 @@ end
 
 local client = vim.lsp.get_client_by_id(client_id)
 helpers.assert_not_nil(client, "jdtls client disappeared after initialize")
+log_step("jdtls initialized")
 
 local function sync_request(method, params, timeout_ms)
+  log_step("request " .. method)
   local result = nil
   local err = nil
   client:request(method, params, function(request_err, request_result)
@@ -112,10 +134,15 @@ local function sync_request(method, params, timeout_ms)
     return result ~= nil or err ~= nil
   end, 100)
   helpers.assert_true(completed, method .. " timed out")
+  log_step("response " .. method .. " err=" .. tostring(err ~= nil) .. " result=" .. tostring(result ~= nil))
+  if err ~= nil then
+    log_step("error " .. method .. " " .. vim.inspect(err))
+  end
   return result, err
 end
 
 local function mcdev_command(command, payload, timeout_ms)
+  log_step("command " .. command)
   return sync_request("workspace/executeCommand", {
     command = command,
     arguments = { payload },
@@ -154,6 +181,7 @@ sync_request("workspace/executeCommand", {
   command = "java.reloadBundles",
   arguments = { { bundle_jar } },
 }, 120000)
+log_step("reload bundles requested")
 
 if mixin_file then
 with_buffer(mixin_file, "java", nil, function(bufnr)
@@ -375,4 +403,5 @@ with_buffer(at_file, "accesstransformer", {
 end)
 
 print("mcdev osgi bundle e2e passed for " .. fixture)
+log_step("passed")
 vim.cmd("qa!")

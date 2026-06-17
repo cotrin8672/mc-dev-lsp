@@ -2,6 +2,7 @@ local config = require("mcdev.config")
 local navigation = require("mcdev.navigation")
 local code_action = require("mcdev.code_action")
 local hover = require("mcdev.hover")
+local lsp = require("mcdev.lsp")
 
 local M = {}
 
@@ -45,19 +46,37 @@ function M.setup(bufnr)
   local nav_opts = config.options.navigation or {}
   if nav_opts.enable then
     vim.keymap.set("n", "gd", function()
-      navigation.definition(bufnr, nil, function(locations, err, raw_locations)
+      local provider = config.options.standard_lsp.prefer and lsp.definition or navigation.definition
+      provider(bufnr, nil, function(locations, err, raw_locations)
         goto_location(locations, err, "definition", raw_locations)
       end)
     end, { buffer = bufnr, desc = "Mcdev go to definition" })
 
     vim.keymap.set("n", "gr", function()
-      navigation.references(bufnr, nil, function(locations, err)
+      local provider = config.options.standard_lsp.prefer and lsp.references or navigation.references
+      provider(bufnr, nil, function(locations, err)
         goto_location(locations, err, "references")
       end)
     end, { buffer = bufnr, desc = "Mcdev find references" })
 
     vim.keymap.set("n", "K", function()
-      hover.show(bufnr)
+      if config.options.standard_lsp.prefer then
+        lsp.hover(bufnr, nil, function(result, err)
+          if err then
+            vim.notify(tostring(err), vim.log.levels.WARN)
+            return
+          end
+          local contents = result and (result.contents or result)
+          if contents and contents.value then contents = { contents.value } end
+          if contents and #contents > 0 then
+            vim.lsp.util.open_floating_preview(contents, "markdown", { border = "rounded" })
+          else
+            hover.show(bufnr)
+          end
+        end)
+      else
+        hover.show(bufnr)
+      end
     end, { buffer = bufnr, desc = "Mcdev hover" })
   end
 
@@ -73,7 +92,8 @@ function M.setup(bufnr)
       local diagnostic_codes = vim.tbl_map(function(diagnostic)
         return diagnostic.code
       end, vim.diagnostic.get(bufnr, { namespace = require("mcdev.diagnostics").namespace }))
-      code_action.code_actions(bufnr, range, diagnostic_codes, function(actions, err)
+      local provider = config.options.standard_lsp.prefer and lsp.code_actions or code_action.code_actions
+      provider(bufnr, range, diagnostic_codes, function(actions, err)
         if err then
           vim.notify(tostring(err), vim.log.levels.WARN)
           return

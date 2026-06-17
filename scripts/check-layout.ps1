@@ -36,4 +36,28 @@ foreach ($forbidden in @("parseDescriptor", "remap", "scanJar")) {
     }
 }
 
+$memberResolutionFiles = @(
+    "mcdev-core/src/main/kotlin/io/github/mcdev/core/at/AtMemberResolver.kt",
+    "mcdev-core/src/main/kotlin/io/github/mcdev/core/at/AccessTransformerDefinitionService.kt",
+    "mcdev-core/src/main/kotlin/io/github/mcdev/core/aw/AccessWidenerDefinitionService.kt",
+    "mcdev-core/src/main/kotlin/io/github/mcdev/core/mixin/MixinDefinitionService.kt"
+)
+
+foreach ($path in $memberResolutionFiles) {
+    if (-not (Test-Path -LiteralPath $path)) {
+        throw "Missing member resolution file: $path"
+    }
+    $source = Get-Content -Raw -LiteralPath $path
+    if ($source -match "\.first\(\)" -or $source -match "firstOrNull\(\)\s*\?:" ) {
+        throw "Forbidden first-overload fallback in member resolution file: $path"
+    }
+}
+
+$resolverSource = Get-Content -Raw -LiteralPath "mcdev-core/src/main/kotlin/io/github/mcdev/core/mixin/MemberResolver.kt"
+foreach ($marker in @("EXACT_DESCRIPTOR_REQUIRED", "SINGLE_CANDIDATE_IF_DESCRIPTOR_MISSING", "ALLOW_AMBIGUOUS_FOR_COMPLETION")) {
+    if (-not $resolverSource.Contains($marker)) {
+        throw "MemberResolver is missing ambiguity policy marker: $marker"
+    }
+}
+
 Write-Host "layout check passed"

@@ -5,11 +5,11 @@
 ### Member Parser Status
 
 `@Shadow`, `@Accessor`, `@Invoker`, and `@Overwrite` member declarations are currently parsed by a strengthened
-hand-written parser. The parser handles common multiline declarations, parameter annotations, generic erasure, arrays,
+JDT AST/binding-backed semantic model in JDT LS runtime, with a hand-written fallback parser for non-JDT paths. The fallback handles common multiline declarations, parameter annotations, generic erasure, arrays,
 varargs, explicit imports, `java.lang` types, selected well-known Mixin/Minecraft types, and class-index-confirmed
 same-package or wildcard imports.
 
-This parser is not JDT AST/binding based yet. Unresolved or ambiguous Java types are reported as diagnostics instead of
+When JDT AST APIs are unavailable, unresolved or ambiguous Java types are reported as diagnostics instead of
 being converted to guessed JVM descriptors, and definition/code-action paths are expected to stop when the handler
 descriptor cannot be resolved safely.
 

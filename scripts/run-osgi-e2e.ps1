@@ -9,7 +9,11 @@ try {
     & powershell -NoProfile -ExecutionPolicy Bypass -File (Join-Path $PSScriptRoot "prepare-e2e-workspace.ps1")
     if ($LASTEXITCODE -ne 0) { throw "workspace preparation failed" }
 
-    $bundleJar = Join-Path $repoRoot "mcdev-jdtls-extension/build/libs/io.github.mcdev.jdtls-0.1.0-SNAPSHOT.jar"
+    $bundleJar = Get-ChildItem -LiteralPath (Join-Path $repoRoot "mcdev-jdtls-extension/build/libs") `
+        -Filter "io.github.mcdev.jdtls-*.jar" |
+        Sort-Object LastWriteTime -Descending |
+        Select-Object -First 1 -ExpandProperty FullName
+    if (-not $bundleJar) { throw "bundle jar not found" }
     $workspace = Join-Path $repoRoot "build/e2e-workspace"
     $jdtlsCmd = $env:JDTLS_CMD
     if (-not $jdtlsCmd) {
@@ -24,6 +28,10 @@ try {
     $env:MCDEV_BUNDLE_JAR = $bundleJar
     $env:MCDEV_E2E_WORKSPACE = $workspace
     $env:JDTLS_CMD = $jdtlsCmd
+    if ($env:MCDEV_JDTLS_JAVA_HOME) {
+        $env:JAVA_HOME = $env:MCDEV_JDTLS_JAVA_HOME
+        $env:PATH = (Join-Path $env:MCDEV_JDTLS_JAVA_HOME "bin") + [IO.Path]::PathSeparator + $env:PATH
+    }
 
     nvim --headless `
         -u (Join-Path $repoRoot "mcdev-nvim/tests/e2e/minimal_init.lua") `

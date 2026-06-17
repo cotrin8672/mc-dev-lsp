@@ -1,12 +1,15 @@
 plugins {
-    id 'fabric-loom' version '1.8-SNAPSHOT'
+    id 'java'
     id 'maven-publish'
 }
 
+repositories {
+    mavenCentral()
+}
+
 dependencies {
-    minecraft "com.mojang:minecraft:1.21.1"
-    mappings loom.officialMojangMappings()
-    modImplementation "net.fabricmc:fabric-loader:0.16.9"
-    modImplementation "net.fabricmc.fabric-api:fabric-api:0.110.0+1.21.1"
+    // fabric-loom marker for mcdev platform detection; this fixture is imported
+    // by JDT LS without resolving the live Loom plugin.
+    compileOnly "org.spongepowered:mixin:0.8.7"
     annotationProcessor "org.spongepowered:mixin:0.8.7"
 }

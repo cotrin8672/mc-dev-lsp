@@ -4,7 +4,11 @@ import io.github.mcdev.core.mapping.FieldRef
 import io.github.mcdev.core.mapping.MappingLookupResult
 import io.github.mcdev.core.mapping.ProjectMappingContext
 import io.github.mcdev.core.mixin.ClassIndex
+import io.github.mcdev.core.mixin.AmbiguityPolicy
+import io.github.mcdev.core.mixin.ClassIndexMemberResolver
 import io.github.mcdev.core.mixin.FieldIndexEntry
+import io.github.mcdev.core.mixin.FieldResolution
+import io.github.mcdev.core.mixin.MethodResolution
 import io.github.mcdev.core.mixin.MethodIndexEntry
 import io.github.mcdev.core.model.MemberKind
 import io.github.mcdev.core.model.MappingNamespace
@@ -49,13 +53,54 @@ class AtMemberResolver(
         classIndex: ClassIndex,
         mappingContext: ProjectMappingContext?,
     ): AtMemberResolution {
-        val namedMethods = classIndex.getMethods(ownerInternalName).filter { it.name == memberName }
-        if (namedMethods.isNotEmpty()) {
-            return resolveNamedMethod(namedMethods, memberName, memberDescriptor, mappingContext, ownerInternalName)
+        val resolver = ClassIndexMemberResolver(classIndex)
+        when (val methodResolution = resolver.resolveMethod(
+            owner = ownerInternalName,
+            name = memberName,
+            descriptor = memberDescriptor,
+            policy = AmbiguityPolicy.SINGLE_CANDIDATE_IF_DESCRIPTOR_MISSING,
+        )) {
+            is MethodResolution.Resolved -> {
+                return resolveNamedMethod(
+                    listOf(methodResolution.method),
+                    memberName,
+                    memberDescriptor,
+                    mappingContext,
+                    ownerInternalName,
+                )
+            }
+            is MethodResolution.DescriptorMismatch -> return AtMemberResolution.DescriptorMismatch(
+                memberName,
+                memberDescriptor.orEmpty(),
+                methodResolution.candidates,
+            )
+            is MethodResolution.MissingDescriptor,
+            is MethodResolution.Ambiguous,
+            -> if (classIndex.getMethods(ownerInternalName).any { it.name == memberName }) {
+                return AtMemberResolution.MissingDescriptor(memberName)
+            }
+            MethodResolution.NotFound,
+            is MethodResolution.UnresolvedOwner,
+            -> Unit
         }
-        val namedField = classIndex.getFields(ownerInternalName).find { it.name == memberName }
-        if (namedField != null) {
-            return resolveNamedField(namedField, memberName, mappingContext, ownerInternalName)
+        when (val fieldResolution = resolver.resolveField(
+            owner = ownerInternalName,
+            name = memberName,
+            descriptor = memberDescriptor,
+            policy = AmbiguityPolicy.SINGLE_CANDIDATE_IF_DESCRIPTOR_MISSING,
+        )) {
+            is FieldResolution.Resolved -> {
+                return resolveNamedField(fieldResolution.field, memberName, mappingContext, ownerInternalName)
+            }
+            is FieldResolution.DescriptorMismatch -> return AtMemberResolution.NotFound
+            is FieldResolution.MissingDescriptor,
+            is FieldResolution.Ambiguous,
+            -> if (classIndex.getFields(ownerInternalName).any { it.name == memberName }) {
+                return AtMemberResolution.MissingDescriptor(memberName)
+            }
+            FieldResolution.NotFound,
+            is FieldResolution.UnresolvedOwner,
+            -> Unit
         }
 
         val mappings = mappingContext

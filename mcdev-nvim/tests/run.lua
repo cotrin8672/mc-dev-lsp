@@ -14,6 +14,7 @@ local code_action = require("mcdev.code_action")
 local hover = require("mcdev.hover")
 local jdtls_helper = require("mcdev.jdtls")
 local health = require("mcdev.health")
+local lsp_adapter = require("mcdev.lsp")
 
 mcdev.setup({
   jdtls = {
@@ -191,6 +192,7 @@ helpers.assert_eq(mcdev.options().completion.omnifunc, true)
 helpers.assert_eq(mcdev.options().diagnostics.enabled, false)
 helpers.assert_eq(mcdev.options().diagnostics.events[1], "BufWritePost")
 helpers.assert_eq(diagnostics.running, false)
+helpers.assert_eq(mcdev.options().standard_lsp.prefer, true)
 
 local function has_buffer_keymap(bufnr, mode, lhs)
   for _, map in ipairs(vim.api.nvim_buf_get_keymap(bufnr, mode)) do
@@ -589,7 +591,28 @@ helpers.assert_not_nil(mcdev.navigation)
 helpers.assert_not_nil(mcdev.code_action)
 helpers.assert_not_nil(mcdev.diagnostics)
 helpers.assert_not_nil(mcdev.convert)
+helpers.assert_not_nil(mcdev.lsp)
 helpers.assert_true(#health.lines(0) > 0)
+
+do
+  local original_buf_request = vim.lsp.buf_request
+  local original_definition = navigation.definition
+  local fallback_used = false
+  vim.lsp.buf_request = function(_, method, _, callback)
+    helpers.assert_eq(method, "textDocument/definition")
+    callback(nil, nil)
+  end
+  navigation.definition = function(_, _, callback)
+    fallback_used = true
+    callback({}, nil)
+  end
+  lsp_adapter.definition(0, { 1, 1 }, function(_, err)
+    helpers.assert_nil(err)
+  end)
+  helpers.assert_true(fallback_used)
+  vim.lsp.buf_request = original_buf_request
+  navigation.definition = original_definition
+end
 
 print("mcdev-nvim adapter tests passed")
 vim.cmd("qa!")
