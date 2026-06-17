@@ -23,6 +23,34 @@ data class MixinFacadeRequest(
     val semanticModel: MixinClassModel? = null,
 )
 
+data class McdevCompletionDebugInfo(
+    val command: String,
+    val documentUri: String,
+    val languageId: String,
+    val parseSource: ParseSource?,
+    val parseConfidence: ParseConfidence?,
+    val usedCompilationUnit: Boolean,
+    val usedJavaProject: Boolean,
+    val bindingResolvedCount: Int,
+    val bindingFailedCount: Int,
+    val fallbackReason: String?,
+    val semanticTargetCount: Int,
+    val semanticMemberCount: Int,
+    val completionContextKind: String?,
+    val owner: String?,
+    val methodName: String?,
+    val methodDescriptor: String?,
+    val candidateCountBeforeFilter: Int,
+    val candidateCountAfterFilter: Int,
+    val zeroItemReason: String?,
+    val warnings: List<String>,
+)
+
+data class MixinCompletionResult(
+    val items: List<McCompletionItem>,
+    val debug: McdevCompletionDebugInfo,
+)
+
 class MixinServiceFacade(
     private val classIndex: ClassIndex,
     private val bytecodeIndex: BytecodeIndex,
@@ -57,11 +85,66 @@ class MixinServiceFacade(
     fun complete(
         request: MixinFacadeRequest,
         options: MixinCompletionOptions = MixinCompletionOptions(),
-    ): List<McCompletionItem> {
-        val offset = AnnotationContextExtractor.toOffset(request.bufferText, request.line, request.character)
-            ?: return emptyList()
-        val context = AnnotationContextExtractor.extractAtOffset(request.bufferText, offset) ?: return emptyList()
-        return routeCompletion(request, context, options)
+    ): List<McCompletionItem> = completeWithDebug(request, options).items
+
+    fun completeWithDebug(
+        request: MixinFacadeRequest,
+        options: MixinCompletionOptions = MixinCompletionOptions(),
+        command: String = "mcdev.completion",
+        languageId: String = "java",
+    ): MixinCompletionResult {
+        val effectiveRequest = if (request.semanticModel == null) {
+            request.copy(
+                semanticModel = MixinSemanticModelParser.parse(
+                    source = request.bufferText,
+                    sourceUri = request.documentUri,
+                    parseSource = ParseSource.HAND_WRITTEN_FALLBACK,
+                    confidence = ParseConfidence.MEDIUM,
+                ),
+            )
+        } else {
+            request
+        }
+        val semanticContext = SemanticCompletionContextExtractor.extract(
+            source = effectiveRequest.bufferText,
+            line = effectiveRequest.line,
+            character = effectiveRequest.character,
+            model = effectiveRequest.semanticModel,
+        )
+        val semanticAnnotationContext = semanticContext?.let {
+            SemanticCompletionContextExtractor.toAnnotationContext(
+                source = effectiveRequest.bufferText,
+                line = effectiveRequest.line,
+                character = effectiveRequest.character,
+                model = effectiveRequest.semanticModel,
+                context = it,
+            )
+        }
+        val fallbackContext = if (semanticAnnotationContext == null) {
+            val offset = AnnotationContextExtractor.toOffset(effectiveRequest.bufferText, effectiveRequest.line, effectiveRequest.character)
+            offset?.let { AnnotationContextExtractor.extractAtOffset(effectiveRequest.bufferText, it) }
+        } else {
+            null
+        }
+        val context = semanticAnnotationContext ?: fallbackContext
+        val warnings = mutableListOf<String>()
+        warnings += effectiveRequest.semanticModel?.warnings.orEmpty()
+        if (fallbackContext != null) {
+            warnings += "FALLBACK_PARSER_USED: semantic completion context was unavailable"
+        }
+        val items = context?.let { routeCompletion(effectiveRequest, it, options) }.orEmpty()
+        return MixinCompletionResult(
+            items = items,
+            debug = debugInfo(
+                request = effectiveRequest,
+                command = command,
+                languageId = languageId,
+                context = context,
+                semanticContext = semanticContext,
+                items = items,
+                warnings = warnings.distinct(),
+            ),
+        )
     }
 
     fun diagnose(request: MixinFacadeRequest): List<McDiagnostic> {
@@ -171,16 +254,13 @@ class MixinServiceFacade(
     }
 
     private fun completeAtTarget(request: MixinFacadeRequest, context: AnnotationContext): List<McCompletionItem> {
-        val source = request.bufferText
         val owners = resolveMixinTargets(request, context)
         val owner = owners.firstOrNull() ?: return emptyList()
         val methodTarget = parseMethodTarget(
             context.injectMethodName
-            ?: findEnclosingInjectorMethod(source, context.valueStartOffset)
             ?: return emptyList(),
         )
         val atValue = context.atValue
-            ?: findAtValueInAnnotationBody(source, context.annotationStartOffset, context.annotationEndOffset)
             ?: return emptyList()
         val candidates = bytecodeIndex.getAtTargetCandidates(
             owner,
@@ -205,12 +285,6 @@ class MixinServiceFacade(
         }
     }
 
-    private fun findAtValueInAnnotationBody(source: String, annotationStart: Int, annotationEnd: Int): String? {
-        val bodyStart = source.indexOf('(', annotationStart).takeIf { it in annotationStart until annotationEnd } ?: return null
-        val body = source.substring(bodyStart, annotationEnd.coerceAtMost(source.length))
-        return Regex("""value\s*=\s*"([^"]*)"""").find(body)?.groupValues?.get(1)
-    }
-
     private fun resolveMixinTargets(request: MixinFacadeRequest, context: AnnotationContext): List<String> {
         val source = request.bufferText
         request.semanticModel?.targets
@@ -224,45 +298,6 @@ class MixinServiceFacade(
             AnnotationContextExtractor.resolveRawMixinTargets(source, context.valueStartOffset)
         }
         return MixinTargetResolver.resolveTargets(rawTargets, classIndex, JavaTypeDescriptorResolver.importsFor(source))
-    }
-
-    private fun findEnclosingInjectorMethod(source: String, cursorOffset: Int): String? {
-        val before = source.substring(0, cursorOffset.coerceIn(0, source.length))
-        val pattern = Regex(
-            """@(Inject|Redirect|ModifyArg|ModifyArgs|ModifyVariable|ModifyConstant|ModifyExpressionValue|ModifyReturnValue|ModifyReceiver|WrapOperation|WrapWithCondition|WrapMethod)\s*\(""",
-        )
-        val match = pattern.findAll(before).lastOrNull() ?: return null
-        val bodyStart = match.range.last
-        val bodyEnd = findMatchingParen(source, bodyStart) ?: return null
-        val body = source.substring(bodyStart, bodyEnd + 1)
-        val methodMatch = Regex("method\\s*=\\s*\"([^\"]+)\"").find(body) ?: return null
-        return methodMatch.groupValues[1]
-    }
-
-    private fun findMatchingParen(source: String, openIndex: Int): Int? {
-        if (source.getOrNull(openIndex) != '(') return null
-        var depth = 0
-        var inString = false
-        var i = openIndex
-        while (i < source.length) {
-            when {
-                inString -> {
-                    if (source[i] == '\\') {
-                        i += 2
-                        continue
-                    }
-                    if (source[i] == '"') inString = false
-                }
-                source[i] == '"' -> inString = true
-                source[i] == '(' -> depth++
-                source[i] == ')' -> {
-                    depth--
-                    if (depth == 0) return i
-                }
-            }
-            i++
-        }
-        return null
     }
 
     private fun AnnotationContext.withResolvedMixinTargets(request: MixinFacadeRequest): AnnotationContext =
@@ -380,5 +415,52 @@ class MixinServiceFacade(
                 warnings = member.warnings,
             )
         }
+    }
+
+    private fun debugInfo(
+        request: MixinFacadeRequest,
+        command: String,
+        languageId: String,
+        context: AnnotationContext?,
+        semanticContext: MixinCompletionContext?,
+        items: List<McCompletionItem>,
+        warnings: List<String>,
+    ): McdevCompletionDebugInfo {
+        val semanticModel = request.semanticModel
+        val parsedMethod = when (semanticContext) {
+            is MixinCompletionContext.AtTarget -> semanticContext.methodName?.let {
+                MethodTarget(it, semanticContext.methodDescriptor)
+            }
+            else -> context?.injectMethodName?.let(::parseMethodTarget)
+        }
+        val zeroReason = when {
+            context == null -> "NO_COMPLETION_CONTEXT"
+            warnings.any { it.startsWith("FALLBACK_PARSER_USED") } && items.isEmpty() -> "FALLBACK_PARSER_USED"
+            semanticModel?.targets.isNullOrEmpty() && context.annotation != MixinAnnotation.MIXIN -> "NO_MIXIN_TARGET"
+            items.isEmpty() -> "NO_CANDIDATES"
+            else -> null
+        }
+        return McdevCompletionDebugInfo(
+            command = command,
+            documentUri = request.documentUri,
+            languageId = languageId,
+            parseSource = semanticModel?.parseSource,
+            parseConfidence = semanticModel?.confidence,
+            usedCompilationUnit = semanticModel?.debugInfo?.usedCompilationUnit ?: false,
+            usedJavaProject = semanticModel?.debugInfo?.usedJavaProject ?: false,
+            bindingResolvedCount = semanticModel?.debugInfo?.bindingResolvedCount ?: 0,
+            bindingFailedCount = semanticModel?.debugInfo?.bindingFailedCount ?: 0,
+            fallbackReason = semanticModel?.debugInfo?.fallbackReason,
+            semanticTargetCount = semanticModel?.targets?.size ?: 0,
+            semanticMemberCount = semanticModel?.members?.size ?: 0,
+            completionContextKind = semanticContext?.javaClass?.simpleName ?: context?.slot?.name,
+            owner = semanticModel?.targets?.firstOrNull()?.internalName,
+            methodName = parsedMethod?.name,
+            methodDescriptor = parsedMethod?.descriptor,
+            candidateCountBeforeFilter = items.size,
+            candidateCountAfterFilter = items.size,
+            zeroItemReason = zeroReason,
+            warnings = warnings,
+        )
     }
 }

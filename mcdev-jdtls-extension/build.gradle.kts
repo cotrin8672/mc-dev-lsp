@@ -96,7 +96,12 @@ tasks.jar {
             "Bundle-ActivationPolicy" to "lazy",
             "Bundle-RequiredExecutionEnvironment" to "JavaSE-21",
             "Bundle-ClassPath" to ".",
-            "Require-Bundle" to "org.eclipse.core.runtime,org.eclipse.jdt.ls.core",
+            "Require-Bundle" to listOf(
+                "org.eclipse.core.runtime",
+                "org.eclipse.core.resources",
+                "org.eclipse.jdt.core",
+                "org.eclipse.jdt.ls.core",
+            ).joinToString(","),
             "Private-Package" to "io.github.mcdev.*",
             "Import-Package" to "org.eclipse.lsp4j.*,org.osgi.framework,*",
         )
@@ -114,6 +119,13 @@ tasks.register("checkBundle") {
                 "unexpected Bundle-SymbolicName: $symbolicName"
             }
             check(manifest.getValue("Bundle-Activator") == "io.github.mcdev.jdtls.McdevPlugin")
+            val requireBundle = manifest.getValue("Require-Bundle") ?: ""
+            check("org.eclipse.jdt.core" in requireBundle) {
+                "Require-Bundle must expose org.eclipse.jdt.core for ASTParser"
+            }
+            check("org.eclipse.core.resources" in requireBundle) {
+                "Require-Bundle must expose org.eclipse.core.resources for IFile lookup"
+            }
 
             val entries = jar.entries().asSequence().map { it.name }.toSet()
             check("plugin.xml" in entries) { "plugin.xml is missing from bundle jar" }

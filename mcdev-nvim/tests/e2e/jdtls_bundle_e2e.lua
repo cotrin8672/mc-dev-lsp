@@ -71,6 +71,7 @@ local function workspace_uri(path)
 end
 
 local data_dir = vim.fn.stdpath("cache") .. "/mcdev-osgi-e2e-jdtls"
+vim.fn.delete(data_dir, "rf")
 vim.fn.mkdir(data_dir, "p")
 log_step("data dir prepared")
 
@@ -196,6 +197,8 @@ with_buffer(mixin_file, "java", nil, function(bufnr)
   helpers.assert_not_nil(mixin_line, "@Mixin line not found")
 
   local context = build_context(bufnr, { mixin_line + 1, 8 })
+  log_step("request workspaceRoot: " .. tostring(context.workspaceRoot))
+  log_step("request documentUri: " .. tostring(context.documentUri))
 
   local info_result, info_err = mcdev_command("mcdev.info", { context = context })
   helpers.assert_nil(info_err, "mcdev.info failed: " .. vim.inspect(info_err))
@@ -224,6 +227,15 @@ with_buffer(mixin_file, "java", nil, function(bufnr)
   helpers.assert_true(#items > 0, "mixin mcdev.completion returned no items")
   helpers.assert_true(items[1].label ~= nil, "completion item must include label")
   helpers.assert_true(items[1].insertText ~= nil, "completion item must include insertText")
+  local debug = completion_result.result and completion_result.result.debug or {}
+  log_step("completion debug: " .. vim.inspect(debug))
+  helpers.assert_eq(debug.command, "mcdev.completion")
+  helpers.assert_eq(debug.zeroItemReason, nil)
+  helpers.assert_eq(debug.parseSource, "JDT_AST")
+  helpers.assert_eq(debug.usedCompilationUnit, true)
+  helpers.assert_eq(debug.usedJavaProject, true)
+  helpers.assert_eq(#(debug.warnings or {}), 0)
+  helpers.assert_true((debug.semanticTargetCount or 0) > 0, "completion debug should report semantic targets")
 
   if fixture_spec.deep_mixin then
     local definition_result, definition_err = mcdev_command("mcdev.definition", { context = context })
@@ -289,12 +301,52 @@ with_buffer(mixin_file, "java", nil, function(bufnr)
     })
     helpers.assert_nil(inject_err, "mixin inject mcdev.completion failed: " .. vim.inspect(inject_err))
     local inject_items = inject_result.result and inject_result.result.items or {}
+    local inject_debug = inject_result.result and inject_result.result.debug or {}
+    log_step("inject completion debug: " .. vim.inspect(inject_debug))
+    helpers.assert_eq(inject_debug.command, "mcdev.completion")
+    helpers.assert_eq(inject_debug.zeroItemReason, nil)
+    helpers.assert_eq(inject_debug.parseSource, "JDT_AST")
+    helpers.assert_eq(inject_debug.usedCompilationUnit, true)
+    helpers.assert_eq(inject_debug.usedJavaProject, true)
+    helpers.assert_eq(#(inject_debug.warnings or {}), 0)
     helpers.assert_true(
       vim.tbl_filter(function(item)
         return item.insertText and item.insertText:find("draw%(Ljava/lang/String;FF%)V", 1, false)
       end, inject_items)[1] ~= nil,
       "mixin inject completion should return descriptor-qualified draw overload"
     )
+
+    local invoker_source = {
+      "package com.example.mixin;",
+      "",
+      "import com.example.target.SimpleTarget;",
+      "import org.spongepowered.asm.mixin.Mixin;",
+      "import org.spongepowered.asm.mixin.gen.Invoker;",
+      "",
+      "@Mixin(SimpleTarget.class)",
+      "public abstract class ExampleMixin {",
+      "    @Invoker(\"\")",
+      "    public abstract void invokeDraw(String text, float x, float y);",
+      "}",
+    }
+    vim.api.nvim_buf_set_lines(bufnr, 0, -1, false, invoker_source)
+    local invoker_context = build_context(bufnr, { 9, 14 })
+    local invoker_result, invoker_err = mcdev_command("mcdev.completion", {
+      context = invoker_context,
+      trigger = { kind = "manual" },
+      options = {
+        preferredAtTarget = "descriptor",
+        mixinClassInsert = "import",
+        injectMethodDescriptor = "auto",
+      },
+    })
+    helpers.assert_nil(invoker_err, "mixin invoker mcdev.completion failed: " .. vim.inspect(invoker_err))
+    local invoker_debug = invoker_result.result and invoker_result.result.debug or {}
+    log_step("invoker completion debug: " .. vim.inspect(invoker_debug))
+    helpers.assert_eq(invoker_debug.parseSource, "JDT_AST")
+    helpers.assert_eq(invoker_debug.usedCompilationUnit, true)
+    helpers.assert_eq(invoker_debug.usedJavaProject, true)
+    helpers.assert_eq(#(invoker_debug.warnings or {}), 0)
   end
 end)
 end

@@ -42,7 +42,7 @@ class JdtReflectionBridge private constructor() {
     fun discoverClasspathEntries(workspaceRootUri: String): List<Path> {
         if (!available) return emptyList()
         val javaProject = findJavaProject(workspaceRootUri) ?: return emptyList()
-        return readClasspath(javaProject)
+        return runCatching { readClasspath(javaProject) }.getOrDefault(emptyList())
     }
 
     private fun findJavaProject(workspaceRootUri: String): Any? {
@@ -241,8 +241,9 @@ class JdtReflectionBridge private constructor() {
         val rawClasspath = runCatching {
             javaProject.javaClass.getMethod("getResolvedClasspath", Boolean::class.javaPrimitiveType)
                 .invoke(javaProject, true) as? Array<*>
-        }.getOrNull() ?: javaProject.javaClass.getMethod("getRawClasspath").invoke(javaProject) as? Array<*>
-            ?: return emptyList()
+        }.getOrNull() ?: runCatching {
+            javaProject.javaClass.getMethod("getRawClasspath").invoke(javaProject) as? Array<*>
+        }.getOrNull() ?: return emptyList()
         val paths = linkedSetOf<Path>()
         val projectRoot = projectRoot(javaProject)
         for (entry in rawClasspath) {

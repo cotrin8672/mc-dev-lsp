@@ -8,6 +8,7 @@ import io.github.mcdev.jdtls.project.FileBasedProjectContextService
 import io.github.mcdev.jdtls.protocol.ProtocolDecodeException
 import io.github.mcdev.jdtls.protocol.ProtocolPayloadDecoder
 import io.github.mcdev.protocol.McdevCompletionRequest
+import io.github.mcdev.protocol.McdevCompletionDebugInfo
 import io.github.mcdev.protocol.McdevCompletionResponse
 import io.github.mcdev.protocol.McdevError
 import io.github.mcdev.protocol.McdevErrorCode
@@ -81,7 +82,7 @@ class McdevCompletionHandler(
             character = request.context.position.character,
         )
         val semanticModel = mixinFacade.semanticModel(request.context.bufferText, request.context.documentUri)
-        val items = mixinFacade.complete(
+        val completion = mixinFacade.completeWithDebug(
             session = session,
             source = request.context.bufferText,
             line = request.context.position.line,
@@ -89,12 +90,13 @@ class McdevCompletionHandler(
             options = options,
             documentUri = request.context.documentUri,
             semanticModel = semanticModel,
+            languageId = request.context.languageId,
         )
         return McdevResponseEnvelope(
             capabilities = setOf("completion"),
             result = McdevCompletionResponse(
                 items = CompletionItemConverter.toDtos(
-                    items = items,
+                    items = completion.items,
                     annotationContext = annotationContext,
                     source = request.context.bufferText,
                     convertContext = CompletionConvertContext(
@@ -113,9 +115,34 @@ class McdevCompletionHandler(
                     code = "MIXIN_PARSE_SOURCE",
                     message = semanticModel.parseSource.name,
                 ),
+                debug = completion.debug.toProtocolDebug(),
             ),
         )
     }
+
+    private fun io.github.mcdev.core.mixin.McdevCompletionDebugInfo.toProtocolDebug(): McdevCompletionDebugInfo =
+        McdevCompletionDebugInfo(
+            command = command,
+            documentUri = documentUri,
+            languageId = languageId,
+            parseSource = parseSource?.name,
+            parseConfidence = parseConfidence?.name,
+            usedCompilationUnit = usedCompilationUnit,
+            usedJavaProject = usedJavaProject,
+            bindingResolvedCount = bindingResolvedCount,
+            bindingFailedCount = bindingFailedCount,
+            fallbackReason = fallbackReason,
+            semanticTargetCount = semanticTargetCount,
+            semanticMemberCount = semanticMemberCount,
+            completionContextKind = completionContextKind,
+            owner = owner,
+            methodName = methodName,
+            methodDescriptor = methodDescriptor,
+            candidateCountBeforeFilter = candidateCountBeforeFilter,
+            candidateCountAfterFilter = candidateCountAfterFilter,
+            zeroItemReason = zeroItemReason,
+            warnings = warnings,
+        )
 
     private fun errorEnvelope(code: McdevErrorCode, message: String): McdevResponseEnvelope<McdevCompletionResponse> =
         McdevResponseEnvelope(error = McdevError(code = code, message = message))

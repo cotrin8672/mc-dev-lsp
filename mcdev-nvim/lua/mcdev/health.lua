@@ -73,6 +73,7 @@ function M.lines(bufnr)
     "last completion request: " .. vim.inspect(require("mcdev.completion").last_request),
     "last completion response count: " .. tostring(require("mcdev.completion").last_response_count),
     "last completion error: " .. tostring(require("mcdev.completion").last_error),
+    "last completion debug: " .. vim.inspect(require("mcdev.completion").last_debug),
     "last diagnostics request: " .. vim.inspect(diagnostics.last_request),
     "last diagnostics error: " .. tostring(diagnostics.last_error),
   })
@@ -92,6 +93,7 @@ function M.debug_completion(bufnr)
     local elapsed_ms = math.floor((vim.loop.hrtime() - started) / 1000000)
     local result = envelope and envelope.result or {}
     local items = result.items or {}
+    local debug = result.debug or {}
     local labels = {}
     for index = 1, math.min(#items, 20) do
       labels[#labels + 1] = items[index].label
@@ -101,6 +103,17 @@ function M.debug_completion(bufnr)
       "selected jdtls client: " .. client_id(protocol.active_jdtls_client(bufnr)),
       "raw response: " .. vim.inspect(envelope),
       "item count: " .. tostring(#items),
+      "zero item reason: " .. tostring(debug.zeroItemReason),
+      "parse source: " .. tostring(debug.parseSource),
+      "parse confidence: " .. tostring(debug.parseConfidence),
+      "used compilation unit/project: " .. tostring(debug.usedCompilationUnit) .. "/" .. tostring(debug.usedJavaProject),
+      "binding resolved/failed: " .. tostring(debug.bindingResolvedCount) .. "/" .. tostring(debug.bindingFailedCount),
+      "fallback reason: " .. tostring(debug.fallbackReason),
+      "semantic target/member count: " .. tostring(debug.semanticTargetCount) .. "/" .. tostring(debug.semanticMemberCount),
+      "completion context kind: " .. tostring(debug.completionContextKind),
+      "owner: " .. tostring(debug.owner),
+      "method: " .. tostring(debug.methodName) .. tostring(debug.methodDescriptor or ""),
+      "warnings: " .. vim.inspect(debug.warnings or {}),
       "first 20 labels: " .. vim.inspect(labels),
       "error: " .. tostring(err),
       "elapsed ms: " .. tostring(elapsed_ms),

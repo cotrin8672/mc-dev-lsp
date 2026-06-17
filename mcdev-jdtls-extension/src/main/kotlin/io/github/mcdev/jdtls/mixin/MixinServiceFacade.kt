@@ -8,6 +8,8 @@ import io.github.mcdev.core.mixin.InjectMethodDescriptorMode
 import io.github.mcdev.core.mixin.MixinClassInsertMode
 import io.github.mcdev.core.mixin.MixinCompletionOptions
 import io.github.mcdev.core.mixin.MixinClassModel
+import io.github.mcdev.core.mixin.MixinCompletionResult
+import io.github.mcdev.core.mixin.McdevCompletionDebugInfo
 import io.github.mcdev.core.mixin.MixinDefinitionService
 import io.github.mcdev.core.mixin.MixinFacadeRequest
 import io.github.mcdev.core.mixin.MixinReferenceService
@@ -66,6 +68,57 @@ class MixinServiceFacade(
                 ),
                 options,
             )
+
+    fun completeWithDebug(
+        session: McdevProjectSession,
+        source: String,
+        line: Int,
+        character: Int,
+        options: MixinCompletionOptions,
+        documentUri: String,
+        semanticModel: MixinClassModel,
+        languageId: String,
+    ): MixinCompletionResult {
+        completeOverride?.invoke(session, source, line, character, options)?.let { items ->
+            return MixinCompletionResult(
+                items = items,
+                debug = McdevCompletionDebugInfo(
+                    command = "mcdev.completion",
+                    documentUri = documentUri,
+                    languageId = languageId,
+                    parseSource = semanticModel.parseSource,
+                    parseConfidence = semanticModel.confidence,
+                    usedCompilationUnit = semanticModel.debugInfo.usedCompilationUnit,
+                    usedJavaProject = semanticModel.debugInfo.usedJavaProject,
+                    bindingResolvedCount = semanticModel.debugInfo.bindingResolvedCount,
+                    bindingFailedCount = semanticModel.debugInfo.bindingFailedCount,
+                    fallbackReason = semanticModel.debugInfo.fallbackReason,
+                    semanticTargetCount = semanticModel.targets.size,
+                    semanticMemberCount = semanticModel.members.size,
+                    completionContextKind = "OVERRIDE",
+                    owner = semanticModel.targets.firstOrNull()?.internalName,
+                    methodName = null,
+                    methodDescriptor = null,
+                    candidateCountBeforeFilter = items.size,
+                    candidateCountAfterFilter = items.size,
+                    zeroItemReason = if (items.isEmpty()) "NO_CANDIDATES" else null,
+                    warnings = semanticModel.warnings,
+                ),
+            )
+        }
+        return facade(session, source = source, documentUri = documentUri).completeWithDebug(
+            MixinFacadeRequest(
+                bufferText = source,
+                line = line,
+                character = character,
+                documentUri = documentUri,
+                semanticModel = semanticModel,
+            ),
+            options,
+            command = "mcdev.completion",
+            languageId = languageId,
+        )
+    }
 
     fun analyzeDiagnostics(
         session: McdevProjectSession,

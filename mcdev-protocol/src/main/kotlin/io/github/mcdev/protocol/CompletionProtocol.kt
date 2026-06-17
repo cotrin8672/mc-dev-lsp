@@ -20,6 +20,30 @@ data class McdevCompletionOptions(
 data class McdevCompletionResponse(
     val items: List<McdevCompletionItemDto>,
     val warnings: List<McdevWarning> = emptyList(),
+    val debug: McdevCompletionDebugInfo? = null,
+)
+
+data class McdevCompletionDebugInfo(
+    val command: String,
+    val documentUri: String,
+    val languageId: String,
+    val parseSource: String?,
+    val parseConfidence: String?,
+    val usedCompilationUnit: Boolean,
+    val usedJavaProject: Boolean,
+    val bindingResolvedCount: Int,
+    val bindingFailedCount: Int,
+    val fallbackReason: String?,
+    val semanticTargetCount: Int,
+    val semanticMemberCount: Int,
+    val completionContextKind: String?,
+    val owner: String?,
+    val methodName: String?,
+    val methodDescriptor: String?,
+    val candidateCountBeforeFilter: Int,
+    val candidateCountAfterFilter: Int,
+    val zeroItemReason: String?,
+    val warnings: List<String>,
 )
 
 data class McdevCompletionItemDto(

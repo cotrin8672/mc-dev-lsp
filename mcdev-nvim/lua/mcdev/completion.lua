@@ -4,6 +4,7 @@ local M = {}
 M.last_request = nil
 M.last_response_count = nil
 M.last_error = nil
+M.last_debug = nil
 
 local kind_map = {
   class = vim.lsp.protocol.CompletionItemKind.Class,
@@ -56,6 +57,7 @@ function M.complete(callback, bufnr, position)
       return
     end
     local result = envelope and envelope.result or { items = {} }
+    M.last_debug = result.debug
     local items = {}
     for _, item in ipairs(result.items or {}) do
       table.insert(items, M.to_lsp_item(item))

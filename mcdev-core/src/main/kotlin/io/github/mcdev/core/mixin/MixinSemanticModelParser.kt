@@ -14,6 +14,16 @@ data class MixinClassModel(
     val parseSource: ParseSource = ParseSource.HAND_WRITTEN_FALLBACK,
     val confidence: ParseConfidence = ParseConfidence.MEDIUM,
     val warnings: List<String> = emptyList(),
+    val debugInfo: SemanticParseDebugInfo = SemanticParseDebugInfo(),
+)
+
+data class SemanticParseDebugInfo(
+    val parseSource: ParseSource = ParseSource.HAND_WRITTEN_FALLBACK,
+    val usedCompilationUnit: Boolean = false,
+    val usedJavaProject: Boolean = false,
+    val bindingResolvedCount: Int = 0,
+    val bindingFailedCount: Int = 0,
+    val fallbackReason: String? = null,
 )
 
 enum class JavaTypeKind {
@@ -129,6 +139,7 @@ object MixinSemanticModelParser {
         parseSource: ParseSource = ParseSource.HAND_WRITTEN_FALLBACK,
         confidence: ParseConfidence = ParseConfidence.MEDIUM,
         warnings: List<String> = emptyList(),
+        debugInfo: SemanticParseDebugInfo = SemanticParseDebugInfo(parseSource = parseSource),
     ): MixinClassModel =
         MixinClassModel(
             sourceUri = sourceUri,
@@ -140,6 +151,7 @@ object MixinSemanticModelParser {
             parseSource = parseSource,
             confidence = confidence,
             warnings = warnings,
+            debugInfo = debugInfo,
         )
 
     private fun parsePackageName(source: String): String? =

@@ -270,6 +270,10 @@ class McdevCompletionHandlerTest {
         val completion = assertIs<McdevCompletionResponse>(response.result)
         assertTrue(completion.items.any { it.metadata["source"] == "mixin.injectMethod" })
         assertTrue(completion.items.any { it.insertText.startsWith("draw") })
+        assertEquals("mcdev.completion", completion.debug?.command)
+        assertEquals(null, completion.debug?.zeroItemReason)
+        assertTrue((completion.debug?.semanticTargetCount ?: 0) > 0)
+        assertTrue(completion.debug?.parseSource != null)
     }
 
     @Test

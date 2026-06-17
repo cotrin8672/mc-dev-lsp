@@ -14,6 +14,8 @@ import io.github.mcdev.core.mixin.MixinSemanticModelParser
 import io.github.mcdev.core.mixin.MixinTargetRef
 import io.github.mcdev.core.mixin.ParseConfidence
 import io.github.mcdev.core.mixin.ParseSource
+import io.github.mcdev.core.mixin.SemanticParseDebugInfo
+import java.net.URI
 
 class JdtMixinSemanticModelParser {
     private val astParserClass: Class<*>? = runCatching {
@@ -29,22 +31,29 @@ class JdtMixinSemanticModelParser {
         if (parserClass == null || astApiClass == null) {
             return fallback(source, documentUri, "JDT ASTParser is not available in this runtime")
         }
+        val jdtSource = resolveJdtSource(documentUri)
+            ?: return fallback(source, documentUri, "JDT compilation unit is not available for $documentUri")
         return runCatching {
-            val ast = parseAst(parserClass, astApiClass, source)
+            val ast = parseAst(parserClass, astApiClass, source, jdtSource)
             val fallback = MixinSemanticModelParser.parse(
                 source = source,
                 sourceUri = documentUri,
                 parseSource = ParseSource.JDT_AST,
                 confidence = ParseConfidence.HIGH,
+                debugInfo = SemanticParseDebugInfo(
+                    parseSource = ParseSource.JDT_AST,
+                    usedCompilationUnit = jdtSource.compilationUnit != null,
+                    usedJavaProject = jdtSource.javaProject != null,
+                ),
             )
-            val astModel = AstModelExtractor(source, documentUri).extract(ast, fallback)
+            val astModel = AstModelExtractor(source, documentUri).extract(ast, fallback, jdtSource)
             astModel
         }.getOrElse { error ->
             fallback(source, documentUri, "JDT AST parse failed: ${error.message ?: error.javaClass.name}")
         }
     }
 
-    private fun parseAst(parserClass: Class<*>, astApiClass: Class<*>, source: String): Any {
+    private fun parseAst(parserClass: Class<*>, astApiClass: Class<*>, source: String, jdtSource: JdtAstSource): Any {
         val astLevel = astApiClass.fields.firstOrNull { it.name == "JLS21" }?.getInt(null)
             ?: astApiClass.fields.firstOrNull { it.name.startsWith("JLS") }?.getInt(null)
             ?: 21
@@ -53,6 +62,13 @@ class JdtMixinSemanticModelParser {
         val kind = parserClass.getField("K_COMPILATION_UNIT").getInt(null)
         parserClass.getMethod("setKind", Int::class.javaPrimitiveType).invoke(parser, kind)
         parserClass.getMethod("setSource", CharArray::class.java).invoke(parser, source.toCharArray())
+        jdtSource.javaProject?.let {
+            val javaProjectClass = Class.forName("org.eclipse.jdt.core.IJavaProject")
+            parserClass.getMethod("setProject", javaProjectClass).invoke(parser, it)
+        }
+        jdtSource.unitName?.let {
+            runCatching { parserClass.getMethod("setUnitName", String::class.java).invoke(parser, it) }
+        }
         parserClass.getMethod("setResolveBindings", Boolean::class.javaPrimitiveType).invoke(parser, true)
         parserClass.getMethod("setBindingsRecovery", Boolean::class.javaPrimitiveType).invoke(parser, true)
         parserClass.getMethod("setStatementsRecovery", Boolean::class.javaPrimitiveType).invoke(parser, true)
@@ -68,15 +84,48 @@ class JdtMixinSemanticModelParser {
             parseSource = ParseSource.HAND_WRITTEN_FALLBACK,
             confidence = ParseConfidence.LOW,
             warnings = listOf(reason),
+            debugInfo = SemanticParseDebugInfo(
+                parseSource = ParseSource.HAND_WRITTEN_FALLBACK,
+                fallbackReason = reason,
+            ),
         )
+
+    private data class JdtAstSource(
+        val compilationUnit: Any?,
+        val javaProject: Any?,
+        val unitName: String?,
+    )
+
+    private fun resolveJdtSource(documentUri: String): JdtAstSource? {
+        val javaCoreClass = runCatching { Class.forName("org.eclipse.jdt.core.JavaCore") }.getOrNull() ?: return null
+        val resourcesPlugin = runCatching { Class.forName("org.eclipse.core.resources.ResourcesPlugin") }.getOrNull() ?: return null
+        val workspace = resourcesPlugin.getMethod("getWorkspace").invoke(null) ?: return null
+        val root = workspace.javaClass.getMethod("getRoot").invoke(workspace) ?: return null
+        val uri = runCatching { URI(documentUri) }.getOrNull() ?: return null
+        val file = runCatching {
+            val files = root.javaClass.getMethod("findFilesForLocationURI", URI::class.java).invoke(root, uri) as? Array<*>
+            files?.firstOrNull()
+        }.getOrNull() ?: return null
+        val compilationUnit = javaCoreClass.methods
+            .firstOrNull { it.name == "createCompilationUnitFrom" && it.parameterCount == 1 }
+            ?.invoke(null, file)
+            ?: return null
+        val javaProject = runCatching { compilationUnit.javaClass.getMethod("getJavaProject").invoke(compilationUnit) }.getOrNull()
+            ?: return null
+        val unitName = runCatching { compilationUnit.javaClass.getMethod("getElementName").invoke(compilationUnit) as? String }
+            .getOrNull()
+        return JdtAstSource(compilationUnit, javaProject, unitName)
+    }
 
     private class AstModelExtractor(
         private val source: String,
         private val documentUri: String,
     ) {
         private val imports = JavaTypeDescriptorResolver.importsFor(source)
+        private var bindingResolvedCount = 0
+        private var bindingFailedCount = 0
 
-        fun extract(root: Any, fallback: MixinClassModel): MixinClassModel {
+        fun extract(root: Any, fallback: MixinClassModel, jdtSource: JdtAstSource): MixinClassModel {
             val nodes = flatten(root)
             val typeNode = nodes.firstOrNull { it.javaClass.simpleName in setOf("TypeDeclaration", "EnumDeclaration", "RecordDeclaration") }
             val packageName = packageName(root) ?: fallback.packageName
@@ -106,6 +155,13 @@ class JdtMixinSemanticModelParser {
                 parseSource = ParseSource.JDT_AST,
                 confidence = if (members.any { it.confidence != ParseConfidence.HIGH }) ParseConfidence.MEDIUM else ParseConfidence.HIGH,
                 warnings = members.flatMap { it.warnings }.distinct(),
+                debugInfo = SemanticParseDebugInfo(
+                    parseSource = ParseSource.JDT_AST,
+                    usedCompilationUnit = jdtSource.compilationUnit != null,
+                    usedJavaProject = jdtSource.javaProject != null,
+                    bindingResolvedCount = bindingResolvedCount,
+                    bindingFailedCount = bindingFailedCount,
+                ),
             )
         }
 
@@ -189,7 +245,11 @@ class JdtMixinSemanticModelParser {
             val binding = runCatching {
                 node.javaClass.methods.firstOrNull { it.name in setOf("resolveBinding", "resolveTypeBinding") && it.parameterCount == 0 }
                     ?.invoke(node)
-            }.getOrNull() ?: return null
+            }.getOrNull() ?: run {
+                bindingFailedCount++
+                return null
+            }
+            bindingResolvedCount++
             return descriptorFromBinding(binding)
         }
 
@@ -197,7 +257,11 @@ class JdtMixinSemanticModelParser {
             val binding = runCatching {
                 node.javaClass.methods.firstOrNull { it.name == "resolveTypeBinding" && it.parameterCount == 0 }
                     ?.invoke(node)
-            }.getOrNull() ?: return null
+            }.getOrNull() ?: run {
+                bindingFailedCount++
+                return null
+            }
+            bindingResolvedCount++
             return bindingBinaryName(binding)?.replace('.', '/')
         }
 
@@ -364,7 +428,11 @@ class JdtMixinSemanticModelParser {
             }.getOrNull().orEmpty()
 
         private fun getStructuralProperty(node: Any, property: Any): Any? =
-            runCatching { node.javaClass.getMethod("getStructuralProperty", property.javaClass).invoke(node, property) }
+            runCatching {
+                node.javaClass.methods
+                    .firstOrNull { it.name == "getStructuralProperty" && it.parameterCount == 1 }
+                    ?.invoke(node, property)
+            }
                 .getOrNull()
 
         private fun listProperty(node: Any?, name: String): List<Any> {
