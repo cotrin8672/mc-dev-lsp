@@ -45,7 +45,7 @@ function source:get_completions(ctx, callback)
       is_incomplete_backward = result.isIncomplete or false,
       items = result.items or {},
     })
-  end, bufnr, ctx_position(ctx))
+  end, bufnr, ctx_position(ctx), { source = "blink" })
 end
 
 return source

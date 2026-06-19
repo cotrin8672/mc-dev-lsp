@@ -5,6 +5,9 @@ M.last_request = nil
 M.last_response_count = nil
 M.last_error = nil
 M.last_debug = nil
+M.request_count = 0
+M.last_source = nil
+M.last_callback_item_count = nil
 
 local kind_map = {
   class = vim.lsp.protocol.CompletionItemKind.Class,
@@ -36,23 +39,29 @@ local function changedtick(bufnr)
   return vim.api.nvim_buf_get_changedtick(bufnr)
 end
 
-function M.complete(callback, bufnr, position)
+function M.complete(callback, bufnr, position, opts)
+  opts = opts or {}
   bufnr = bufnr or vim.api.nvim_get_current_buf()
   position = position or vim.api.nvim_win_get_cursor(0)
   local request_tick = changedtick(bufnr)
+  M.request_count = M.request_count + 1
+  M.last_source = opts.source or "manual"
   M.last_request = {
     bufnr = bufnr,
     position = position,
     changedtick = request_tick,
+    source = M.last_source,
   }
   M.last_error = nil
   protocol.completion(function(envelope, err)
     if err then
       M.last_error = tostring(err)
+      M.last_callback_item_count = 0
       callback({ isIncomplete = false, items = {} })
       return
     end
     if request_tick ~= changedtick(bufnr) then
+      M.last_callback_item_count = 0
       callback({ isIncomplete = false, items = {} })
       return
     end
@@ -63,6 +72,7 @@ function M.complete(callback, bufnr, position)
       table.insert(items, M.to_lsp_item(item))
     end
     M.last_response_count = #items
+    M.last_callback_item_count = #items
     callback({ isIncomplete = result.isIncomplete or false, items = items })
   end, bufnr, position)
 end

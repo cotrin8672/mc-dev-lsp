@@ -14,6 +14,9 @@ M.last_request = nil
 M.last_error = nil
 M.last_dropped_stale = false
 M.running = false
+M.request_count = 0
+M.last_trigger_event = nil
+M.last_trigger_time = nil
 
 function M.publish(bufnr, diagnostics)
   local vim_diagnostics = {}
@@ -55,10 +58,14 @@ function M.refresh(bufnr, opts)
     return
   end
   local request_tick = changedtick(bufnr)
+  M.request_count = M.request_count + 1
+  M.last_trigger_event = opts.trigger_event or (opts.manual and "manual" or M.last_trigger_event)
+  M.last_trigger_time = os.time()
   M.last_request = {
     bufnr = bufnr,
     changedtick = request_tick,
     manual = opts.manual == true,
+    trigger_event = M.last_trigger_event,
     started_at = vim.loop and vim.loop.hrtime() or nil,
   }
   M.last_error = nil
@@ -101,9 +108,11 @@ function M.setup_autocmds(opts)
       if debounce_timers[bufnr] then
         vim.fn.timer_stop(debounce_timers[bufnr])
       end
+      M.last_trigger_event = args.event
       debounce_timers[bufnr] = vim.fn.timer_start(debounce_ms, function()
         debounce_timers[bufnr] = nil
         if vim.api.nvim_buf_is_valid(bufnr) then
+          opts.trigger_event = args.event
           M.refresh(bufnr, opts)
         end
       end)
@@ -140,6 +149,9 @@ function M.status_lines()
     "debounce_ms: " .. tostring(opts.debounce_ms),
     "insert_mode: " .. tostring(opts.insert_mode),
     "in_flight_buffers: " .. tostring(vim.tbl_count(in_flight)),
+    "request_count: " .. tostring(M.request_count),
+    "last_trigger_event: " .. tostring(M.last_trigger_event or "none"),
+    "last_trigger_time: " .. tostring(M.last_trigger_time or "none"),
     "last_error: " .. tostring(M.last_error),
     "last_dropped_stale: " .. tostring(M.last_dropped_stale),
   }

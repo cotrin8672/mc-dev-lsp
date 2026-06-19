@@ -1,4 +1,5 @@
 import java.util.jar.JarFile
+import java.time.Instant
 
 plugins {
     kotlin("jvm")
@@ -22,11 +23,37 @@ sourceSets {
     }
     main {
         compileClasspath += eclipseStub.output
+        resources.srcDir(layout.buildDirectory.dir("generated/mcdevBuildInfo"))
     }
     test {
         compileClasspath += eclipseStub.output
         runtimeClasspath += eclipseStub.output
     }
+}
+
+val generateMcdevBuildInfo by tasks.registering {
+    val outputDir = layout.buildDirectory.dir("generated/mcdevBuildInfo")
+    outputs.dir(outputDir)
+    doLast {
+        val commit = runCatching {
+            providers.exec {
+                commandLine("git", "rev-parse", "HEAD")
+            }.standardOutput.asText.get().trim()
+        }.getOrDefault("unknown")
+        val file = outputDir.get().file("mcdev-build.properties").asFile
+        file.parentFile.mkdirs()
+        file.writeText(
+            listOf(
+                "commit=$commit",
+                "buildTime=${Instant.now()}",
+                "version=${project.version}",
+            ).joinToString("\n") + "\n",
+        )
+    }
+}
+
+tasks.named("processResources") {
+    dependsOn(generateMcdevBuildInfo)
 }
 
 tasks.named<JavaCompile>("compileEclipseStubJava") {
@@ -129,6 +156,7 @@ tasks.register("checkBundle") {
 
             val entries = jar.entries().asSequence().map { it.name }.toSet()
             check("plugin.xml" in entries) { "plugin.xml is missing from bundle jar" }
+            check("mcdev-build.properties" in entries) { "mcdev-build.properties is missing from bundle jar" }
             check(
                 entries.any { it == "io/github/mcdev/jdtls/McdevDelegateCommandHandler.class" },
             ) { "McdevDelegateCommandHandler is missing from bundle jar" }

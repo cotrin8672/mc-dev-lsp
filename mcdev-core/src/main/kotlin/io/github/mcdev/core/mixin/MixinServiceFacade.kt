@@ -34,6 +34,9 @@ data class McdevCompletionDebugInfo(
     val bindingResolvedCount: Int,
     val bindingFailedCount: Int,
     val fallbackReason: String?,
+    val semanticContextFound: Boolean,
+    val fallbackAnnotationContextUsed: Boolean,
+    val fallbackAnnotationContextReason: String?,
     val semanticTargetCount: Int,
     val semanticMemberCount: Int,
     val completionContextKind: String?,
@@ -129,8 +132,13 @@ class MixinServiceFacade(
         val context = semanticAnnotationContext ?: fallbackContext
         val warnings = mutableListOf<String>()
         warnings += effectiveRequest.semanticModel?.warnings.orEmpty()
-        if (fallbackContext != null) {
-            warnings += "FALLBACK_PARSER_USED: semantic completion context was unavailable"
+        val fallbackAnnotationContextReason = if (semanticAnnotationContext == null && fallbackContext != null) {
+            "semantic completion context was unavailable"
+        } else {
+            null
+        }
+        if (fallbackAnnotationContextReason != null) {
+            warnings += "FALLBACK_ANNOTATION_CONTEXT_USED: $fallbackAnnotationContextReason"
         }
         val items = context?.let { routeCompletion(effectiveRequest, it, options) }.orEmpty()
         return MixinCompletionResult(
@@ -141,6 +149,8 @@ class MixinServiceFacade(
                 languageId = languageId,
                 context = context,
                 semanticContext = semanticContext,
+                fallbackAnnotationContextUsed = fallbackContext != null,
+                fallbackAnnotationContextReason = fallbackAnnotationContextReason,
                 items = items,
                 warnings = warnings.distinct(),
             ),
@@ -423,6 +433,8 @@ class MixinServiceFacade(
         languageId: String,
         context: AnnotationContext?,
         semanticContext: MixinCompletionContext?,
+        fallbackAnnotationContextUsed: Boolean,
+        fallbackAnnotationContextReason: String?,
         items: List<McCompletionItem>,
         warnings: List<String>,
     ): McdevCompletionDebugInfo {
@@ -435,7 +447,7 @@ class MixinServiceFacade(
         }
         val zeroReason = when {
             context == null -> "NO_COMPLETION_CONTEXT"
-            warnings.any { it.startsWith("FALLBACK_PARSER_USED") } && items.isEmpty() -> "FALLBACK_PARSER_USED"
+            fallbackAnnotationContextUsed && items.isEmpty() -> "FALLBACK_ANNOTATION_CONTEXT_USED"
             semanticModel?.targets.isNullOrEmpty() && context.annotation != MixinAnnotation.MIXIN -> "NO_MIXIN_TARGET"
             items.isEmpty() -> "NO_CANDIDATES"
             else -> null
@@ -451,6 +463,9 @@ class MixinServiceFacade(
             bindingResolvedCount = semanticModel?.debugInfo?.bindingResolvedCount ?: 0,
             bindingFailedCount = semanticModel?.debugInfo?.bindingFailedCount ?: 0,
             fallbackReason = semanticModel?.debugInfo?.fallbackReason,
+            semanticContextFound = semanticContext != null,
+            fallbackAnnotationContextUsed = fallbackAnnotationContextUsed,
+            fallbackAnnotationContextReason = fallbackAnnotationContextReason,
             semanticTargetCount = semanticModel?.targets?.size ?: 0,
             semanticMemberCount = semanticModel?.members?.size ?: 0,
             completionContextKind = semanticContext?.javaClass?.simpleName ?: context?.slot?.name,

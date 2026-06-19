@@ -22,7 +22,7 @@ function source:complete(params, callback)
       items = result.items or {},
       isIncomplete = result.isIncomplete or false,
     })
-  end, bufnr, cursor)
+  end, bufnr, cursor, { source = "cmp" })
 end
 
 return source

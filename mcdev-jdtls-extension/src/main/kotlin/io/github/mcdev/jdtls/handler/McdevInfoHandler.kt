@@ -11,6 +11,7 @@ import io.github.mcdev.protocol.McdevInfoResponse
 import io.github.mcdev.protocol.McdevProtocol
 import io.github.mcdev.protocol.McdevResponseEnvelope
 import io.github.mcdev.protocol.McdevRequestContext
+import io.github.mcdev.protocol.McdevCommands
 
 class McdevInfoHandler(
     private val projectService: FileBasedProjectContextService = FileBasedProjectContextService(),
@@ -36,14 +37,35 @@ class McdevInfoHandler(
         }
 
         val session = projectService.loadSession(context.workspaceRoot)
+        val build = McdevBuildInfo.load()
+        val commands = listOf(
+            McdevCommands.INFO,
+            McdevCommands.COMPLETION,
+            McdevCommands.DIAGNOSTICS,
+            McdevCommands.HOVER,
+            McdevCommands.DEFINITION,
+            McdevCommands.CODE_ACTION,
+        )
+        val lines = InfoService.formatLines(
+            context = session.context,
+            protocolVersion = McdevProtocol.VERSION,
+            extensionVersion = McdevProtocol.SERVER_VERSION,
+        ) + listOf(
+            "Extension loaded: true",
+            "Extension build commit: ${build.commit}",
+            "Extension build time: ${build.buildTime}",
+            "Extension jar location: ${build.jarLocation}",
+            "Registered commands:",
+        ) + commands.map { "  - $it" }
         return McdevResponseEnvelope(
             capabilities = setOf("info", "completion", "diagnostics"),
             result = McdevInfoResponse(
-                lines = InfoService.formatLines(
-                    context = session.context,
-                    protocolVersion = McdevProtocol.VERSION,
-                    extensionVersion = McdevProtocol.SERVER_VERSION,
-                ),
+                lines = lines,
+                buildCommit = build.commit,
+                buildTime = build.buildTime,
+                version = build.version,
+                jarLocation = build.jarLocation,
+                registeredCommands = commands,
             ),
         )
     }

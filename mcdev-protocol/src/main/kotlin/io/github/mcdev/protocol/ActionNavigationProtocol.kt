@@ -61,4 +61,9 @@ data class McdevInfoRequest(
 
 data class McdevInfoResponse(
     val lines: List<String>,
+    val buildCommit: String? = null,
+    val buildTime: String? = null,
+    val version: String? = null,
+    val jarLocation: String? = null,
+    val registeredCommands: List<String> = emptyList(),
 )

@@ -132,7 +132,9 @@ helpers.assert_eq(#blink_adapter:get_trigger_characters(), 5)
 local completion_module = package.loaded["mcdev.completion"]
 local original_complete = completion_module.complete
 local blink_result = nil
-completion_module.complete = function(callback)
+local adapter_sources = {}
+completion_module.complete = function(callback, _, _, opts)
+  adapter_sources[#adapter_sources + 1] = opts and opts.source or nil
   callback({
     isIncomplete = true,
     items = {
@@ -160,6 +162,7 @@ helpers.assert_eq(blink_result.is_incomplete_backward, true)
 helpers.assert_eq(#blink_result.items, 1)
 helpers.assert_eq(blink_result.items[1].label, "tick(): void")
 helpers.assert_eq(blink_result.items[1].insertText, "tick")
+helpers.assert_eq(adapter_sources[#adapter_sources], "blink")
 
 local cmp_result = nil
 local cmp_source = cmp.source()
@@ -170,6 +173,7 @@ helpers.assert_not_nil(cmp_result)
 helpers.assert_eq(#cmp_result.items, 1)
 helpers.assert_eq(cmp_result.items[1].insertText, "tick")
 helpers.assert_eq(cmp_result.isIncomplete, true)
+helpers.assert_eq(adapter_sources[#adapter_sources], "cmp")
 completion_module.complete = original_complete
 
 local commands = vim.api.nvim_get_commands({})
@@ -593,6 +597,78 @@ helpers.assert_not_nil(mcdev.diagnostics)
 helpers.assert_not_nil(mcdev.convert)
 helpers.assert_not_nil(mcdev.lsp)
 helpers.assert_true(#health.lines(0) > 0)
+
+do
+  local original_get_clients_for_health = vim.lsp.get_clients
+  local original_notify_for_health = vim.notify
+  local health_message = nil
+  local commands_seen = {}
+  local fake_client = {
+    id = 99,
+    name = "jdtls",
+    config = { root_dir = vim.fn.getcwd() },
+    request = function(method, params, callback)
+      helpers.assert_eq(method, "workspace/executeCommand")
+      commands_seen[params.command] = true
+      if params.command == "mcdev.info" then
+        callback(nil, {
+          result = {
+            lines = { "Extension loaded: true" },
+            buildCommit = "test-commit",
+            buildTime = "test-time",
+            jarLocation = "file:///test.jar",
+            registeredCommands = { "mcdev.info", "mcdev.completion" },
+          },
+        })
+      elseif params.command == "mcdev.completion" then
+        callback(nil, {
+          result = {
+            items = {
+              { label = "tick(): void" },
+            },
+            debug = {
+              zeroItemReason = vim.NIL,
+              parseSource = "JDT_AST",
+              parseConfidence = "HIGH",
+              usedCompilationUnit = true,
+              usedJavaProject = true,
+              bindingResolvedCount = 1,
+              bindingFailedCount = 0,
+              semanticContextFound = true,
+              fallbackAnnotationContextUsed = false,
+              semanticTargetCount = 1,
+              semanticMemberCount = 0,
+              completionContextKind = "InjectMethod",
+              warnings = {},
+            },
+          },
+        })
+      else
+        callback(nil, { result = {} })
+      end
+    end,
+  }
+  vim.lsp.get_clients = function(opts)
+    if opts and (opts.bufnr == 0 or opts.name == "jdtls") then
+      return { fake_client }
+    end
+    return {}
+  end
+  vim.notify = function(message)
+    health_message = message
+  end
+  health.health(0)
+  helpers.assert_true(commands_seen["mcdev.info"])
+  helpers.assert_true(commands_seen["mcdev.completion"])
+  helpers.assert_true(commands_seen["mcdev.diagnostics"])
+  helpers.assert_true(commands_seen["mcdev.hover"])
+  helpers.assert_true(health_message:find("mcdev.info ping: OK", 1, true) ~= nil, health_message)
+  helpers.assert_true(health_message:find("mcdev.completion itemCount: 1", 1, true) ~= nil, health_message)
+  helpers.assert_true(health_message:find("usedCompilationUnit: true", 1, true) ~= nil, health_message)
+  helpers.assert_true(health_message:find("fallbackAnnotationContextUsed: false", 1, true) ~= nil, health_message)
+  vim.lsp.get_clients = original_get_clients_for_health
+  vim.notify = original_notify_for_health
+end
 
 do
   local original_buf_request = vim.lsp.buf_request
