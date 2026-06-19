@@ -5,8 +5,12 @@ Push-Location $repoRoot
 try {
     $gradleCmd = $env:GRADLE_CMD
     if (-not $gradleCmd) {
-        $miseGradle = Join-Path $env:LOCALAPPDATA "mise/installs/gradle/9.5.1/gradle-9.5.1/bin/gradle.bat"
-        if (Test-Path -LiteralPath $miseGradle) {
+        $miseGradle = if ($env:LOCALAPPDATA) {
+            Join-Path $env:LOCALAPPDATA "mise/installs/gradle/9.5.1/gradle-9.5.1/bin/gradle.bat"
+        } else {
+            $null
+        }
+        if ($miseGradle -and (Test-Path -LiteralPath $miseGradle)) {
             $gradleCmd = $miseGradle
         } else {
             $gradleCmd = "gradle"
@@ -18,7 +22,8 @@ try {
         if ($LASTEXITCODE -ne 0) { throw "bundle build failed" }
     }
 
-    & powershell -NoProfile -ExecutionPolicy Bypass -File (Join-Path $PSScriptRoot "prepare-e2e-workspace.ps1")
+    $powershellCmd = if ($PSVersionTable.PSEdition -eq "Core") { "pwsh" } else { "powershell" }
+    & $powershellCmd -NoProfile -ExecutionPolicy Bypass -File (Join-Path $PSScriptRoot "prepare-e2e-workspace.ps1")
     if ($LASTEXITCODE -ne 0) { throw "workspace preparation failed" }
 
     $bundleJar = Get-ChildItem -LiteralPath (Join-Path $repoRoot "mcdev-jdtls-extension/build/libs") `
@@ -29,8 +34,12 @@ try {
     $workspace = Join-Path $repoRoot "build/e2e-workspace"
     $jdtlsCmd = $env:JDTLS_CMD
     if (-not $jdtlsCmd) {
-        $masonJdtls = Join-Path $env:LOCALAPPDATA "nvim-data/mason/bin/jdtls.cmd"
-        if (Test-Path -LiteralPath $masonJdtls) {
+        $masonJdtls = if ($env:LOCALAPPDATA) {
+            Join-Path $env:LOCALAPPDATA "nvim-data/mason/bin/jdtls.cmd"
+        } else {
+            $null
+        }
+        if ($masonJdtls -and (Test-Path -LiteralPath $masonJdtls)) {
             $jdtlsCmd = $masonJdtls
         } else {
             $jdtlsCmd = "jdtls"
@@ -47,8 +56,12 @@ try {
 
     $nvimCmd = $env:NVIM_CMD
     if (-not $nvimCmd) {
-        $miseNvim = Join-Path $env:LOCALAPPDATA "mise/installs/neovim/0.12.2/nvim-win64/bin/nvim.exe"
-        if (Test-Path -LiteralPath $miseNvim) {
+        $miseNvim = if ($env:LOCALAPPDATA) {
+            Join-Path $env:LOCALAPPDATA "mise/installs/neovim/0.12.2/nvim-win64/bin/nvim.exe"
+        } else {
+            $null
+        }
+        if ($miseNvim -and (Test-Path -LiteralPath $miseNvim)) {
             $nvimCmd = $miseNvim
         } else {
             $nvimCmd = "nvim"

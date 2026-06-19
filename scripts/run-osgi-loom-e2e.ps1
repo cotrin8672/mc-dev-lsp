@@ -12,9 +12,11 @@ try {
     }
 
     if ($runGenSources) {
-        & powershell -NoProfile -ExecutionPolicy Bypass -File (Join-Path $PSScriptRoot "prepare-loom-e2e-workspace.ps1") -RunGenSources
+        $powershellCmd = if ($PSVersionTable.PSEdition -eq "Core") { "pwsh" } else { "powershell" }
+        & $powershellCmd -NoProfile -ExecutionPolicy Bypass -File (Join-Path $PSScriptRoot "prepare-loom-e2e-workspace.ps1") -RunGenSources
     } else {
-        & powershell -NoProfile -ExecutionPolicy Bypass -File (Join-Path $PSScriptRoot "prepare-loom-e2e-workspace.ps1")
+        $powershellCmd = if ($PSVersionTable.PSEdition -eq "Core") { "pwsh" } else { "powershell" }
+        & $powershellCmd -NoProfile -ExecutionPolicy Bypass -File (Join-Path $PSScriptRoot "prepare-loom-e2e-workspace.ps1")
     }
     if ($LASTEXITCODE -ne 0) { throw "loom workspace preparation failed" }
 
@@ -26,8 +28,12 @@ try {
     $workspace = Join-Path $repoRoot "build/e2e-loom-workspace"
     $jdtlsCmd = $env:JDTLS_CMD
     if (-not $jdtlsCmd) {
-        $masonJdtls = Join-Path $env:LOCALAPPDATA "nvim-data/mason/bin/jdtls.cmd"
-        if (Test-Path -LiteralPath $masonJdtls) {
+        $masonJdtls = if ($env:LOCALAPPDATA) {
+            Join-Path $env:LOCALAPPDATA "nvim-data/mason/bin/jdtls.cmd"
+        } else {
+            $null
+        }
+        if ($masonJdtls -and (Test-Path -LiteralPath $masonJdtls)) {
             $jdtlsCmd = $masonJdtls
         } else {
             $jdtlsCmd = "jdtls"

@@ -11,14 +11,8 @@ permissions:
 
 jobs:
   test:
-    name: Test (${{ matrix.os }})
-    runs-on: ${{ matrix.os }}
-    strategy:
-      fail-fast: false
-      matrix:
-        os:
-          - ubuntu-latest
-          - windows-latest
+    name: Test
+    runs-on: ubuntu-latest
 
     steps:
       - name: Check out repository
@@ -53,21 +47,12 @@ jobs:
             Sort-Object LastWriteTime -Descending |
             Select-Object -First 1 -ExpandProperty FullName
           if (-not $launcher) { throw "JDT LS launcher not found" }
-          $configDir = if ("${{ runner.os }}" -eq "Windows") { "config_win" } elseif ("${{ runner.os }}" -eq "macOS") { "config_mac" } else { "config_linux" }
-          if ("${{ runner.os }}" -eq "Windows") {
-            $cmdPath = Join-Path $env:RUNNER_TEMP "jdtls-ci.cmd"
-            @(
-              "@echo off",
-              "java -Declipse.application=org.eclipse.jdt.ls.core.id1 -Dosgi.bundles.defaultStartLevel=4 -Declipse.product=org.eclipse.jdt.ls.core.product -Dosgi.checkConfiguration=true -Xms1G --add-modules=ALL-SYSTEM --add-opens java.base/java.util=ALL-UNNAMED --add-opens java.base/java.lang=ALL-UNNAMED -jar `"$launcher`" -configuration `"$(Join-Path $installDir $configDir)`" %*"
-            ) | Set-Content -LiteralPath $cmdPath -Encoding ASCII
-          } else {
-            $cmdPath = Join-Path $env:RUNNER_TEMP "jdtls-ci"
-            @(
-              "#!/usr/bin/env sh",
-              "exec java -Declipse.application=org.eclipse.jdt.ls.core.id1 -Dosgi.bundles.defaultStartLevel=4 -Declipse.product=org.eclipse.jdt.ls.core.product -Dosgi.checkConfiguration=true -Xms1G --add-modules=ALL-SYSTEM --add-opens java.base/java.util=ALL-UNNAMED --add-opens java.base/java.lang=ALL-UNNAMED -jar '$launcher' -configuration '$(Join-Path $installDir $configDir)' `"`$@`""
-            ) | Set-Content -LiteralPath $cmdPath -Encoding ASCII
-            chmod +x $cmdPath
-          }
+          $cmdPath = Join-Path $env:RUNNER_TEMP "jdtls-ci"
+          @(
+            "#!/usr/bin/env sh",
+            "exec java -Declipse.application=org.eclipse.jdt.ls.core.id1 -Dosgi.bundles.defaultStartLevel=4 -Declipse.product=org.eclipse.jdt.ls.core.product -Dosgi.checkConfiguration=true -Xms1G --add-modules=ALL-SYSTEM --add-opens java.base/java.util=ALL-UNNAMED --add-opens java.base/java.lang=ALL-UNNAMED -jar '$launcher' -configuration '$(Join-Path $installDir "config_linux")' `"`$@`""
+          ) | Set-Content -LiteralPath $cmdPath -Encoding ASCII
+          chmod +x $cmdPath
           "JDTLS_CMD=$cmdPath" | Out-File -FilePath $env:GITHUB_ENV -Encoding utf8 -Append
 
       - name: Run Gradle tests

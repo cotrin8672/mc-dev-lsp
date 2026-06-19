@@ -16,15 +16,24 @@ try {
 
     foreach ($fixture in $fixtures) {
         Write-Host "running osgi e2e for $fixture"
-        & powershell -NoProfile -ExecutionPolicy Bypass -File (Join-Path $PSScriptRoot "prepare-e2e-workspace.ps1") -Fixture $fixture
+        $powershellCmd = if ($PSVersionTable.PSEdition -eq "Core") { "pwsh" } else { "powershell" }
+        & $powershellCmd -NoProfile -ExecutionPolicy Bypass -File (Join-Path $PSScriptRoot "prepare-e2e-workspace.ps1") -Fixture $fixture
         if ($LASTEXITCODE -ne 0) { throw "workspace preparation failed for $fixture" }
 
-        $bundleJar = Join-Path $repoRoot "mcdev-jdtls-extension/build/libs/io.github.mcdev.jdtls-0.1.0-SNAPSHOT.jar"
+        $bundleJar = Get-ChildItem -LiteralPath (Join-Path $repoRoot "mcdev-jdtls-extension/build/libs") `
+            -Filter "io.github.mcdev.jdtls-*.jar" |
+            Sort-Object LastWriteTime -Descending |
+            Select-Object -First 1 -ExpandProperty FullName
+        if (-not $bundleJar) { throw "bundle jar not found" }
         $workspace = Join-Path $repoRoot "build/e2e-workspace"
         $jdtlsCmd = $env:JDTLS_CMD
         if (-not $jdtlsCmd) {
-            $masonJdtls = Join-Path $env:LOCALAPPDATA "nvim-data/mason/bin/jdtls.cmd"
-            if (Test-Path -LiteralPath $masonJdtls) {
+            $masonJdtls = if ($env:LOCALAPPDATA) {
+                Join-Path $env:LOCALAPPDATA "nvim-data/mason/bin/jdtls.cmd"
+            } else {
+                $null
+            }
+            if ($masonJdtls -and (Test-Path -LiteralPath $masonJdtls)) {
                 $jdtlsCmd = $masonJdtls
             } else {
                 $jdtlsCmd = "jdtls"

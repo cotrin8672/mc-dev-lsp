@@ -9,22 +9,38 @@ $repoRoot = Split-Path -Parent $PSScriptRoot
 $workspaceRoot = Join-Path $repoRoot "build/e2e-workspace"
 $awAtFixtureRoot = "fixtures/fabric-aw-at"
 
+function Get-FixtureJar {
+    if ($script:FixtureJar) { return $script:FixtureJar }
+
+    $jarDir = Join-Path $repoRoot "mcdev-test-fixtures/build/libs"
+    Push-Location $repoRoot
+    try {
+        & gradle :mcdev-test-fixtures:jar 2>&1 | ForEach-Object { Write-Host $_ }
+        if ($LASTEXITCODE -ne 0) { throw "failed to build mcdev-test-fixtures jar" }
+    } finally {
+        Pop-Location
+    }
+
+    $rootBuild = Get-Content -LiteralPath (Join-Path $repoRoot "build.gradle.kts") -Raw
+    if ($rootBuild -notmatch 'version\s*=\s*"([^"]+)"') {
+        throw "root project version not found"
+    }
+    $version = $Matches[1]
+    $sourceJar = Join-Path $jarDir "mcdev-test-fixtures-$version.jar"
+    if (-not (Test-Path -LiteralPath $sourceJar)) {
+        throw "mcdev-test-fixtures jar not found: $sourceJar"
+    }
+    $script:FixtureJar = $sourceJar
+    return $sourceJar
+}
+
 function Copy-FixtureResource {
     param(
         [string]$ResourcePath,
         [string]$Destination
     )
 
-    $sourceJar = Join-Path $repoRoot "mcdev-test-fixtures/build/libs/mcdev-test-fixtures-0.1.0-SNAPSHOT.jar"
-    if (-not (Test-Path -LiteralPath $sourceJar)) {
-        Push-Location $repoRoot
-        try {
-            & gradle :mcdev-test-fixtures:jar
-            if ($LASTEXITCODE -ne 0) { throw "failed to build mcdev-test-fixtures jar" }
-        } finally {
-            Pop-Location
-        }
-    }
+    $sourceJar = Get-FixtureJar
 
     Add-Type -AssemblyName System.IO.Compression.FileSystem
     $zip = [System.IO.Compression.ZipFile]::OpenRead($sourceJar)
@@ -49,16 +65,7 @@ function Copy-FixtureTree {
         [string]$DestinationRoot
     )
 
-    $sourceJar = Join-Path $repoRoot "mcdev-test-fixtures/build/libs/mcdev-test-fixtures-0.1.0-SNAPSHOT.jar"
-    if (-not (Test-Path -LiteralPath $sourceJar)) {
-        Push-Location $repoRoot
-        try {
-            & gradle :mcdev-test-fixtures:jar
-            if ($LASTEXITCODE -ne 0) { throw "failed to build mcdev-test-fixtures jar" }
-        } finally {
-            Pop-Location
-        }
-    }
+    $sourceJar = Get-FixtureJar
 
     Add-Type -AssemblyName System.IO.Compression.FileSystem
     $zip = [System.IO.Compression.ZipFile]::OpenRead($sourceJar)
