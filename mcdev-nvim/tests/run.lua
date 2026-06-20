@@ -155,7 +155,9 @@ completion_module.complete = function(callback, _, _, opts)
     },
   })
 end
-blink_adapter:get_completions({ bufnr = 0, cursor = { 1, 5 } }, function(result)
+vim.api.nvim_buf_set_lines(0, 0, -1, false, { '@Inject(method = "ti' })
+local blink_cursor = { 1, #'@Inject(method = "ti' }
+blink_adapter:get_completions({ bufnr = 0, cursor = blink_cursor }, function(result)
   blink_result = result
 end)
 helpers.assert_not_nil(blink_result)
@@ -164,6 +166,14 @@ helpers.assert_eq(blink_result.is_incomplete_backward, true)
 helpers.assert_eq(#blink_result.items, 1)
 helpers.assert_eq(blink_result.items[1].label, "tick(): void")
 helpers.assert_eq(blink_result.items[1].insertText, "tick")
+helpers.assert_eq(blink_result.items[1].kind, vim.lsp.protocol.CompletionItemKind.Value)
+helpers.assert_eq(blink_result.items[1].kind_icon, "")
+helpers.assert_eq(blink_result.items[1].kind_name, "Mixin")
+helpers.assert_eq(blink_result.items[1].textEdit.newText, "tick")
+helpers.assert_eq(blink_result.items[1].textEdit.range.start.line, 0)
+helpers.assert_eq(blink_result.items[1].textEdit.range.start.character, blink_cursor[2] - 2)
+helpers.assert_eq(blink_result.items[1].textEdit.range["end"].line, 0)
+helpers.assert_eq(blink_result.items[1].textEdit.range["end"].character, blink_cursor[2])
 helpers.assert_eq(adapter_sources[#adapter_sources], "blink")
 
 local cmp_result = nil
