@@ -40,6 +40,7 @@ local function to_blink_item(item, bufnr, position)
   local blink_item = vim.deepcopy(item)
   blink_item.kind_icon = mixin_icon
   blink_item.kind_name = "Mixin"
+  blink_item.cursor_column = position[2] or 0
 
   if is_method_kind(blink_item.kind) then
     blink_item.kind = vim.lsp.protocol.CompletionItemKind.Value

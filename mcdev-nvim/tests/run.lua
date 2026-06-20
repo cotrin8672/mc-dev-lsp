@@ -169,11 +169,15 @@ helpers.assert_eq(blink_result.items[1].insertText, "tick")
 helpers.assert_eq(blink_result.items[1].kind, vim.lsp.protocol.CompletionItemKind.Value)
 helpers.assert_eq(blink_result.items[1].kind_icon, "")
 helpers.assert_eq(blink_result.items[1].kind_name, "Mixin")
+helpers.assert_eq(blink_result.items[1].cursor_column, blink_cursor[2])
 helpers.assert_eq(blink_result.items[1].textEdit.newText, "tick")
 helpers.assert_eq(blink_result.items[1].textEdit.range.start.line, 0)
 helpers.assert_eq(blink_result.items[1].textEdit.range.start.character, blink_cursor[2] - 2)
 helpers.assert_eq(blink_result.items[1].textEdit.range["end"].line, 0)
 helpers.assert_eq(blink_result.items[1].textEdit.range["end"].character, blink_cursor[2])
+vim.lsp.util.apply_text_edits({ blink_result.items[1].textEdit }, vim.api.nvim_get_current_buf(), "utf-8")
+helpers.assert_eq(vim.api.nvim_buf_get_lines(0, 0, 1, false)[1], '@Inject(method = "tick')
+vim.bo.modified = false
 helpers.assert_eq(adapter_sources[#adapter_sources], "blink")
 
 local cmp_result = nil
