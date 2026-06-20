@@ -32,6 +32,12 @@ data class CompletionConvertContext(
     val sourceNamespace: MappingNamespace = MappingNamespace.NAMED,
     val runtimeNamespace: MappingNamespace = MappingNamespace.INTERMEDIARY,
     val siblingItems: List<McCompletionItem> = emptyList(),
+    val atTargetStats: AtTargetStats? = null,
+)
+
+data class AtTargetStats(
+    val sameNameCounts: Map<String, Int>,
+    val sameSignatureCounts: Map<Pair<String, String>, Int>,
 )
 
 object CompletionItemConverter {
@@ -80,8 +86,13 @@ object CompletionItemConverter {
             source = source,
             annotationContext = annotationContext,
         ),
-    ): List<McdevCompletionItemDto> =
-        items.map { toDto(it, annotationContext, source, convertContext.copy(siblingItems = items)) }
+    ): List<McdevCompletionItemDto> {
+        val statsContext = convertContext.copy(
+            siblingItems = items,
+            atTargetStats = buildAtTargetStats(items, convertContext),
+        )
+        return items.map { toDto(it, annotationContext, source, statsContext) }
+    }
 
     private fun resolveInsertText(item: McCompletionItem, context: CompletionConvertContext): String {
         if (context.preferredAtTarget.equals("descriptor", ignoreCase = true) &&
@@ -107,21 +118,34 @@ object CompletionItemConverter {
 
     private fun smartAtTargetInsertText(item: McCompletionItem, context: CompletionConvertContext): String {
         val target = remappedMemberTarget(item, context) ?: return item.insertText
-        val siblingTargets = context.siblingItems
-            .asSequence()
-            .filter { it.metadata.source == "mixin.atTarget" }
-            .mapNotNull { remappedMemberTarget(it, context) }
-            .toList()
-        val sameNameCount = siblingTargets.count { it.name == target.name }
-        val sameSignatureCount = siblingTargets.count {
-            it.name == target.name && it.descriptor == target.descriptor
-        }
+        val stats = context.atTargetStats ?: buildAtTargetStats(context.siblingItems, context)
+        val sameNameCount = stats?.sameNameCounts?.get(target.name) ?: 0
+        val sameSignatureCount = stats?.sameSignatureCounts?.get(target.name to target.descriptor) ?: 0
         return when {
             target.kind == AtTargetKind.RETURN || target.kind == AtTargetKind.CONSTANT -> item.insertText
             sameNameCount <= 1 -> target.name
             sameSignatureCount <= 1 -> target.name + target.separator + target.descriptor
             else -> target.fullText
         }
+    }
+
+    private fun buildAtTargetStats(
+        items: List<McCompletionItem>,
+        context: CompletionConvertContext,
+    ): AtTargetStats? {
+        if (!context.preferredAtTarget.equals("smart", ignoreCase = true) || context.mappingResolver == null) {
+            return null
+        }
+        val targets = items
+            .asSequence()
+            .filter { it.metadata.source == "mixin.atTarget" }
+            .mapNotNull { remappedMemberTarget(it, context.copy(atTargetStats = null)) }
+            .toList()
+        if (targets.isEmpty()) return null
+        return AtTargetStats(
+            sameNameCounts = targets.groupingBy { it.name }.eachCount(),
+            sameSignatureCounts = targets.groupingBy { it.name to it.descriptor }.eachCount(),
+        )
     }
 
     private data class RemappedAtTarget(

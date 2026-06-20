@@ -23,6 +23,7 @@ import io.github.mcdev.core.project.MixinConfigRef
 import io.github.mcdev.core.project.ProjectContext
 import io.github.mcdev.jdtls.project.McdevProjectSession
 import io.github.mcdev.jdtls.project.UriPathSupport
+import java.net.URI
 
 class MixinServiceFacade(
     private val facadeFactory: (ClassIndex, BytecodeIndex) -> CoreMixinServiceFacade = { classIndex, bytecodeIndex ->
@@ -30,6 +31,7 @@ class MixinServiceFacade(
     },
     private val referenceService: MixinReferenceService = MixinReferenceService(),
     private val semanticModelParser: JdtMixinSemanticModelParser = JdtMixinSemanticModelParser(),
+    private val completionIndexCaches: CompletionIndexCaches = CompletionIndexCaches(),
     private val completeOverride: ((
         session: McdevProjectSession,
         source: String,
@@ -56,9 +58,10 @@ class MixinServiceFacade(
         options: MixinCompletionOptions,
         documentUri: String,
         semanticModel: MixinClassModel,
+        projectSessionVersion: Long = 0,
     ): List<McCompletionItem> =
         completeOverride?.invoke(session, source, line, character, options)
-            ?: facade(session, source = source, documentUri = documentUri).complete(
+            ?: facade(session, source = source, documentUri = documentUri, projectSessionVersion = projectSessionVersion).complete(
                 MixinFacadeRequest(
                     bufferText = source,
                     line = line,
@@ -78,7 +81,9 @@ class MixinServiceFacade(
         documentUri: String,
         semanticModel: MixinClassModel,
         languageId: String,
+        projectSessionVersion: Long = 0,
     ): MixinCompletionResult {
+        completionIndexCaches.resetDebug()
         completeOverride?.invoke(session, source, line, character, options)?.let { items ->
             return MixinCompletionResult(
                 items = items,
@@ -109,7 +114,12 @@ class MixinServiceFacade(
                 ),
             )
         }
-        return facade(session, source = source, documentUri = documentUri).completeWithDebug(
+        return facade(
+            session,
+            source = source,
+            documentUri = documentUri,
+            projectSessionVersion = projectSessionVersion,
+        ).completeWithDebug(
             MixinFacadeRequest(
                 bufferText = source,
                 line = line,
@@ -122,6 +132,8 @@ class MixinServiceFacade(
             languageId = languageId,
         )
     }
+
+    fun candidateCacheDebug(): CandidateCacheDebug = completionIndexCaches.debug()
 
     fun analyzeDiagnostics(
         session: McdevProjectSession,
@@ -223,15 +235,26 @@ class MixinServiceFacade(
     private fun facade(session: McdevProjectSession): CoreMixinServiceFacade =
         facadeFactory(session.classIndex, session.bytecodeIndex)
 
-    private fun facade(session: McdevProjectSession, source: String, documentUri: String): CoreMixinServiceFacade =
+    private fun facade(
+        session: McdevProjectSession,
+        source: String,
+        documentUri: String,
+        projectSessionVersion: Long = 0,
+    ): CoreMixinServiceFacade =
         facadeFactory(
-            SourceBackedClassIndex(
-                delegate = session.classIndex,
-                session = session,
-                currentDocumentUri = documentUri,
-                currentBufferText = source,
+            completionIndexCaches.classIndex(
+                SourceBackedClassIndex(
+                    delegate = session.classIndex,
+                    session = session,
+                    currentDocumentUri = documentUri,
+                    currentBufferText = source,
+                ),
+                projectSessionVersion = projectSessionVersion,
             ),
-            session.bytecodeIndex,
+            completionIndexCaches.bytecodeIndex(
+                session.bytecodeIndex,
+                projectSessionVersion = projectSessionVersion,
+            ),
         )
 
     private fun buildFacadeRequest(
@@ -263,4 +286,31 @@ class MixinServiceFacade(
 
     fun semanticModel(source: String, documentUri: String): MixinClassModel =
         semanticModelParser.parse(source, documentUri)
+
+    fun semanticModel(source: String, documentUri: String, session: McdevProjectSession): MixinClassModel =
+        semanticModelParser.parse(
+            source = source,
+            documentUri = documentUri,
+            environment = JdtParseEnvironment(
+                classpathEntries = session.context.classpath.allEntries.map { it.toString() },
+                sourcepathEntries = session.context.sourceSets.flatMap { sourceSet ->
+                    sourceSet.sourceDirectories.map { it.toString() }
+                },
+                unitName = unitNameFor(documentUri, session),
+            ),
+        )
+
+    private fun unitNameFor(documentUri: String, session: McdevProjectSession): String? {
+        val path = runCatching { UriPathSupport.uriToPath(documentUri) }
+            .getOrElse {
+                runCatching { java.nio.file.Path.of(URI(documentUri)) }.getOrNull()
+            } ?: return null
+        session.context.sourceSets
+            .flatMap { it.sourceDirectories }
+            .firstOrNull { sourceDir -> path.startsWith(sourceDir) }
+            ?.let { sourceDir ->
+                return sourceDir.relativize(path).toString().replace('\\', '/')
+            }
+        return path.fileName?.toString()
+    }
 }

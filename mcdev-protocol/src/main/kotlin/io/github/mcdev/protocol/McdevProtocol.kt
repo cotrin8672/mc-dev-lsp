@@ -41,6 +41,8 @@ data class McdevRequestContext(
     val languageId: String,
     val position: McdevPosition,
     val bufferText: String,
+    val documentVersion: Long? = null,
+    val bufferTextFallbackUsed: Boolean = false,
     val client: McdevClientInfo,
 )
 

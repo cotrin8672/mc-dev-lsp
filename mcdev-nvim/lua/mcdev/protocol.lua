@@ -110,6 +110,7 @@ function M.context(bufnr, position)
       line = position[1] - 1,
       character = position[2],
     },
+    documentVersion = vim.api.nvim_buf_get_changedtick(bufnr),
     bufferText = table.concat(vim.api.nvim_buf_get_lines(bufnr, 0, -1, false), "\n"),
     client = {
       name = "mcdev.nvim",
@@ -143,8 +144,11 @@ end
 
 function M.build_completion_payload(bufnr, position)
   local opts = config.options.insert
+  local ctx = M.context(bufnr, position)
+  ctx.bufferTextFallback = ctx.bufferText
+  ctx.bufferText = nil
   return {
-    context = M.context(bufnr, position),
+    context = ctx,
     trigger = {
       kind = "manual",
       character = nil,

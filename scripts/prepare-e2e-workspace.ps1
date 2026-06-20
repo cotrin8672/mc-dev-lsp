@@ -13,6 +13,17 @@ function Get-FixtureJar {
     if ($script:FixtureJar) { return $script:FixtureJar }
 
     $jarDir = Join-Path $repoRoot "mcdev-test-fixtures/build/libs"
+    $rootBuild = Get-Content -LiteralPath (Join-Path $repoRoot "build.gradle.kts") -Raw
+    if ($rootBuild -notmatch 'version\s*=\s*"([^"]+)"') {
+        throw "root project version not found"
+    }
+    $version = $Matches[1]
+    $sourceJar = Join-Path $jarDir "mcdev-test-fixtures-$version.jar"
+    if (Test-Path -LiteralPath $sourceJar) {
+        $script:FixtureJar = $sourceJar
+        return $sourceJar
+    }
+
     Push-Location $repoRoot
     try {
         & gradle :mcdev-test-fixtures:jar 2>&1 | ForEach-Object { Write-Host $_ }
@@ -21,12 +32,6 @@ function Get-FixtureJar {
         Pop-Location
     }
 
-    $rootBuild = Get-Content -LiteralPath (Join-Path $repoRoot "build.gradle.kts") -Raw
-    if ($rootBuild -notmatch 'version\s*=\s*"([^"]+)"') {
-        throw "root project version not found"
-    }
-    $version = $Matches[1]
-    $sourceJar = Join-Path $jarDir "mcdev-test-fixtures-$version.jar"
     if (-not (Test-Path -LiteralPath $sourceJar)) {
         throw "mcdev-test-fixtures jar not found: $sourceJar"
     }

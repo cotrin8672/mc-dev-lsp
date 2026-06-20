@@ -118,7 +118,11 @@ class ProtocolPayloadDecoder(
         val workspaceRoot = contextObject.getRequiredString("workspaceRoot")
         val documentUri = contextObject.getRequiredString("documentUri")
         val languageId = contextObject.getStringOrDefault("languageId", "java")
-        val bufferText = contextObject.getStringOrDefault("bufferText", "")
+        val directBufferText = contextObject.getNullableString("bufferText")
+        val fallbackBufferText = contextObject.getNullableString("bufferTextFallback")
+        val bufferText = directBufferText ?: fallbackBufferText.orEmpty()
+        val documentVersion = contextObject.getLongOrNull("documentVersion")
+            ?: contextObject.getLongOrNull("changedtick")
         val positionObject = contextObject.getAsJsonObject("position")
             ?: throw ProtocolDecodeException("missing cursor position")
         val clientObject = contextObject.getAsJsonObject("client")
@@ -132,6 +136,8 @@ class ProtocolPayloadDecoder(
                 character = positionObject.getIntOrDefault("character", 0),
             ),
             bufferText = bufferText,
+            documentVersion = documentVersion,
+            bufferTextFallbackUsed = directBufferText == null && fallbackBufferText != null,
             client = McdevClientInfo(
                 name = clientObject?.getStringOrDefault("name", "unknown") ?: "unknown",
                 version = clientObject?.getStringOrDefault("version", "0.0.0") ?: "0.0.0",
@@ -157,6 +163,11 @@ class ProtocolPayloadDecoder(
     private fun JsonObject.getIntOrDefault(name: String, defaultValue: Int): Int {
         if (!has(name) || get(name).isJsonNull) return defaultValue
         return get(name).asInt
+    }
+
+    private fun JsonObject.getLongOrNull(name: String): Long? {
+        if (!has(name) || get(name).isJsonNull) return null
+        return runCatching { get(name).asLong }.getOrNull()
     }
 
     private fun decodeRange(rangeObject: JsonObject): McdevRange {

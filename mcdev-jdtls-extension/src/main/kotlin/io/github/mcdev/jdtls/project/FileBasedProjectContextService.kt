@@ -15,16 +15,35 @@ import kotlin.io.path.isRegularFile
 import kotlin.io.path.name
 import kotlin.io.path.readText
 
-class FileBasedProjectContextService(
-    private val sessionCache: MutableMap<String, McdevProjectSession> = mutableMapOf(),
-) {
-    fun loadSession(workspaceRootUri: String): McdevProjectSession {
+data class CachedProjectSession(
+    val session: McdevProjectSession,
+    val version: Long,
+    val cacheHit: Boolean,
+)
+
+class FileBasedProjectContextService {
+    private data class SessionEntry(
+        val session: McdevProjectSession,
+        val version: Long,
+    )
+
+    private val sessionCache: MutableMap<String, SessionEntry> = mutableMapOf()
+    private val versionCounters: MutableMap<String, Long> = mutableMapOf()
+
+    fun loadSession(workspaceRootUri: String): McdevProjectSession =
+        loadCachedSession(workspaceRootUri).session
+
+    fun loadCachedSession(workspaceRootUri: String): CachedProjectSession {
         val cacheKey = workspaceRootUri.trim()
-        return sessionCache.getOrPut(cacheKey) {
-            val root = UriPathSupport.uriToPath(workspaceRootUri)
-            val context = buildProjectContext(root)
-            McdevProjectSession.create(context)
+        sessionCache[cacheKey]?.let { entry ->
+            return CachedProjectSession(entry.session, entry.version, cacheHit = true)
         }
+        val root = UriPathSupport.uriToPath(workspaceRootUri)
+        val context = buildProjectContext(root)
+        val session = McdevProjectSession.create(context)
+        val version = versionCounters.getOrPut(cacheKey) { 1L }
+        sessionCache[cacheKey] = SessionEntry(session, version)
+        return CachedProjectSession(session, version, cacheHit = false)
     }
 
     fun reindex(workspaceRootUri: String): McdevProjectSession {
@@ -32,7 +51,9 @@ class FileBasedProjectContextService(
         val root = UriPathSupport.uriToPath(workspaceRootUri)
         val context = buildProjectContext(root)
         val session = McdevProjectSession.create(context).reindex()
-        sessionCache[cacheKey] = session
+        val version = (versionCounters[cacheKey] ?: 0L) + 1L
+        versionCounters[cacheKey] = version
+        sessionCache[cacheKey] = SessionEntry(session, version)
         return session
     }
 

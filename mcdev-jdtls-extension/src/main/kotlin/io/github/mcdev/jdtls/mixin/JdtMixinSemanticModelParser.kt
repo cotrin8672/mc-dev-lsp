@@ -17,6 +17,12 @@ import io.github.mcdev.core.mixin.ParseSource
 import io.github.mcdev.core.mixin.SemanticParseDebugInfo
 import java.net.URI
 
+data class JdtParseEnvironment(
+    val classpathEntries: List<String> = emptyList(),
+    val sourcepathEntries: List<String> = emptyList(),
+    val unitName: String? = null,
+)
+
 class JdtMixinSemanticModelParser {
     private val astParserClass: Class<*>? = runCatching {
         Class.forName("org.eclipse.jdt.core.dom.ASTParser")
@@ -25,7 +31,11 @@ class JdtMixinSemanticModelParser {
         Class.forName("org.eclipse.jdt.core.dom.AST")
     }.getOrNull()
 
-    fun parse(source: String, documentUri: String): MixinClassModel {
+    fun parse(
+        source: String,
+        documentUri: String,
+        environment: JdtParseEnvironment = JdtParseEnvironment(),
+    ): MixinClassModel {
         val parserClass = astParserClass
         val astApiClass = astClass
         if (parserClass == null || astApiClass == null) {
@@ -34,7 +44,7 @@ class JdtMixinSemanticModelParser {
         val jdtSource = resolveJdtSource(documentUri)
             ?: return fallback(source, documentUri, "JDT compilation unit is not available for $documentUri")
         return runCatching {
-            val ast = parseAst(parserClass, astApiClass, source, jdtSource)
+            val ast = parseAst(parserClass, astApiClass, source, jdtSource, environment)
             val fallback = MixinSemanticModelParser.parse(
                 source = source,
                 sourceUri = documentUri,
@@ -53,7 +63,13 @@ class JdtMixinSemanticModelParser {
         }
     }
 
-    private fun parseAst(parserClass: Class<*>, astApiClass: Class<*>, source: String, jdtSource: JdtAstSource): Any {
+    private fun parseAst(
+        parserClass: Class<*>,
+        astApiClass: Class<*>,
+        source: String,
+        jdtSource: JdtAstSource,
+        environment: JdtParseEnvironment,
+    ): Any {
         val astLevel = astApiClass.fields.firstOrNull { it.name == "JLS21" }?.getInt(null)
             ?: astApiClass.fields.firstOrNull { it.name.startsWith("JLS") }?.getInt(null)
             ?: 21
@@ -62,11 +78,14 @@ class JdtMixinSemanticModelParser {
         val kind = parserClass.getField("K_COMPILATION_UNIT").getInt(null)
         parserClass.getMethod("setKind", Int::class.javaPrimitiveType).invoke(parser, kind)
         parserClass.getMethod("setSource", CharArray::class.java).invoke(parser, source.toCharArray())
-        jdtSource.javaProject?.let {
+        val environmentApplied = applyEnvironment(parserClass, parser, environment)
+        if (!environmentApplied) {
+            jdtSource.javaProject?.let {
             val javaProjectClass = Class.forName("org.eclipse.jdt.core.IJavaProject")
             parserClass.getMethod("setProject", javaProjectClass).invoke(parser, it)
+            }
         }
-        jdtSource.unitName?.let {
+        (environment.unitName ?: jdtSource.unitName)?.let {
             runCatching { parserClass.getMethod("setUnitName", String::class.java).invoke(parser, it) }
         }
         parserClass.getMethod("setResolveBindings", Boolean::class.javaPrimitiveType).invoke(parser, true)
@@ -75,6 +94,27 @@ class JdtMixinSemanticModelParser {
         return parserClass.methods.firstOrNull { it.name == "createAST" && it.parameterCount == 1 }
             ?.invoke(parser, null)
             ?: error("ASTParser.createAST returned null")
+    }
+
+    private fun applyEnvironment(parserClass: Class<*>, parser: Any, environment: JdtParseEnvironment): Boolean {
+        if (environment.classpathEntries.isEmpty() && environment.sourcepathEntries.isEmpty()) {
+            return false
+        }
+        return runCatching {
+            parserClass.getMethod(
+                "setEnvironment",
+                Array<String>::class.java,
+                Array<String>::class.java,
+                Array<String>::class.java,
+                Boolean::class.javaPrimitiveType,
+            ).invoke(
+                parser,
+                environment.classpathEntries.toTypedArray(),
+                environment.sourcepathEntries.toTypedArray(),
+                null,
+                true,
+            )
+        }.isSuccess
     }
 
     private fun fallback(source: String, documentUri: String, reason: String): MixinClassModel =

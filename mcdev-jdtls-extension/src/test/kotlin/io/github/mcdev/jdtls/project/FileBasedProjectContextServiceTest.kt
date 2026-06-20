@@ -67,6 +67,22 @@ class FileBasedProjectContextServiceTest {
     }
 
     @Test
+    fun cachedSessionReportsHitAndReindexBumpsVersion() {
+        JdtlsFixtureSupport.copyFixture(FixturePaths.FABRIC_BASIC, tempDir)
+        JdtlsFixtureSupport.installClasspathClasses(tempDir)
+        val uri = JdtlsFixtureSupport.workspaceUri(tempDir)
+        val first = service.loadCachedSession(uri)
+        val second = service.loadCachedSession(uri)
+        service.reindex(uri)
+        val afterReindex = service.loadCachedSession(uri)
+
+        assertEquals(false, first.cacheHit)
+        assertEquals(true, second.cacheHit)
+        assertEquals(first.version, second.version)
+        assertTrue(afterReindex.version > second.version)
+    }
+
+    @Test
     fun emptyWorkspaceHasNoClasspathEntries() {
         val context = service.buildProjectContext(tempDir)
         assertEquals(0, context.classpath.entryCount)

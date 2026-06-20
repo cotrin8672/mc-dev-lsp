@@ -259,11 +259,7 @@ local function capture_notify(callback, timeout_ms)
   return message
 end
 
-sync_request("workspace/executeCommand", {
-  command = "java.reloadBundles",
-  arguments = { { bundle_jar } },
-}, 120000)
-log_step("reload bundles requested")
+log_step("bundle provided through init_options.bundles")
 
 if mixin_file then
 with_buffer(mixin_file, "java", nil, function(bufnr)

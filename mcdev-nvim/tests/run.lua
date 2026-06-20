@@ -105,6 +105,8 @@ helpers.assert_eq(payload.options.mixinClassInsert, "import")
 helpers.assert_eq(payload.options.injectMethodDescriptor, "auto")
 helpers.assert_not_nil(payload.context.client)
 helpers.assert_eq(payload.context.client.name, "mcdev.nvim")
+helpers.assert_nil(payload.context.bufferText)
+helpers.assert_not_nil(payload.context.bufferTextFallback)
 
 local original_get_clients = vim.lsp.get_clients
 local original_notify = vim.notify
@@ -220,6 +222,55 @@ local function with_named_buffer(name, filetype, lines, callback)
   callback(bufnr)
   vim.api.nvim_buf_delete(bufnr, { force = true })
 end
+
+with_named_buffer("/project/src/main/java/com/example/mixin/ExampleMixin.java", "java", {
+  '@Inject(method = "dr',
+}, function(bufnr)
+  local protocol_module = package.loaded["mcdev.protocol"]
+  local original_completion = protocol_module.completion
+  local server_requests = 0
+  protocol_module.completion = function(callback)
+    server_requests = server_requests + 1
+    if server_requests == 1 then
+      callback({
+        result = {
+          items = {
+            {
+              label = "draw(String): void",
+              insertText = "draw",
+              kind = "method",
+              sortKey = "0200_draw",
+              filterText = "draw",
+              detail = "SimpleTarget",
+              additionalEdits = {},
+              metadata = { source = "mixin.injectMethod" },
+            },
+          },
+          debug = {},
+        },
+      }, nil)
+    end
+  end
+
+  local first = nil
+  completion.complete(function(result)
+    first = result
+  end, bufnr, { 1, #'@Inject(method = "dr' }, { source = "manual" })
+  helpers.assert_eq(#first.items, 1)
+
+  vim.api.nvim_buf_set_lines(bufnr, 0, 1, false, { '@Inject(method = "dra' })
+  local second = nil
+  completion.complete(function(result)
+    second = result
+  end, bufnr, { 1, #'@Inject(method = "dra' }, { source = "manual" })
+  helpers.assert_not_nil(second)
+  helpers.assert_eq(#second.items, 1)
+  helpers.assert_eq(second.items[1].insertText, "draw")
+  helpers.assert_true(completion.last_local_prefix_cache_hit)
+  helpers.assert_eq(server_requests, 2)
+
+  protocol_module.completion = original_completion
+end)
 
 with_named_buffer("/project/src/main/resources/mod.accesswidener", "plaintext", {
   "accessWidener v2 named",
@@ -394,6 +445,7 @@ with_named_buffer("/project/src/main/resources/mod.accesswidener", "accesswidene
   local ctx = protocol.context(bufnr, { 2, 12 })
   helpers.assert_eq(ctx.position.line, 1)
   helpers.assert_eq(ctx.position.character, 12)
+  helpers.assert_eq(ctx.documentVersion, vim.api.nvim_buf_get_changedtick(bufnr))
   helpers.assert_true(ctx.bufferText:find("accessible class", 1, true) ~= nil)
 end)
 

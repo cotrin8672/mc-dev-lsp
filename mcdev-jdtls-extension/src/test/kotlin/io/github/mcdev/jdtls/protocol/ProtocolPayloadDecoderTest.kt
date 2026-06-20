@@ -33,6 +33,16 @@ class ProtocolPayloadDecoderTest {
     }
 
     @Test
+    fun decodesCompletionBufferTextFallback() {
+        val context = contextPayload().toMutableMap()
+        context.remove("bufferText")
+        context["bufferTextFallback"] = "@Mixin(Fallback"
+        val request = decoder.decodeCompletionRequest(listOf(context + completionOptionsPayload()))
+        assertEquals("@Mixin(Fallback", request.context.bufferText)
+        assertEquals(true, request.context.bufferTextFallbackUsed)
+    }
+
+    @Test
     fun decodesFlatContextPayload() {
         val context = decoder.decodeContextRequest(listOf(contextPayload()))
         assertEquals(12, context.position.line)
@@ -180,6 +190,15 @@ class ProtocolPayloadDecoderTest {
     )
 
     private fun completionPayload(): Map<String, Any?> = contextPayload() + mapOf(
+        "trigger" to mapOf("kind" to "manual", "character" to null),
+        "options" to mapOf(
+            "preferredAtTarget" to "descriptor",
+            "mixinClassInsert" to "import",
+            "injectMethodDescriptor" to "auto",
+        ),
+    )
+
+    private fun completionOptionsPayload(): Map<String, Any?> = mapOf(
         "trigger" to mapOf("kind" to "manual", "character" to null),
         "options" to mapOf(
             "preferredAtTarget" to "descriptor",

@@ -65,6 +65,77 @@ class McdevCompletionHandlerTest {
     }
 
     @Test
+    fun reusesSemanticModelForSameDocumentVersion() {
+        val handler = createHandler()
+        val source = FixtureResourceLoader.loadText(FixturePaths.FABRIC_BASIC_EXAMPLE_MIXIN)
+        val (line, character) = JdtlsFixtureSupport.mixinCursorPosition(source, "SimpleTarget")
+        val payload = completionPayload(
+            workspaceRoot = JdtlsFixtureSupport.workspaceUri(tempDir),
+            source = source,
+            line = line,
+            character = character,
+            documentVersion = 42,
+        )
+
+        val first = assertIs<McdevCompletionResponse>(handler.handle(listOf(payload)).result)
+        val second = assertIs<McdevCompletionResponse>(handler.handle(listOf(payload)).result)
+
+        assertEquals(false, first.debug?.semanticCacheHit)
+        assertEquals(true, second.debug?.semanticCacheHit)
+        assertEquals(42, second.debug?.documentVersion)
+        assertNotNull(second.debug?.astParseMs)
+    }
+
+    @Test
+    fun reusesNegativeCompletionForSameZeroItemRequest() {
+        val handler = createHandler()
+        val source = "package com.example;\npublic class Plain {}"
+        val payload = completionPayload(
+            workspaceRoot = JdtlsFixtureSupport.workspaceUri(tempDir),
+            source = source,
+            line = 1,
+            character = 10,
+            documentVersion = 7,
+        )
+
+        val first = assertIs<McdevCompletionResponse>(handler.handle(listOf(payload)).result)
+        val second = assertIs<McdevCompletionResponse>(handler.handle(listOf(payload)).result)
+
+        assertEquals("NO_COMPLETION_CONTEXT", first.debug?.zeroItemReason)
+        assertEquals(true, second.debug?.negativeCacheHit)
+        assertEquals("NO_COMPLETION_CONTEXT", second.debug?.zeroItemReason)
+    }
+
+    @Test
+    fun reusesCandidateCacheForSameInjectMethodCompletion() {
+        val handler = createHandler()
+        val source = """
+            package com.example.mixin;
+            import com.example.target.SimpleTarget;
+            import org.spongepowered.asm.mixin.Mixin;
+            import org.spongepowered.asm.mixin.injection.Inject;
+            @Mixin(SimpleTarget.class)
+            public abstract class CacheMixin {
+                @Inject(method = "dra")
+            }
+        """.trimIndent()
+        val marker = "method = \"dra"
+        val (line, character) = JdtlsFixtureSupport.offsetToPosition(source, source.indexOf(marker) + marker.length)
+        val payload = completionPayload(
+            workspaceRoot = JdtlsFixtureSupport.workspaceUri(tempDir),
+            source = source,
+            line = line,
+            character = character,
+            documentVersion = 8,
+        )
+
+        assertIs<McdevCompletionResponse>(handler.handle(listOf(payload)).result)
+        val second = assertIs<McdevCompletionResponse>(handler.handle(listOf(payload)).result)
+
+        assertEquals(true, second.debug?.candidateCacheHit)
+    }
+
+    @Test
     fun missingWorkspaceRootReturnsIncompleteContextError() {
         val handler = McdevCompletionHandler()
         val response = handler.handle(
@@ -541,12 +612,14 @@ class McdevCompletionHandlerTest {
         line: Int,
         character: Int,
         injectMethodDescriptor: String = "auto",
+        documentVersion: Long? = null,
     ): Map<String, Any?> = mapOf(
         "protocolVersion" to McdevProtocol.VERSION,
         "workspaceRoot" to workspaceRoot,
         "documentUri" to "$workspaceRoot/src/main/java/com/example/mixin/ExampleMixin.java",
         "languageId" to "java",
         "position" to mapOf("line" to line, "character" to character),
+        "documentVersion" to documentVersion,
         "bufferText" to source,
         "client" to mapOf("name" to "mcdev.nvim", "version" to "0.1.0"),
         "trigger" to mapOf("kind" to "manual", "character" to null),

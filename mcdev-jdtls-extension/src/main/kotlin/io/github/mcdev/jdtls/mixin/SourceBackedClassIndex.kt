@@ -9,6 +9,7 @@ import io.github.mcdev.jdtls.project.McdevProjectSession
 import io.github.mcdev.jdtls.project.UriPathSupport
 import java.nio.file.Files
 import java.nio.file.Path
+import java.util.LinkedHashMap
 import kotlin.io.path.extension
 
 internal class SourceBackedClassIndex(
@@ -55,6 +56,24 @@ private data class SourceClass(
 )
 
 private object SourceClassScanner {
+    private data class CacheKey(
+        val root: String,
+        val currentDocumentUri: String,
+        val currentBufferHash: Int,
+    )
+
+    private data class CacheEntry(
+        val classes: Map<String, SourceClass>,
+        val createdAtMillis: Long,
+    )
+
+    private const val MaxEntries = 16
+    private const val MaxAgeMillis = 10 * 60 * 1000L
+    private val cache = object : LinkedHashMap<CacheKey, CacheEntry>(16, 0.75f, true) {
+        override fun removeEldestEntry(eldest: MutableMap.MutableEntry<CacheKey, CacheEntry>): Boolean =
+            size > MaxEntries
+    }
+
     private val packagePattern = Regex("""(?m)^\s*package\s+([\w.]+)\s*;""")
     private val classPattern = Regex(
         """(?:public\s+|protected\s+|private\s+)?(?:abstract\s+|final\s+|static\s+)?(?:class|interface|enum|record)\s+(\w+)""",
@@ -68,6 +87,15 @@ private object SourceClassScanner {
         currentDocumentUri: String,
         currentBufferText: String,
     ): Map<String, SourceClass> {
+        val key = CacheKey(
+            root = session.context.root.toString(),
+            currentDocumentUri = currentDocumentUri,
+            currentBufferHash = currentBufferText.hashCode(),
+        )
+        val now = System.currentTimeMillis()
+        synchronized(cache) {
+            cache[key]?.takeIf { now - it.createdAtMillis <= MaxAgeMillis }?.let { return it.classes }
+        }
         val entries = linkedMapOf<String, String>()
         if (currentDocumentUri.endsWith(".java", ignoreCase = true)) {
             entries[currentDocumentUri] = currentBufferText
@@ -85,7 +113,11 @@ private object SourceClassScanner {
                 }
             }
         }
-        return entries.values.mapNotNull(::scanClass).associateBy { it.entry.internalName }
+        val classes = entries.values.mapNotNull(::scanClass).associateBy { it.entry.internalName }
+        synchronized(cache) {
+            cache[key] = CacheEntry(classes, now)
+        }
+        return classes
     }
 
     private fun scanClass(source: String): SourceClass? {
