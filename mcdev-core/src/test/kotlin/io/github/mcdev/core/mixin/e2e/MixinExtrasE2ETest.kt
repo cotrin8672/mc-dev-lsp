@@ -122,6 +122,29 @@ class MixinExtrasE2ETest {
     }
 
     @Test
+    fun completesMixinExtrasFeatureAnnotationsThroughFacade() {
+        val source = wrapMixin("""
+            @Expr
+        """)
+        val items = facade.complete(MixinE2ETestSupport.requestAt(source, "@Expr"))
+
+        assertTrue(items.any { it.insertText == "@Expression(\"\")" })
+        assertTrue(items.any { it.insertText == "@Expressions({})" })
+    }
+
+    @Test
+    fun completesMixinExtrasInjectorAnnotationsThroughFacade() {
+        val source = wrapMixin("""
+            @Wrap
+        """)
+        val items = facade.complete(MixinE2ETestSupport.requestAt(source, "@Wrap"))
+
+        assertTrue(items.any { it.insertText.startsWith("@WrapOperation") })
+        assertTrue(items.any { it.insertText.startsWith("@WrapWithCondition") })
+        assertTrue(items.any { it.insertText.startsWith("@WrapMethod") })
+    }
+
+    @Test
     fun injectMethodDescriptorModeAppliesToMixinExtrasCompletion() {
         val source = wrapMixin("""
             @WrapOperation(method = "dra", at = @At(value = "INVOKE", target = "Ljava/lang/String;length()I"))

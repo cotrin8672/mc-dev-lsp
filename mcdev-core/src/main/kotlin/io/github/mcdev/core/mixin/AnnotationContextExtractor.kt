@@ -59,7 +59,13 @@ object AnnotationContextExtractor {
             } else {
                 return null
             }
-        return slotContext?.copy(
+        val context = slotContext ?: return null
+        val enrichedContext = if (annotation == MixinAnnotation.AT) {
+            context.enrichAtContextFromParentInjector(source, annotationStart)
+        } else {
+            context
+        }
+        return enrichedContext.copy(
             annotationStartOffset = annotationStart,
             annotationEndOffset = annotationEnd,
             mixinTargetInternalNames = mixinTargets,
@@ -243,6 +249,41 @@ object AnnotationContextExtractor {
         )
     }
 
+    private fun AnnotationContext.enrichAtContextFromParentInjector(
+        source: String,
+        atAnnotationStart: Int,
+    ): AnnotationContext {
+        if (annotation != MixinAnnotation.AT) return this
+        val parent = findParentInjectorBody(source, atAnnotationStart) ?: return this
+        return copy(
+            injectMethodName = injectMethodName ?: findMethodAttribute(source, parent.bodyStart, parent.bodyEnd),
+        )
+    }
+
+    private data class AnnotationBody(
+        val bodyStart: Int,
+        val bodyEnd: Int,
+    )
+
+    private fun findParentInjectorBody(source: String, nestedAnnotationStart: Int): AnnotationBody? {
+        var searchFrom = nestedAnnotationStart - 1
+        while (searchFrom >= 0) {
+            val at = source.lastIndexOf('@', searchFrom)
+            if (at < 0) return null
+            val annotation = parseAnnotationName(source, at)
+            val nameEnd = skipAnnotationName(source, at)
+            val paren = if (source.getOrNull(nameEnd) == '(') nameEnd else -1
+            if (annotation in injectorAnnotations && paren >= 0) {
+                val close = findMatchingParen(source, paren) ?: source.length
+                if (nestedAnnotationStart in paren..close) {
+                    return AnnotationBody(paren + 1, close)
+                }
+            }
+            searchFrom = at - 1
+        }
+        return null
+    }
+
     private fun javaIdentifierStartBefore(source: String, cursorOffset: Int): Int {
         var index = cursorOffset.coerceIn(0, source.length)
         while (index > 0 && isJavaIdentifierPart(source[index - 1])) {
@@ -337,10 +378,10 @@ object AnnotationContextExtractor {
         } else {
             findMethodAttribute(source, bodyStart, bodyEnd)
         }
-        val atValue = if (annotation == MixinAnnotation.AT && attrName == "value") {
-            partial.trim('"')
-        } else {
-            findAtValue(source, bodyStart, bodyEnd)
+        val atValue = when {
+            annotation == MixinAnnotation.AT && attrName == "value" -> partial.trim('"')
+            annotation == MixinAnnotation.AT -> findAtValueInAtBody(source, bodyStart, bodyEnd)
+            else -> findAtValue(source, bodyStart, bodyEnd)
         }
         val slot = when {
             annotation == MixinAnnotation.MIXIN && attrName in setOf("targets", "target") -> AnnotationSlot.TARGETS
@@ -699,7 +740,7 @@ object AnnotationContextExtractor {
     }
 
     private fun findMethodAttribute(source: String, bodyStart: Int, bodyEnd: Int): String? {
-        val body = source.substring(bodyStart, bodyEnd + 1)
+        val body = source.substring(bodyStart.coerceIn(0, source.length), (bodyEnd + 1).coerceIn(0, source.length))
         val match = Regex("""method\s*=\s*"([^"]*)""").find(body) ?: return null
         return match.groupValues[1]
     }
@@ -726,6 +767,10 @@ object AnnotationContextExtractor {
         return null
     }
 
+    private fun findAtValueInAtBody(source: String, bodyStart: Int, bodyEnd: Int): String? =
+        findStringAttribute(source, bodyStart, bodyEnd, "value")
+            ?: readShorthandString(source, bodyStart, bodyEnd)
+
     private fun readShorthandString(source: String, start: Int, end: Int): String? {
         val index = skipWhitespace(source, start, end)
         if (index >= end || source[index] != '"') return null
@@ -734,13 +779,13 @@ object AnnotationContextExtractor {
     }
 
     private fun findStringAttribute(source: String, bodyStart: Int, bodyEnd: Int, name: String): String? {
-        val body = source.substring(bodyStart, bodyEnd + 1)
+        val body = source.substring(bodyStart.coerceIn(0, source.length), (bodyEnd + 1).coerceIn(0, source.length))
         val match = Regex("""$name\s*=\s*"([^"]*)""").find(body) ?: return null
         return match.groupValues[1]
     }
 
     private fun findBooleanAttribute(source: String, bodyStart: Int, bodyEnd: Int, name: String): Boolean? {
-        val body = source.substring(bodyStart, bodyEnd + 1)
+        val body = source.substring(bodyStart.coerceIn(0, source.length), (bodyEnd + 1).coerceIn(0, source.length))
         val match = Regex("""$name\s*=\s*(true|false)""").find(body) ?: return null
         return match.groupValues[1] == "true"
     }

@@ -46,7 +46,9 @@ class MixinDiagnosticsServiceTest {
                 mixinConfigPath = "mixins.json",
             ),
         )
-        assertTrue(diagnostics.any { it.code == MixinDiagnosticCodes.MIXIN_CLASS_NOT_LISTED_IN_CONFIG })
+        val diagnostic = diagnostics.single { it.code == MixinDiagnosticCodes.MIXIN_CLASS_NOT_LISTED_IN_CONFIG }
+        assertRangeCovers(source, diagnostic.range, "class ExampleMixin")
+        assertEquals("mixins.json", diagnostic.metadata["configPath"])
     }
 
     @Test

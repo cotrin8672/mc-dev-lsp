@@ -42,6 +42,7 @@ class ExpressionSupportTest {
         )
         val items = expressionSupport.completeExpressionAnnotations(context)
         assertTrue(items.any { it.insertText.startsWith("@Definition") })
+        assertTrue(items.any { it.metadata.source == "mixinextras.feature" })
     }
 
     @Test
@@ -54,6 +55,58 @@ class ExpressionSupportTest {
     fun completesLocalSnippet() {
         val items = expressionSupport.completeExpressionAnnotations(emptyPartialContext())
         assertTrue(items.any { it.metadata.name == "local" })
+    }
+
+    @Test
+    fun completesCancellableSnippet() {
+        val items = expressionSupport.completeExpressionAnnotations(emptyPartialContext())
+        assertTrue(items.any { it.metadata.name == "cancellable" })
+    }
+
+    @Test
+    fun completesAllMixinExtrasFeatureSnippets() {
+        val items = expressionSupport.completeExpressionAnnotations(emptyPartialContext())
+        val names = items.map { it.metadata.name }.toSet()
+
+        assertTrue(names.containsAll(
+            setOf(
+                "modifyexpressionvalue",
+                "modifyreturnvalue",
+                "modifyreceiver",
+                "wrapoperation",
+                "wrapwithcondition",
+                "wrapmethod",
+                "definition",
+                "definitions",
+                "expression",
+                "expressions",
+                "share",
+                "sharenamespace",
+                "local",
+                "localordinal",
+                "localindex",
+                "localname",
+                "localargsonly",
+                "localtype",
+                "cancellable",
+            ),
+        ))
+    }
+
+    @Test
+    fun completesFeatureAnnotationsAtAtSign() {
+        val source = """
+            @Mixin(com.example.target.SimpleTarget.class)
+            class ExampleMixin {
+                @Expr
+            }
+        """.trimIndent()
+        val offset = source.indexOf("@Expr") + "@Expr".length
+        val (line, character) = offsetToLineCharacter(source, offset)
+        val items = expressionSupport.completeFeatureAnnotations(source, line, character)
+
+        assertTrue(items.any { it.insertText == "@Expression(\"\")" })
+        assertTrue(items.any { it.insertText == "@Expressions({})" })
     }
 
     @Test
@@ -95,4 +148,20 @@ class ExpressionSupportTest {
         annotationStartOffset = 0,
         annotationEndOffset = 0,
     )
+
+    private fun offsetToLineCharacter(source: String, offset: Int): Pair<Int, Int> {
+        var line = 0
+        var character = 0
+        var index = 0
+        while (index < offset && index < source.length) {
+            if (source[index] == '\n') {
+                line++
+                character = 0
+            } else {
+                character++
+            }
+            index++
+        }
+        return line to character
+    }
 }

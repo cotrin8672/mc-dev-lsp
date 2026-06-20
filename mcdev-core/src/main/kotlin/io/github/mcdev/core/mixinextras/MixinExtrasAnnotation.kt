@@ -11,8 +11,11 @@ enum class MixinExtrasAnnotation(val simpleName: String) {
     WRAP_METHOD("WrapMethod"),
     LOCAL("Local"),
     SHARE("Share"),
+    CANCELLABLE("Cancellable"),
     DEFINITION("Definition"),
+    DEFINITIONS("Definitions"),
     EXPRESSION("Expression"),
+    EXPRESSIONS("Expressions"),
     ;
 
     companion object {

@@ -140,7 +140,14 @@ class MixinServiceFacade(
         if (fallbackAnnotationContextReason != null) {
             warnings += "FALLBACK_ANNOTATION_CONTEXT_USED: $fallbackAnnotationContextReason"
         }
-        val items = context?.let { routeCompletion(effectiveRequest, it, options) }.orEmpty()
+        val routedItems = context?.let { routeCompletion(effectiveRequest, it, options) }.orEmpty()
+        val items = routedItems.ifEmpty {
+            expressionSupport.completeFeatureAnnotations(
+                effectiveRequest.bufferText,
+                effectiveRequest.line,
+                effectiveRequest.character,
+            )
+        }
         return MixinCompletionResult(
             items = items,
             debug = debugInfo(

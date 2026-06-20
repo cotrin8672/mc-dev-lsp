@@ -55,6 +55,24 @@ class MixinExtrasAnnotationContextTest {
     }
 
     @Test
+    fun extractsAtTargetContextWithParentMixinExtrasMethod() {
+        val source = """
+            @Mixin(com.example.target.SimpleTarget.class)
+            class ExampleMixin {
+                @WrapOperation(method = "draw(Ljava/lang/String;FF)V", at = @At(value = "INVOKE", target = "length"))
+                private void handler() {}
+            }
+        """.trimIndent()
+        val offset = source.indexOf("length") + 6
+        val context = AnnotationContextExtractor.extractAtOffset(source, offset)
+        assertNotNull(context)
+        assertEquals(MixinAnnotation.AT, context.annotation)
+        assertEquals(AnnotationSlot.TARGET, context.slot)
+        assertEquals("draw(Ljava/lang/String;FF)V", context.injectMethodName)
+        assertEquals("INVOKE", context.atValue)
+    }
+
+    @Test
     fun extractsWrapWithConditionMethodSlot() {
         val source = """
             @Mixin(com.example.target.SimpleTarget.class)
