@@ -35,6 +35,41 @@ class SemanticCompletionContextExtractorTest {
     }
 
     @Test
+    fun injectMethodTextEditStartsAfterOpenQuote() {
+        val fixture = markedSource(
+            """
+            package com.example.mixin;
+
+            @Mixin(net.minecraft.world.item.Item.class)
+            class ItemMixin {
+                @Inject(method = "isF/*caret*/", at = @At("HEAD"))
+                private void injected(CallbackInfoReturnable<Boolean> cir) {}
+            }
+            """.trimIndent(),
+        )
+        val model = MixinSemanticModelParser.parse(fixture.source, "file:///ItemMixin.java")
+        val completionContext = SemanticCompletionContextExtractor.extract(
+            source = fixture.source,
+            line = fixture.line,
+            character = fixture.character,
+            model = model,
+        )
+        val annotationContext = SemanticCompletionContextExtractor.toAnnotationContext(
+            source = fixture.source,
+            line = fixture.line,
+            character = fixture.character,
+            model = model,
+            context = completionContext!!,
+        )!!
+
+        val lineStart = fixture.source.lastIndexOf('\n', fixture.source.indexOf("isF")).let { if (it < 0) 0 else it + 1 }
+        assertEquals(fixture.source.indexOf("isF"), annotationContext.valueStartOffset)
+        assertEquals(fixture.source.indexOf("isF") + "isF".length, annotationContext.valueEndOffset)
+        assertEquals("isF", annotationContext.partialValue)
+        assertEquals("    @Inject(method = \"isF", fixture.source.substring(lineStart, annotationContext.valueEndOffset))
+    }
+
+    @Test
     fun completesAtTargetFromRecoveredSemanticContextWithoutFallback() {
         val fixture = markedSource(
             """

@@ -13,6 +13,8 @@ import io.github.mcdev.core.mapping.MappingParseResult
 import io.github.mcdev.core.mapping.TinyV2Parser
 import io.github.mcdev.core.mapping.asResolver
 import io.github.mcdev.core.mixin.MixinClassInsertMode
+import io.github.mcdev.core.mixin.MixinSemanticModelParser
+import io.github.mcdev.core.mixin.SemanticCompletionContextExtractor
 import io.github.mcdev.fixtures.FixturePaths
 import io.github.mcdev.fixtures.FixtureResourceLoader
 import io.github.mcdev.core.definition.McDefinitionTarget
@@ -193,6 +195,51 @@ class ConverterTest {
         assertEquals("SimpleTarget.class", dto.edit?.newText)
         assertEquals(0, dto.edit?.range?.start?.line)
         assertEquals(7, dto.edit?.range?.start?.character)
+    }
+
+    @Test
+    fun completionConverterKeepsInjectMethodOpenQuoteOutsideTextEdit() {
+        val marker = "/*caret*/"
+        val sourceWithMarker = """
+            package com.example.mixin;
+
+            @Mixin(net.minecraft.world.item.Item.class)
+            class ItemMixin {
+                @Inject(method = "isF$marker", at = @At("HEAD"))
+                private void injected(CallbackInfoReturnable<Boolean> cir) {}
+            }
+        """.trimIndent()
+        val markerOffset = sourceWithMarker.indexOf(marker)
+        val source = sourceWithMarker.replace(marker, "")
+        val beforeMarker = sourceWithMarker.substring(0, markerOffset)
+        val line = beforeMarker.count { it == '\n' }
+        val character = beforeMarker.substringAfterLast('\n').length
+        val model = MixinSemanticModelParser.parse(source, "file:///ItemMixin.java")
+        val completionContext = SemanticCompletionContextExtractor.extract(source, line, character, model)
+        val annotationContext = SemanticCompletionContextExtractor.toAnnotationContext(
+            source = source,
+            line = line,
+            character = character,
+            model = model,
+            context = completionContext!!,
+        )!!
+        val item = McCompletionItem(
+            label = "isFoil(): boolean",
+            detail = "Item",
+            documentation = null,
+            filterText = "isFoil Item boolean",
+            insertText = "isFoil",
+            kind = McCompletionKind.METHOD,
+            sortKey = "0200_isFoil",
+            metadata = McCompletionMetadata(source = "mixin.injectMethod"),
+        )
+
+        val dto = CompletionItemConverter.toDto(item, annotationContext, source)
+
+        assertNotNull(dto.edit)
+        assertEquals("isFoil", dto.edit?.newText)
+        assertEquals(source.indexOf("isF") - source.lastIndexOf('\n', source.indexOf("isF")) - 1, dto.edit?.range?.start?.character)
+        assertEquals(source.indexOf("isF") + "isF".length - source.lastIndexOf('\n', source.indexOf("isF")) - 1, dto.edit?.range?.end?.character)
     }
 
     @Test

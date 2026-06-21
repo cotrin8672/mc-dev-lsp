@@ -228,7 +228,7 @@ object SemanticCompletionContextExtractor {
             if (previous == '"' || previous == '{' || previous == '=' || previous == ',' || previous == '(') break
             index--
         }
-        return if (source.getOrNull(index - 1) == '"') index - 1 else index
+        return index
     }
 
     private fun partialValue(source: String, cursorOffset: Int): String {
