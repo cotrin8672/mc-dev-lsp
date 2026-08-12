@@ -91,7 +91,7 @@ function source:get_trigger_characters()
 end
 
 function source:enabled(ctx)
-  return buffer.is_mcdev_completion_context(ctx_bufnr(ctx))
+  return buffer.is_mcdev_buffer(ctx_bufnr(ctx))
 end
 
 function source:get_completions(ctx, callback)

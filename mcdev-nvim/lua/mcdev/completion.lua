@@ -161,11 +161,6 @@ function M.complete(callback, bufnr, position, opts)
   M.last_local_prefix_cache_hit = false
   M.last_local_prefix_cache_items = 0
 
-  local previous = active_requests[bufnr]
-  if previous then
-    previous({ isIncomplete = false, items = {} })
-  end
-
   local completed = false
   local function finish(result)
     if completed then
@@ -191,7 +186,6 @@ function M.complete(callback, bufnr, position, opts)
   protocol.completion(function(envelope, err)
     if active_requests[bufnr] ~= finish then
       M.stale_dropped_count = M.stale_dropped_count + 1
-      finish({ isIncomplete = false, items = {} })
       return
     end
     local result, unwrap_err = convert.unwrap_envelope(envelope, err)

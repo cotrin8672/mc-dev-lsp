@@ -383,6 +383,49 @@ with_named_buffer("/project/src/main/java/com/example/mixin/ErrorMixin.java", "j
   protocol_module.completion = original_completion
 end)
 
+with_named_buffer("/project/src/main/java/com/example/mixin/ConcurrentMixin.java", "java", {
+  '@WrapOperation(method = "")',
+}, function(bufnr)
+  local protocol_module = package.loaded["mcdev.protocol"]
+  local original_completion = protocol_module.completion
+  local pending = {}
+  protocol_module.completion = function(callback)
+    pending[#pending + 1] = callback
+  end
+
+  local first = nil
+  local second = nil
+  completion.complete(function(result)
+    first = result
+  end, bufnr, { 1, #'@WrapOperation(method = "' }, { source = "blink-concurrent" })
+  completion.complete(function(result)
+    second = result
+  end, bufnr, { 1, #'@WrapOperation(method = "' }, { source = "blink-concurrent" })
+  helpers.assert_eq(#pending, 2)
+
+  local response = {
+    result = {
+      items = {
+        {
+          label = "tick(MovementContext): void",
+          insertText = "tick",
+          kind = "value",
+          sortKey = "0200_tick",
+          metadata = { source = "mixinextras.injectMethod" },
+        },
+      },
+    },
+  }
+  pending[1](response, nil)
+  helpers.assert_nil(first)
+  pending[2](response, nil)
+  helpers.assert_not_nil(second)
+  helpers.assert_eq(#second.items, 1)
+  helpers.assert_eq(second.items[1].insertText, "tick")
+
+  protocol_module.completion = original_completion
+end)
+
 do
   local original_request = protocol.request
   local original_notify = vim.notify
@@ -445,7 +488,8 @@ with_named_buffer("/project/src/main/java/com/example/PlainService.java", "java"
 }, function(bufnr)
   helpers.assert_true(buffer.is_mcdev_buffer(bufnr))
   helpers.assert_eq(buffer.is_mcdev_completion_context(bufnr), false)
-  helpers.assert_eq(blink_adapter:enabled({ bufnr = bufnr }), false)
+  -- Keep the source available while a Mixin annotation/import is still being typed.
+  helpers.assert_eq(blink_adapter:enabled({ bufnr = bufnr }), true)
 end)
 
 with_named_buffer("/project/src/main/resources/data.json", "json", {
