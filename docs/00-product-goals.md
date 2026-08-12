@@ -2,7 +2,7 @@
 
 ## Product Definition
 
-`mcdev-kotlin` is a Minecraft modding semantic extension for JDT LS with a Neovim frontend.
+`mc-dev-lsp` is a Minecraft modding semantic extension for JDT LS with a Neovim frontend.
 
 The intended user experience is close to IntelliJ IDEA with MinecraftDev for the selected surfaces:
 
@@ -251,4 +251,3 @@ The product is considered aligned with this design when all of these are true:
 - Mapping namespace must be explicit in all target/member models.
 - Every target insertion must be deterministic.
 - Every workspace edit must be testable without launching Neovim.
-

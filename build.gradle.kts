@@ -3,7 +3,7 @@ plugins {
 }
 
 group = "io.github.mcdev"
-version = "0.7.4"
+version = "0.7.5"
 
 subprojects {
     group = rootProject.group

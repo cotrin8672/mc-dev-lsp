@@ -7,6 +7,7 @@ import io.github.mcdev.jdtls.support.JdtlsFixtureSupport
 import io.github.mcdev.protocol.McdevCompletionResponse
 import io.github.mcdev.protocol.McdevProtocol
 import kotlin.test.Test
+import kotlin.test.assertEquals
 import kotlin.test.assertIs
 import kotlin.test.assertTrue
 import org.junit.jupiter.api.io.TempDir
@@ -46,9 +47,10 @@ class McdevAwAtCompletionHandlerTest {
         val handler = createHandler()
         val source = """
             accessWidener v2 named
-            accessible class com/example/target/Simp
+            accessible class com/example/target/SimpleTarget
         """.trimIndent()
-        val (line, character) = JdtlsFixtureSupport.offsetToPosition(source, source.length)
+        val cursorOffset = source.indexOf("SimpleTarget") + "Simp".length
+        val (line, character) = JdtlsFixtureSupport.offsetToPosition(source, cursorOffset)
         val response = handler.handle(
             listOf(
                 completionPayload(
@@ -62,7 +64,8 @@ class McdevAwAtCompletionHandlerTest {
             ),
         )
         val completion = assertIs<McdevCompletionResponse>(response.result)
-        assertTrue(completion.items.any { it.insertText == "com/example/target/SimpleTarget" })
+        val item = completion.items.first { it.insertText == "com/example/target/SimpleTarget" }
+        assertEquals("com/example/target/SimpleTarget".length, item.edit?.range?.end?.character?.minus(item.edit!!.range.start.character))
     }
 
     @Test
@@ -139,21 +142,25 @@ class McdevAwAtCompletionHandlerTest {
     @Test
     fun returnsAccessTransformerMemberCompletionsWithMappedInsertText() {
         val handler = createHandler()
-        val source = "public com.example.target.SimpleTarget dr"
+        val source = "public com.example.target.SimpleTarget draw(Ljava/lang/String;FF)V"
+        val cursor = source.indexOf("draw") + "dr".length
         val response = handler.handle(
             listOf(
                 completionPayload(
                     workspaceRoot = JdtlsFixtureSupport.workspaceUri(tempDir),
                     source = source,
                     line = 0,
-                    character = source.length,
+                    character = cursor,
                     languageId = "accesstransformer",
                     documentUri = "${JdtlsFixtureSupport.workspaceUri(tempDir)}/mod_at.cfg",
                 ),
             ),
         )
         val completion = assertIs<McdevCompletionResponse>(response.result)
-        assertTrue(completion.items.any { it.insertText == "draw(Ljava/lang/String;FF)V" })
+        val method = completion.items.first { it.insertText == "draw(Ljava/lang/String;FF)V" }
+        assertEquals("value", method.kind)
+        assertEquals(source.indexOf("dr"), method.edit?.range?.start?.character)
+        assertEquals(source.length, method.edit?.range?.end?.character)
     }
 
     private fun createHandler(): McdevCompletionHandler {

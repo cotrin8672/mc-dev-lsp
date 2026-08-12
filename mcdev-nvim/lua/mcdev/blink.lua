@@ -16,10 +16,6 @@ local function is_mixin_item(item)
   return type(source_name) == "string" and source_name:sub(1, 6) == "mixin."
 end
 
-local function is_method_kind(kind)
-  return kind == "method" or kind == vim.lsp.protocol.CompletionItemKind.Method
-end
-
 local function current_prefix_range(bufnr, position)
   local row = position[1] or 1
   local col = position[2] or 0
@@ -42,8 +38,9 @@ local function to_blink_item(item, bufnr, position)
   blink_item.kind_name = "Mixin"
   blink_item.cursor_column = position[2] or 0
 
-  if is_method_kind(blink_item.kind) then
-    blink_item.kind = vim.lsp.protocol.CompletionItemKind.Value
+  if item_source(blink_item) == "mixin.attribute" then
+    -- Attribute snippets must outrank JDT LS' incomplete `name = ` items.
+    blink_item.score_offset = math.max(blink_item.score_offset or 0, 100)
   end
 
   if not blink_item.textEdit and blink_item.insertText then
@@ -94,7 +91,7 @@ function source:get_trigger_characters()
 end
 
 function source:enabled(ctx)
-  return buffer.is_mcdev_buffer(ctx_bufnr(ctx))
+  return buffer.is_mcdev_completion_context(ctx_bufnr(ctx))
 end
 
 function source:get_completions(ctx, callback)

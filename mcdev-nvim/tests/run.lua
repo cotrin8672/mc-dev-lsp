@@ -15,6 +15,7 @@ local hover = require("mcdev.hover")
 local jdtls_helper = require("mcdev.jdtls")
 local health = require("mcdev.health")
 local lsp_adapter = require("mcdev.lsp")
+local omnifunc = require("mcdev.omnifunc")
 
 mcdev.setup({
   jdtls = {
@@ -41,6 +42,7 @@ config.options.jdtls.mason = {
   jar = "io.github.mcdev.jdtls.jar",
   root = mason_root,
 }
+config.options.jdtls.repo_root = mason_root .. "/not-a-repository"
 helpers.assert_eq(mcdev.extension_jar(), mason_jar)
 
 local jdtls_config = {
@@ -72,6 +74,18 @@ helpers.assert_eq(started_config.init_options.bundles[2], mason_jar)
 vim.lsp.start = original_lsp_start
 config.options.jdtls = original_jdtls_options
 
+local fake_repo = vim.fn.tempname()
+local fake_built_jar = fake_repo .. "/mcdev-jdtls-extension/build/libs/io.github.mcdev.jdtls-9.8.7.jar"
+vim.fn.mkdir(vim.fn.fnamemodify(fake_built_jar, ":h"), "p")
+vim.fn.writefile({}, fake_built_jar)
+local configured_jar = config.options.jdtls.extension_jar
+config.options.jdtls.extension_jar = nil
+helpers.assert_eq(
+  vim.fs.normalize(jdtls_helper.resolve_extension_jar({ repo_root = fake_repo, mason = { enabled = false } })),
+  vim.fs.normalize(fake_built_jar)
+)
+config.options.jdtls.extension_jar = configured_jar
+
 local item = completion.to_lsp_item({
   label = "setScreen(Screen): void",
   detail = "MinecraftClient",
@@ -91,6 +105,19 @@ helpers.assert_eq(item.label, "setScreen(Screen): void")
 helpers.assert_eq(item.insertText, "m_91152_(Lnet/minecraft/client/gui/screens/Screen;)V")
 helpers.assert_eq(item.filterText, "setScreen MinecraftClient Screen")
 helpers.assert_true(item.label ~= item.insertText, "label must differ from insertText")
+
+local attribute_item = completion.to_lsp_item({
+  label = 'method = "…"',
+  filterText = "method",
+  insertText = 'method = "${1}"$0',
+  insertTextFormat = "snippet",
+  kind = "keyword",
+  sortKey = "0000_method",
+  additionalEdits = {},
+  metadata = { source = "mixin.attribute" },
+})
+helpers.assert_eq(attribute_item.insertTextFormat, vim.lsp.protocol.InsertTextFormat.Snippet)
+helpers.assert_eq(attribute_item.preselect, true)
 
 local payload = protocol.build_completion_payload(0, { 1, 5 })
 helpers.assert_not_nil(payload.context)
@@ -143,7 +170,7 @@ completion_module.complete = function(callback, _, _, opts)
       {
         label = "tick(): void",
         insertText = "tick",
-        kind = "method",
+        kind = vim.lsp.protocol.CompletionItemKind.Value,
         sortKey = "0200_tick",
         filterText = "tick",
         detail = "SimpleTarget",
@@ -155,6 +182,7 @@ completion_module.complete = function(callback, _, _, opts)
     },
   })
 end
+vim.bo[0].filetype = "java"
 vim.api.nvim_buf_set_lines(0, 0, -1, false, { '@Inject(method = "ti' })
 local blink_cursor = { 1, #'@Inject(method = "ti' }
 blink_adapter:get_completions({ bufnr = 0, cursor = blink_cursor }, function(result)
@@ -180,6 +208,33 @@ helpers.assert_eq(vim.api.nvim_buf_get_lines(0, 0, 1, false)[1], '@Inject(method
 vim.bo.modified = false
 helpers.assert_eq(adapter_sources[#adapter_sources], "blink")
 
+completion_module.complete = function(callback, _, _, opts)
+  adapter_sources[#adapter_sources + 1] = opts and opts.source or nil
+  callback({
+    isIncomplete = true,
+    items = {
+      completion.to_lsp_item({
+        label = 'method = "…"',
+        filterText = "method",
+        insertText = 'method = "${1}"$0',
+        insertTextFormat = "snippet",
+        kind = "keyword",
+        sortKey = "0000_method",
+        edit = nil,
+        additionalEdits = {},
+        metadata = { source = "mixin.attribute" },
+      }),
+    },
+  })
+end
+vim.api.nvim_buf_set_lines(0, 0, -1, false, { "@Inject(meth" })
+local attribute_blink_result = nil
+blink_adapter:get_completions({ bufnr = 0, cursor = { 1, #"@Inject(meth" } }, function(result)
+  attribute_blink_result = result
+end)
+helpers.assert_eq(attribute_blink_result.items[1].score_offset, 100)
+helpers.assert_eq(attribute_blink_result.items[1].insertTextFormat, vim.lsp.protocol.InsertTextFormat.Snippet)
+
 local cmp_result = nil
 local cmp_source = cmp.source()
 cmp_source:complete({}, function(items)
@@ -187,7 +242,8 @@ cmp_source:complete({}, function(items)
 end)
 helpers.assert_not_nil(cmp_result)
 helpers.assert_eq(#cmp_result.items, 1)
-helpers.assert_eq(cmp_result.items[1].insertText, "tick")
+helpers.assert_eq(cmp_result.items[1].insertText, 'method = "${1}"$0')
+helpers.assert_eq(cmp_result.items[1].insertTextFormat, vim.lsp.protocol.InsertTextFormat.Snippet)
 helpers.assert_eq(cmp_result.isIncomplete, true)
 helpers.assert_eq(adapter_sources[#adapter_sources], "cmp")
 completion_module.complete = original_complete
@@ -208,11 +264,24 @@ helpers.assert_not_nil(commands.McdevDiagnosticsStatus)
 helpers.assert_eq(mcdev.options().insert.at_target, "smart")
 helpers.assert_eq(mcdev.options().insert.mixin_class_import, true)
 helpers.assert_eq(mcdev.options().insert.inject_method_descriptor, "auto")
-helpers.assert_eq(mcdev.options().completion.omnifunc, true)
+helpers.assert_eq(mcdev.options().completion.omnifunc, false)
+helpers.assert_eq(mcdev.options().completion.omnifunc_timeout_ms, 500)
 helpers.assert_eq(mcdev.options().diagnostics.enabled, false)
 helpers.assert_eq(mcdev.options().diagnostics.events[1], "BufWritePost")
 helpers.assert_eq(diagnostics.running, false)
 helpers.assert_eq(mcdev.options().standard_lsp.prefer, true)
+
+do
+  local original_complete_for_omnifunc = completion.complete
+  local original_timeout = config.options.completion.omnifunc_timeout_ms
+  config.options.completion.omnifunc_timeout_ms = 10
+  completion.complete = function() end
+  local items = omnifunc.complete(0, "")
+  helpers.assert_eq(#items, 0)
+  helpers.assert_true(omnifunc.last_timeout)
+  completion.complete = original_complete_for_omnifunc
+  config.options.completion.omnifunc_timeout_ms = original_timeout
+end
 
 local function has_buffer_keymap(bufnr, mode, lhs)
   for _, map in ipairs(vim.api.nvim_buf_get_keymap(bufnr, mode)) do
@@ -252,11 +321,18 @@ with_named_buffer("/project/src/main/java/com/example/mixin/ExampleMixin.java", 
             {
               label = "draw(String): void",
               insertText = "draw",
-              kind = "method",
+              kind = "value",
               sortKey = "0200_draw",
               filterText = "draw",
               detail = "SimpleTarget",
               additionalEdits = {},
+              edit = {
+                range = {
+                  start = { line = 0, character = #'@Inject(method = "' },
+                  ["end"] = { line = 0, character = #'@Inject(method = "dr' },
+                },
+                newText = "draw",
+              },
               metadata = { source = "mixin.injectMethod" },
             },
           },
@@ -280,11 +356,48 @@ with_named_buffer("/project/src/main/java/com/example/mixin/ExampleMixin.java", 
   helpers.assert_not_nil(second)
   helpers.assert_eq(#second.items, 1)
   helpers.assert_eq(second.items[1].insertText, "draw")
+  helpers.assert_eq(second.items[1].textEdit.range["end"].character, #'@Inject(method = "dra')
   helpers.assert_true(completion.last_local_prefix_cache_hit)
-  helpers.assert_eq(server_requests, 2)
+  helpers.assert_eq(server_requests, 1)
+  vim.lsp.util.apply_text_edits({ second.items[1].textEdit }, bufnr, "utf-8")
+  helpers.assert_eq(vim.api.nvim_buf_get_lines(bufnr, 0, 1, false)[1], '@Inject(method = "draw')
 
   protocol_module.completion = original_completion
 end)
+
+with_named_buffer("/project/src/main/java/com/example/mixin/ErrorMixin.java", "java", {
+  '@Inject(method = "error',
+}, function(bufnr)
+  local protocol_module = package.loaded["mcdev.protocol"]
+  local original_completion = protocol_module.completion
+  protocol_module.completion = function(callback)
+    callback({ error = { message = "completion failed" } }, nil)
+  end
+  local failed = nil
+  completion.complete(function(result)
+    failed = result
+  end, bufnr, { 1, #'@Inject(method = "error' }, { source = "error-test" })
+  helpers.assert_not_nil(failed)
+  helpers.assert_eq(#failed.items, 0)
+  helpers.assert_eq(completion.last_error, "completion failed")
+  protocol_module.completion = original_completion
+end)
+
+do
+  local original_request = protocol.request
+  local original_notify = vim.notify
+  local message = nil
+  protocol.request = function(_, _, callback)
+    callback({ error = { message = "reindex failed" } }, nil)
+  end
+  vim.notify = function(value)
+    message = value
+  end
+  protocol.reindex()
+  helpers.assert_eq(message, "mcdev: reindex failed")
+  protocol.request = original_request
+  vim.notify = original_notify
+end
 
 with_named_buffer("/project/src/main/resources/mod.accesswidener", "plaintext", {
   "accessWidener v2 named",
@@ -310,20 +423,41 @@ with_named_buffer("/project/src/main/java/com/example/mixin/ExampleMixin.java", 
 }, function(bufnr)
   helpers.assert_nil(buffer.detect_file_type(bufnr))
   helpers.assert_true(buffer.is_mcdev_buffer(bufnr))
+  helpers.assert_true(buffer.is_mcdev_completion_context(bufnr))
   local payload = protocol.build_completion_payload(bufnr, { 1, 8 })
   helpers.assert_eq(payload.context.languageId, "java")
   require("mcdev.attach").setup(bufnr)
-  helpers.assert_eq(vim.bo[bufnr].omnifunc, "v:lua.require'mcdev.omnifunc'.complete")
+  helpers.assert_eq(vim.bo[bufnr].omnifunc, "")
 end)
 
-with_named_buffer("/project/src/main/java/com/example/mixin/NoOmnifuncMixin.java", "java", {
+with_named_buffer("/project/src/main/java/com/example/mixin/OmnifuncMixin.java", "java", {
   "@Mixin(SimpleTarget.class)",
 }, function(bufnr)
   local original_completion_options = vim.deepcopy(config.options.completion)
-  config.options.completion.omnifunc = false
+  config.options.completion.omnifunc = true
   require("mcdev.attach").setup(bufnr)
-  helpers.assert_eq(vim.bo[bufnr].omnifunc, "")
+  helpers.assert_eq(vim.bo[bufnr].omnifunc, "v:lua.require'mcdev.omnifunc'.complete")
   config.options.completion = original_completion_options
+end)
+
+with_named_buffer("/project/src/main/java/com/example/PlainService.java", "java", {
+  "public final class PlainService {}",
+}, function(bufnr)
+  helpers.assert_true(buffer.is_mcdev_buffer(bufnr))
+  helpers.assert_eq(buffer.is_mcdev_completion_context(bufnr), false)
+  helpers.assert_eq(blink_adapter:enabled({ bufnr = bufnr }), false)
+end)
+
+with_named_buffer("/project/src/main/resources/data.json", "json", {
+  '{"name":"plain"}',
+}, function(bufnr)
+  helpers.assert_eq(buffer.is_mcdev_completion_context(bufnr), false)
+end)
+
+with_named_buffer("/project/src/main/resources/example.mixins.json", "json", {
+  '{"package":"com.example.mixin","mixins":[]}',
+}, function(bufnr)
+  helpers.assert_true(buffer.is_mcdev_completion_context(bufnr))
 end)
 
 with_named_buffer("/project/src/main/resources/mod.aw", "plaintext", {
@@ -435,6 +569,43 @@ with_named_buffer("/project/src/main/java/com/example/mixin/DiagnosticsMixin.jav
   vim.wait(30)
   helpers.assert_eq(requests, 1)
   diagnostics.stop()
+  protocol_module.diagnostics = original_diagnostics
+end)
+
+with_named_buffer("/project/src/main/java/com/example/mixin/QueuedDiagnosticsMixin.java", "java", {
+  "@Mixin(SimpleTarget.class)",
+}, function(bufnr)
+  local protocol_module = package.loaded["mcdev.protocol"]
+  local original_diagnostics = protocol_module.diagnostics
+  local callbacks = {}
+  protocol_module.diagnostics = function(_, _, callback)
+    callbacks[#callbacks + 1] = callback
+  end
+
+  diagnostics.refresh(bufnr, { in_flight_policy = "latest", stale_result_policy = "drop" })
+  vim.api.nvim_buf_set_lines(bufnr, 0, 1, false, { "@Mixin(UpdatedTarget.class)" })
+  diagnostics.refresh(bufnr, { in_flight_policy = "latest", stale_result_policy = "drop" })
+  helpers.assert_eq(#callbacks, 1)
+  callbacks[1]({ result = { diagnostics = {} } }, nil)
+  helpers.assert_eq(#callbacks, 2)
+  callbacks[2]({
+    result = {
+      diagnostics = {
+        {
+          code = "LATEST",
+          severity = "warning",
+          message = "latest result",
+          range = {
+            start = { line = 0, character = 0 },
+            ["end"] = { line = 0, character = 6 },
+          },
+        },
+      },
+    },
+  }, nil)
+  local published = vim.diagnostic.get(bufnr, { namespace = diagnostics.namespace })
+  helpers.assert_eq(#published, 1)
+  helpers.assert_eq(published[1].code, "LATEST")
   protocol_module.diagnostics = original_diagnostics
 end)
 
@@ -754,6 +925,38 @@ do
   helpers.assert_true(fallback_used)
   vim.lsp.buf_request = original_buf_request
   navigation.definition = original_definition
+end
+
+do
+  local original_buf_request_all = vim.lsp.buf_request_all
+  local original_mcdev_code_actions = code_action.code_actions
+  vim.lsp.buf_request_all = function(_, method, _, callback)
+    helpers.assert_eq(method, "textDocument/codeAction")
+    callback({
+      [1] = {
+        result = {
+          { title = "Standard fix", kind = "quickfix" },
+        },
+      },
+    })
+  end
+  code_action.code_actions = function(_, _, _, callback)
+    callback({
+      { title = "mcdev fix", kind = "quickfix.mcdev" },
+      { title = "Standard fix", kind = "quickfix" },
+    }, nil)
+  end
+  local merged = nil
+  lsp_adapter.code_actions(0, nil, {}, function(actions, err)
+    helpers.assert_nil(err)
+    merged = actions
+  end)
+  helpers.assert_not_nil(merged)
+  helpers.assert_eq(#merged, 2)
+  helpers.assert_eq(merged[1].title, "Standard fix")
+  helpers.assert_eq(merged[2].title, "mcdev fix")
+  vim.lsp.buf_request_all = original_buf_request_all
+  code_action.code_actions = original_mcdev_code_actions
 end
 
 print("mcdev-nvim adapter tests passed")

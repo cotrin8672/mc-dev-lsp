@@ -1,6 +1,7 @@
 package io.github.mcdev.core.mixinextras
 
 import io.github.mcdev.core.completion.McCompletionItem
+import io.github.mcdev.core.completion.McCompletionInsertTextFormat
 import io.github.mcdev.core.completion.McCompletionKind
 import io.github.mcdev.core.completion.McCompletionMetadata
 import io.github.mcdev.core.mixin.AnnotationContext
@@ -12,25 +13,25 @@ class ExpressionSupport {
     private val expressionAtValues = listOf("MIXINEXTRAS:EXPRESSION")
 
     private val featureSnippets = listOf(
-        FeatureSnippet("modifyexpressionvalue", "ModifyExpressionValue", "@ModifyExpressionValue(method = \"\", at = @At(\"\"))"),
-        FeatureSnippet("modifyreturnvalue", "ModifyReturnValue", "@ModifyReturnValue(method = \"\", at = @At(\"RETURN\"))"),
-        FeatureSnippet("modifyreceiver", "ModifyReceiver", "@ModifyReceiver(method = \"\", at = @At(value = \"INVOKE\", target = \"\"))"),
-        FeatureSnippet("wrapoperation", "WrapOperation", "@WrapOperation(method = \"\", at = @At(value = \"INVOKE\", target = \"\"))"),
-        FeatureSnippet("wrapwithcondition", "WrapWithCondition", "@WrapWithCondition(method = \"\", at = @At(value = \"INVOKE\", target = \"\"))"),
-        FeatureSnippet("wrapmethod", "WrapMethod", "@WrapMethod(method = \"\")"),
-        FeatureSnippet("definition", "Definition", "@Definition(id = \"\")"),
-        FeatureSnippet("definitions", "Definitions", "@Definitions({})"),
-        FeatureSnippet("expression", "Expression", "@Expression(\"\")"),
-        FeatureSnippet("expressions", "Expressions", "@Expressions({})"),
-        FeatureSnippet("share", "Share", "@Share(\"\")"),
-        FeatureSnippet("sharenamespace", "Share namespace", "@Share(value = \"\", namespace = \"\")"),
-        FeatureSnippet("local", "Local", "@Local"),
-        FeatureSnippet("localordinal", "Local ordinal", "@Local(ordinal = 0)"),
-        FeatureSnippet("localindex", "Local index", "@Local(index = 0)"),
-        FeatureSnippet("localname", "Local name", "@Local(name = \"\")"),
-        FeatureSnippet("localargsonly", "Local argsOnly", "@Local(argsOnly = true)"),
-        FeatureSnippet("localtype", "Local type", "@Local(type = void.class)"),
-        FeatureSnippet("cancellable", "Cancellable", "@Cancellable"),
+        FeatureSnippet("modifyexpressionvalue", "ModifyExpressionValue", "ModifyExpressionValue(method = \"${'$'}{1}\", at = @At(\"${'$'}{2}\"))${'$'}0"),
+        FeatureSnippet("modifyreturnvalue", "ModifyReturnValue", "ModifyReturnValue(method = \"${'$'}{1}\", at = @At(\"RETURN\"))${'$'}0"),
+        FeatureSnippet("modifyreceiver", "ModifyReceiver", "ModifyReceiver(method = \"${'$'}{1}\", at = @At(value = \"INVOKE\", target = \"${'$'}{2}\"))${'$'}0"),
+        FeatureSnippet("wrapoperation", "WrapOperation", "WrapOperation(method = \"${'$'}{1}\", at = @At(value = \"INVOKE\", target = \"${'$'}{2}\"))${'$'}0"),
+        FeatureSnippet("wrapwithcondition", "WrapWithCondition", "WrapWithCondition(method = \"${'$'}{1}\", at = @At(value = \"INVOKE\", target = \"${'$'}{2}\"))${'$'}0"),
+        FeatureSnippet("wrapmethod", "WrapMethod", "WrapMethod(method = \"${'$'}{1}\")${'$'}0"),
+        FeatureSnippet("definition", "Definition", "Definition(id = \"${'$'}{1}\")${'$'}0"),
+        FeatureSnippet("definitions", "Definitions", "Definitions({ ${'$'}{1} })${'$'}0"),
+        FeatureSnippet("expression", "Expression", "Expression(\"${'$'}{1}\")${'$'}0"),
+        FeatureSnippet("expressions", "Expressions", "Expressions({ ${'$'}{1} })${'$'}0"),
+        FeatureSnippet("share", "Share", "Share(\"${'$'}{1}\")${'$'}0"),
+        FeatureSnippet("sharenamespace", "Share namespace", "Share(value = \"${'$'}{1}\", namespace = \"${'$'}{2}\")${'$'}0"),
+        FeatureSnippet("local", "Local", "Local${'$'}0"),
+        FeatureSnippet("localordinal", "Local ordinal", "Local(ordinal = ${'$'}{1:0})${'$'}0"),
+        FeatureSnippet("localindex", "Local index", "Local(index = ${'$'}{1:0})${'$'}0"),
+        FeatureSnippet("localname", "Local name", "Local(name = \"${'$'}{1}\")${'$'}0"),
+        FeatureSnippet("localargsonly", "Local argsOnly", "Local(argsOnly = ${'$'}{1|true,false|})${'$'}0"),
+        FeatureSnippet("localtype", "Local type", "Local(type = ${'$'}{1:void}.class)${'$'}0"),
+        FeatureSnippet("cancellable", "Cancellable", "Cancellable${'$'}0"),
     )
 
     fun completeAtValue(context: AnnotationContext): List<McCompletionItem> {
@@ -88,6 +89,7 @@ class ExpressionSupport {
                     kind = McCompletionKind.KEYWORD,
                     sortKey = "0311_${snippet.trigger}",
                     metadata = McCompletionMetadata(source = "mixinextras.feature", name = snippet.trigger),
+                    insertTextFormat = McCompletionInsertTextFormat.SNIPPET,
                 )
             }
 

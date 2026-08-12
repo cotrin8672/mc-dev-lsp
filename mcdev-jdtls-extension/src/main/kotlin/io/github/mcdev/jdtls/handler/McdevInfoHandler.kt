@@ -1,6 +1,7 @@
 package io.github.mcdev.jdtls.handler
 
 import io.github.mcdev.core.project.InfoService
+import io.github.mcdev.jdtls.command.McdevCommandRegistry
 import io.github.mcdev.jdtls.project.FileBasedProjectContextService
 import io.github.mcdev.jdtls.protocol.ProtocolDecodeException
 import io.github.mcdev.jdtls.protocol.ProtocolPayloadDecoder
@@ -11,7 +12,6 @@ import io.github.mcdev.protocol.McdevInfoResponse
 import io.github.mcdev.protocol.McdevProtocol
 import io.github.mcdev.protocol.McdevResponseEnvelope
 import io.github.mcdev.protocol.McdevRequestContext
-import io.github.mcdev.protocol.McdevCommands
 
 class McdevInfoHandler(
     private val projectService: FileBasedProjectContextService = FileBasedProjectContextService(),
@@ -38,18 +38,11 @@ class McdevInfoHandler(
 
         val session = projectService.loadSession(context.workspaceRoot)
         val build = McdevBuildInfo.load()
-        val commands = listOf(
-            McdevCommands.INFO,
-            McdevCommands.COMPLETION,
-            McdevCommands.DIAGNOSTICS,
-            McdevCommands.HOVER,
-            McdevCommands.DEFINITION,
-            McdevCommands.CODE_ACTION,
-        )
+        val commands = McdevCommandRegistry.implementedCommandIds
         val lines = InfoService.formatLines(
             context = session.context,
             protocolVersion = McdevProtocol.VERSION,
-            extensionVersion = McdevProtocol.SERVER_VERSION,
+            extensionVersion = build.version,
         ) + listOf(
             "Extension loaded: true",
             "Extension build commit: ${build.commit}",
@@ -58,7 +51,17 @@ class McdevInfoHandler(
             "Registered commands:",
         ) + commands.map { "  - $it" }
         return McdevResponseEnvelope(
-            capabilities = setOf("info", "completion", "diagnostics"),
+            capabilities = setOf(
+                "info",
+                "completion",
+                "diagnostics",
+                "hover",
+                "definition",
+                "references",
+                "codeAction",
+                "reindex",
+                "projectContext",
+            ),
             result = McdevInfoResponse(
                 lines = lines,
                 buildCommit = build.commit,

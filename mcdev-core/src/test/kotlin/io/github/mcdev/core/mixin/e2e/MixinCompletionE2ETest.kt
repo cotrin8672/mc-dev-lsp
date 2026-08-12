@@ -22,6 +22,19 @@ class MixinCompletionE2ETest {
     }
 
     @Test
+    fun completesOverwriteMethodNameWithoutAddingParentheses() {
+        val source = """
+            @Mixin(MinecraftClient.class)
+            class M {
+                @Overwrite public void ti() {}
+            }
+        """.trimIndent()
+        val items = fakeFacade.complete(MixinE2ETestSupport.requestAt(source, "void ti"))
+        val tick = items.first { it.metadata.source == "mixin.overwrite" && it.insertText == "tick" }
+        assertEquals(io.github.mcdev.core.completion.McCompletionKind.VALUE, tick.kind)
+    }
+
+    @Test
     fun mixinClassCompletionSeparatesLabelAndInsertText() {
         val source = """@Mixin(Mine"""
         val item = fakeFacade.complete(MixinE2ETestSupport.requestAt(source, "Mine"))

@@ -1,6 +1,7 @@
 package io.github.mcdev.core.mixin
 
 object AnnotationContextExtractor {
+    private val mixinAttributeNames = setOf("value", "targets", "target", "priority", "remap")
     private val injectorAnnotations = setOf(
         MixinAnnotation.INJECT,
         MixinAnnotation.REDIRECT,
@@ -201,7 +202,12 @@ object AnnotationContextExtractor {
             index = skipWhitespace(source, index, bodyEnd)
             if (index >= bodyEnd) break
 
-            val valueInfo = readValue(source, index, bodyEnd) ?: break
+            val containerValue = readValue(source, index, bodyEnd) ?: break
+            val valueInfo = if (source[index] == '{') {
+                findArrayElementAtCursor(source, index, containerValue.contentEnd, cursorOffset) ?: containerValue
+            } else {
+                containerValue
+            }
             if (cursorOffset in valueInfo.contentStart..valueInfo.contentEnd) {
                 return buildContextForAttribute(
                     annotation,
@@ -213,17 +219,132 @@ object AnnotationContextExtractor {
                     cursorOffset,
                 )
             }
-            index = valueInfo.end
+            index = containerValue.end
             if (index < bodyEnd && source[index] == ',') {
                 index++
             }
         }
+
+        findAttributeNameContext(source, annotation, bodyStart, bodyEnd, cursorOffset)?.let { return it }
 
         if (annotation == MixinAnnotation.SHADOW && cursorOffset > bodyStart) {
             return buildBareMemberContext(source, annotation, AnnotationSlot.SHADOW_MEMBER, bodyEnd, cursorOffset)
         }
         if (annotation == MixinAnnotation.OVERWRITE && cursorOffset > bodyStart) {
             return buildBareMemberContext(source, annotation, AnnotationSlot.OVERWRITE_METHOD, bodyEnd, cursorOffset)
+        }
+        return null
+    }
+
+    private fun findAttributeNameContext(
+        source: String,
+        annotation: MixinAnnotation,
+        bodyStart: Int,
+        bodyEnd: Int,
+        cursorOffset: Int,
+    ): AnnotationContext? {
+        if (cursorOffset !in (bodyStart + 1)..bodyEnd) return null
+        var segmentStart = bodyStart + 1
+        var parenDepth = 0
+        var braceDepth = 0
+        var inString = false
+        var escaped = false
+        var index = segmentStart
+        while (index < cursorOffset) {
+            val ch = source[index]
+            if (inString) {
+                when {
+                    escaped -> escaped = false
+                    ch == '\\' -> escaped = true
+                    ch == '"' -> inString = false
+                }
+            } else {
+                when (ch) {
+                    '"' -> inString = true
+                    '(' -> parenDepth++
+                    ')' -> if (parenDepth > 0) parenDepth--
+                    '{' -> braceDepth++
+                    '}' -> if (braceDepth > 0) braceDepth--
+                    ',' -> if (parenDepth == 0 && braceDepth == 0) segmentStart = index + 1
+                }
+            }
+            index++
+        }
+        if (inString || parenDepth > 0 || braceDepth > 0) return null
+        val valueStart = skipWhitespace(source, segmentStart, cursorOffset)
+        val partial = source.substring(valueStart, cursorOffset)
+        if (partial.isNotEmpty() && !partial.matches(Regex("[A-Za-z_][A-Za-z0-9_]*"))) return null
+        if (annotation == MixinAnnotation.MIXIN) {
+            if (partial.isEmpty() || mixinAttributeNames.none { it.startsWith(partial, ignoreCase = true) }) {
+                return null
+            }
+        }
+        return AnnotationContext(
+            annotation = annotation,
+            slot = AnnotationSlot.ATTRIBUTE,
+            partialValue = partial,
+            valueStartOffset = valueStart,
+            valueEndOffset = cursorOffset,
+            annotationStartOffset = 0,
+            annotationEndOffset = 0,
+            existingAttributes = topLevelAttributeNames(source, bodyStart, bodyEnd),
+        )
+    }
+
+    private fun topLevelAttributeNames(source: String, bodyStart: Int, bodyEnd: Int): Set<String> {
+        val names = linkedSetOf<String>()
+        var segmentStart = (bodyStart + 1).coerceAtMost(source.length)
+        var parenDepth = 0
+        var braceDepth = 0
+        var inString = false
+        var escaped = false
+        var index = segmentStart
+        val safeEnd = bodyEnd.coerceAtMost(source.length)
+        fun collect(end: Int) {
+            val segment = source.substring(segmentStart, end)
+            Regex("^\\s*([A-Za-z_][A-Za-z0-9_]*)\\s*=").find(segment)?.groupValues?.get(1)?.let(names::add)
+        }
+        while (index < safeEnd) {
+            val ch = source[index]
+            if (inString) {
+                when {
+                    escaped -> escaped = false
+                    ch == '\\' -> escaped = true
+                    ch == '"' -> inString = false
+                }
+            } else {
+                when (ch) {
+                    '"' -> inString = true
+                    '(' -> parenDepth++
+                    ')' -> if (parenDepth > 0) parenDepth--
+                    '{' -> braceDepth++
+                    '}' -> if (braceDepth > 0) braceDepth--
+                    ',' -> if (parenDepth == 0 && braceDepth == 0) {
+                        collect(index)
+                        segmentStart = index + 1
+                    }
+                }
+            }
+            index++
+        }
+        collect(safeEnd)
+        return names
+    }
+
+    private fun findArrayElementAtCursor(
+        source: String,
+        openBrace: Int,
+        closeBrace: Int,
+        cursorOffset: Int,
+    ): ValueInfo? {
+        var index = openBrace + 1
+        while (index < closeBrace) {
+            index = skipWhitespace(source, index, closeBrace)
+            if (index >= closeBrace) break
+            val value = readValue(source, index, closeBrace) ?: return null
+            if (cursorOffset in value.contentStart..value.contentEnd) return value
+            index = value.end
+            if (index < closeBrace && source[index] == ',') index++
         }
         return null
     }
@@ -238,12 +359,13 @@ object AnnotationContextExtractor {
         val safeCursor = cursorOffset.coerceIn(0, source.length)
         val tokenStart = javaIdentifierStartBefore(source, safeCursor)
         val start = if (tokenStart >= annotationBodyEnd) tokenStart else safeCursor
+        val tokenEnd = javaIdentifierEndAfter(source, safeCursor)
         return AnnotationContext(
             annotation = annotation,
             slot = slot,
             partialValue = source.substring(start, safeCursor),
             valueStartOffset = start,
-            valueEndOffset = safeCursor,
+            valueEndOffset = tokenEnd,
             annotationStartOffset = 0,
             annotationEndOffset = 0,
         )
@@ -288,6 +410,14 @@ object AnnotationContextExtractor {
         var index = cursorOffset.coerceIn(0, source.length)
         while (index > 0 && isJavaIdentifierPart(source[index - 1])) {
             index--
+        }
+        return index
+    }
+
+    private fun javaIdentifierEndAfter(source: String, cursorOffset: Int): Int {
+        var index = cursorOffset.coerceIn(0, source.length)
+        while (index < source.length && isJavaIdentifierPart(source[index])) {
+            index++
         }
         return index
     }
@@ -355,7 +485,7 @@ object AnnotationContextExtractor {
             slot = slot,
             partialValue = cleanedPartial,
             valueStartOffset = valueInfo.replaceStart,
-            valueEndOffset = cursorOffset,
+            valueEndOffset = replacementEnd(source, valueInfo, cursorOffset),
             annotationStartOffset = 0,
             annotationEndOffset = 0,
             injectMethodName = findMethodAttribute(source, bodyStart, bodyEnd),
@@ -411,7 +541,7 @@ object AnnotationContextExtractor {
             slot = slot,
             partialValue = cleanedPartial,
             valueStartOffset = valueInfo.replaceStart,
-            valueEndOffset = cursorOffset,
+            valueEndOffset = replacementEnd(source, valueInfo, cursorOffset),
             annotationStartOffset = 0,
             annotationEndOffset = 0,
             injectMethodName = injectMethod,
@@ -419,6 +549,15 @@ object AnnotationContextExtractor {
             shadowPrefix = shadowPrefix,
             shadowRemap = shadowRemap,
         )
+    }
+
+    private fun replacementEnd(source: String, valueInfo: ValueInfo, cursorOffset: Int): Int {
+        val isString = source.getOrNull(valueInfo.contentStart - 1) == '"'
+        return if (isString && source.getOrNull(valueInfo.contentEnd) != '"') {
+            cursorOffset
+        } else {
+            valueInfo.contentEnd
+        }
     }
 
     private data class ValueInfo(
@@ -440,11 +579,16 @@ object AnnotationContextExtractor {
                         continue
                     }
                     if (source[i] == '"') {
-                        return ValueInfo(contentStart, i, start, i + 1)
+                        return ValueInfo(contentStart, i, contentStart, i + 1)
                     }
                     i++
                 }
-                ValueInfo(contentStart, bodyEnd.coerceAtMost(source.length), start, bodyEnd.coerceAtMost(source.length))
+                ValueInfo(
+                    contentStart,
+                    bodyEnd.coerceAtMost(source.length),
+                    contentStart,
+                    bodyEnd.coerceAtMost(source.length),
+                )
             }
             '{' -> {
                 val close = findMatchingBrace(source, start) ?: bodyEnd

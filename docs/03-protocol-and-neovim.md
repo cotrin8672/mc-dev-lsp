@@ -103,6 +103,7 @@ Completion response:
       "documentation": null,
       "filterText": "draw TextRenderer String float int",
       "insertText": "Lnet/minecraft/client/font/TextRenderer;draw(Ljava/lang/String;FFI)I",
+      "insertTextFormat": "plainText",
       "kind": "method",
       "sortKey": "0200_draw",
       "edit": {
@@ -167,9 +168,6 @@ Recommended config:
 
 ```lua
 require("mcdev").setup({
-  jdtls = {
-    extension_jar = "/path/to/io.github.mcdev.jdtls.jar",
-  },
   insert = {
     at_target = "smart",
     mixin_class_import = true,
@@ -177,6 +175,9 @@ require("mcdev").setup({
   },
 })
 ```
+
+The repo-built extension jar is auto-discovered. `jdtls.extension_jar` remains
+an explicit override for jars installed elsewhere.
 
 Defaults do not publish diagnostics. Enable on-save diagnostics explicitly; completion sources, navigation, and code actions remain explicit user choices around the thin `mcdev.*` adapters.
 
@@ -200,7 +201,7 @@ The Blink source should:
 - find an active JDT LS client for the project
 - send `mcdev.completion`
 - convert response items into Blink items
-- preserve `label`, `detail`, `filterText`, and exact text edit
+- preserve `label`, `detail`, `filterText`, `insertTextFormat`, and exact text edit
 - expose warnings through logs or `:McdevInfo`, not as noisy completion items
 
 It should not:
@@ -219,6 +220,8 @@ Do not implement separate semantic behavior for Blink and cmp.
 ## omnifunc
 
 Omnifunc support can be a fallback adapter. It should use the same command and response model.
+It is disabled by default because omnifunc is synchronous; the opt-in adapter
+uses a short configurable timeout instead of blocking editing for seconds.
 
 ## AW/AT Buffer Handling
 

@@ -1,39 +1,30 @@
 # Mason Setup
 
-mcdev publishes the JDT LS extension bundle through a Mason registry package.
+mcdev uses Mason for the standard `jdtls` executable when available.
 
-The Mason package only installs the extension jar. It does not replace `jdtls`, `nvim-jdtls`, or your Java LSP configuration. mcdev still works by adding the jar to JDT LS through `init_options.bundles`.
+The mcdev JDT LS extension bundle is not installed from a Mason registry in this
+repo layout. Build or install the jar separately, then let mcdev add it
+to JDT LS through `init_options.bundles`.
 
 ## Registry
 
-Add the mcdev registry before the core Mason registry:
+Keep Mason on the official registry:
 
 ```lua
 require("mason").setup({
   registries = {
-    "github:cotrin8672/mc-dev-lsp",
     "github:mason-org/mason-registry",
   },
 })
 ```
 
-Install `jdtls` and `mcdev-jdtls-extension` through your Mason setup. That can be Mason UI, `:MasonInstall`, or an ensure-installed plugin. mcdev does not trigger installation; it only resolves the installed jar.
-
-The installed jar is resolved from:
-
-```text
-$MASON/share/mcdev-jdtls-extension/io.github.mcdev.jdtls.jar
-```
-
-When `$MASON` is not set, mcdev uses:
-
-```text
-vim.fn.stdpath("data") .. "/mason"
-```
+Install `jdtls` through your Mason setup. That can be Mason UI,
+`:MasonInstall`, or an ensure-installed plugin. Do not add
+`github:cotrin8672/mc-dev-lsp` to Mason `registries`.
 
 ## Neovim
 
-With Mason, `extension_jar` can usually be omitted:
+After the repository build, the versioned extension jar is discovered automatically:
 
 ```lua
 require("mcdev").setup()
@@ -82,4 +73,5 @@ The resolution order is:
 
 1. `jdtls.extension_jar`
 2. `MCDEV_JDTLS_EXTENSION_JAR`
-3. Mason `mcdev-jdtls-extension`
+3. newest repo-built `mcdev-jdtls-extension/build/libs/io.github.mcdev.jdtls-*.jar`
+4. legacy Mason bundle lookup, only when `jdtls.mason.enabled = true`

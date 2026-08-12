@@ -1,6 +1,6 @@
-# mcdev-kotlin Design Dossier
+# mc-dev-lsp Design Dossier
 
-This directory is an onboarding dossier for building `mcdev-kotlin`, a Kotlin/JVM semantic extension for Minecraft modding support in Neovim through JDT LS.
+This directory is an onboarding dossier for building `mc-dev-lsp`, a Kotlin/JVM semantic extension for Minecraft modding support in Neovim through JDT LS.
 
 The goal is not to build a small Neovim plugin. The goal is to provide an IDEA MinecraftDev-like semantic editing experience for the selected Minecraft modding surfaces:
 
@@ -48,7 +48,7 @@ The explicit non-goals are:
 - [Installation](installation.md)
   Prerequisites, prebuilt jar setup, and build from source.
 - [Mason Setup](mason.md)
-  Install the JDT LS extension bundle through the mcdev Mason registry.
+  Install JDT LS with Mason and inject the separately built mcdev bundle.
 - [Lazy.nvim Setup](lazy-nvim.md)
   Full Lazy.nvim spec with mcdev-nvim path and jdtls bundles.
 - [Troubleshooting](troubleshooting.md)

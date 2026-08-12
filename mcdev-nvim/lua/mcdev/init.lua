@@ -2,6 +2,7 @@ local config = require("mcdev.config")
 local protocol = require("mcdev.protocol")
 local diagnostics = require("mcdev.diagnostics")
 local health = require("mcdev.health")
+local ui = require("mcdev.ui")
 
 local M = {}
 
@@ -32,7 +33,7 @@ function M.setup(opts)
     diagnostics.start()
   end, {})
   vim.api.nvim_create_user_command("McdevDiagnosticsStatus", function()
-    vim.notify(table.concat(diagnostics.status_lines(), "\n"))
+    ui.show_report("mcdev diagnostics", diagnostics.status_lines())
   end, {})
   vim.api.nvim_create_user_command("McdevHealth", function()
     health.health()
@@ -60,5 +61,6 @@ M.diagnostics = diagnostics
 M.convert = require("mcdev.convert")
 M.attach = require("mcdev.attach")
 M.lsp = require("mcdev.lsp")
+M.ui = ui
 
 return M

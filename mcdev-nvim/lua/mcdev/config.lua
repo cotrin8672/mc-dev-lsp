@@ -4,7 +4,7 @@ M.options = {
   jdtls = {
     extension_jar = nil,
     mason = {
-      enabled = true,
+      enabled = false,
       package = "mcdev-jdtls-extension",
       jar = "io.github.mcdev.jdtls.jar",
     },
@@ -15,7 +15,8 @@ M.options = {
     inject_method_descriptor = "auto",
   },
   completion = {
-    omnifunc = true,
+    omnifunc = false,
+    omnifunc_timeout_ms = 500,
   },
   standard_lsp = {
     prefer = true,
@@ -25,7 +26,7 @@ M.options = {
     events = { "BufWritePost" },
     debounce_ms = 1000,
     insert_mode = false,
-    in_flight_policy = "drop",
+    in_flight_policy = "latest",
     stale_result_policy = "drop",
   },
 }

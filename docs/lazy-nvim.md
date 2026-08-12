@@ -1,21 +1,12 @@
 # Lazy.nvim Setup
 
-This is a complete Lazy.nvim example for mcdev with Mason `jdtls`, the mcdev Mason registry, and `nvim-jdtls`.
+This is a complete Lazy.nvim example for mcdev with Mason `jdtls`, a repo-built
+mcdev JDT LS extension jar, and `nvim-jdtls`.
 
-Register the mcdev Mason registry before the core Mason registry:
-
-```lua
-require("mason").setup({
-  registries = {
-    "github:cotrin8672/mc-dev-lsp",
-    "github:mason-org/mason-registry",
-  },
-})
-```
-
-Install packages through your Mason layer, for example Mason UI, `:MasonInstall`, or an ensure-installed plugin. mcdev only resolves already-installed Mason packages; it does not install them.
-
-If Nix, a system package, or a local build owns the jar, set `jdtls.extension_jar` explicitly in `require("mcdev").setup()`.
+Install `jdtls` through your Mason layer, for example Mason UI,
+`:MasonInstall`, or an ensure-installed plugin. Do not add
+`github:cotrin8672/mc-dev-lsp` to Mason `registries`; this repository is loaded
+by Lazy.nvim and builds its own extension jar.
 
 Diagnostics are disabled by default and should normally run on save when enabled. Completion adapters are exposed as sources for your completion UI; mcdev does not register them globally. Navigation and code actions remain user keymap choices.
 
@@ -23,16 +14,6 @@ Diagnostics are disabled by default and should normally run on save when enabled
 
 ```lua
 return {
-  {
-    "mason-org/mason.nvim",
-    opts = {
-      registries = {
-        "github:cotrin8672/mc-dev-lsp",
-        "github:mason-org/mason-registry",
-      },
-    },
-  },
-
   -- Optional example. Use Mason UI or another ensure-installed layer if you
   -- already manage tools elsewhere.
   {
@@ -41,15 +22,17 @@ return {
     opts = {
       ensure_installed = {
         "jdtls",
-        "mcdev-jdtls-extension",
       },
     },
   },
 
   {
+    "cotrin8672/mc-dev-lsp",
     name = "mcdev-nvim",
-    -- Local checkout layout. Mason installs the JDT LS bundle, not this Lua plugin.
-    dir = "C:/Users/you/ghq/github.com/cotrin8672/mc-dev-lsp/mcdev-nvim",
+    build = "gradle :mcdev-jdtls-extension:jar --no-daemon",
+    init = function(plugin)
+      vim.opt.rtp:prepend(plugin.dir .. "/mcdev-nvim")
+    end,
     opts = {
       insert = {
         at_target = "smart",
@@ -63,7 +46,8 @@ return {
         insert_mode = false,
       },
     },
-    config = function(_, opts)
+    config = function(plugin, opts)
+      vim.opt.rtp:prepend(plugin.dir .. "/mcdev-nvim")
       require("mcdev").setup(opts)
     end,
   },
@@ -86,12 +70,17 @@ return {
 
 ## Alternative: mcdev.jdtls starter
 
-The repository includes a thin `mcdev.jdtls` starter that picks Mason `jdtls`, validates the extension jar, and injects `init_options.bundles`:
+The repository includes a thin `mcdev.jdtls` starter that picks Mason `jdtls`,
+auto-discovers the newest repo-built extension jar, validates it, and injects
+`init_options.bundles`:
 
 ```lua
 require("mcdev").setup()
 require("mcdev.jdtls").start_or_attach()
 ```
+
+Set `jdtls.extension_jar` or `MCDEV_JDTLS_EXTENSION_JAR` only when the jar lives
+outside the checked-out repository.
 
 If you already have a detailed `nvim-jdtls` setup, keep it and add mcdev before `start_or_attach`:
 
@@ -122,6 +111,7 @@ Blink:
         mcdev = {
           name = "mcdev",
           module = "mcdev.blink",
+          score_offset = 100,
           async = true,
           timeout_ms = 5000,
         },
@@ -130,6 +120,8 @@ Blink:
   },
 }
 ```
+
+Do not restrict this provider to `vim.bo.filetype == "java"`: the source already checks its context, and a Java-only predicate disables Access Widener and Access Transformer completion. The score offset prioritizes mcdev's quoted/snippet-aware annotation attributes over JDT LS' plain `name = ` items.
 
 nvim-cmp:
 
@@ -142,13 +134,15 @@ nvim-cmp:
     cmp.register_source("mcdev", require("mcdev.cmp").new())
     cmp.setup({
       sources = {
-        { name = "nvim_lsp" },
-        { name = "mcdev" },
+        { name = "mcdev", priority = 1100 },
+        { name = "nvim_lsp", priority = 1000 },
       },
     })
   end,
 }
 ```
+
+The explicit priority keeps quoted/snippet-aware mcdev attributes ahead of JDT LS' incomplete annotation stubs.
 
 Blink, cmp, and omnifunc share the same `mcdev.completion` command path. Do not implement separate semantic behavior in each adapter.
 

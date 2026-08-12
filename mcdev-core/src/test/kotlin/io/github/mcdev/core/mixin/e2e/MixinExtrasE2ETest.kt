@@ -128,8 +128,8 @@ class MixinExtrasE2ETest {
         """)
         val items = facade.complete(MixinE2ETestSupport.requestAt(source, "@Expr"))
 
-        assertTrue(items.any { it.insertText == "@Expression(\"\")" })
-        assertTrue(items.any { it.insertText == "@Expressions({})" })
+        assertTrue(items.any { it.insertText == "Expression(\"${'$'}{1}\")${'$'}0" })
+        assertTrue(items.any { it.insertText == "Expressions({ ${'$'}{1} })${'$'}0" })
     }
 
     @Test
@@ -139,9 +139,9 @@ class MixinExtrasE2ETest {
         """)
         val items = facade.complete(MixinE2ETestSupport.requestAt(source, "@Wrap"))
 
-        assertTrue(items.any { it.insertText.startsWith("@WrapOperation") })
-        assertTrue(items.any { it.insertText.startsWith("@WrapWithCondition") })
-        assertTrue(items.any { it.insertText.startsWith("@WrapMethod") })
+        assertTrue(items.any { it.insertText.startsWith("WrapOperation") })
+        assertTrue(items.any { it.insertText.startsWith("WrapWithCondition") })
+        assertTrue(items.any { it.insertText.startsWith("WrapMethod") })
     }
 
     @Test

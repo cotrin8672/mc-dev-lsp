@@ -4,7 +4,6 @@ import io.github.mcdev.core.model.MappingNamespace
 import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertNotNull
-import kotlin.test.assertNull
 
 class AwContextExtractorTest {
     @Test
@@ -85,10 +84,21 @@ class AwContextExtractorTest {
     }
 
     @Test
-    fun returnsNullForBlankLine() {
+    fun blankEntryLineCompletesDirective() {
         val source = "accessWidener v2 named\n\naccessible class Foo"
         val offset = source.indexOf("\n\n") + 1
-        assertNull(AwContextExtractor.extractAtOffset(source, offset))
+        val context = assertNotNull(AwContextExtractor.extractAtOffset(source, offset))
+        assertEquals(AwSyntaxSlot.DIRECTIVE, context.slot)
+        assertEquals("", context.partialValue)
+    }
+
+    @Test
+    fun trailingWhitespaceAdvancesToTheNextSlot() {
+        val source = "accessWidener v2 named\naccessible method "
+        val context = assertNotNull(AwContextExtractor.extractAtOffset(source, source.length))
+        assertEquals(AwSyntaxSlot.OWNER, context.slot)
+        assertEquals("", context.partialValue)
+        assertEquals(source.length, context.valueStartOffset)
     }
 
     @Test

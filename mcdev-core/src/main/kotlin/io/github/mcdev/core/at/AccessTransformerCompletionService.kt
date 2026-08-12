@@ -76,7 +76,7 @@ class AccessTransformerCompletionService(
                     documentation = insert.insertText,
                     filterText = "${method.name} ${method.readableSignature}",
                     insertText = insert.insertText,
-                    kind = McCompletionKind.METHOD,
+                    kind = McCompletionKind.VALUE,
                     sortKey = "0300_${method.name}",
                     metadata = McCompletionMetadata(
                         source = "at.member.method",

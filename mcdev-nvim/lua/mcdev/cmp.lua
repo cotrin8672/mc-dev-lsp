@@ -10,13 +10,17 @@ end
 source.new = source.source
 
 function source:is_available()
-  return buffer.is_mcdev_buffer(0)
+  return buffer.is_mcdev_completion_context(0)
 end
 
 function source:complete(params, callback)
   local context = params and params.context or {}
   local bufnr = context.bufnr or vim.api.nvim_get_current_buf()
   local cursor = context.cursor or vim.api.nvim_win_get_cursor(0)
+  if not buffer.is_mcdev_completion_context(bufnr) then
+    callback({ items = {}, isIncomplete = false })
+    return
+  end
   completion.complete(function(result)
     callback({
       items = result.items or {},

@@ -26,10 +26,7 @@ class AtTargetCompletionService {
                     documentation = constantHint ?: insertText,
                     filterText = "${candidate.name} ${candidate.displayLabel} ${candidate.detail}",
                     insertText = insertText,
-                    kind = when (candidate.kind) {
-                        AtTargetKind.FIELD -> McCompletionKind.FIELD
-                        else -> McCompletionKind.METHOD
-                    },
+                    kind = McCompletionKind.VALUE,
                     sortKey = "0400_${candidate.name}",
                     metadata = McCompletionMetadata(
                         source = "mixin.atTarget",

@@ -6,6 +6,58 @@ local lsp = require("mcdev.lsp")
 
 local M = {}
 
+local function cursor_range()
+  local position = vim.api.nvim_win_get_cursor(0)
+  return {
+    start = { line = position[1] - 1, character = position[2] },
+    ["end"] = { line = position[1] - 1, character = position[2] },
+  }
+end
+
+local function visual_range(bufnr)
+  local start_pos = vim.api.nvim_buf_get_mark(bufnr, "<")
+  local end_pos = vim.api.nvim_buf_get_mark(bufnr, ">")
+  return {
+    start = { line = start_pos[1] - 1, character = start_pos[2] },
+    ["end"] = { line = end_pos[1] - 1, character = end_pos[2] + 1 },
+  }
+end
+
+local function select_code_action(actions, bufnr)
+  if #actions == 1 then
+    code_action.apply(actions[1], bufnr)
+    return
+  end
+  vim.ui.select(actions, {
+    prompt = "mcdev code action:",
+    format_item = function(action)
+      return action.title or action.command or "(untitled action)"
+    end,
+  }, function(choice)
+    if choice then
+      code_action.apply(choice, bufnr)
+    end
+  end)
+end
+
+local function request_code_actions(bufnr, range)
+  local diagnostic_codes = vim.tbl_map(function(diagnostic)
+    return diagnostic.code
+  end, vim.diagnostic.get(bufnr, { namespace = require("mcdev.diagnostics").namespace }))
+  local provider = config.options.standard_lsp.prefer and lsp.code_actions or code_action.code_actions
+  provider(bufnr, range, diagnostic_codes, function(actions, err)
+    if err then
+      vim.notify(tostring(err), vim.log.levels.WARN)
+      return
+    end
+    if not actions or #actions == 0 then
+      vim.notify("mcdev: no code actions available", vim.log.levels.INFO)
+      return
+    end
+    select_code_action(actions, bufnr)
+  end)
+end
+
 local function goto_location(locations, err, label, raw_locations)
   if err then
     vim.notify(tostring(err), vim.log.levels.WARN)
@@ -82,28 +134,11 @@ function M.setup(bufnr)
 
   local code_action_opts = config.options.code_action or {}
   if code_action_opts.enable then
-    vim.keymap.set({ "n", "v" }, "<leader>ca", function()
-      local start_pos = vim.api.nvim_buf_get_mark(bufnr, "<")
-      local end_pos = vim.api.nvim_buf_get_mark(bufnr, ">")
-      local range = {
-        start = { line = start_pos[1] - 1, character = start_pos[2] },
-        ["end"] = { line = end_pos[1] - 1, character = end_pos[2] + 1 },
-      }
-      local diagnostic_codes = vim.tbl_map(function(diagnostic)
-        return diagnostic.code
-      end, vim.diagnostic.get(bufnr, { namespace = require("mcdev.diagnostics").namespace }))
-      local provider = config.options.standard_lsp.prefer and lsp.code_actions or code_action.code_actions
-      provider(bufnr, range, diagnostic_codes, function(actions, err)
-        if err then
-          vim.notify(tostring(err), vim.log.levels.WARN)
-          return
-        end
-        if not actions or #actions == 0 then
-          vim.notify("mcdev: no code actions available", vim.log.levels.INFO)
-          return
-        end
-        code_action.apply(actions[1])
-      end)
+    vim.keymap.set("n", "<leader>ca", function()
+      request_code_actions(bufnr, cursor_range())
+    end, { buffer = bufnr, desc = "Mcdev code action" })
+    vim.keymap.set("v", "<leader>ca", function()
+      request_code_actions(bufnr, visual_range(bufnr))
     end, { buffer = bufnr, desc = "Mcdev code action" })
   end
 end

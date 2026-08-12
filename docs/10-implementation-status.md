@@ -67,14 +67,15 @@ Known limits:
 - Setup API, extension jar accessor, active JDT LS client detection, request wrapper.
 - Completion payload construction matching `McdevCompletionRequest` shape.
 - Blink, nvim-cmp, and omnifunc adapter shims preserving label vs insertText.
-- Standard-LSP-first wrappers for definition, references, hover, and code actions, with mcdev command fallback.
-- Commands for `:McdevInfo` and `:McdevReindex`.
+- Completion-context gating and a prefix-cache short circuit prevent per-keystroke duplicate JDT LS requests (and repeated Fidget `Update documents` progress) while typing inside Mixin annotations.
+- Standard-LSP-first wrappers for definition, references, and hover; code actions merge standard and mcdev results and de-duplicate them.
+- Commands for info, reindex, project-context reload/dump, health, diagnostics status, and completion/diagnostics debugging, with long output shown in a scratch report window.
 - AW/AT buffer detection (`mcdev.buffer`) and languageId routing for all protocol requests.
 - Definition and references navigation helpers via `mcdev.definition` / `mcdev.references`; no keymaps are installed by default.
 - Code action helper with workspace edit application; no `<leader>ca` keymap is installed by default.
-- Diagnostics publication via `mcdev.diagnostics` with debounced on-save autocmds, stale-result guards, and the `mcdev` diagnostic namespace; `mcdev.context` remains a compatibility alias.
+- Diagnostics publication via `mcdev.diagnostics` with debounced on-save autocmds, stale-result guards, latest-request coalescing, and the `mcdev` diagnostic namespace; `mcdev.context` remains a compatibility alias.
 - Shared DTO converters (`mcdev.convert`) for locations, diagnostics, and code actions.
-- `mcdev.jdtls` helper for Mason `jdtls` startup with bundle injection.
+- `mcdev.jdtls` helper for Mason `jdtls` startup, repo-built bundle auto-discovery, and bundle injection.
 - Headless Lua adapter tests with mocked JDT LS client absence handling, AW/AT payload checks, navigation, diagnostics, and code action conversion.
 
 ### Documentation (WP-14)

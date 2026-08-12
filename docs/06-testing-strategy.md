@@ -2,7 +2,7 @@
 
 ## Testing Goal
 
-The test suite must prove that `mcdev-kotlin` behaves like a semantic Minecraft modding assistant, not a text completion plugin.
+The test suite must prove that `mc-dev-lsp` behaves like a semantic Minecraft modding assistant, not a text completion plugin.
 
 Tests must cover:
 
@@ -320,11 +320,10 @@ Examples:
 Recommended CI tasks:
 
 ```text
-./gradlew test
-./gradlew :mcdev-jdtls-extension:jar
-./gradlew :mcdev-jdtls-extension:checkBundle
+gradle test
+gradle :mcdev-jdtls-extension:jar
+gradle :mcdev-jdtls-extension:checkBundle
 nvim --headless -u tests/minimal_init.lua -c "lua require('mcdev.tests').run()" -c qa
 ```
 
 CI should not require downloading Minecraft dependencies during every test if fixtures can provide stable minimal jars/classes.
-

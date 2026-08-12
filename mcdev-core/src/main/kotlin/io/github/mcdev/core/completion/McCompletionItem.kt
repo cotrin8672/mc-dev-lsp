@@ -10,6 +10,11 @@ enum class McCompletionKind {
     VALUE,
 }
 
+enum class McCompletionInsertTextFormat {
+    PLAIN_TEXT,
+    SNIPPET,
+}
+
 data class McCompletionMetadata(
     val source: String,
     val owner: String? = null,
@@ -28,4 +33,5 @@ data class McCompletionItem(
     val sortKey: String,
     val metadata: McCompletionMetadata,
     val additionalEdits: List<McTextEdit> = emptyList(),
+    val insertTextFormat: McCompletionInsertTextFormat = McCompletionInsertTextFormat.PLAIN_TEXT,
 )

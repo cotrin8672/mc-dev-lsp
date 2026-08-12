@@ -41,7 +41,7 @@ class ExpressionSupportTest {
             annotationEndOffset = 0,
         )
         val items = expressionSupport.completeExpressionAnnotations(context)
-        assertTrue(items.any { it.insertText.startsWith("@Definition") })
+        assertTrue(items.any { it.insertText.startsWith("Definition") })
         assertTrue(items.any { it.metadata.source == "mixinextras.feature" })
     }
 
@@ -105,8 +105,8 @@ class ExpressionSupportTest {
         val (line, character) = offsetToLineCharacter(source, offset)
         val items = expressionSupport.completeFeatureAnnotations(source, line, character)
 
-        assertTrue(items.any { it.insertText == "@Expression(\"\")" })
-        assertTrue(items.any { it.insertText == "@Expressions({})" })
+        assertTrue(items.any { it.insertText == "Expression(\"${'$'}{1}\")${'$'}0" })
+        assertTrue(items.any { it.insertText == "Expressions({ ${'$'}{1} })${'$'}0" })
     }
 
     @Test

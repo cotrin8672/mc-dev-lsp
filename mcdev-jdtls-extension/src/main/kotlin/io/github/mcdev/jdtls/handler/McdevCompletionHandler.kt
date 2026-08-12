@@ -1,8 +1,12 @@
 package io.github.mcdev.jdtls.handler
 
+import io.github.mcdev.core.at.AtContextExtractor
+import io.github.mcdev.core.aw.AwContextExtractor
+import io.github.mcdev.core.awat.AwAtFileType
 import io.github.mcdev.jdtls.awat.AwAtServiceFacade
 import io.github.mcdev.jdtls.convert.CompletionConvertContext
 import io.github.mcdev.jdtls.convert.CompletionItemConverter
+import io.github.mcdev.jdtls.convert.CompletionReplacementRange
 import io.github.mcdev.jdtls.mixin.MixinServiceFacade
 import io.github.mcdev.jdtls.mixin.SemanticModelCache
 import io.github.mcdev.jdtls.project.FileBasedProjectContextService
@@ -114,6 +118,18 @@ class McdevCompletionHandler(
                             mappingResolver = session.context.mappings.resolver,
                             sourceNamespace = session.context.mappings.sourceNamespace,
                             runtimeNamespace = session.context.mappings.runtimeNamespace,
+                            replacementRange = when (awAtFileType) {
+                                AwAtFileType.ACCESS_WIDENER -> AwContextExtractor.extract(
+                                    request.context.bufferText,
+                                    request.context.position.line,
+                                    request.context.position.character,
+                                )?.let { CompletionReplacementRange(it.valueStartOffset, it.valueEndOffset) }
+                                AwAtFileType.ACCESS_TRANSFORMER -> AtContextExtractor.extract(
+                                    request.context.bufferText,
+                                    request.context.position.line,
+                                    request.context.position.character,
+                                )?.let { CompletionReplacementRange(it.valueStartOffset, it.valueEndOffset) }
+                            },
                         ),
                     ),
                 ),

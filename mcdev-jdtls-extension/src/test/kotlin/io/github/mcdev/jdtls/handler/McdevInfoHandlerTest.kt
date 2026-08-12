@@ -33,7 +33,7 @@ class McdevInfoHandlerTest {
         val response = handler.handle(listOf(contextPayload()))
         val info = assertIs<McdevInfoResponse>(response.result)
         assertTrue(info.lines.any { it == "Protocol: ${McdevProtocol.VERSION}" })
-        assertTrue(info.lines.any { it == "Extension: ${McdevProtocol.SERVER_VERSION}" })
+        assertTrue(info.lines.any { it == "Extension: ${info.version}" })
     }
 
     @Test

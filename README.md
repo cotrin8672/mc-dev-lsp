@@ -1,4 +1,4 @@
-# mcdev-kotlin
+# mc-dev-lsp
 
 Minecraft modding semantic support for Neovim through a JDT LS extension.
 
@@ -22,8 +22,8 @@ The repository follows the design dossier in [docs](docs/README.md). Kotlin owns
 
 ## User documentation
 
-- [Installation](docs/installation.md) — prerequisites, Mason, prebuilt jar, build from source
-- [Mason setup](docs/mason.md) — install the JDT LS extension bundle through a custom Mason registry
+- [Installation](docs/installation.md) — prerequisites, JDT LS, prebuilt jar, build from source
+- [Mason setup](docs/mason.md) — use Mason for JDT LS while loading the mcdev bundle separately
 - [Lazy.nvim setup](docs/lazy-nvim.md) — full Lazy spec with mcdev-nvim and jdtls bundles
 - [Troubleshooting](docs/troubleshooting.md) — bundle loading, workspace root, AW/AT buffers, diagnostics
 - [Contributing](docs/contributing.md) — architecture boundaries and the no-Lua-semantics rule
@@ -45,29 +45,19 @@ The `CI` GitHub Actions workflow runs `gradle test --no-daemon`, the headless Ne
 The JDT LS extension jar is produced as:
 
 ```text
-mcdev-jdtls-extension/build/libs/io.github.mcdev.jdtls-0.1.0-SNAPSHOT.jar
+mcdev-jdtls-extension/build/libs/io.github.mcdev.jdtls-<version>.jar
 ```
 
 ## Neovim Setup
 
-Mason owns the `jdtls` executable and the `mcdev-jdtls-extension` bundle. Add
-the mcdev registry to Mason, then install `jdtls` and `mcdev-jdtls-extension`
-from your Mason layer. mcdev does not run Mason installs by itself.
+Mason should own the `jdtls` executable and ordinary formatter/linter tools.
+Do not register this repository as a Mason registry; `mcdev-jdtls-extension`
+is built from this repo and passed to JDT LS through `init_options.bundles`.
 
 With lazy.nvim, a minimal setup looks like this:
 
 ```lua
 return {
-  {
-    "mason-org/mason.nvim",
-    opts = {
-      registries = {
-        "github:cotrin8672/mc-dev-lsp",
-        "github:mason-org/mason-registry",
-      },
-    },
-  },
-
   -- Optional example with mason-tool-installer. Use Mason UI or another
   -- ensure-installed layer if that is how your config manages tools.
   {
@@ -76,15 +66,17 @@ return {
     opts = {
       ensure_installed = {
         "jdtls",
-        "mcdev-jdtls-extension",
       },
     },
   },
 
   {
+    "cotrin8672/mc-dev-lsp",
     name = "mcdev-nvim",
-    -- Mason installs the JDT LS bundle. lazy.nvim loads this Lua plugin.
-    dir = "/path/to/mc-dev-lsp/mcdev-nvim",
+    build = "gradle :mcdev-jdtls-extension:jar --no-daemon",
+    init = function(plugin)
+      vim.opt.rtp:prepend(plugin.dir .. "/mcdev-nvim")
+    end,
     opts = {
       insert = {
         at_target = "smart",
@@ -92,7 +84,8 @@ return {
         inject_method_descriptor = "auto",
       },
     },
-    config = function(_, opts)
+    config = function(plugin, opts)
+      vim.opt.rtp:prepend(plugin.dir .. "/mcdev-nvim")
       require("mcdev").setup(opts)
     end,
   },
@@ -113,7 +106,9 @@ return {
 }
 ```
 
-`extend_config(config)` only appends the Mason-installed mcdev bundle to
+The plugin auto-discovers the newest repo-built jar under
+`mcdev-jdtls-extension/build/libs`. Set `jdtls.extension_jar` only when the jar
+is installed elsewhere. `extend_config(config)` only appends the resolved bundle to
 `config.init_options.bundles`; it does not change your JDT LS `cmd`, `root_dir`,
 `settings`, or `capabilities`.
 
@@ -135,6 +130,7 @@ Blink:
         mcdev = {
           name = "mcdev",
           module = "mcdev.blink",
+          score_offset = 100,
           async = true,
           timeout_ms = 5000,
         },
@@ -143,6 +139,8 @@ Blink:
   },
 }
 ```
+
+Keep the provider enabled for Java, Access Widener, and Access Transformer buffers; `mcdev.blink` performs its own context check. The score offset makes mcdev's complete snippets (for example `method = "…"`) win over JDT LS' incomplete `method = ` annotation item.
 
 nvim-cmp:
 
@@ -155,13 +153,15 @@ nvim-cmp:
     cmp.register_source("mcdev", require("mcdev.cmp").new())
     cmp.setup({
       sources = {
-        { name = "nvim_lsp" },
-        { name = "mcdev" },
+        { name = "mcdev", priority = 1100 },
+        { name = "nvim_lsp", priority = 1000 },
       },
     })
   end,
 }
 ```
+
+The higher mcdev priority serves the same purpose as Blink's score offset: complete Mixin snippets should beat JDT LS' plain annotation-attribute stubs.
 
 Use your normal Neovim keymap layer for navigation and code actions. The current JDT LS bundle exposes mcdev navigation through `workspace/executeCommand` commands (`mcdev.definition`, `mcdev.references`); it does not contribute to JDT LS `textDocument/definition` directly.
 

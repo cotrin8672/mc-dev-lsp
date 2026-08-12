@@ -2,6 +2,8 @@ local config = require("mcdev.config")
 local diagnostics = require("mcdev.diagnostics")
 local completion = require("mcdev.completion")
 local protocol = require("mcdev.protocol")
+local convert = require("mcdev.convert")
+local ui = require("mcdev.ui")
 
 local M = {}
 
@@ -34,7 +36,12 @@ local function module_path(name)
 end
 
 local function current_commit()
-  local ok, lines = pcall(vim.fn.systemlist, { "git", "rev-parse", "HEAD" })
+  local module = module_path("mcdev")
+  local root = vim.fs and vim.fs.root and vim.fs.root(module, ".git") or nil
+  if not root then
+    return "unknown"
+  end
+  local ok, lines = pcall(vim.fn.systemlist, { "git", "-C", root, "rev-parse", "HEAD" })
   if ok and vim.v.shell_error == 0 and lines and lines[1] and lines[1] ~= "" then
     return lines[1]
   end
@@ -85,8 +92,8 @@ local function base_lines(bufnr)
   bufnr = bufnr or vim.api.nvim_get_current_buf()
   local client = protocol.active_jdtls_client(bufnr)
   local jar = extension_jar()
-  local blink_loaded = package.loaded["blink.cmp"] ~= nil or pcall(require, "blink.cmp")
-  local cmp_loaded = package.loaded["cmp"] ~= nil or pcall(require, "cmp")
+  local blink_loaded = package.loaded["blink.cmp"] ~= nil
+  local cmp_loaded = package.loaded["cmp"] ~= nil
   return {
     "mcdev-nvim loaded: yes",
     "mcdev-nvim module path: " .. module_path("mcdev"),
@@ -118,6 +125,7 @@ local function base_lines(bufnr)
     "last diagnostics trigger event: " .. tostring(diagnostics.last_trigger_event or "none"),
     "completion adapter last source: " .. tostring(completion.last_source or "none"),
     "completion adapter request count: " .. tostring(completion.request_count),
+    "completion server request count: " .. tostring(completion.server_request_count),
     "completion adapter last callback item count: " .. tostring(completion.last_callback_item_count),
     "last completion request: " .. vim.inspect(completion.last_request),
     "last completion response count: " .. tostring(completion.last_response_count),
@@ -154,17 +162,18 @@ function M.health(bufnr)
       return
     end
 
-    local info = results.info.envelope and results.info.envelope.result or {}
-    local completion_result = results.completion.envelope and results.completion.envelope.result or {}
+    local info = convert.unwrap_envelope(results.info.envelope, results.info.err) or {}
+    local completion_result = convert.unwrap_envelope(results.completion.envelope, results.completion.err) or {}
     local completion_items = completion_result.items or {}
     local debug = completion_result.debug or {}
     local labels = {}
     for index = 1, math.min(#completion_items, 10) do
       labels[#labels + 1] = completion_items[index].label
     end
+    local repo_commit = current_commit()
     local lines = base_lines(bufnr)
     vim.list_extend(lines, {
-      "repo current commit: " .. current_commit(),
+      "repo current commit: " .. repo_commit,
       "jar build commit: " .. tostring(info.buildCommit or "unknown"),
       "extension build commit: " .. tostring(info.buildCommit or "unknown"),
       "extension build time: " .. tostring(info.buildTime or "unknown"),
@@ -199,10 +208,10 @@ function M.health(bufnr)
       "  completionContextKind: " .. tostring(debug.completionContextKind),
       "  warnings: " .. vim.inspect(debug.warnings or {}),
     })
-    if info.buildCommit and current_commit() ~= "unknown" and info.buildCommit ~= current_commit() then
+    if info.buildCommit and repo_commit ~= "unknown" and info.buildCommit ~= repo_commit then
       lines[#lines + 1] = "WARNING: JDTLS is using an old mcdev extension jar. Rebuild/reinstall the jar and restart JDTLS."
     end
-    vim.notify(table.concat(lines, "\n"))
+    ui.show_report("mcdev health", lines)
   end
 
   for name, request in pairs(payloads) do
@@ -219,14 +228,15 @@ function M.debug_completion(bufnr)
   local payload = protocol.build_completion_payload(bufnr, position)
   protocol.completion(function(envelope, err)
     local elapsed_ms = math.floor((vim.loop.hrtime() - started) / 1000000)
-    local result = envelope and envelope.result or {}
+    local result, unwrap_err = convert.unwrap_envelope(envelope, err)
+    result = result or {}
     local items = result.items or {}
     local debug = result.debug or {}
     local labels = {}
     for index = 1, math.min(#items, 20) do
       labels[#labels + 1] = items[index].label
     end
-    vim.notify(table.concat({
+    ui.show_report("mcdev completion debug", {
       "request params: " .. vim.inspect(payload),
       "selected jdtls client: " .. client_id(protocol.active_jdtls_client(bufnr)),
       "raw response: " .. vim.inspect(envelope),
@@ -245,9 +255,9 @@ function M.debug_completion(bufnr)
       "method: " .. tostring(debug.methodName) .. tostring(debug.methodDescriptor or ""),
       "warnings: " .. vim.inspect(debug.warnings or {}),
       "first 20 labels: " .. vim.inspect(labels),
-      "error: " .. tostring(err),
+      "error: " .. tostring(unwrap_err),
       "elapsed ms: " .. tostring(elapsed_ms),
-    }, "\n"))
+    })
   end, bufnr, position)
 end
 
@@ -257,16 +267,17 @@ function M.debug_diagnostics(bufnr)
   local started = vim.loop.hrtime()
   protocol.diagnostics(bufnr, position, function(envelope, err)
     local elapsed_ms = math.floor((vim.loop.hrtime() - started) / 1000000)
-    local result = envelope and envelope.result or {}
+    local result, unwrap_err = convert.unwrap_envelope(envelope, err)
+    result = result or {}
     local items = result.diagnostics or {}
-    vim.notify(table.concat({
+    ui.show_report("mcdev diagnostics debug", {
       "request params: " .. vim.inspect({ context = protocol.context(bufnr, position) }),
       "diagnostic count: " .. tostring(#items),
       "first diagnostics: " .. vim.inspect(first_items(items, 10)),
-      "error: " .. tostring(err),
+      "error: " .. tostring(unwrap_err),
       "elapsed ms: " .. tostring(elapsed_ms),
       "stale result dropped: " .. tostring(diagnostics.last_dropped_stale),
-    }, "\n"))
+    })
   end)
 end
 

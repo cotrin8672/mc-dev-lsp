@@ -6,16 +6,16 @@ Error messages are designed to be actionable. If you see a generic failure, chec
 
 ## Extension bundle not loading
 
-### `mcdev: extension jar is not configured or readable`
+### `mcdev: extension jar is not readable`
 
-mcdev could not resolve a readable JDT LS extension jar from explicit config, `MCDEV_JDTLS_EXTENSION_JAR`, or Mason.
+mcdev could not resolve a readable JDT LS extension jar from explicit config,
+`MCDEV_JDTLS_EXTENSION_JAR`, or the repository build output.
 
 Fix:
 
-1. Add the mcdev Mason registry and ensure Mason installs `jdtls` and `mcdev-jdtls-extension`.
-2. Or build the jar: `gradle :mcdev-jdtls-extension:jar`
-3. If Mason does not own the jar, set an **absolute** path in `jdtls.extension_jar`.
-4. Confirm readability: `:lua print(vim.fn.filereadable(require('mcdev').extension_jar()))` should print `1`.
+1. Build the jar: `gradle :mcdev-jdtls-extension:jar`
+2. If the jar is outside the plugin checkout, set an **absolute** path in `jdtls.extension_jar` or `MCDEV_JDTLS_EXTENSION_JAR`.
+3. Confirm readability: `:lua print(vim.fn.filereadable(require('mcdev').extension_jar()))` should print `1`.
 
 ### `Java language server doesn't support the command 'mcdev.info'`
 

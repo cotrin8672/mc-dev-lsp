@@ -61,6 +61,7 @@ class MixinServiceFacade(
     private val injectMethodCompletion: InjectMethodCompletionService = InjectMethodCompletionService(classIndex),
     private val atValueCompletion: AtValueCompletionService = AtValueCompletionService(),
     private val atTargetCompletion: AtTargetCompletionService = AtTargetCompletionService(),
+    private val attributeCompletion: MixinAttributeCompletionService = MixinAttributeCompletionService(),
     private val shadowValidation: ShadowValidationService = ShadowValidationService(classIndex),
     private val accessorService: AccessorService = AccessorService(classIndex),
     private val invokerService: InvokerService = InvokerService(classIndex),
@@ -215,6 +216,9 @@ class MixinServiceFacade(
         options: MixinCompletionOptions,
     ): List<McCompletionItem> {
         val source = request.bufferText
+        if (context.slot == AnnotationSlot.ATTRIBUTE) {
+            return attributeCompletion.complete(context)
+        }
         return when (context.annotation) {
             MixinAnnotation.MIXIN -> mixinTargetCompletion.complete(context, options)
             MixinAnnotation.INJECT,
@@ -253,6 +257,7 @@ class MixinServiceFacade(
                 emptyList()
             }
             MixinAnnotation.SHADOW -> completeShadow(request, context)
+            MixinAnnotation.OVERWRITE -> completeOverwrite(request, context)
             else -> emptyList()
         }
     }
@@ -345,7 +350,7 @@ class MixinServiceFacade(
                 documentation = method.readableSignature,
                 filterText = "${method.name} ${method.readableSignature}",
                 insertText = method.name,
-                kind = McCompletionKind.METHOD,
+                kind = McCompletionKind.VALUE,
                 sortKey = "0701_${method.name}",
                 metadata = McCompletionMetadata(
                     source = "mixin.shadow",
@@ -355,6 +360,35 @@ class MixinServiceFacade(
             )
         }
         return fieldItems + methodItems
+    }
+
+    private fun completeOverwrite(request: MixinFacadeRequest, context: AnnotationContext): List<McCompletionItem> {
+        if (context.slot != AnnotationSlot.OVERWRITE_METHOD) return emptyList()
+        val targets = resolveMixinTargets(request, context)
+        return targets
+            .flatMap { owner ->
+                classIndex.getMethods(owner)
+                    .filter { it.name.startsWith(context.partialValue) }
+                    .map { owner to it }
+            }
+            .distinctBy { (_, method) -> method.name to method.descriptor }
+            .map { (owner, method) ->
+                McCompletionItem(
+                    label = method.readableSignature,
+                    detail = AnnotationContextExtractor.internalToFqn(owner),
+                    documentation = method.descriptor,
+                    filterText = "${method.name} ${method.readableSignature}",
+                    insertText = method.name,
+                    kind = McCompletionKind.VALUE,
+                    sortKey = "0702_${method.name}",
+                    metadata = McCompletionMetadata(
+                        source = "mixin.overwrite",
+                        owner = owner,
+                        name = method.name,
+                        descriptor = method.descriptor,
+                    ),
+                )
+            }
     }
 
     private fun analyzeMemberDeclarations(request: MixinFacadeRequest): List<McDiagnostic> {

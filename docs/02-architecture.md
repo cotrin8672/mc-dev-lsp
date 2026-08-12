@@ -420,6 +420,7 @@ data class McCompletionItem(
     val documentation: String?,
     val filterText: String,
     val insertText: String,
+    val insertTextFormat: McCompletionInsertTextFormat,
     val kind: McCompletionKind,
     val sortKey: String,
     val metadata: McCompletionMetadata,

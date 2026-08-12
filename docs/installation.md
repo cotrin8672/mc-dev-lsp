@@ -1,6 +1,6 @@
 # Installation
 
-This guide covers prerequisites, installing the extension jar with Mason, configuring an external jar path, and building the JDT LS bundle from source.
+This guide covers prerequisites, installing JDT LS, configuring an external jar path, and building the JDT LS bundle from source.
 
 mcdev runs as an OSGi bundle inside JDT LS. Neovim talks to it through `workspace/executeCommand` requests. See [Protocol And Neovim](03-protocol-and-neovim.md) for the integration model.
 
@@ -16,23 +16,18 @@ mcdev runs as an OSGi bundle inside JDT LS. Neovim talks to it through `workspac
 
 Optional for building from source:
 
-- Gradle (wrapper included in the repository)
+- Gradle (the repository does not include a Gradle wrapper)
 - Git
 
 ## Quick start with Mason
 
-Add the mcdev registry before the core Mason registry:
+Use Mason for `jdtls` and ordinary formatter/linter tools. Do not add
+`github:cotrin8672/mc-dev-lsp` to Mason `registries`; this repository is not a
+Mason registry archive.
 
-```lua
-require("mason").setup({
-  registries = {
-    "github:cotrin8672/mc-dev-lsp",
-    "github:mason-org/mason-registry",
-  },
-})
-```
-
-Install `jdtls` and `mcdev-jdtls-extension` through your Mason layer, such as Mason UI, `:MasonInstall`, or an ensure-installed plugin. mcdev only resolves installed packages; it does not install them.
+Build the mcdev JDT LS extension jar in the checked-out repository. mcdev
+automatically selects the newest versioned jar under
+`mcdev-jdtls-extension/build/libs`.
 
 Minimal setup:
 
@@ -41,7 +36,8 @@ require("mcdev").setup()
 require("mcdev.jdtls").start_or_attach()
 ```
 
-This starts Mason `jdtls` when available, resolves the mcdev extension jar, and infers the workspace root from Gradle/Maven/Git markers.
+This starts Mason `jdtls` when available, appends the discovered mcdev extension
+jar, and infers the workspace root from Gradle/Maven/Git markers.
 
 If you already own an `nvim-jdtls` config, append mcdev to that config before starting JDT LS:
 
@@ -76,7 +72,7 @@ Use this path for Nix, system packages, or local builds.
 1. Obtain the extension jar. After a local build it is:
 
    ```text
-   mcdev-jdtls-extension/build/libs/io.github.mcdev.jdtls-0.1.0-SNAPSHOT.jar
+   mcdev-jdtls-extension/build/libs/io.github.mcdev.jdtls-<version>.jar
    ```
 
 2. Add `mcdev-nvim` to your Neovim runtime path. For local development, point at the repository checkout:
@@ -92,7 +88,7 @@ Use this path for Nix, system packages, or local builds.
    ```lua
    require("mcdev").setup({
      jdtls = {
-       extension_jar = "/absolute/path/to/io.github.mcdev.jdtls-0.1.0-SNAPSHOT.jar",
+       extension_jar = "/absolute/path/to/io.github.mcdev.jdtls-<version>.jar",
      },
      insert = {
        at_target = "smart",
@@ -125,12 +121,14 @@ gradle :mcdev-jdtls-extension:checkBundle
 The bundle jar is written to:
 
 ```text
-mcdev-jdtls-extension/build/libs/io.github.mcdev.jdtls-0.1.0-SNAPSHOT.jar
+mcdev-jdtls-extension/build/libs/io.github.mcdev.jdtls-<version>.jar
 ```
 
 `checkBundle` verifies the OSGi manifest, `plugin.xml`, delegate command handler class, embedded `mcdev-core` classes, and Kotlin stdlib.
 
-Point `extension_jar` at the absolute path of that file. Rebuild and restart JDT LS after Kotlin changes.
+When Neovim loads mcdev from this repository, that file is discovered automatically.
+For a separately installed jar, set `extension_jar` to its absolute path. Rebuild
+and restart JDT LS after Kotlin changes.
 
 ### Environment variables (optional)
 
@@ -138,7 +136,7 @@ Point `extension_jar` at the absolute path of that file. Rebuild and restart JDT
 |---|---|
 | `JDTLS_CMD` | Override the `jdtls` executable path (used by E2E scripts). |
 | `JDTLS_PLUGINS_DIR` | Compile-time path to JDT LS plugins when building the extension. |
-| `MCDEV_JDTLS_EXTENSION_JAR` | Runtime extension jar path for Neovim when Mason is not used. |
+| `MCDEV_JDTLS_EXTENSION_JAR` | Runtime extension jar override for Neovim. |
 | `MCDEV_BUNDLE_JAR` | Bundle jar path for headless OSGi E2E. |
 | `MCDEV_E2E_WORKSPACE` | Fixture workspace path for headless OSGi E2E. |
 
@@ -169,7 +167,9 @@ See [Local OSGi Bundle E2E](local-osgi-e2e.md) for manual Neovim steps.
 
 ## Supported buffers
 
-mcdev completion and diagnostics apply to:
+mcdev diagnostics apply to the supported buffers below. Completion is enabled
+only in Mixin/MixinExtras Java sources, likely Mixin config JSON files, and AW/AT
+files so ordinary Java and JSON editing does not trigger mcdev requests.
 
 - Java (`java`) — Mixin, MixinExtras, and related annotations
 - Access Widener (`.accesswidener`, `.aw`, or `accesswidener` filetype)
@@ -180,7 +180,7 @@ AW and AT buffers may not attach to JDT LS as normal Java documents. The Neovim 
 
 ## Next steps
 
-- [Mason setup](mason.md) — custom registry and Mason package details
+- [Mason setup](mason.md) — JDT LS installation and bundle injection details
 - [Lazy.nvim setup](lazy-nvim.md) — full plugin spec with blink.cmp and jdtls bundles
 - [Troubleshooting](troubleshooting.md) — common setup failures
 - [Contributing](contributing.md) — where to put semantic vs integration code

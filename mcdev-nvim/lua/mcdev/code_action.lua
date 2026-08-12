@@ -22,9 +22,25 @@ function M.code_actions(bufnr, range, diagnostic_codes, cb)
   end)
 end
 
-function M.apply(action)
+function M.apply(action, bufnr)
+  bufnr = bufnr or vim.api.nvim_get_current_buf()
   if action and action.edit then
-    vim.lsp.util.apply_workspace_edit(action.edit, "utf-8")
+    local client = protocol.active_jdtls_client(bufnr)
+    vim.lsp.util.apply_workspace_edit(action.edit, (client and client.offset_encoding) or "utf-16")
+  end
+  if action and action.command then
+    local command = type(action.command) == "table" and action.command or {
+      command = action.command,
+      arguments = action.arguments,
+    }
+    if vim.lsp.buf.execute_command then
+      vim.lsp.buf.execute_command(command)
+    else
+      local client = protocol.active_jdtls_client(bufnr)
+      if client then
+        client.request("workspace/executeCommand", command, nil, bufnr)
+      end
+    end
   end
 end
 

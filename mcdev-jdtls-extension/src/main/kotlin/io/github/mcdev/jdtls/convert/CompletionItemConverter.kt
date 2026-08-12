@@ -2,6 +2,7 @@ package io.github.mcdev.jdtls.convert
 
 import io.github.mcdev.core.codeaction.McTextEdit
 import io.github.mcdev.core.completion.McCompletionItem
+import io.github.mcdev.core.completion.McCompletionInsertTextFormat
 import io.github.mcdev.core.completion.McCompletionKind
 import io.github.mcdev.core.descriptor.DescriptorParseResult
 import io.github.mcdev.core.descriptor.DescriptorRenderer
@@ -33,7 +34,10 @@ data class CompletionConvertContext(
     val runtimeNamespace: MappingNamespace = MappingNamespace.INTERMEDIARY,
     val siblingItems: List<McCompletionItem> = emptyList(),
     val atTargetStats: AtTargetStats? = null,
+    val replacementRange: CompletionReplacementRange? = null,
 )
+
+data class CompletionReplacementRange(val startOffset: Int, val endOffset: Int)
 
 data class AtTargetStats(
     val sameNameCounts: Map<String, Int>,
@@ -53,11 +57,17 @@ object CompletionItemConverter {
         ),
     ): McdevCompletionItemDto {
         val insertText = resolveInsertText(item, convertContext)
-        val edit = annotationContext?.let { context ->
-            val range = offsetRange(
-                source = source,
+        val replacementRange = convertContext.replacementRange ?: annotationContext?.let { context ->
+            CompletionReplacementRange(
                 startOffset = context.valueStartOffset,
                 endOffset = context.valueEndOffset.coerceAtLeast(context.valueStartOffset),
+            )
+        }
+        val edit = replacementRange?.let { replacement ->
+            val range = offsetRange(
+                source = source,
+                startOffset = replacement.startOffset,
+                endOffset = replacement.endOffset.coerceAtLeast(replacement.startOffset),
             )
             McdevTextEdit(
                 range = range,
@@ -75,6 +85,7 @@ object CompletionItemConverter {
             edit = edit,
             additionalEdits = buildAdditionalEdits(item, convertContext),
             metadata = buildMetadata(item),
+            insertTextFormat = item.insertTextFormat.toProtocolFormat(),
         )
     }
 
@@ -256,6 +267,11 @@ object CompletionItemConverter {
         McCompletionKind.FIELD -> "field"
         McCompletionKind.KEYWORD -> "keyword"
         McCompletionKind.VALUE -> "value"
+    }
+
+    private fun McCompletionInsertTextFormat.toProtocolFormat(): String = when (this) {
+        McCompletionInsertTextFormat.PLAIN_TEXT -> "plainText"
+        McCompletionInsertTextFormat.SNIPPET -> "snippet"
     }
 
     private fun offsetRange(source: String, startOffset: Int, endOffset: Int): McdevRange =

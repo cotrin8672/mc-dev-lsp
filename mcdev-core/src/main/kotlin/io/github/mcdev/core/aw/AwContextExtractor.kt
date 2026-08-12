@@ -16,10 +16,27 @@ object AwContextExtractor {
         val lineText = source.substring(lineStart, lineEnd)
         val column = safeOffset - lineStart
 
-        val contentLine = lineText.substringBefore('#').trimEnd()
-        if (contentLine.isBlank()) return null
-
         val fileNamespace = parseFileNamespace(source)
+        val contentLine = lineText.substringBefore('#').trimEnd()
+        if (contentLine.isBlank()) {
+            if (lineNumber == 1) return null
+            return AwAnnotationContext(
+                slot = AwSyntaxSlot.DIRECTIVE,
+                partialValue = "",
+                valueStartOffset = safeOffset,
+                valueEndOffset = safeOffset,
+                lineStartOffset = lineStart,
+                lineEndOffset = lineEnd,
+                lineNumber = lineNumber,
+                fileNamespace = fileNamespace,
+                directive = null,
+                kind = null,
+                owner = null,
+                name = null,
+                descriptor = null,
+                isHeaderLine = false,
+            )
+        }
         if (lineNumber == 1) {
             return extractHeaderContext(source, safeOffset, lineStart, lineEnd, lineNumber, contentLine, fileNamespace)
         }
@@ -27,12 +44,19 @@ object AwContextExtractor {
         val tokens = tokenizeAwLine(contentLine.trim(), lineStart + lineText.indexOf(contentLine.trim()))
         if (tokens.isEmpty()) return null
 
-        val activeTokenIndex = tokens.indexOfFirst { safeOffset in it.startOffset..it.endOffset }
-            .takeIf { it >= 0 }
-            ?: tokens.indexOfLast { it.startOffset <= safeOffset }.takeIf { it >= 0 }
-            ?: tokens.lastIndex
+        val afterWhitespace = tokens.lastOrNull()?.let { token ->
+            safeOffset > token.endOffset && source.substring(token.endOffset, safeOffset).any { it.isWhitespace() }
+        } == true
+        val activeTokenIndex = if (afterWhitespace) {
+            tokens.size
+        } else {
+            tokens.indexOfFirst { safeOffset in it.startOffset..it.endOffset }
+                .takeIf { it >= 0 }
+                ?: tokens.indexOfLast { it.startOffset <= safeOffset }.takeIf { it >= 0 }
+                ?: tokens.lastIndex
+        }
 
-        val activeToken = tokens[activeTokenIndex]
+        val activeToken = tokens.getOrNull(activeTokenIndex)
         val directive = tokens.getOrNull(0)?.text?.let(::parseDirectiveToken)
         val kind = tokens.getOrNull(1)?.text?.let(::parseKindToken)
         val owner = tokens.getOrNull(2)?.text
@@ -54,12 +78,14 @@ object AwContextExtractor {
             else -> AwSyntaxSlot.DESCRIPTOR
         }
 
-        val partialEnd = safeOffset.coerceIn(activeToken.startOffset, activeToken.endOffset)
+        val partialStart = activeToken?.startOffset ?: safeOffset
+        val partialEnd = activeToken?.let { safeOffset.coerceIn(it.startOffset, it.endOffset) } ?: safeOffset
+        val replacementEnd = activeToken?.endOffset ?: safeOffset
         return AwAnnotationContext(
             slot = slot,
-            partialValue = source.substring(activeToken.startOffset, partialEnd),
-            valueStartOffset = activeToken.startOffset,
-            valueEndOffset = partialEnd,
+            partialValue = source.substring(partialStart, partialEnd),
+            valueStartOffset = partialStart,
+            valueEndOffset = replacementEnd,
             lineStartOffset = lineStart,
             lineEndOffset = lineEnd,
             lineNumber = lineNumber,
@@ -126,7 +152,7 @@ object AwContextExtractor {
             slot = AwSyntaxSlot.HEADER_NAMESPACE,
             partialValue = source.substring(namespaceStart, cursorOffset.coerceAtMost(namespaceEnd)),
             valueStartOffset = namespaceStart,
-            valueEndOffset = cursorOffset.coerceIn(namespaceStart, namespaceEnd),
+            valueEndOffset = namespaceEnd,
             lineStartOffset = lineStart,
             lineEndOffset = lineEnd,
             lineNumber = lineNumber,

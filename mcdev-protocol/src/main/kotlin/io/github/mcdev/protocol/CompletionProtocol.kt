@@ -77,6 +77,7 @@ data class McdevCompletionItemDto(
     val edit: McdevTextEdit?,
     val additionalEdits: List<McdevTextEdit> = emptyList(),
     val metadata: Map<String, String?> = emptyMap(),
+    val insertTextFormat: String = "plainText",
 )
 
 data class McdevTextEdit(

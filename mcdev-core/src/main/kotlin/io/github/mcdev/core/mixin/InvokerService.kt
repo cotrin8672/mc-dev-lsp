@@ -35,7 +35,7 @@ class InvokerService(
                         documentation = method.descriptor,
                         filterText = "${method.name} ${method.readableSignature}",
                         insertText = method.name,
-                        kind = McCompletionKind.METHOD,
+                        kind = McCompletionKind.VALUE,
                         sortKey = "0600_${method.name}",
                         metadata = McCompletionMetadata(
                             source = "mixin.invoker",

@@ -16,7 +16,7 @@ The repository is not a single artifact. It is a single source of truth for mult
 ## Target Layout
 
 ```text
-mcdev-kotlin/
+mc-dev-lsp/
 ├─ settings.gradle.kts
 ├─ build.gradle.kts
 ├─ gradle/
@@ -222,4 +222,3 @@ Do not split repositories until one of these is true:
 - the command protocol is stable across multiple minor versions
 
 Until then, splitting repositories increases coordination cost without improving product quality.
-

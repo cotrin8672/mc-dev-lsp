@@ -1,5 +1,7 @@
 local config = require("mcdev.config")
 local buffer = require("mcdev.buffer")
+local convert = require("mcdev.convert")
+local ui = require("mcdev.ui")
 
 local M = {}
 
@@ -221,51 +223,56 @@ end
 
 function M.info()
   M.request(M.commands.info, { context = M.context() }, function(result, err)
-    if err then
-      vim.notify(tostring(err), vim.log.levels.WARN)
+    local payload, unwrap_err = convert.unwrap_envelope(result, err)
+    if unwrap_err then
+      ui.error(unwrap_err)
       return
     end
-    local envelope = result or {}
-    local lines = envelope.result and envelope.result.lines or {}
-    vim.notify(table.concat(lines, "\n"))
+    ui.show_report("mcdev info", payload.lines or {})
   end)
 end
 
 function M.reindex()
-  M.request(M.commands.reindex, { context = M.context() }, function(_, err)
-    if err then
-      vim.notify(tostring(err), vim.log.levels.WARN)
-    else
-      vim.notify("mcdev: reindex requested")
+  M.request(M.commands.reindex, { context = M.context() }, function(result, err)
+    local payload, unwrap_err = convert.unwrap_envelope(result, err)
+    if unwrap_err then
+      ui.error(unwrap_err)
+      return
     end
+    vim.notify(string.format(
+      "mcdev: %s (index: %s, classpath: %s)",
+      payload.status or "reindex complete",
+      payload.indexState or "unknown",
+      tostring(payload.classpathEntries or "unknown")
+    ))
   end)
 end
 
 function M.reload_project_context()
   M.request(M.commands.reload_project_context, { context = M.context() }, function(result, err)
-    if err then
-      vim.notify(tostring(err), vim.log.levels.WARN)
+    local payload, unwrap_err = convert.unwrap_envelope(result, err)
+    if unwrap_err then
+      ui.error(unwrap_err)
       return
     end
-    local envelope = result or {}
-    local payload = envelope.result or {}
-    vim.notify(payload.status or "mcdev: project context reloaded")
+    local lines = { payload.status or "project context reloaded" }
+    vim.list_extend(lines, payload.lines or {})
+    ui.show_report("mcdev project context", lines)
   end)
 end
 
 function M.dump_context()
   M.request(M.commands.dump_context, { context = M.context() }, function(result, err)
-    if err then
-      vim.notify(tostring(err), vim.log.levels.WARN)
+    local payload, unwrap_err = convert.unwrap_envelope(result, err)
+    if unwrap_err then
+      ui.error(unwrap_err)
       return
     end
-    local envelope = result or {}
-    local payload = envelope.result or {}
     local lines = payload.lines or {}
     if #lines > 0 then
-      vim.notify(table.concat(lines, "\n"))
+      ui.show_report("mcdev project context", lines)
     else
-      vim.notify(vim.inspect(payload))
+      ui.show_report("mcdev project context", vim.split(vim.inspect(payload), "\n", { plain = true }))
     end
   end)
 end

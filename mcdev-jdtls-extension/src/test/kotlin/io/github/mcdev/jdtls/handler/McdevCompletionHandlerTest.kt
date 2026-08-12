@@ -11,6 +11,8 @@ import io.github.mcdev.jdtls.support.JdtlsFixtureSupport
 import io.github.mcdev.protocol.McdevCompletionResponse
 import io.github.mcdev.protocol.McdevErrorCode
 import io.github.mcdev.protocol.McdevProtocol
+import io.github.mcdev.protocol.McdevPosition
+import io.github.mcdev.protocol.McdevTextEdit
 import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertFalse
@@ -348,6 +350,87 @@ class McdevCompletionHandlerTest {
     }
 
     @Test
+    fun injectMethodEditPreservesQuotesAndReplacesTheWholeStringValue() {
+        val handler = createHandler()
+        val source = """
+            package com.example.mixin;
+            import com.example.target.SimpleTarget;
+            import org.spongepowered.asm.mixin.Mixin;
+            import org.spongepowered.asm.mixin.injection.Inject;
+            @Mixin(SimpleTarget.class)
+            public abstract class QuoteMixin {
+                @Inject(method = "dra")
+            }
+        """.trimIndent()
+        val cursorOffset = source.indexOf("dra") + 2
+        val (line, character) = JdtlsFixtureSupport.offsetToPosition(source, cursorOffset)
+        val completion = assertIs<McdevCompletionResponse>(
+            handler.handle(
+                listOf(completionPayload(JdtlsFixtureSupport.workspaceUri(tempDir), source, line, character)),
+            ).result,
+        )
+        val item = completion.items.first { it.metadata["source"] == "mixin.injectMethod" && it.insertText.startsWith("draw") }
+        assertEquals("value", item.kind)
+        assertEquals(
+            source.replace("method = \"dra\"", "method = \"${item.insertText}\""),
+            applyEdit(source, assertNotNull(item.edit)),
+        )
+    }
+
+    @Test
+    fun injectMethodArrayEditOnlyReplacesTheActiveElement() {
+        val handler = createHandler()
+        val source = """
+            package com.example.mixin;
+            import com.example.target.SimpleTarget;
+            import org.spongepowered.asm.mixin.Mixin;
+            import org.spongepowered.asm.mixin.injection.Inject;
+            @Mixin(SimpleTarget.class)
+            public abstract class ArrayMixin {
+                @Inject(method = { "dra", "render" })
+            }
+        """.trimIndent()
+        val cursorOffset = source.indexOf("dra") + "dra".length
+        val (line, character) = JdtlsFixtureSupport.offsetToPosition(source, cursorOffset)
+        val completion = assertIs<McdevCompletionResponse>(
+            handler.handle(
+                listOf(completionPayload(JdtlsFixtureSupport.workspaceUri(tempDir), source, line, character)),
+            ).result,
+        )
+        val item = completion.items.first { it.metadata["source"] == "mixin.injectMethod" && it.insertText.startsWith("draw") }
+        assertEquals(
+            source.replace("{ \"dra\", \"render\" }", "{ \"${item.insertText}\", \"render\" }"),
+            applyEdit(source, assertNotNull(item.edit)),
+        )
+    }
+
+    @Test
+    fun incompleteMethodAttributeOffersQuotedSnippet() {
+        val handler = createHandler()
+        val source = """
+            package com.example.mixin;
+            import com.example.target.SimpleTarget;
+            import org.spongepowered.asm.mixin.Mixin;
+            import org.spongepowered.asm.mixin.injection.Inject;
+            @Mixin(SimpleTarget.class)
+            public abstract class AttributeMixin {
+                @Inject(meth)
+            }
+        """.trimIndent()
+        val cursorOffset = source.indexOf("meth") + "meth".length
+        val (line, character) = JdtlsFixtureSupport.offsetToPosition(source, cursorOffset)
+        val completion = assertIs<McdevCompletionResponse>(
+            handler.handle(
+                listOf(completionPayload(JdtlsFixtureSupport.workspaceUri(tempDir), source, line, character)),
+            ).result,
+        )
+        val method = completion.items.first { it.metadata["source"] == "mixin.attribute" && it.metadata["name"] == "method" }
+        assertEquals("method = \"${'$'}{1}\"${'$'}0", method.insertText)
+        assertEquals("snippet", method.insertTextFormat)
+        assertEquals("method = \"${'$'}{1}\"${'$'}0", method.edit?.newText)
+    }
+
+    @Test
     fun returnsInjectMethodCompletionsFromSourceOnlyMixinTarget() {
         val targetDir = tempDir.resolve("src/main/java/com/example/target")
         Files.createDirectories(targetDir)
@@ -604,6 +687,20 @@ class McdevCompletionHandlerTest {
         JdtlsFixtureSupport.copyFixture(FixturePaths.FABRIC_BASIC, tempDir)
         JdtlsFixtureSupport.installClasspathClasses(tempDir)
         return McdevCompletionHandler(projectService = FileBasedProjectContextService())
+    }
+
+    private fun applyEdit(source: String, edit: McdevTextEdit): String {
+        val start = positionToOffset(source, edit.range.start)
+        val end = positionToOffset(source, edit.range.end)
+        return source.replaceRange(start, end, edit.newText)
+    }
+
+    private fun positionToOffset(source: String, position: McdevPosition): Int {
+        var offset = 0
+        repeat(position.line) {
+            offset = source.indexOf('\n', offset).let { newline -> if (newline < 0) source.length else newline + 1 }
+        }
+        return (offset + position.character).coerceAtMost(source.length)
     }
 
     private fun completionPayload(

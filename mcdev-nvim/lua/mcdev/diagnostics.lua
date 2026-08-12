@@ -8,6 +8,7 @@ M.namespace = vim.api.nvim_create_namespace("mcdev")
 
 local debounce_timers = {}
 local in_flight = {}
+local queued = {}
 local augroup = nil
 
 M.last_request = nil
@@ -54,7 +55,11 @@ function M.refresh(bufnr, opts)
   if not vim.api.nvim_buf_is_valid(bufnr) then
     return
   end
-  if in_flight[bufnr] and opts.in_flight_policy ~= "queue" then
+  if in_flight[bufnr] then
+    if opts.in_flight_policy == "drop" then
+      return
+    end
+    queued[bufnr] = vim.deepcopy(opts)
     return
   end
   local request_tick = changedtick(bufnr)
@@ -73,15 +78,40 @@ function M.refresh(bufnr, opts)
   in_flight[bufnr] = true
   M.fetch(bufnr, nil, function(diagnostics, err)
     in_flight[bufnr] = nil
+    local function run_queued()
+      local next_opts = queued[bufnr]
+      queued[bufnr] = nil
+      if next_opts and vim.api.nvim_buf_is_valid(bufnr) then
+        M.refresh(bufnr, next_opts)
+      end
+    end
     if err then
       M.last_error = tostring(err)
+      if opts.manual then
+        vim.notify("mcdev diagnostics: " .. M.last_error, vim.log.levels.WARN)
+      end
+      if opts.callback then
+        opts.callback(nil, err)
+      end
+      run_queued()
       return
     end
     if opts.stale_result_policy ~= "publish" and request_tick ~= changedtick(bufnr) then
       M.last_dropped_stale = true
+      if opts.callback then
+        opts.callback(nil, "stale result")
+      end
+      run_queued()
       return
     end
     M.publish(bufnr, diagnostics)
+    if opts.manual then
+      vim.notify("mcdev diagnostics: " .. tostring(#diagnostics) .. " item(s)")
+    end
+    if opts.callback then
+      opts.callback(diagnostics, nil)
+    end
+    run_queued()
   end)
 end
 
@@ -112,8 +142,7 @@ function M.setup_autocmds(opts)
       debounce_timers[bufnr] = vim.fn.timer_start(debounce_ms, function()
         debounce_timers[bufnr] = nil
         if vim.api.nvim_buf_is_valid(bufnr) then
-          opts.trigger_event = args.event
-          M.refresh(bufnr, opts)
+          M.refresh(bufnr, vim.tbl_extend("force", opts, { trigger_event = args.event }))
         end
       end)
     end,
@@ -129,6 +158,7 @@ function M.stop()
     vim.fn.timer_stop(timer)
     debounce_timers[bufnr] = nil
   end
+  queued = {}
   M.running = false
 end
 
@@ -149,6 +179,7 @@ function M.status_lines()
     "debounce_ms: " .. tostring(opts.debounce_ms),
     "insert_mode: " .. tostring(opts.insert_mode),
     "in_flight_buffers: " .. tostring(vim.tbl_count(in_flight)),
+    "queued_buffers: " .. tostring(vim.tbl_count(queued)),
     "request_count: " .. tostring(M.request_count),
     "last_trigger_event: " .. tostring(M.last_trigger_event or "none"),
     "last_trigger_time: " .. tostring(M.last_trigger_time or "none"),

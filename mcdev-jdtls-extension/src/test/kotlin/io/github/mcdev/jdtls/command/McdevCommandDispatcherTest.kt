@@ -34,6 +34,8 @@ import kotlin.test.assertIs
 import kotlin.test.assertTrue
 import org.junit.jupiter.api.io.TempDir
 import java.nio.file.Path
+import kotlin.io.path.createDirectories
+import kotlin.io.path.writeText
 
 class McdevCommandDispatcherTest {
     @TempDir
@@ -91,6 +93,33 @@ class McdevCommandDispatcherTest {
         val response = dispatcher.execute(McdevCommands.REINDEX, listOf(contextPayload("")))
         val result = assertIs<McdevReindexResponse>(response.result)
         assertEquals("reindex complete", result.status)
+    }
+
+    @Test
+    fun productionDispatcherReindexInvalidatesTheSharedProjectContext() {
+        JdtlsFixtureSupport.copyFixture(FixturePaths.FABRIC_BASIC, tempDir)
+        JdtlsFixtureSupport.installClasspathClasses(tempDir)
+        val dispatcher = McdevCommandDispatcher()
+
+        val initial = assertIs<McdevInfoResponse>(
+            dispatcher.execute(McdevCommands.INFO, listOf(contextPayload(""))).result,
+        )
+        assertTrue(initial.lines.any { it == "Mixin config: 1 file" })
+
+        tempDir.resolve("src/main/resources/extra.mixins.json").apply {
+            parent.createDirectories()
+            writeText("""{"required":true,"package":"com.example.mixin","mixins":[]}""")
+        }
+        val stillCached = assertIs<McdevInfoResponse>(
+            dispatcher.execute(McdevCommands.INFO, listOf(contextPayload(""))).result,
+        )
+        assertTrue(stillCached.lines.any { it == "Mixin config: 1 file" })
+
+        dispatcher.execute(McdevCommands.REINDEX, listOf(contextPayload("")))
+        val refreshed = assertIs<McdevInfoResponse>(
+            dispatcher.execute(McdevCommands.INFO, listOf(contextPayload(""))).result,
+        )
+        assertTrue(refreshed.lines.any { it == "Mixin config: 2 files" })
     }
 
     @Test

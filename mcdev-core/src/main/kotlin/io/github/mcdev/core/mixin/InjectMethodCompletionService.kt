@@ -60,7 +60,7 @@ class InjectMethodCompletionService(
             documentation = method.descriptor,
             filterText = "${method.name} ${method.readableSignature}",
             insertText = insertText,
-            kind = McCompletionKind.METHOD,
+            kind = McCompletionKind.VALUE,
             sortKey = "0200_${method.name}",
             metadata = McCompletionMetadata(
                 source = "mixin.injectMethod",

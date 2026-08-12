@@ -68,6 +68,45 @@ local function mason_candidates(opts)
   }
 end
 
+local function inferred_repo_root()
+  local source = debug.getinfo(1, "S").source:gsub("^@", "")
+  local plugin_root = vim.fn.fnamemodify(source, ":p:h:h:h")
+  return vim.fn.fnamemodify(plugin_root, ":h")
+end
+
+local function repo_candidates(opts)
+  local configured_root = opts.repo_root
+  if configured_root == nil then
+    configured_root = config.options.jdtls.repo_root
+  end
+  if configured_root == false then
+    return {}
+  end
+  local root = configured_root or inferred_repo_root()
+  local pattern = path_join(
+    root,
+    "mcdev-jdtls-extension",
+    "build",
+    "libs",
+    "io.github.mcdev.jdtls-*.jar"
+  )
+  local candidates = vim.fn.glob(pattern, false, true)
+  local filtered = {}
+  for _, candidate in ipairs(candidates) do
+    if not candidate:match("%-sources%.jar$")
+      and not candidate:match("%-javadoc%.jar$")
+      and not candidate:match("%-plain%.jar$")
+      and readable(candidate)
+    then
+      filtered[#filtered + 1] = candidate
+    end
+  end
+  table.sort(filtered, function(left, right)
+    return vim.fn.getftime(left) > vim.fn.getftime(right)
+  end)
+  return filtered
+end
+
 function M.resolve_extension_jar(opts)
   opts = opts or {}
   local explicit = opts.extension_jar or config.options.jdtls.extension_jar
@@ -75,8 +114,13 @@ function M.resolve_extension_jar(opts)
     return explicit
   end
 
-  if readable(vim.env.MCDEV_JDTLS_EXTENSION_JAR) then
+  if vim.env.MCDEV_JDTLS_EXTENSION_JAR and vim.env.MCDEV_JDTLS_EXTENSION_JAR ~= "" then
     return vim.env.MCDEV_JDTLS_EXTENSION_JAR
+  end
+
+  local built = repo_candidates(opts)
+  if built[1] then
+    return built[1]
   end
 
   local mason = opts.mason or config.options.jdtls.mason or {}
@@ -94,11 +138,7 @@ function M.resolve_extension_jar(opts)
 end
 
 local function missing_jar_message()
-  local mason = config.options.jdtls.mason or {}
-  local package = mason.package or "mcdev-jdtls-extension"
-  return "mcdev: extension jar is not configured or readable; ensure Mason installs "
-    .. package
-    .. " or set jdtls.extension_jar"
+  return "mcdev: extension jar is not readable; run the repository build, set MCDEV_JDTLS_EXTENSION_JAR, or set jdtls.extension_jar"
 end
 
 function M.extend_config(jdtls_config, opts)
@@ -169,6 +209,7 @@ function M.start_or_attach(opts)
   start_opts.extension_jar = nil
   start_opts.data_dir = nil
   start_opts.mason = nil
+  start_opts.repo_root = nil
 
   return vim.lsp.start(start_opts)
 end

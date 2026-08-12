@@ -29,6 +29,7 @@ enum class MixinAnnotation(val simpleName: String) {
 }
 
 enum class AnnotationSlot {
+    ATTRIBUTE,
     CLASS,
     TARGETS,
     METHOD,
@@ -72,4 +73,5 @@ data class AnnotationContext(
     val atValue: String? = null,
     val shadowPrefix: String? = null,
     val shadowRemap: Boolean = true,
+    val existingAttributes: Set<String> = emptySet(),
 )

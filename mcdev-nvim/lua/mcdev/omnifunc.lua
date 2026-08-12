@@ -1,6 +1,8 @@
 local completion = require("mcdev.completion")
+local config = require("mcdev.config")
 
 local M = {}
+M.last_timeout = false
 
 function M.complete(findstart, base)
   if findstart == 1 then
@@ -15,15 +17,27 @@ function M.complete(findstart, base)
 
   local items = {}
   local done = false
+  M.last_timeout = false
   completion.complete(function(result)
     for _, item in ipairs(result.items or {}) do
-      table.insert(items, item.label or item.insertText or "")
+      if item.insertTextFormat ~= vim.lsp.protocol.InsertTextFormat.Snippet then
+        table.insert(items, {
+          word = item.insertText or item.label or "",
+          abbr = item.label or item.insertText or "",
+          menu = item.detail or "[mcdev]",
+          info = item.documentation or "",
+        })
+      end
     end
     done = true
   end)
-  vim.wait(5000, function()
+  local completed = vim.wait(config.options.completion.omnifunc_timeout_ms or 500, function()
     return done
-  end, 50)
+  end, 20)
+  if not completed then
+    M.last_timeout = true
+    return {}
+  end
   return items
 end
 

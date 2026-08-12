@@ -68,6 +68,46 @@ class AnnotationContextExtractorTest {
     }
 
     @Test
+    fun quotedValueReplacementKeepsQuotesAndReplacesTheWholeValue() {
+        val source = """@Inject(method = "draw")"""
+        val cursor = source.indexOf("draw") + 2
+        val context = assertNotNull(AnnotationContextExtractor.extractAtOffset(source, cursor))
+        assertEquals(source.indexOf("draw"), context.valueStartOffset)
+        assertEquals(source.indexOf("draw") + "draw".length, context.valueEndOffset)
+        assertEquals("dr", context.partialValue)
+    }
+
+    @Test
+    fun extractsCurrentStringFromMethodArrayWithoutReplacingOtherElements() {
+        val source = """@Inject(method = { "tick", "render" }, at = @At("HEAD"))"""
+        val cursor = source.indexOf("render") + 3
+        val context = assertNotNull(AnnotationContextExtractor.extractAtOffset(source, cursor))
+        assertEquals(AnnotationSlot.METHOD, context.slot)
+        assertEquals("ren", context.partialValue)
+        assertEquals(source.indexOf("render"), context.valueStartOffset)
+        assertEquals(source.indexOf("render") + "render".length, context.valueEndOffset)
+    }
+
+    @Test
+    fun extractsIncompleteInjectorAttributeName() {
+        val source = """@Inject(meth)"""
+        val cursor = source.indexOf("meth") + "meth".length
+        val context = assertNotNull(AnnotationContextExtractor.extractAtOffset(source, cursor))
+        assertEquals(AnnotationSlot.ATTRIBUTE, context.slot)
+        assertEquals("meth", context.partialValue)
+        assertEquals(source.indexOf("meth"), context.valueStartOffset)
+    }
+
+    @Test
+    fun nestedAtAttributesAreNotTreatedAsOuterInjectorAttributes() {
+        val source = """@Inject(method = "tick", at = @At(value = "INVOKE", remap = false), re)"""
+        val cursor = source.lastIndexOf("re") + 2
+        val context = assertNotNull(AnnotationContextExtractor.extractAtOffset(source, cursor))
+        assertEquals(AnnotationSlot.ATTRIBUTE, context.slot)
+        assertEquals(setOf("method", "at"), context.existingAttributes)
+    }
+
+    @Test
     fun extractsNestedAtValueSlot() {
         val source = """
             @Mixin(MinecraftClient.class)
@@ -171,6 +211,21 @@ class AnnotationContextExtractorTest {
         assertEquals(MixinAnnotation.SHADOW, context.annotation)
         assertEquals(AnnotationSlot.SHADOW_MEMBER, context.slot)
         assertEquals("is", context.partialValue)
+    }
+
+    @Test
+    fun overwriteReplacementCoversTheWholeIdentifier() {
+        val source = """
+            @Mixin(MinecraftClient.class)
+            class M {
+                @Overwrite public void ticker() {}
+            }
+        """.trimIndent()
+        val cursor = source.indexOf("ticker") + 2
+        val context = assertNotNull(AnnotationContextExtractor.extractAtOffset(source, cursor))
+        assertEquals(AnnotationSlot.OVERWRITE_METHOD, context.slot)
+        assertEquals("ti", context.partialValue)
+        assertEquals(source.indexOf("ticker") + "ticker".length, context.valueEndOffset)
     }
 
     @Test

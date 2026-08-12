@@ -45,7 +45,7 @@ Configure mcdev and start JDT LS with the bundle:
 ```lua
 require("mcdev").setup({
   jdtls = {
-    extension_jar = "C:/path/to/mc-dev-lsp/mcdev-jdtls-extension/build/libs/io.github.mcdev.jdtls-0.1.0-SNAPSHOT.jar",
+    extension_jar = "C:/path/to/mc-dev-lsp/mcdev-jdtls-extension/build/libs/io.github.mcdev.jdtls-<version>.jar",
   },
 })
 
@@ -105,7 +105,7 @@ powershell -NoProfile -ExecutionPolicy Bypass -File scripts/run-osgi-loom-e2e.ps
 ## Troubleshooting
 
 ```text
-mcdev: extension jar is not configured or readable
+mcdev: extension jar is not readable
 ```
 
 Build the bundle jar first and point `extension_jar` to the absolute path.

@@ -54,7 +54,7 @@ object AtContextExtractor {
             slot = slot,
             partialValue = partialValueForSlot(lineContext, slot, offset, memberParts),
             valueStart = valueStartForSlot(lineContext, slot, memberParts) ?: lineContext.lineStartOffset,
-            valueEnd = valueEndForSlot(lineContext, slot, offset, memberParts),
+            valueEnd = valueEndForSlot(lineContext, slot, offset),
             modifier = lineContext.modifier?.text?.let { token ->
                 AccessTransformerModifier.entries.firstOrNull { it.token == token }
             },
@@ -239,13 +239,10 @@ object AtContextExtractor {
         lineContext: AtLineContext,
         slot: AtSlot,
         cursorOffset: Int,
-        memberParts: MemberParts?,
     ): Int = when (slot) {
-        AtSlot.MEMBER_DESCRIPTOR -> memberParts?.descriptorStart?.let { start ->
-            val token = lineContext.member ?: return cursorOffset
-            start + (cursorOffset - start).coerceAtMost(token.endOffset - start)
-        } ?: cursorOffset
-        else -> cursorOffset
+        AtSlot.MEMBER_NAME -> lineContext.member?.endOffset ?: cursorOffset
+        AtSlot.MEMBER_DESCRIPTOR -> lineContext.member?.endOffset ?: cursorOffset
+        else -> tokenForSlot(lineContext, slot)?.endOffset ?: cursorOffset
     }
 
     private fun buildContext(

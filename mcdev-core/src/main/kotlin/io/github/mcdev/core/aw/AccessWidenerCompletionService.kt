@@ -130,7 +130,7 @@ class AccessWidenerCompletionService(
         return when (kind) {
             AccessWidenerKind.METHOD -> classIndex.getMethods(resolvedOwner)
                 .filter { it.name.startsWith(prefix) }
-                .map { method -> memberCompletion(resolvedOwner, method.name, method.descriptor, method.readableSignature, kind, targetNamespace, mappingContext, options, McCompletionKind.METHOD, context.slot) }
+                .map { method -> memberCompletion(resolvedOwner, method.name, method.descriptor, method.readableSignature, kind, targetNamespace, mappingContext, options, McCompletionKind.VALUE, context.slot) }
             AccessWidenerKind.FIELD -> classIndex.getFields(resolvedOwner)
                 .filter { it.name.startsWith(prefix) }
                 .map { field ->
@@ -220,7 +220,7 @@ class AccessWidenerCompletionService(
             AccessWidenerKind.METHOD -> classIndex.getMethods(resolvedOwner)
                 .filter { it.name == name && it.descriptor.startsWith(partial) }
                 .map { method ->
-                    descriptorCompletion(resolvedOwner, name, method.descriptor, method.readableSignature, kind, targetNamespace, mappingContext, McCompletionKind.METHOD)
+                    descriptorCompletion(resolvedOwner, name, method.descriptor, method.readableSignature, kind, targetNamespace, mappingContext, McCompletionKind.VALUE)
                 }
             AccessWidenerKind.FIELD -> classIndex.getFields(resolvedOwner)
                 .filter { it.name == name && it.descriptor.startsWith(partial) }

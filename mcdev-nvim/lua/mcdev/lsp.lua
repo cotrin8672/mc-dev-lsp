@@ -95,17 +95,58 @@ function M.code_actions(bufnr, range, diagnostic_codes, cb)
     range = resolved_range,
     context = { diagnostics = vim.diagnostic.get(bufnr) },
   }
-  request_first(
-    bufnr,
-    "textDocument/codeAction",
-    params,
-    function(result)
-      if cb then cb(result, nil) end
-    end,
-    function()
-      code_action.code_actions(bufnr, range, diagnostic_codes, cb)
+  local standard_actions = nil
+  local standard_error = nil
+  local mcdev_actions = nil
+  local mcdev_error = nil
+
+  local function finish()
+    if standard_actions == nil or mcdev_actions == nil then
+      return
     end
-  )
+    local merged = {}
+    local seen = {}
+    for _, actions in ipairs({ standard_actions, mcdev_actions }) do
+      for _, action in ipairs(actions) do
+        local key = tostring(action.title or action.command or "") .. "\0" .. tostring(action.kind or "")
+        if not seen[key] then
+          seen[key] = true
+          merged[#merged + 1] = action
+        end
+      end
+    end
+    local err = #merged == 0 and (standard_error or mcdev_error) or nil
+    if cb then cb(merged, err) end
+  end
+
+  local function collect_standard(results)
+    standard_actions = {}
+    for _, response in pairs(results or {}) do
+      local response_error = response.err or response.error
+      if response_error and not standard_error then
+        standard_error = type(response_error) == "table" and (response_error.message or vim.inspect(response_error))
+          or tostring(response_error)
+      end
+      for _, action in ipairs(response.result or {}) do
+        standard_actions[#standard_actions + 1] = action
+      end
+    end
+    finish()
+  end
+
+  if vim.lsp.buf_request_all then
+    vim.lsp.buf_request_all(bufnr, "textDocument/codeAction", params, collect_standard)
+  else
+    vim.lsp.buf_request(bufnr, "textDocument/codeAction", params, function(err, result)
+      collect_standard({ { error = err, result = result } })
+    end)
+  end
+
+  code_action.code_actions(bufnr, range, diagnostic_codes, function(actions, err)
+    mcdev_actions = actions or {}
+    mcdev_error = err
+    finish()
+  end)
 end
 
 return M
