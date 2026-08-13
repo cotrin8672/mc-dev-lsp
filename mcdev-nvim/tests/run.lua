@@ -426,6 +426,129 @@ with_named_buffer("/project/src/main/java/com/example/mixin/ConcurrentMixin.java
   protocol_module.completion = original_completion
 end)
 
+with_named_buffer("/project/src/main/java/com/example/mixin/RapidTypingMixin.java", "java", {
+  '@WrapOperation(method = "destro")',
+}, function(bufnr)
+  vim.api.nvim_set_current_buf(bufnr)
+  local protocol_module = package.loaded["mcdev.protocol"]
+  local original_completion = protocol_module.completion
+  local pending = {}
+  protocol_module.completion = function(callback)
+    pending[#pending + 1] = callback
+  end
+
+  local stale = nil
+  local rapid_blink = blink.source()
+  rapid_blink:get_completions({ bufnr = bufnr, cursor = { 1, #'@WrapOperation(method = "destro' } }, function(result)
+    stale = result
+  end)
+  helpers.assert_eq(#pending, 1)
+
+  vim.api.nvim_buf_set_lines(bufnr, 0, 1, false, { '@WrapOperation(method = "destroy")' })
+  vim.api.nvim_win_set_cursor(0, { 1, #'@WrapOperation(method = "destroy' })
+  pending[1]({
+    result = {
+      items = {
+        {
+          label = "destroyBlock(MovementContext): void",
+          insertText = "destroyBlock",
+          kind = "value",
+          sortKey = "0200_destroyBlock",
+          filterText = "destroyBlock",
+          edit = {
+            range = {
+              start = { line = 0, character = #'@WrapOperation(method = "' },
+              ["end"] = { line = 0, character = #'@WrapOperation(method = "destro' },
+            },
+            newText = "destroyBlock",
+          },
+          metadata = { source = "mixinextras.injectMethod" },
+        },
+      },
+    },
+  }, nil)
+  helpers.assert_not_nil(stale)
+  helpers.assert_eq(#stale.items, 1)
+  helpers.assert_eq(stale.items[1].insertText, "destroyBlock")
+  helpers.assert_eq(stale.items[1].cursor_column, #'@WrapOperation(method = "destroy')
+  helpers.assert_eq(stale.items[1].textEdit.range["end"].character, #'@WrapOperation(method = "destroy')
+  vim.lsp.util.apply_text_edits({ stale.items[1].textEdit }, bufnr, "utf-8")
+  helpers.assert_eq(vim.api.nvim_buf_get_lines(bufnr, 0, 1, false)[1], '@WrapOperation(method = "destroyBlock")')
+
+  local fresh = nil
+  vim.api.nvim_buf_set_lines(bufnr, 0, 1, false, { '@WrapOperation(method = "destroy")' })
+  vim.api.nvim_win_set_cursor(0, { 1, #'@WrapOperation(method = "destroy' })
+  rapid_blink:get_completions({ bufnr = bufnr, cursor = { 1, #'@WrapOperation(method = "destroy' } }, function(result)
+    fresh = result
+  end)
+  helpers.assert_eq(#pending, 1)
+  helpers.assert_not_nil(fresh)
+  helpers.assert_eq(#fresh.items, 1)
+  helpers.assert_eq(fresh.items[1].insertText, "destroyBlock")
+  helpers.assert_true(completion.last_local_prefix_cache_hit)
+
+  local extended_cache = nil
+  vim.api.nvim_buf_set_lines(bufnr, 0, 1, false, { '@WrapOperation(method = "destroyB")' })
+  vim.api.nvim_win_set_cursor(0, { 1, #'@WrapOperation(method = "destroyB' })
+  rapid_blink:get_completions({ bufnr = bufnr, cursor = { 1, #'@WrapOperation(method = "destroyB' } }, function(result)
+    extended_cache = result
+  end)
+  helpers.assert_eq(#pending, 1)
+  helpers.assert_not_nil(extended_cache)
+  helpers.assert_eq(#extended_cache.items, 1)
+  helpers.assert_eq(extended_cache.items[1].cursor_column, #'@WrapOperation(method = "destroyB')
+  helpers.assert_eq(
+    extended_cache.items[1].textEdit.range["end"].character,
+    #'@WrapOperation(method = "destroyB'
+  )
+
+  protocol_module.completion = original_completion
+end)
+
+with_named_buffer("/project/src/main/java/com/example/mixin/ChangedTargetMixin.java", "java", {
+  "@Mixin(FirstTarget.class)",
+  '@WrapOperation(method = "destro")',
+}, function(bufnr)
+  vim.api.nvim_set_current_buf(bufnr)
+  vim.api.nvim_win_set_cursor(0, { 2, #'@WrapOperation(method = "destro' })
+  local protocol_module = package.loaded["mcdev.protocol"]
+  local original_completion = protocol_module.completion
+  local pending = nil
+  protocol_module.completion = function(callback)
+    pending = callback
+  end
+
+  local stale = nil
+  blink.source():get_completions({ bufnr = bufnr, cursor = { 2, #'@WrapOperation(method = "destro' } }, function(result)
+    stale = result
+  end)
+  helpers.assert_not_nil(pending)
+
+  vim.api.nvim_buf_set_lines(bufnr, 0, 2, false, {
+    "@Mixin(SecondTarget.class)",
+    '@WrapOperation(method = "destroy")',
+  })
+  vim.api.nvim_win_set_cursor(0, { 2, #'@WrapOperation(method = "destroy' })
+  pending({
+    result = {
+      items = {
+        {
+          label = "destroyBlock(MovementContext): void",
+          insertText = "destroyBlock",
+          kind = "value",
+          filterText = "destroyBlock",
+          metadata = { source = "mixinextras.injectMethod" },
+        },
+      },
+    },
+  }, nil)
+  helpers.assert_not_nil(stale)
+  helpers.assert_eq(#stale.items, 0)
+  helpers.assert_true(stale.is_incomplete_forward)
+
+  protocol_module.completion = original_completion
+end)
+
 do
   local original_request = protocol.request
   local original_notify = vim.notify

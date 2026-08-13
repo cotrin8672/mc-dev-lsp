@@ -65,6 +65,31 @@ local function cursor_prefix(bufnr, position)
   return prefix, before:sub(1, #before - #prefix)
 end
 
+local function visible_cursor_position(bufnr)
+  local current_winid = vim.api.nvim_get_current_win()
+  if vim.api.nvim_win_get_buf(current_winid) == bufnr then
+    return vim.api.nvim_win_get_cursor(current_winid)
+  end
+  for _, winid in ipairs(vim.api.nvim_list_wins()) do
+    if vim.api.nvim_win_get_buf(winid) == bufnr then
+      return vim.api.nvim_win_get_cursor(winid)
+    end
+  end
+  return nil
+end
+
+local function changed_only_by_prefix_extension(bufnr, request_lines, request_position, current_position, extension)
+  local request_row = request_position[1]
+  local request_column = request_position[2]
+  local request_line = request_lines[request_row] or ""
+  local expected_lines = vim.deepcopy(request_lines)
+  expected_lines[request_row] = request_line:sub(1, request_column)
+    .. extension
+    .. request_line:sub(request_column + 1)
+  local current_lines = vim.api.nvim_buf_get_lines(bufnr, 0, -1, false)
+  return current_position[2] == request_column + #extension and vim.deep_equal(current_lines, expected_lines)
+end
+
 local function item_matches_prefix(item, prefix)
   if prefix == "" then
     return true
@@ -104,6 +129,9 @@ end
 
 local function refresh_cached_edit(item, cached_column, current_column)
   local copy = vim.deepcopy(item)
+  if copy._mcdev_cursor_column then
+    copy._mcdev_cursor_column = current_column
+  end
   local edit = copy.textEdit
   local range = edit and (edit.range or edit.replace)
   if range and range["end"] and range["end"].character and cached_column ~= current_column then
@@ -143,6 +171,7 @@ function M.complete(callback, bufnr, position, opts)
   position = position or vim.api.nvim_win_get_cursor(0)
   local request_tick = changedtick(bufnr)
   local request_prefix, request_prefix_base = cursor_prefix(bufnr, position)
+  local request_lines = vim.api.nvim_buf_get_lines(bufnr, 0, -1, false)
   M.request_seq = M.request_seq + 1
   local request_id = M.request_seq
   M.request_count = M.request_count + 1
@@ -195,11 +224,33 @@ function M.complete(callback, bufnr, position, opts)
       finish({ isIncomplete = false, items = {} })
       return
     end
+    local response_position = position
+    local response_prefix = request_prefix
+    local response_prefix_base = request_prefix_base
+    local prefix_was_extended = false
     if request_tick ~= changedtick(bufnr) then
-      M.stale_dropped_count = M.stale_dropped_count + 1
-      M.last_callback_item_count = 0
-      finish({ isIncomplete = false, items = {} })
-      return
+      local current_position = visible_cursor_position(bufnr)
+      if current_position and current_position[1] == position[1] then
+        local current_prefix, current_prefix_base = cursor_prefix(bufnr, current_position)
+        local extension = current_prefix:sub(#request_prefix + 1)
+        prefix_was_extended = current_prefix_base == request_prefix_base
+          and current_prefix:sub(1, #request_prefix) == request_prefix
+          and changed_only_by_prefix_extension(bufnr, request_lines, position, current_position, extension)
+        if prefix_was_extended then
+          response_position = current_position
+          response_prefix = current_prefix
+          response_prefix_base = current_prefix_base
+        end
+      end
+      if not prefix_was_extended then
+        M.stale_dropped_count = M.stale_dropped_count + 1
+        M.last_callback_item_count = 0
+        -- Blink must retry for the prefix typed while this request was running.
+        -- Marking the empty stale result complete makes Blink cache it and hides
+        -- every mcdev candidate until completion is manually restarted.
+        finish({ isIncomplete = true, items = {} })
+        return
+      end
     end
     result = result or { items = {} }
     M.last_debug = result.debug
@@ -210,19 +261,28 @@ function M.complete(callback, bufnr, position, opts)
     end
     local items = {}
     for _, item in ipairs(result.items or {}) do
-      table.insert(items, M.to_lsp_item(item))
+      local converted = M.to_lsp_item(item)
+      if prefix_was_extended then
+        converted = refresh_cached_edit(converted, position[2], response_position[2])
+        -- Blink compensates edits for cursor movement after a request.  Tell
+        -- the adapter that this edit has already been refreshed to the current
+        -- column so the movement is not applied a second time.
+        converted._mcdev_cursor_column = response_position[2]
+      end
+      table.insert(items, converted)
     end
     prefix_cache = {
       key = key,
-      prefix_base = request_prefix_base,
-      prefix = request_prefix,
-      column = position[2],
+      prefix_base = response_prefix_base,
+      prefix = response_prefix,
+      column = response_position[2],
       items = items,
       expires_at = vim.loop.hrtime() + 2000000000,
     }
-    M.last_response_count = #items
-    M.last_callback_item_count = #items
-    finish({ isIncomplete = result.isIncomplete or false, items = items })
+    local response_items = prefix_was_extended and filter_items(items, response_prefix) or items
+    M.last_response_count = #response_items
+    M.last_callback_item_count = #response_items
+    finish({ isIncomplete = result.isIncomplete or false, items = response_items })
   end, bufnr, position)
 end
 

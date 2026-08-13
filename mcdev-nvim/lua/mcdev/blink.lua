@@ -13,7 +13,8 @@ end
 
 local function is_mixin_item(item)
   local source_name = item_source(item)
-  return type(source_name) == "string" and source_name:sub(1, 6) == "mixin."
+  return type(source_name) == "string"
+    and (source_name:sub(1, 6) == "mixin." or source_name:sub(1, 12) == "mixinextras.")
 end
 
 local function current_prefix_range(bufnr, position)
@@ -29,14 +30,16 @@ local function current_prefix_range(bufnr, position)
 end
 
 local function to_blink_item(item, bufnr, position)
+  local blink_item = vim.deepcopy(item)
+  blink_item.cursor_column = blink_item._mcdev_cursor_column or position[2] or 0
+  blink_item._mcdev_cursor_column = nil
+
   if not is_mixin_item(item) then
-    return item
+    return blink_item
   end
 
-  local blink_item = vim.deepcopy(item)
   blink_item.kind_icon = mixin_icon
   blink_item.kind_name = "Mixin"
-  blink_item.cursor_column = position[2] or 0
 
   if item_source(blink_item) == "mixin.attribute" then
     -- Attribute snippets must outrank JDT LS' incomplete `name = ` items.
