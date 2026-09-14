@@ -5,6 +5,8 @@ import io.github.mcdev.core.completion.McCompletionItem
 import io.github.mcdev.core.completion.McCompletionKind
 import io.github.mcdev.core.completion.McCompletionMetadata
 
+private const val WRAP_WITH_CONDITION_V1_FQN = "com.llamalad7.mixinextras.injector.WrapWithCondition"
+
 class MixinAttributeCompletionService {
     private data class AttributeSnippet(
         val name: String,
@@ -18,6 +20,7 @@ class MixinAttributeCompletionService {
         return snippetsFor(context.annotation)
             .asSequence()
             .filter { it.name !in context.existingAttributes }
+            .filter { isValidAttributeForContext(context, it.name) }
             .filter { it.name.startsWith(partial, ignoreCase = true) }
             .mapIndexed { index, snippet ->
                 McCompletionItem(
@@ -66,10 +69,10 @@ class MixinAttributeCompletionService {
         MixinAnnotation.MODIFY_EXPRESSION_VALUE,
         MixinAnnotation.MODIFY_RETURN_VALUE,
         MixinAnnotation.MODIFY_RECEIVER,
-        MixinAnnotation.WRAP_OPERATION,
         MixinAnnotation.WRAP_WITH_CONDITION,
-        -> injectorBase()
-        MixinAnnotation.WRAP_METHOD -> methodBase() + requirementOptions()
+        -> mixinExtrasInjectorBase()
+        MixinAnnotation.WRAP_OPERATION -> wrapOperationBase()
+        MixinAnnotation.WRAP_METHOD -> wrapMethodBase()
         MixinAnnotation.AT -> listOf(
             quoted("value"),
             quoted("target"),
@@ -81,6 +84,24 @@ class MixinAttributeCompletionService {
             quotedArray("args"),
             boolean("remap"),
             quoted("id"),
+        )
+        MixinAnnotation.CONSTANT -> listOf(
+            boolean("nullValue"),
+            plain("intValue"),
+            plain("floatValue"),
+            plain("longValue"),
+            plain("doubleValue"),
+            quoted("stringValue"),
+            classLiteral("classValue"),
+            plain("ordinal"),
+            quoted("slice"),
+            plain("expandZeroConditions"),
+            boolean("log"),
+        )
+        MixinAnnotation.SLICE -> listOf(
+            quoted("id"),
+            annotationValue("from", "At"),
+            annotationValue("to", "At"),
         )
         MixinAnnotation.ACCESSOR,
         MixinAnnotation.INVOKER,
@@ -94,6 +115,32 @@ class MixinAttributeCompletionService {
             quoted("constraints"),
             boolean("remap"),
         )
+        MixinAnnotation.LOCAL -> listOf(
+            boolean("print"),
+            plain("ordinal"),
+            plain("index"),
+            quotedArray("name"),
+            boolean("argsOnly"),
+            classLiteral("type"),
+        )
+        MixinAnnotation.SHARE -> listOf(
+            quoted("value"),
+            quoted("namespace"),
+        )
+        MixinAnnotation.DEFINITION -> listOf(
+            quoted("id"),
+            quotedArray("method"),
+            quotedArray("field"),
+            classArray("type"),
+            localArray(),
+            boolean("remap"),
+        )
+        MixinAnnotation.EXPRESSION -> listOf(
+            quotedArray("value"),
+            quoted("id"),
+        )
+        MixinAnnotation.DEFINITIONS -> listOf(definitionsValue())
+        MixinAnnotation.EXPRESSIONS -> listOf(expressionsValue())
     }
 
     private fun injectorBase(): List<AttributeSnippet> = methodBase() + listOf(
@@ -101,13 +148,47 @@ class MixinAttributeCompletionService {
         annotationValue("slice", "Slice"),
     ) + requirementOptions()
 
+    private fun mixinExtrasInjectorBase(): List<AttributeSnippet> = methodBase() + listOf(
+        at(),
+        annotationValue("slice", "Slice"),
+    ) + mixinExtrasRequirementOptions() + listOf(
+        plain("order"),
+    )
+
+    private fun wrapOperationBase(): List<AttributeSnippet> = mixinExtrasInjectorBase() + listOf(
+        annotationValue("constant", "Constant"),
+    )
+
+    private fun wrapMethodBase(): List<AttributeSnippet> = methodBase() + mixinExtrasRequirementOptions() + listOf(
+        plain("order"),
+    )
+
+    private fun isValidAttributeForContext(context: AnnotationContext, attributeName: String): Boolean {
+        if (
+            context.annotation == MixinAnnotation.WRAP_WITH_CONDITION &&
+            attributeName == "order" &&
+            context.resolvedAnnotationFqn == WRAP_WITH_CONDITION_V1_FQN
+        ) {
+            return false
+        }
+        if (context.annotation != MixinAnnotation.WRAP_OPERATION) return true
+        return when (attributeName) {
+            "at" -> "constant" !in context.existingAttributes
+            "constant" -> "at" !in context.existingAttributes
+            else -> true
+        }
+    }
+
     private fun methodBase(): List<AttributeSnippet> = listOf(quoted("method"))
 
-    private fun requirementOptions(): List<AttributeSnippet> = listOf(
+    private fun requirementOptions(): List<AttributeSnippet> = mixinExtrasRequirementOptions() + listOf(
+        quoted("constraints"),
+    )
+
+    private fun mixinExtrasRequirementOptions(): List<AttributeSnippet> = listOf(
         plain("require"),
         plain("expect"),
         plain("allow"),
-        quoted("constraints"),
         boolean("remap"),
     )
 
@@ -134,4 +215,24 @@ class MixinAttributeCompletionService {
 
     private fun at(): AttributeSnippet =
         AttributeSnippet("at", "at = @At(\"…\")", "at = @At(\"${'$'}{1}\")${'$'}0")
+
+    private fun classArray(name: String): AttributeSnippet =
+        AttributeSnippet(name, "$name = { ….class }", "$name = { ${'$'}{1}.class }${'$'}0")
+
+    private fun localArray(): AttributeSnippet =
+        AttributeSnippet("local", "local = { @Local(…) }", "local = { @Local(${ '$' }{1}) }${'$'}0")
+
+    private fun definitionsValue(): AttributeSnippet =
+        AttributeSnippet(
+            "value",
+            "value = { @Definition(…) }",
+            "value = { @Definition(id = \"${'$'}{1}\") }${'$'}0",
+        )
+
+    private fun expressionsValue(): AttributeSnippet =
+        AttributeSnippet(
+            "value",
+            "value = { @Expression(…) }",
+            "value = { @Expression(\"${'$'}{1}\") }${'$'}0",
+        )
 }

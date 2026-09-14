@@ -29,10 +29,26 @@ local function current_prefix_range(bufnr, position)
   }
 end
 
+local function utf16_to_byte_edit(bufnr, edit)
+  if not edit or not edit.range then
+    return
+  end
+  for _, position in ipairs({ edit.range.start, edit.range["end"] }) do
+    local line = vim.api.nvim_buf_get_lines(bufnr, position.line, position.line + 1, false)[1]
+    if line then
+      position.character = vim.str_byteindex(line, "utf-16", position.character, false)
+    end
+  end
+end
+
 local function to_blink_item(item, bufnr, position)
   local blink_item = vim.deepcopy(item)
   blink_item.cursor_column = blink_item._mcdev_cursor_column or position[2] or 0
   blink_item._mcdev_cursor_column = nil
+  utf16_to_byte_edit(bufnr, blink_item.textEdit)
+  for _, edit in ipairs(blink_item.additionalTextEdits or {}) do
+    utf16_to_byte_edit(bufnr, edit)
+  end
 
   if not is_mixin_item(item) then
     return blink_item
@@ -94,19 +110,44 @@ function source:get_trigger_characters()
 end
 
 function source:enabled(ctx)
-  return buffer.is_mcdev_buffer(ctx_bufnr(ctx))
+  return buffer.is_mcdev_completion_context(ctx_bufnr(ctx))
 end
 
 function source:get_completions(ctx, callback)
   local bufnr = ctx_bufnr(ctx)
   local position = ctx_position(ctx)
-  completion.complete(function(result)
+  if not buffer.is_mcdev_completion_context(bufnr) then
     callback({
-      is_incomplete_forward = result.isIncomplete or false,
-      is_incomplete_backward = result.isIncomplete or false,
-      items = to_blink_items(result.items, bufnr, position),
+      is_incomplete_forward = false,
+      is_incomplete_backward = false,
+      items = {},
     })
-  end, bufnr, position, { source = "blink" })
+    return
+  end
+  local seen = {}
+  return completion.complete(function(result)
+    if result.isStale then
+      callback({
+        is_incomplete_forward = true,
+        is_incomplete_backward = true,
+        items = {},
+      })
+      return
+    end
+    local items = {}
+    for _, item in ipairs(result.items or {}) do
+      local key = completion.item_key(item)
+      if not seen[key] then
+        seen[key] = true
+        items[#items + 1] = item
+      end
+    end
+    callback({
+      is_incomplete_forward = result.isProvisional or result.isIncomplete or false,
+      is_incomplete_backward = result.isProvisional or result.isIncomplete or false,
+      items = to_blink_items(items, bufnr, position),
+    })
+  end, bufnr, position, { source = "blink", stream = true })
 end
 
 return source

@@ -3,10 +3,12 @@ package io.github.mcdev.jdtls.handler
 import io.github.mcdev.core.at.AtContextExtractor
 import io.github.mcdev.core.aw.AwContextExtractor
 import io.github.mcdev.core.awat.AwAtFileType
+import io.github.mcdev.core.mixin.MixinCompletionOptions
 import io.github.mcdev.jdtls.awat.AwAtServiceFacade
 import io.github.mcdev.jdtls.convert.CompletionConvertContext
 import io.github.mcdev.jdtls.convert.CompletionItemConverter
 import io.github.mcdev.jdtls.convert.CompletionReplacementRange
+import io.github.mcdev.jdtls.mixin.BufferOnlyCompletionResult
 import io.github.mcdev.jdtls.mixin.MixinServiceFacade
 import io.github.mcdev.jdtls.mixin.SemanticModelCache
 import io.github.mcdev.jdtls.project.FileBasedProjectContextService
@@ -20,6 +22,7 @@ import io.github.mcdev.protocol.McdevErrorCode
 import io.github.mcdev.protocol.McdevProtocol
 import io.github.mcdev.protocol.McdevResponseEnvelope
 import io.github.mcdev.protocol.McdevWarning
+import java.util.LinkedHashMap
 import java.util.concurrent.ConcurrentHashMap
 
 class McdevCompletionHandler(
@@ -31,14 +34,12 @@ class McdevCompletionHandler(
         mixinFacade.semanticModel(source, documentUri)
     },
     private val documentCache: DocumentSnapshotCache = DocumentSnapshotCache(),
+    private val currentTimeMillis: () -> Long = { System.currentTimeMillis() },
 ) {
-    private data class NegativeEntry(
-        val reason: String,
-        val expiresAtMillis: Long,
-    )
-
-    private val negativeCache = ConcurrentHashMap<String, NegativeEntry>()
+    private val negativeCache = NegativeCompletionCache(currentTimeMillis = currentTimeMillis)
     private val inFlightLocks = ConcurrentHashMap<String, Any>()
+
+    internal fun negativeCacheSizeForTests(): Int = negativeCache.sizeForTests()
 
     fun handle(arguments: List<Any?>): McdevResponseEnvelope<McdevCompletionResponse> =
         try {
@@ -48,7 +49,32 @@ class McdevCompletionHandler(
             errorEnvelope(McdevErrorCode.PARSE_ERROR, error.message ?: "invalid completion payload")
         }
 
-    fun handle(request: McdevCompletionRequest): McdevResponseEnvelope<McdevCompletionResponse> {
+    /**
+     * Handles the completion request on the same-JVM project-aware transport.
+     *
+     * The normal command path deliberately returns buffer-only results for the
+     * contexts that can be answered without a project session. The transport
+     * must always compute the final project-aware result instead of relabeling
+     * that provisional subset as final.
+     */
+    internal fun handleProjectAware(arguments: List<Any?>): McdevResponseEnvelope<McdevCompletionResponse> =
+        try {
+            val request = decoder.decodeCompletionRequest(arguments)
+            handleProjectAware(request)
+        } catch (error: ProtocolDecodeException) {
+            errorEnvelope(McdevErrorCode.PARSE_ERROR, error.message ?: "invalid completion payload")
+        }
+
+    fun handle(request: McdevCompletionRequest): McdevResponseEnvelope<McdevCompletionResponse> =
+        handle(request, projectAware = false)
+
+    internal fun handleProjectAware(request: McdevCompletionRequest): McdevResponseEnvelope<McdevCompletionResponse> =
+        handle(request, projectAware = true)
+
+    private fun handle(
+        request: McdevCompletionRequest,
+        projectAware: Boolean,
+    ): McdevResponseEnvelope<McdevCompletionResponse> {
         val totalStarted = System.nanoTime()
         if (request.context.protocolVersion != McdevProtocol.VERSION) {
             return typedProtocolMismatch(request.context.protocolVersion)
@@ -56,16 +82,41 @@ class McdevCompletionHandler(
         if (request.context.workspaceRoot.isBlank()) {
             return incompleteContext("workspace root is required")
         }
+        if (
+            projectAware &&
+            awAtFacade.detectFileType(request.context.languageId, request.context.documentUri) == null &&
+            !mixinFacade.hasJavaProject(request.context.documentUri)
+        ) {
+            return incompleteContext("JDT project dependencies are not available yet")
+        }
         val requestKey = request.cacheKey()
         val inFlightDedupHit = inFlightLocks.containsKey(requestKey)
         val lock = inFlightLocks.computeIfAbsent(requestKey) { Any() }
         return try {
             synchronized(lock) {
-                handleComputed(request, totalStarted, requestKey, inFlightDedupHit)
+                handleComputed(request, totalStarted, requestKey, inFlightDedupHit, projectAware)
             }
         } finally {
             inFlightLocks.remove(requestKey, lock)
         }
+    }
+
+    /**
+     * Computes only the no-index part of completion.
+     *
+     * A standalone stdio helper uses this before the normal JDT LS command. A
+     * null result means that the request needs the project-aware path.
+     */
+    internal fun handleBufferOnly(request: McdevCompletionRequest): McdevResponseEnvelope<McdevCompletionResponse>? {
+        if (request.context.protocolVersion != McdevProtocol.VERSION || request.context.workspaceRoot.isBlank()) {
+            return null
+        }
+        return bufferOnlyResponse(
+            request = request,
+            totalStarted = System.nanoTime(),
+            inFlightDedupHit = false,
+            requireItems = true,
+        )
     }
 
     private fun handleComputed(
@@ -73,29 +124,36 @@ class McdevCompletionHandler(
         totalStarted: Long,
         requestKey: String,
         inFlightDedupHit: Boolean,
+        projectAware: Boolean,
     ): McdevResponseEnvelope<McdevCompletionResponse> {
-        val loadSessionStarted = System.nanoTime()
-        val cachedSession = projectService.loadCachedSession(request.context.workspaceRoot)
-        val session = cachedSession.session
-        val loadSessionMs = elapsedMs(loadSessionStarted)
-        negativeCache[requestKey]
-            ?.takeIf { System.currentTimeMillis() <= it.expiresAtMillis }
-            ?.let { negative ->
+        if (!projectAware) {
+            negativeCache.get(requestKey)?.let { reason ->
                 return emptyCompletion(
                     request = request,
-                    reason = negative.reason,
+                    reason = reason,
                     totalMs = elapsedMs(totalStarted),
-                    loadSessionMs = loadSessionMs,
-                    projectSessionCacheHit = cachedSession.cacheHit,
-                    projectSessionVersion = cachedSession.version,
+                    loadSessionMs = 0,
+                    projectSessionCacheHit = false,
+                    projectSessionVersion = 0,
                     negativeCacheHit = true,
                     inFlightDedupHit = inFlightDedupHit,
                 )
             }
+            bufferOnlyResponse(
+                request = request,
+                totalStarted = totalStarted,
+                inFlightDedupHit = inFlightDedupHit,
+                requireItems = false,
+            )?.let { return it }
+        }
         val awAtFileType = awAtFacade.detectFileType(
             languageId = request.context.languageId,
             documentUri = request.context.documentUri,
         )
+        val loadSessionStarted = System.nanoTime()
+        val cachedSession = projectService.loadCachedSession(request.context.workspaceRoot)
+        val session = cachedSession.session
+        val loadSessionMs = elapsedMs(loadSessionStarted)
         if (awAtFileType != null) {
             val items = awAtFacade.complete(
                 session = session,
@@ -132,6 +190,7 @@ class McdevCompletionHandler(
                             },
                         ),
                     ),
+                    isIncomplete = CompletionItemConverter.isIncomplete(items),
                 ),
             )
         }
@@ -173,9 +232,10 @@ class McdevCompletionHandler(
         )
         completion.debug.zeroItemReason?.let { reason ->
             if (completion.items.isEmpty()) {
-                negativeCache[requestKey] = NegativeEntry(
+                negativeCache.put(
+                    requestKey,
                     reason = reason,
-                    expiresAtMillis = System.currentTimeMillis() + negativeTtlMillis(reason),
+                    expiresAtMillis = currentTimeMillis() + negativeTtlMillis(reason),
                 )
             }
         }
@@ -200,6 +260,7 @@ class McdevCompletionHandler(
             capabilities = setOf("completion"),
             result = McdevCompletionResponse(
                 items = itemDtos,
+                isIncomplete = CompletionItemConverter.isIncomplete(completion.items),
                 warnings = semantic.model.warnings.map {
                     McdevWarning(code = "MIXIN_PARSE_FALLBACK", message = it)
                 } + McdevWarning(
@@ -229,6 +290,102 @@ class McdevCompletionHandler(
         )
     }
 
+    private fun bufferOnlyResponse(
+        request: McdevCompletionRequest,
+        totalStarted: Long,
+        inFlightDedupHit: Boolean,
+        requireItems: Boolean,
+    ): McdevResponseEnvelope<McdevCompletionResponse>? {
+        if (awAtFacade.detectFileType(request.context.languageId, request.context.documentUri) != null) {
+            return null
+        }
+        val options = mixinFacade.toCompletionOptions(
+            mixinClassInsert = request.options.mixinClassInsert,
+            injectMethodDescriptor = request.options.injectMethodDescriptor,
+            preferredAtTarget = request.options.preferredAtTarget,
+        )
+        val bufferOnly = mixinFacade.tryCompleteBufferOnly(
+            source = request.context.bufferText,
+            line = request.context.position.line,
+            character = request.context.position.character,
+            options = options,
+            documentUri = request.context.documentUri,
+            languageId = request.context.languageId,
+        ) ?: return null
+        if (requireItems && bufferOnly.result.items.isEmpty()) {
+            return null
+        }
+        return buildBufferOnlyCompletionResponse(
+            request = request,
+            bufferOnly = bufferOnly,
+            options = options,
+            totalStarted = totalStarted,
+            requestKey = request.cacheKey(),
+            inFlightDedupHit = inFlightDedupHit,
+        )
+    }
+
+    private fun buildBufferOnlyCompletionResponse(
+        request: McdevCompletionRequest,
+        bufferOnly: BufferOnlyCompletionResult,
+        options: MixinCompletionOptions,
+        totalStarted: Long,
+        requestKey: String,
+        inFlightDedupHit: Boolean,
+    ): McdevResponseEnvelope<McdevCompletionResponse> {
+        val completion = bufferOnly.result
+        completion.debug.zeroItemReason?.let { reason ->
+            if (completion.items.isEmpty()) {
+                negativeCache.put(
+                    requestKey,
+                    reason = reason,
+                    expiresAtMillis = currentTimeMillis() + negativeTtlMillis(reason),
+                )
+            }
+        }
+        val bufferTextBytes = request.context.bufferText.toByteArray(Charsets.UTF_8).size
+        val payloadBytes = estimatePayloadBytes(request)
+        val dtoStarted = System.nanoTime()
+        val itemDtos = CompletionItemConverter.toDtos(
+            items = completion.items,
+            annotationContext = bufferOnly.context,
+            source = request.context.bufferText,
+            convertContext = CompletionConvertContext(
+                source = request.context.bufferText,
+                annotationContext = bufferOnly.context,
+                classInsertMode = options.classInsertMode,
+                preferredAtTarget = options.preferredAtTarget,
+            ),
+        )
+        val dtoConvertMs = elapsedMs(dtoStarted)
+        return McdevResponseEnvelope(
+            capabilities = setOf("completion"),
+            result = McdevCompletionResponse(
+                items = itemDtos,
+                isIncomplete = CompletionItemConverter.isIncomplete(completion.items),
+                debug = completion.debug.toProtocolDebug(
+                    totalMs = elapsedMs(totalStarted),
+                    payloadBytes = payloadBytes,
+                    bufferTextBytes = bufferTextBytes,
+                    bufferTextFallbackUsed = request.context.bufferTextFallbackUsed,
+                    loadSessionMs = 0,
+                    projectSessionCacheHit = false,
+                    projectSessionVersion = 0,
+                    documentCacheHit = null,
+                    documentSnapshotMs = null,
+                    documentVersion = request.context.documentVersion,
+                    semanticCacheHit = null,
+                    astParseMs = null,
+                    candidateCacheHit = null,
+                    candidateBuildMs = null,
+                    dtoConvertMs = dtoConvertMs,
+                    negativeCacheHit = false,
+                    inFlightDedupHit = inFlightDedupHit,
+                ),
+            ),
+        )
+    }
+
     private fun io.github.mcdev.core.mixin.McdevCompletionDebugInfo.toProtocolDebug(
         totalMs: Long,
         payloadBytes: Int,
@@ -237,13 +394,13 @@ class McdevCompletionHandler(
         loadSessionMs: Long,
         projectSessionCacheHit: Boolean,
         projectSessionVersion: Long,
-        documentCacheHit: Boolean,
-        documentSnapshotMs: Long,
-        documentVersion: Long,
-        semanticCacheHit: Boolean,
-        astParseMs: Long,
-        candidateCacheHit: Boolean,
-        candidateBuildMs: Long,
+        documentCacheHit: Boolean?,
+        documentSnapshotMs: Long?,
+        documentVersion: Long?,
+        semanticCacheHit: Boolean?,
+        astParseMs: Long?,
+        candidateCacheHit: Boolean?,
+        candidateBuildMs: Long?,
         dtoConvertMs: Long,
         negativeCacheHit: Boolean,
         inFlightDedupHit: Boolean,
@@ -385,4 +542,40 @@ class McdevCompletionHandler(
 
     private fun incompleteContext(message: String): McdevResponseEnvelope<McdevCompletionResponse> =
         errorEnvelope(McdevErrorCode.INCOMPLETE_PROJECT_CONTEXT, message)
+
+    private class NegativeCompletionCache(
+        private val maxEntries: Int = MAX_NEGATIVE_CACHE_ENTRIES,
+        private val currentTimeMillis: () -> Long,
+    ) {
+        private data class Entry(
+            val reason: String,
+            val expiresAtMillis: Long,
+        )
+
+        private val entries = object : LinkedHashMap<String, Entry>(maxEntries, 0.75f, true) {
+            override fun removeEldestEntry(eldest: MutableMap.MutableEntry<String, Entry>?): Boolean =
+                size > maxEntries
+        }
+
+        @Synchronized
+        fun get(key: String): String? {
+            val entry = entries[key] ?: return null
+            if (currentTimeMillis() > entry.expiresAtMillis) {
+                entries.remove(key)
+                return null
+            }
+            return entry.reason
+        }
+
+        @Synchronized
+        fun put(key: String, reason: String, expiresAtMillis: Long) {
+            entries[key] = Entry(reason = reason, expiresAtMillis = expiresAtMillis)
+        }
+
+        internal fun sizeForTests(): Int = synchronized(this) { entries.size }
+
+        private companion object {
+            const val MAX_NEGATIVE_CACHE_ENTRIES = 256
+        }
+    }
 }

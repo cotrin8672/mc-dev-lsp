@@ -1,5 +1,7 @@
 local protocol = require("mcdev.protocol")
 local convert = require("mcdev.convert")
+local stdio = require("mcdev.stdio")
+local transport = require("mcdev.transport")
 
 local M = {}
 M.last_request = nil
@@ -10,13 +12,24 @@ M.request_count = 0
 M.server_request_count = 0
 M.request_seq = 0
 M.stale_dropped_count = 0
+M.cancelled_count = 0
 M.last_source = nil
 M.last_callback_item_count = nil
-M.last_local_prefix_cache_hit = false
-M.last_local_prefix_cache_items = 0
+M.helper_request_count = 0
+M.last_project_transport_error = nil
 
-local prefix_cache = nil
 local active_requests = {}
+
+local function cancel_operation(operation)
+  if not operation or operation.cancelled or operation.completed then
+    return
+  end
+  operation.cancelled = true
+  M.cancelled_count = M.cancelled_count + 1
+  if operation.cancel_transport then
+    operation.cancel_transport()
+  end
+end
 
 local kind_map = {
   class = vim.lsp.protocol.CompletionItemKind.Class,
@@ -54,10 +67,6 @@ local function changedtick(bufnr)
   return vim.api.nvim_buf_get_changedtick(bufnr)
 end
 
-local function document_uri(bufnr)
-  return vim.uri_from_bufnr(bufnr)
-end
-
 local function cursor_prefix(bufnr, position)
   local line = vim.api.nvim_buf_get_lines(bufnr, position[1] - 1, position[1], false)[1] or ""
   local before = line:sub(1, position[2])
@@ -65,118 +74,79 @@ local function cursor_prefix(bufnr, position)
   return prefix, before:sub(1, #before - #prefix)
 end
 
-local function visible_cursor_position(bufnr)
-  local current_winid = vim.api.nvim_get_current_win()
-  if vim.api.nvim_win_get_buf(current_winid) == bufnr then
-    return vim.api.nvim_win_get_cursor(current_winid)
-  end
-  for _, winid in ipairs(vim.api.nvim_list_wins()) do
-    if vim.api.nvim_win_get_buf(winid) == bufnr then
-      return vim.api.nvim_win_get_cursor(winid)
-    end
-  end
-  return nil
-end
-
-local function changed_only_by_prefix_extension(bufnr, request_lines, request_position, current_position, extension)
-  local request_row = request_position[1]
-  local request_column = request_position[2]
-  local request_line = request_lines[request_row] or ""
-  local expected_lines = vim.deepcopy(request_lines)
-  expected_lines[request_row] = request_line:sub(1, request_column)
-    .. extension
-    .. request_line:sub(request_column + 1)
-  local current_lines = vim.api.nvim_buf_get_lines(bufnr, 0, -1, false)
-  return current_position[2] == request_column + #extension and vim.deep_equal(current_lines, expected_lines)
-end
-
-local function item_matches_prefix(item, prefix)
-  if prefix == "" then
-    return true
-  end
-  local needle = prefix:lower()
-  local fields = {
-    item.filterText,
-    item.label,
-    item.insertText,
-    item.detail,
-  }
-  for _, value in ipairs(fields) do
-    if value and tostring(value):lower():find(needle, 1, true) then
-      return true
-    end
-  end
-  return false
-end
-
-local function filter_items(items, prefix)
-  local filtered = {}
-  for _, item in ipairs(items or {}) do
-    if item_matches_prefix(item, prefix) then
-      table.insert(filtered, item)
-    end
-  end
-  return filtered
-end
-
-local function cache_key(bufnr, position, source)
+local function item_key(item)
+  local text_edit = item.textEdit or {}
+  local range = text_edit.range or {}
+  local start = range.start or {}
+  local finish = range["end"] or {}
   return table.concat({
-    document_uri(bufnr),
-    tostring(position[1] or ""),
-    source or "manual",
-  }, "|")
+    tostring(item.label or ""),
+    tostring(item.insertText or text_edit.newText or ""),
+    tostring(start.line or ""),
+    tostring(start.character or ""),
+    tostring(finish.line or ""),
+    tostring(finish.character or ""),
+  }, "\31")
 end
 
-local function refresh_cached_edit(item, cached_column, current_column)
-  local copy = vim.deepcopy(item)
-  if copy._mcdev_cursor_column then
-    copy._mcdev_cursor_column = current_column
-  end
-  local edit = copy.textEdit
-  local range = edit and (edit.range or edit.replace)
-  if range and range["end"] and range["end"].character and cached_column ~= current_column then
-    local suffix_length = math.max(0, range["end"].character - cached_column)
-    range["end"].character = current_column + suffix_length
-    if edit.insert and edit.insert["end"] then
-      edit.insert["end"].character = current_column
+function M.item_key(item)
+  return item_key(item)
+end
+
+local function merge_items(first, second)
+  local merged = {}
+  local seen = {}
+  for _, items in ipairs({ first or {}, second or {} }) do
+    for _, item in ipairs(items) do
+      local key = item_key(item)
+      if not seen[key] then
+        seen[key] = true
+        merged[#merged + 1] = item
+      end
     end
   end
-  return copy
+  return merged
 end
 
-local function local_prefix_cache_hit(key, prefix_base, prefix, current_column)
-  if not prefix_cache or prefix_cache.expires_at < vim.loop.hrtime() then
-    return nil
+local function decode_completion(envelope, err)
+  local result, unwrap_err = convert.unwrap_envelope(envelope, err)
+  if unwrap_err then
+    return nil, unwrap_err
   end
-  if prefix_cache.key ~= key then
-    return nil
+  if result == nil then
+    result = { items = {} }
+  elseif type(result) ~= "table" then
+    return nil, "mcdev: invalid completion response"
   end
-  if prefix_cache.prefix_base ~= prefix_base then
-    return nil
+  local raw_items = result.items or {}
+  if type(raw_items) ~= "table" then
+    return nil, "mcdev: invalid completion items"
   end
-  if prefix:sub(1, #prefix_cache.prefix) ~= prefix_cache.prefix then
-    return nil
+  local items = {}
+  for _, item in ipairs(raw_items) do
+    if type(item) ~= "table" then
+      return nil, "mcdev: invalid completion item"
+    end
+    items[#items + 1] = M.to_lsp_item(item)
   end
-  local filtered = filter_items(prefix_cache.items, prefix)
-  local refreshed = {}
-  for _, item in ipairs(filtered) do
-    table.insert(refreshed, refresh_cached_edit(item, prefix_cache.column, current_column))
-  end
-  return refreshed
+  return {
+    items = items,
+    isIncomplete = result.isIncomplete or false,
+    debug = result.debug,
+  }
 end
 
 function M.complete(callback, bufnr, position, opts)
   opts = opts or {}
+  callback = callback or function() end
   bufnr = bufnr or vim.api.nvim_get_current_buf()
   position = position or vim.api.nvim_win_get_cursor(0)
   local request_tick = changedtick(bufnr)
   local request_prefix, request_prefix_base = cursor_prefix(bufnr, position)
-  local request_lines = vim.api.nvim_buf_get_lines(bufnr, 0, -1, false)
   M.request_seq = M.request_seq + 1
   local request_id = M.request_seq
   M.request_count = M.request_count + 1
   M.last_source = opts.source or "manual"
-  local key = cache_key(bufnr, position, M.last_source)
   M.last_request = {
     bufnr = bufnr,
     position = position,
@@ -187,103 +157,234 @@ function M.complete(callback, bufnr, position, opts)
     source = M.last_source,
   }
   M.last_error = nil
-  M.last_local_prefix_cache_hit = false
-  M.last_local_prefix_cache_items = 0
+  M.last_project_transport_error = nil
 
-  local completed = false
+  local operation = {
+    bufnr = bufnr,
+    cancelled = false,
+    completed = false,
+    cancel_transport = nil,
+    cancel_project = nil,
+    cancel_helper = nil,
+    cancel_jdt = nil,
+  }
+
+  local helper_items = {}
+  local helper_stream = opts.stream == true
+  local helper_done = false
+  local jdt_failed = false
+
+  local function cancel_auxiliary_requests()
+    if operation.cancel_ready then operation.cancel_ready(); operation.cancel_ready = nil end
+    if type(operation.cancel_project) == "function" then
+      operation.cancel_project()
+      operation.cancel_project = nil
+    end
+    if type(operation.cancel_helper) == "function" then
+      operation.cancel_helper()
+      operation.cancel_helper = nil
+    end
+    if type(operation.cancel_jdt) == "function" then
+      operation.cancel_jdt()
+      operation.cancel_jdt = nil
+    end
+  end
+
   local function finish(result)
-    if completed then
+    if operation.completed then
       return
     end
-    completed = true
-    if active_requests[bufnr] == finish then
+    operation.completed = true
+    if operation.cancel_ready then operation.cancel_ready(); operation.cancel_ready = nil end
+    if active_requests[bufnr] == operation then
       active_requests[bufnr] = nil
     end
     callback(result)
   end
 
-  local cached_items = local_prefix_cache_hit(key, request_prefix_base, request_prefix, position[2])
-  if cached_items then
-    M.last_local_prefix_cache_hit = true
-    M.last_local_prefix_cache_items = #cached_items
-    M.last_callback_item_count = #cached_items
-    finish({ isIncomplete = true, items = cached_items })
-    return
+  local function finish_stale()
+    if operation.completed then
+      return
+    end
+    M.stale_dropped_count = M.stale_dropped_count + 1
+    M.last_callback_item_count = 0
+    cancel_auxiliary_requests()
+    finish({ isStale = true })
   end
-  active_requests[bufnr] = finish
-  M.server_request_count = M.server_request_count + 1
-  protocol.completion(function(envelope, err)
-    if active_requests[bufnr] ~= finish then
+
+  local function request_is_stale()
+    return operation.cancelled or active_requests[bufnr] ~= operation
+      or request_tick ~= changedtick(bufnr)
+  end
+
+  cancel_operation(active_requests[bufnr])
+  active_requests[bufnr] = operation
+
+  operation.cancel_transport = function()
+    cancel_auxiliary_requests()
+  end
+
+  local function cancel()
+    cancel_operation(operation)
+  end
+
+  local function finish_helper_fallback()
+    if operation.completed or request_is_stale() then
+      return
+    end
+    M.last_response_count = #helper_items
+    M.last_callback_item_count = #helper_items
+    cancel_auxiliary_requests()
+    finish({ isIncomplete = true, items = vim.deepcopy(helper_items) })
+  end
+
+  local function on_helper(envelope, err)
+    if operation.cancelled or active_requests[bufnr] ~= operation or operation.completed then
       M.stale_dropped_count = M.stale_dropped_count + 1
       return
     end
-    local result, unwrap_err = convert.unwrap_envelope(envelope, err)
-    if unwrap_err then
-      M.last_error = tostring(unwrap_err)
-      M.last_callback_item_count = 0
-      finish({ isIncomplete = false, items = {} })
+    if request_tick ~= changedtick(bufnr) then
+      finish_stale()
       return
     end
-    local response_position = position
-    local response_prefix = request_prefix
-    local response_prefix_base = request_prefix_base
-    local prefix_was_extended = false
+
+    local result, helper_err = decode_completion(envelope, err)
+    helper_done = true
+    if helper_err then
+      if jdt_failed then
+        finish_helper_fallback()
+      end
+      return
+    end
+    helper_items = result.items
+    if helper_stream and #helper_items > 0 then
+      M.last_callback_item_count = #helper_items
+      callback({
+        isProvisional = true,
+        isIncomplete = true,
+        items = vim.deepcopy(helper_items),
+      })
+    end
+    if jdt_failed and not request_is_stale() then
+      finish_helper_fallback()
+    end
+  end
+
+  local payload = protocol.build_completion_payload(bufnr, position)
+  M.helper_request_count = M.helper_request_count + 1
+  local cancel_helper, helper_start_error = stdio.request(payload, on_helper)
+  if request_is_stale() or operation.completed then
+    if type(cancel_helper) == "function" then
+      cancel_helper()
+    end
+    return cancel
+  end
+  operation.cancel_helper = cancel_helper
+  if helper_start_error and not helper_done then
+    helper_done = true
+  end
+
+  if request_is_stale() or operation.completed then
+    return cancel
+  end
+
+  local function on_jdt(envelope, err)
+    if operation.cancelled or active_requests[bufnr] ~= operation or operation.completed then
+      M.stale_dropped_count = M.stale_dropped_count + 1
+      return
+    end
     if request_tick ~= changedtick(bufnr) then
-      local current_position = visible_cursor_position(bufnr)
-      if current_position and current_position[1] == position[1] then
-        local current_prefix, current_prefix_base = cursor_prefix(bufnr, current_position)
-        local extension = current_prefix:sub(#request_prefix + 1)
-        prefix_was_extended = current_prefix_base == request_prefix_base
-          and current_prefix:sub(1, #request_prefix) == request_prefix
-          and changed_only_by_prefix_extension(bufnr, request_lines, position, current_position, extension)
-        if prefix_was_extended then
-          response_position = current_position
-          response_prefix = current_prefix
-          response_prefix_base = current_prefix_base
-        end
-      end
-      if not prefix_was_extended then
-        M.stale_dropped_count = M.stale_dropped_count + 1
-        M.last_callback_item_count = 0
-        -- Blink must retry for the prefix typed while this request was running.
-        -- Marking the empty stale result complete makes Blink cache it and hides
-        -- every mcdev candidate until completion is manually restarted.
-        finish({ isIncomplete = true, items = {} })
-        return
-      end
+      finish_stale()
+      return
     end
-    result = result or { items = {} }
+
+    local result, unwrap_err = decode_completion(envelope, err)
+    if unwrap_err then
+      jdt_failed = true
+      M.last_error = tostring(unwrap_err)
+      if helper_done then
+        finish_helper_fallback()
+      end
+      return
+    end
+
     M.last_debug = result.debug
-    if M.last_debug then
-      M.last_debug.staleDropped = M.stale_dropped_count
-      M.last_debug.localPrefixCacheHit = M.last_local_prefix_cache_hit
-      M.last_debug.localPrefixCacheItems = M.last_local_prefix_cache_items
+    local items = merge_items(result.items, helper_items)
+    M.last_response_count = #items
+    M.last_callback_item_count = #items
+    if type(operation.cancel_helper) == "function" then
+      operation.cancel_helper()
+      operation.cancel_helper = nil
     end
-    local items = {}
-    for _, item in ipairs(result.items or {}) do
-      local converted = M.to_lsp_item(item)
-      if prefix_was_extended then
-        converted = refresh_cached_edit(converted, position[2], response_position[2])
-        -- Blink compensates edits for cursor movement after a request.  Tell
-        -- the adapter that this edit has already been refreshed to the current
-        -- column so the movement is not applied a second time.
-        converted._mcdev_cursor_column = response_position[2]
+    finish({ isIncomplete = result.isIncomplete or false, items = items })
+  end
+
+  if request_is_stale() or operation.completed then
+    return cancel
+  end
+  local jdt_started = false
+  local function start_jdt_request()
+    if jdt_started or request_is_stale() or operation.completed then
+      return
+    end
+    jdt_started = true
+    M.server_request_count = M.server_request_count + 1
+    local cancel_jdt = protocol.completion(on_jdt, bufnr, position)
+    if request_is_stale() or operation.completed then
+      if type(cancel_jdt) == "function" then
+        cancel_jdt()
       end
-      table.insert(items, converted)
+    else
+      operation.cancel_jdt = cancel_jdt
     end
-    prefix_cache = {
-      key = key,
-      prefix_base = response_prefix_base,
-      prefix = response_prefix,
-      column = response_position[2],
-      items = items,
-      expires_at = vim.loop.hrtime() + 2000000000,
-    }
-    local response_items = prefix_was_extended and filter_items(items, response_prefix) or items
-    M.last_response_count = #response_items
-    M.last_callback_item_count = #response_items
-    finish({ isIncomplete = result.isIncomplete or false, items = response_items })
-  end, bufnr, position)
+  end
+
+  local request_project
+  local function wait_for_project()
+    if operation.cancel_ready or not transport.when_ready then return end
+    operation.cancel_ready = transport.when_ready(bufnr, function()
+      operation.cancel_ready = nil
+      if request_is_stale() or operation.completed then return end
+      request_project()
+    end, operation.project_generation)
+  end
+
+  local function on_project(envelope, err)
+    operation.cancel_project = nil
+    if operation.cancelled or active_requests[bufnr] ~= operation or operation.completed then
+      M.stale_dropped_count = M.stale_dropped_count + 1
+      return
+    end
+    if request_tick ~= changedtick(bufnr) then
+      finish_stale()
+      return
+    end
+    local decoded, decode_error = decode_completion(envelope, err)
+    if not decoded or type(envelope) ~= "table" or type(envelope.result) ~= "table" then
+      M.last_project_transport_error = decode_error or "invalid transport envelope"
+      wait_for_project()
+      start_jdt_request()
+      return
+    end
+    if operation.cancel_jdt then operation.cancel_jdt(); operation.cancel_jdt = nil end
+    M.last_project_transport_error = nil
+    on_jdt(envelope, nil)
+  end
+
+  request_project = function()
+    operation.project_generation = transport.ready_generation and transport.ready_generation(bufnr) or nil
+    local cancel_project, project_start_error = transport.request(payload, on_project, bufnr)
+    if cancel_project then
+      if operation.completed or operation.cancelled then cancel_project()
+      else operation.cancel_project = cancel_project end
+    else
+      M.last_project_transport_error = project_start_error
+      wait_for_project()
+      start_jdt_request()
+    end
+  end
+  request_project()
+  return cancel
 end
 
 return M

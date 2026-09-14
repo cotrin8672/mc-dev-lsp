@@ -1,5 +1,8 @@
 package io.github.mcdev.core.mixin
 
+import io.github.mcdev.core.mixinextras.ClassLiteralTypeNameResolver
+import org.objectweb.asm.Type
+
 object MixinTargetResolver {
     fun resolveTargets(
         rawTargets: List<String>,
@@ -15,15 +18,22 @@ object MixinTargetResolver {
     ): String? {
         val trimmed = raw.trim()
         if (trimmed.isEmpty()) return null
-        resolveImportedTarget(trimmed, classIndex, imports)?.let { return it }
+        resolveClassLiteralTarget(trimmed, classIndex, imports)?.let { return it }
+        val sourceResolutionContext = hasSourceResolutionContext(imports)
         val internal = when {
             trimmed.contains('/') -> trimmed
             trimmed.contains('.') -> AnnotationContextExtractor.fqnToInternal(trimmed)
             else -> trimmed
         }
-        classIndex.findClass(internal)?.internalName?.let { return it }
-        classIndex.findClassByFqn(trimmed)?.internalName?.let { return it }
-        classIndex.findClasses(trimmed, limit = 5).singleOrNull { it.simpleName == trimmed }?.internalName?.let { return it }
+        if (!sourceResolutionContext || trimmed.contains('/') || trimmed.contains('.')) {
+            classIndex.findClass(internal)?.internalName?.let { return it }
+            classIndex.findClassByFqn(trimmed)?.internalName?.let { return it }
+        }
+        if (!sourceResolutionContext) {
+            classIndex.findClasses(trimmed, limit = 5).singleOrNull { it.simpleName == trimmed }
+                ?.internalName
+                ?.let { return it }
+        }
         return null
     }
 
@@ -33,14 +43,31 @@ object MixinTargetResolver {
         return resolveTargets(raw, classIndex, JavaTypeDescriptorResolver.importsFor(source))
     }
 
-    private fun resolveImportedTarget(
+    private fun resolveClassLiteralTarget(
         target: String,
         classIndex: ClassIndex,
         imports: JavaSourceImports?,
     ): String? {
-        if (imports == null || target.contains('/') || target.contains('.')) return null
-        val importedFqn = imports.explicit[target] ?: return null
-        return classIndex.findClassByFqn(importedFqn)?.internalName
-            ?: classIndex.findClass(AnnotationContextExtractor.fqnToInternal(importedFqn))?.internalName
+        if (imports == null) return null
+        val resolver = ClassLiteralTypeNameResolver.forImports(imports, classIndex)
+        val candidates = sequenceOf(
+            target,
+            target.replace('/', '.').takeIf { '/' in target },
+        ).filterNotNull().distinct()
+        return candidates
+            .mapNotNull { candidate ->
+                resolver.resolve(candidate)
+                    ?.takeIf { it.sort == Type.OBJECT }
+                    ?.internalName
+            }
+            .mapNotNull { internalName -> classIndex.findClass(internalName)?.internalName }
+            .firstOrNull()
     }
+
+    private fun hasSourceResolutionContext(imports: JavaSourceImports?): Boolean =
+        imports != null && (
+            imports.explicit.isNotEmpty() ||
+                imports.wildcardPackages.isNotEmpty() ||
+                imports.ambiguousExplicit.isNotEmpty()
+            )
 }

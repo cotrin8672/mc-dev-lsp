@@ -25,6 +25,18 @@ class DescriptorParserEdgeCasesTest {
     }
 
     @Test
+    fun rejectsObjectDescriptorWithBracketInInternalName() {
+        assertIs<DescriptorParseResult.Failure>(parseFieldDescriptor("Lfoo[Bar;"))
+        assertIs<DescriptorParseResult.Failure>(parseMethodDescriptor("(Lfoo[Bar;)V"))
+    }
+
+    @Test
+    fun acceptsArrayDescriptorWithLeadingBracketPrefix() {
+        val parsed = assertIs<DescriptorParseResult.Success<JvmType>>(parseFieldDescriptor("[Ljava/lang/String;"))
+        assertEquals("String[]", DescriptorRenderer.render(parsed.value))
+    }
+
+    @Test
     fun rendersNestedArrayDescriptor() {
         val parsed = assertIs<DescriptorParseResult.Success<JvmType>>(parseFieldDescriptor("[[I"))
         assertEquals("int[][]", DescriptorRenderer.render(parsed.value))

@@ -6,7 +6,6 @@ import io.github.mcdev.core.mapping.SrgParser
 import io.github.mcdev.core.mapping.TinyV2Parser
 import io.github.mcdev.core.mapping.asCompositeResolver
 import io.github.mcdev.core.model.MappingNamespace
-import java.nio.file.Files
 import java.nio.file.Path
 import kotlin.io.path.exists
 import kotlin.io.path.extension
@@ -18,21 +17,19 @@ object MappingDiscoveryService {
     fun discoverMappingFiles(root: Path): List<Path> {
         if (!root.exists()) return emptyList()
         val normalizedRoot = root.toAbsolutePath().normalize()
-        return Files.walk(normalizedRoot).use { stream ->
-            stream
-                .filter { Files.isRegularFile(it) }
-                .filter { path ->
-                    val extension = path.extension.lowercase()
-                    extension in MAPPING_EXTENSIONS ||
-                        (path.name.endsWith(".tiny") && extension.isEmpty())
-                }
-                .filter { path ->
-                    val relativePath = normalizedRoot.relativize(path.toAbsolutePath().normalize())
-                    !ProjectPathFilters.isExcludedFromMappingDiscovery(relativePath)
-                }
-                .sorted()
-                .toList()
-        }
+        return ProjectTreeWalker.walkMappingDiscoveryRegularFiles(normalizedRoot)
+            .asSequence()
+            .filter { path ->
+                val extension = path.extension.lowercase()
+                extension in MAPPING_EXTENSIONS ||
+                    (path.name.endsWith(".tiny") && extension.isEmpty())
+            }
+            .filter { path ->
+                val relativePath = normalizedRoot.relativize(path.toAbsolutePath().normalize())
+                !ProjectPathFilters.isExcludedFromMappingDiscovery(relativePath)
+            }
+            .sorted()
+            .toList()
     }
 
     fun discoverMappingContext(root: Path, platform: ModPlatform): ProjectMappingContext {

@@ -16,6 +16,8 @@ local jdtls_helper = require("mcdev.jdtls")
 local health = require("mcdev.health")
 local lsp_adapter = require("mcdev.lsp")
 local omnifunc = require("mcdev.omnifunc")
+local stdio = require("mcdev.stdio")
+local completion_transport = require("mcdev.transport")
 
 mcdev.setup({
   jdtls = {
@@ -306,46 +308,180 @@ local function with_named_buffer(name, filetype, lines, callback)
   vim.api.nvim_buf_delete(bufnr, { force = true })
 end
 
+local function draw_completion_response()
+  return {
+    result = {
+      items = {
+        {
+          label = "draw(String): void",
+          insertText = "draw",
+          kind = "value",
+          sortKey = "0200_draw",
+          filterText = "draw",
+          detail = "SimpleTarget",
+          additionalEdits = {},
+          metadata = { source = "mixin.injectMethod" },
+        },
+      },
+    },
+  }
+end
+
+local function mock_completion_transport()
+  return function()
+  end
+end
+
+local function install_completion_transport_mock(on_request)
+  local protocol_module = package.loaded["mcdev.protocol"]
+  local original_completion = protocol_module.completion
+  protocol_module.completion = function(callback, bufnr, position)
+    return on_request(callback, bufnr, position)
+  end
+  return original_completion
+end
+
+local function install_stdio_transport_mock(on_request)
+  local original_request = stdio.request
+  stdio.request = function(payload, callback, opts)
+    return on_request(payload, callback, opts)
+  end
+  return original_request
+end
+
+local function install_tracked_completion_client(bufnr, root_dir)
+  local original_get_clients = vim.lsp.get_clients
+  local next_request_id = 0
+  local pending_by_id = {}
+  local cancel_calls = {}
+  local fake_client = {
+    name = "jdtls",
+    config = { root_dir = root_dir or "/project" },
+    request = function(self, _, params, handler, request_bufnr)
+      next_request_id = next_request_id + 1
+      pending_by_id[next_request_id] = {
+        handler = handler,
+        bufnr = request_bufnr,
+      }
+      return true, next_request_id
+    end,
+    cancel_request = function(self, id)
+      cancel_calls[#cancel_calls + 1] = id
+    end,
+  }
+
+  vim.lsp.get_clients = function(opts)
+    if opts and opts.bufnr and opts.bufnr ~= bufnr then
+      return {}
+    end
+    if opts and opts.name == "jdtls" then
+      return { fake_client }
+    end
+    if opts and opts.bufnr == bufnr then
+      return { fake_client }
+    end
+    return { fake_client }
+  end
+
+  return {
+    fake_client = fake_client,
+    pending_by_id = pending_by_id,
+    cancel_calls = cancel_calls,
+    restore = function()
+      vim.lsp.get_clients = original_get_clients
+    end,
+    resolve = function(index, response)
+      local entry = pending_by_id[index]
+      if entry then
+        entry.handler(nil, response)
+      end
+    end,
+    pending_count = function()
+      local count = 0
+      for _ in pairs(pending_by_id) do
+        count = count + 1
+      end
+      return count
+    end,
+  }
+end
+
+local function assert_overlapping_prefix_lifecycle(bufnr, resolve_order)
+  local transport = install_tracked_completion_client(bufnr)
+
+  local callbacks = {}
+  local cancelled_before = completion.cancelled_count
+
+  completion.complete(function(result)
+    callbacks[#callbacks + 1] = result
+  end, bufnr, { 1, #'@Inject(method = "d' }, { source = "lifecycle" })
+  vim.api.nvim_buf_set_lines(bufnr, 0, 1, false, { '@Inject(method = "dr' })
+  completion.complete(function(result)
+    callbacks[#callbacks + 1] = result
+  end, bufnr, { 1, #'@Inject(method = "dr' }, { source = "lifecycle" })
+  vim.api.nvim_buf_set_lines(bufnr, 0, 1, false, { '@Inject(method = "dra' })
+  completion.complete(function(result)
+    callbacks[#callbacks + 1] = result
+  end, bufnr, { 1, #'@Inject(method = "dra' }, { source = "lifecycle" })
+
+  helpers.assert_eq(transport.pending_count(), 3)
+  helpers.assert_eq(#transport.cancel_calls, 2)
+  helpers.assert_eq(transport.cancel_calls[1], 1)
+  helpers.assert_eq(transport.cancel_calls[2], 2)
+  helpers.assert_eq(completion.cancelled_count - cancelled_before, 2)
+
+  local response = draw_completion_response()
+  for _, index in ipairs(resolve_order) do
+    transport.resolve(index, response)
+  end
+
+  helpers.assert_eq(#callbacks, 1)
+  helpers.assert_eq(#callbacks[1].items, 1)
+  helpers.assert_eq(callbacks[1].items[1].insertText, "draw")
+
+  transport.restore()
+end
+
 with_named_buffer("/project/src/main/java/com/example/mixin/ExampleMixin.java", "java", {
   '@Inject(method = "dr',
 }, function(bufnr)
   local protocol_module = package.loaded["mcdev.protocol"]
-  local original_completion = protocol_module.completion
   local server_requests = 0
-  protocol_module.completion = function(callback)
+  local original_completion = install_completion_transport_mock(function(callback, _, position)
     server_requests = server_requests + 1
-    if server_requests == 1 then
-      callback({
-        result = {
-          items = {
-            {
-              label = "draw(String): void",
-              insertText = "draw",
-              kind = "value",
-              sortKey = "0200_draw",
-              filterText = "draw",
-              detail = "SimpleTarget",
-              additionalEdits = {},
-              edit = {
-                range = {
-                  start = { line = 0, character = #'@Inject(method = "' },
-                  ["end"] = { line = 0, character = #'@Inject(method = "dr' },
-                },
-                newText = "draw",
+    local prefix_end = position[2]
+    callback({
+      result = {
+        items = {
+          {
+            label = "draw(String): void",
+            insertText = "draw",
+            kind = "value",
+            sortKey = "0200_draw",
+            filterText = "draw",
+            detail = "SimpleTarget",
+            additionalEdits = {},
+            edit = {
+              range = {
+                start = { line = 0, character = #'@Inject(method = "' },
+                ["end"] = { line = 0, character = prefix_end },
               },
-              metadata = { source = "mixin.injectMethod" },
+              newText = "draw",
             },
+            metadata = { source = "mixin.injectMethod" },
           },
-          debug = {},
         },
-      }, nil)
-    end
-  end
+        debug = {},
+      },
+    }, nil)
+    return mock_completion_transport()
+  end)
 
   local first = nil
   completion.complete(function(result)
     first = result
   end, bufnr, { 1, #'@Inject(method = "dr' }, { source = "manual" })
+  helpers.assert_eq(server_requests, 1)
   helpers.assert_eq(#first.items, 1)
 
   vim.api.nvim_buf_set_lines(bufnr, 0, 1, false, { '@Inject(method = "dra' })
@@ -354,13 +490,86 @@ with_named_buffer("/project/src/main/java/com/example/mixin/ExampleMixin.java", 
     second = result
   end, bufnr, { 1, #'@Inject(method = "dra' }, { source = "manual" })
   helpers.assert_not_nil(second)
+  helpers.assert_eq(server_requests, 2)
   helpers.assert_eq(#second.items, 1)
   helpers.assert_eq(second.items[1].insertText, "draw")
   helpers.assert_eq(second.items[1].textEdit.range["end"].character, #'@Inject(method = "dra')
-  helpers.assert_true(completion.last_local_prefix_cache_hit)
-  helpers.assert_eq(server_requests, 1)
   vim.lsp.util.apply_text_edits({ second.items[1].textEdit }, bufnr, "utf-8")
   helpers.assert_eq(vim.api.nvim_buf_get_lines(bufnr, 0, 1, false)[1], '@Inject(method = "draw')
+
+  protocol_module.completion = original_completion
+end)
+
+with_named_buffer("/project/src/main/java/com/example/mixin/LimitedPageMixin.java", "java", {
+  '@Inject(method = "d',
+}, function(bufnr)
+  local protocol_module = package.loaded["mcdev.protocol"]
+  local server_requests = 0
+  local original_completion = install_completion_transport_mock(function(callback, _, position)
+    server_requests = server_requests + 1
+    if server_requests == 1 then
+      local items = {}
+      for index = 1, 50 do
+        items[#items + 1] = {
+          label = string.format("candidate%02d(): void", index),
+          insertText = string.format("candidate%02d", index),
+          kind = "value",
+          sortKey = string.format("0200_candidate%02d", index),
+          filterText = string.format("candidate%02d", index),
+          detail = "SimpleTarget",
+          additionalEdits = {},
+          metadata = { source = "mixin.injectMethod" },
+        }
+      end
+      callback({ result = { items = items } }, nil)
+      return mock_completion_transport()
+    end
+    local prefix_end = position[2]
+    callback({
+      result = {
+        items = {
+          {
+            label = "zzz(): void",
+            insertText = "zzz",
+            kind = "value",
+            sortKey = "0200_zzz",
+            filterText = "zzz",
+            detail = "SimpleTarget",
+            additionalEdits = {},
+            edit = {
+              range = {
+                start = { line = 0, character = #'@Inject(method = "' },
+                ["end"] = { line = 0, character = prefix_end },
+              },
+              newText = "zzz",
+            },
+            metadata = { source = "mixin.injectMethod" },
+          },
+        },
+      },
+    }, nil)
+    return mock_completion_transport()
+  end)
+
+  local first = nil
+  completion.complete(function(result)
+    first = result
+  end, bufnr, { 1, #'@Inject(method = "d' }, { source = "limited-page" })
+  helpers.assert_eq(server_requests, 1)
+  helpers.assert_eq(#first.items, 50)
+  helpers.assert_nil(vim.tbl_filter(function(item)
+    return item.insertText == "zzz"
+  end, first.items)[1])
+
+  vim.api.nvim_buf_set_lines(bufnr, 0, 1, false, { '@Inject(method = "zzz' })
+  local second = nil
+  completion.complete(function(result)
+    second = result
+  end, bufnr, { 1, #'@Inject(method = "zzz' }, { source = "limited-page" })
+  helpers.assert_eq(server_requests, 2)
+  helpers.assert_not_nil(second)
+  helpers.assert_eq(#second.items, 1)
+  helpers.assert_eq(second.items[1].insertText, "zzz")
 
   protocol_module.completion = original_completion
 end)
@@ -369,10 +578,10 @@ with_named_buffer("/project/src/main/java/com/example/mixin/ErrorMixin.java", "j
   '@Inject(method = "error',
 }, function(bufnr)
   local protocol_module = package.loaded["mcdev.protocol"]
-  local original_completion = protocol_module.completion
-  protocol_module.completion = function(callback)
+  local original_completion = install_completion_transport_mock(function(callback)
     callback({ error = { message = "completion failed" } }, nil)
-  end
+    return mock_completion_transport()
+  end)
   local failed = nil
   completion.complete(function(result)
     failed = result
@@ -383,25 +592,69 @@ with_named_buffer("/project/src/main/java/com/example/mixin/ErrorMixin.java", "j
   protocol_module.completion = original_completion
 end)
 
+with_named_buffer("/project/src/main/java/com/example/mixin/RequestStartFailureMixin.java", "java", {
+  '@Inject(method = "error',
+}, function(bufnr)
+  local original_get_clients = vim.lsp.get_clients
+  local request_count = 0
+  local pending = nil
+  local fake_client = {
+    name = "jdtls",
+    config = { root_dir = "/project" },
+    request = function(self, _, _, handler)
+      request_count = request_count + 1
+      if request_count == 1 then
+        return false, nil
+      end
+      pending = handler
+      return true, request_count
+    end,
+    cancel_request = function() end,
+  }
+  vim.lsp.get_clients = function()
+    return { fake_client }
+  end
+
+  local failed = nil
+  completion.complete(function(result)
+    failed = result
+  end, bufnr, { 1, #'@Inject(method = "error' }, { source = "request-start-failure" })
+  helpers.assert_not_nil(failed)
+  helpers.assert_true(failed.isIncomplete)
+  helpers.assert_eq(#failed.items, 0)
+  helpers.assert_eq(completion.last_error, "mcdev: failed to start JDT LS request")
+
+  local recovered = nil
+  completion.complete(function(result)
+    recovered = result
+  end, bufnr, { 1, #'@Inject(method = "error' }, { source = "request-start-failure" })
+  helpers.assert_eq(request_count, 2)
+  pending(nil, draw_completion_response())
+  helpers.assert_not_nil(recovered)
+  helpers.assert_eq(#recovered.items, 1)
+  helpers.assert_eq(recovered.items[1].insertText, "draw")
+
+  vim.lsp.get_clients = original_get_clients
+end)
+
 with_named_buffer("/project/src/main/java/com/example/mixin/ConcurrentMixin.java", "java", {
   '@WrapOperation(method = "")',
 }, function(bufnr)
-  local protocol_module = package.loaded["mcdev.protocol"]
-  local original_completion = protocol_module.completion
-  local pending = {}
-  protocol_module.completion = function(callback)
-    pending[#pending + 1] = callback
-  end
+  local transport = install_tracked_completion_client(bufnr)
 
   local first = nil
   local second = nil
+  local cancelled_before = completion.cancelled_count
   completion.complete(function(result)
     first = result
   end, bufnr, { 1, #'@WrapOperation(method = "' }, { source = "blink-concurrent" })
   completion.complete(function(result)
     second = result
   end, bufnr, { 1, #'@WrapOperation(method = "' }, { source = "blink-concurrent" })
-  helpers.assert_eq(#pending, 2)
+  helpers.assert_eq(transport.pending_count(), 2)
+  helpers.assert_eq(#transport.cancel_calls, 1)
+  helpers.assert_eq(transport.cancel_calls[1], 1)
+  helpers.assert_eq(completion.cancelled_count - cancelled_before, 1)
 
   local response = {
     result = {
@@ -416,14 +669,26 @@ with_named_buffer("/project/src/main/java/com/example/mixin/ConcurrentMixin.java
       },
     },
   }
-  pending[1](response, nil)
+  transport.resolve(1, response)
   helpers.assert_nil(first)
-  pending[2](response, nil)
+  transport.resolve(2, response)
   helpers.assert_not_nil(second)
   helpers.assert_eq(#second.items, 1)
   helpers.assert_eq(second.items[1].insertText, "tick")
 
-  protocol_module.completion = original_completion
+  transport.restore()
+end)
+
+with_named_buffer("/project/src/main/java/com/example/mixin/LifecycleNewestFirstMixin.java", "java", {
+  '@Inject(method = "d',
+}, function(bufnr)
+  assert_overlapping_prefix_lifecycle(bufnr, { 3, 2, 1 })
+end)
+
+with_named_buffer("/project/src/main/java/com/example/mixin/LifecycleOldestFirstMixin.java", "java", {
+  '@Inject(method = "d',
+}, function(bufnr)
+  assert_overlapping_prefix_lifecycle(bufnr, { 1, 2, 3 })
 end)
 
 with_named_buffer("/project/src/main/java/com/example/mixin/RapidTypingMixin.java", "java", {
@@ -431,16 +696,39 @@ with_named_buffer("/project/src/main/java/com/example/mixin/RapidTypingMixin.jav
 }, function(bufnr)
   vim.api.nvim_set_current_buf(bufnr)
   local protocol_module = package.loaded["mcdev.protocol"]
-  local original_completion = protocol_module.completion
   local pending = {}
-  protocol_module.completion = function(callback)
+  local original_completion = install_completion_transport_mock(function(callback)
     pending[#pending + 1] = callback
+    return mock_completion_transport()
+  end)
+
+  local destroy_block_item = function(prefix_end)
+    return {
+      label = "destroyBlock(MovementContext): void",
+      insertText = "destroyBlock",
+      kind = "value",
+      sortKey = "0200_destroyBlock",
+      filterText = "destroyBlock",
+      edit = {
+        range = {
+          start = { line = 0, character = #'@WrapOperation(method = "' },
+          ["end"] = { line = 0, character = prefix_end },
+        },
+        newText = "destroyBlock",
+      },
+      metadata = { source = "mixinextras.injectMethod" },
+    }
   end
 
+  local stale_dropped_before = completion.stale_dropped_count
   local stale = nil
+  local queued = nil
   local rapid_blink = blink.source()
   rapid_blink:get_completions({ bufnr = bufnr, cursor = { 1, #'@WrapOperation(method = "destro' } }, function(result)
     stale = result
+    rapid_blink:get_completions({ bufnr = bufnr, cursor = { 1, #'@WrapOperation(method = "destroy' } }, function(result)
+      queued = result
+    end)
   end)
   helpers.assert_eq(#pending, 1)
 
@@ -449,59 +737,441 @@ with_named_buffer("/project/src/main/java/com/example/mixin/RapidTypingMixin.jav
   pending[1]({
     result = {
       items = {
-        {
-          label = "destroyBlock(MovementContext): void",
-          insertText = "destroyBlock",
-          kind = "value",
-          sortKey = "0200_destroyBlock",
-          filterText = "destroyBlock",
-          edit = {
-            range = {
-              start = { line = 0, character = #'@WrapOperation(method = "' },
-              ["end"] = { line = 0, character = #'@WrapOperation(method = "destro' },
-            },
-            newText = "destroyBlock",
-          },
-          metadata = { source = "mixinextras.injectMethod" },
-        },
+        destroy_block_item(#'@WrapOperation(method = "destro'),
       },
     },
   }, nil)
   helpers.assert_not_nil(stale)
-  helpers.assert_eq(#stale.items, 1)
-  helpers.assert_eq(stale.items[1].insertText, "destroyBlock")
-  helpers.assert_eq(stale.items[1].cursor_column, #'@WrapOperation(method = "destroy')
-  helpers.assert_eq(stale.items[1].textEdit.range["end"].character, #'@WrapOperation(method = "destroy')
-  vim.lsp.util.apply_text_edits({ stale.items[1].textEdit }, bufnr, "utf-8")
+  helpers.assert_true(stale.is_incomplete_forward)
+  helpers.assert_true(stale.is_incomplete_backward)
+  helpers.assert_eq(#stale.items, 0)
+  helpers.assert_eq(completion.stale_dropped_count - stale_dropped_before, 1)
+  helpers.assert_eq(#pending, 2)
+  pending[2]({
+    result = {
+      items = {
+        destroy_block_item(#'@WrapOperation(method = "destroy'),
+      },
+    },
+  }, nil)
+  helpers.assert_not_nil(queued)
+  helpers.assert_eq(#queued.items, 1)
+  helpers.assert_eq(queued.items[1].insertText, "destroyBlock")
+  vim.lsp.util.apply_text_edits({ queued.items[1].textEdit }, bufnr, "utf-8")
   helpers.assert_eq(vim.api.nvim_buf_get_lines(bufnr, 0, 1, false)[1], '@WrapOperation(method = "destroyBlock")')
 
-  local fresh = nil
-  vim.api.nvim_buf_set_lines(bufnr, 0, 1, false, { '@WrapOperation(method = "destroy")' })
-  vim.api.nvim_win_set_cursor(0, { 1, #'@WrapOperation(method = "destroy' })
-  rapid_blink:get_completions({ bufnr = bufnr, cursor = { 1, #'@WrapOperation(method = "destroy' } }, function(result)
-    fresh = result
-  end)
-  helpers.assert_eq(#pending, 1)
-  helpers.assert_not_nil(fresh)
-  helpers.assert_eq(#fresh.items, 1)
-  helpers.assert_eq(fresh.items[1].insertText, "destroyBlock")
-  helpers.assert_true(completion.last_local_prefix_cache_hit)
-
-  local extended_cache = nil
+  local extended = nil
   vim.api.nvim_buf_set_lines(bufnr, 0, 1, false, { '@WrapOperation(method = "destroyB")' })
   vim.api.nvim_win_set_cursor(0, { 1, #'@WrapOperation(method = "destroyB' })
   rapid_blink:get_completions({ bufnr = bufnr, cursor = { 1, #'@WrapOperation(method = "destroyB' } }, function(result)
-    extended_cache = result
+    extended = result
   end)
-  helpers.assert_eq(#pending, 1)
-  helpers.assert_not_nil(extended_cache)
-  helpers.assert_eq(#extended_cache.items, 1)
-  helpers.assert_eq(extended_cache.items[1].cursor_column, #'@WrapOperation(method = "destroyB')
+  helpers.assert_eq(#pending, 3)
+  pending[3]({
+    result = {
+      items = {
+        destroy_block_item(#'@WrapOperation(method = "destroyB'),
+      },
+    },
+  }, nil)
+  helpers.assert_not_nil(extended)
+  helpers.assert_eq(#extended.items, 1)
+  helpers.assert_eq(extended.items[1].cursor_column, #'@WrapOperation(method = "destroyB')
   helpers.assert_eq(
-    extended_cache.items[1].textEdit.range["end"].character,
+    extended.items[1].textEdit.range["end"].character,
     #'@WrapOperation(method = "destroyB'
   )
 
+  protocol_module.completion = original_completion
+end)
+
+with_named_buffer("/project/src/main/java/com/example/mixin/QueuedCompletionMixin.java", "java", {
+  '@Inject(method = "d',
+}, function(bufnr)
+  local protocol_module = package.loaded["mcdev.protocol"]
+  local pending = {}
+  local original_completion = install_completion_transport_mock(function(callback)
+    pending[#pending + 1] = callback
+    return mock_completion_transport()
+  end)
+
+  -- A queued Blink request keeps the active operation alive while the buffer changes.
+  local stale = nil
+  completion.complete(function(result)
+    stale = result
+  end, bufnr, { 1, #'@Inject(method = "d' }, { source = "blink-queue" })
+  vim.api.nvim_buf_set_lines(bufnr, 0, 1, false, { '@Inject(method = "dr' })
+  pending[1]({ error = { message = "completion failed after edit" } }, nil)
+  helpers.assert_not_nil(stale)
+  helpers.assert_true(stale.isStale)
+  helpers.assert_nil(stale.isIncomplete)
+  helpers.assert_nil(stale.items)
+
+  local cmp_stale_callback_calls = 0
+  local cmp_stale_result = nil
+  cmp.source():complete({
+    context = { bufnr = bufnr, cursor = { 1, #'@Inject(method = "dr' } },
+  }, function(result)
+    cmp_stale_callback_calls = cmp_stale_callback_calls + 1
+    cmp_stale_result = result
+  end)
+  helpers.assert_eq(#pending, 2)
+  vim.api.nvim_buf_set_lines(bufnr, 0, 1, false, { '@Inject(method = "dra' })
+  pending[2]({ error = { message = "completion failed after edit" } }, nil)
+  helpers.assert_eq(cmp_stale_callback_calls, 1)
+  helpers.assert_not_nil(cmp_stale_result)
+  helpers.assert_true(cmp_stale_result.isIncomplete)
+  helpers.assert_eq(#cmp_stale_result.items, 0)
+
+  -- cmp can issue a fresh request after the stale result settled.
+  local cmp_fresh = nil
+  cmp.source():complete({
+    context = { bufnr = bufnr, cursor = { 1, #'@Inject(method = "dra' } },
+  }, function(result)
+    cmp_fresh = result
+  end)
+  helpers.assert_eq(#pending, 3)
+  pending[3](draw_completion_response(), nil)
+  helpers.assert_not_nil(cmp_fresh)
+  helpers.assert_eq(#cmp_fresh.items, 1)
+
+  -- The underlying request lifecycle also recovers for the next Blink request.
+  local fresh = nil
+  completion.complete(function(result)
+    fresh = result
+  end, bufnr, { 1, #'@Inject(method = "dra' }, { source = "blink-queue" })
+  helpers.assert_eq(#pending, 4)
+  pending[4](draw_completion_response(), nil)
+  helpers.assert_not_nil(fresh)
+  helpers.assert_eq(#fresh.items, 1)
+
+  -- Explicitly cancel the currently active request; its late response is silent.
+  local cancelled = nil
+  local cancel = completion.complete(function(result)
+    cancelled = result
+  end, bufnr, { 1, #'@Inject(method = "dr' }, { source = "blink-queue" })
+  helpers.assert_eq(#pending, 5)
+  cancel()
+  pending[5]({ result = { items = {} } }, nil)
+  helpers.assert_nil(cancelled)
+
+  protocol_module.completion = original_completion
+end)
+
+with_named_buffer("/project/src/main/java/com/example/mixin/ProvisionalCompletionMixin.java", "java", {
+  '@Inject(method = "d',
+}, function(bufnr)
+  local protocol_module = package.loaded["mcdev.protocol"]
+  local jdt_callbacks = {}
+  local helper_callbacks = {}
+  local original_completion = install_completion_transport_mock(function(callback)
+    jdt_callbacks[#jdt_callbacks + 1] = callback
+    return function() end
+  end)
+  local original_stdio = install_stdio_transport_mock(function(payload, callback)
+    helpers.assert_not_nil(payload.context)
+    helpers.assert_not_nil(payload.context.bufferTextFallback)
+    helper_callbacks[#helper_callbacks + 1] = callback
+    return function() end
+  end)
+
+  local jdt_response = draw_completion_response()
+  jdt_response.result.items[1].detail = "JDT rich metadata"
+  jdt_response.result.items[1].metadata = { source = "jdt.mixin.injectMethod", richer = true }
+  jdt_response.result.items[#jdt_response.result.items + 1] = {
+    label = "tick(MovementContext): void",
+    insertText = "tick",
+    kind = "value",
+    sortKey = "0200_tick",
+    detail = "SimpleTarget",
+    metadata = { source = "mixin.injectMethod" },
+  }
+
+  local blink_results = {}
+  blink.source():get_completions({
+    bufnr = bufnr,
+    cursor = { 1, #'@Inject(method = "d' },
+  }, function(result)
+    blink_results[#blink_results + 1] = result
+  end)
+  helpers.assert_eq(#helper_callbacks, 1)
+  helpers.assert_eq(#jdt_callbacks, 1)
+  helpers.assert_eq(#blink_results, 0)
+
+  helper_callbacks[1](draw_completion_response(), nil)
+  helpers.assert_eq(#blink_results, 1)
+  helpers.assert_true(blink_results[1].is_incomplete_forward)
+  helpers.assert_eq(#blink_results[1].items, 1)
+  helpers.assert_eq(blink_results[1].items[1].insertText, "draw")
+
+  jdt_callbacks[1](jdt_response, nil)
+  helpers.assert_eq(#blink_results, 2)
+  helpers.assert_eq(blink_results[2].is_incomplete_forward, false)
+  helpers.assert_eq(#blink_results[2].items, 1)
+  helpers.assert_eq(blink_results[2].items[1].insertText, "tick")
+
+  local cmp_results = {}
+  cmp.source():complete({
+    context = { bufnr = bufnr, cursor = { 1, #'@Inject(method = "d' } },
+  }, function(result)
+    cmp_results[#cmp_results + 1] = result
+  end)
+  helpers.assert_eq(#helper_callbacks, 2)
+  helpers.assert_eq(#jdt_callbacks, 2)
+  helper_callbacks[2](draw_completion_response(), nil)
+  helpers.assert_eq(#cmp_results, 1)
+  helpers.assert_eq(#cmp_results[1].items, 1)
+  jdt_callbacks[2](jdt_response, nil)
+  helpers.assert_eq(#cmp_results, 2)
+  helpers.assert_eq(#cmp_results[2].items, 2)
+  helpers.assert_eq(cmp_results[2].items[1].insertText, "draw")
+  helpers.assert_eq(cmp_results[2].items[1].detail, "JDT rich metadata")
+  helpers.assert_true(cmp_results[2].items[1].data.richer)
+  helpers.assert_eq(cmp_results[2].items[2].insertText, "tick")
+
+  local manual_results = {}
+  completion.complete(function(result)
+    manual_results[#manual_results + 1] = result
+  end, bufnr, { 1, #'@Inject(method = "d' }, { source = "manual" })
+  helpers.assert_eq(#helper_callbacks, 3)
+  helpers.assert_eq(#jdt_callbacks, 3)
+  helper_callbacks[3](draw_completion_response(), nil)
+  helpers.assert_eq(#manual_results, 0)
+  jdt_callbacks[3](jdt_response, nil)
+  helpers.assert_eq(#manual_results, 1)
+  helpers.assert_eq(#manual_results[1].items, 2)
+
+  stdio.request = original_stdio
+  protocol_module.completion = original_completion
+end)
+
+with_named_buffer("/project/src/main/java/com/example/mixin/TransportFallbackMixin.java", "java", {
+  '@Inject(method = "d',
+}, function(bufnr)
+  local protocol_module = package.loaded["mcdev.protocol"]
+  local original_completion = install_completion_transport_mock(function(callback)
+    callback(draw_completion_response(), nil)
+    return function() end
+  end)
+  local original_stdio = install_stdio_transport_mock(function(_, callback)
+    callback({ result = { items = {} } }, nil)
+    return function() end
+  end)
+  local original_transport_request = completion_transport.request
+  local transport_calls = 0
+  completion_transport.request = function(_, callback)
+    transport_calls = transport_calls + 1
+    callback({ error = { code = "INCOMPLETE_PROJECT_CONTEXT", message = "JDT project is not ready" } }, nil)
+    return function() end
+  end
+
+  local result = nil
+  completion.complete(function(value)
+    result = value
+  end, bufnr, { 1, #'@Inject(method = "d' }, { source = "transport-fallback" })
+  helpers.assert_eq(transport_calls, 1)
+  helpers.assert_not_nil(result)
+  helpers.assert_eq(#result.items, 1)
+  helpers.assert_eq(result.items[1].insertText, "draw")
+
+  completion_transport.request = original_transport_request
+  stdio.request = original_stdio
+  protocol_module.completion = original_completion
+end)
+
+for _, unavailable_state in ipairs({ "endpoint", "classpath" }) do
+with_named_buffer("/project/src/main/java/com/example/mixin/TransportReadyMixin.java", "java", {
+  '@Inject(method = "d',
+}, function(bufnr)
+  local jdt_callback, ready_callback
+  local jdt_cancelled = false
+  local original_completion = install_completion_transport_mock(function(callback)
+    jdt_callback = callback
+    return function() jdt_cancelled = true end
+  end)
+  local original_stdio = install_stdio_transport_mock(function() return function() end end)
+  local original_request, original_ready = completion_transport.request, completion_transport.when_ready
+  completion_transport.request = function(_, callback)
+    if unavailable_state == "endpoint" then return nil, "unavailable" end
+    callback({ error = { code = "INCOMPLETE_PROJECT_CONTEXT", message = "dependencies not ready" } }, nil)
+    return function() end
+  end
+  completion_transport.when_ready = function(_, callback)
+    ready_callback = callback
+    return function() end
+  end
+  local results = {}
+  completion.complete(function(result) results[#results + 1] = result end, bufnr, { 1, #'@Inject(method = "d' })
+  helpers.assert_not_nil(jdt_callback, "unavailable endpoint must retain normal fallback")
+  helpers.assert_eq(#results, 0)
+  completion_transport.request = function(_, callback)
+    callback(draw_completion_response(), nil)
+    return function() end
+  end
+  ready_callback()
+  helpers.assert_eq(#results, 1, "ready endpoint must finish without waiting for JDT index gate")
+  helpers.assert_true(jdt_cancelled)
+  jdt_callback(draw_completion_response(), nil)
+  helpers.assert_eq(#results, 1, "cancelled fallback must not publish again")
+  completion_transport.request, completion_transport.when_ready = original_request, original_ready
+  stdio.request = original_stdio
+  protocol.completion = original_completion
+end)
+end
+
+with_named_buffer("/project/src/main/java/com/example/mixin/ProvisionalFailureMixin.java", "java", {
+  '@Inject(method = "d',
+}, function(bufnr)
+  local protocol_module = package.loaded["mcdev.protocol"]
+  local jdt_callback = nil
+  local original_completion = install_completion_transport_mock(function(callback)
+    jdt_callback = callback
+    return function() end
+  end)
+  local original_stdio = install_stdio_transport_mock(function()
+    return nil, "mcdev: helper unavailable"
+  end)
+
+  local results = {}
+  blink.source():get_completions({
+    bufnr = bufnr,
+    cursor = { 1, #'@Inject(method = "d' },
+  }, function(result)
+    results[#results + 1] = result
+  end)
+  helpers.assert_eq(#results, 0)
+  jdt_callback({ error = { message = "jdt failed" } }, nil)
+  helpers.assert_eq(#results, 1)
+  helpers.assert_true(results[1].is_incomplete_forward)
+  helpers.assert_eq(#results[1].items, 0)
+
+  stdio.request = original_stdio
+  protocol_module.completion = original_completion
+end)
+
+with_named_buffer("/project/src/main/java/com/example/mixin/ProvisionalJdtFailureMixin.java", "java", {
+  '@Inject(method = "d',
+}, function(bufnr)
+  local protocol_module = package.loaded["mcdev.protocol"]
+  local helper_callback = nil
+  local jdt_callback = nil
+  local original_completion = install_completion_transport_mock(function(callback)
+    jdt_callback = callback
+    return function() end
+  end)
+  local original_stdio = install_stdio_transport_mock(function(_, callback)
+    helper_callback = callback
+    return function() end
+  end)
+
+  local results = {}
+  blink.source():get_completions({
+    bufnr = bufnr,
+    cursor = { 1, #'@Inject(method = "d' },
+  }, function(result)
+    results[#results + 1] = result
+  end)
+  helper_callback(draw_completion_response(), nil)
+  helpers.assert_eq(#results, 1)
+  jdt_callback({ error = { message = "jdt failed after provisional" } }, nil)
+  helpers.assert_eq(#results, 2)
+  helpers.assert_true(results[2].is_incomplete_forward)
+  helpers.assert_eq(#results[2].items, 0)
+  helpers.assert_eq(#results[1].items, 1)
+
+  stdio.request = original_stdio
+  protocol_module.completion = original_completion
+end)
+
+with_named_buffer("/project/src/main/java/com/example/mixin/JdtFailureBeforeHelperMixin.java", "java", {
+  '@Inject(method = "d',
+}, function(bufnr)
+  local protocol_module = package.loaded["mcdev.protocol"]
+  local helper_callback = nil
+  local jdt_callback = nil
+  local original_completion = install_completion_transport_mock(function(callback)
+    jdt_callback = callback
+    return function() end
+  end)
+  local original_stdio = install_stdio_transport_mock(function(_, callback)
+    helper_callback = callback
+    return function() end
+  end)
+
+  local results = {}
+  blink.source():get_completions({
+    bufnr = bufnr,
+    cursor = { 1, #'@Inject(method = "d' },
+  }, function(result)
+    results[#results + 1] = result
+  end)
+  jdt_callback({ error = { message = "jdt failed before helper" } }, nil)
+  helpers.assert_eq(#results, 0)
+  helper_callback(draw_completion_response(), nil)
+  helpers.assert_eq(#results, 2)
+  helpers.assert_eq(#results[1].items, 1)
+  helpers.assert_eq(results[1].items[1].insertText, "draw")
+  helpers.assert_eq(#results[2].items, 0)
+
+  stdio.request = original_stdio
+  protocol_module.completion = original_completion
+end)
+
+with_named_buffer("/project/src/main/java/com/example/mixin/MalformedHelperMixin.java", "java", {
+  '@Inject(method = "d',
+}, function(bufnr)
+  local protocol_module = package.loaded["mcdev.protocol"]
+  local jdt_callback = nil
+  local original_completion = install_completion_transport_mock(function(callback)
+    jdt_callback = callback
+    return function() end
+  end)
+  local original_stdio = install_stdio_transport_mock(function(_, callback)
+    callback({ result = { items = "malformed" } }, nil)
+    return function() end
+  end)
+
+  local result = nil
+  completion.complete(function(value)
+    result = value
+  end, bufnr, { 1, #'@Inject(method = "d' }, { source = "malformed-helper" })
+  helpers.assert_not_nil(jdt_callback)
+  jdt_callback(draw_completion_response(), nil)
+  helpers.assert_not_nil(result)
+  helpers.assert_eq(#result.items, 1)
+  helpers.assert_eq(result.items[1].insertText, "draw")
+
+  stdio.request = original_stdio
+  protocol_module.completion = original_completion
+end)
+
+with_named_buffer("/project/src/main/java/com/example/mixin/ReentrantCompletionMixin.java", "java", {
+  '@Inject(method = "d',
+}, function(bufnr)
+  local protocol_module = package.loaded["mcdev.protocol"]
+  local jdt_requests = 0
+  local original_completion = install_completion_transport_mock(function()
+    jdt_requests = jdt_requests + 1
+    return function() end
+  end)
+  local original_stdio = install_stdio_transport_mock(function(_, callback)
+    callback(draw_completion_response(), nil)
+    return function() end
+  end)
+
+  local nested = true
+  completion.complete(function()
+    if nested then
+      nested = false
+      local cancel = completion.complete(function() end, bufnr, { 1, #'@Inject(method = "d' }, {
+        source = "reentrant-inner",
+      })
+      cancel()
+    end
+  end, bufnr, { 1, #'@Inject(method = "d' }, { source = "reentrant-outer", stream = true })
+  helpers.assert_eq(jdt_requests, 1)
+
+  stdio.request = original_stdio
   protocol_module.completion = original_completion
 end)
 
@@ -512,15 +1182,16 @@ with_named_buffer("/project/src/main/java/com/example/mixin/ChangedTargetMixin.j
   vim.api.nvim_set_current_buf(bufnr)
   vim.api.nvim_win_set_cursor(0, { 2, #'@WrapOperation(method = "destro' })
   local protocol_module = package.loaded["mcdev.protocol"]
-  local original_completion = protocol_module.completion
   local pending = nil
-  protocol_module.completion = function(callback)
+  local original_completion = install_completion_transport_mock(function(callback)
     pending = callback
-  end
+    return mock_completion_transport()
+  end)
 
-  local stale = nil
-  blink.source():get_completions({ bufnr = bufnr, cursor = { 2, #'@WrapOperation(method = "destro' } }, function(result)
-    stale = result
+  local stale_dropped_before = completion.stale_dropped_count
+  local stale_callback_calls = 0
+  blink.source():get_completions({ bufnr = bufnr, cursor = { 2, #'@WrapOperation(method = "destro' } }, function()
+    stale_callback_calls = stale_callback_calls + 1
   end)
   helpers.assert_not_nil(pending)
 
@@ -542,9 +1213,8 @@ with_named_buffer("/project/src/main/java/com/example/mixin/ChangedTargetMixin.j
       },
     },
   }, nil)
-  helpers.assert_not_nil(stale)
-  helpers.assert_eq(#stale.items, 0)
-  helpers.assert_true(stale.is_incomplete_forward)
+  helpers.assert_eq(stale_callback_calls, 1)
+  helpers.assert_eq(completion.stale_dropped_count - stale_dropped_before, 1)
 
   protocol_module.completion = original_completion
 end)
@@ -611,20 +1281,108 @@ with_named_buffer("/project/src/main/java/com/example/PlainService.java", "java"
 }, function(bufnr)
   helpers.assert_true(buffer.is_mcdev_buffer(bufnr))
   helpers.assert_eq(buffer.is_mcdev_completion_context(bufnr), false)
-  -- Keep the source available while a Mixin annotation/import is still being typed.
-  helpers.assert_eq(blink_adapter:enabled({ bufnr = bufnr }), true)
+  helpers.assert_eq(blink_adapter:enabled({ bufnr = bufnr }), false)
+
+  local plain_java_requests = 0
+  local original_complete = completion_module.complete
+  completion_module.complete = function(callback)
+    plain_java_requests = plain_java_requests + 1
+    callback({ items = {} })
+  end
+  local plain_java_result = nil
+  blink_adapter:get_completions({ bufnr = bufnr, cursor = { 1, 1 } }, function(result)
+    plain_java_result = result
+  end)
+  helpers.assert_eq(plain_java_requests, 0)
+  helpers.assert_not_nil(plain_java_result)
+  helpers.assert_eq(#plain_java_result.items, 0)
+  completion_module.complete = original_complete
 end)
 
 with_named_buffer("/project/src/main/resources/data.json", "json", {
   '{"name":"plain"}',
 }, function(bufnr)
   helpers.assert_eq(buffer.is_mcdev_completion_context(bufnr), false)
+  helpers.assert_eq(blink_adapter:enabled({ bufnr = bufnr }), false)
+
+  local plain_json_requests = 0
+  local original_complete = completion_module.complete
+  completion_module.complete = function(callback)
+    plain_json_requests = plain_json_requests + 1
+    callback({ items = {} })
+  end
+  local plain_json_result = nil
+  blink_adapter:get_completions({ bufnr = bufnr, cursor = { 1, 2 } }, function(result)
+    plain_json_result = result
+  end)
+  helpers.assert_eq(plain_json_requests, 0)
+  helpers.assert_not_nil(plain_json_result)
+  helpers.assert_eq(#plain_json_result.items, 0)
+  completion_module.complete = original_complete
+end)
+
+with_named_buffer("/project/src/main/java/com/example/mixin/InjectStringMixin.java", "java", {
+  '@Inject(method = "dr',
+}, function(bufnr)
+  helpers.assert_true(buffer.is_mcdev_completion_context(bufnr))
+  helpers.assert_eq(blink_adapter:enabled({ bufnr = bufnr }), true)
+
+  local mixin_string_requests = 0
+  local original_complete = completion_module.complete
+  completion_module.complete = function(callback)
+    mixin_string_requests = mixin_string_requests + 1
+    callback({ items = {} })
+  end
+  blink_adapter:get_completions({ bufnr = bufnr, cursor = { 1, #'@Inject(method = "dr' } }, function() end)
+  helpers.assert_eq(mixin_string_requests, 1)
+  completion_module.complete = original_complete
+end)
+
+with_named_buffer("/project/src/main/java/com/example/mixin/BlinkCancelMixin.java", "java", {
+  '@Inject(method = "dr',
+}, function(bufnr)
+  local cancel_calls = 0
+  local menu_callback_calls = 0
+  local original_complete = completion_module.complete
+  completion_module.complete = function(_, _, _, opts)
+    helpers.assert_eq(opts and opts.source, "blink")
+    local cancelled = false
+    return function()
+      if cancelled then
+        return
+      end
+      cancelled = true
+      cancel_calls = cancel_calls + 1
+    end
+  end
+
+  local cancel = blink_adapter:get_completions({ bufnr = bufnr, cursor = { 1, #'@Inject(method = "dr' } }, function()
+    menu_callback_calls = menu_callback_calls + 1
+  end)
+  helpers.assert_eq(type(cancel), "function")
+  helpers.assert_eq(menu_callback_calls, 0)
+  cancel()
+  cancel()
+  helpers.assert_eq(cancel_calls, 1)
+
+  completion_module.complete = original_complete
 end)
 
 with_named_buffer("/project/src/main/resources/example.mixins.json", "json", {
   '{"package":"com.example.mixin","mixins":[]}',
 }, function(bufnr)
   helpers.assert_true(buffer.is_mcdev_completion_context(bufnr))
+  helpers.assert_eq(blink_adapter:enabled({ bufnr = bufnr }), true)
+
+  local mixin_json_requests = 0
+  local original_complete = completion_module.complete
+  completion_module.complete = function(callback)
+    mixin_json_requests = mixin_json_requests + 1
+    callback({ items = {} })
+  end
+  blink_adapter:get_completions({ bufnr = bufnr, cursor = { 1, 12 } }, function() end)
+  helpers.assert_eq(mixin_json_requests, 1)
+  completion_module.complete = original_complete
 end)
 
 with_named_buffer("/project/src/main/resources/mod.aw", "plaintext", {
@@ -669,10 +1427,11 @@ with_named_buffer("/project/src/main/resources/mod.accesswidener", "accesswidene
   local fallback_client = {
     name = "jdtls",
     config = { root_dir = "/project" },
-    request = function(method, params, callback, request_bufnr)
+    request = function(self, method, params, handler, request_bufnr)
       requested_command = params.command
       requested_bufnr = request_bufnr
-      callback(nil, { result = { items = {} } })
+      handler(nil, { result = { items = {} } })
+      return true, 1
     end,
   }
   vim.lsp.get_clients = function(opts)
@@ -774,6 +1533,48 @@ with_named_buffer("/project/src/main/java/com/example/mixin/QueuedDiagnosticsMix
   helpers.assert_eq(#published, 1)
   helpers.assert_eq(published[1].code, "LATEST")
   protocol_module.diagnostics = original_diagnostics
+end)
+
+with_named_buffer("/project/src/main/java/com/example/mixin/FailedDiagnosticsMixin.java", "java", {
+  "@Mixin(SimpleTarget.class)",
+}, function(bufnr)
+  local original_get_clients = vim.lsp.get_clients
+  local original_notify = vim.notify
+  local request_count = 0
+  local errors = {}
+  local fake_client = {
+    name = "jdtls",
+    config = { root_dir = "/project" },
+    request = function()
+      request_count = request_count + 1
+      return false, nil
+    end,
+  }
+  vim.lsp.get_clients = function()
+    return { fake_client }
+  end
+  vim.notify = function() end
+
+  diagnostics.refresh(bufnr, {
+    manual = true,
+    callback = function(_, err)
+      errors[#errors + 1] = err
+    end,
+  })
+  helpers.assert_eq(request_count, 1)
+  helpers.assert_eq(#errors, 1)
+
+  diagnostics.refresh(bufnr, {
+    manual = true,
+    callback = function(_, err)
+      errors[#errors + 1] = err
+    end,
+  })
+  helpers.assert_eq(request_count, 2)
+  helpers.assert_eq(#errors, 2)
+
+  vim.lsp.get_clients = original_get_clients
+  vim.notify = original_notify
 end)
 
 with_named_buffer("/project/META-INF/accesstransformer.cfg", "plaintext", {
@@ -1011,11 +1812,11 @@ do
     id = 99,
     name = "jdtls",
     config = { root_dir = vim.fn.getcwd() },
-    request = function(method, params, callback)
+    request = function(self, method, params, handler, request_bufnr)
       helpers.assert_eq(method, "workspace/executeCommand")
       commands_seen[params.command] = true
       if params.command == "mcdev.info" then
-        callback(nil, {
+        handler(nil, {
           result = {
             lines = { "Extension loaded: true" },
             buildCommit = "test-commit",
@@ -1025,7 +1826,7 @@ do
           },
         })
       elseif params.command == "mcdev.completion" then
-        callback(nil, {
+        handler(nil, {
           result = {
             items = {
               { label = "tick(): void" },
@@ -1048,8 +1849,9 @@ do
           },
         })
       else
-        callback(nil, { result = {} })
+        handler(nil, { result = {} })
       end
+      return true, 1
     end,
   }
   vim.lsp.get_clients = function(opts)
@@ -1126,5 +1928,71 @@ do
   code_action.code_actions = original_mcdev_code_actions
 end
 
+do
+  local jar = vim.fn.tempname()
+  vim.fn.writefile({}, jar)
+  local original_jobstart = vim.fn.jobstart
+  local original_jobstop = vim.fn.jobstop
+  local original_chansend = vim.fn.chansend
+  local original_timeout = stdio.timeout_ms
+  local jobs = {}
+  local next_job = 0
+
+  vim.fn.jobstart = function(_, opts)
+    next_job = next_job + 1
+    jobs[next_job] = { opts = opts }
+    return next_job
+  end
+  vim.fn.jobstop = function() end
+  vim.fn.chansend = function(job, encoded)
+    jobs[job].request = vim.json.decode(encoded)
+    return #encoded
+  end
+  stdio.timeout_ms = 1
+  stdio.stop("mcdev: test reset")
+
+  local first_error = nil
+  stdio.request({}, function(_, err)
+    first_error = err
+  end, { extension_jar = jar, java = "java" })
+  vim.wait(100, function()
+    return first_error ~= nil
+  end, 10)
+  helpers.assert_eq(first_error, "mcdev: stdio helper timed out")
+  helpers.assert_eq(next_job, 1)
+
+  local second_result = nil
+  local second_error = nil
+  stdio.request({}, function(result, err)
+    second_result = result
+    second_error = err
+  end, { extension_jar = jar, java = "java" })
+  helpers.assert_eq(next_job, 2)
+  local request = jobs[2].request
+  jobs[2].opts.on_stdout(2, {
+    vim.json.encode({
+      id = request.id,
+      handled = true,
+      response = { result = { items = {} } },
+    }),
+    "",
+  })
+  helpers.assert_not_nil(second_result)
+  helpers.assert_nil(second_error)
+
+  stdio.stop("mcdev: test cleanup")
+  stdio.timeout_ms = original_timeout
+  vim.fn.jobstart = original_jobstart
+  vim.fn.jobstop = original_jobstop
+  vim.fn.chansend = original_chansend
+  vim.fn.delete(jar)
+end
+
+dofile(vim.fn.getcwd() .. "/mcdev-nvim/tests/protocol_positions.lua")
+dofile(vim.fn.getcwd() .. "/mcdev-nvim/tests/diagnostic_positions.lua")
+dofile(vim.fn.getcwd() .. "/mcdev-nvim/tests/jdtls_workspace.lua")
+dofile(vim.fn.getcwd() .. "/mcdev-nvim/tests/blink_positions.lua")
+dofile(vim.fn.getcwd() .. "/mcdev-nvim/tests/cmp_positions.lua")
+dofile(vim.fn.getcwd() .. "/mcdev-nvim/tests/transport.lua")
 print("mcdev-nvim adapter tests passed")
 vim.cmd("qa!")

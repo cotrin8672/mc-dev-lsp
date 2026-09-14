@@ -20,9 +20,12 @@ internal object ProjectPathFilters {
         listOf("tmp"),
     )
 
+    fun isExcludedDirectorySegment(name: String): Boolean =
+        name.lowercase() in EXCLUDED_DIRECTORY_NAMES
+
     fun isUnderExcludedDirectory(path: Path): Boolean {
         for (index in 0 until path.nameCount) {
-            if (path.getName(index).toString().lowercase() in EXCLUDED_DIRECTORY_NAMES) {
+            if (isExcludedDirectorySegment(path.getName(index).toString())) {
                 return true
             }
         }
@@ -47,6 +50,47 @@ internal object ProjectPathFilters {
             }
         }
         return false
+    }
+
+    fun shouldPruneMappingDiscoveryDirectory(relativePath: Path): Boolean {
+        val path = relativePath.normalize()
+        for (index in 0 until path.nameCount) {
+            when (path.getName(index).toString().lowercase()) {
+                "node_modules" -> return true
+                ".gradle" -> {
+                    if (!isViableMappingDiscoverySuffix(path, index + 1, GRADLE_MAPPING_WHITELIST_PREFIXES)) {
+                        return true
+                    }
+                }
+                "build" -> {
+                    if (!isViableMappingDiscoverySuffix(path, index + 1, BUILD_MAPPING_WHITELIST_PREFIXES)) {
+                        return true
+                    }
+                }
+            }
+        }
+        return false
+    }
+
+    private fun isViableMappingDiscoverySuffix(path: Path, startIndex: Int, prefixes: List<List<String>>): Boolean {
+        if (startIndex >= path.nameCount) {
+            return true
+        }
+        return prefixes.any { prefix -> sharesWhitelistPrefix(path, startIndex, prefix) }
+    }
+
+    private fun sharesWhitelistPrefix(path: Path, startIndex: Int, prefix: List<String>): Boolean {
+        val remainingSegments = path.nameCount - startIndex
+        val compareLength = minOf(remainingSegments, prefix.size)
+        if (compareLength == 0) {
+            return false
+        }
+        for (index in 0 until compareLength) {
+            if (path.getName(startIndex + index).toString().lowercase() != prefix[index].lowercase()) {
+                return false
+            }
+        }
+        return true
     }
 
     private fun isUnderWhitelistedPrefix(path: Path, startIndex: Int, prefixes: List<List<String>>): Boolean =

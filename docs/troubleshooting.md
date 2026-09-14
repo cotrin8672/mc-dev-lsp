@@ -142,6 +142,10 @@ Protocol: 1
 
 The Neovim plugin and extension jar are incompatible versions. Rebuild the extension jar and update `mcdev-nvim` from the same repository revision.
 
+### Gradle 9 annotation-processor import fails with an exclusive-lock error
+
+JDT LS 1.60 can fail to import annotation-processor settings with `Resolution of the configuration ... was attempted without an exclusive lock` ([upstream issue](https://github.com/eclipse-jdtls/eclipse.jdt.ls/issues/3807)). For this specific error, set `org.gradle.parallel=false` in the affected project's `gradle.properties` and reimport the project. This also disables parallel Gradle task execution. Setting only `org.gradle.tooling.parallel=false` did not resolve the error in our Sodium/Gradle 9.4.1 verification. Keep annotation processing enabled so generated sources and processor configuration remain available.
+
 ## Diagnostics
 
 ### How diagnostics work
@@ -204,7 +208,7 @@ See [Implementation Status](10-implementation-status.md) for the current matrix.
 1. Run the OSGi E2E script to isolate bundle vs editor issues:
 
    ```powershell
-   powershell -NoProfile -ExecutionPolicy Bypass -File scripts/run-osgi-e2e.ps1
+   powershell -NoProfile -ExecutionPolicy Bypass -File scripts/run-osgi-e2e-compact.ps1 -TimeoutSeconds 300
    ```
 
 2. Read [Local OSGi Bundle E2E](local-osgi-e2e.md) for manual reproduction steps.

@@ -1,6 +1,6 @@
 # Implementation Status
 
-This file records what exists in the repository after the full product completion pass.
+This is a historical inventory of implemented components, not a current acceptance report. See [MixinExtras verification](mixinextras-verification.md) for current test evidence and unresolved UX requirements. The approximate counts and completion claims below predate that audit.
 
 ## Implemented
 

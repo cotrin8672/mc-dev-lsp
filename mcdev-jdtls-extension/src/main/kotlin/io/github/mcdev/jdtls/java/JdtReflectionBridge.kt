@@ -109,31 +109,10 @@ class JdtReflectionBridge private constructor() {
             MemberKind.METHOD -> {
                 val name = target.name ?: return null
                 val methods = iType.javaClass.getMethod("getMethods").invoke(iType) as? Array<*> ?: return null
-                selectMethod(methods, name, target.descriptor)
+                selectMethod(methods, name, target.descriptor, signatureClass)
             }
             else -> null
         }
-    }
-
-    private fun selectMethod(methods: Array<*>, name: String, descriptor: String?): Any? {
-        val matches = methods.filter { method ->
-            val elementName = method?.javaClass?.getMethod("getElementName")?.invoke(method) as? String
-            elementName == name
-        }
-        if (matches.isEmpty()) return null
-        val signature = signatureClass
-        if (descriptor.isNullOrBlank() || signature == null) {
-            return matches.singleOrNull() ?: matches.first()
-        }
-        val expectedParams = runCatching {
-            signature.getMethod("getParameterTypes", String::class.java)
-                .invoke(null, descriptor) as? Array<*>
-        }.getOrNull()
-        if (expectedParams == null) return matches.first()
-        return matches.firstOrNull { method ->
-            val actualParams = method?.javaClass?.getMethod("getParameterTypes")?.invoke(method) as? Array<*>
-            actualParams != null && actualParams.contentDeepEquals(expectedParams)
-        } ?: matches.first()
     }
 
     private fun toResolvedLocation(element: Any, target: McDefinitionTarget): JdtResolvedLocation? {
@@ -289,6 +268,33 @@ class JdtReflectionBridge private constructor() {
 
     companion object {
         private val ECLIPSE_PROJECT_NAME_PATTERN = Regex("""<name>\s*([^<]+?)\s*</name>""")
+
+        internal fun selectMethod(
+            methods: Array<*>,
+            name: String,
+            descriptor: String?,
+            signatureClass: Class<*>?,
+        ): Any? {
+            val matches = methods.filter { method ->
+                val elementName = method?.javaClass?.getMethod("getElementName")?.invoke(method) as? String
+                elementName == name
+            }
+            if (matches.isEmpty()) return null
+            if (descriptor.isNullOrBlank()) {
+                return matches.singleOrNull() ?: matches.first()
+            }
+            val signature = signatureClass ?: return null
+            val expectedParams = runCatching {
+                signature.getMethod("getParameterTypes", String::class.java)
+                    .invoke(null, descriptor) as? Array<*>
+            }.getOrNull() ?: return null
+            return matches.firstOrNull { method ->
+                val actualParams = runCatching {
+                    method?.javaClass?.getMethod("getParameterTypes")?.invoke(method) as? Array<*>
+                }.getOrNull()
+                actualParams != null && actualParams.contentDeepEquals(expectedParams)
+            }
+        }
 
         val instance: JdtReflectionBridge? by lazy {
             runCatching { JdtReflectionBridge() }.getOrNull()?.takeIf { it.isAvailable() }

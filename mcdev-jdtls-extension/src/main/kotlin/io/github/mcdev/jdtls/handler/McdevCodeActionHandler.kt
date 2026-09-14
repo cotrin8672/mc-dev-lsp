@@ -2,6 +2,7 @@ package io.github.mcdev.jdtls.handler
 
 import io.github.mcdev.core.at.AccessTransformerCodeActionService
 import io.github.mcdev.core.aw.AccessWidenerCodeActionService
+import io.github.mcdev.core.mixinextras.MixinExtrasCodeActionService
 import io.github.mcdev.jdtls.awat.AwAtServiceFacade
 import io.github.mcdev.jdtls.convert.CodeActionConverter
 import io.github.mcdev.jdtls.mixin.MixinServiceFacade
@@ -41,6 +42,7 @@ class McdevCodeActionHandler(
         val mixinConfigContent = mixinFacade.selectedMixinConfigContent(
             projectContext = session.context,
             source = request.context.bufferText,
+            documentUri = request.context.documentUri,
         )
         val awAtFileType = awAtFacade.detectFileType(request.context.languageId, request.context.documentUri)
         val filteredFixes = if (awAtFileType != null) {
@@ -53,7 +55,7 @@ class McdevCodeActionHandler(
                     diagnosticCode = null,
                 )
             } else {
-                request.diagnosticCodes.flatMap { code ->
+                MixinExtrasCodeActionService.deduplicateFixes(request.diagnosticCodes.flatMap { code ->
                     awAtFacade.codeActions(
                         session = session,
                         source = request.context.bufferText,
@@ -61,7 +63,7 @@ class McdevCodeActionHandler(
                         fileType = awAtFileType,
                         diagnosticCode = code,
                     )
-                }.distinctBy { "${it.kind}:${it.title}" }
+                })
             }
         } else if (request.diagnosticCodes.isEmpty()) {
             mixinFacade.codeActions(
@@ -69,18 +71,22 @@ class McdevCodeActionHandler(
                 projectContext = session.context,
                 source = request.context.bufferText,
                 documentUri = request.context.documentUri,
+                line = request.range.start.line,
+                character = request.range.start.character,
                 diagnosticCode = null,
             )
         } else {
-            request.diagnosticCodes.flatMap { code ->
+            MixinExtrasCodeActionService.deduplicateFixes(request.diagnosticCodes.flatMap { code ->
                 mixinFacade.codeActions(
                     session = session,
                     projectContext = session.context,
                     source = request.context.bufferText,
                     documentUri = request.context.documentUri,
+                    line = request.range.start.line,
+                    character = request.range.start.character,
                     diagnosticCode = code,
                 )
-            }.distinctBy { "${it.kind}:${it.title}" }
+            })
         }
 
         return McdevResponseEnvelope(

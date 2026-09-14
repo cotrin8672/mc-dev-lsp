@@ -113,6 +113,7 @@ object SemanticCompletionContextExtractor {
                 mixinTargetInternalNames = targets,
                 injectMethodName = context.injector.methodSelectors.firstOrNull()?.value,
                 atValue = context.partialValue.trim('"'),
+                parentInjectorAnnotation = context.injector.annotation,
             )
             is MixinCompletionContext.AtTarget -> AnnotationContext(
                 annotation = MixinAnnotation.AT,
@@ -126,6 +127,7 @@ object SemanticCompletionContextExtractor {
                 injectMethodName = context.methodName?.let { name -> name + (context.methodDescriptor ?: "") }
                     ?: context.injector.methodSelectors.firstOrNull()?.value,
                 atValue = context.atSelector.value,
+                parentInjectorAnnotation = context.injector.annotation,
             )
             is MixinCompletionContext.AccessorValue -> AnnotationContext(
                 annotation = MixinAnnotation.ACCESSOR,

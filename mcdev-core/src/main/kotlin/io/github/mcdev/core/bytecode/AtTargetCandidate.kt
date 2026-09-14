@@ -1,5 +1,12 @@
 package io.github.mcdev.core.bytecode
 
+enum class OccurrenceResultClassification {
+    VOID,
+    IMMEDIATELY_POPPED,
+    RETAINED,
+    NOT_APPLICABLE,
+}
+
 enum class AtTargetKind {
     INVOKE_VIRTUAL,
     INVOKE_STATIC,
@@ -21,6 +28,9 @@ data class AtTargetCandidate(
     val ordinal: Int,
     val kind: AtTargetKind,
     val constantValue: ConstantValue? = null,
+    val instructionOccurrenceIndex: Int = -1,
+    val occurrenceResultClassification: OccurrenceResultClassification = OccurrenceResultClassification.NOT_APPLICABLE,
+    val conditionOpcode: Int? = null,
 )
 
 sealed interface ConstantValue {

@@ -17,6 +17,7 @@ class AtTargetCompletionService {
                     candidate.displayLabel.contains(partial, ignoreCase = true) ||
                     formatTarget(candidate).contains(partial, ignoreCase = true)
             }
+            .distinctBy(::formatTarget)
             .map { candidate ->
                 val insertText = formatTarget(candidate)
                 val constantHint = ConstantAtHintFormatter.hintFor(candidate)

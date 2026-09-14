@@ -12,6 +12,7 @@ data class McDefinitionTarget(
     val descriptor: String? = null,
     val namespace: MappingNamespace = MappingNamespace.NAMED,
     val sourceRange: McTextRange? = null,
+    val directSourceDocumentUri: String? = null,
 )
 
 data class McReferenceLocation(

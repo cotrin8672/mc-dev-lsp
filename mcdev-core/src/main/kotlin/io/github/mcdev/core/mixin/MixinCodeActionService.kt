@@ -29,12 +29,18 @@ class MixinCodeActionService(
                 MixinDiagnosticCodes.MIXIN_CLASS_NOT_LISTED_IN_CONFIG -> {
                     val mixinClass = diagnostic.metadata["mixinClass"] ?: continue
                     val configPath = mixinConfigPath ?: diagnostic.metadata["configPath"] ?: continue
+                    val arrayName = when (MixinSideResolver.explicitSideFromSource(source)) {
+                        MixinSide.CLIENT -> "client"
+                        MixinSide.SERVER -> "server"
+                        null -> "mixins"
+                    }
                     listOf(
                         AddMixinConfigEntryFix(
                             title = "Add '$mixinClass' to mixin config",
                             configPath = configPath,
                             mixinClassName = mixinClass,
                             mixinPackage = mixinPackage,
+                            arrayName = arrayName,
                         ),
                     )
                 }
@@ -76,17 +82,22 @@ class MixinCodeActionService(
     ): WorkspaceEditFix? {
         val result = configEditor.addEntry(currentContent, fix.mixinClassName, fix.arrayName)
         if (!result.added) return null
+        val textEdit = result.delta?.let { delta ->
+            McTextEdit(
+                startOffset = delta.startOffset,
+                endOffset = delta.endOffset,
+                newText = delta.newText,
+            )
+        } ?: McTextEdit(
+            startOffset = 0,
+            endOffset = currentContent.length,
+            newText = result.content,
+        )
         return WorkspaceEditFix(
             title = fix.title,
             kind = fix.kind,
             documentUri = fix.configPath,
-            edits = listOf(
-                McTextEdit(
-                    startOffset = 0,
-                    endOffset = currentContent.length,
-                    newText = result.content,
-                ),
-            ),
+            edits = listOf(textEdit),
             metadata = mapOf("arrayName" to result.arrayName),
         )
     }

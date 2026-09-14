@@ -5,6 +5,9 @@ import io.github.mcdev.core.diagnostics.McDiagnostic
 import io.github.mcdev.core.diagnostics.McSeverity
 import io.github.mcdev.core.diagnostics.McTextPosition
 import io.github.mcdev.core.diagnostics.McTextRange
+import io.github.mcdev.core.project.MixinConfigDiscoveryService
+import io.github.mcdev.core.project.MixinConfigRef
+import java.nio.file.Path
 
 data class MixinDiagnosticRequest(
     val source: String,
@@ -37,12 +40,13 @@ class MixinDiagnosticsService(
 
     private fun analyzeMixinTargets(request: MixinDiagnosticRequest, model: MixinClassModel): List<McDiagnostic> {
         val results = mutableListOf<McDiagnostic>()
+        val imports = JavaTypeDescriptorResolver.importsFor(request.source)
         AnnotationContextExtractor.findAnnotationOffsets(request.source, MixinAnnotation.MIXIN).forEach { atOffset ->
             val end = AnnotationContextExtractor.annotationEndOffset(request.source, atOffset)
             val range = offsetRange(request.source, atOffset, end)
             results += duplicateMixinTargetDiagnostics(request.source, atOffset, range)
             for (target in model.targets) {
-                if (MixinTargetResolver.resolveTarget(target.internalName, classIndex) == null) {
+                if (MixinTargetResolver.resolveTarget(target.internalName, classIndex, imports) == null) {
                     results += McDiagnostic(
                         code = MixinDiagnosticCodes.UNRESOLVED_MIXIN_TARGET,
                         severity = McSeverity.ERROR,
@@ -90,7 +94,28 @@ class MixinDiagnosticsService(
         val configContent = request.mixinConfigContent ?: return emptyList()
         val config = configEditor.parse(configContent, request.mixinConfigPath.orEmpty())
         val listed = config.mixins + config.client + config.server + config.common
-        if (mixinName !in listed) {
+        val configRef = MixinConfigRef(
+            path = Path.of("."),
+            packageName = config.packageName,
+            mixins = config.mixins,
+            client = config.client,
+            server = config.server,
+            common = config.common,
+        )
+        val configPackage = config.packageName?.takeIf { it.isNotBlank() }
+        val sourcePackage = request.mixinPackage
+        val mixinConfigName = when {
+            configPackage == null || sourcePackage == configPackage -> mixinName
+            else -> {
+                val relativePackage = sourcePackage
+                    ?.takeIf { it.startsWith("$configPackage.") }
+                    ?.removePrefix("$configPackage.")
+                    ?.takeIf { it.isNotBlank() }
+                    ?: return emptyList()
+                "$relativePackage.$mixinName"
+            }
+        }
+        if (!MixinConfigDiscoveryService.isMixinListed(configRef, mixinName, request.mixinPackage)) {
             val classDecl = Regex("""\bclass\s+(\w+)""").find(request.source)
             val range = classDecl?.let {
                 offsetRange(request.source, it.range.first, it.range.last + 1)
@@ -102,7 +127,7 @@ class MixinDiagnosticsService(
                     message = "Mixin class '$mixinName' is not listed in mixin config",
                     range = range,
                     metadata = mapOf(
-                        "mixinClass" to mixinName,
+                        "mixinClass" to mixinConfigName,
                         "configPath" to request.mixinConfigPath.orEmpty(),
                     ),
                 ),

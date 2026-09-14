@@ -2,6 +2,7 @@ package io.github.mcdev.core.mixin
 
 import io.github.mcdev.core.diagnostics.McTextPosition
 import io.github.mcdev.core.diagnostics.McTextRange
+import io.github.mcdev.core.mixinextras.ResolvedMixinExtrasContext
 
 data class MixinClassModel(
     val sourceUri: String = "",
@@ -11,6 +12,7 @@ data class MixinClassModel(
     val targets: List<MixinTargetRef>,
     val members: List<MixinMemberModel> = emptyList(),
     val injectors: List<InjectorModel>,
+    val resolvedMixinExtrasContexts: List<ResolvedMixinExtrasContext> = emptyList(),
     val parseSource: ParseSource = ParseSource.HAND_WRITTEN_FALLBACK,
     val confidence: ParseConfidence = ParseConfidence.MEDIUM,
     val warnings: List<String> = emptyList(),

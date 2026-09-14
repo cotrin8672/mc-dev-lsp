@@ -178,7 +178,10 @@ function M.start_or_attach(opts)
       vim.notify("mcdev: jdtls executable not found", vim.log.levels.ERROR)
       return nil
     end
-    local data_dir = opts.data_dir or (vim.fn.stdpath("cache") .. "/mcdev-jdtls")
+    local data_dir = opts.data_dir
+      or (vim.fn.stdpath("cache")
+        .. "/mcdev-jdtls/"
+        .. vim.fn.sha256(vim.fs.normalize(vim.fn.fnamemodify(root_dir, ":p"))))
     vim.fn.mkdir(data_dir, "p")
     cmd = { jdtls_cmd, "-data", data_dir }
   end

@@ -5,12 +5,22 @@ import io.github.mcdev.core.bytecode.BytecodeIndexService
 import io.github.mcdev.core.bytecode.ClassBytesProvider
 import io.github.mcdev.core.mixin.AtTargetCandidate
 import io.github.mcdev.core.mixin.BytecodeIndex
+import io.github.mcdev.core.mixinextras.BytecodeCommonSuperClassResolver
 
 class BytecodeAtTargetAdapter(
     private val bytecodeService: BytecodeIndexService,
     private val provider: ClassBytesProvider,
 ) : BytecodeIndex {
     private val memberIndex by lazy { bytecodeService.buildIndex(provider) }
+    private val commonSuperClassResolver by lazy {
+        BytecodeCommonSuperClassResolver(classBytesLookup = provider::getClassBytes)
+    }
+
+    override fun getClassBytes(ownerInternalName: String): ByteArray? =
+        provider.getClassBytes(ownerInternalName)
+
+    override fun resolveCommonSuperClass(type1Descriptor: String, type2Descriptor: String): String? =
+        commonSuperClassResolver.resolve(type1Descriptor, type2Descriptor)
 
     override fun getAtTargetCandidates(
         ownerInternalName: String,

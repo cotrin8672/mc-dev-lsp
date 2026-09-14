@@ -1,7 +1,21 @@
 package io.github.mcdev.core.mixin
 
+import io.github.mcdev.core.mixinextras.ExpressionCompletionLexer
+import io.github.mcdev.core.mixinextras.ExpressionCompletionPosition
+import io.github.mcdev.core.text.JavaStringContentDecoder
+
 object AnnotationContextExtractor {
+    data class MixinClassScope(
+        val className: String,
+        val rawTargets: List<String>,
+    )
+
     private val mixinAttributeNames = setOf("value", "targets", "target", "priority", "remap")
+    private val localAttributeNames = setOf("print", "ordinal", "index", "name", "argsOnly", "type")
+    private val shareAttributeNames = setOf("value", "namespace")
+    private val definitionAttributeNames = setOf("id", "method", "field", "type", "local", "remap")
+    private val expressionAttributeNames = setOf("value", "id")
+    private val containerExpressionAttributeNames = setOf("value")
     private val injectorAnnotations = setOf(
         MixinAnnotation.INJECT,
         MixinAnnotation.REDIRECT,
@@ -25,8 +39,10 @@ object AnnotationContextExtractor {
     fun extractAtOffset(source: String, cursorOffset: Int): AnnotationContext? {
         if (cursorOffset < 0 || cursorOffset > source.length) return null
         val mixinTargets = resolveMixinTargets(source, cursorOffset)
-        val annotationStart = findEnclosingAnnotationStart(source, cursorOffset) ?: return null
-        val annotation = parseAnnotationName(source, annotationStart) ?: return null
+        val imports = JavaTypeDescriptorResolver.importsFor(source)
+        val annotationStart = findEnclosingAnnotationStart(source, cursorOffset, imports) ?: return null
+        val annotation = parseAnnotationName(source, annotationStart, imports) ?: return null
+        val resolvedAnnotationFqn = resolveAnnotationFqn(source, annotationStart, imports)
         val annotationEndWithoutParens = skipAnnotationName(source, annotationStart)
         val parenStart = annotationEndWithoutParens.takeIf { source.getOrNull(it) == '(' }
         val bodyStart = parenStart ?: annotationEndWithoutParens
@@ -39,6 +55,7 @@ object AnnotationContextExtractor {
         if (cursorOffset <= bodyStart) {
             if (annotation == MixinAnnotation.MIXIN) {
                 return buildClassSlotContext(source, annotation, annotationStart, bodyStart, cursorOffset, mixinTargets)
+                    ?.copy(resolvedAnnotationFqn = resolvedAnnotationFqn)
             }
             if (annotation == MixinAnnotation.OVERWRITE) {
                 return AnnotationContext(
@@ -50,6 +67,7 @@ object AnnotationContextExtractor {
                     annotationStartOffset = annotationStart,
                     annotationEndOffset = annotationEnd,
                     mixinTargetInternalNames = mixinTargets,
+                    resolvedAnnotationFqn = resolvedAnnotationFqn,
                 )
             }
             return null
@@ -70,6 +88,7 @@ object AnnotationContextExtractor {
             annotationStartOffset = annotationStart,
             annotationEndOffset = annotationEnd,
             mixinTargetInternalNames = mixinTargets,
+            resolvedAnnotationFqn = resolvedAnnotationFqn,
         )
     }
 
@@ -97,38 +116,43 @@ object AnnotationContextExtractor {
         )
     }
 
-    private fun findEnclosingAnnotationStart(source: String, cursorOffset: Int): Int? {
-        var searchFrom = cursorOffset
-        while (searchFrom >= 0) {
-            val at = source.lastIndexOf('@', searchFrom)
-            if (at < 0) return null
-            val annotation = parseAnnotationName(source, at)
-            if (annotation != null) {
-                val nameEnd = skipAnnotationName(source, at)
-                val immediateParen = if (source.getOrNull(nameEnd) == '(') nameEnd else -1
-                if (immediateParen < 0) {
-                    if (annotationSupportsBareForm(annotation) && cursorOffset >= at) {
-                        return at
-                    }
-                    searchFrom = at - 1
-                    continue
+    private fun findEnclosingAnnotationStart(
+        source: String,
+        cursorOffset: Int,
+        imports: JavaSourceImports,
+    ): Int? {
+        val atOffsets = collectLexicalAtSignOffsets(source, cursorOffset + 1)
+        for (index in atOffsets.indices.reversed()) {
+            val at = atOffsets[index]
+            val annotation = parseAnnotationName(source, at, imports)
+            val nameEnd = skipAnnotationName(source, at)
+            val immediateParen = if (source.getOrNull(nameEnd) == '(') nameEnd else -1
+            if (annotation == null) {
+                if (immediateParen >= 0 && immediateParen <= cursorOffset) {
+                    val close = findMatchingParen(source, immediateParen)
+                    if (close == null || cursorOffset <= close) return null
                 }
-                if (immediateParen > cursorOffset) {
-                    searchFrom = at - 1
-                    continue
-                }
-                val close = findMatchingParen(source, immediateParen)
-                if (close == null || cursorOffset <= close) {
-                    return at
-                }
-                if (
-                    annotationSupportsBareForm(annotation) &&
-                    isCursorInAnnotatedMemberDeclaration(source, close + 1, cursorOffset)
-                ) {
-                    return at
-                }
+                continue
             }
-            searchFrom = at - 1
+            if (immediateParen < 0) {
+                if (annotationSupportsBareForm(annotation) && cursorOffset >= at) {
+                    return at
+                }
+                continue
+            }
+            if (immediateParen > cursorOffset) {
+                continue
+            }
+            val close = findMatchingParen(source, immediateParen)
+            if (close == null || cursorOffset <= close) {
+                return at
+            }
+            if (
+                annotationSupportsBareForm(annotation) &&
+                isCursorInAnnotatedMemberDeclaration(source, close + 1, cursorOffset)
+            ) {
+                return at
+            }
         }
         return null
     }
@@ -152,11 +176,37 @@ object AnnotationContextExtractor {
     }
 
     private fun parseAnnotationName(source: String, atOffset: Int): MixinAnnotation? {
+        return parseAnnotationName(source, atOffset, JavaTypeDescriptorResolver.importsFor(source))
+    }
+
+    private fun parseAnnotationName(
+        source: String,
+        atOffset: Int,
+        imports: JavaSourceImports,
+    ): MixinAnnotation? {
         if (source.getOrNull(atOffset) != '@') return null
         val nameEnd = skipAnnotationName(source, atOffset)
         if (nameEnd <= atOffset + 1) return null
-        val qualifiedName = source.substring(atOffset + 1, nameEnd)
-        return MixinAnnotation.fromSimpleName(qualifiedName.substringAfterLast('.'))
+        val token = source.substring(atOffset + 1, nameEnd)
+        if ('.' in token) {
+            return MixinAnnotation.fromOfficialFqn(token)
+        }
+        val explicitImport = imports.explicit[token]
+        if (explicitImport != null) {
+            return MixinAnnotation.fromOfficialFqn(explicitImport)
+        }
+        return MixinAnnotation.fromSimpleName(token)
+    }
+
+    private fun resolveAnnotationFqn(
+        source: String,
+        atOffset: Int,
+        imports: JavaSourceImports,
+    ): String? {
+        val nameEnd = skipAnnotationName(source, atOffset)
+        if (nameEnd <= atOffset + 1) return null
+        val token = source.substring(atOffset + 1, nameEnd)
+        return if ('.' in token) token else imports.explicit[token]
     }
 
     private fun isAnnotationNameChar(ch: Char): Boolean =
@@ -173,6 +223,16 @@ object AnnotationContextExtractor {
         while (index < bodyEnd) {
             index = skipWhitespace(source, index, bodyEnd)
             if (index >= bodyEnd) break
+            if (source[index] == '{' && annotation == MixinAnnotation.EXPRESSIONS) {
+                val containerValue = readValue(source, index, bodyEnd) ?: break
+                val element = findArrayElementAtCursor(source, index, containerValue.contentEnd, cursorOffset)
+                if (element != null && cursorOffset in element.contentStart..element.contentEnd) {
+                    return buildContextForShorthand(annotation, element, source, bodyStart, bodyEnd, cursorOffset)
+                }
+                index = containerValue.end
+                if (index < bodyEnd && source[index] == ',') index++
+                continue
+            }
             val shorthand = readShorthandValue(source, index, bodyEnd)
             if (shorthand != null) {
                 if (cursorOffset in shorthand.contentStart..shorthand.contentEnd) {
@@ -200,7 +260,21 @@ object AnnotationContextExtractor {
             if (index >= bodyEnd || source[index] != '=') break
             index++
             index = skipWhitespace(source, index, bodyEnd)
-            if (index >= bodyEnd) break
+            if (index >= bodyEnd) {
+                if (cursorOffset == bodyEnd) {
+                    val emptyValue = ValueInfo(bodyEnd, bodyEnd, bodyEnd, bodyEnd)
+                    return buildContextForAttribute(
+                        annotation,
+                        attrName,
+                        emptyValue,
+                        source,
+                        bodyStart,
+                        bodyEnd,
+                        cursorOffset,
+                    )
+                }
+                break
+            }
 
             val containerValue = readValue(source, index, bodyEnd) ?: break
             val valueInfo = if (source[index] == '{') {
@@ -275,7 +349,35 @@ object AnnotationContextExtractor {
         val partial = source.substring(valueStart, cursorOffset)
         if (partial.isNotEmpty() && !partial.matches(Regex("[A-Za-z_][A-Za-z0-9_]*"))) return null
         if (annotation == MixinAnnotation.MIXIN) {
+            if (partial.isNotEmpty() && partial.first().isUpperCase()) {
+                return null
+            }
             if (partial.isEmpty() || mixinAttributeNames.none { it.startsWith(partial, ignoreCase = true) }) {
+                return null
+            }
+        }
+        if (annotation == MixinAnnotation.LOCAL) {
+            if (partial.isNotEmpty() && localAttributeNames.none { it.startsWith(partial, ignoreCase = true) }) {
+                return null
+            }
+        }
+        if (annotation == MixinAnnotation.SHARE) {
+            if (partial.isNotEmpty() && shareAttributeNames.none { it.startsWith(partial, ignoreCase = true) }) {
+                return null
+            }
+        }
+        if (annotation == MixinAnnotation.DEFINITION) {
+            if (partial.isNotEmpty() && definitionAttributeNames.none { it.startsWith(partial, ignoreCase = true) }) {
+                return null
+            }
+        }
+        if (annotation == MixinAnnotation.EXPRESSION) {
+            if (partial.isNotEmpty() && expressionAttributeNames.none { it.startsWith(partial, ignoreCase = true) }) {
+                return null
+            }
+        }
+        if (annotation == MixinAnnotation.DEFINITIONS || annotation == MixinAnnotation.EXPRESSIONS) {
+            if (partial.isNotEmpty() && containerExpressionAttributeNames.none { it.startsWith(partial, ignoreCase = true) }) {
                 return null
             }
         }
@@ -376,13 +478,102 @@ object AnnotationContextExtractor {
         atAnnotationStart: Int,
     ): AnnotationContext {
         if (annotation != MixinAnnotation.AT) return this
-        val parent = findParentInjectorBody(source, atAnnotationStart) ?: return this
+        val parent = findParentInjectorBody(source, atAnnotationStart)
+        val atInsideSlice = findImmediateEnclosingAnnotation(source, atAnnotationStart)
+            ?.let { isSliceAnnotation(source, it) }
+            ?: false
         return copy(
-            injectMethodName = injectMethodName ?: findMethodAttribute(source, parent.bodyStart, parent.bodyEnd),
+            injectMethodName = injectMethodName ?: parent?.let { findMethodAttribute(source, it.bodyStart, it.bodyEnd) },
+            parentInjectorAnnotation = parent?.annotation,
+            atInsideSlice = atInsideSlice,
         )
     }
 
+    private fun findImmediateEnclosingAnnotation(source: String, nestedAnnotationStart: Int): Int? {
+        val atOffsets = collectLexicalAtSignOffsets(source, nestedAnnotationStart)
+        for (index in atOffsets.indices.reversed()) {
+            val at = atOffsets[index]
+            val nameEnd = skipAnnotationName(source, at)
+            val paren = if (source.getOrNull(nameEnd) == '(') nameEnd else -1
+            if (paren >= 0) {
+                val close = findMatchingParen(source, paren) ?: source.length
+                if (nestedAnnotationStart in paren..close) {
+                    return at
+                }
+            }
+        }
+        return null
+    }
+
+    private fun collectLexicalAtSignOffsets(source: String, limitExclusive: Int): List<Int> {
+        if (limitExclusive <= 0) return emptyList()
+        val safeLimit = limitExclusive.coerceAtMost(source.length)
+        val offsets = ArrayList<Int>()
+        var inString = false
+        var inCharLiteral = false
+        var escaped = false
+        var inLineComment = false
+        var inBlockComment = false
+        var index = 0
+        while (index < safeLimit) {
+            if (inLineComment) {
+                if (source[index] == '\n') inLineComment = false
+                index++
+                continue
+            }
+            if (inBlockComment) {
+                if (source[index] == '*' && source.getOrNull(index + 1) == '/') {
+                    inBlockComment = false
+                    index += 2
+                    continue
+                }
+                index++
+                continue
+            }
+            if (inString) {
+                when {
+                    escaped -> escaped = false
+                    source[index] == '\\' -> escaped = true
+                    source[index] == '"' -> inString = false
+                }
+                index++
+                continue
+            }
+            if (inCharLiteral) {
+                when {
+                    escaped -> escaped = false
+                    source[index] == '\\' -> escaped = true
+                    source[index] == '\'' -> inCharLiteral = false
+                }
+                index++
+                continue
+            }
+            when {
+                source[index] == '"' -> inString = true
+                source[index] == '\'' -> inCharLiteral = true
+                source[index] == '/' && source.getOrNull(index + 1) == '/' -> {
+                    inLineComment = true
+                    index += 2
+                    continue
+                }
+                source[index] == '/' && source.getOrNull(index + 1) == '*' -> {
+                    inBlockComment = true
+                    index += 2
+                    continue
+                }
+                source[index] == '@' -> offsets += index
+            }
+            index++
+        }
+        return offsets
+    }
+
+    private fun isSliceAnnotation(source: String, atOffset: Int): Boolean {
+        return parseAnnotationName(source, atOffset) == MixinAnnotation.SLICE
+    }
+
     private data class AnnotationBody(
+        val annotation: MixinAnnotation,
         val bodyStart: Int,
         val bodyEnd: Int,
     )
@@ -395,10 +586,10 @@ object AnnotationContextExtractor {
             val annotation = parseAnnotationName(source, at)
             val nameEnd = skipAnnotationName(source, at)
             val paren = if (source.getOrNull(nameEnd) == '(') nameEnd else -1
-            if (annotation in injectorAnnotations && paren >= 0) {
+            if (annotation != null && annotation in injectorAnnotations && paren >= 0) {
                 val close = findMatchingParen(source, paren) ?: source.length
                 if (nestedAnnotationStart in paren..close) {
-                    return AnnotationBody(paren + 1, close)
+                    return AnnotationBody(annotation, paren + 1, close)
                 }
             }
             searchFrom = at - 1
@@ -470,7 +661,7 @@ object AnnotationContextExtractor {
         bodyStart: Int,
         bodyEnd: Int,
         cursorOffset: Int,
-    ): AnnotationContext {
+    ): AnnotationContext? {
         val partial = source.substring(valueInfo.contentStart, cursorOffset.coerceAtMost(valueInfo.contentEnd))
         val slot = when (annotation) {
             MixinAnnotation.ACCESSOR -> AnnotationSlot.ACCESSOR_VALUE
@@ -480,7 +671,7 @@ object AnnotationContextExtractor {
             else -> AnnotationSlot.VALUE
         }
         val cleanedPartial = if (slot == AnnotationSlot.CLASS) classSlotPartial(partial) else partial.trim('"')
-        return AnnotationContext(
+        val context = AnnotationContext(
             annotation = annotation,
             slot = slot,
             partialValue = cleanedPartial,
@@ -491,6 +682,11 @@ object AnnotationContextExtractor {
             injectMethodName = findMethodAttribute(source, bodyStart, bodyEnd),
             atValue = if (annotation == MixinAnnotation.AT) partial.trim('"') else findAtValue(source, bodyStart, bodyEnd),
         )
+        return if (isExpressionValueStringContext(annotation, attrName = null, isShorthand = true)) {
+            applyExpressionValueTokenContext(source, context, valueInfo, cursorOffset)
+        } else {
+            context
+        }
     }
 
     private fun buildContextForAttribute(
@@ -501,7 +697,7 @@ object AnnotationContextExtractor {
         bodyStart: Int,
         bodyEnd: Int,
         cursorOffset: Int,
-    ): AnnotationContext {
+    ): AnnotationContext? {
         val partial = source.substring(valueInfo.contentStart, cursorOffset.coerceAtMost(valueInfo.contentEnd))
         val injectMethod = if (annotation in injectorAnnotations && attrName == "method") {
             partial.trim('"')
@@ -536,7 +732,7 @@ object AnnotationContextExtractor {
             true
         }
         val cleanedPartial = if (slot == AnnotationSlot.CLASS) classSlotPartial(partial) else partial
-        return AnnotationContext(
+        val context = AnnotationContext(
             annotation = annotation,
             slot = slot,
             partialValue = cleanedPartial,
@@ -548,7 +744,158 @@ object AnnotationContextExtractor {
             atValue = atValue,
             shadowPrefix = shadowPrefix,
             shadowRemap = shadowRemap,
+            attributeName = attrName,
         )
+        return if (isExpressionValueStringContext(annotation, attrName, isShorthand = false)) {
+            applyExpressionValueTokenContext(source, context, valueInfo, cursorOffset)
+        } else {
+            context
+        }
+    }
+
+    private fun isExpressionValueStringContext(
+        annotation: MixinAnnotation,
+        attrName: String?,
+        isShorthand: Boolean,
+    ): Boolean = when (annotation) {
+        MixinAnnotation.EXPRESSION -> isShorthand || attrName == "value"
+        MixinAnnotation.EXPRESSIONS -> isShorthand || attrName == "value"
+        else -> false
+    }
+
+    private fun applyExpressionValueTokenContext(
+        source: String,
+        context: AnnotationContext,
+        valueInfo: ValueInfo,
+        cursorOffset: Int,
+    ): AnnotationContext? {
+        val mapped = mapStringContentPrefix(
+            source = source,
+            contentStart = valueInfo.contentStart,
+            contentEnd = valueInfo.contentEnd,
+            cursorOffset = cursorOffset,
+        ) ?: return null
+        val lexResult = ExpressionCompletionLexer.lex(mapped.unescaped, mapped.cursorInUnescaped)
+        val tokenStartFile = mapped.fileOffsetAt(lexResult.tokenStart)
+        val tokenEndFile = mapped.fileOffsetAt(lexResult.tokenEnd).coerceAtLeast(tokenStartFile)
+        val partialEnd = cursorOffset.coerceIn(tokenStartFile, tokenEndFile)
+        val decodedIdentifier = mapped.unescaped.substring(lexResult.tokenStart, lexResult.tokenEnd)
+        val decodedPrefix = DecodedExpressionPrefix(
+            prefix = mapped.unescaped.substring(0, mapped.cursorInUnescaped),
+            cursor = mapped.cursorInUnescaped,
+        )
+        return context.copy(
+            partialValue = source.substring(tokenStartFile, partialEnd),
+            decodedPartialValue = decodedIdentifier,
+            decodedExpressionPrefix = decodedPrefix,
+            valueStartOffset = tokenStartFile,
+            valueEndOffset = tokenEndFile,
+            expressionCompletionPosition = lexResult.position,
+        )
+    }
+
+    private data class UnescapedStringPrefix(
+        val unescaped: String,
+        private val startOffsets: IntArray,
+        private val endFileOffset: Int,
+        val cursorInUnescaped: Int,
+    ) {
+        fun fileOffsetAt(unescapedIndex: Int): Int {
+            val clamped = unescapedIndex.coerceIn(0, unescaped.length)
+            return if (clamped < startOffsets.size) startOffsets[clamped] else endFileOffset
+        }
+    }
+
+    private data class MappedStringChar(val char: Char, val startOffset: Int, val endOffset: Int)
+
+    private fun mapStringContentPrefix(
+        source: String,
+        contentStart: Int,
+        contentEnd: Int,
+        cursorOffset: Int,
+    ): UnescapedStringPrefix? {
+        if (contentStart < 0 || contentStart > source.length) return null
+        val contentLimit = contentEnd.coerceAtMost(source.length)
+        val phase1 = decodeUnicodeStringContent(source, contentStart, contentLimit) ?: return null
+        val phase1Text = buildString(phase1.size) { phase1.forEach { append(it.char) } }
+        val builder = StringBuilder()
+        val startOffsets = mutableListOf<Int>()
+        val endOffsets = mutableListOf<Int>()
+        var phase1Index = 0
+        var endFileOffset = contentLimit
+        while (phase1Index < phase1.size) {
+            val current = phase1[phase1Index]
+            if (current.char == '\\') {
+                val decoded = JavaStringContentDecoder.decodeEscape(phase1Text, phase1Index, phase1.size)
+                if (decoded == null) {
+                    endFileOffset = current.startOffset
+                    break
+                }
+                val end = phase1[decoded.nextIndex - 1].endOffset
+                builder.append(decoded.char)
+                startOffsets += current.startOffset
+                endOffsets += end
+                phase1Index = decoded.nextIndex
+            } else {
+                builder.append(current.char)
+                startOffsets += current.startOffset
+                endOffsets += current.endOffset
+                phase1Index++
+            }
+        }
+        val cursorInUnescaped = cursorIndexForMappedContent(startOffsets, endOffsets, cursorOffset)
+        return UnescapedStringPrefix(
+            unescaped = builder.toString(),
+            startOffsets = startOffsets.toIntArray(),
+            endFileOffset = endFileOffset,
+            cursorInUnescaped = cursorInUnescaped,
+        )
+    }
+
+    private fun decodeUnicodeStringContent(
+        source: String,
+        contentStart: Int,
+        contentLimit: Int,
+    ): List<MappedStringChar>? {
+        val mapped = mutableListOf<MappedStringChar>()
+        var index = contentStart
+        var rawBackslashRun = 0
+        while (index < contentLimit) {
+            if (
+                source[index] == '\\' &&
+                rawBackslashRun % 2 == 0 &&
+                source.getOrNull(index + 1) == 'u'
+            ) {
+                val decoded = JavaStringContentDecoder.decodeUnicodeEscape(source, index, contentLimit) ?: return null
+                if (decoded.char == '"' || decoded.char == '\n' || decoded.char == '\r') return null
+                mapped += MappedStringChar(decoded.char, index, decoded.nextIndex)
+                index = decoded.nextIndex
+                rawBackslashRun = 0
+                continue
+            }
+            mapped += MappedStringChar(source[index], index, index + 1)
+            rawBackslashRun = if (source[index] == '\\') rawBackslashRun + 1 else 0
+            index++
+        }
+        return mapped
+    }
+
+    private fun cursorIndexForMappedContent(
+        startOffsets: List<Int>,
+        endOffsets: List<Int>,
+        cursorOffset: Int,
+    ): Int {
+        var index = 0
+        while (index < endOffsets.size) {
+            val start = startOffsets[index]
+            val end = endOffsets[index]
+            if (end <= cursorOffset || (end - start > 1 && cursorOffset in start until end)) {
+                index++
+            } else {
+                break
+            }
+        }
+        return index
     }
 
     private fun replacementEnd(source: String, valueInfo: ValueInfo, cursorOffset: Int): Int {
@@ -620,21 +967,136 @@ object AnnotationContextExtractor {
         return parts.lastOrNull { it.isNotEmpty() } ?: cleaned
     }
 
+    fun resolveMixinClassScope(source: String, cursorOffset: Int): MixinClassScope? {
+        val declarations = findTypeDeclarations(source)
+            .filter { cursorOffset > it.bodyStart && cursorOffset <= it.bodyEnd + 1 }
+            .sortedBy { it.bodyStart }
+        val selected = declarations.lastIndex.takeIf { it >= 0 && findMixinAnnotationOnClass(source, declarations[it].start) != null }
+            ?: return null
+        val declaration = declarations[selected]
+        val mixinAnnotation = findMixinAnnotationOnClass(source, declaration.start) ?: return null
+        val className = (JavaTypeDescriptorResolver.importsFor(source).packageName?.let { "$it." } ?: "") +
+            declarations.take(selected + 1).joinToString("$") { it.name }
+        return MixinClassScope(className, parseMixinTargetValues(source, mixinAnnotation))
+    }
+
     fun resolveMixinTargets(source: String, cursorOffset: Int): List<String> =
         resolveRawMixinTargets(source, cursorOffset)
 
-    fun resolveRawMixinTargets(source: String, cursorOffset: Int): List<String> {
-        val classDecl = findEnclosingClassDeclaration(source, cursorOffset) ?: return emptyList()
-        val mixinAnnotation = findMixinAnnotationOnClass(source, classDecl) ?: return emptyList()
-        return parseMixinTargetValues(source, mixinAnnotation)
+    fun resolveRawMixinTargets(source: String, cursorOffset: Int): List<String> =
+        resolveMixinClassScope(source, cursorOffset)?.rawTargets.orEmpty()
+
+    private data class TypeDeclaration(
+        val start: Int,
+        val name: String,
+        val bodyStart: Int,
+        val bodyEnd: Int,
+    )
+
+    private val typeDeclarationPattern = Regex(
+        """\b(?:(?:public|protected|private|abstract|final|static|strictfp|sealed|non-sealed)\s+)*(class|interface|enum|record)\s+([A-Za-z_$][\w$]*)""",
+    )
+
+    private fun findTypeDeclarations(source: String): List<TypeDeclaration> {
+        val code = maskNonCode(source)
+        return typeDeclarationPattern.findAll(code).mapNotNull { match ->
+            if (match.range.first > 0 && code[match.range.first - 1] == '@') return@mapNotNull null
+            val bodyStart = code.indexOf('{', match.range.last + 1)
+            if (bodyStart < 0) return@mapNotNull null
+            val bodyEnd = findMatchingCodeBrace(code, bodyStart) ?: code.length
+            TypeDeclaration(match.range.first, match.groupValues[2], bodyStart, bodyEnd)
+        }.toList()
     }
 
-    private fun findEnclosingClassDeclaration(source: String, cursorOffset: Int): Int? {
-        val before = source.substring(0, cursorOffset)
-        val declPattern = Regex(
-            """\b(?:public\s+|private\s+|protected\s+)?(?:abstract\s+|final\s+|static\s+)?(?:class|interface|enum|record)\s+\w+""",
-        )
-        return declPattern.findAll(before).lastOrNull()?.range?.first
+    internal fun maskNonCode(source: String): String {
+        val chars = source.toCharArray()
+        var mode = 0
+        var escaped = false
+        var index = 0
+        while (index < source.length) {
+            when (mode) {
+                0 -> when {
+                    source[index] == '/' && source.getOrNull(index + 1) == '/' -> {
+                        chars[index] = ' '
+                        chars[index + 1] = ' '
+                        index += 2
+                        mode = 1
+                    }
+                    source[index] == '/' && source.getOrNull(index + 1) == '*' -> {
+                        chars[index] = ' '
+                        chars[index + 1] = ' '
+                        index += 2
+                        mode = 2
+                    }
+                    source[index] == '"' && source.getOrNull(index + 1) == '"' && source.getOrNull(index + 2) == '"' -> {
+                        chars[index] = ' '
+                        chars[index + 1] = ' '
+                        chars[index + 2] = ' '
+                        index += 3
+                        mode = 5
+                        escaped = false
+                    }
+                    source[index] == '"' -> {
+                        chars[index] = ' '
+                        index++
+                        mode = 3
+                        escaped = false
+                    }
+                    source[index] == '\'' -> {
+                        chars[index] = ' '
+                        index++
+                        mode = 4
+                        escaped = false
+                    }
+                    else -> index++
+                }
+                1 -> {
+                    if (source[index] == '\n') mode = 0 else chars[index] = ' '
+                    index++
+                }
+                2 -> {
+                    if (source[index] == '*' && source.getOrNull(index + 1) == '/') {
+                        chars[index] = ' '
+                        chars[index + 1] = ' '
+                        index += 2
+                        mode = 0
+                    } else {
+                        if (source[index] != '\n') chars[index] = ' '
+                        index++
+                    }
+                }
+                3, 4 -> {
+                    if (source[index] != '\n') chars[index] = ' '
+                    when {
+                        escaped -> escaped = false
+                        source[index] == '\\' -> escaped = true
+                        mode == 3 && source[index] == '"' -> mode = 0
+                        mode == 4 && source[index] == '\'' -> mode = 0
+                    }
+                    index++
+                }
+                5 -> {
+                    if (
+                        !escaped &&
+                        source[index] == '"' &&
+                        source.getOrNull(index + 1) == '"' &&
+                        source.getOrNull(index + 2) == '"'
+                    ) {
+                        chars[index] = ' '
+                        chars[index + 1] = ' '
+                        chars[index + 2] = ' '
+                        index += 3
+                        mode = 0
+                        escaped = false
+                    } else {
+                        if (source[index] != '\n') chars[index] = ' '
+                        escaped = if (escaped) false else source[index] == '\\'
+                        index++
+                    }
+                }
+            }
+        }
+        return String(chars)
     }
 
     private fun findMixinAnnotationOnClass(source: String, classDeclOffset: Int): Int? {
@@ -654,14 +1116,11 @@ object AnnotationContextExtractor {
 
     fun findAnnotationOffsets(source: String, annotation: MixinAnnotation): List<Int> {
         val results = mutableListOf<Int>()
-        var search = 0
-        while (search < source.length) {
-            val at = source.indexOf('@', search)
-            if (at < 0) break
-            if (parseAnnotationName(source, at) == annotation) {
+        val imports = JavaTypeDescriptorResolver.importsFor(source)
+        for (at in collectLexicalAtSignOffsets(source, source.length)) {
+            if (parseAnnotationName(source, at, imports) == annotation) {
                 results += at
             }
-            search = at + 1
         }
         return results
     }
@@ -951,17 +1410,57 @@ object AnnotationContextExtractor {
         if (source.getOrNull(openIndex) != '(') return null
         var depth = 0
         var inString = false
+        var inCharLiteral = false
+        var escaped = false
+        var inLineComment = false
+        var inBlockComment = false
         var i = openIndex
         while (i < source.length) {
-            when {
-                inString -> {
-                    if (source[i] == '\\') {
-                        i += 2
-                        continue
-                    }
-                    if (source[i] == '"') inString = false
+            if (inLineComment) {
+                if (source[i] == '\n') inLineComment = false
+                i++
+                continue
+            }
+            if (inBlockComment) {
+                if (source[i] == '*' && source.getOrNull(i + 1) == '/') {
+                    inBlockComment = false
+                    i += 2
+                    continue
                 }
+                i++
+                continue
+            }
+            if (inString) {
+                when {
+                    escaped -> escaped = false
+                    source[i] == '\\' -> escaped = true
+                    source[i] == '"' -> inString = false
+                }
+                i++
+                continue
+            }
+            if (inCharLiteral) {
+                when {
+                    escaped -> escaped = false
+                    source[i] == '\\' -> escaped = true
+                    source[i] == '\'' -> inCharLiteral = false
+                }
+                i++
+                continue
+            }
+            when {
                 source[i] == '"' -> inString = true
+                source[i] == '\'' -> inCharLiteral = true
+                source[i] == '/' && source.getOrNull(i + 1) == '/' -> {
+                    inLineComment = true
+                    i += 2
+                    continue
+                }
+                source[i] == '/' && source.getOrNull(i + 1) == '*' -> {
+                    inBlockComment = true
+                    i += 2
+                    continue
+                }
                 source[i] == '(' -> depth++
                 source[i] == ')' -> {
                     depth--
@@ -974,22 +1473,17 @@ object AnnotationContextExtractor {
     }
 
     private fun findMatchingBrace(source: String, openIndex: Int): Int? {
+        return findMatchingCodeBrace(maskNonCode(source), openIndex)
+    }
+
+    private fun findMatchingCodeBrace(source: String, openIndex: Int): Int? {
         if (source.getOrNull(openIndex) != '{') return null
         var depth = 0
-        var inString = false
         var i = openIndex
         while (i < source.length) {
-            when {
-                inString -> {
-                    if (source[i] == '\\') {
-                        i += 2
-                        continue
-                    }
-                    if (source[i] == '"') inString = false
-                }
-                source[i] == '"' -> inString = true
-                source[i] == '{' -> depth++
-                source[i] == '}' -> {
+            when (source[i]) {
+                '{' -> depth++
+                '}' -> {
                     depth--
                     if (depth == 0) return i
                 }
@@ -1013,15 +1507,12 @@ object AnnotationContextExtractor {
 
     fun findInjectorAnnotationOffsets(source: String): List<Int> {
         val results = mutableListOf<Int>()
-        var search = 0
-        while (search < source.length) {
-            val at = source.indexOf('@', search)
-            if (at < 0) break
-            val annotation = parseAnnotationName(source, at)
+        val imports = JavaTypeDescriptorResolver.importsFor(source)
+        for (at in collectLexicalAtSignOffsets(source, source.length)) {
+            val annotation = parseAnnotationName(source, at, imports)
             if (annotation != null && annotation in injectorAnnotations) {
                 results += at
             }
-            search = at + 1
         }
         return results
     }

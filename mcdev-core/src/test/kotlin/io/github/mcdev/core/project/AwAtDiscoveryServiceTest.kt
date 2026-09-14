@@ -106,4 +106,28 @@ class AwAtDiscoveryServiceTest {
         assertEquals(1, refs.size)
         assertTrue(refs.first().path.toString().contains("src"))
     }
+
+    @Test
+    fun excludesGradleDirectoryAwAtFiles() {
+        val gradleDir = tempDir.resolve(".gradle/caches").createDirectories()
+        gradleDir.resolve("mod.aw").writeText(accessWidenerContent)
+        val resources = tempDir.resolve("src/main/resources").createDirectories()
+        resources.resolve("mod.aw").writeText(accessWidenerContent)
+
+        val refs = AwAtDiscoveryService.discoverAccessWideners(tempDir)
+        assertEquals(1, refs.size)
+        assertTrue(refs.first().path.toString().contains("src"))
+    }
+
+    @Test
+    fun excludesNodeModulesDirectoryAwAtFiles() {
+        val nodeModules = tempDir.resolve("node_modules/pkg").createDirectories()
+        nodeModules.resolve("mod.aw").writeText(accessWidenerContent)
+        val resources = tempDir.resolve("src/main/resources").createDirectories()
+        resources.resolve("mod.aw").writeText(accessWidenerContent)
+
+        val refs = AwAtDiscoveryService.discoverAccessWideners(tempDir)
+        assertEquals(1, refs.size)
+        assertTrue(refs.first().path.toString().contains("src"))
+    }
 }

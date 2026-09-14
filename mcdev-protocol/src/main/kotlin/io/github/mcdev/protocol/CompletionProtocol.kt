@@ -19,6 +19,7 @@ data class McdevCompletionOptions(
 
 data class McdevCompletionResponse(
     val items: List<McdevCompletionItemDto>,
+    val isIncomplete: Boolean = false,
     val warnings: List<McdevWarning> = emptyList(),
     val debug: McdevCompletionDebugInfo? = null,
 )

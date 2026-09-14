@@ -1,6 +1,7 @@
 package io.github.mcdev.jdtls.mixin
 
 import io.github.mcdev.core.mixin.MixinClassModel
+import io.github.mcdev.core.mixin.ParseSource
 import java.util.LinkedHashMap
 
 data class CachedSemanticModelResult(
@@ -63,11 +64,13 @@ class SemanticModelCache(
         val started = System.nanoTime()
         val model = compute(source, documentUri)
         val elapsedMs = ((System.nanoTime() - started) / 1_000_000).coerceAtLeast(0)
-        entries[key] = Entry(
-            model = model,
-            astParseMs = elapsedMs,
-            createdAtMillis = now,
-        )
+        if (model.isCacheableSemanticModel()) {
+            entries[key] = Entry(
+                model = model,
+                astParseMs = elapsedMs,
+                createdAtMillis = now,
+            )
+        }
         return CachedSemanticModelResult(
             model = model,
             cacheHit = false,
@@ -85,4 +88,9 @@ class SemanticModelCache(
     fun invalidateAll() {
         entries.clear()
     }
+
+    private fun MixinClassModel.isCacheableSemanticModel(): Boolean =
+        parseSource != ParseSource.HAND_WRITTEN_FALLBACK ||
+            debugInfo.fallbackReason == null ||
+            debugInfo.fallbackReason == "JDT ASTParser is not available in this runtime"
 }

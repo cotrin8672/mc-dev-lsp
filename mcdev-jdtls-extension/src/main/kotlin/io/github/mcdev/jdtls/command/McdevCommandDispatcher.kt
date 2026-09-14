@@ -15,6 +15,7 @@ import io.github.mcdev.protocol.McdevCommands
 import io.github.mcdev.protocol.McdevError
 import io.github.mcdev.protocol.McdevErrorCode
 import io.github.mcdev.protocol.McdevResponseEnvelope
+import java.util.concurrent.CancellationException
 
 class McdevCommandDispatcher(
     private val completionHandler: McdevCompletionHandler,
@@ -42,9 +43,28 @@ class McdevCommandDispatcher(
     )
 
     fun execute(command: String, arguments: List<Any?>): McdevResponseEnvelope<*> =
+        executeInternal(command, arguments, projectAwareCompletion = false)
+
+    /**
+     * Executes completion through the same dispatcher without the JDT LS
+     * executeCommand/index barrier. This route is final project-aware
+     * completion; it never uses the normal handler's buffer-only shortcut.
+     */
+    fun executeProjectAwareCompletion(arguments: List<Any?>): McdevResponseEnvelope<*> =
+        executeInternal(McdevCommands.COMPLETION, arguments, projectAwareCompletion = true)
+
+    private fun executeInternal(
+        command: String,
+        arguments: List<Any?>,
+        projectAwareCompletion: Boolean,
+    ): McdevResponseEnvelope<*> =
         try {
             when (command) {
-                McdevCommands.COMPLETION -> completionHandler.handle(arguments)
+                McdevCommands.COMPLETION -> if (projectAwareCompletion) {
+                    completionHandler.handleProjectAware(arguments)
+                } else {
+                    completionHandler.handle(arguments)
+                }
                 McdevCommands.DIAGNOSTICS -> diagnosticsHandler.handle(arguments)
                 McdevCommands.CONTEXT -> diagnosticsHandler.handle(arguments)
                 McdevCommands.INFO -> infoHandler.handle(arguments)
@@ -57,7 +77,12 @@ class McdevCommandDispatcher(
                 McdevCommands.HOVER -> hoverHandler.handle(arguments)
                 else -> unknownCommand(command)
             }
+        } catch (error: CancellationException) {
+            throw error
         } catch (error: RuntimeException) {
+            if (error.javaClass.name == OPERATION_CANCELED_EXCEPTION) {
+                throw error
+            }
             McdevResponseEnvelope<Nothing>(
                 error = McdevError(
                     code = McdevErrorCode.INTERNAL_ERROR,
@@ -95,6 +120,8 @@ class McdevCommandDispatcher(
     )
 
     companion object {
+        private const val OPERATION_CANCELED_EXCEPTION = "org.eclipse.core.runtime.OperationCanceledException"
+
         private fun defaultHandlers(): DefaultHandlers {
             val projectService = FileBasedProjectContextService()
             val mixinFacade = MixinServiceFacade()

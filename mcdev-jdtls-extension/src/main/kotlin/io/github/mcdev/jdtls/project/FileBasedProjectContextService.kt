@@ -9,6 +9,7 @@ import io.github.mcdev.core.project.SourceSetContext
 import io.github.mcdev.jdtls.java.JdtClasspathBridge
 import java.nio.file.Files
 import java.nio.file.Path
+import java.util.concurrent.ConcurrentHashMap
 import kotlin.io.path.exists
 import kotlin.io.path.extension
 import kotlin.io.path.isRegularFile
@@ -21,14 +22,19 @@ data class CachedProjectSession(
     val cacheHit: Boolean,
 )
 
-class FileBasedProjectContextService {
+class FileBasedProjectContextService(
+    contextBuilder: ((Path) -> ProjectContext)? = null,
+) {
+    private val contextBuilder: (Path) -> ProjectContext =
+        contextBuilder ?: { root -> buildProjectContextInternal(root) }
     private data class SessionEntry(
         val session: McdevProjectSession,
         val version: Long,
     )
 
-    private val sessionCache: MutableMap<String, SessionEntry> = mutableMapOf()
-    private val versionCounters: MutableMap<String, Long> = mutableMapOf()
+    private val sessionCache = ConcurrentHashMap<String, SessionEntry>()
+    private val versionCounters = ConcurrentHashMap<String, Long>()
+    private val workspaceLocks = ConcurrentHashMap<String, Any>()
 
     fun loadSession(workspaceRootUri: String): McdevProjectSession =
         loadCachedSession(workspaceRootUri).session
@@ -38,30 +44,47 @@ class FileBasedProjectContextService {
         sessionCache[cacheKey]?.let { entry ->
             return CachedProjectSession(entry.session, entry.version, cacheHit = true)
         }
-        val root = UriPathSupport.uriToPath(workspaceRootUri)
-        val context = buildProjectContext(root)
-        val session = McdevProjectSession.create(context)
-        val version = versionCounters.getOrPut(cacheKey) { 1L }
-        sessionCache[cacheKey] = SessionEntry(session, version)
-        return CachedProjectSession(session, version, cacheHit = false)
+
+        synchronized(workspaceLock(cacheKey)) {
+            sessionCache[cacheKey]?.let { entry ->
+                return CachedProjectSession(entry.session, entry.version, cacheHit = true)
+            }
+            val root = UriPathSupport.uriToPath(workspaceRootUri)
+            val context = contextBuilder(root)
+            val session = McdevProjectSession.create(context)
+            val version = versionCounters.computeIfAbsent(cacheKey) { 1L }
+            sessionCache[cacheKey] = SessionEntry(session, version)
+            return CachedProjectSession(session, version, cacheHit = false)
+        }
     }
 
     fun reindex(workspaceRootUri: String): McdevProjectSession {
         val cacheKey = workspaceRootUri.trim()
-        val root = UriPathSupport.uriToPath(workspaceRootUri)
-        val context = buildProjectContext(root)
-        val session = McdevProjectSession.create(context).reindex()
-        val version = (versionCounters[cacheKey] ?: 0L) + 1L
-        versionCounters[cacheKey] = version
-        sessionCache[cacheKey] = SessionEntry(session, version)
-        return session
+        synchronized(workspaceLock(cacheKey)) {
+            sessionCache.remove(cacheKey)
+            val root = UriPathSupport.uriToPath(workspaceRootUri)
+            val context = contextBuilder(root)
+            val session = McdevProjectSession.create(context).reindex()
+            val version = versionCounters.compute(cacheKey) { _, current -> (current ?: 0L) + 1L }!!
+            sessionCache[cacheKey] = SessionEntry(session, version)
+            return session
+        }
     }
 
+    /**
+     * Clears cached sessions. Per-workspace lock objects in [workspaceLocks] are intentionally
+     * retained so threads blocked on or holding a lock never observe a removed monitor.
+     */
     fun clearCache() {
         sessionCache.clear()
     }
 
-    fun buildProjectContext(root: Path): ProjectContext {
+    private fun workspaceLock(cacheKey: String): Any =
+        workspaceLocks.computeIfAbsent(cacheKey) { Any() }
+
+    fun buildProjectContext(root: Path): ProjectContext = buildProjectContextInternal(root)
+
+    internal fun buildProjectContextInternal(root: Path): ProjectContext {
         val gradleContents = readGradleContents(root)
         val classpath = discoverEnhancedClasspath(root)
         val sourceSets = discoverSourceSets(root)

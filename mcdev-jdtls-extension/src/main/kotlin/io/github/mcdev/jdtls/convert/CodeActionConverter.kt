@@ -102,12 +102,7 @@ object CodeActionConverter {
                 val applied = codeActionService.applyMixinConfigFix(fix, content) ?: return null
                 McdevWorkspaceEdit(
                     documentUri = applied.documentUri,
-                    edits = applied.edits.map { edit ->
-                        McdevTextEdit(
-                            range = fullDocumentRange(content),
-                            newText = edit.newText,
-                        )
-                    },
+                    edits = applied.edits.map { toTextEdit(content, it) },
                 )
             }
             is AddMethodDescriptorFix -> {

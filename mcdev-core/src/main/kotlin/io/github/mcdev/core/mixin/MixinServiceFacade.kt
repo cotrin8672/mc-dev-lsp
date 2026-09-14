@@ -1,15 +1,39 @@
 package io.github.mcdev.core.mixin
 
 import io.github.mcdev.core.codeaction.McFix
+import io.github.mcdev.core.bytecode.OccurrenceResultClassification
 import io.github.mcdev.core.completion.McCompletionItem
 import io.github.mcdev.core.completion.McCompletionKind
 import io.github.mcdev.core.completion.McCompletionMetadata
+import io.github.mcdev.core.descriptor.DescriptorParseResult
+import io.github.mcdev.core.descriptor.JvmType
+import io.github.mcdev.core.descriptor.parseMethodDescriptor
 import io.github.mcdev.core.diagnostics.McDiagnostic
+import io.github.mcdev.core.diagnostics.McSeverity
+import io.github.mcdev.core.mixinextras.CommonSuperClassResolver
+import io.github.mcdev.core.mixinextras.ClassLiteralTypeNameResolver
+import io.github.mcdev.core.mixinextras.ExpressionContextResolver
+import io.github.mcdev.core.mixinextras.ExpressionMemberCompletionService
 import io.github.mcdev.core.mixinextras.ExpressionSupport
+import io.github.mcdev.core.mixinextras.HandlerParameterDeclaration
+import io.github.mcdev.core.mixinextras.HandlerParameterSugarSpec
+import io.github.mcdev.core.mixinextras.HandlerSignatureService
+import io.github.mcdev.core.mixinextras.LocalCaptureValidationService
+import io.github.mcdev.core.mixinextras.LocalCompletionService
+import io.github.mcdev.core.mixinextras.MixinExtrasAnnotation
+import io.github.mcdev.core.mixinextras.MixinExtrasAnnotationSite
 import io.github.mcdev.core.mixinextras.MixinExtrasCodeActionService
 import io.github.mcdev.core.mixinextras.MixinExtrasCompletionService
+import io.github.mcdev.core.mixinextras.MixinExtrasDiagnosticCodes
 import io.github.mcdev.core.mixinextras.MixinExtrasDiagnosticRequest
 import io.github.mcdev.core.mixinextras.MixinExtrasDiagnosticsService
+import io.github.mcdev.core.mixinextras.OfficialExpressionIdentifierPoolBuilder
+import io.github.mcdev.core.mixinextras.OfficialExpressionMatchResult
+import io.github.mcdev.core.mixinextras.OfficialExpressionMatcher
+import io.github.mcdev.core.mixinextras.ResolvedMixinExtrasContext
+import io.github.mcdev.core.mixinextras.ShareCompletionService
+import io.github.mcdev.core.mixinextras.toOfficialExpressionMatchContextType
+import io.github.mcdev.core.mixin.MethodIndexEntry
 
 data class MixinFacadeRequest(
     val bufferText: String,
@@ -75,9 +99,16 @@ class MixinServiceFacade(
         bytecodeIndex,
     ),
     private val mixinExtrasDiagnostics: MixinExtrasDiagnosticsService = MixinExtrasDiagnosticsService(classIndex, bytecodeIndex),
-    private val mixinExtrasCodeActions: MixinExtrasCodeActionService = MixinExtrasCodeActionService(classIndex),
-    private val expressionSupport: ExpressionSupport = ExpressionSupport(),
+    private val shareCompletion: ShareCompletionService = ShareCompletionService(classIndex),
+    private val shareSources: () -> Sequence<String> = { emptySequence() },
+    private val expressionSupport: ExpressionSupport = ExpressionSupport(
+        ExpressionMemberCompletionService(classIndex, bytecodeIndex),
+    ),
 ) {
+    private val handlerSignatureService = HandlerSignatureService(classIndex, bytecodeIndex)
+    private val localCaptureValidation = LocalCaptureValidationService(classIndex, bytecodeIndex)
+    private val localCompletion = LocalCompletionService(classIndex)
+    private val mixinExtrasCodeActions = MixinExtrasCodeActionService(classIndex, handlerSignatureService)
     private val mixinExtrasMethodAnnotations = setOf(
         MixinAnnotation.MODIFY_EXPRESSION_VALUE,
         MixinAnnotation.MODIFY_RETURN_VALUE,
@@ -143,11 +174,15 @@ class MixinServiceFacade(
         }
         val routedItems = context?.let { routeCompletion(effectiveRequest, it, options) }.orEmpty()
         val items = routedItems.ifEmpty {
-            expressionSupport.completeFeatureAnnotations(
-                effectiveRequest.bufferText,
-                effectiveRequest.line,
-                effectiveRequest.character,
-            )
+            if (isInsideExpressionValue(context)) {
+                emptyList()
+            } else {
+                expressionSupport.completeFeatureAnnotations(
+                    effectiveRequest.bufferText,
+                    effectiveRequest.line,
+                    effectiveRequest.character,
+                )
+            }
         }
         return MixinCompletionResult(
             items = items,
@@ -183,8 +218,11 @@ class MixinServiceFacade(
             MixinExtrasDiagnosticRequest(
                 source = request.bufferText,
                 documentUri = request.documentUri,
+                resolvedContexts = request.semanticModel?.resolvedMixinExtrasContexts.orEmpty(),
             ),
         )
+        diagnostics += diagnoseLocalCaptures(request)
+        diagnostics += diagnoseStandardInjectorSugarConstraints(request)
         return diagnostics
     }
 
@@ -206,8 +244,17 @@ class MixinServiceFacade(
             diagnostics = diagnostics,
             documentUri = request.documentUri,
             source = request.bufferText,
+            resolvedContexts = request.semanticModel?.resolvedMixinExtrasContexts.orEmpty(),
         )
-        return (mixinFixes + extrasFixes).distinctBy { it.title }
+        val generatedExtrasFixes = mixinExtrasCodeActions.generateHandlerFixesAtPosition(
+            documentUri = request.documentUri,
+            source = request.bufferText,
+            line = request.line,
+            character = request.character,
+            mixinTargets = MixinTargetResolver.resolveTargetsFromSource(request.bufferText, classIndex),
+            resolvedContexts = request.semanticModel?.resolvedMixinExtrasContexts.orEmpty(),
+        )
+        return MixinExtrasCodeActionService.deduplicateFixes(mixinFixes + extrasFixes + generatedExtrasFixes)
     }
 
     private fun routeCompletion(
@@ -217,7 +264,17 @@ class MixinServiceFacade(
     ): List<McCompletionItem> {
         val source = request.bufferText
         if (context.slot == AnnotationSlot.ATTRIBUTE) {
-            return attributeCompletion.complete(context)
+            val items = attributeCompletion.complete(context)
+            if (context.annotation == MixinAnnotation.LOCAL) {
+                val matchingSites = findLocalParameterSitesAtOffset(source, context.valueEndOffset)
+                if (matchingSites.any { it.site.annotation == MixinExtrasAnnotation.WRAP_METHOD }) {
+                    return emptyList()
+                }
+                if (matchingSites.isNotEmpty()) {
+                    return items.filter { it.metadata.name != "type" }
+                }
+            }
+            return items
         }
         return when (context.annotation) {
             MixinAnnotation.MIXIN -> mixinTargetCompletion.complete(context, options)
@@ -230,14 +287,8 @@ class MixinServiceFacade(
             -> injectMethodCompletion.complete(context.withResolvedMixinTargets(request), options)
             in mixinExtrasMethodAnnotations -> completeMixinExtrasMethod(request, context, options)
             MixinAnnotation.AT -> when (context.slot) {
-                AnnotationSlot.VALUE -> {
-                    val expressionItems = expressionSupport.completeAtValue(context)
-                    if (expressionItems.isNotEmpty()) expressionItems else atValueCompletion.complete(context)
-                }
-                AnnotationSlot.TARGET -> {
-                    val extrasItems = mixinExtrasCompletion.complete(context.withResolvedMixinTargets(request), options)
-                    if (extrasItems.isNotEmpty()) extrasItems else completeAtTarget(request, context)
-                }
+                AnnotationSlot.VALUE -> mergeAtValueCompletions(context)
+                AnnotationSlot.TARGET -> completeAtTarget(request, context)
                 else -> emptyList()
             }
             MixinAnnotation.ACCESSOR -> if (context.slot == AnnotationSlot.ACCESSOR_VALUE) {
@@ -258,8 +309,202 @@ class MixinServiceFacade(
             }
             MixinAnnotation.SHADOW -> completeShadow(request, context)
             MixinAnnotation.OVERWRITE -> completeOverwrite(request, context)
+            MixinAnnotation.LOCAL -> if (context.slot == AnnotationSlot.VALUE) {
+                completeLocalAttributeValues(request, context)
+            } else {
+                emptyList()
+            }
+            MixinAnnotation.SHARE -> if (
+                context.slot == AnnotationSlot.VALUE && context.attributeName != "namespace"
+            ) {
+                shareCompletion.complete(source, context, shareSources())
+            } else {
+                emptyList()
+            }
+            MixinAnnotation.EXPRESSION,
+            MixinAnnotation.EXPRESSIONS,
+            -> if (context.slot == AnnotationSlot.VALUE) {
+                expressionSupport.completeExpressionValue(
+                    context = context,
+                    source = request.bufferText,
+                    resolvedContexts = request.semanticModel?.resolvedMixinExtrasContexts.orEmpty(),
+                    mixinTargetOwners = resolveMixinTargets(request, context),
+                )
+            } else {
+                emptyList()
+            }
             else -> emptyList()
         }
+    }
+
+    private fun completeLocalAttributeValues(
+        request: MixinFacadeRequest,
+        context: AnnotationContext,
+    ): List<McCompletionItem> {
+        val attributeName = context.attributeName ?: return emptyList()
+        if (attributeName !in LOCAL_VALUE_ATTRIBUTES) return emptyList()
+
+        val source = request.bufferText
+        val matchingSites = findLocalParameterSitesAtOffset(source, context.valueStartOffset)
+        if (matchingSites.isEmpty()) return emptyList()
+        if (matchingSites.any { it.site.annotation == MixinExtrasAnnotation.WRAP_METHOD }) return emptyList()
+
+        val mixinTargets = resolveMixinTargets(request, context)
+        if (mixinTargets.isEmpty()) return emptyList()
+
+        val parameter = matchingSites.first().parameter
+        val results = matchingSites.flatMap { (site, siteParameter) ->
+            resolveLocalCaptures(request, site, siteParameter, mixinTargets)
+        }
+        if (results.isEmpty()) return emptyList()
+
+        return localCompletion.complete(
+            source = source,
+            parameter = parameter,
+            results = results,
+            attributeName = attributeName,
+            partialPrefix = context.partialValue.trim().trim('"'),
+        )
+    }
+
+    private fun resolveLocalCaptures(
+        request: MixinFacadeRequest,
+        site: MixinExtrasAnnotationSite,
+        parameter: HandlerParameterDeclaration,
+        mixinTargets: List<String>,
+    ): List<LocalCaptureValidationService.Result> {
+        val targetMethod = handlerSignatureService.resolveTargetMethod(
+            mixinTargets,
+            site.methodAttribute,
+        ) ?: return emptyList()
+        val owners = eligibleLocalCaptureOwners(mixinTargets, targetMethod)
+        if (owners.isEmpty()) return emptyList()
+
+        val source = request.bufferText
+        val resolvedContexts = request.semanticModel?.resolvedMixinExtrasContexts.orEmpty()
+        val points = owners.map { owner ->
+            LocalCaptureValidationService.Point(
+                owner = owner,
+                targetMethod = targetMethod,
+                site = site,
+                expressionInstructionIndices = resolveExpressionInstructionIndices(
+                    source = source,
+                    site = site,
+                    targetMethod = targetMethod,
+                    owner = owner,
+                    resolvedContexts = resolvedContexts,
+                ),
+            )
+        }
+        return localCaptureValidation.validate(source, parameter, points)
+    }
+
+    private data class LocalParameterSite(
+        val site: MixinExtrasAnnotationSite,
+        val parameter: HandlerParameterDeclaration,
+    )
+
+    private fun findLocalParameterSitesAtOffset(source: String, offset: Int): List<LocalParameterSite> {
+        val matches = mutableListOf<LocalParameterSite>()
+        for (site in HandlerSignatureService.findSugarHandlerAnnotationSites(source)) {
+            val handler = site.handlerMethod ?: continue
+            for (parameter in handler.parameters) {
+                if (parameter.sugarSpec !is HandlerParameterSugarSpec.Local) continue
+                val range = parameter.sugarAnnotationRange ?: continue
+                val start = AnnotationContextExtractor.toOffset(source, range.start.line, range.start.character)
+                    ?: continue
+                val end = AnnotationContextExtractor.toOffset(source, range.end.line, range.end.character)
+                    ?: continue
+                if (offset in start until end) {
+                    matches += LocalParameterSite(site, parameter)
+                }
+            }
+        }
+        return matches
+    }
+
+    private fun eligibleLocalCaptureOwners(
+        mixinTargetOwners: List<String>,
+        targetMethod: MethodIndexEntry,
+    ): List<String> =
+        mixinTargetOwners.filter { owner ->
+            classIndex.getMethods(owner).any { method ->
+                method.name == targetMethod.name && method.descriptor == targetMethod.descriptor
+            }
+        }
+
+    private fun resolveExpressionInstructionIndices(
+        source: String,
+        site: MixinExtrasAnnotationSite,
+        targetMethod: MethodIndexEntry,
+        owner: String,
+        resolvedContexts: List<ResolvedMixinExtrasContext>,
+    ): Set<Int>? {
+        if (!site.atValue.equals(MIXINEXTRAS_EXPRESSION_AT_VALUE, ignoreCase = true)) {
+            return null
+        }
+        val contextType = site.annotation.toOfficialExpressionMatchContextType() ?: return null
+        val expressionContext = ExpressionContextResolver.resolveExpressionContextForSite(
+            source = source,
+            site = site,
+            resolvedContexts = resolvedContexts,
+        ) ?: return null
+        val expressions = expressionContext.expressionValuesForAtId(site.atId)
+            .map { it.trim() }
+            .filter { it.isNotEmpty() }
+        if (expressions.isEmpty()) return null
+
+        val classBytes = bytecodeIndex.getClassBytes(owner) ?: return null
+        val identifierPool = OfficialExpressionIdentifierPoolBuilder.build(
+            expressionContext.definitionIndex,
+            ClassLiteralTypeNameResolver.forSource(source, classIndex),
+        ).pool
+        val commonSuperClass = CommonSuperClassResolver { left, right ->
+            bytecodeIndex.resolveCommonSuperClass(left, right)
+        }
+        return when (
+            val matchResult = OfficialExpressionMatcher.match(
+                classBytes = classBytes,
+                methodName = targetMethod.name,
+                methodDescriptor = targetMethod.descriptor,
+                expressions = expressions,
+                contextType = contextType,
+                identifierPool = identifierPool,
+                commonSuperClass = commonSuperClass,
+            )
+        ) {
+            is OfficialExpressionMatchResult.Unavailable -> null
+            is OfficialExpressionMatchResult.Available -> {
+                val indices = matchResult.matches.map { it.originalInstructionIndex }.toSet()
+                indices.takeIf { it.isNotEmpty() }
+            }
+        }
+    }
+
+    private fun isInsideExpressionValue(context: AnnotationContext?): Boolean {
+        if (context == null) return false
+        return context.annotation in setOf(MixinAnnotation.EXPRESSION, MixinAnnotation.EXPRESSIONS) &&
+            context.slot == AnnotationSlot.VALUE
+    }
+
+    private fun mergeAtValueCompletions(context: AnnotationContext): List<McCompletionItem> {
+        val coreItems = atValueCompletion.complete(context)
+        val expressionItems = expressionSupport.completeAtValue(context)
+        val expressionByInsertText = expressionItems.associateBy { it.insertText }
+        val merged = mutableListOf<McCompletionItem>()
+        val seen = mutableSetOf<String>()
+        for (item in coreItems) {
+            val preferred = expressionByInsertText[item.insertText] ?: item
+            if (seen.add(preferred.insertText)) {
+                merged.add(preferred)
+            }
+        }
+        for (item in expressionItems) {
+            if (seen.add(item.insertText)) {
+                merged.add(item)
+            }
+        }
+        return merged
     }
 
     private fun completeMixinExtrasMethod(
@@ -277,26 +522,106 @@ class MixinServiceFacade(
 
     private fun completeAtTarget(request: MixinFacadeRequest, context: AnnotationContext): List<McCompletionItem> {
         val owners = resolveMixinTargets(request, context)
-        val owner = owners.firstOrNull() ?: return emptyList()
+        if (owners.isEmpty()) return emptyList()
         val methodTarget = parseMethodTarget(
             context.injectMethodName
             ?: return emptyList(),
         )
         val atValue = context.atValue
             ?: return emptyList()
-        val candidates = bytecodeIndex.getAtTargetCandidates(
-            owner,
-            methodTarget.name,
-            methodTarget.descriptor,
-            atValue,
-        )
-        return atTargetCompletion.complete(context, candidates)
+        val candidates = owners.flatMap { owner ->
+            bytecodeIndex.getAtTargetCandidates(
+                owner,
+                methodTarget.name,
+                methodTarget.descriptor,
+                atValue,
+            )
+        }.distinct()
+        val filteredCandidates = if (context.atInsideSlice) {
+            candidates
+        } else {
+            candidates.filter {
+                isValidAtTargetCandidate(context.parentInjectorAnnotation, methodTarget.descriptor, it)
+            }
+        }
+        return atTargetCompletion.complete(context, filteredCandidates)
+    }
+
+    private fun isValidAtTargetCandidate(
+        injector: MixinAnnotation?,
+        targetMethodDescriptor: String?,
+        candidate: AtTargetCandidate,
+    ): Boolean = when (injector) {
+        MixinAnnotation.MODIFY_EXPRESSION_VALUE -> when (candidate.kind) {
+            AtTargetKind.INVOKE ->
+                candidate.name != "<init>" && hasNonVoidReturn(candidate.descriptor)
+            AtTargetKind.FIELD -> candidate.operationKind in FIELD_GET_KINDS
+            AtTargetKind.NEW,
+            AtTargetKind.CONSTANT,
+            -> true
+            else -> false
+        }
+        MixinAnnotation.MODIFY_RETURN_VALUE ->
+            hasNonVoidReturn(targetMethodDescriptor) && candidate.kind == AtTargetKind.RETURN
+        MixinAnnotation.MODIFY_RECEIVER ->
+            candidate.name != "<init>" &&
+                (candidate.operationKind in INSTANCE_INVOKE_KINDS || candidate.operationKind in INSTANCE_FIELD_KINDS)
+        MixinAnnotation.WRAP_OPERATION -> when (candidate.kind) {
+            AtTargetKind.INVOKE -> candidate.name != "<init>" && candidate.operationKind in INVOKE_KINDS
+            AtTargetKind.FIELD -> candidate.operationKind in FIELD_KINDS
+            AtTargetKind.NEW -> true
+            else -> false
+        }
+        MixinAnnotation.WRAP_WITH_CONDITION ->
+            (candidate.name != "<init>" &&
+                candidate.operationKind in INVOKE_KINDS &&
+                candidate.occurrenceResultClassification in CONDITION_INVOKE_RESULTS) ||
+                candidate.operationKind in FIELD_PUT_KINDS
+        else -> true
+    }
+
+    private fun hasNonVoidReturn(descriptor: String?): Boolean {
+        val parsed = descriptor?.let(::parseMethodDescriptor) as? DescriptorParseResult.Success ?: return false
+        return parsed.value.returnType != JvmType.VoidType
     }
 
     private data class MethodTarget(
         val name: String,
         val descriptor: String?,
     )
+
+    private companion object {
+        val INVOKE_KINDS = setOf(
+            AtTargetOperationKind.INVOKE_VIRTUAL,
+            AtTargetOperationKind.INVOKE_STATIC,
+            AtTargetOperationKind.INVOKE_SPECIAL,
+            AtTargetOperationKind.INVOKE_INTERFACE,
+        )
+        val INSTANCE_INVOKE_KINDS = setOf(
+            AtTargetOperationKind.INVOKE_VIRTUAL,
+            AtTargetOperationKind.INVOKE_SPECIAL,
+            AtTargetOperationKind.INVOKE_INTERFACE,
+        )
+        val FIELD_GET_KINDS = setOf(
+            AtTargetOperationKind.FIELD_GET_INSTANCE,
+            AtTargetOperationKind.FIELD_GET_STATIC,
+        )
+        val FIELD_PUT_KINDS = setOf(
+            AtTargetOperationKind.FIELD_PUT_INSTANCE,
+            AtTargetOperationKind.FIELD_PUT_STATIC,
+        )
+        val FIELD_KINDS = FIELD_GET_KINDS + FIELD_PUT_KINDS
+        val INSTANCE_FIELD_KINDS = setOf(
+            AtTargetOperationKind.FIELD_GET_INSTANCE,
+            AtTargetOperationKind.FIELD_PUT_INSTANCE,
+        )
+        val CONDITION_INVOKE_RESULTS = setOf(
+            OccurrenceResultClassification.VOID,
+            OccurrenceResultClassification.IMMEDIATELY_POPPED,
+        )
+        val LOCAL_VALUE_ATTRIBUTES = setOf("ordinal", "index", "name")
+        const val MIXINEXTRAS_EXPRESSION_AT_VALUE = "MIXINEXTRAS:EXPRESSION"
+    }
 
     private fun parseMethodTarget(value: String): MethodTarget {
         val paren = value.indexOf('(')
@@ -309,17 +634,15 @@ class MixinServiceFacade(
 
     private fun resolveMixinTargets(request: MixinFacadeRequest, context: AnnotationContext): List<String> {
         val source = request.bufferText
+        val imports = JavaTypeDescriptorResolver.importsFor(source)
         request.semanticModel?.targets
-            ?.mapNotNull {
-                MixinTargetResolver.resolveTarget(it.internalName, classIndex)
-                    ?: it.internalName.takeIf { name -> '/' in name }
-            }
+            ?.mapNotNull { MixinTargetResolver.resolveTarget(it.internalName, classIndex, imports) }
             ?.takeIf { it.isNotEmpty() }
             ?.let { return it }
         val rawTargets = context.mixinTargetInternalNames.ifEmpty {
             AnnotationContextExtractor.resolveRawMixinTargets(source, context.valueStartOffset)
         }
-        return MixinTargetResolver.resolveTargets(rawTargets, classIndex, JavaTypeDescriptorResolver.importsFor(source))
+        return MixinTargetResolver.resolveTargets(rawTargets, classIndex, imports)
     }
 
     private fun AnnotationContext.withResolvedMixinTargets(request: MixinFacadeRequest): AnnotationContext =
@@ -389,6 +712,81 @@ class MixinServiceFacade(
                     ),
                 )
             }
+    }
+
+    private fun diagnoseStandardInjectorSugarConstraints(request: MixinFacadeRequest): List<McDiagnostic> {
+        val source = request.bufferText
+        val imports = JavaTypeDescriptorResolver.importsFor(source)
+
+        val standardInjectorAnnotations =
+            MixinExtrasAnnotation.sugarHandlerInjectorAnnotations - MixinExtrasAnnotation.injectorAnnotations
+        val diagnostics = mutableListOf<McDiagnostic>()
+        for (site in HandlerSignatureService.findSugarHandlerAnnotationSites(source)) {
+            if (site.annotation !in standardInjectorAnnotations) continue
+            val handler = site.handlerMethod ?: continue
+            val annotationOffset = AnnotationContextExtractor.toOffset(
+                source,
+                site.annotationRange.start.line,
+                site.annotationRange.start.character,
+            ) ?: continue
+            val scope = AnnotationContextExtractor.resolveMixinClassScope(source, annotationOffset) ?: continue
+            val mixinTargets = MixinTargetResolver.resolveTargets(scope.rawTargets, classIndex, imports)
+            if (mixinTargets.isEmpty()) continue
+            val enriched = HandlerSignatureService.enrichHandlerTypes(handler, classIndex)
+            val targetMethod = handlerSignatureService.resolveTargetMethod(mixinTargets, site.methodAttribute)
+            val issues = handlerSignatureService.validateCommonSugarConstraints(
+                enriched,
+                targetMethod,
+                site.annotation,
+            )
+            diagnostics += issues.map { issue ->
+                McDiagnostic(
+                    code = issue.code,
+                    severity = McSeverity.ERROR,
+                    message = issue.message,
+                    range = issue.range,
+                )
+            }
+        }
+        return diagnostics.distinctBy { Triple(it.code, it.message, it.range) }
+    }
+
+    private fun diagnoseLocalCaptures(request: MixinFacadeRequest): List<McDiagnostic> {
+        val source = request.bufferText
+        val mixinTargets = MixinTargetResolver.resolveTargetsFromSource(source, classIndex)
+        if (mixinTargets.isEmpty()) return emptyList()
+
+        val diagnostics = mutableListOf<McDiagnostic>()
+        for (site in HandlerSignatureService.findSugarHandlerAnnotationSites(source)) {
+            if (site.annotation == MixinExtrasAnnotation.WRAP_METHOD) continue
+            val handler = site.handlerMethod ?: continue
+            for (parameter in handler.parameters) {
+                if (parameter.sugarSpec !is HandlerParameterSugarSpec.Local) continue
+                val results = resolveLocalCaptures(request, site, parameter, mixinTargets)
+                if (results.isEmpty()) continue
+
+                val range = parameter.sugarAnnotationRange ?: parameter.range ?: site.annotationRange
+                when {
+                    results.any { it is LocalCaptureValidationService.Result.Ambiguous } -> {
+                        diagnostics += McDiagnostic(
+                            code = MixinExtrasDiagnosticCodes.LOCAL_CAPTURE_AMBIGUOUS,
+                            severity = McSeverity.ERROR,
+                            message = "Local capture is ambiguous; specify ordinal, index, or name.",
+                            range = range,
+                        )
+                    }
+                    results.any { it is LocalCaptureValidationService.Result.NotFound } -> {
+                        diagnostics += McDiagnostic(
+                            code = MixinExtrasDiagnosticCodes.LOCAL_CAPTURE_NOT_FOUND,
+                            severity = McSeverity.ERROR,
+                            message = "Could not find a matching local variable",
+                            range = range,
+                        )
+                    }
+                }
+            }
+        }
+        return diagnostics.distinct()
     }
 
     private fun analyzeMemberDeclarations(request: MixinFacadeRequest): List<McDiagnostic> {

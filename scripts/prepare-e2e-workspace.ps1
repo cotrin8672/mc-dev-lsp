@@ -102,6 +102,112 @@ New-Item -ItemType Directory -Path $workspaceRoot -Force | Out-Null
 $fixtureRoot = "fixtures/$Fixture"
 Copy-FixtureTree -FixtureRoot $fixtureRoot -DestinationRoot $workspaceRoot
 
+if ($Fixture -eq "fabric-mixinextras") {
+    $e2eBuildGradlePath = Join-Path $workspaceRoot "build.gradle"
+    $e2eBuildGradleContent = @'
+plugins {
+    id 'java'
+    id 'maven-publish'
+}
+
+repositories {
+    mavenCentral()
+    maven { url "https://repo.spongepowered.org/repository/maven-public/" }
+}
+
+dependencies {
+    // fabric-loom marker for mcdev platform detection; this fixture is imported
+    // by JDT LS without resolving the live Loom plugin.
+    compileOnly "org.spongepowered:mixin:0.8.7"
+    compileOnly "io.github.llamalad7:mixinextras-fabric:0.5.5"
+}
+'@
+    [System.IO.File]::WriteAllText($e2eBuildGradlePath, $e2eBuildGradleContent, [System.Text.UTF8Encoding]::new($false))
+
+    $sharedMixinPath = Join-Path $workspaceRoot "src/main/java/com/example/mixin/MixinExtrasSharedExample.java"
+    $sharedMixinContent = @'
+package com.example.mixin;
+
+import com.example.target.SimpleTarget;
+import com.llamalad7.mixinextras.sugar.Share;
+import com.llamalad7.mixinextras.sugar.ref.LocalIntRef;
+import org.spongepowered.asm.mixin.Mixin;
+import org.spongepowered.asm.mixin.injection.At;
+import org.spongepowered.asm.mixin.injection.Inject;
+import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
+
+@Mixin(SimpleTarget.class)
+public abstract class MixinExtrasSharedExample {
+    @Inject(method = "draw(Ljava/lang/String;FF)V", at = @At("HEAD"))
+    private void mcdev$shareAcrossFiles(
+        CallbackInfo ci,
+        @Share(value = "speedAcrossFiles", namespace = "shared") LocalIntRef speed
+    ) {}
+}
+'@
+    [System.IO.File]::WriteAllText($sharedMixinPath, $sharedMixinContent, [System.Text.UTF8Encoding]::new($false))
+
+    $mixinsJsonPath = Join-Path $workspaceRoot "mixins.json"
+    $mixinsJson = Get-Content -LiteralPath $mixinsJsonPath -Raw | ConvertFrom-Json
+    $mixinsJson.mixins = @($mixinsJson.mixins) + "MixinExtrasSharedExample"
+    $mixinsJsonContent = $mixinsJson | ConvertTo-Json -Depth 10
+    [System.IO.File]::WriteAllText($mixinsJsonPath, $mixinsJsonContent, [System.Text.UTF8Encoding]::new($false))
+}
+
+if ($Fixture -in @("multi-source-set", "forge-basic")) {
+    $platformMarker = if ($Fixture -eq "multi-source-set") { "fabric-loom" } else { "net.minecraftforge.gradle" }
+    $sourceSets = ""
+    $clientDependencies = ""
+    if ($Fixture -eq "multi-source-set") {
+        $sourceSets = @'
+sourceSets {
+    main {
+        java.srcDirs = ["src/main/java"]
+        resources.srcDirs = ["src/main/resources"]
+    }
+    client {
+        java.srcDirs = ["src/client/java"]
+        resources.srcDirs = ["src/client/resources"]
+        compileClasspath += sourceSets.main.output
+        runtimeClasspath += sourceSets.main.output
+    }
+}
+'@
+        $clientDependencies = @'
+    clientCompileOnly files("classpath")
+    clientCompileOnly "org.spongepowered:mixin:0.8.7"
+'@
+    }
+
+    $e2eBuildGradlePath = Join-Path $workspaceRoot "build.gradle"
+    $e2eBuildGradleContent = @"
+plugins {
+    id 'java'
+    id 'maven-publish'
+}
+
+// $platformMarker marker for mcdev platform detection; this fixture is imported
+// by JDT LS without resolving the live platform plugin.
+repositories {
+    mavenCentral()
+    maven { url "https://repo.spongepowered.org/repository/maven-public/" }
+}
+
+$sourceSets
+dependencies {
+    compileOnly files("classpath")
+    compileOnly "org.spongepowered:mixin:0.8.7"
+$clientDependencies}
+"@
+    [System.IO.File]::WriteAllText($e2eBuildGradlePath, $e2eBuildGradleContent, [System.Text.UTF8Encoding]::new($false))
+}
+
+$settingsGradlePath = Join-Path $workspaceRoot "settings.gradle"
+$settingsGradleContent = @'
+rootProject.name = "mcdev-e2e-workspace"
+'@
+[System.IO.File]::WriteAllText($settingsGradlePath, $settingsGradleContent, [System.Text.UTF8Encoding]::new($false))
+
 $classResource = "fixtures/shared/classes/com/example/target/SimpleTarget.class"
 $classDestination = Join-Path $workspaceRoot "classpath/com/example/target/SimpleTarget.class"
 Copy-FixtureResource -ResourcePath $classResource -Destination $classDestination
@@ -124,9 +230,23 @@ if ($Fixture -eq "fabric-basic") {
         $fabricMod | Add-Member -NotePropertyName "accessWidener" -NotePropertyValue "mod.accesswidener" -Force
         $fabricMod | ConvertTo-Json -Depth 10 | Set-Content -LiteralPath $fabricModPath -Encoding utf8
     }
+
+    $sourceOnlyTargetDir = Join-Path $workspaceRoot "src/main/java/com/example/target"
+    New-Item -ItemType Directory -Path $sourceOnlyTargetDir -Force | Out-Null
+    @'
+package com.example.target;
+
+public class SourceOnlyTarget {
+    public void pulse() {}
+
+    public int measure(String label) {
+        return label.length();
+    }
+}
+'@ | Set-Content -LiteralPath (Join-Path $sourceOnlyTargetDir "SourceOnlyTarget.java") -Encoding utf8
 }
 
-if ($Fixture -eq "fabric-aw-at") {
+if ($Fixture -in @("fabric-aw-at", "fabric-mixinextras")) {
     Copy-FixtureResource `
         -ResourcePath "fixtures/fabric-basic/src/main/java/com/example/target/SimpleTarget.java" `
         -Destination (Join-Path $workspaceRoot "src/main/java/com/example/target/SimpleTarget.java")

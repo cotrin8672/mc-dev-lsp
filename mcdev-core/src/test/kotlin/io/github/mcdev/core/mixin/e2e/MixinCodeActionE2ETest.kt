@@ -32,6 +32,28 @@ class MixinCodeActionE2ETest {
     }
 
     @Test
+    fun producesAndAppliesRelativeMixinConfigEntryFix() {
+        val source = """
+            package com.example.mixin.client;
+            @Mixin(MinecraftClient.class) class ClientMixin {}
+        """.trimIndent()
+        val request = MixinE2ETestSupport.requestAt(source, "ClientMixin").copy(
+            mixinClassName = "ClientMixin",
+            mixinPackage = "com.example.mixin.client",
+            mixinConfigContent = """{ "package": "com.example.mixin", "client": [] }""",
+            mixinConfigPath = "mixins.json",
+        )
+        val fixes = facade.codeActions(request, MixinDiagnosticCodes.MIXIN_CLASS_NOT_LISTED_IN_CONFIG)
+        assertEquals(1, fixes.size)
+        val fix = fixes.single() as AddMixinConfigEntryFix
+        assertEquals("client.ClientMixin", fix.mixinClassName)
+
+        val edit = codeActionService.applyMixinConfigFix(fix, request.mixinConfigContent!!)
+        assertNotNull(edit)
+        assertTrue(edit.edits.first().newText.contains("client.ClientMixin"))
+    }
+
+    @Test
     fun applyMixinConfigFixAddsEntry() {
         val source = """@Mixin(MinecraftClient.class) class ExampleMixin {}"""
         val request = MixinE2ETestSupport.requestAt(source, "ExampleMixin").copy(

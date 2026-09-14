@@ -22,7 +22,7 @@ M.last_trigger_time = nil
 function M.publish(bufnr, diagnostics)
   local vim_diagnostics = {}
   for _, diagnostic in ipairs(diagnostics or {}) do
-    table.insert(vim_diagnostics, convert.to_vim_diagnostic(diagnostic))
+    table.insert(vim_diagnostics, convert.to_vim_diagnostic(diagnostic, bufnr))
   end
   vim.diagnostic.set(M.namespace, bufnr, vim_diagnostics)
 end

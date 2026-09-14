@@ -1,6 +1,7 @@
 package io.github.mcdev.core.mixin
 
 import io.github.mcdev.core.codeaction.AddMixinConfigEntryFix
+import io.github.mcdev.core.codeaction.McTextEdit
 import io.github.mcdev.core.diagnostics.McDiagnostic
 import io.github.mcdev.core.diagnostics.McSeverity
 import io.github.mcdev.core.diagnostics.McTextPosition
@@ -18,6 +19,29 @@ class MixinCodeActionServiceTest {
         accessorService = AccessorService(FakeClassIndex()),
         invokerService = InvokerService(FakeClassIndex()),
     )
+
+    private fun applyTextEdit(original: String, edit: McTextEdit): String =
+        original.substring(0, edit.startOffset) + edit.newText + original.substring(edit.endOffset)
+
+    private fun addMixinConfigFixForSource(source: String, mixinClass: String = "ExampleMixin"): AddMixinConfigEntryFix {
+        val diagnostic = McDiagnostic(
+            code = MixinDiagnosticCodes.MIXIN_CLASS_NOT_LISTED_IN_CONFIG,
+            severity = McSeverity.WARNING,
+            message = "missing",
+            range = McTextRange(McTextPosition(0, 0), McTextPosition(0, 10)),
+            metadata = mapOf("mixinClass" to mixinClass),
+        )
+        val fixes = service.fixesForDiagnostics(
+            listOf(diagnostic),
+            documentUri = "file:///Mixin.java",
+            source = source,
+            mixinConfigContent = null,
+            mixinConfigPath = "mixins.json",
+            mixinPackage = "example.mixin",
+        )
+        assertEquals(1, fixes.size)
+        return fixes.first() as AddMixinConfigEntryFix
+    }
 
     @Test
     fun producesAddMixinConfigFix() {
@@ -40,6 +64,87 @@ class MixinCodeActionServiceTest {
         val fix = fixes.first() as AddMixinConfigEntryFix
         assertEquals("ExampleMixin", fix.mixinClassName)
         assertEquals("mixins.json", fix.configPath)
+        assertEquals("mixins", fix.arrayName)
+    }
+
+    @Test
+    fun addMixinConfigFixUsesClientArrayForFabricClient() {
+        val source = """
+            @Environment(EnvType.CLIENT)
+            @Mixin(MinecraftClient.class)
+            class ClientMixin {}
+        """.trimIndent()
+        val fix = addMixinConfigFixForSource(source, mixinClass = "ClientMixin")
+        assertEquals("client", fix.arrayName)
+    }
+
+    @Test
+    fun addMixinConfigFixUsesServerArrayForNeoForgeDedicatedServer() {
+        val source = """
+            @net.neoforged.api.distmarker.OnlyIn(net.neoforged.api.distmarker.Dist.DEDICATED_SERVER)
+            @Mixin(MinecraftServer.class)
+            class ServerMixin {}
+        """.trimIndent()
+        val fix = addMixinConfigFixForSource(source, mixinClass = "ServerMixin")
+        assertEquals("server", fix.arrayName)
+    }
+
+    @Test
+    fun addMixinConfigFixUsesMixinsArrayWhenNoSideAnnotationPresent() {
+        val source = """
+            @Mixin(MinecraftClient.class)
+            class ExampleMixin {}
+        """.trimIndent()
+        val fix = addMixinConfigFixForSource(source)
+        assertEquals("mixins", fix.arrayName)
+    }
+
+    @Test
+    fun addMixinConfigFixUsesMixinsArrayForConflictingSideAnnotations() {
+        val source = """
+            @Environment(EnvType.CLIENT)
+            @OnlyIn(Dist.DEDICATED_SERVER)
+            @Mixin(MinecraftClient.class)
+            class ExampleMixin {}
+        """.trimIndent()
+        val fix = addMixinConfigFixForSource(source)
+        assertEquals("mixins", fix.arrayName)
+    }
+
+    @Test
+    fun applyMixinConfigFixTargetsClientArrayFromFix() {
+        val source = """
+            @Environment(EnvType.CLIENT)
+            @Mixin(MinecraftClient.class)
+            class ClientMixin {}
+        """.trimIndent()
+        val fix = addMixinConfigFixForSource(source, mixinClass = "ClientMixin")
+        val content = """{ "client": ["ExistingClientMixin"] }"""
+        val edit = service.applyMixinConfigFix(fix, content)
+        assertNotNull(edit)
+        assertEquals("client", edit.metadata["arrayName"])
+        assertEquals(
+            """{ "client": ["ExistingClientMixin", "ClientMixin"] }""",
+            applyTextEdit(content, edit.edits.first()),
+        )
+    }
+
+    @Test
+    fun applyMixinConfigFixTargetsServerArrayFromFix() {
+        val source = """
+            @OnlyIn(Dist.DEDICATED_SERVER)
+            @Mixin(MinecraftServer.class)
+            class ServerMixin {}
+        """.trimIndent()
+        val fix = addMixinConfigFixForSource(source, mixinClass = "ServerMixin")
+        val content = """{ "server": ["ExistingServerMixin"] }"""
+        val edit = service.applyMixinConfigFix(fix, content)
+        assertNotNull(edit)
+        assertEquals("server", edit.metadata["arrayName"])
+        assertEquals(
+            """{ "server": ["ExistingServerMixin", "ServerMixin"] }""",
+            applyTextEdit(content, edit.edits.first()),
+        )
     }
 
     @Test
@@ -55,6 +160,62 @@ class MixinCodeActionServiceTest {
         assertNotNull(edit)
         assertTrue(edit.edits.first().newText.contains("ExampleMixin"))
         assertTrue(edit.edits.first().newText.indexOf("AlphaMixin") < edit.edits.first().newText.indexOf("ExampleMixin"))
+    }
+
+    @Test
+    fun applyMixinConfigFixUsesLosslessDeltaForJson5Comments() {
+        val content = """
+            {
+              "mixins": ["AlphaMixin", /* keep trailing comma */ ,]
+            }
+        """.trimIndent()
+        val fix = AddMixinConfigEntryFix(
+            title = "Add mixin",
+            configPath = "mixins.json",
+            mixinClassName = "BetaMixin",
+            mixinPackage = null,
+        )
+        val editorResult = configEditor.addEntry(content, fix.mixinClassName)
+        val edit = service.applyMixinConfigFix(fix, content)
+
+        assertNotNull(edit)
+        assertEquals(1, edit.edits.size)
+        val textEdit = edit.edits.first()
+        assertEquals(textEdit.startOffset, textEdit.endOffset)
+        assertTrue(textEdit.startOffset > 0)
+        assertTrue(textEdit.endOffset < content.length)
+        assertEquals(editorResult.content, applyTextEdit(content, textEdit))
+        assertEquals(content.substring(0, textEdit.startOffset), editorResult.content.substring(0, textEdit.startOffset))
+        assertEquals(
+            content.substring(textEdit.endOffset),
+            editorResult.content.substring(textEdit.startOffset + textEdit.newText.length),
+        )
+    }
+
+    @Test
+    fun applyMixinConfigFixUsesLosslessDeltaForCrlf() {
+        val content = "{\r\n  \"mixins\": [\"AlphaMixin\"]\r\n}"
+        val fix = AddMixinConfigEntryFix(
+            title = "Add mixin",
+            configPath = "mixins.json",
+            mixinClassName = "BetaMixin",
+            mixinPackage = null,
+        )
+        val editorResult = configEditor.addEntry(content, fix.mixinClassName)
+        val edit = service.applyMixinConfigFix(fix, content)
+
+        assertNotNull(edit)
+        assertEquals(1, edit.edits.size)
+        val textEdit = edit.edits.first()
+        assertEquals(textEdit.startOffset, textEdit.endOffset)
+        assertTrue(textEdit.startOffset > 0)
+        assertTrue(textEdit.endOffset < content.length)
+        assertEquals(editorResult.content, applyTextEdit(content, textEdit))
+        assertEquals(content.substring(0, textEdit.startOffset), editorResult.content.substring(0, textEdit.startOffset))
+        assertEquals(
+            content.substring(textEdit.endOffset),
+            editorResult.content.substring(textEdit.startOffset + textEdit.newText.length),
+        )
     }
 
     @Test

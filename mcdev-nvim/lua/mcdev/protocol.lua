@@ -100,6 +100,14 @@ local function workspace_root(bufnr)
   return vim.uri_from_fname(root)
 end
 
+local function utf16_position(bufnr, position)
+  local line = vim.api.nvim_buf_get_lines(bufnr, position[1] - 1, position[1], false)[1] or ""
+  return {
+    line = position[1] - 1,
+    character = vim.str_utfindex(line, "utf-16", position[2], false),
+  }
+end
+
 function M.context(bufnr, position)
   bufnr = bufnr or vim.api.nvim_get_current_buf()
   position = position or vim.api.nvim_win_get_cursor(0)
@@ -108,10 +116,7 @@ function M.context(bufnr, position)
     workspaceRoot = workspace_root(bufnr),
     documentUri = document_uri(bufnr),
     languageId = buffer.effective_language_id(bufnr),
-    position = {
-      line = position[1] - 1,
-      character = position[2],
-    },
+    position = utf16_position(bufnr, position),
     documentVersion = vim.api.nvim_buf_get_changedtick(bufnr),
     bufferText = table.concat(vim.api.nvim_buf_get_lines(bufnr, 0, -1, false), "\n"),
     client = {
@@ -121,6 +126,9 @@ function M.context(bufnr, position)
   }
 end
 
+local function noop_cancel()
+end
+
 function M.request(command, payload, callback, bufnr)
   bufnr = bufnr or 0
   local client = M.active_jdtls_client(bufnr)
@@ -128,13 +136,13 @@ function M.request(command, payload, callback, bufnr)
     local message = "mcdev: no active JDT LS client for this buffer"
     if callback then
       callback(nil, message)
-      return
+      return noop_cancel
     end
     vim.notify(message, vim.log.levels.WARN)
-    return
+    return noop_cancel
   end
 
-  client.request("workspace/executeCommand", {
+  local status, request_id = client:request("workspace/executeCommand", {
     command = command,
     arguments = { payload },
   }, function(err, result)
@@ -142,6 +150,25 @@ function M.request(command, payload, callback, bufnr)
       callback(result, err)
     end
   end, bufnr)
+
+  if not status or not request_id then
+    local message = "mcdev: failed to start JDT LS request"
+    if callback then
+      callback(nil, message)
+    else
+      vim.notify(message, vim.log.levels.WARN)
+    end
+    return noop_cancel
+  end
+
+  local cancelled = false
+  return function()
+    if cancelled then
+      return
+    end
+    cancelled = true
+    client:cancel_request(request_id)
+  end
 end
 
 function M.build_completion_payload(bufnr, position)
@@ -167,25 +194,27 @@ function M.completion(callback, bufnr, position)
   bufnr = bufnr or vim.api.nvim_get_current_buf()
   position = position or vim.api.nvim_win_get_cursor(0)
   local payload = M.build_completion_payload(bufnr, position)
-  M.request(M.commands.completion, payload, callback, bufnr)
+  return M.request(M.commands.completion, payload, callback, bufnr)
 end
 
 function M.build_code_action_payload(bufnr, range, diagnostic_codes)
   bufnr = bufnr or vim.api.nvim_get_current_buf()
-  local position = range and { range.start.line + 1, range.start.character }
-    or vim.api.nvim_win_get_cursor(0)
+  local context = M.context(bufnr)
+  if range then
+    context.position = range.start
+  end
   local resolved_range = range or {
     start = {
-      line = position[1] - 1,
-      character = position[2],
+      line = context.position.line,
+      character = context.position.character,
     },
     ["end"] = {
-      line = position[1] - 1,
-      character = position[2],
+      line = context.position.line,
+      character = context.position.character,
     },
   }
   return {
-    context = M.context(bufnr, position),
+    context = context,
     range = resolved_range,
     diagnosticCodes = diagnostic_codes or {},
   }

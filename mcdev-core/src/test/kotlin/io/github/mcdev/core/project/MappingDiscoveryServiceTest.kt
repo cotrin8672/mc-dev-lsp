@@ -155,6 +155,23 @@ class MappingDiscoveryServiceTest {
     }
 
     @Test
+    fun includesNestedWhitelistMappingPaths() {
+        tempDir.resolve("src/build/loom-cache").createDirectories().resolve("nested.tiny").writeText(tinyMapping)
+        tempDir
+            .resolve("nested/.gradle/caches/fabric-loom/mappings")
+            .createDirectories()
+            .resolve("intermediary.tiny")
+            .writeText(tinyMapping)
+        tempDir.resolve("build/classes").createDirectories().resolve("ignored.tiny").writeText(tinyMapping)
+
+        val files = MappingDiscoveryService.discoverMappingFiles(tempDir)
+        assertEquals(2, files.size)
+        val normalized = files.map { it.toString().replace('\\', '/') }
+        assertTrue(normalized.any { it.contains("src/build/loom-cache/nested.tiny") })
+        assertTrue(normalized.any { it.contains("nested/.gradle/caches/fabric-loom/mappings/intermediary.tiny") })
+    }
+
+    @Test
     fun parsesTinyMappingFile() {
         val path = tempDir.resolve("test.tiny").apply { writeText(tinyMapping) }
         val result = assertIs<MappingParseResult.Success>(MappingDiscoveryService.parseMappingFile(path))

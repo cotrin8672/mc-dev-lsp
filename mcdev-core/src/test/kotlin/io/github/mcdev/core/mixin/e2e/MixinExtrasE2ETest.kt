@@ -8,6 +8,7 @@ import io.github.mcdev.core.mixinextras.MixinExtrasDiagnosticCodes
 import io.github.mcdev.core.mixinextras.MixinExtrasTestFixtures
 import kotlin.test.Test
 import kotlin.test.assertEquals
+import kotlin.test.assertFalse
 import kotlin.test.assertNotNull
 import kotlin.test.assertTrue
 
@@ -33,6 +34,155 @@ class MixinExtrasE2ETest {
         """)
         val items = facade.complete(MixinE2ETestSupport.requestAt(source, "draw"))
         assertTrue(items.any { it.insertText.startsWith("draw") })
+    }
+
+    @Test
+    fun completesModifyReturnValueAtEmptyValueWithReturnOnlyThroughFacade() {
+        val source = wrapMixin("""
+            @ModifyReturnValue(method = "draw(Ljava/lang/String;FF)V", at = @At(value = ""))
+            private void mcdevModifyReturn() {}
+        """)
+        val quote = source.indexOf("at = @At(value = \"") + "at = @At(value = \"".length
+        val items = facade.complete(MixinE2ETestSupport.requestAtOffset(source, quote))
+        assertEquals(listOf("RETURN", "TAIL", "MIXINEXTRAS:EXPRESSION"), items.map { it.insertText })
+    }
+
+    @Test
+    fun completesModifyExpressionValueAtEmptyValueWithExpressionSliceAtValuesOnlyThroughFacade() {
+        val source = wrapMixin("""
+            @ModifyExpressionValue(method = "draw(Ljava/lang/String;FF)V", at = @At(value = ""))
+            private float mcdevModifyX(float original) { return original; }
+        """)
+        val quote = source.indexOf("at = @At(value = \"") + "at = @At(value = \"".length
+        val items = facade.complete(MixinE2ETestSupport.requestAtOffset(source, quote))
+        assertEquals(
+            listOf("INVOKE", "FIELD", "NEW", "CONSTANT", "MIXINEXTRAS:EXPRESSION"),
+            items.map { it.insertText },
+        )
+    }
+
+    @Test
+    fun completesModifyReceiverAtEmptyValueWithInvokeFieldAndExpressionOnlyThroughFacade() {
+        val source = wrapMixin("""
+            @ModifyReceiver(method = "draw(Ljava/lang/String;FF)V", at = @At(value = ""))
+            private String mcdevModifyReceiver(String receiver) { return receiver; }
+        """)
+        val quote = source.indexOf("at = @At(value = \"") + "at = @At(value = \"".length
+        val items = facade.complete(MixinE2ETestSupport.requestAtOffset(source, quote))
+        assertEquals(listOf("INVOKE", "FIELD", "MIXINEXTRAS:EXPRESSION"), items.map { it.insertText })
+    }
+
+    @Test
+    fun completesWrapWithConditionAtEmptyValueWithInvokeFieldAndExpressionOnlyThroughFacade() {
+        val source = wrapMixin("""
+            @WrapWithCondition(method = "draw(Ljava/lang/String;FF)V", at = @At(value = ""))
+            private boolean mcdevWrap(String instance, Operation<Boolean> original) { return original.call(instance); }
+        """)
+        val quote = source.indexOf("at = @At(value = \"") + "at = @At(value = \"".length
+        val items = facade.complete(MixinE2ETestSupport.requestAtOffset(source, quote))
+        assertEquals(listOf("INVOKE", "FIELD", "MIXINEXTRAS:EXPRESSION"), items.map { it.insertText })
+    }
+
+    @Test
+    fun completesWrapOperationAtEmptyValueWithInvokeFieldNewAndExpressionOnlyThroughFacade() {
+        val source = wrapMixin("""
+            @WrapOperation(method = "draw(Ljava/lang/String;FF)V", at = @At(value = ""))
+            private int mcdevWrap(String instance, Operation<Integer> original) { return original.call(instance); }
+        """)
+        val quote = source.indexOf("at = @At(value = \"") + "at = @At(value = \"".length
+        val items = facade.complete(MixinE2ETestSupport.requestAtOffset(source, quote))
+        assertEquals(listOf("INVOKE", "FIELD", "NEW", "MIXINEXTRAS:EXPRESSION"), items.map { it.insertText })
+    }
+
+    @Test
+    fun completesWrapOperationConstantAttributeThroughFacade() {
+        val source = wrapMixin("""
+            @WrapOperation(method = "draw(Ljava/lang/String;FF)V", con
+            private int mcdevWrap(String instance, Operation<Integer> original) { return original.call(instance); }
+        """)
+        val items = facade.complete(MixinE2ETestSupport.requestAt(source, "con"))
+        val attributeNames = items.map { it.metadata.name }.toSet()
+        assertTrue(attributeNames.contains("constant"))
+        val constant = items.single { it.metadata.name == "constant" }
+        assertEquals("constant = @Constant(${ '$' }{1})${ '$' }0", constant.insertText)
+        assertEquals("mixin.attribute", constant.metadata.source)
+        assertFalse(attributeNames.contains("cancellable"))
+        assertFalse(attributeNames.contains("index"))
+        assertFalse(attributeNames.contains("locals"))
+    }
+
+    @Test
+    fun completesWrapOperationOrderAttributeThroughFacade() {
+        val source = wrapMixin("""
+            @WrapOperation(method = "draw(Ljava/lang/String;FF)V", ord
+            private int mcdevWrap(String instance, Operation<Integer> original) { return original.call(instance); }
+        """)
+        val items = facade.complete(MixinE2ETestSupport.requestAt(source, "ord"))
+        val attributeNames = items.map { it.metadata.name }.toSet()
+        assertTrue(attributeNames.contains("order"))
+        val order = items.single { it.metadata.name == "order" }
+        assertEquals("order = ${ '$' }{1}${ '$' }0", order.insertText)
+        assertEquals("mixin.attribute", order.metadata.source)
+        assertFalse(attributeNames.contains("cancellable"))
+        assertFalse(attributeNames.contains("index"))
+        assertFalse(attributeNames.contains("locals"))
+    }
+
+    @Test
+    fun completesOrderAttributeOnMixinExtrasAnnotationsThroughFacade() {
+        data class Case(val annotationLine: String, val handler: String, val expectOrder: Boolean)
+
+        val cases = listOf(
+            Case(
+                """@ModifyExpressionValue(method = "draw(Ljava/lang/String;FF)V", at = @At("CONSTANT"), ord""",
+                "private float mcdevModifyX(float original) { return original; }",
+                true,
+            ),
+            Case(
+                """@ModifyReturnValue(method = "compute()I", at = @At("RETURN"), ord""",
+                "private int mcdevModifyReturn(int original) { return original; }",
+                true,
+            ),
+            Case(
+                """@ModifyReceiver(method = "draw(Ljava/lang/String;FF)V", at = @At("INVOKE", target = "Ljava/lang/String;length()I"), ord""",
+                "private String mcdevModifyReceiver(String receiver) { return receiver; }",
+                true,
+            ),
+            Case(
+                """@WrapWithCondition(method = "draw(Ljava/lang/String;FF)V", at = @At("INVOKE", target = "Ljava/lang/String;length()I"), ord""",
+                "private boolean mcdevWrap(String instance) { return true; }",
+                true,
+            ),
+            Case(
+                """@WrapMethod(method = "draw(Ljava/lang/String;FF)V", ord""",
+                "private void mcdevWrap(String arg0, float arg1, float arg2, Operation<Void> original) { original.call(arg0, arg1, arg2); }",
+                true,
+            ),
+            Case(
+                """@Inject(method = "draw(Ljava/lang/String;FF)V", at = @At("HEAD"), ord""",
+                "private void mcdevInject() {}",
+                false,
+            ),
+        )
+
+        for (case in cases) {
+            val source = wrapMixin("""
+                ${case.annotationLine}
+                ${case.handler}
+            """)
+            val items = facade.complete(MixinE2ETestSupport.requestAt(source, "ord"))
+            val attributeNames = items.map { it.metadata.name }.toSet()
+            assertEquals(
+                case.expectOrder,
+                attributeNames.contains("order"),
+                "order completion for ${case.annotationLine.substringBefore(", ord")}",
+            )
+            if (case.expectOrder) {
+                val order = items.single { it.metadata.name == "order" }
+                assertEquals("order = ${ '$' }{1}${ '$' }0", order.insertText)
+                assertEquals("mixin.attribute", order.metadata.source)
+            }
+        }
     }
 
     @Test
@@ -130,6 +280,66 @@ class MixinExtrasE2ETest {
 
         assertTrue(items.any { it.insertText == "Expression(\"${'$'}{1}\")${'$'}0" })
         assertTrue(items.any { it.insertText == "Expressions({ ${'$'}{1} })${'$'}0" })
+    }
+
+    @Test
+    fun completesExpressionValueKeywordsThroughFacade() {
+        val source = wrapMixin("""
+            @ModifyExpressionValue(method = "draw(Ljava/lang/String;FF)V", at = @At(value = "MIXINEXTRAS:EXPRESSION"))
+            @Expression("th")
+            private float mcdevModifyX(float original) { return original; }
+        """)
+        val items = facade.complete(MixinE2ETestSupport.requestInAnnotationValue(source, "@Expression", "th"))
+        assertEquals(listOf("this"), items.map { it.insertText })
+        assertTrue(items.all { it.metadata.source == "mixinextras.expressionValue" })
+    }
+
+    @Test
+    fun completesExpressionBlockStatementKeywordsThroughFacade() {
+        val source = wrapMixin("""
+            @ModifyExpressionValue(method = "draw(Ljava/lang/String;FF)V", at = @At(value = "MIXINEXTRAS:EXPRESSION"))
+            @Expression("{ ret")
+            private float mcdevModifyX(float original) { return original; }
+        """)
+        val items = facade.complete(MixinE2ETestSupport.requestInAnnotationValue(source, "@Expression", "ret"))
+        assertTrue(items.any { it.insertText == "return" })
+        assertTrue(items.none { it.insertText == "throw" })
+        assertTrue(items.none { it.insertText == "Expression(\"${'$'}{1}\")${'$'}0" })
+    }
+
+    @Test
+    fun expressionValueAfterDotDoesNotFallBackToFeatureAnnotations() {
+        val source = wrapMixin("""
+            @ModifyExpressionValue(method = "draw(Ljava/lang/String;FF)V", at = @At(value = "MIXINEXTRAS:EXPRESSION"))
+            @Expression("this.")
+            private float mcdevModifyX(float original) { return original; }
+        """)
+        val dotCursor = source.indexOf("this.") + "this.".length
+        val items = facade.complete(MixinE2ETestSupport.requestAtOffset(source, dotCursor))
+        assertTrue(items.isEmpty())
+    }
+
+    @Test
+    fun completesExpressionValueAfterMethodReferenceThroughFacade() {
+        val source = wrapMixin("""
+            @ModifyExpressionValue(method = "draw(Ljava/lang/String;FF)V", at = @At(value = "MIXINEXTRAS:EXPRESSION"))
+            @Expression("String::n")
+            private float mcdevModifyX(float original) { return original; }
+        """)
+        val items = facade.complete(MixinE2ETestSupport.requestInAnnotationValue(source, "@Expression", "String::n"))
+        assertEquals(listOf("new"), items.map { it.insertText })
+    }
+
+    @Test
+    fun completesExpressionsArrayElementValueThroughFacade() {
+        val source = wrapMixin("""
+            @ModifyExpressionValue(method = "draw(Ljava/lang/String;FF)V", at = @At(value = "MIXINEXTRAS:EXPRESSION"))
+            @Expressions(value = { "a + th", "other" })
+            private float mcdevModifyX(float original) { return original; }
+        """)
+        val thOffset = source.indexOf("a + th") + "a + th".length
+        val items = facade.complete(MixinE2ETestSupport.requestAtOffset(source, thOffset))
+        assertEquals(listOf("this"), items.map { it.insertText })
     }
 
     @Test
@@ -262,7 +472,13 @@ class MixinExtrasE2ETest {
         )
         val fix = fixes.filterIsInstance<WorkspaceEditFix>().firstOrNull { it.title == "Fix WrapOperation handler signature" }
         assertNotNull(fix)
-        assertTrue(fix.edits.first().newText.contains("return original.call(instance);"))
+        val edit = fix.edits.first { it.newText.contains("mcdevWrapLength") }
+        assertFalse(edit.newText.contains("return original.call(instance);"))
+        val updated = fix.edits.sortedByDescending { it.startOffset }.fold(source) { current, candidate ->
+            current.substring(0, candidate.startOffset) + candidate.newText + current.substring(candidate.endOffset)
+        }
+        assertTrue(updated.contains("private int mcdevWrapLength(String instance, Operation<Integer> original)"))
+        assertTrue(updated.contains("original.call(instance);"))
     }
 
     @Test

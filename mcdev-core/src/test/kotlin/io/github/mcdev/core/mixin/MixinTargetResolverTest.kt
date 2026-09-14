@@ -56,4 +56,49 @@ class MixinTargetResolverTest {
             MixinTargetResolver.resolveTargetsFromSource(source, classIndex),
         )
     }
+
+    @Test
+    fun resolvesSamePackageAndNestedClassWhenBindingIsUnavailable() {
+        val classIndex = FakeClassIndex(
+            classes = listOf(
+                ClassIndexEntry("Target", "example.mixin", "example/mixin/Target"),
+                ClassIndexEntry("Outer\$Inner", "example.mixin", "example/mixin/Outer\$Inner"),
+            ),
+        )
+        val source = """
+            package example.mixin;
+            import example.mixin.Outer;
+            @Mixin({ Target.class, Outer.Inner.class })
+            class MixinClass {}
+        """.trimIndent()
+
+        assertEquals(
+            listOf("example/mixin/Target", "example/mixin/Outer\$Inner"),
+            MixinTargetResolver.resolveTargetsFromSource(source, classIndex),
+        )
+    }
+
+    @Test
+    fun explicitImportWinsAndAmbiguousWildcardDoesNotGuess() {
+        val classIndex = FakeClassIndex(
+            classes = listOf(
+                ClassIndexEntry("Target", "one", "one/Target"),
+                ClassIndexEntry("Target", "two", "two/Target"),
+            ),
+        )
+        assertEquals(
+            listOf("one/Target"),
+            MixinTargetResolver.resolveTargetsFromSource(
+                "import one.Target;\nimport two.*;\n@Mixin(Target.class) class M {}",
+                classIndex,
+            ),
+        )
+        assertEquals(
+            emptyList(),
+            MixinTargetResolver.resolveTargetsFromSource(
+                "import one.*;\nimport two.*;\n@Mixin(Target.class) class M {}",
+                classIndex,
+            ),
+        )
+    }
 }

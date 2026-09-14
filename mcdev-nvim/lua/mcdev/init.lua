@@ -3,11 +3,27 @@ local protocol = require("mcdev.protocol")
 local diagnostics = require("mcdev.diagnostics")
 local health = require("mcdev.health")
 local ui = require("mcdev.ui")
+local stdio = require("mcdev.stdio")
+local transport = require("mcdev.transport")
 
 local M = {}
+local stdio_augroup
+
+-- Register before JDT LS starts; bundle notifications can arrive during initialization.
+transport.setup()
 
 function M.setup(opts)
   config.setup(opts or {})
+  transport.setup()
+  if not stdio_augroup then
+    stdio_augroup = vim.api.nvim_create_augroup("McdevStdio", { clear = true })
+    vim.api.nvim_create_autocmd("VimLeavePre", {
+      group = stdio_augroup,
+      callback = function()
+        stdio.stop("mcdev: Neovim exiting")
+      end,
+    })
+  end
   if config.options.diagnostics.enabled then
     diagnostics.setup_autocmds(config.options.diagnostics)
   end

@@ -66,6 +66,19 @@ class MixinImportEditBuilderTest {
     }
 
     @Test
+    fun ignoresImportMentionedInCommentWhenChoosingTypeReference() {
+        val source = """
+            /* import a.Foo; */
+            package com.example.mixin;
+            class Example { String decoy = "import a.Foo;"; }
+        """.trimIndent()
+        val reference = MixinImportEditBuilder.referenceForInternalName(source, "a/Foo")
+        assertEquals("Foo", reference.text)
+        assertEquals("a.Foo", reference.importFqn)
+        assertNotNull(MixinImportEditBuilder.buildImportEdit(source, "a.Foo"))
+    }
+
+    @Test
     fun importEditPairsWithImportModeCompletionInsertText() {
         val classIndex = FakeClassIndex()
         val service = MixinTargetCompletionService(classIndex)

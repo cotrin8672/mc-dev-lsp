@@ -52,6 +52,67 @@ class MixinDiagnosticsServiceTest {
     }
 
     @Test
+    fun acceptsRelativeEntryForMixinSubpackage() {
+        val source = """
+            package com.example.mixin.client;
+            @Mixin(MinecraftClient.class) class ClientMixin {}
+        """.trimIndent()
+        val config = """{ "package": "com.example.mixin", "client": ["client.ClientMixin"] }"""
+        val diagnostics = service.analyze(
+            MixinDiagnosticRequest(
+                source = source,
+                documentUri = "file:///ClientMixin.java",
+                mixinClassName = "ClientMixin",
+                mixinPackage = "com.example.mixin.client",
+                mixinConfigContent = config,
+                mixinConfigPath = "mixins.json",
+            ),
+        )
+        assertTrue(diagnostics.none { it.code == MixinDiagnosticCodes.MIXIN_CLASS_NOT_LISTED_IN_CONFIG })
+    }
+
+    @Test
+    fun rejectsSimpleEntryForMixinSubpackage() {
+        val source = """
+            package com.example.mixin.client;
+            @Mixin(MinecraftClient.class) class ClientMixin {}
+        """.trimIndent()
+        val diagnostics = service.analyze(
+            MixinDiagnosticRequest(
+                source = source,
+                documentUri = "file:///ClientMixin.java",
+                mixinClassName = "ClientMixin",
+                mixinPackage = "com.example.mixin.client",
+                mixinConfigContent = """{ "package": "com.example.mixin", "client": ["ClientMixin"] }""",
+                mixinConfigPath = "mixins.json",
+            ),
+        )
+        val diagnostic = diagnostics.single { it.code == MixinDiagnosticCodes.MIXIN_CLASS_NOT_LISTED_IN_CONFIG }
+        assertEquals("client.ClientMixin", diagnostic.metadata["mixinClass"])
+    }
+
+    @Test
+    fun missingSubpackageEntryUsesConfigRelativeName() {
+        val source = """
+            package com.example.mixin.client;
+            @Mixin(MinecraftClient.class) class ClientMixin {}
+        """.trimIndent()
+        val config = """{ "package": "com.example.mixin", "client": [] }"""
+        val diagnostics = service.analyze(
+            MixinDiagnosticRequest(
+                source = source,
+                documentUri = "file:///ClientMixin.java",
+                mixinClassName = "ClientMixin",
+                mixinPackage = "com.example.mixin.client",
+                mixinConfigContent = config,
+                mixinConfigPath = "mixins.json",
+            ),
+        )
+        val diagnostic = diagnostics.single { it.code == MixinDiagnosticCodes.MIXIN_CLASS_NOT_LISTED_IN_CONFIG }
+        assertEquals("client.ClientMixin", diagnostic.metadata["mixinClass"])
+    }
+
+    @Test
     fun duplicateMixinConfigEntryRangesConfigEntry() {
         val source = """@Mixin(MinecraftClient.class) class ExampleMixin {}"""
         val config = """

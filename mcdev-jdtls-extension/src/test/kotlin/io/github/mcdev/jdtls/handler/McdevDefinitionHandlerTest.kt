@@ -167,6 +167,74 @@ class McdevDefinitionHandlerTest {
         assertTrue(location.range.end.character > location.range.start.character)
     }
 
+    @Test
+    fun resolvesExpressionDefinitionIdToDirectSourceLocation() {
+        val handler = createHandler()
+        val source = """
+            package com.example.mixin;
+            import com.example.target.SimpleTarget;
+            import org.spongepowered.asm.mixin.Mixin;
+            import com.llamalad7.mixinextras.injector.ModifyExpressionValue;
+            import com.llamalad7.mixinextras.expression.Definition;
+            import com.llamalad7.mixinextras.expression.Expression;
+            import org.spongepowered.asm.mixin.injection.At;
+            @Mixin(SimpleTarget.class)
+            public abstract class ExampleMixin {
+                @Definition(id = "drawCall")
+                @ModifyExpressionValue(method = "draw(Ljava/lang/String;FF)V", at = @At("MIXINEXTRAS:EXPRESSION"))
+                @Expression("drawCall")
+                private int mcdev${'$'}handler(int original) { return original; }
+            }
+        """.trimIndent()
+        val expressionTokenStart = source.indexOf("drawCall", source.indexOf("@Expression"))
+        val (line, character) = JdtlsFixtureSupport.offsetToPosition(source, expressionTokenStart + 2)
+        val documentUri = "${JdtlsFixtureSupport.workspaceUri(tempDir)}/src/main/java/com/example/mixin/ExampleMixin.java"
+        val response = handler.handle(listOf(definitionPayload(source, line, character, documentUri = documentUri)))
+        val result = assertIs<McdevDefinitionResponse>(response.result)
+        assertEquals(1, result.locations.size)
+        val location = result.locations.first()
+        assertEquals(McdevDefinitionResolution.SOURCE, location.resolution)
+        assertEquals(documentUri, location.documentUri)
+        val idStart = source.indexOf("drawCall", source.indexOf("@Definition"))
+        val idEnd = idStart + "drawCall".length
+        val (startLine, startCharacter) = JdtlsFixtureSupport.offsetToPosition(source, idStart)
+        val (endLine, endCharacter) = JdtlsFixtureSupport.offsetToPosition(source, idEnd)
+        assertEquals(startLine, location.range.start.line)
+        assertEquals(startCharacter, location.range.start.character)
+        assertEquals(endLine, location.range.end.line)
+        assertEquals(endCharacter, location.range.end.character)
+    }
+
+    @Test
+    fun preservesDefinitionExactMethodNavigation() {
+        val handler = createHandler()
+        val source = """
+            package com.example.mixin;
+            import com.example.target.SimpleTarget;
+            import org.spongepowered.asm.mixin.Mixin;
+            import com.llamalad7.mixinextras.injector.ModifyExpressionValue;
+            import com.llamalad7.mixinextras.expression.Definition;
+            import org.spongepowered.asm.mixin.injection.At;
+            @Mixin(SimpleTarget.class)
+            public abstract class ExampleMixin {
+                @Definition(id = "drawCall", method = "Lcom/example/target/SimpleTarget;draw(Ljava/lang/String;FF)V")
+                @ModifyExpressionValue(method = "draw(Ljava/lang/String;FF)V", at = @At("MIXINEXTRAS:EXPRESSION"))
+                private void onDraw() {}
+            }
+        """.trimIndent()
+        val marker = "Lcom/example/target/SimpleTarget;draw"
+        val offset = source.indexOf(marker) + "draw".length
+        val (line, character) = JdtlsFixtureSupport.offsetToPosition(source, offset)
+        val response = handler.handle(listOf(definitionPayload(source, line, character)))
+        val result = assertIs<McdevDefinitionResponse>(response.result)
+        assertEquals(1, result.locations.size)
+        val location = result.locations.first()
+        assertEquals("method", location.metadata["kind"])
+        assertEquals("draw", location.metadata["name"])
+        assertEquals(McdevDefinitionResolution.SOURCE, location.resolution)
+        assertTrue(location.documentUri.contains("SimpleTarget.java"))
+    }
+
     private fun createHandler(): McdevDefinitionHandler {
         JdtlsFixtureSupport.copyFixture(FixturePaths.FABRIC_BASIC, tempDir)
         JdtlsFixtureSupport.installClasspathClasses(tempDir)

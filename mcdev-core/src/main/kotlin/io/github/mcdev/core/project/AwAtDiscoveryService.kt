@@ -4,7 +4,6 @@ import io.github.mcdev.core.at.AccessTransformerParser
 import io.github.mcdev.core.at.AccessTransformerParseResult
 import io.github.mcdev.core.aw.AccessWidenerParser
 import io.github.mcdev.core.aw.AccessWidenerParseResult
-import java.nio.file.Files
 import java.nio.file.Path
 import kotlin.io.path.exists
 import kotlin.io.path.extension
@@ -15,27 +14,17 @@ object AwAtDiscoveryService {
 
     fun discoverAccessWideners(root: Path): List<AccessWidenerRef> {
         if (!root.exists()) return emptyList()
-        val paths = Files.walk(root).use { stream ->
-            stream
-                .filter { Files.isRegularFile(it) }
-                .filter { isAccessWidenerFile(it) }
-                .filter { path -> !ProjectPathFilters.isUnderExcludedDirectory(path) }
-                .sorted()
-                .toList()
-        }
+        val paths = ProjectTreeWalker.walkRegularFiles(root)
+            .filter { isAccessWidenerFile(it) }
+            .filter { path -> !ProjectPathFilters.isUnderExcludedDirectory(path) }
         return paths.map { path -> parseAccessWidener(path) }.sortedBy { it.path.toString() }
     }
 
     fun discoverAccessTransformers(root: Path): List<AccessTransformerRef> {
         if (!root.exists()) return emptyList()
-        val paths = Files.walk(root).use { stream ->
-            stream
-                .filter { Files.isRegularFile(it) }
-                .filter { isAccessTransformerFile(it) }
-                .filter { path -> !ProjectPathFilters.isUnderExcludedDirectory(path) }
-                .sorted()
-                .toList()
-        }
+        val paths = ProjectTreeWalker.walkRegularFiles(root)
+            .filter { isAccessTransformerFile(it) }
+            .filter { path -> !ProjectPathFilters.isUnderExcludedDirectory(path) }
         return paths.map { path -> parseAccessTransformer(path) }.sortedBy { it.path.toString() }
     }
 

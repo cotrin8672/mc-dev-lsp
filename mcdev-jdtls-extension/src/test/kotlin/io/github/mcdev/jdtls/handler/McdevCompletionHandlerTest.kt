@@ -6,6 +6,7 @@ import io.github.mcdev.core.completion.McCompletionMetadata
 import io.github.mcdev.fixtures.FixturePaths
 import io.github.mcdev.fixtures.FixtureResourceLoader
 import io.github.mcdev.jdtls.mixin.MixinServiceFacade
+import io.github.mcdev.jdtls.mixin.SourceClassScanner
 import io.github.mcdev.jdtls.project.FileBasedProjectContextService
 import io.github.mcdev.jdtls.support.JdtlsFixtureSupport
 import io.github.mcdev.protocol.McdevCompletionResponse
@@ -46,6 +47,70 @@ class McdevCompletionHandlerTest {
         assertTrue(completion.items.isNotEmpty())
         assertTrue(completion.items.any { it.label == "SimpleTarget" })
         assertTrue(completion.items.any { it.insertText == "SimpleTarget.class" })
+    }
+
+    @Test
+    fun mixinClassCompletionNeverInvokesSourceClassScannerOnProductionPath() {
+        SourceClassScanner.resetMetrics()
+        SourceClassScanner.clearDiskCache()
+        val handler = createHandler()
+        val source = FixtureResourceLoader.loadText(FixturePaths.FABRIC_BASIC_EXAMPLE_MIXIN)
+        val (line, character) = JdtlsFixtureSupport.mixinCursorPosition(source, "SimpleTarget")
+        val workspaceRoot = JdtlsFixtureSupport.workspaceUri(tempDir)
+
+        repeat(30) { version ->
+            val completion = assertIs<McdevCompletionResponse>(
+                handler.handle(
+                    listOf(
+                        completionPayload(
+                            workspaceRoot = workspaceRoot,
+                            source = source,
+                            line = line,
+                            character = character,
+                            documentVersion = version.toLong(),
+                        ),
+                    ),
+                ).result,
+            )
+            assertTrue(completion.items.isNotEmpty())
+            assertTrue(completion.items.any { it.label == "SimpleTarget" })
+        }
+
+        assertEquals(0, SourceClassScanner.diskReadCount())
+        assertEquals(0, SourceClassScanner.diskParseCount())
+        assertEquals(0, SourceClassScanner.overlayParseCount())
+    }
+
+    @Test
+    fun mixinClassCompletionReturnsBufferDeclaredClassWhenJdtUnavailable() {
+        val handler = McdevCompletionHandler(projectService = FileBasedProjectContextService())
+        val source = """
+            package com.example.target;
+
+            import org.spongepowered.asm.mixin.Mixin;
+
+            @Mixin(BufferOnly
+            public class BufferOnlyTarget {
+            }
+        """.trimIndent()
+        val (line, character) = JdtlsFixtureSupport.mixinCursorPosition(source, "BufferOnly")
+        val response = handler.handle(
+            listOf(
+                completionPayload(
+                    workspaceRoot = JdtlsFixtureSupport.workspaceUri(tempDir),
+                    source = source,
+                    line = line,
+                    character = character,
+                    documentVersion = 1,
+                ),
+            ),
+        )
+        val completion = assertIs<McdevCompletionResponse>(response.result)
+        val item = completion.items.firstOrNull { it.label == "BufferOnlyTarget" }
+        assertNotNull(item)
+        assertEquals("mixin.target", item.metadata["source"])
+        assertEquals("BufferOnlyTarget.class", item.insertText)
+        assertEquals("HAND_WRITTEN_FALLBACK", completion.debug?.parseSource)
     }
 
     @Test
@@ -106,6 +171,84 @@ class McdevCompletionHandlerTest {
         assertEquals("NO_COMPLETION_CONTEXT", first.debug?.zeroItemReason)
         assertEquals(true, second.debug?.negativeCacheHit)
         assertEquals("NO_COMPLETION_CONTEXT", second.debug?.zeroItemReason)
+    }
+
+    @Test
+    fun reusesNegativeCompletionBeforeTtlExpires() {
+        var now = 1_000L
+        val handler = McdevCompletionHandler(
+            projectService = FileBasedProjectContextService(),
+            currentTimeMillis = { now },
+        ).also { setupBasicFixture() }
+        val source = "package com.example;\npublic class Plain {}"
+        val payload = completionPayload(
+            workspaceRoot = JdtlsFixtureSupport.workspaceUri(tempDir),
+            source = source,
+            line = 1,
+            character = 10,
+            documentVersion = 7,
+        )
+
+        val first = assertIs<McdevCompletionResponse>(handler.handle(listOf(payload)).result)
+        now += 499
+        val second = assertIs<McdevCompletionResponse>(handler.handle(listOf(payload)).result)
+
+        assertEquals(false, first.debug?.negativeCacheHit)
+        assertEquals("NO_COMPLETION_CONTEXT", first.debug?.zeroItemReason)
+        assertEquals(true, second.debug?.negativeCacheHit)
+        assertEquals("NO_COMPLETION_CONTEXT", second.debug?.zeroItemReason)
+    }
+
+    @Test
+    fun expiresNegativeCompletionAfterTtlAndRecomputes() {
+        var now = 1_000L
+        val handler = McdevCompletionHandler(
+            projectService = FileBasedProjectContextService(),
+            currentTimeMillis = { now },
+        ).also { setupBasicFixture() }
+        val source = "package com.example;\npublic class Plain {}"
+        val payload = completionPayload(
+            workspaceRoot = JdtlsFixtureSupport.workspaceUri(tempDir),
+            source = source,
+            line = 1,
+            character = 10,
+            documentVersion = 7,
+        )
+
+        val first = assertIs<McdevCompletionResponse>(handler.handle(listOf(payload)).result)
+        val second = assertIs<McdevCompletionResponse>(handler.handle(listOf(payload)).result)
+        now += 501
+        val third = assertIs<McdevCompletionResponse>(handler.handle(listOf(payload)).result)
+
+        assertEquals(false, first.debug?.negativeCacheHit)
+        assertEquals(true, second.debug?.negativeCacheHit)
+        assertEquals(false, third.debug?.negativeCacheHit)
+        assertEquals("NO_COMPLETION_CONTEXT", third.debug?.zeroItemReason)
+        assertEquals(true, third.debug?.semanticCacheHit)
+        assertEquals(1, handler.negativeCacheSizeForTests())
+    }
+
+    @Test
+    fun capsNegativeCacheAt256DistinctRequests() {
+        val handler = createHandler()
+        val source = "package com.example;\npublic class Plain {}"
+        val workspaceRoot = JdtlsFixtureSupport.workspaceUri(tempDir)
+
+        repeat(257) { index ->
+            handler.handle(
+                listOf(
+                    completionPayload(
+                        workspaceRoot = workspaceRoot,
+                        source = source,
+                        line = 1,
+                        character = 10 + index,
+                        documentVersion = 7,
+                    ),
+                ),
+            )
+        }
+
+        assertTrue(handler.negativeCacheSizeForTests() <= 256)
     }
 
     @Test
@@ -431,7 +574,9 @@ class McdevCompletionHandlerTest {
     }
 
     @Test
-    fun returnsInjectMethodCompletionsFromSourceOnlyMixinTarget() {
+    fun mixinMemberCompletionDoesNotScanSourceOnlySiblingTarget() {
+        SourceClassScanner.resetMetrics()
+        SourceClassScanner.clearDiskCache()
         val targetDir = tempDir.resolve("src/main/java/com/example/target")
         Files.createDirectories(targetDir)
         Files.writeString(
@@ -468,163 +613,11 @@ class McdevCompletionHandlerTest {
             ),
         )
         val completion = assertIs<McdevCompletionResponse>(response.result)
-        assertTrue(completion.items.any { it.metadata["source"] == "mixin.injectMethod" })
-        assertTrue(completion.items.any { it.insertText == "pulse" })
-        assertTrue(completion.items.any { it.insertText == "measure" })
-    }
-
-    @Test
-    fun returnsImportedItemMixinInjectMethodCompletion() {
-        val minecraftDir = tempDir.resolve("src/main/java/net/minecraft/world/item")
-        val otherDir = tempDir.resolve("src/main/java/com/example/other")
-        Files.createDirectories(minecraftDir)
-        Files.createDirectories(otherDir)
-        Files.writeString(
-            minecraftDir.resolve("Item.java"),
-            """
-                package net.minecraft.world.item;
-                public class Item {
-                    public boolean isFoil() { return false; }
-                }
-            """.trimIndent(),
-        )
-        Files.writeString(
-            otherDir.resolve("Item.java"),
-            """
-                package com.example.other;
-                public class Item {
-                    public void otherOnly() {}
-                }
-            """.trimIndent(),
-        )
-        val handler = McdevCompletionHandler(projectService = FileBasedProjectContextService())
-        val source = """
-            package com.example.mixin;
-            import net.minecraft.world.item.Item;
-            import org.spongepowered.asm.mixin.Mixin;
-            import org.spongepowered.asm.mixin.injection.Inject;
-            @Mixin(Item.class)
-            public abstract class ItemMixin {
-                @Inject(method = "
-            }
-        """.trimIndent()
-        val marker = "method = \""
-        val (line, character) = JdtlsFixtureSupport.offsetToPosition(source, source.indexOf(marker) + marker.length)
-        val response = handler.handle(
-            listOf(
-                completionPayload(
-                    workspaceRoot = JdtlsFixtureSupport.workspaceUri(tempDir),
-                    source = source,
-                    line = line,
-                    character = character,
-                ),
-            ),
-        )
-        val completion = assertIs<McdevCompletionResponse>(response.result)
-        assertTrue(completion.items.any { it.insertText == "isFoil" })
-        assertFalse(completion.items.any { it.insertText == "otherOnly" })
-    }
-
-    @Test
-    fun returnsImportedItemShadowMethodCompletionAtDeclarationName() {
-        val minecraftDir = tempDir.resolve("src/main/java/net/minecraft/world/item")
-        val otherDir = tempDir.resolve("src/main/java/com/example/other")
-        Files.createDirectories(minecraftDir)
-        Files.createDirectories(otherDir)
-        Files.writeString(
-            minecraftDir.resolve("Item.java"),
-            """
-                package net.minecraft.world.item;
-                public class Item {
-                    public boolean isFoil() { return false; }
-                    public int getCount() { return 1; }
-                }
-            """.trimIndent(),
-        )
-        Files.writeString(
-            otherDir.resolve("Item.java"),
-            """
-                package com.example.other;
-                public class Item {
-                    public void otherOnly() {}
-                }
-            """.trimIndent(),
-        )
-        val handler = McdevCompletionHandler(projectService = FileBasedProjectContextService())
-        val source = """
-            package com.example.mixin;
-            import net.minecraft.world.item.Item;
-            import org.spongepowered.asm.mixin.Mixin;
-            import org.spongepowered.asm.mixin.Shadow;
-            @Mixin(Item.class)
-            public abstract class ItemMixin {
-                @Shadow public boolean is
-            }
-        """.trimIndent()
-        val marker = "@Shadow public boolean is"
-        val cursorOffset = source.indexOf(marker) + marker.length
-        val (line, character) = JdtlsFixtureSupport.offsetToPosition(source, cursorOffset)
-        val response = handler.handle(
-            listOf(
-                completionPayload(
-                    workspaceRoot = JdtlsFixtureSupport.workspaceUri(tempDir),
-                    source = source,
-                    line = line,
-                    character = character,
-                ),
-            ),
-        )
-        val completion = assertIs<McdevCompletionResponse>(response.result)
-        val item = completion.items.firstOrNull { it.insertText == "isFoil" }
-        assertNotNull(item)
-        assertFalse(completion.items.any { it.insertText == "getCount" })
-        assertFalse(completion.items.any { it.insertText == "otherOnly" })
-        assertEquals(line, item.edit?.range?.start?.line)
-        assertEquals(character - "is".length, item.edit?.range?.start?.character)
-        assertEquals(line, item.edit?.range?.end?.line)
-        assertEquals(character, item.edit?.range?.end?.character)
-    }
-
-    @Test
-    fun sourceOnlyMixinTargetSkipsMethodsWithUnresolvedDescriptors() {
-        val targetDir = tempDir.resolve("src/main/java/com/example/target")
-        Files.createDirectories(targetDir)
-        Files.writeString(
-            targetDir.resolve("SourceOnlyTarget.java"),
-            """
-                package com.example.target;
-                public class SourceOnlyTarget {
-                    public void pulse() {}
-                    public void broken(MissingType value) {}
-                }
-            """.trimIndent(),
-        )
-        val handler = McdevCompletionHandler(projectService = FileBasedProjectContextService())
-        val source = """
-            package com.example.mixin;
-            import com.example.target.SourceOnlyTarget;
-            import org.spongepowered.asm.mixin.Mixin;
-            import org.spongepowered.asm.mixin.injection.Inject;
-            @Mixin(SourceOnlyTarget.class)
-            public abstract class SourceOnlyMixin {
-                @Inject(method = "
-            }
-        """.trimIndent()
-        val marker = "method = \""
-        val (line, character) = JdtlsFixtureSupport.offsetToPosition(source, source.indexOf(marker) + marker.length)
-        val response = handler.handle(
-            listOf(
-                completionPayload(
-                    workspaceRoot = JdtlsFixtureSupport.workspaceUri(tempDir),
-                    source = source,
-                    line = line,
-                    character = character,
-                ),
-            ),
-        )
-        val completion = assertIs<McdevCompletionResponse>(response.result)
-        assertTrue(completion.items.any { it.insertText == "pulse" })
-        assertFalse(completion.items.any { it.insertText == "broken" })
+        assertFalse(completion.items.any { it.insertText == "pulse" })
+        assertFalse(completion.items.any { it.insertText == "measure" })
+        assertEquals(0, SourceClassScanner.diskReadCount())
+        assertEquals(0, SourceClassScanner.diskParseCount())
+        assertEquals(0, SourceClassScanner.overlayParseCount())
     }
 
     @Test
@@ -683,10 +676,403 @@ class McdevCompletionHandlerTest {
         assertTrue(completion.items.any { it.insertText == "com.example.target.SimpleTarget.class" })
     }
 
+    @Test
+    fun bufferOnlyInjectAttributeCompletionSkipsProjectSessionLoad() {
+        val (projectService, builderCount) = countingProjectService()
+        val handler = McdevCompletionHandler(projectService = projectService)
+        val source = """
+            package com.example.mixin;
+            import org.spongepowered.asm.mixin.injection.Inject;
+            public abstract class AttributeMixin {
+                @Inject(meth
+            }
+        """.trimIndent()
+        val cursorOffset = source.indexOf("meth") + "meth".length
+        val (line, character) = JdtlsFixtureSupport.offsetToPosition(source, cursorOffset)
+        val response = handler.handle(
+            listOf(
+                completionPayload(
+                    workspaceRoot = JdtlsFixtureSupport.workspaceUri(tempDir),
+                    source = source,
+                    line = line,
+                    character = character,
+                ),
+            ),
+        )
+        val completion = assertIs<McdevCompletionResponse>(response.result)
+        assertEquals(0, builderCount())
+        assertTrue(completion.items.any { it.metadata["source"] == "mixin.attribute" && it.metadata["name"] == "method" })
+        assertBufferOnlySessionDebug(completion)
+    }
+
+    @Test
+    fun projectAwareCompletionDoesNotCacheSessionBeforeJdtProjectExists() {
+        val (projectService, builderCount) = countingProjectService()
+        val handler = McdevCompletionHandler(projectService = projectService)
+        val source = "@Inject(meth"
+        val (line, character) = JdtlsFixtureSupport.offsetToPosition(source, source.length)
+
+        val response = handler.handleProjectAware(
+            listOf(
+                completionPayload(
+                    workspaceRoot = JdtlsFixtureSupport.workspaceUri(tempDir),
+                    source = source,
+                    line = line,
+                    character = character,
+                ),
+            ),
+        )
+
+        assertEquals(McdevErrorCode.INCOMPLETE_PROJECT_CONTEXT, response.error?.code)
+        assertEquals(0, builderCount())
+    }
+
+    @Test
+    fun projectAwareCompletionBypassesBufferOnlyShortcut() {
+        val (projectService, builderCount) = countingProjectService()
+        val projectItem = McCompletionItem(
+            label = "project-method",
+            detail = "project",
+            documentation = null,
+            filterText = "project-method",
+            insertText = "project-method",
+            kind = McCompletionKind.METHOD,
+            sortKey = "0000_project-method",
+            metadata = McCompletionMetadata(source = "project-aware"),
+        )
+        val project = ImportingJavaProject()
+        val handler = McdevCompletionHandler(
+            projectService = projectService,
+            mixinFacade = MixinServiceFacade(
+                javaProjectResolver = { project },
+                completeOverride = { _, _, _, _, _ -> listOf(projectItem) },
+            ),
+        )
+        val source = "@Inject(meth"
+        val (line, character) = JdtlsFixtureSupport.offsetToPosition(source, source.length)
+        val pending = handler.handleProjectAware(listOf(completionPayload(
+            workspaceRoot = JdtlsFixtureSupport.workspaceUri(tempDir), source = source,
+            line = line, character = character,
+        )))
+        assertEquals(McdevErrorCode.INCOMPLETE_PROJECT_CONTEXT, pending.error?.code)
+        assertEquals(0, builderCount())
+        project.ready = true
+
+        val completion = assertIs<McdevCompletionResponse>(
+            handler.handleProjectAware(
+                listOf(
+                    completionPayload(
+                        workspaceRoot = JdtlsFixtureSupport.workspaceUri(tempDir),
+                        source = source,
+                        line = line,
+                        character = character,
+                    ),
+                ),
+            ).result,
+        )
+
+        assertEquals(1, builderCount())
+        assertEquals(listOf("project-method"), completion.items.map { it.label })
+    }
+
+    private class ImportingJavaProject {
+        var ready = false
+        fun findType(name: String): Any? = if (ready && name == "org.spongepowered.asm.mixin.Mixin") Any() else null
+    }
+
+    @Test
+    fun bufferOnlyAtHeadValueCompletionSkipsProjectSessionLoad() {
+        val (projectService, builderCount) = countingProjectService()
+        val handler = McdevCompletionHandler(projectService = projectService)
+        val source = """@Inject(method = "tick", at = @At(value = "HE"))"""
+        val partial = "HE"
+        val offset = source.indexOf("\"$partial\"") + 1 + partial.length
+        val (line, character) = JdtlsFixtureSupport.offsetToPosition(source, offset)
+        val response = handler.handle(
+            listOf(
+                completionPayload(
+                    workspaceRoot = JdtlsFixtureSupport.workspaceUri(tempDir),
+                    source = source,
+                    line = line,
+                    character = character,
+                ),
+            ),
+        )
+        val completion = assertIs<McdevCompletionResponse>(response.result)
+        assertEquals(0, builderCount())
+        assertTrue(completion.items.any { it.insertText == "HEAD" })
+        assertBufferOnlySessionDebug(completion)
+    }
+
+    @Test
+    fun bufferOnlyAtHeadValueCompletionStaysStableAcrossSequentialTyping() {
+        val (projectService, builderCount) = countingProjectService()
+        val handler = McdevCompletionHandler(projectService = projectService)
+        for ((version, partial) in listOf("", "H", "HE", "HEA").withIndex()) {
+            val source = """@Inject(method = "tick", at = @At(value = "$partial"))"""
+            val offset = source.indexOf("\"$partial\"") + 1 + partial.length
+            val (line, character) = JdtlsFixtureSupport.offsetToPosition(source, offset)
+            val completion = assertIs<McdevCompletionResponse>(
+                handler.handle(
+                    listOf(
+                        completionPayload(
+                            workspaceRoot = JdtlsFixtureSupport.workspaceUri(tempDir),
+                            source = source,
+                            line = line,
+                            character = character,
+                            documentVersion = version.toLong(),
+                        ),
+                    ),
+                ).result,
+            )
+            assertEquals(0, builderCount())
+            assertTrue(completion.items.any { it.insertText == "HEAD" })
+            assertBufferOnlySessionDebug(completion)
+        }
+    }
+
+    @Test
+    fun bufferOnlyDefinitionIdCompletionSkipsProjectSessionLoad() {
+        val (projectService, builderCount) = countingProjectService()
+        val handler = McdevCompletionHandler(projectService = projectService)
+        val source = definitionIdHandlerSource(expressionValue = "len")
+        val tokenStart = source.indexOf("\"len\"") + 1
+        val (line, character) = JdtlsFixtureSupport.offsetToPosition(source, tokenStart + "len".length)
+        val completion = assertIs<McdevCompletionResponse>(
+            handler.handle(
+                listOf(
+                    completionPayload(
+                        workspaceRoot = JdtlsFixtureSupport.workspaceUri(tempDir),
+                        source = source,
+                        line = line,
+                        character = character,
+                    ),
+                ),
+            ).result,
+        )
+        assertEquals(0, builderCount())
+        val item = completion.items.first {
+            it.metadata["source"] == "mixinextras.definitionId" && it.insertText == "lengthCall"
+        }
+        assertEquals("lengthCall", item.edit?.newText)
+        assertEquals(
+            source.replace("""@Expression("len")""", """@Expression("lengthCall")"""),
+            applyEdit(source, assertNotNull(item.edit)),
+        )
+        val editStart = positionToOffset(source, assertNotNull(item.edit).range.start)
+        val editEnd = positionToOffset(source, item.edit!!.range.end)
+        assertEquals(tokenStart, editStart)
+        assertEquals(tokenStart + "len".length, editEnd)
+        assertBufferOnlySessionDebug(completion)
+    }
+
+    @Test
+    fun bufferOnlyDefinitionIdCompletionDoesNotLeakAdjacentHandlerDefinitions() {
+        val (projectService, builderCount) = countingProjectService()
+        val handler = McdevCompletionHandler(projectService = projectService)
+        val source = adjacentDefinitionIdHandlerSource()
+        val tokenStart = source.indexOf("\"len\"") + 1
+        val (line, character) = JdtlsFixtureSupport.offsetToPosition(source, tokenStart + "len".length)
+        val completion = assertIs<McdevCompletionResponse>(
+            handler.handle(
+                listOf(
+                    completionPayload(
+                        workspaceRoot = JdtlsFixtureSupport.workspaceUri(tempDir),
+                        source = source,
+                        line = line,
+                        character = character,
+                    ),
+                ),
+            ).result,
+        )
+        assertEquals(0, builderCount())
+        val definitionIds = completion.items
+            .filter { it.metadata["source"] == "mixinextras.definitionId" }
+            .map { it.insertText }
+        assertEquals(listOf("lengthCall"), definitionIds)
+        assertBufferOnlySessionDebug(completion)
+    }
+
+    @Test
+    fun bufferOnlyExpressionReturnKeywordCompletionSkipsProjectSessionLoad() {
+        val (projectService, builderCount) = countingProjectService()
+        val handler = McdevCompletionHandler(projectService = projectService)
+        val source = """@Expression("{ ret")"""
+        val cursorOffset = source.indexOf("ret") + "ret".length
+        val (line, character) = JdtlsFixtureSupport.offsetToPosition(source, cursorOffset)
+        val completion = assertIs<McdevCompletionResponse>(
+            handler.handle(
+                listOf(
+                    completionPayload(
+                        workspaceRoot = JdtlsFixtureSupport.workspaceUri(tempDir),
+                        source = source,
+                        line = line,
+                        character = character,
+                    ),
+                ),
+            ).result,
+        )
+        assertEquals(0, builderCount())
+        val item = completion.items.first { it.insertText == "return" }
+        assertEquals("mixinextras.expressionValue", item.metadata["source"])
+        assertEquals("return", item.edit?.newText)
+        assertEquals(
+            source.replace("ret", "return"),
+            applyEdit(source, assertNotNull(item.edit)),
+        )
+        assertBufferOnlySessionDebug(completion)
+    }
+
+    @Test
+    fun atTargetCompletionLoadsProjectSession() {
+        val (projectService, builderCount) = countingProjectService()
+        setupBasicFixture()
+        val handler = McdevCompletionHandler(projectService = projectService)
+        val source = """
+            package com.example.mixin;
+            import com.example.target.SimpleTarget;
+            import org.spongepowered.asm.mixin.Mixin;
+            import org.spongepowered.asm.mixin.injection.At;
+            import org.spongepowered.asm.mixin.injection.Inject;
+            import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
+            @Mixin(SimpleTarget.class)
+            public abstract class AtTargetMixin {
+                @Inject(method = "draw(Ljava/lang/String;FF)V", at = @At(value = "INVOKE", target = "L"))
+                private void mcdev${"$"}onDraw(String text, float x, float y, CallbackInfo ci) {}
+            }
+        """.trimIndent()
+        val marker = "target = \"L"
+        val (line, character) = JdtlsFixtureSupport.offsetToPosition(source, source.indexOf(marker) + marker.length)
+        handler.handle(
+            listOf(
+                completionPayload(
+                    workspaceRoot = JdtlsFixtureSupport.workspaceUri(tempDir),
+                    source = source,
+                    line = line,
+                    character = character,
+                ),
+            ),
+        )
+        assertEquals(1, builderCount())
+    }
+
+    @Test
+    fun accessWidenerCompletionLoadsProjectSession() {
+        val (projectService, builderCount) = countingProjectService()
+        val handler = McdevCompletionHandler(projectService = projectService)
+        val source = FixtureResourceLoader.loadText(FixturePaths.FABRIC_AW_AT_ACCESS_WIDENER)
+        val marker = "accessible class com/example/target/Simple"
+        val offset = source.indexOf(marker) + marker.length
+        val (line, character) = JdtlsFixtureSupport.offsetToPosition(source, offset)
+        val workspaceRoot = JdtlsFixtureSupport.workspaceUri(tempDir)
+        handler.handle(
+            listOf(
+                completionPayload(
+                    workspaceRoot = workspaceRoot,
+                    source = source,
+                    line = line,
+                    character = character,
+                    languageId = "accesswidener",
+                    documentUri = "$workspaceRoot/src/main/resources/mod.accesswidener",
+                ),
+            ),
+        )
+        assertEquals(1, builderCount())
+    }
+
+    @Test
+    fun accessTransformerCompletionLoadsProjectSession() {
+        val (projectService, builderCount) = countingProjectService()
+        val handler = McdevCompletionHandler(projectService = projectService)
+        val source = FixtureResourceLoader.loadText(FixturePaths.FABRIC_AW_AT_ACCESS_TRANSFORMER)
+        val marker = "public com.example.target.SimpleTarget counter"
+        val offset = source.indexOf(marker) + marker.indexOf("counter") + 3
+        val (line, character) = JdtlsFixtureSupport.offsetToPosition(source, offset)
+        val workspaceRoot = JdtlsFixtureSupport.workspaceUri(tempDir)
+        handler.handle(
+            listOf(
+                completionPayload(
+                    workspaceRoot = workspaceRoot,
+                    source = source,
+                    line = line,
+                    character = character,
+                    languageId = "accesstransformer",
+                    documentUri = "$workspaceRoot/src/main/resources/mod_at.cfg",
+                ),
+            ),
+        )
+        assertEquals(1, builderCount())
+    }
+
+    private fun definitionIdHandlerSource(
+        expressionValue: String = "len",
+        definitionId: String = "lengthCall",
+    ): String = """
+        package com.example.mixin;
+        import com.example.target.SimpleTarget;
+        import com.llamalad7.mixinextras.expression.Definition;
+        import com.llamalad7.mixinextras.expression.Expression;
+        import com.llamalad7.mixinextras.injector.ModifyExpressionValue;
+        import org.spongepowered.asm.mixin.Mixin;
+        import org.spongepowered.asm.mixin.injection.At;
+        @Mixin(SimpleTarget.class)
+        public abstract class DefinitionIdMixin {
+            @Definition(id = "$definitionId")
+            @ModifyExpressionValue(method = "draw(Ljava/lang/String;FF)V", at = @At(value = "MIXINEXTRAS:EXPRESSION"))
+            @Expression("$expressionValue")
+            private float mcdev${'$'}handler(float original) { return original; }
+        }
+    """.trimIndent()
+
+    private fun adjacentDefinitionIdHandlerSource(): String = """
+        package com.example.mixin;
+        import com.example.target.SimpleTarget;
+        import com.llamalad7.mixinextras.expression.Definition;
+        import com.llamalad7.mixinextras.expression.Expression;
+        import com.llamalad7.mixinextras.injector.ModifyExpressionValue;
+        import org.spongepowered.asm.mixin.Mixin;
+        import org.spongepowered.asm.mixin.injection.At;
+        @Mixin(SimpleTarget.class)
+        public abstract class AdjacentDefinitionIdMixin {
+            @Definition(id = "lengthCall")
+            @ModifyExpressionValue(method = "draw(Ljava/lang/String;FF)V", at = @At(value = "MIXINEXTRAS:EXPRESSION"))
+            @Expression("len")
+            private float mcdev${'$'}handler1(float original) { return original; }
+
+            @Definition(id = "lengthOther")
+            @ModifyExpressionValue(method = "draw(Ljava/lang/String;FF)V", at = @At(value = "MIXINEXTRAS:EXPRESSION"))
+            @Expression("")
+            private float mcdev${'$'}handler2(float original) { return original; }
+        }
+    """.trimIndent()
+
+    private fun countingProjectService(): Pair<FileBasedProjectContextService, () -> Int> {
+        var count = 0
+        val delegate = FileBasedProjectContextService()
+        val projectService = FileBasedProjectContextService(contextBuilder = { root ->
+            count++
+            delegate.buildProjectContext(root)
+        })
+        return projectService to { count }
+    }
+
+    private fun assertBufferOnlySessionDebug(completion: McdevCompletionResponse) {
+        assertEquals(0, completion.debug?.loadSessionMs)
+        assertEquals(false, completion.debug?.projectSessionCacheHit)
+        assertEquals(0, completion.debug?.projectSessionVersion)
+        assertEquals(null, completion.debug?.documentCacheHit)
+        assertEquals(null, completion.debug?.semanticCacheHit)
+        assertEquals(null, completion.debug?.candidateCacheHit)
+    }
+
     private fun createHandler(): McdevCompletionHandler {
+        setupBasicFixture()
+        return McdevCompletionHandler(projectService = FileBasedProjectContextService())
+    }
+
+    private fun setupBasicFixture() {
         JdtlsFixtureSupport.copyFixture(FixturePaths.FABRIC_BASIC, tempDir)
         JdtlsFixtureSupport.installClasspathClasses(tempDir)
-        return McdevCompletionHandler(projectService = FileBasedProjectContextService())
     }
 
     private fun applyEdit(source: String, edit: McdevTextEdit): String {
@@ -710,11 +1096,13 @@ class McdevCompletionHandlerTest {
         character: Int,
         injectMethodDescriptor: String = "auto",
         documentVersion: Long? = null,
+        languageId: String = "java",
+        documentUri: String = "$workspaceRoot/src/main/java/com/example/mixin/ExampleMixin.java",
     ): Map<String, Any?> = mapOf(
         "protocolVersion" to McdevProtocol.VERSION,
         "workspaceRoot" to workspaceRoot,
-        "documentUri" to "$workspaceRoot/src/main/java/com/example/mixin/ExampleMixin.java",
-        "languageId" to "java",
+        "documentUri" to documentUri,
+        "languageId" to languageId,
         "position" to mapOf("line" to line, "character" to character),
         "documentVersion" to documentVersion,
         "bufferText" to source,

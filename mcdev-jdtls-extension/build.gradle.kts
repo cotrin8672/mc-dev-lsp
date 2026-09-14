@@ -34,6 +34,7 @@ sourceSets {
 val generateMcdevBuildInfo by tasks.registering {
     val outputDir = layout.buildDirectory.dir("generated/mcdevBuildInfo")
     outputs.dir(outputDir)
+    outputs.upToDateWhen { false }
     doLast {
         val commit = runCatching {
             providers.exec {
@@ -120,7 +121,6 @@ tasks.jar {
             "Bundle-Name" to "Minecraft Development for JDT LS",
             "Bundle-Version" to project.version.toString().removeSuffix("-SNAPSHOT"),
             "Bundle-Activator" to "io.github.mcdev.jdtls.McdevPlugin",
-            "Bundle-ActivationPolicy" to "lazy",
             "Bundle-RequiredExecutionEnvironment" to "JavaSE-21",
             "Bundle-ClassPath" to ".",
             "Require-Bundle" to listOf(
@@ -160,6 +160,9 @@ tasks.register("checkBundle") {
             check(
                 entries.any { it == "io/github/mcdev/jdtls/McdevDelegateCommandHandler.class" },
             ) { "McdevDelegateCommandHandler is missing from bundle jar" }
+            check(
+                entries.any { it == "io/github/mcdev/jdtls/stdio/McdevStdioMain.class" },
+            ) { "McdevStdioMain is missing from bundle jar" }
             check(
                 entries.any { it.startsWith("io/github/mcdev/core/") },
             ) { "mcdev-core classes are missing from bundle jar" }

@@ -61,10 +61,26 @@ class DefinitionResolutionService(
     ): List<ResolvedDefinition> {
         if (targets.isEmpty()) return emptyList()
         return targets.map { target ->
-            backends.firstNotNullOfOrNull { backend ->
-                backend.resolve(target, projectContext, workspaceRootUri)
-            } ?: unresolved(target, "no navigable definition found")
+            resolveDirectSourceTarget(target)
+                ?: backends.firstNotNullOfOrNull { backend ->
+                    backend.resolve(target, projectContext, workspaceRootUri)
+                }
+                ?: unresolved(target, "no navigable definition found")
         }
+    }
+
+    private fun resolveDirectSourceTarget(target: McDefinitionTarget): ResolvedDefinition? {
+        val documentUri = target.directSourceDocumentUri ?: return null
+        val range = target.sourceRange
+        if (documentUri.isBlank() || range == null) {
+            return unresolved(target, "direct source target missing uri or range")
+        }
+        return ResolvedDefinition(
+            target = target,
+            documentUri = documentUri,
+            range = range,
+            resolution = McdevDefinitionResolution.SOURCE,
+        )
     }
 
     private fun unresolved(target: McDefinitionTarget, message: String): ResolvedDefinition =

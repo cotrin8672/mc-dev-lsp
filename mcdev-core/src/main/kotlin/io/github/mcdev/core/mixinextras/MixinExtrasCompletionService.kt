@@ -20,6 +20,7 @@ class MixinExtrasCompletionService(
     private val methodCompletionAnnotations = setOf(
         MixinAnnotation.MODIFY_EXPRESSION_VALUE,
         MixinAnnotation.MODIFY_RETURN_VALUE,
+        MixinAnnotation.MODIFY_RECEIVER,
         MixinAnnotation.WRAP_OPERATION,
         MixinAnnotation.WRAP_WITH_CONDITION,
         MixinAnnotation.WRAP_METHOD,

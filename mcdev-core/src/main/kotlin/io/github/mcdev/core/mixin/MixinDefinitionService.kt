@@ -1,10 +1,22 @@
 package io.github.mcdev.core.mixin
 
 import io.github.mcdev.core.definition.McDefinitionTarget
+import io.github.mcdev.core.descriptor.DescriptorParseResult
+import io.github.mcdev.core.descriptor.DescriptorRenderer
+import io.github.mcdev.core.descriptor.FieldSelector
+import io.github.mcdev.core.descriptor.MethodSelector
+import io.github.mcdev.core.descriptor.Pattern
+import io.github.mcdev.core.descriptor.parseFieldSelector
+import io.github.mcdev.core.descriptor.parseMethodSelector
 import io.github.mcdev.core.diagnostics.McTextPosition
 import io.github.mcdev.core.diagnostics.McTextRange
+import io.github.mcdev.core.mixinextras.ExpressionCompletionPosition
+import io.github.mcdev.core.mixinextras.ExpressionContextResolver
+import io.github.mcdev.core.mixinextras.MixinExtrasAnnotation
+import io.github.mcdev.core.mixinextras.ClassLiteralTypeNameResolver
 import io.github.mcdev.core.model.MemberKind
 import io.github.mcdev.core.model.MappingNamespace
+import org.objectweb.asm.Type
 
 class MixinDefinitionService(
     private val classIndex: ClassIndex,
@@ -17,17 +29,23 @@ class MixinDefinitionService(
         line: Int,
         character: Int,
         semanticModel: MixinClassModel? = null,
+        documentUri: String? = null,
     ): List<McDefinitionTarget> {
         val offset = AnnotationContextExtractor.toOffset(source, line, character) ?: return emptyList()
-        return definitionsAtOffset(source, offset, semanticModel)
+        return definitionsAtOffset(source, offset, semanticModel, documentUri)
     }
 
-    fun definitionsAtOffset(source: String, offset: Int, semanticModel: MixinClassModel? = null): List<McDefinitionTarget> {
+    fun definitionsAtOffset(
+        source: String,
+        offset: Int,
+        semanticModel: MixinClassModel? = null,
+        documentUri: String? = null,
+    ): List<McDefinitionTarget> {
         if (offset < 0 || offset > source.length) return emptyList()
 
         val context = AnnotationContextExtractor.extractAtOffset(source, offset)
         if (context != null) {
-            val fromContext = resolveFromAnnotationContext(source, context, semanticModel)
+            val fromContext = resolveFromAnnotationContext(source, context, semanticModel, offset, documentUri)
             if (fromContext.isNotEmpty()) return fromContext
         }
 
@@ -63,12 +81,17 @@ class MixinDefinitionService(
         source: String,
         context: AnnotationContext,
         semanticModel: MixinClassModel?,
-    ): List<McDefinitionTarget> =
-        when (context.annotation) {
+        offset: Int,
+        documentUri: String?,
+    ): List<McDefinitionTarget> {
+        if (context.slot == AnnotationSlot.METHOD && MixinExtrasAnnotation.fromMixinAnnotation(context.annotation) != null) {
+            return resolveInjectorMethodTarget(source, context, semanticModel)
+        }
+        return when (context.annotation) {
             MixinAnnotation.MIXIN -> when (context.slot) {
                 AnnotationSlot.CLASS,
                 AnnotationSlot.TARGETS,
-                    -> resolveMixinClassTarget(source, context)
+                    -> resolveMixinClassTarget(source, context, semanticModel, offset)
                 else -> emptyList()
             }
             MixinAnnotation.SHADOW -> when (context.slot) {
@@ -91,8 +114,20 @@ class MixinDefinitionService(
                 AnnotationSlot.TARGET -> resolveAtTarget(source, context)
                 else -> emptyList()
             }
+            MixinAnnotation.DEFINITION -> when (context.slot) {
+                AnnotationSlot.VALUE -> resolveDefinitionMemberReference(source, context)
+                else -> emptyList()
+            }
+            MixinAnnotation.LOCAL -> resolveDefinitionLocalType(source, context)
+            MixinAnnotation.EXPRESSION,
+            MixinAnnotation.EXPRESSIONS,
+            -> when (context.slot) {
+                AnnotationSlot.VALUE -> resolveExpressionDefinitionIdReference(source, context, offset, documentUri)
+                else -> emptyList()
+            }
             else -> emptyList()
         }
+    }
 
     private fun offsetFromContext(context: AnnotationContext): Int =
         context.valueEndOffset.coerceAtLeast(context.valueStartOffset)
@@ -100,10 +135,33 @@ class MixinDefinitionService(
     private fun resolveMixinClassTarget(
         source: String,
         context: AnnotationContext,
+        semanticModel: MixinClassModel?,
+        cursorOffset: Int,
     ): List<McDefinitionTarget> {
         val raw = context.partialValue.trim().trim('"').removeSuffix(".class")
         if (raw.isEmpty()) return emptyList()
-        val entry = resolveClassEntry(raw) ?: return emptyList()
+        val semanticTarget = semanticModel?.targets?.firstOrNull { target ->
+            val start = positionToOffset(source, target.range.start)
+            val end = positionToOffset(source, target.range.end).coerceAtLeast(start)
+            cursorOffset in start..end
+        }
+        val entry = if (semanticTarget != null) {
+            classIndex.findClass(semanticTarget.internalName)
+                ?: MixinTargetResolver.resolveTarget(
+                    semanticTarget.internalName,
+                    classIndex,
+                    JavaTypeDescriptorResolver.importsFor(source),
+                )
+                    ?.let(classIndex::findClass)
+                ?: return emptyList()
+        } else {
+            val completeRaw = completeMixinTargetValue(source, context, cursorOffset)
+            resolveClassEntry(
+                raw = completeRaw ?: raw,
+                imports = JavaTypeDescriptorResolver.importsFor(source),
+                allowPrefix = completeRaw == null,
+            ) ?: return emptyList()
+        }
         val internalName = entry.internalName
         return listOf(
             McDefinitionTarget(
@@ -113,6 +171,20 @@ class MixinDefinitionService(
                 sourceRange = offsetRange(source, context.valueStartOffset, context.valueEndOffset),
             ),
         )
+    }
+
+    private fun completeMixinTargetValue(
+        source: String,
+        context: AnnotationContext,
+        cursorOffset: Int,
+    ): String? {
+        val start = context.valueStartOffset.coerceIn(0, source.length)
+        val end = context.valueEndOffset.coerceIn(start, source.length)
+        if (start >= end || cursorOffset !in start..end) return null
+        val candidate = source.substring(start, end).trim()
+        if (candidate.isEmpty()) return null
+        if (candidate.endsWith(".class")) return candidate.removeSuffix(".class").trim()
+        return null
     }
 
     private fun resolveOverwriteMethodAtOffset(source: String, offset: Int): List<McDefinitionTarget> {
@@ -262,6 +334,222 @@ class MixinDefinitionService(
         return resolveMethodInTargets(mixinTargets, methodName, range, descriptor)
     }
 
+    private fun resolveInjectorMethodTarget(
+        source: String,
+        context: AnnotationContext,
+        semanticModel: MixinClassModel?,
+    ): List<McDefinitionTarget> {
+        val rawValue = definitionAttributeRawValue(source, context) ?: return emptyList()
+        if (rawValue.contains('*')) return emptyList()
+        val selector = when (val parsed = parseMethodSelector(rawValue)) {
+            is DescriptorParseResult.Success -> parsed.value
+            is DescriptorParseResult.Failure -> return emptyList()
+        }
+        val methodName = when (val namePattern = selector.name) {
+            is Pattern.Exact -> namePattern.value
+            is Pattern.Any -> return emptyList()
+        }
+        val descriptor = when (val descriptorPattern = selector.descriptor) {
+            is Pattern.Exact -> DescriptorRenderer.toDescriptor(descriptorPattern.value)
+            is Pattern.Any -> null
+        }
+        val mixinTargets = resolveMixinTargets(source, context, semanticModel)
+        if (mixinTargets.isEmpty()) return emptyList()
+        val targetOwners = when (val ownerPattern = selector.owner) {
+            is Pattern.Exact -> {
+                if (ownerPattern.value !in mixinTargets) return emptyList()
+                listOf(ownerPattern.value)
+            }
+            is Pattern.Any -> mixinTargets
+        }
+        return resolveMethodInTargets(
+            mixinTargets = targetOwners,
+            methodName = methodName,
+            sourceRange = offsetRange(source, context.valueStartOffset, context.valueEndOffset),
+            descriptor = descriptor,
+        )
+    }
+
+    private fun resolveExpressionDefinitionIdReference(
+        source: String,
+        context: AnnotationContext,
+        offset: Int,
+        documentUri: String?,
+    ): List<McDefinitionTarget> {
+        val position = context.expressionCompletionPosition ?: return emptyList()
+        if (position != ExpressionCompletionPosition.STATEMENT_START &&
+            position != ExpressionCompletionPosition.VALUE_START &&
+            position != ExpressionCompletionPosition.AFTER_DOT &&
+            position != ExpressionCompletionPosition.AFTER_METHOD_REFERENCE
+        ) {
+            return emptyList()
+        }
+        if (offset !in context.valueStartOffset until context.valueEndOffset) return emptyList()
+
+        val identifier = context.decodedPartialValue
+            ?: source.substring(context.valueStartOffset, context.valueEndOffset)
+        if (!isExpressionDefinitionIdentifier(identifier)) return emptyList()
+
+        val site = ExpressionContextResolver.findEnclosingSite(source, context.valueStartOffset) ?: return emptyList()
+        val expressionContext = ExpressionContextResolver.resolveExpressionContext(source, site)
+        val matches = expressionContext.definitionIndex.definitionsWithId(identifier)
+        return matches.mapNotNull { definition ->
+            if (position == ExpressionCompletionPosition.AFTER_DOT &&
+                definition.rawFieldReferences.isEmpty() && definition.rawMethodReferences.isEmpty()
+            ) return@mapNotNull null
+            if (position == ExpressionCompletionPosition.AFTER_METHOD_REFERENCE &&
+                definition.rawMethodReferences.isEmpty()
+            ) return@mapNotNull null
+            val idRange = definition.idSourceRange ?: return@mapNotNull null
+            McDefinitionTarget(
+                kind = MemberKind.CLASS,
+                ownerInternalName = "",
+                ownerFqn = null,
+                name = identifier,
+                sourceRange = definitionIdSourceRange(source, idRange),
+                directSourceDocumentUri = documentUri,
+            )
+        }
+    }
+
+    private fun definitionIdSourceRange(source: String, idRange: IntRange): McTextRange =
+        offsetRange(source, idRange.first, idRange.last + 1)
+
+    private fun isExpressionDefinitionIdentifier(identifier: String): Boolean {
+        if (identifier.isEmpty()) return false
+        if (identifier in EXPRESSION_DEFINITION_IDENTIFIER_KEYWORDS) return false
+        if (!identifier[0].isJavaIdentifierStart()) return false
+        if (identifier.drop(1).any { !it.isJavaIdentifierPart() }) return false
+        return true
+    }
+
+    private fun Char.isJavaIdentifierStart(): Boolean = isLetter() || this == '_' || this == '$'
+
+    private fun Char.isJavaIdentifierPart(): Boolean = isLetterOrDigit() || this == '_' || this == '$'
+
+    private fun resolveDefinitionMemberReference(
+        source: String,
+        context: AnnotationContext,
+    ): List<McDefinitionTarget> {
+        when (context.attributeName) {
+            "method" -> return resolveExactDefinitionMethod(source, context)
+            "field" -> return resolveExactDefinitionField(source, context)
+            "type" -> return resolveDefinitionClassLiteralType(source, context)
+            else -> return emptyList()
+        }
+    }
+
+    private fun resolveDefinitionLocalType(
+        source: String,
+        context: AnnotationContext,
+    ): List<McDefinitionTarget> {
+        if (context.slot != AnnotationSlot.VALUE || context.attributeName != "type") return emptyList()
+        val localStart = context.annotationStartOffset
+        val insideDefinition = AnnotationContextExtractor.findAnnotationOffsets(source, MixinAnnotation.DEFINITION)
+            .any { definition ->
+                val definitionEnd = AnnotationContextExtractor.annotationEndOffset(source, definition)
+                localStart in (definition + 1) until definitionEnd
+            }
+        if (!insideDefinition) return emptyList()
+        return resolveDefinitionClassLiteralType(source, context)
+    }
+
+    private fun resolveDefinitionClassLiteralType(
+        source: String,
+        context: AnnotationContext,
+    ): List<McDefinitionTarget> {
+        if (context.slot != AnnotationSlot.VALUE || context.attributeName != "type") return emptyList()
+        val start = context.valueStartOffset.coerceIn(0, source.length)
+        val end = context.valueEndOffset.coerceIn(start, source.length)
+        val rawLiteral = source.substring(start, end)
+        val literal = rawLiteral.trim()
+        val suffix = literal.indexOf(".class")
+        if (suffix < 0 || literal.substring(suffix + ".class".length).isNotBlank()) return emptyList()
+        val typeName = literal.substring(0, suffix).trim()
+        val resolvedType = ClassLiteralTypeNameResolver.forSource(source, classIndex).resolve(typeName)
+            ?.let { if (it.sort == Type.ARRAY) it.elementType else it }
+            ?.takeIf { it.sort == Type.OBJECT }
+            ?: return emptyList()
+        val entry = classIndex.findClass(resolvedType.internalName) ?: return emptyList()
+        val literalStart = start + rawLiteral.indexOf(literal)
+        val literalEnd = literalStart + suffix + ".class".length
+        return listOf(
+            McDefinitionTarget(
+                kind = MemberKind.CLASS,
+                ownerInternalName = entry.internalName,
+                ownerFqn = entry.fqn,
+                sourceRange = offsetRange(source, literalStart, literalEnd),
+            ),
+        )
+    }
+
+    private fun resolveExactDefinitionMethod(
+        source: String,
+        context: AnnotationContext,
+    ): List<McDefinitionTarget> {
+        val rawValue = definitionAttributeRawValue(source, context) ?: return emptyList()
+        val selector = when (val parsed = parseMethodSelector(rawValue)) {
+            is DescriptorParseResult.Success -> parsed.value
+            is DescriptorParseResult.Failure -> return emptyList()
+        }
+        if (!isExactMethodSelector(selector, rawValue)) return emptyList()
+        val owner = (selector.owner as Pattern.Exact).value
+        return listOf(
+            McDefinitionTarget(
+                kind = MemberKind.METHOD,
+                ownerInternalName = owner,
+                ownerFqn = classIndex.findClass(owner)?.fqn
+                    ?: AnnotationContextExtractor.internalToFqn(owner),
+                name = (selector.name as Pattern.Exact).value,
+                descriptor = DescriptorRenderer.toDescriptor((selector.descriptor as Pattern.Exact).value),
+                sourceRange = offsetRange(source, context.valueStartOffset, context.valueEndOffset),
+            ),
+        )
+    }
+
+    private fun resolveExactDefinitionField(
+        source: String,
+        context: AnnotationContext,
+    ): List<McDefinitionTarget> {
+        val rawValue = definitionAttributeRawValue(source, context) ?: return emptyList()
+        val selector = when (val parsed = parseFieldSelector(rawValue)) {
+            is DescriptorParseResult.Success -> parsed.value
+            is DescriptorParseResult.Failure -> return emptyList()
+        }
+        if (!isExactFieldSelector(selector, rawValue)) return emptyList()
+        val owner = (selector.owner as Pattern.Exact).value
+        return listOf(
+            McDefinitionTarget(
+                kind = MemberKind.FIELD,
+                ownerInternalName = owner,
+                ownerFqn = classIndex.findClass(owner)?.fqn
+                    ?: AnnotationContextExtractor.internalToFqn(owner),
+                name = (selector.name as Pattern.Exact).value,
+                descriptor = DescriptorRenderer.toDescriptor((selector.descriptor as Pattern.Exact).value),
+                sourceRange = offsetRange(source, context.valueStartOffset, context.valueEndOffset),
+            ),
+        )
+    }
+
+    private fun definitionAttributeRawValue(source: String, context: AnnotationContext): String? {
+        val start = context.valueStartOffset.coerceIn(0, source.length)
+        val end = context.valueEndOffset.coerceIn(start, source.length)
+        if (start >= end) return null
+        return source.substring(start, end).trim('"').takeIf { it.isNotEmpty() }
+    }
+
+    private fun isExactMethodSelector(selector: MethodSelector, rawValue: String): Boolean =
+        !rawValue.contains('*') &&
+            selector.owner is Pattern.Exact &&
+            selector.name is Pattern.Exact &&
+            selector.descriptor is Pattern.Exact
+
+    private fun isExactFieldSelector(selector: FieldSelector, rawValue: String): Boolean =
+        !rawValue.contains('*') &&
+            selector.owner is Pattern.Exact &&
+            selector.name is Pattern.Exact &&
+            selector.descriptor is Pattern.Exact
+
     private fun resolveAtTarget(
         source: String,
         context: AnnotationContext,
@@ -366,14 +654,15 @@ class MixinDefinitionService(
         context: AnnotationContext?,
         semanticModel: MixinClassModel? = null,
     ): List<String> {
+        val imports = JavaTypeDescriptorResolver.importsFor(source)
         semanticModel?.targets
-            ?.mapNotNull { target -> MixinTargetResolver.resolveTarget(target.internalName, classIndex) ?: target.internalName.takeIf { '/' in it } }
+            ?.mapNotNull { target -> MixinTargetResolver.resolveTarget(target.internalName, classIndex, imports) }
             ?.takeIf { it.isNotEmpty() }
             ?.let { return it }
         val rawTargets = context?.mixinTargetInternalNames?.ifEmpty {
             AnnotationContextExtractor.resolveRawMixinTargets(source, context.valueStartOffset)
         } ?: AnnotationContextExtractor.resolveRawMixinTargets(source, 0)
-        return MixinTargetResolver.resolveTargets(rawTargets, classIndex, JavaTypeDescriptorResolver.importsFor(source))
+        return MixinTargetResolver.resolveTargets(rawTargets, classIndex, imports)
     }
 
     private fun findShadowMemberAtOffset(source: String, offset: Int): ShadowMemberDeclaration? {
@@ -507,13 +796,19 @@ class MixinDefinitionService(
     private fun lineAtOffset(source: String, offset: Int): Int =
         offsetToPosition(source, offset.coerceIn(0, source.length)).line
 
-    private fun resolveClassEntry(raw: String): ClassIndexEntry? {
+    private fun resolveClassEntry(
+        raw: String,
+        imports: JavaSourceImports? = null,
+        allowPrefix: Boolean = true,
+    ): ClassIndexEntry? {
         val trimmed = raw.trim().trim('"').removeSuffix(".class")
         if (trimmed.isEmpty()) return null
         classIndex.findClassByFqn(trimmed)?.let { return it }
-        classIndex.findClasses(trimmed, limit = 5).firstOrNull()?.let { return it }
-        MixinTargetResolver.resolveTarget(trimmed, classIndex)?.let { internalName ->
+        MixinTargetResolver.resolveTarget(trimmed, classIndex, imports)?.let { internalName ->
             classIndex.findClass(internalName)?.let { return it }
+        }
+        if (allowPrefix) {
+            classIndex.findClasses(trimmed, limit = 5).singleOrNull()?.let { return it }
         }
         return null
     }
@@ -552,4 +847,15 @@ internal data class ParsedAtTarget(
     val name: String,
     val descriptor: String,
     val kind: MemberKind,
+)
+
+private val EXPRESSION_DEFINITION_IDENTIFIER_KEYWORDS = setOf(
+    "return",
+    "throw",
+    "this",
+    "super",
+    "true",
+    "false",
+    "null",
+    "new",
 )

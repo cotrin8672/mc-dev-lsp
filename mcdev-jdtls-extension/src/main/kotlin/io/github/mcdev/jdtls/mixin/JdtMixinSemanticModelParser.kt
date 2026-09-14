@@ -3,6 +3,7 @@ package io.github.mcdev.jdtls.mixin
 import io.github.mcdev.core.diagnostics.McTextPosition
 import io.github.mcdev.core.diagnostics.McTextRange
 import io.github.mcdev.core.mixin.InjectorModel
+import io.github.mcdev.core.mixin.AnnotationContextExtractor
 import io.github.mcdev.core.mixin.JavaModifier
 import io.github.mcdev.core.mixin.JavaTypeDescriptorResolver
 import io.github.mcdev.core.mixin.JavaTypeKind
@@ -15,7 +16,11 @@ import io.github.mcdev.core.mixin.MixinTargetRef
 import io.github.mcdev.core.mixin.ParseConfidence
 import io.github.mcdev.core.mixin.ParseSource
 import io.github.mcdev.core.mixin.SemanticParseDebugInfo
+import io.github.mcdev.core.mixinextras.ResolvedMixinExtrasContext
+import java.lang.reflect.InvocationTargetException
+import java.lang.reflect.UndeclaredThrowableException
 import java.net.URI
+import java.util.concurrent.CancellationException
 
 data class JdtParseEnvironment(
     val classpathEntries: List<String> = emptyList(),
@@ -43,7 +48,7 @@ class JdtMixinSemanticModelParser {
         }
         val jdtSource = resolveJdtSource(documentUri)
             ?: return fallback(source, documentUri, "JDT compilation unit is not available for $documentUri")
-        return runCatching {
+        return try {
             val ast = parseAst(parserClass, astApiClass, source, jdtSource, environment)
             val fallback = MixinSemanticModelParser.parse(
                 source = source,
@@ -58,8 +63,10 @@ class JdtMixinSemanticModelParser {
             )
             val astModel = AstModelExtractor(source, documentUri).extract(ast, fallback, jdtSource)
             astModel
-        }.getOrElse { error ->
-            fallback(source, documentUri, "JDT AST parse failed: ${error.message ?: error.javaClass.name}")
+        } catch (error: Throwable) {
+            val cause = unwrapReflectionFailure(error)
+            throwIfJdtAbort(cause)
+            fallback(source, documentUri, "JDT AST parse failed: ${describeFailure(cause)}")
         }
     }
 
@@ -78,15 +85,18 @@ class JdtMixinSemanticModelParser {
         val kind = parserClass.getField("K_COMPILATION_UNIT").getInt(null)
         parserClass.getMethod("setKind", Int::class.javaPrimitiveType).invoke(parser, kind)
         parserClass.getMethod("setSource", CharArray::class.java).invoke(parser, source.toCharArray())
-        val environmentApplied = applyEnvironment(parserClass, parser, environment)
-        if (!environmentApplied) {
-            jdtSource.javaProject?.let {
+        if (jdtSource.javaProject != null) {
             val javaProjectClass = Class.forName("org.eclipse.jdt.core.IJavaProject")
-            parserClass.getMethod("setProject", javaProjectClass).invoke(parser, it)
-            }
+            parserClass.getMethod("setProject", javaProjectClass).invoke(parser, jdtSource.javaProject)
+        } else {
+            applyEnvironment(parserClass, parser, environment)
         }
         (environment.unitName ?: jdtSource.unitName)?.let {
-            runCatching { parserClass.getMethod("setUnitName", String::class.java).invoke(parser, it) }
+            try {
+                parserClass.getMethod("setUnitName", String::class.java).invoke(parser, it)
+            } catch (error: Throwable) {
+                throwIfJdtAbort(error)
+            }
         }
         parserClass.getMethod("setResolveBindings", Boolean::class.javaPrimitiveType).invoke(parser, true)
         parserClass.getMethod("setBindingsRecovery", Boolean::class.javaPrimitiveType).invoke(parser, true)
@@ -100,7 +110,7 @@ class JdtMixinSemanticModelParser {
         if (environment.classpathEntries.isEmpty() && environment.sourcepathEntries.isEmpty()) {
             return false
         }
-        return runCatching {
+        return try {
             parserClass.getMethod(
                 "setEnvironment",
                 Array<String>::class.java,
@@ -114,7 +124,11 @@ class JdtMixinSemanticModelParser {
                 null,
                 true,
             )
-        }.isSuccess
+            true
+        } catch (error: Throwable) {
+            throwIfJdtAbort(error)
+            false
+        }
     }
 
     private fun fallback(source: String, documentUri: String, reason: String): MixinClassModel =
@@ -137,24 +151,68 @@ class JdtMixinSemanticModelParser {
     )
 
     private fun resolveJdtSource(documentUri: String): JdtAstSource? {
-        val javaCoreClass = runCatching { Class.forName("org.eclipse.jdt.core.JavaCore") }.getOrNull() ?: return null
-        val resourcesPlugin = runCatching { Class.forName("org.eclipse.core.resources.ResourcesPlugin") }.getOrNull() ?: return null
-        val workspace = resourcesPlugin.getMethod("getWorkspace").invoke(null) ?: return null
-        val root = workspace.javaClass.getMethod("getRoot").invoke(workspace) ?: return null
-        val uri = runCatching { URI(documentUri) }.getOrNull() ?: return null
-        val file = runCatching {
-            val files = root.javaClass.getMethod("findFilesForLocationURI", URI::class.java).invoke(root, uri) as? Array<*>
-            files?.firstOrNull()
-        }.getOrNull() ?: return null
-        val compilationUnit = javaCoreClass.methods
-            .firstOrNull { it.name == "createCompilationUnitFrom" && it.parameterCount == 1 }
-            ?.invoke(null, file)
-            ?: return null
-        val javaProject = runCatching { compilationUnit.javaClass.getMethod("getJavaProject").invoke(compilationUnit) }.getOrNull()
-            ?: return null
-        val unitName = runCatching { compilationUnit.javaClass.getMethod("getElementName").invoke(compilationUnit) as? String }
-            .getOrNull()
-        return JdtAstSource(compilationUnit, javaProject, unitName)
+        return try {
+            val javaCoreClass = Class.forName("org.eclipse.jdt.core.JavaCore")
+            val resourcesPlugin = Class.forName("org.eclipse.core.resources.ResourcesPlugin")
+            val workspace = resourcesPlugin.getMethod("getWorkspace").invoke(null) ?: return null
+            val root = workspace.javaClass.getMethod("getRoot").invoke(workspace) ?: return null
+            val uri = try {
+                URI(documentUri)
+            } catch (_: IllegalArgumentException) {
+                return null
+            }
+            val files = root.javaClass.getMethod("findFilesForLocationURI", URI::class.java)
+                .invoke(root, uri) as? Array<*>
+            val file = files?.firstOrNull() ?: return null
+            val compilationUnit = javaCoreClass.methods
+                .firstOrNull { it.name == "createCompilationUnitFrom" && it.parameterCount == 1 }
+                ?.invoke(null, file)
+                ?: return null
+            val javaProject = compilationUnit.javaClass.getMethod("getJavaProject").invoke(compilationUnit)
+                ?: return null
+            val unitName = compilationUnit.javaClass.getMethod("getElementName").invoke(compilationUnit) as? String
+            JdtAstSource(compilationUnit, javaProject, unitName)
+        } catch (error: Throwable) {
+            throwIfJdtAbort(error)
+            null
+        }
+    }
+
+    internal fun resolveJavaProject(documentUri: String): Any? =
+        resolveJdtSource(documentUri)?.javaProject
+
+    companion object {
+        private const val OPERATION_CANCELED_EXCEPTION = "org.eclipse.core.runtime.OperationCanceledException"
+
+        internal fun unwrapReflectionFailure(throwable: Throwable): Throwable {
+            var cause = throwable
+            while (true) {
+                val next = when (cause) {
+                    is InvocationTargetException -> cause.targetException ?: cause.cause
+                    is UndeclaredThrowableException -> cause.undeclaredThrowable ?: cause.cause
+                    else -> null
+                } ?: return cause
+                if (next === cause) return cause
+                cause = next
+            }
+        }
+
+        internal fun describeFailure(throwable: Throwable): String {
+            val cause = unwrapReflectionFailure(throwable)
+            return cause.javaClass.name + (cause.message?.takeIf { it.isNotBlank() }?.let { ": $it" } ?: "")
+        }
+
+        internal fun throwIfJdtAbort(throwable: Throwable) {
+            val cause = unwrapReflectionFailure(throwable)
+            if (
+                cause is Error ||
+                cause is CancellationException ||
+                cause is InterruptedException ||
+                cause.javaClass.name == OPERATION_CANCELED_EXCEPTION
+            ) {
+                throw cause
+            }
+        }
     }
 
     private class AstModelExtractor(
@@ -185,6 +243,13 @@ class JdtMixinSemanticModelParser {
                     else -> emptyList()
                 }
             }.ifEmpty { fallback.members }
+            val methodNodes = nodes.filter { it.javaClass.simpleName == "MethodDeclaration" }
+            val mixinExtras = JdtMixinExtrasResolvedContextCollector.collect(
+                methodDeclarations = methodNodes,
+                handlerRange = ::range,
+                methodName = ::nodeName,
+                source = source,
+            )
             return fallback.copy(
                 sourceUri = documentUri,
                 packageName = packageName,
@@ -192,9 +257,10 @@ class JdtMixinSemanticModelParser {
                 typeKind = typeKind(typeNode),
                 targets = targets,
                 members = members,
+                resolvedMixinExtrasContexts = mixinExtras.contexts,
                 parseSource = ParseSource.JDT_AST,
-                confidence = if (members.any { it.confidence != ParseConfidence.HIGH }) ParseConfidence.MEDIUM else ParseConfidence.HIGH,
-                warnings = members.flatMap { it.warnings }.distinct(),
+                confidence = if (bindingFailedCount > 0 || members.any { it.confidence != ParseConfidence.HIGH }) ParseConfidence.MEDIUM else ParseConfidence.HIGH,
+                warnings = (members.flatMap { it.warnings } + mixinExtras.warnings).distinct(),
                 debugInfo = SemanticParseDebugInfo(
                     parseSource = ParseSource.JDT_AST,
                     usedCompilationUnit = jdtSource.compilationUnit != null,
@@ -270,8 +336,20 @@ class JdtMixinSemanticModelParser {
 
         private fun mixinTargets(annotation: Any): List<MixinTargetRef> =
             annotationValues(annotation).mapNotNull { expression ->
-                val raw = expression.toString().removeSuffix(".class").trim('"')
-                val internal = typeBindingInternalName(expression) ?: raw.replace('.', '/')
+                val typeLiteral = expression.javaClass.simpleName == "TypeLiteral"
+                val raw = if (typeLiteral) {
+                    expression.toString().removeSuffix(".class").trim('"')
+                } else {
+                    JdtAnnotationConstantExtractor.constantString(expression)
+                        ?: expression.toString().removeSuffix(".class").trim('"')
+                }
+                val internal = if (typeLiteral) {
+                    typeBindingInternalName(expression)
+                        ?: imports.explicit[raw]?.let(AnnotationContextExtractor::fqnToInternal)
+                        ?: raw
+                } else {
+                    raw.replace('.', '/')
+                }
                 MixinTargetRef(internalName = internal, range = range(expression))
             }
 
@@ -282,53 +360,21 @@ class JdtMixinSemanticModelParser {
         }
 
         private fun typeBindingDescriptor(node: Any): String? {
-            val binding = runCatching {
-                node.javaClass.methods.firstOrNull { it.name in setOf("resolveBinding", "resolveTypeBinding") && it.parameterCount == 0 }
-                    ?.invoke(node)
-            }.getOrNull() ?: run {
+            val binding = JdtAnnotationConstantExtractor.typeBinding(node) ?: run {
                 bindingFailedCount++
                 return null
             }
             bindingResolvedCount++
-            return descriptorFromBinding(binding)
+            return JdtBindingDescriptorConverter.descriptorFromBinding(binding)
         }
 
         private fun typeBindingInternalName(node: Any): String? {
-            val binding = runCatching {
-                node.javaClass.methods.firstOrNull { it.name == "resolveTypeBinding" && it.parameterCount == 0 }
-                    ?.invoke(node)
-            }.getOrNull() ?: run {
+            val binding = JdtAnnotationConstantExtractor.typeBinding(node) ?: run {
                 bindingFailedCount++
                 return null
             }
             bindingResolvedCount++
             return bindingBinaryName(binding)?.replace('.', '/')
-        }
-
-        private fun descriptorFromBinding(binding: Any): String? {
-            val isPrimitive = bool(binding, "isPrimitive")
-            if (isPrimitive) {
-                return when (string(binding, "getName")) {
-                    "void" -> "V"
-                    "boolean" -> "Z"
-                    "byte" -> "B"
-                    "char" -> "C"
-                    "short" -> "S"
-                    "int" -> "I"
-                    "long" -> "J"
-                    "float" -> "F"
-                    "double" -> "D"
-                    else -> null
-                }
-            }
-            if (bool(binding, "isArray")) {
-                val component = call(binding, "getComponentType") ?: return null
-                val dims = int(binding, "getDimensions") ?: 1
-                return "[".repeat(dims) + descriptorFromBinding(component)
-            }
-            val erasure = call(binding, "getErasure") ?: binding
-            val binaryName = bindingBinaryName(erasure) ?: return null
-            return "L${binaryName.replace('.', '/')};"
         }
 
         private fun bindingBinaryName(binding: Any): String? =
@@ -478,14 +524,20 @@ class JdtMixinSemanticModelParser {
         private fun listProperty(node: Any?, name: String): List<Any> {
             if (node == null) return emptyList()
             return runCatching {
-                val value = node.javaClass.getMethod(name).invoke(node)
+                val value = node.javaClass.getMethod(name).apply { trySetAccessible() }.invoke(node)
                 @Suppress("UNCHECKED_CAST")
                 value as? List<Any>
-            }.getOrNull().orEmpty()
+            }.onFailure { throwIfJdtAbort(it) }.getOrNull().orEmpty()
         }
 
         private fun call(node: Any, name: String): Any? =
-            runCatching { node.javaClass.methods.firstOrNull { it.name == name && it.parameterCount == 0 }?.invoke(node) }
+            runCatching {
+                node.javaClass.methods
+                    .firstOrNull { it.name == name && it.parameterCount == 0 }
+                    ?.apply { trySetAccessible() }
+                    ?.invoke(node)
+            }
+                .onFailure { throwIfJdtAbort(it) }
                 .getOrNull()
 
         private fun string(node: Any, name: String): String? =
@@ -496,5 +548,48 @@ class JdtMixinSemanticModelParser {
 
         private fun bool(node: Any, name: String): Boolean =
             call(node, name) as? Boolean ?: false
+    }
+}
+
+internal data class CollectedMixinExtrasContexts(
+    val contexts: List<ResolvedMixinExtrasContext>,
+    val warnings: List<String>,
+)
+
+internal object JdtMixinExtrasResolvedContextCollector {
+    fun collect(
+        methodDeclarations: Iterable<Any>,
+        handlerRange: (Any) -> McTextRange,
+        methodName: (Any) -> String? = { node ->
+            runCatching {
+                node.javaClass.methods
+                    .firstOrNull { it.name == "getName" && it.parameterCount == 0 }
+                    ?.invoke(node)
+                    ?.toString()
+            }.getOrNull()
+        },
+        source: String? = null,
+        extract: (Any, McTextRange) -> JdtMixinExtrasResolvedContextResult = { method, range ->
+            JdtMixinExtrasResolvedContextExtractor.extract(method, range, source)
+        },
+    ): CollectedMixinExtrasContexts {
+        val contexts = mutableListOf<ResolvedMixinExtrasContext>()
+        val warnings = mutableListOf<String>()
+        for (method in methodDeclarations) {
+            val range = handlerRange(method)
+            when (val result = extract(method, range)) {
+                JdtMixinExtrasResolvedContextResult.NotMixinExtrasHandler -> Unit
+                is JdtMixinExtrasResolvedContextResult.Unavailable -> {
+                    val name = methodName(method)
+                    warnings += if (name != null) {
+                        "MixinExtras context unavailable for method $name: ${result.reason}"
+                    } else {
+                        "MixinExtras context unavailable: ${result.reason}"
+                    }
+                }
+                is JdtMixinExtrasResolvedContextResult.Resolved -> contexts += result.context
+            }
+        }
+        return CollectedMixinExtrasContexts(contexts, warnings)
     }
 }

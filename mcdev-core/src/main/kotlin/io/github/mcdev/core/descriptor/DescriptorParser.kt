@@ -52,7 +52,7 @@ class DescriptorParser(private val input: String) {
         }
         val internalName = input.substring(start, index)
         index++
-        if (internalName.isBlank() || internalName.contains('.')) {
+        if (internalName.isBlank() || internalName.contains('.') || internalName.contains('[')) {
             index = start - 1
             return null
         }

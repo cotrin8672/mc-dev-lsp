@@ -4,6 +4,7 @@ data class JavaSourceImports(
     val packageName: String?,
     val explicit: Map<String, String>,
     val wildcardPackages: List<String> = emptyList(),
+    val ambiguousExplicit: Map<String, List<String>> = emptyMap(),
 )
 
 data class JavaTypeResolutionContext(
@@ -98,23 +99,29 @@ object JavaTypeDescriptorResolver {
     )
 
     fun importsFor(source: String): JavaSourceImports {
+        val code = AnnotationContextExtractor.maskNonCode(source)
         val packageName = Regex("""(?m)^\s*package\s+([\w.]+)\s*;""")
-            .find(source)
+            .find(code)
             ?.groupValues
             ?.get(1)
-        val explicit = linkedMapOf<String, String>()
+        val explicit = linkedMapOf<String, MutableSet<String>>()
         val wildcards = mutableListOf<String>()
         Regex("""(?m)^\s*import\s+(?!static\b)([\w.]+(?:\.\*)?)\s*;""")
-            .findAll(source)
+            .findAll(code)
             .forEach { match ->
                 val fqn = match.groupValues[1]
                 if (fqn.endsWith(".*")) {
                     wildcards += fqn.removeSuffix(".*")
                 } else {
-                    explicit[fqn.substringAfterLast('.')] = fqn
+                    explicit.getOrPut(fqn.substringAfterLast('.')) { linkedSetOf() }.add(fqn)
                 }
             }
-        return JavaSourceImports(packageName, explicit, wildcards)
+        return JavaSourceImports(
+            packageName,
+            explicit.filterValues { it.size == 1 }.mapValues { it.value.single() },
+            wildcards,
+            explicit.filterValues { it.size > 1 }.mapValues { it.value.toList() },
+        )
     }
 
     fun methodDescriptor(returnType: String, parameterTypes: List<String>, imports: JavaSourceImports): String =
@@ -286,6 +293,9 @@ object JavaTypeDescriptorResolver {
         if (normalized.isEmpty()) return TypeLookupResult.NotFound
         val imports = context.imports
         val lookup = context.lookup
+        imports.ambiguousExplicit[normalized.substringBefore('.')]?.let { candidates ->
+            return TypeLookupResult.Ambiguous(candidates.map(::fqnToInternalName))
+        }
 
         if ('.' in normalized) {
             lookup?.findInternalNameByQualifiedName(normalized)?.let { return TypeLookupResult.Found(it) }

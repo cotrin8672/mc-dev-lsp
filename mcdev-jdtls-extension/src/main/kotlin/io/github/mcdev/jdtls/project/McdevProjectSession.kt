@@ -17,11 +17,10 @@ data class McdevProjectSession(
             entries = context.classpath.allEntries,
             entryTimestamps = context.classpath.entryTimestamps,
         )
-        val memberIndex = ClasspathIndexBuilder.build(provider)
-        val classIndex = ClassMemberIndexAdapter(memberIndex)
+        val classIndex = LazyClasspathClassIndex(provider)
         val bytecodeIndexAdapter = BytecodeIndexAdapter(provider, classIndex)
         return copy(
-            context = context.copy(indexState = ProjectIndexState.READY),
+            context = context.copy(indexState = indexStateFor(context)),
             classBytesProvider = provider,
             classIndex = classIndex,
             bytecodeIndex = bytecodeIndexAdapter,
@@ -35,18 +34,8 @@ data class McdevProjectSession(
                 entries = context.classpath.allEntries,
                 entryTimestamps = context.classpath.entryTimestamps,
             )
-            val indexState = if (provider.classCount() > 0) ProjectIndexState.READY else ProjectIndexState.NOT_READY
-            val resolvedContext = context.copy(indexState = indexState)
-            val memberIndex = if (indexState == ProjectIndexState.READY) {
-                ClasspathIndexBuilder.build(provider)
-            } else {
-                io.github.mcdev.core.bytecode.ClassMemberIndex(
-                    classes = emptyMap(),
-                    methodsByOwner = emptyMap(),
-                    fieldsByOwner = emptyMap(),
-                )
-            }
-            val classIndex = ClassMemberIndexAdapter(memberIndex)
+            val resolvedContext = context.copy(indexState = indexStateFor(context))
+            val classIndex = LazyClasspathClassIndex(provider)
             val bytecodeIndexAdapter = BytecodeIndexAdapter(provider, classIndex)
             return McdevProjectSession(
                 context = resolvedContext,
@@ -56,5 +45,8 @@ data class McdevProjectSession(
                 bytecodeIndexAdapter = bytecodeIndexAdapter,
             )
         }
+
+        private fun indexStateFor(context: ProjectContext): ProjectIndexState =
+            if (context.classpath.allEntries.isEmpty()) ProjectIndexState.NOT_READY else ProjectIndexState.READY
     }
 }

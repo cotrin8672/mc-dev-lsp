@@ -47,7 +47,7 @@ try {
 
         nvim --headless `
             -u (Join-Path $repoRoot "mcdev-nvim/tests/e2e/minimal_init.lua") `
-            -c "luafile mcdev-nvim/tests/e2e/jdtls_bundle_e2e.lua"
+            -c "luafile mcdev-nvim/tests/e2e/run_bundle_e2e.lua"
         if ($LASTEXITCODE -ne 0) { throw "osgi e2e failed for $fixture" }
     }
 

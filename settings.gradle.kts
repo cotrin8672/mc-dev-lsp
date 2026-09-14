@@ -9,6 +9,14 @@ dependencyResolutionManagement {
     repositoriesMode.set(RepositoriesMode.FAIL_ON_PROJECT_REPOS)
     repositories {
         mavenCentral()
+        exclusiveContent {
+            forRepository {
+                maven("https://repo.spongepowered.org/repository/maven-public/")
+            }
+            filter {
+                includeGroup("org.spongepowered")
+            }
+        }
     }
 }
 

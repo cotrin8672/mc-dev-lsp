@@ -42,12 +42,18 @@ function M.to_lsp_location(location, fallback_uri)
   }
 end
 
-function M.to_vim_diagnostic(diagnostic)
+local function to_byte_col(bufnr, position)
+  local line = vim.api.nvim_buf_get_lines(bufnr, position.line, position.line + 1, false)[1]
+  return line and vim.str_byteindex(line, "utf-16", position.character, false) or position.character
+end
+
+function M.to_vim_diagnostic(diagnostic, bufnr)
+  bufnr = bufnr or vim.api.nvim_get_current_buf()
   return {
     lnum = diagnostic.range.start.line,
-    col = diagnostic.range.start.character,
+    col = to_byte_col(bufnr, diagnostic.range.start),
     end_lnum = diagnostic.range["end"].line,
-    end_col = diagnostic.range["end"].character,
+    end_col = to_byte_col(bufnr, diagnostic.range["end"]),
     severity = severity_map[diagnostic.severity] or vim.diagnostic.severity.ERROR,
     message = diagnostic.message,
     code = diagnostic.code,
@@ -78,7 +84,7 @@ function M.to_lsp_code_action(action)
     table.insert(document_changes, {
       textDocument = {
         uri = workspace_edit.documentUri,
-        version = nil,
+        version = vim.NIL,
       },
       edits = vim.tbl_map(to_lsp_text_edit, workspace_edit.edits or {}),
     })

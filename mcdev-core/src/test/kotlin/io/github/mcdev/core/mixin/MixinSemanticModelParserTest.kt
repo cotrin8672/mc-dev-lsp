@@ -1,5 +1,11 @@
 package io.github.mcdev.core.mixin
 
+import io.github.mcdev.core.diagnostics.McTextPosition
+import io.github.mcdev.core.diagnostics.McTextRange
+import io.github.mcdev.core.mixinextras.ExpressionContext
+import io.github.mcdev.core.mixinextras.MixinExtrasDefinitionIndex
+import io.github.mcdev.core.mixinextras.MixinExtrasExpressionIndex
+import io.github.mcdev.core.mixinextras.ResolvedMixinExtrasContext
 import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertTrue
@@ -31,5 +37,24 @@ class MixinSemanticModelParserTest {
             injector.methodSelectors.any { it.name == "draw" && it.descriptor == "(I)V" } &&
                 injector.atSelectors.any { it.value == "INVOKE" && it.target == "Lcom/example/Target;tick()V" }
         })
+        assertTrue(model.resolvedMixinExtrasContexts.isEmpty())
+    }
+
+    @Test
+    fun retainsExplicitResolvedMixinExtrasContexts() {
+        val handlerRange = McTextRange(McTextPosition(1, 4), McTextPosition(1, 20))
+        val context = ExpressionContext(
+            expressionIndex = MixinExtrasExpressionIndex(),
+            definitionIndex = MixinExtrasDefinitionIndex(),
+        )
+        val resolved = ResolvedMixinExtrasContext(handlerRange = handlerRange, context = context)
+
+        val model = MixinClassModel(
+            targets = emptyList(),
+            injectors = emptyList(),
+            resolvedMixinExtrasContexts = listOf(resolved),
+        )
+
+        assertEquals(listOf(resolved), model.resolvedMixinExtrasContexts)
     }
 }

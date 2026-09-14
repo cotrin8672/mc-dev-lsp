@@ -16,6 +16,18 @@ class InstructionExtractorMiscTest {
     }
 
     @Test
+    fun extractsClassLiteralConstantsFromCheckcastAndInstanceofOnly() {
+        val bytes = BytecodeFixtureCompiler.classBytes("TypeInstructionSamples")
+        val candidates = InstructionExtractor.extract(bytes, "typeInstructions", "(Ljava/lang/Object;I)V")
+        val classLiterals = candidates
+            .filter { it.kind == AtTargetKind.CONSTANT && it.constantValue is ConstantValue.ClassLiteral }
+            .map { (it.constantValue as ConstantValue.ClassLiteral).internalName }
+        assertEquals(listOf("java/lang/String", "java/util/List"), classLiterals)
+        assertEquals(1, candidates.count { it.kind == AtTargetKind.NEW })
+        assertTrue(classLiterals.none { it == "java/lang/StringBuilder" || it.startsWith("[")})
+    }
+
+    @Test
     fun newInstructionDescriptorUsesClassLiteralForm() {
         val bytes = BytecodeFixtureCompiler.classBytes("NewSamples")
         val candidate = InstructionExtractor.extract(bytes, "createObjects", "()V")

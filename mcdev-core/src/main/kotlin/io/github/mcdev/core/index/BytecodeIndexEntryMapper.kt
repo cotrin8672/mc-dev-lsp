@@ -7,6 +7,7 @@ import io.github.mcdev.core.descriptor.parseFieldDescriptor
 import io.github.mcdev.core.descriptor.parseMethodDescriptor
 import io.github.mcdev.core.mixin.AtTargetCandidate
 import io.github.mcdev.core.mixin.AtTargetKind
+import io.github.mcdev.core.mixin.AtTargetOperationKind
 import io.github.mcdev.core.mixin.ClassIndexEntry
 import io.github.mcdev.core.mixin.FieldIndexEntry
 import io.github.mcdev.core.mixin.MethodIndexEntry
@@ -91,6 +92,10 @@ internal object BytecodeIndexEntryMapper {
             ordinal = candidate.ordinal,
             namespace = MappingNamespace.NAMED,
             constantValue = candidate.constantValue,
+            operationKind = toMixinAtTargetOperationKind(candidate.kind),
+            instructionOccurrenceIndex = candidate.instructionOccurrenceIndex,
+            occurrenceResultClassification = candidate.occurrenceResultClassification,
+            conditionOpcode = candidate.conditionOpcode,
         )
     }
 
@@ -133,6 +138,22 @@ internal object BytecodeIndexEntryMapper {
             BytecodeAtTargetKind.NEW -> AtTargetKind.NEW
             BytecodeAtTargetKind.RETURN -> AtTargetKind.RETURN
             BytecodeAtTargetKind.CONSTANT -> AtTargetKind.CONSTANT
+        }
+
+    private fun toMixinAtTargetOperationKind(kind: BytecodeAtTargetKind): AtTargetOperationKind? =
+        when (kind) {
+            BytecodeAtTargetKind.INVOKE_VIRTUAL -> AtTargetOperationKind.INVOKE_VIRTUAL
+            BytecodeAtTargetKind.INVOKE_STATIC -> AtTargetOperationKind.INVOKE_STATIC
+            BytecodeAtTargetKind.INVOKE_SPECIAL -> AtTargetOperationKind.INVOKE_SPECIAL
+            BytecodeAtTargetKind.INVOKE_INTERFACE -> AtTargetOperationKind.INVOKE_INTERFACE
+            BytecodeAtTargetKind.FIELD_GET_INSTANCE -> AtTargetOperationKind.FIELD_GET_INSTANCE
+            BytecodeAtTargetKind.FIELD_PUT_INSTANCE -> AtTargetOperationKind.FIELD_PUT_INSTANCE
+            BytecodeAtTargetKind.FIELD_GET_STATIC -> AtTargetOperationKind.FIELD_GET_STATIC
+            BytecodeAtTargetKind.FIELD_PUT_STATIC -> AtTargetOperationKind.FIELD_PUT_STATIC
+            BytecodeAtTargetKind.NEW,
+            BytecodeAtTargetKind.RETURN,
+            BytecodeAtTargetKind.CONSTANT,
+                -> null
         }
 
     private fun formatConstantLabel(value: ConstantValue?): String =

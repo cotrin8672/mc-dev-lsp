@@ -1,8 +1,12 @@
 package io.github.mcdev.core.mixin.e2e
 
+import io.github.mcdev.core.mixin.AtTargetCandidate
+import io.github.mcdev.core.mixin.AtTargetKind
+import io.github.mcdev.core.mixin.ClassIndexEntry
 import io.github.mcdev.core.mixin.InjectMethodDescriptorMode
 import io.github.mcdev.core.mixin.MixinClassInsertMode
 import io.github.mcdev.core.mixin.MixinCompletionOptions
+import io.github.mcdev.core.model.MappingNamespace
 import io.github.mcdev.fixtures.FixturePaths
 import kotlin.test.Test
 import kotlin.test.assertEquals
@@ -312,6 +316,86 @@ class MixinCompletionE2ETest {
         val source = "class Plain { int value; }"
         val items = fakeFacade.complete(MixinE2ETestSupport.requestAt(source, "value"))
         assertTrue(items.isEmpty())
+    }
+
+    @Test
+    fun completesAtTargetFromAllMultiMixinTargets() {
+        val firstOwner = "com/example/target/FirstTarget"
+        val secondOwner = "com/example/target/SecondTarget"
+        val firstInvokeOwner = "com/example/target/FirstInvokeOwner"
+        val secondInvokeOwner = "com/example/target/SecondInvokeOwner"
+        val firstCandidateInsert = "L$firstInvokeOwner;firstHook()V"
+        val secondCandidateInsert = "L$secondInvokeOwner;secondHook()V"
+
+        val classIndex = io.github.mcdev.core.mixin.FakeClassIndex(
+            classes = io.github.mcdev.core.mixin.FakeClassIndex.defaultClasses() + listOf(
+                ClassIndexEntry("FirstTarget", "com.example.target", firstOwner),
+                ClassIndexEntry("SecondTarget", "com.example.target", secondOwner),
+            ),
+            methods = io.github.mcdev.core.mixin.FakeClassIndex.defaultMethods() + mapOf(
+                firstOwner to listOf(
+                    io.github.mcdev.core.mixin.MethodIndexEntry("run", "()V", false, "run(): void"),
+                ),
+                secondOwner to listOf(
+                    io.github.mcdev.core.mixin.MethodIndexEntry("run", "()V", false, "run(): void"),
+                ),
+            ),
+        )
+        val bytecodeIndex = io.github.mcdev.core.mixin.FakeBytecodeIndex(
+            candidates = io.github.mcdev.core.mixin.FakeBytecodeIndex.defaultCandidates() + mapOf(
+                "$firstOwner#run#INVOKE" to listOf(
+                    AtTargetCandidate(
+                        owner = firstInvokeOwner,
+                        name = "firstHook",
+                        descriptor = "()V",
+                        displayLabel = "firstHook(): void",
+                        detail = "FirstInvokeOwner",
+                        kind = AtTargetKind.INVOKE,
+                        ordinal = 0,
+                        namespace = MappingNamespace.NAMED,
+                    ),
+                ),
+                "$secondOwner#run#INVOKE" to listOf(
+                    AtTargetCandidate(
+                        owner = secondInvokeOwner,
+                        name = "secondHook",
+                        descriptor = "()V",
+                        displayLabel = "secondHook(): void",
+                        detail = "SecondInvokeOwner",
+                        kind = AtTargetKind.INVOKE,
+                        ordinal = 0,
+                        namespace = MappingNamespace.NAMED,
+                    ),
+                ),
+            ),
+        )
+        val facade = io.github.mcdev.core.mixin.MixinServiceFacade(classIndex, bytecodeIndex)
+        val source = """
+            import com.example.target.FirstTarget;
+            import com.example.target.SecondTarget;
+
+            @Mixin({ FirstTarget.class, SecondTarget.class })
+            class MultiTargetMixin {
+                @Inject(method = "run", at = @At(value = "INVOKE", target = ""))
+                void onRun() {}
+            }
+        """.trimIndent()
+        val quote = source.indexOf("target = \"") + "target = \"".length
+        val items = facade.complete(MixinE2ETestSupport.requestAtOffset(source, quote))
+
+        assertEquals(2, items.size)
+        assertEquals(
+            listOf(firstCandidateInsert, secondCandidateInsert),
+            items.map { it.insertText }.sorted(),
+        )
+        assertEquals(
+            listOf("FirstInvokeOwner", "SecondInvokeOwner"),
+            items.mapNotNull { it.detail }.sorted(),
+        )
+        assertEquals(
+            listOf(firstInvokeOwner, secondInvokeOwner),
+            items.mapNotNull { it.metadata.owner }.sorted(),
+        )
     }
 
     @Test

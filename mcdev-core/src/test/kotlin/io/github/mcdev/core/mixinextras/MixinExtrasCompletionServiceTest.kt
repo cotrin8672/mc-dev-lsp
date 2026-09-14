@@ -28,6 +28,15 @@ class MixinExtrasCompletionServiceTest {
     }
 
     @Test
+    fun completesModifyReceiverMethod() {
+        val context = methodContext(MixinAnnotation.MODIFY_RECEIVER, "draw", listOf("com/example/target/SimpleTarget"))
+        val items = service.complete(context)
+        assertTrue(items.any { it.insertText == "draw(Ljava/lang/String;FF)V" })
+        assertTrue(items.any { it.insertText == "draw(I)V" })
+        assertEquals("mixinextras.injectMethod", items.first().metadata.source)
+    }
+
+    @Test
     fun completesWrapOperationMethod() {
         val context = methodContext(MixinAnnotation.WRAP_OPERATION, "draw", listOf("com/example/target/SimpleTarget"))
         val items = service.complete(context)
@@ -38,7 +47,8 @@ class MixinExtrasCompletionServiceTest {
     fun completesWrapWithConditionMethod() {
         val context = methodContext(MixinAnnotation.WRAP_WITH_CONDITION, "draw", listOf("com/example/target/SimpleTarget"))
         val items = service.complete(context)
-        assertEquals(1, items.size)
+        assertTrue(items.any { it.insertText == "draw(Ljava/lang/String;FF)V" })
+        assertTrue(items.any { it.insertText == "draw(I)V" })
     }
 
     @Test

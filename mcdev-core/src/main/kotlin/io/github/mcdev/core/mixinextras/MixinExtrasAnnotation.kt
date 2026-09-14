@@ -9,6 +9,12 @@ enum class MixinExtrasAnnotation(val simpleName: String) {
     WRAP_OPERATION("WrapOperation"),
     WRAP_WITH_CONDITION("WrapWithCondition"),
     WRAP_METHOD("WrapMethod"),
+    INJECT("Inject"),
+    REDIRECT("Redirect"),
+    MODIFY_ARG("ModifyArg"),
+    MODIFY_ARGS("ModifyArgs"),
+    MODIFY_VARIABLE("ModifyVariable"),
+    MODIFY_CONSTANT("ModifyConstant"),
     LOCAL("Local"),
     SHARE("Share"),
     CANCELLABLE("Cancellable"),
@@ -30,6 +36,12 @@ enum class MixinExtrasAnnotation(val simpleName: String) {
             MixinAnnotation.WRAP_OPERATION -> WRAP_OPERATION
             MixinAnnotation.WRAP_WITH_CONDITION -> WRAP_WITH_CONDITION
             MixinAnnotation.WRAP_METHOD -> WRAP_METHOD
+            MixinAnnotation.INJECT -> INJECT
+            MixinAnnotation.REDIRECT -> REDIRECT
+            MixinAnnotation.MODIFY_ARG -> MODIFY_ARG
+            MixinAnnotation.MODIFY_ARGS -> MODIFY_ARGS
+            MixinAnnotation.MODIFY_VARIABLE -> MODIFY_VARIABLE
+            MixinAnnotation.MODIFY_CONSTANT -> MODIFY_CONSTANT
             else -> null
         }
 
@@ -40,6 +52,15 @@ enum class MixinExtrasAnnotation(val simpleName: String) {
             WRAP_OPERATION,
             WRAP_WITH_CONDITION,
             WRAP_METHOD,
+        )
+
+        val sugarHandlerInjectorAnnotations = injectorAnnotations + setOf(
+            INJECT,
+            REDIRECT,
+            MODIFY_ARG,
+            MODIFY_ARGS,
+            MODIFY_VARIABLE,
+            MODIFY_CONSTANT,
         )
     }
 }

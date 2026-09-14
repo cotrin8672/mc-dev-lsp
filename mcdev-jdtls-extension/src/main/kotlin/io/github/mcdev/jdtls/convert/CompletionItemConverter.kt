@@ -15,6 +15,7 @@ import io.github.mcdev.core.mixin.AnnotationSlot
 import io.github.mcdev.core.mixin.AtTargetCandidate
 import io.github.mcdev.core.mixin.AtTargetInsertFormatter
 import io.github.mcdev.core.mixin.AtTargetKind
+import io.github.mcdev.core.mixin.CLASS_COMPLETION_LIMIT
 import io.github.mcdev.core.mixin.MixinAnnotation
 import io.github.mcdev.core.mixin.MixinClassInsertMode
 import io.github.mcdev.core.mixin.MixinImportEditBuilder
@@ -46,6 +47,10 @@ data class AtTargetStats(
 
 object CompletionItemConverter {
     private val atTargetInsertFormatter = AtTargetInsertFormatter()
+
+    fun isIncomplete(items: List<McCompletionItem>): Boolean =
+        items.count { it.kind == McCompletionKind.CLASS && it.metadata.source in BOUNDED_CLASS_SOURCES } >=
+            CLASS_COMPLETION_LIMIT
 
     fun toDto(
         item: McCompletionItem,
@@ -297,4 +302,6 @@ object CompletionItemConverter {
 
     fun extractAnnotationContext(source: String, line: Int, character: Int): AnnotationContext? =
         AnnotationContextExtractor.extract(source, line, character)
+
+    private val BOUNDED_CLASS_SOURCES = setOf("mixin.target", "mixin.targets", "aw.class", "at.class")
 }

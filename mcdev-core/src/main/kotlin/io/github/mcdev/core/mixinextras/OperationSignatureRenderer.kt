@@ -5,9 +5,22 @@ import io.github.mcdev.core.descriptor.DescriptorParseResult
 import io.github.mcdev.core.descriptor.parseFieldDescriptor
 
 object OperationSignatureRenderer {
+    private val operationGenericPrimitiveTypes = mapOf(
+        "B" to "Byte",
+        "C" to "Character",
+        "D" to "Double",
+        "F" to "Float",
+        "I" to "Integer",
+        "J" to "Long",
+        "S" to "Short",
+        "Z" to "Boolean",
+        "V" to "Void",
+    )
+
     fun renderOperationType(returnTypeDescriptor: String): String {
-        val readable = readableType(returnTypeDescriptor)
-        return "Operation<$readable>"
+        val generic = operationGenericPrimitiveTypes[returnTypeDescriptor]
+            ?: readableType(returnTypeDescriptor)
+        return "Operation<$generic>"
     }
 
     fun readableType(descriptor: String): String = when (descriptor) {

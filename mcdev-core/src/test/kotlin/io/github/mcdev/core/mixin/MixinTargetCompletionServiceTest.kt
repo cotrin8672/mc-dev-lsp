@@ -74,6 +74,28 @@ class MixinTargetCompletionServiceTest {
     }
 
     @Test
+    fun narrowerPrefixFindsClassBeyondBroadCompletionLimit() {
+        val classes = (0 until CLASS_COMPLETION_LIMIT).map { index ->
+            ClassIndexEntry(
+                simpleName = "Candidate${index.toString().padStart(2, '0')}",
+                packageName = "com.example",
+                internalName = "com/example/Candidate${index.toString().padStart(2, '0')}",
+            )
+        } + ClassIndexEntry(
+            simpleName = "CandidateLate",
+            packageName = "com.example",
+            internalName = "com/example/CandidateLate",
+        )
+        val service = MixinTargetCompletionService(FakeClassIndex(classes = classes))
+
+        assertEquals(CLASS_COMPLETION_LIMIT, service.complete(context(MixinAnnotation.MIXIN, AnnotationSlot.CLASS, "Candidate")).size)
+        assertTrue(
+            service.complete(context(MixinAnnotation.MIXIN, AnnotationSlot.CLASS, "CandidateLate"))
+                .any { it.label == "CandidateLate" },
+        )
+    }
+
+    @Test
     fun sortKeyIsStable() {
         val context = context(MixinAnnotation.MIXIN, AnnotationSlot.CLASS, "M")
         val items = service.complete(context)
