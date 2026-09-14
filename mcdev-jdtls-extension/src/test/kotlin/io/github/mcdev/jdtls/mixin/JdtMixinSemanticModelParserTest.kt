@@ -2,6 +2,7 @@ package io.github.mcdev.jdtls.mixin
 
 import io.github.mcdev.core.diagnostics.McTextPosition
 import io.github.mcdev.core.diagnostics.McTextRange
+import io.github.mcdev.core.mixin.MixinAnnotation
 import io.github.mcdev.core.mixin.MixinTargetRef
 import io.github.mcdev.core.mixin.ParseSource
 import io.github.mcdev.core.mixinextras.ExpressionContext
@@ -54,6 +55,22 @@ class JdtMixinSemanticModelParserTest {
         assertEquals("file:///ExampleMixin.java", model.sourceUri)
         assertEquals(ParseSource.HAND_WRITTEN_FALLBACK, model.parseSource)
         assertTrue(model.warnings.any { it.contains("JDT ASTParser is not available") })
+    }
+
+    @Test
+    fun doesNotFabricateMethodDescriptorWhenAnyParameterOrReturnTypeIsUnresolved() {
+        assertEquals(
+            emptyList<String>() to null,
+            resolveMethodDescriptorParts(listOf("I", null), "V"),
+        )
+        assertEquals(
+            emptyList<String>() to null,
+            resolveMethodDescriptorParts(listOf("I"), null),
+        )
+        assertEquals(
+            listOf("I", "Ljava/lang/String;") to "(ILjava/lang/String;)V",
+            resolveMethodDescriptorParts(listOf("I", "Ljava/lang/String;"), "V"),
+        )
     }
 
     @Test
@@ -124,6 +141,117 @@ class JdtMixinSemanticModelParserTest {
         ) as List<MixinTargetRef>
 
         assertEquals(listOf("Outer.Inner"), targets.map { it.internalName })
+    }
+
+    @Test
+    fun memberAnnotationsUseBindingAndImportIdentity() {
+        val extractorClass = JdtMixinSemanticModelParser::class.java.declaredClasses
+            .single { it.simpleName == "AstModelExtractor" }
+        val constructor = extractorClass.getDeclaredConstructor(String::class.java, String::class.java)
+        constructor.trySetAccessible()
+        val annotationKind = extractorClass.getDeclaredMethod("mixinAnnotation", Any::class.java)
+        annotationKind.trySetAccessible()
+        val methodMember = extractorClass.getDeclaredMethod("methodMember", Any::class.java)
+        methodMember.trySetAccessible()
+        val fieldMembers = extractorClass.getDeclaredMethod("fieldMembers", Any::class.java)
+        fieldMembers.trySetAccessible()
+
+        val importedExtractor = constructor.newInstance(
+            "import foo.Shadow;\nimport org.spongepowered.asm.mixin.Overwrite;",
+            "file:///ExampleMixin.java",
+        )
+        val customImportedShadow = NormalAnnotation(
+            fqn = null,
+            typeName = "Shadow",
+            members = emptyMap(),
+        )
+        val customQualifiedMixin = NormalAnnotation(
+            fqn = null,
+            typeName = "foo.Mixin",
+            members = emptyMap(),
+        )
+        val officialImportedOverwrite = NormalAnnotation(
+            fqn = null,
+            typeName = "Overwrite",
+            members = emptyMap(),
+        )
+        assertEquals(null, annotationKind.invoke(importedExtractor, customImportedShadow))
+        assertEquals(null, annotationKind.invoke(importedExtractor, customQualifiedMixin))
+        assertEquals(
+            MixinAnnotation.OVERWRITE,
+            annotationKind.invoke(importedExtractor, officialImportedOverwrite),
+        )
+        assertTrue(
+            (methodMember.invoke(
+                importedExtractor,
+                FakeMethodDeclaration("custom", listOf(customImportedShadow)),
+            ) as List<*>).isEmpty(),
+        )
+        assertEquals(
+            1,
+            (methodMember.invoke(
+                importedExtractor,
+                FakeMethodDeclaration("overwrite", listOf(officialImportedOverwrite)),
+            ) as List<*>).size,
+        )
+
+        val customQualifiedShadow = NormalAnnotation(
+            fqn = null,
+            typeName = "foo.Shadow",
+            members = emptyMap(),
+        )
+        assertTrue(
+            (fieldMembers.invoke(
+                importedExtractor,
+                FakeFieldDeclaration(listOf(customQualifiedShadow)),
+            ) as List<*>).isEmpty(),
+        )
+
+        val bindingExtractor = constructor.newInstance(
+            "import org.spongepowered.asm.mixin.Shadow;",
+            "file:///ExampleMixin.java",
+        )
+        val customBindingShadow = NormalAnnotation(
+            fqn = "foo.Shadow",
+            typeName = "Shadow",
+            members = emptyMap(),
+        )
+        assertEquals(null, annotationKind.invoke(bindingExtractor, customBindingShadow))
+        val officialBindingShadow = NormalAnnotation(
+            fqn = "org.spongepowered.asm.mixin.Shadow",
+            typeName = "Shadow",
+            members = emptyMap(),
+        )
+        assertEquals(MixinAnnotation.SHADOW, annotationKind.invoke(bindingExtractor, officialBindingShadow))
+
+        val bareExtractor = constructor.newInstance("", "file:///ExampleMixin.java")
+        val bareShadow = NormalAnnotation(
+            fqn = null,
+            typeName = "Shadow",
+            members = emptyMap(),
+        )
+        assertEquals(MixinAnnotation.SHADOW, annotationKind.invoke(bareExtractor, bareShadow))
+        val recoveredBareShadow = NormalAnnotation(
+            fqn = "foo.Shadow",
+            typeName = "Shadow",
+            members = emptyMap(),
+            bindingRecovered = true,
+        )
+        assertEquals(MixinAnnotation.SHADOW, annotationKind.invoke(bareExtractor, recoveredBareShadow))
+        assertEquals(
+            1,
+            (methodMember.invoke(
+                bareExtractor,
+                FakeMethodDeclaration("recovered", listOf(recoveredBareShadow)),
+            ) as List<*>).size,
+        )
+        assertEquals(
+            1,
+            (fieldMembers.invoke(
+                bareExtractor,
+                FakeFieldDeclaration(listOf(bareShadow)),
+            ) as List<*>).size,
+        )
     }
 
     @Test
@@ -298,6 +426,40 @@ class JdtMixinSemanticModelParserTest {
         fun modifiers(): List<Any> = modifierList
 
         fun getName(): SimpleName = SimpleName(name)
+
+        fun parameters(): List<Any> = emptyList()
+
+        fun getReturnType2(): FakeTypeNode = FakeTypeNode("void")
+
+        fun getStartPosition(): Int = 0
+
+        fun getLength(): Int = name.length
+    }
+
+    private class FakeFieldDeclaration(
+        private val modifierList: List<Any>,
+    ) {
+        fun modifiers(): List<Any> = modifierList
+
+        fun getType(): FakeTypeNode = FakeTypeNode("int")
+
+        fun fragments(): List<Any> = listOf(FakeVariableDeclarationFragment("value"))
+
+        fun getStartPosition(): Int = 0
+
+        fun getLength(): Int = 5
+    }
+
+    private class FakeVariableDeclarationFragment(
+        private val name: String,
+    ) {
+        fun getName(): SimpleName = SimpleName(name)
+    }
+
+    private class FakeTypeNode(
+        private val text: String,
+    ) {
+        override fun toString(): String = text
     }
 
     private open class DomNode(
@@ -331,8 +493,13 @@ class JdtMixinSemanticModelParserTest {
         fun resolveBinding(): TypeBinding = binding
     }
 
-    private class AnnotationBinding(private val typeBinding: TypeBinding?) {
+    private class AnnotationBinding(
+        private val typeBinding: TypeBinding?,
+        private val recovered: Boolean = false,
+    ) {
         fun getAnnotationType(): TypeBinding? = typeBinding
+
+        fun isRecovered(): Boolean = recovered
     }
 
     private open class AnnotationNode(
@@ -340,9 +507,15 @@ class JdtMixinSemanticModelParserTest {
         private val typeName: String? = fqn?.substringAfterLast('.'),
         recovered: Boolean = false,
         malformed: Boolean = false,
+        private val bindingRecovered: Boolean = false,
     ) : DomNode(recovered, malformed) {
         fun resolveAnnotationBinding(): AnnotationBinding? =
-            fqn?.let { AnnotationBinding(TypeBinding(it)) }
+            fqn?.let {
+                AnnotationBinding(
+                    TypeBinding(it, recovered = bindingRecovered),
+                    recovered = bindingRecovered,
+                )
+            }
 
         fun getTypeName(): SimpleName = SimpleName(typeName ?: "Unknown")
     }
@@ -360,7 +533,8 @@ class JdtMixinSemanticModelParserTest {
         private val members: Map<String, Any>,
         typeName: String? = fqn?.substringAfterLast('.'),
         recovered: Boolean = false,
-    ) : AnnotationNode(fqn, typeName, recovered) {
+        bindingRecovered: Boolean = false,
+    ) : AnnotationNode(fqn, typeName, recovered, bindingRecovered = bindingRecovered) {
         fun values(): List<Any> =
             members.map { (name, value) -> MemberValuePair(name, value) }
     }

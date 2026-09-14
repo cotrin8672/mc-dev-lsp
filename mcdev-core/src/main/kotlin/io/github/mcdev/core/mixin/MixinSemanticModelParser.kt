@@ -92,6 +92,8 @@ data class MixinMemberModel(
     val parseSource: ParseSource,
     val confidence: ParseConfidence,
     val warnings: List<String>,
+    /** Whether this declaration is a method when its descriptor cannot be resolved. */
+    val isMethod: Boolean? = null,
 )
 
 data class InjectorModel(
@@ -173,7 +175,7 @@ object MixinSemanticModelParser {
     ): List<MixinMemberModel> {
         val members = mutableListOf<MixinMemberModel>()
         MixinMemberDeclarationParser.parseShadowDeclarations(source).forEach { declaration ->
-            members += declaration.toModel(MixinMemberAnnotationKind.SHADOW, parseSource, confidence)
+            members += declaration.toModel(source, MixinMemberAnnotationKind.SHADOW, parseSource, confidence)
         }
         MixinMemberDeclarationParser.parseAccessorDeclarations(source).forEach { declaration ->
             val descriptor = "(${declaration.parameterDescriptors.joinToString("")})${declaration.returnTypeDescriptor ?: "V"}"
@@ -184,10 +186,17 @@ object MixinSemanticModelParser {
                 returnDescriptor = declaration.returnTypeDescriptor,
                 parameterDescriptors = declaration.parameterDescriptors,
                 methodDescriptor = descriptor,
+                isMethod = true,
                 modifiers = emptySet(),
                 range = declaration.range,
                 annotationRange = declaration.range,
-                nameRange = declaration.range,
+                nameRange = MixinMemberDeclarationParser.findMemberNameTextRange(
+                    source,
+                    declaration.range,
+                    declaration.methodName,
+                    "Accessor",
+                    isMethod = true,
+                ) ?: declaration.range,
                 parseSource = parseSource,
                 confidence = confidence,
                 warnings = declaration.warnings,
@@ -202,10 +211,17 @@ object MixinSemanticModelParser {
                 returnDescriptor = declaration.returnTypeDescriptor,
                 parameterDescriptors = declaration.parameterDescriptors,
                 methodDescriptor = descriptor,
+                isMethod = true,
                 modifiers = emptySet(),
                 range = declaration.range,
                 annotationRange = declaration.range,
-                nameRange = declaration.range,
+                nameRange = MixinMemberDeclarationParser.findMemberNameTextRange(
+                    source,
+                    declaration.range,
+                    declaration.methodName,
+                    "Invoker",
+                    isMethod = true,
+                ) ?: declaration.range,
                 parseSource = parseSource,
                 confidence = confidence,
                 warnings = declaration.warnings,
@@ -219,10 +235,17 @@ object MixinSemanticModelParser {
                 returnDescriptor = declaration.descriptor.substringAfter(')', ""),
                 parameterDescriptors = emptyList(),
                 methodDescriptor = declaration.descriptor,
+                isMethod = true,
                 modifiers = if (declaration.isStatic) setOf(JavaModifier.STATIC) else emptySet(),
                 range = declaration.range,
                 annotationRange = declaration.range,
-                nameRange = declaration.range,
+                nameRange = MixinMemberDeclarationParser.findMemberNameTextRange(
+                    source,
+                    declaration.range,
+                    declaration.name,
+                    "Overwrite",
+                    isMethod = true,
+                ) ?: declaration.range,
                 parseSource = parseSource,
                 confidence = confidence,
                 warnings = declaration.warnings,
@@ -232,6 +255,7 @@ object MixinSemanticModelParser {
     }
 
     private fun ShadowMemberDeclaration.toModel(
+        source: String,
         annotationKind: MixinMemberAnnotationKind,
         parseSource: ParseSource,
         confidence: ParseConfidence,
@@ -243,10 +267,17 @@ object MixinSemanticModelParser {
             returnDescriptor = if (isMethod) descriptor.substringAfter(')', "") else descriptor,
             parameterDescriptors = emptyList(),
             methodDescriptor = descriptor.takeIf { isMethod },
+            isMethod = isMethod,
             modifiers = if (isStatic) setOf(JavaModifier.STATIC) else emptySet(),
             range = range,
             annotationRange = range,
-            nameRange = range,
+            nameRange = MixinMemberDeclarationParser.findMemberNameTextRange(
+                source,
+                range,
+                name,
+                "Shadow",
+                isMethod,
+            ) ?: range,
             parseSource = parseSource,
             confidence = confidence,
             warnings = warnings,
@@ -301,12 +332,22 @@ object MixinSemanticModelParser {
 
     private fun findAnnotations(source: String, only: MixinAnnotation? = null): List<AnnotationSpan> {
         val results = mutableListOf<AnnotationSpan>()
+        val resolvedOffsets = if (only != null) {
+            AnnotationContextExtractor.findAnnotationOffsets(source, only).associateWith { only }
+        } else {
+            MixinAnnotation.entries
+                .flatMap { annotation ->
+                    AnnotationContextExtractor.findAnnotationOffsets(source, annotation)
+                        .map { offset -> offset to annotation }
+                }
+                .toMap()
+        }
         var search = 0
         while (search < source.length) {
             val at = source.indexOf('@', search)
             if (at < 0) break
+            val annotation = resolvedOffsets[at]
             val nameEnd = readQualifiedNameEnd(source, at + 1)
-            val annotation = MixinAnnotation.fromSimpleName(source.substring(at + 1, nameEnd).substringAfterLast('.'))
             if (annotation == null || only != null && annotation != only) {
                 search = at + 1
                 continue
@@ -343,24 +384,26 @@ object MixinSemanticModelParser {
 
     private fun findAtSelectors(source: String, start: Int, end: Int): List<AtSelectorModel> {
         val results = mutableListOf<AtSelectorModel>()
-        findAnnotations(source.substring(start, end), MixinAnnotation.AT).forEach { relative ->
-            val atStart = start + relative.start
-            val bodyStart = start + relative.bodyStart
-            val bodyEnd = start + relative.bodyEnd
-            val values = parseAttributeValues(source, bodyStart, bodyEnd, setOf("value"), allowShorthand = true)
-            val value = values.firstOrNull()?.value ?: return@forEach
-            val target = parseAttributeValues(source, bodyStart, bodyEnd, setOf("target"), allowShorthand = false)
-                .firstOrNull()
-            val ordinal = parseIntAttribute(source, bodyStart, bodyEnd, "ordinal")
-            results += AtSelectorModel(
-                value = value,
-                target = target?.value,
-                ordinal = ordinal?.value,
-                range = offsetRange(source, atStart, start + relative.end),
-                targetRange = target?.let { offsetRange(source, it.start, it.end) },
-                ordinalRange = ordinal?.let { offsetRange(source, it.start, it.end) },
-            )
-        }
+        findAnnotations(source, MixinAnnotation.AT)
+            .filter { it.start >= start && it.end <= end }
+            .forEach { annotation ->
+                val atStart = annotation.start
+                val bodyStart = annotation.bodyStart
+                val bodyEnd = annotation.bodyEnd
+                val values = parseAttributeValues(source, bodyStart, bodyEnd, setOf("value"), allowShorthand = true)
+                val value = values.firstOrNull()?.value ?: return@forEach
+                val target = parseAttributeValues(source, bodyStart, bodyEnd, setOf("target"), allowShorthand = false)
+                    .firstOrNull()
+                val ordinal = parseIntAttribute(source, bodyStart, bodyEnd, "ordinal")
+                results += AtSelectorModel(
+                    value = value,
+                    target = target?.value,
+                    ordinal = ordinal?.value,
+                    range = offsetRange(source, atStart, annotation.end),
+                    targetRange = target?.let { offsetRange(source, it.start, it.end) },
+                    ordinalRange = ordinal?.let { offsetRange(source, it.start, it.end) },
+                )
+            }
         return results
     }
 

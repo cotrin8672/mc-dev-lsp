@@ -175,7 +175,7 @@ internal class JdtProjectSourceQuery(
             return emptyList()
         }
         val resolver = typeResolver(type)
-        return methods.mapNotNull { method ->
+        val results = methods.mapNotNull { method ->
             if (method == null) {
                 return@mapNotNull null
             }
@@ -194,6 +194,11 @@ internal class JdtProjectSourceQuery(
                 readableSignature = ClassMemberIndexAdapter.readableMethodSignature(name, descriptor),
             )
         }
+        if (results.size < methods.size) {
+            // A partial source result must not hide bytecode members from the fallback index.
+            lastSourceQueryFailure.set(true)
+        }
+        return results
     }
 
     override fun getFields(ownerInternalName: String): List<FieldIndexEntry> {
@@ -204,7 +209,7 @@ internal class JdtProjectSourceQuery(
             return emptyList()
         }
         val resolver = typeResolver(type)
-        return fields.mapNotNull { field ->
+        val results = fields.mapNotNull { field ->
             if (field == null) {
                 return@mapNotNull null
             }
@@ -220,6 +225,11 @@ internal class JdtProjectSourceQuery(
                 readableType = ClassMemberIndexAdapter.readableFieldType(descriptor),
             )
         }
+        if (results.size < fields.size) {
+            // A partial source result must not hide bytecode members from the fallback index.
+            lastSourceQueryFailure.set(true)
+        }
+        return results
     }
 
     private fun findSourceType(fqn: String): Any? =

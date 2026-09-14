@@ -661,8 +661,16 @@ class MixinServiceFacade(
         if (context.slot != AnnotationSlot.SHADOW_MEMBER) return emptyList()
         val prefix = context.partialValue
         val targets = resolveMixinTargets(request, context)
-        val fields = shadowValidation.completeFields(targets, prefix, context.shadowPrefix)
-        val methods = shadowValidation.completeMethods(targets, prefix, context.shadowPrefix)
+        val fields = if (context.shadowMemberIsMethod == true) {
+            emptyList()
+        } else {
+            shadowValidation.completeFields(targets, prefix, context.shadowPrefix)
+        }
+        val methods = if (context.shadowMemberIsMethod == false) {
+            emptyList()
+        } else {
+            shadowValidation.completeMethods(targets, prefix, context.shadowPrefix)
+        }
         val fieldItems = fields.map { field ->
             McCompletionItem(
                 label = field.name,
@@ -700,6 +708,7 @@ class MixinServiceFacade(
         return targets
             .flatMap { owner ->
                 classIndex.getMethods(owner)
+                    .filter { it.name != "<init>" && it.name != "<clinit>" }
                     .filter { it.name.startsWith(context.partialValue) }
                     .map { owner to it }
             }
@@ -823,10 +832,12 @@ class MixinServiceFacade(
             .orEmpty()
         if (members.isEmpty()) return MixinMemberDeclarationParser.parseShadowDeclarations(request.bufferText, classIndex)
         return members.mapNotNull { member ->
-            val descriptor = member.methodDescriptor ?: member.returnDescriptor ?: return@mapNotNull null
+            val isMethod = member.isMethod ?: (member.methodDescriptor != null)
+            val descriptor = (if (isMethod) member.methodDescriptor else member.returnDescriptor)
+                ?: return@mapNotNull null
             ShadowMemberDeclaration(
                 name = member.javaName,
-                isMethod = member.methodDescriptor != null,
+                isMethod = isMethod,
                 descriptor = descriptor,
                 isStatic = JavaModifier.STATIC in member.modifiers,
                 range = member.range,

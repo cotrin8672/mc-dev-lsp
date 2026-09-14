@@ -144,14 +144,15 @@ Blink:
 }
 ```
 
-`route_sources` keeps `lsp` alongside `mcdev` while typing a Mixin annotation
-name or inside its values and selectors, and removes `mcdev` from the normal
-fallback list. This prevents buffer, snippet, path, and AI words from being
-offered inside selectors while preserving ordinary Java, import, and annotation
-name completion elsewhere. The callback defers loading until Lazy has added the
-plugin to the runtime path. The score offset makes mcdev's complete snippets
-(for example `method = "…"`) win over JDT LS' incomplete `method = ` annotation
-item.
+`route_sources` keeps annotation names and valid Java values (class literals,
+enum constants, and nested annotations) mixed with `lsp`, but switches to the
+`mcdev` source alone for Mixin-owned selectors and DSL strings. This prevents
+buffer, snippet, path, AI, and ordinary Java words from appearing in values
+such as `method = "…"`, `@At(target = "…")`, or `@Expression("…")` while
+preserving normal Java completion where the annotation grammar still expects a
+Java value. The callback defers loading until Lazy has added the plugin to the
+runtime path. The score offset makes mcdev's complete snippets win over JDT
+LS' incomplete annotation-attribute items.
 
 nvim-cmp:
 
@@ -161,18 +162,19 @@ nvim-cmp:
   dependencies = { "mcdev-nvim" },
   config = function()
     local cmp = require("cmp")
-    cmp.register_source("mcdev", require("mcdev.cmp").new())
+    local mcdev_cmp = require("mcdev.cmp")
+    cmp.register_source("mcdev", mcdev_cmp.new())
     cmp.setup({
       sources = {
         { name = "mcdev", priority = 1100 },
-        { name = "nvim_lsp", priority = 1000 },
+        mcdev_cmp.with_exclusive_filter({ name = "nvim_lsp", priority = 1000 }),
       },
     })
   end,
 }
 ```
 
-The higher mcdev priority serves the same purpose as Blink's score offset: complete Mixin snippets should beat JDT LS' plain annotation-attribute stubs.
+Wrap other generic sources, such as `buffer` and `path`, with `with_exclusive_filter` too. It preserves their existing options and entry filters while excluding their candidates in Mixin-only positions. The `mcdev` source checks its own position and does not need this wrapper.
 
 Use your normal Neovim keymap layer for navigation and code actions. The current JDT LS bundle exposes mcdev navigation through `workspace/executeCommand` commands (`mcdev.definition`, `mcdev.references`); it does not contribute to JDT LS `textDocument/definition` directly.
 

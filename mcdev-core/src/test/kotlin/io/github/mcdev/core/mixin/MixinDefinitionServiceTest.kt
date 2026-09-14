@@ -70,6 +70,72 @@ class MixinDefinitionServiceTest {
     }
 
     @Test
+    fun resolvesShadowMembersWhenTheCaretIsAtTheNameEnd() {
+        val source = """
+            @Mixin(com.example.target.SimpleTarget.class)
+            abstract class ExampleMixin {
+                @Shadow private int counter;
+                @Shadow public abstract void draw(String text, float x, float y);
+            }
+        """.trimIndent()
+
+        val fieldOffset = source.indexOf("counter") + "counter".length
+        val fieldRequest = MixinE2ETestSupport.requestAtOffset(source, fieldOffset)
+        val fieldTarget = simpleService.definitionsAt(fieldRequest.bufferText, fieldRequest.line, fieldRequest.character).single()
+        assertEquals(MemberKind.FIELD, fieldTarget.kind)
+        assertEquals("counter", fieldTarget.name)
+
+        val methodOffset = source.indexOf("draw") + "draw".length
+        val methodRequest = MixinE2ETestSupport.requestAtOffset(source, methodOffset)
+        val methodTarget = simpleService.definitionsAt(methodRequest.bufferText, methodRequest.line, methodRequest.character).single()
+        assertEquals(MemberKind.METHOD, methodTarget.kind)
+        assertEquals("draw", methodTarget.name)
+    }
+
+    @Test
+    fun semanticMemberDefinitionsOnlyResolveTheExactNameToken() {
+        val source = """
+            @Mixin(com.example.target.SimpleTarget.class)
+            abstract class ExampleMixin {
+                @Shadow(prefix = "counter") private int counter = 0;
+                @Shadow public void draw(String text, float x, float y) { int local = 0; }
+                int ordinary = 0;
+            }
+        """.trimIndent()
+        val parsed = MixinSemanticModelParser.parse(source)
+        val end = MixinE2ETestSupport.offsetToLineCharacter(source, source.length)
+        val broadRange = McTextRange(McTextPosition(0, 0), McTextPosition(end.first, end.second))
+        val model = parsed.copy(
+            members = parsed.members.map { it.copy(range = broadRange, nameRange = broadRange) },
+        )
+
+        for (needle in listOf("counter =", "local =", "ordinary =")) {
+            val offset = source.indexOf(needle) + needle.indexOf('=')
+            val request = MixinE2ETestSupport.requestAtOffset(source, offset)
+            assertTrue(
+                simpleService.definitionsAt(
+                    request.bufferText,
+                    request.line,
+                    request.character,
+                    semanticModel = model,
+                ).isEmpty(),
+                "definition leaked into $needle",
+            )
+        }
+
+        val nameOffset = source.indexOf("counter", source.indexOf("private int")) + 2
+        val nameRequest = MixinE2ETestSupport.requestAtOffset(source, nameOffset)
+        val target = simpleService.definitionsAt(
+            nameRequest.bufferText,
+            nameRequest.line,
+            nameRequest.character,
+            semanticModel = model,
+        ).single()
+        assertEquals(MemberKind.FIELD, target.kind)
+        assertEquals("counter", target.name)
+    }
+
+    @Test
     fun resolvesAccessorField() {
         val source = """
             @Mixin(com.example.target.SimpleTarget.class)

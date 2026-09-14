@@ -126,6 +126,93 @@ class ExpressionSupportTest {
     }
 
     @Test
+    fun argumentBearingCoreAnnotationSnippetsExposeUsefulAttributes() {
+        val source = "package demo;\n\n@"
+        val (line, character) = offsetToLineCharacter(source, source.length)
+        val items = expressionSupport.completeFeatureAnnotationsWithRange(source, line, character)
+            .items
+            .associateBy { it.label }
+
+        assertTrue(items.getValue("Group").insertText.contains("name ="))
+        assertTrue(items.getValue("Group").insertText.contains("min ="))
+        assertTrue(items.getValue("Debug").insertText.contains("export ="))
+        assertTrue(items.getValue("Dynamic").insertText.contains("mixin ="))
+        assertTrue(items.getValue("Unique").insertText.contains("silent ="))
+        assertTrue(items.getValue("Intrinsic").insertText.contains("displace ="))
+        assertTrue(items.getValue("Implements").insertText.contains("@Interface("))
+        assertTrue(items.getValue("Interface").insertText.contains("prefix ="))
+        assertTrue(items.getValue("Interface").insertText.contains("prefix\\${'$'}"))
+        assertTrue(items.getValue("Debug").insertText.contains("${'$'}{1:false}"))
+        assertTrue(items.getValue("Unique").insertText.contains("${'$'}{1:false}"))
+        assertTrue(items.getValue("Intrinsic").insertText.contains("${'$'}{1:false}"))
+        assertTrue(!items.getValue("Implements").insertText.contains("unique ="))
+        assertTrue(!items.getValue("Implements").insertText.contains("remap ="))
+        assertTrue(!items.getValue("Interface").insertText.contains("unique ="))
+        assertTrue(!items.getValue("Interface").insertText.contains("remap ="))
+        assertTrue(items.getValue("Desc").insertText.contains("args ="))
+        assertTrue(items.getValue("Descriptors").insertText.contains("@Desc("))
+        assertTrue(items.values
+            .filter { it.label in setOf("Group", "Debug", "Dynamic", "Unique", "Intrinsic", "Implements", "Interface", "Desc", "Descriptors") }
+            .all { it.insertText.endsWith("${'$'}0") && it.metadata.source == "mixin.annotation" })
+    }
+
+    @Test
+    fun nestedCoreAnnotationSnippetsAddImportsAndRespectSimpleNameConflicts() {
+        val source = "import other.Interface;\n\n@Impl"
+        val (line, character) = offsetToLineCharacter(source, source.length)
+        val completion = expressionSupport.completeFeatureAnnotationsWithRange(source, line, character)
+        val item = completion.items.first { it.label == "Implements" }
+
+        assertTrue(item.insertText.contains("@org.spongepowered.asm.mixin.Interface("))
+        assertTrue(item.additionalEdits.any { it.newText.contains("import org.spongepowered.asm.mixin.Implements;") })
+        assertTrue(item.additionalEdits.none { it.newText.contains("import org.spongepowered.asm.mixin.Interface;") })
+        val updated = applyCompletion(source, assertNotNull(completion.replacementRange), item)
+        assertTrue(updated.contains("@Implements({ @org.spongepowered.asm.mixin.Interface("))
+        assertTrue(updated.contains("import org.spongepowered.asm.mixin.Implements;"))
+
+        val groupedSource = "package demo;\n\n@Descr"
+        val (groupedLine, groupedCharacter) = offsetToLineCharacter(groupedSource, groupedSource.length)
+        val groupedCompletion = expressionSupport.completeFeatureAnnotationsWithRange(groupedSource, groupedLine, groupedCharacter)
+        val grouped = groupedCompletion.items
+            .first { it.label == "Descriptors" }
+        assertTrue(grouped.insertText.contains("@Desc("))
+        assertTrue(grouped.additionalEdits.any { it.newText.contains("import org.spongepowered.asm.mixin.injection.Descriptors;") })
+        assertTrue(grouped.additionalEdits.any { it.newText.contains("import org.spongepowered.asm.mixin.injection.Desc;") })
+        val groupedUpdated = applyCompletion(
+            groupedSource,
+            assertNotNull(groupedCompletion.replacementRange),
+            grouped,
+        )
+        assertTrue(groupedUpdated.contains("@Descriptors({ @Desc("))
+        assertTrue(groupedUpdated.contains("import org.spongepowered.asm.mixin.injection.Descriptors;"))
+        assertTrue(groupedUpdated.contains("import org.spongepowered.asm.mixin.injection.Desc;"))
+    }
+
+    @Test
+    fun coreAnnotationSnippetReplacesWholeNameAndPreservesExistingArguments() {
+        val source = "@Groupx"
+        val offset = source.indexOf("Group") + 2
+        val (line, character) = offsetToLineCharacter(source, offset)
+        val completion = expressionSupport.completeFeatureAnnotationsWithRange(source, line, character)
+        val range = assertNotNull(completion.replacementRange)
+        val item = completion.items.first { it.label == "Group" }
+
+        assertEquals(source.indexOf("Group"), range.startOffset)
+        assertEquals(source.length, range.endOffset)
+        val updated = applyCompletion(source, range, item)
+        assertTrue(updated.contains("@Group("))
+        assertTrue(!updated.contains("@Groupx"))
+        assertTrue(updated.contains("import org.spongepowered.asm.mixin.injection.Group;"))
+
+        val existing = "@Group(existingArgs)"
+        val existingOffset = existing.indexOf("Group") + 2
+        val (existingLine, existingCharacter) = offsetToLineCharacter(existing, existingOffset)
+        val existingCompletion = expressionSupport.completeFeatureAnnotationsWithRange(existing, existingLine, existingCharacter)
+        assertTrue(existingCompletion.items.isEmpty())
+        assertEquals(null, existingCompletion.replacementRange)
+    }
+
+    @Test
     fun annotationSnippetsApplyOverOnlyTheTypedNameAndAddImports() {
         val cases = listOf(
             "@Mix" to ("Mixin" to "org.spongepowered.asm.mixin.Mixin"),

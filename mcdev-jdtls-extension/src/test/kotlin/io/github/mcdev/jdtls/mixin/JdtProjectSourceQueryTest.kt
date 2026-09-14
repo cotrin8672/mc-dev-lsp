@@ -1,6 +1,9 @@
 package io.github.mcdev.jdtls.mixin
 
+import io.github.mcdev.core.mixin.ClassIndex
 import io.github.mcdev.core.mixin.ClassIndexEntry
+import io.github.mcdev.core.mixin.FieldIndexEntry
+import io.github.mcdev.core.mixin.MethodIndexEntry
 import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertFailsWith
@@ -450,6 +453,54 @@ class JdtProjectSourceQueryTest {
     }
 
     @Test
+    fun incompleteJdtMethodResultKeepsBytecodeMethodsAvailableToMixinCompletion() {
+        val type = sourceType(
+            fqn = "com.example.BlockItem",
+            elementName = "BlockItem",
+            packageName = "com.example",
+            methods = listOf(
+                FakeMethod(elementName = "keep", parameterTypes = emptyArray(), returnType = "V"),
+                FakeMethod(elementName = "getBlock", parameterTypes = emptyArray(), returnType = "QMissing.Type;"),
+            ),
+        )
+        val query = JdtProjectSourceQuery(
+            FakeJavaProject(mapOf("com.example.BlockItem" to type)),
+            isJdtSearchEngineAvailable = { true },
+        )
+        assertEquals(listOf("keep()V"), query.getMethods("com/example/BlockItem").map { it.name + it.descriptor })
+        assertTrue(!query.coversProjectDependencies())
+
+        val bytecodeMethod = MethodIndexEntry(
+            name = "getBlock",
+            descriptor = "()Lnet/minecraft/world/level/block/Block;",
+            isStatic = false,
+            readableSignature = "getBlock(): Block",
+        )
+        fun delegate(methods: List<MethodIndexEntry>): ClassIndex = object : ClassIndex {
+            override fun findClasses(prefix: String, limit: Int): List<ClassIndexEntry> = emptyList()
+
+            override fun findClass(internalName: String): ClassIndexEntry? = null
+
+            override fun findClassByFqn(fqn: String): ClassIndexEntry? = null
+
+            override fun getMethods(ownerInternalName: String): List<MethodIndexEntry> = methods
+
+            override fun getFields(ownerInternalName: String): List<FieldIndexEntry> = emptyList()
+        }
+        val index = SourceBackedClassIndex(delegate(listOf(bytecodeMethod)), query)
+
+        assertEquals(
+            listOf("keep()V", "getBlock()Lnet/minecraft/world/level/block/Block;"),
+            index.getMethods("com/example/BlockItem").map { it.name + it.descriptor },
+        )
+        val sourceOnlyIndex = SourceBackedClassIndex(delegate(emptyList()), query)
+        assertEquals(
+            listOf("keep()V"),
+            sourceOnlyIndex.getMethods("com/example/BlockItem").map { it.name + it.descriptor },
+        )
+    }
+
+    @Test
     fun getMethodsMarksStaticMethodsFromFlags() {
         val type = sourceType(
             fqn = "com.example.StaticSamples",
@@ -678,6 +729,55 @@ class JdtProjectSourceQueryTest {
         val fields = query.getFields("com/example/SkipFieldSamples")
 
         assertEquals(listOf("keepI"), fields.map { it.name + it.descriptor })
+    }
+
+    @Test
+    fun incompleteJdtFieldResultKeepsBytecodeFieldsAvailableToMixinCompletion() {
+        val type = sourceType(
+            fqn = "com.example.BlockItem",
+            elementName = "BlockItem",
+            packageName = "com.example",
+            methods = emptyList(),
+            fields = listOf(
+                FakeField(elementName = "keep", typeSignature = "I"),
+                FakeField(elementName = "block", typeSignature = "QMissing.Type;"),
+            ),
+        )
+        val query = JdtProjectSourceQuery(
+            FakeJavaProject(mapOf("com.example.BlockItem" to type)),
+            isJdtSearchEngineAvailable = { true },
+        )
+        assertEquals(listOf("keepI"), query.getFields("com/example/BlockItem").map { it.name + it.descriptor })
+        assertTrue(!query.coversProjectDependencies())
+
+        val bytecodeField = FieldIndexEntry(
+            name = "block",
+            descriptor = "Lnet/minecraft/world/level/block/Block;",
+            isStatic = false,
+            readableType = "Block",
+        )
+        fun delegate(fields: List<FieldIndexEntry>): ClassIndex = object : ClassIndex {
+            override fun findClasses(prefix: String, limit: Int): List<ClassIndexEntry> = emptyList()
+
+            override fun findClass(internalName: String): ClassIndexEntry? = null
+
+            override fun findClassByFqn(fqn: String): ClassIndexEntry? = null
+
+            override fun getMethods(ownerInternalName: String): List<MethodIndexEntry> = emptyList()
+
+            override fun getFields(ownerInternalName: String): List<FieldIndexEntry> = fields
+        }
+        val index = SourceBackedClassIndex(delegate(listOf(bytecodeField)), query)
+
+        assertEquals(
+            listOf("keepI", "blockLnet/minecraft/world/level/block/Block;"),
+            index.getFields("com/example/BlockItem").map { it.name + it.descriptor },
+        )
+        val sourceOnlyIndex = SourceBackedClassIndex(delegate(emptyList()), query)
+        assertEquals(
+            listOf("keepI"),
+            sourceOnlyIndex.getFields("com/example/BlockItem").map { it.name + it.descriptor },
+        )
     }
 
     @Test

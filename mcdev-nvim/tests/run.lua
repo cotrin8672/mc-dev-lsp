@@ -229,9 +229,11 @@ completion_module.complete = function(callback, _, _, opts)
     },
   })
 end
-vim.api.nvim_buf_set_lines(0, 0, -1, false, { "@Inject(meth" })
+local attribute_line = "@Inject(meth"
+vim.api.nvim_buf_set_lines(0, 0, -1, false, { attribute_line })
+vim.api.nvim_win_set_cursor(0, { 1, #attribute_line })
 local attribute_blink_result = nil
-blink_adapter:get_completions({ bufnr = 0, cursor = { 1, #"@Inject(meth" } }, function(result)
+blink_adapter:get_completions({ bufnr = 0, cursor = { 1, #attribute_line } }, function(result)
   attribute_blink_result = result
 end)
 helpers.assert_eq(attribute_blink_result.items[1].score_offset, 100)
@@ -1997,6 +1999,7 @@ dofile(vim.fn.getcwd() .. "/mcdev-nvim/tests/blink_positions.lua")
 dofile(vim.fn.getcwd() .. "/mcdev-nvim/tests/completion_readiness.lua")
 dofile(vim.fn.getcwd() .. "/mcdev-nvim/tests/blink_routing.lua")
 dofile(vim.fn.getcwd() .. "/mcdev-nvim/tests/cmp_positions.lua")
+dofile(vim.fn.getcwd() .. "/mcdev-nvim/tests/cmp_routing.lua")
 dofile(vim.fn.getcwd() .. "/mcdev-nvim/tests/transport.lua")
 print("mcdev-nvim adapter tests passed")
 vim.cmd("qa!")

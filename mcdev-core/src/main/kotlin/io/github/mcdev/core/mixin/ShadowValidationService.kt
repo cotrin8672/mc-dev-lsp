@@ -73,6 +73,7 @@ class ShadowValidationService(
         val results = mutableListOf<MethodIndexEntry>()
         for (owner in mixinTargets) {
             results += classIndex.getMethods(owner).filter { method ->
+                if (method.name == "<init>" || method.name == "<clinit>") return@filter false
                 val effective = applyPrefix(method.name, shadowPrefix, inverse = true)
                 effective.startsWith(prefix)
             }

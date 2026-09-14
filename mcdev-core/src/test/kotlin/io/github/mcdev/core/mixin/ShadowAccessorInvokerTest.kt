@@ -4,6 +4,7 @@ import io.github.mcdev.core.diagnostics.McTextPosition
 import io.github.mcdev.core.diagnostics.McTextRange
 import kotlin.test.Test
 import kotlin.test.assertEquals
+import kotlin.test.assertFalse
 import kotlin.test.assertTrue
 
 class ShadowAccessorInvokerTest {
@@ -154,6 +155,24 @@ class ShadowAccessorInvokerTest {
     fun invokerMethodCompletionReturnsCandidates() {
         val items = invokerService.completeMethods(listOf("net/minecraft/client/MinecraftClient"), "set")
         assertTrue(items.any { it.insertText == "setScreen" })
+    }
+
+    @Test
+    fun shadowMethodCompletionExcludesClassInitializers() {
+        val owner = "net/minecraft/client/MinecraftClient"
+        val methods = FakeClassIndex.defaultMethods().toMutableMap().apply {
+            this[owner] = this[owner].orEmpty() + listOf(
+                MethodIndexEntry("<init>", "(I)V", false, "<init>(int): void"),
+                MethodIndexEntry("<clinit>", "()V", true, "<clinit>(): void"),
+            )
+        }
+        val service = ShadowValidationService(FakeClassIndex(methods = methods))
+
+        val items = service.completeMethods(listOf(owner), "")
+
+        assertTrue(items.any { it.name == "tick" })
+        assertFalse(items.any { it.name == "<init>" })
+        assertFalse(items.any { it.name == "<clinit>" })
     }
 
     @Test

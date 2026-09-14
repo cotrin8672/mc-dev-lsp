@@ -28,6 +28,17 @@ data class JdtParseEnvironment(
     val unitName: String? = null,
 )
 
+internal fun resolveMethodDescriptorParts(
+    parameterDescriptors: List<String?>,
+    returnDescriptor: String?,
+): Pair<List<String>, String?> {
+    if (returnDescriptor == null || parameterDescriptors.any { it == null }) {
+        return emptyList<String>() to null
+    }
+    val resolvedParameters = parameterDescriptors.filterNotNull()
+    return resolvedParameters to "(${resolvedParameters.joinToString("")})$returnDescriptor"
+}
+
 class JdtMixinSemanticModelParser {
     private val astParserClass: Class<*>? = runCatching {
         Class.forName("org.eclipse.jdt.core.dom.ASTParser")
@@ -233,7 +244,7 @@ class JdtMixinSemanticModelParser {
             }
             val targets = nodes.flatMap { node ->
                 annotations(node)
-                    .filter { annotationName(it) == "Mixin" }
+                    .filter { mixinAnnotation(it) == MixinAnnotation.MIXIN }
                     .flatMap { mixinTargets(it) }
             }.ifEmpty { fallback.targets }
             val members = nodes.flatMap { node ->
@@ -273,18 +284,21 @@ class JdtMixinSemanticModelParser {
 
         private fun methodMember(node: Any): List<MixinMemberModel> {
             val annotation = annotations(node).firstNotNullOfOrNull { annotation ->
-                when (annotationName(annotation)) {
-                    "Accessor" -> MixinMemberAnnotationKind.ACCESSOR to annotation
-                    "Invoker" -> MixinMemberAnnotationKind.INVOKER to annotation
-                    "Shadow" -> MixinMemberAnnotationKind.SHADOW to annotation
-                    "Overwrite" -> MixinMemberAnnotationKind.OVERWRITE to annotation
+                when (mixinAnnotation(annotation)) {
+                    MixinAnnotation.ACCESSOR -> MixinMemberAnnotationKind.ACCESSOR to annotation
+                    MixinAnnotation.INVOKER -> MixinMemberAnnotationKind.INVOKER to annotation
+                    MixinAnnotation.SHADOW -> MixinMemberAnnotationKind.SHADOW to annotation
+                    MixinAnnotation.OVERWRITE -> MixinMemberAnnotationKind.OVERWRITE to annotation
                     else -> null
                 }
             } ?: return emptyList()
             val methodName = nodeName(node) ?: return emptyList()
-            val parameterDescriptors = parameterTypes(node).mapNotNull(::descriptorForType)
+            val parameterDescriptorCandidates = parameterTypes(node).map(::descriptorForType)
             val returnDescriptor = returnType(node)?.let(::descriptorForType)
-            val descriptor = returnDescriptor?.let { "(${parameterDescriptors.joinToString("")})$it" }
+            val (parameterDescriptors, descriptor) = resolveMethodDescriptorParts(
+                parameterDescriptorCandidates,
+                returnDescriptor,
+            )
             val warning = if (descriptor == null) listOf("JDT AST could not resolve descriptor for method $methodName") else emptyList()
             return listOf(
                 MixinMemberModel(
@@ -294,6 +308,7 @@ class JdtMixinSemanticModelParser {
                     returnDescriptor = returnDescriptor,
                     parameterDescriptors = parameterDescriptors,
                     methodDescriptor = descriptor,
+                    isMethod = true,
                     modifiers = modifiers(node),
                     range = range(node),
                     annotationRange = range(annotation.second),
@@ -307,8 +322,8 @@ class JdtMixinSemanticModelParser {
 
         private fun fieldMembers(node: Any): List<MixinMemberModel> {
             val annotation = annotations(node).firstNotNullOfOrNull { annotation ->
-                when (annotationName(annotation)) {
-                    "Shadow" -> MixinMemberAnnotationKind.SHADOW to annotation
+                when (mixinAnnotation(annotation)) {
+                    MixinAnnotation.SHADOW -> MixinMemberAnnotationKind.SHADOW to annotation
                     else -> null
                 }
             } ?: return emptyList()
@@ -323,6 +338,7 @@ class JdtMixinSemanticModelParser {
                     returnDescriptor = typeDescriptor,
                     parameterDescriptors = emptyList(),
                     methodDescriptor = null,
+                    isMethod = false,
                     modifiers = modifiers(node),
                     range = range(node),
                     annotationRange = range(annotation.second),
@@ -440,8 +456,30 @@ class JdtMixinSemanticModelParser {
             }
         }
 
-        private fun annotationName(annotation: Any): String =
-            call(annotation, "getTypeName")?.toString()?.substringAfterLast('.') ?: ""
+        private fun mixinAnnotation(annotation: Any): MixinAnnotation? {
+            annotationBindingFqn(annotation)?.let { fqn ->
+                return MixinAnnotation.fromOfficialFqn(fqn)
+            }
+            val token = call(annotation, "getTypeName")?.toString() ?: return null
+            if ('.' in token) {
+                return MixinAnnotation.fromOfficialFqn(token)
+            }
+            val explicitImport = imports.explicit[token]
+            if (explicitImport != null) {
+                return MixinAnnotation.fromOfficialFqn(explicitImport)
+            }
+            if (token in imports.ambiguousExplicit) return null
+            return MixinAnnotation.fromSimpleName(token)
+        }
+
+        private fun annotationBindingFqn(annotation: Any): String? {
+            val binding = call(annotation, "resolveAnnotationBinding") ?: return null
+            if (bool(binding, "isRecovered")) return null
+            val annotationType = call(binding, "getAnnotationType") ?: binding
+            if (bool(annotationType, "isRecovered")) return null
+            return string(annotationType, "getQualifiedName")?.takeIf { it.isNotBlank() }
+                ?: string(annotationType, "getBinaryName")?.takeIf { it.isNotBlank() }
+        }
 
         private fun packageName(root: Any): String? =
             call(root, "getPackage")?.let { call(it, "getName")?.toString() }

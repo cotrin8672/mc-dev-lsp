@@ -56,17 +56,24 @@ object SemanticCompletionContextExtractor {
                     }
             }
 
-        semanticModel.members
-            .firstOrNull { offset in sourceRange(source, it.annotationRange).expandForOpenString(source) }
-            ?.let { member ->
-                val partial = partialValue(source, offset)
-                return when (member.annotationKind) {
-                    MixinMemberAnnotationKind.ACCESSOR -> MixinCompletionContext.AccessorValue(member, partial)
-                    MixinMemberAnnotationKind.INVOKER -> MixinCompletionContext.InvokerValue(member, partial)
-                    MixinMemberAnnotationKind.SHADOW -> MixinCompletionContext.ShadowMember(partial)
-                    MixinMemberAnnotationKind.OVERWRITE -> null
-                }
+        val member = semanticModel.members.firstOrNull { candidate ->
+            when (candidate.annotationKind) {
+                MixinMemberAnnotationKind.SHADOW,
+                MixinMemberAnnotationKind.OVERWRITE,
+                -> memberNameRange(source, candidate)?.let { offset in it.start..it.end } == true
+                else -> offset in sourceRange(source, candidate.annotationRange).expandForOpenString(source)
             }
+        }
+        if (member != null) {
+            val partial = partialValue(source, offset)
+            when (member.annotationKind) {
+                MixinMemberAnnotationKind.ACCESSOR -> return MixinCompletionContext.AccessorValue(member, partial)
+                MixinMemberAnnotationKind.INVOKER -> return MixinCompletionContext.InvokerValue(member, partial)
+                MixinMemberAnnotationKind.SHADOW,
+                MixinMemberAnnotationKind.OVERWRITE,
+                -> memberNameContext(source, offset, member)?.let { return it }
+            }
+        }
 
         return incompleteInjectorContext(source, offset, semanticModel)
     }
@@ -149,17 +156,76 @@ object SemanticCompletionContextExtractor {
                 annotationEndOffset = offsetOf(source, context.member.annotationRange.end),
                 mixinTargetInternalNames = targets,
             )
-            is MixinCompletionContext.ShadowMember -> AnnotationContext(
-                annotation = MixinAnnotation.SHADOW,
-                slot = AnnotationSlot.SHADOW_MEMBER,
-                partialValue = context.partialValue,
-                valueStartOffset = valueStart(source, offset),
-                valueEndOffset = offset,
-                annotationStartOffset = offset,
-                annotationEndOffset = offset,
-                mixinTargetInternalNames = targets,
-            )
+            is MixinCompletionContext.MemberName -> {
+                val annotation = when (context.member.annotationKind) {
+                    MixinMemberAnnotationKind.SHADOW -> MixinAnnotation.SHADOW
+                    MixinMemberAnnotationKind.OVERWRITE -> MixinAnnotation.OVERWRITE
+                    else -> return null
+                }
+                val slot = when (annotation) {
+                    MixinAnnotation.SHADOW -> AnnotationSlot.SHADOW_MEMBER
+                    MixinAnnotation.OVERWRITE -> AnnotationSlot.OVERWRITE_METHOD
+                    else -> return null
+                }
+                val lexical = AnnotationContextExtractor.extractAtOffset(source, offset)
+                    ?.takeIf { it.annotation == annotation && it.slot == slot }
+                AnnotationContext(
+                    annotation = annotation,
+                    slot = slot,
+                    partialValue = context.partialValue,
+                    valueStartOffset = context.valueStartOffset,
+                    valueEndOffset = context.valueEndOffset,
+                    annotationStartOffset = lexical?.annotationStartOffset
+                        ?: offsetOf(source, context.member.annotationRange.start),
+                    annotationEndOffset = lexical?.annotationEndOffset
+                        ?: offsetOf(source, context.member.annotationRange.end),
+                    mixinTargetInternalNames = targets,
+                    shadowPrefix = lexical?.shadowPrefix,
+                    shadowRemap = lexical?.shadowRemap ?: true,
+                    shadowMemberIsMethod = context.member.isMethod ?: (context.member.methodDescriptor != null),
+                    resolvedAnnotationFqn = lexical?.resolvedAnnotationFqn,
+                )
+            }
         }
+    }
+
+    private fun memberNameContext(
+        source: String,
+        cursorOffset: Int,
+        member: MixinMemberModel,
+    ): MixinCompletionContext.MemberName? {
+        val range = memberNameRange(source, member) ?: return null
+        if (cursorOffset !in range.start..range.end) return null
+        val end = cursorOffset.coerceIn(range.start, range.end)
+        return MixinCompletionContext.MemberName(
+            member = member,
+            partialValue = source.substring(range.start, end),
+            valueStartOffset = range.start,
+            valueEndOffset = range.end,
+        )
+    }
+
+    private fun memberNameRange(source: String, member: MixinMemberModel): OffsetRange? {
+        val semanticRange = sourceRange(source, member.nameRange)
+        if (semanticRange.end > semanticRange.start &&
+            source.substring(semanticRange.start, semanticRange.end) == member.javaName
+        ) {
+            return semanticRange
+        }
+        val annotationName = when (member.annotationKind) {
+            MixinMemberAnnotationKind.ACCESSOR -> "Accessor"
+            MixinMemberAnnotationKind.INVOKER -> "Invoker"
+            MixinMemberAnnotationKind.SHADOW -> "Shadow"
+            MixinMemberAnnotationKind.OVERWRITE -> "Overwrite"
+        }
+        val isMethod = member.isMethod ?: (member.methodDescriptor != null)
+        return MixinMemberDeclarationParser.findMemberNameRange(
+            source = source,
+            declarationRange = member.range,
+            memberName = member.javaName,
+            annotationName = annotationName,
+            isMethod = isMethod,
+        )?.let { OffsetRange(it.start, it.end) }
     }
 
     fun toOffset(source: String, line: Int, character: Int): Int? {

@@ -104,6 +104,8 @@ data class AnnotationContext(
     val atValue: String? = null,
     val shadowPrefix: String? = null,
     val shadowRemap: Boolean = true,
+    /** True for a Shadow method, false for a Shadow field, null when the declaration kind is unknown. */
+    val shadowMemberIsMethod: Boolean? = null,
     val existingAttributes: Set<String> = emptySet(),
     val parentInjectorAnnotation: MixinAnnotation? = null,
     val atInsideSlice: Boolean = false,

@@ -38,7 +38,10 @@ sealed interface MixinCompletionContext {
         val partialValue: String,
     ) : MixinCompletionContext
 
-    data class ShadowMember(
+    data class MemberName(
+        val member: MixinMemberModel,
         val partialValue: String,
+        val valueStartOffset: Int,
+        val valueEndOffset: Int,
     ) : MixinCompletionContext
 }

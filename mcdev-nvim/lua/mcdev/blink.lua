@@ -109,26 +109,83 @@ function source:get_trigger_characters()
   return { '"', "/", ".", ":", "@" }
 end
 
-local function is_owned_context(bufnr, position)
-  return buffer.is_mcdev_completion_context_at(bufnr, position)
+local function completion_context(bufnr, position)
+  return buffer.completion_context_at(bufnr, position)
+end
+
+local function route_for(default_sources, bufnr, position)
+  local context = completion_context(bufnr, position)
+  if context then
+    if context.exclusive then
+      return { "mcdev" }
+    end
+    return { "lsp", "mcdev" }
+  end
+
+  local sources = {}
+  for _, source_name in ipairs(default_sources) do
+    if source_name ~= "mcdev" then
+      sources[#sources + 1] = source_name
+    end
+  end
+  return sources
+end
+
+local function same_sources(first, second)
+  if #first ~= #second then return false end
+  for index, source_name in ipairs(first) do
+    if second[index] ~= source_name then return false end
+  end
+  return true
+end
+
+local function install_route_refresh(resolver)
+  source._route_resolver = resolver
+  if source._route_refresh_installed then return end
+  source._route_refresh_installed = true
+
+  local group = vim.api.nvim_create_augroup("McdevBlinkRouting", { clear = true })
+  vim.api.nvim_create_autocmd({ "TextChangedI", "CursorMovedI" }, {
+    group = group,
+    callback = function(args)
+      if args.buf ~= vim.api.nvim_get_current_buf() then return end
+      local blink = package.loaded["blink.cmp"]
+      if not blink or type(blink.get_context) ~= "function" or type(blink.show) ~= "function" then
+        return
+      end
+      local context = blink.get_context()
+      if not context or context.bufnr ~= args.buf then return end
+      local expected = source._route_resolver(args.buf, vim.api.nvim_win_get_cursor(0))
+      if same_sources(context.providers or {}, expected) then return end
+
+      -- Blink's public show API accepts an explicit provider set and creates
+      -- a fresh context id. This is needed when a cursor move changes from a
+      -- normal Java expression to a Mixin-only value in the same query.
+      vim.schedule(function()
+        local current = package.loaded["blink.cmp"]
+        if not current or type(current.get_context) ~= "function" or type(current.show) ~= "function" then
+          return
+        end
+        local live = current.get_context()
+        if live and live.bufnr == args.buf then
+          local providers = source._route_resolver(args.buf, vim.api.nvim_win_get_cursor(0))
+          if not same_sources(live.providers or {}, providers) then
+            current.show({ providers = providers })
+          end
+        end
+      end)
+    end,
+  })
 end
 
 function source.route_sources(default_sources)
   local fallback = vim.deepcopy(default_sources or {})
+  local function resolve(bufnr, position)
+    return route_for(fallback, bufnr, position)
+  end
+  install_route_refresh(resolve)
   return function()
-    local bufnr = vim.api.nvim_get_current_buf()
-    local position = vim.api.nvim_win_get_cursor(0)
-    if is_owned_context(bufnr, position) then
-      return { "lsp", "mcdev" }
-    end
-
-    local sources = {}
-    for _, source_name in ipairs(fallback) do
-      if source_name ~= "mcdev" then
-        sources[#sources + 1] = source_name
-      end
-    end
-    return sources
+    return resolve(vim.api.nvim_get_current_buf(), vim.api.nvim_win_get_cursor(0))
   end
 end
 
@@ -136,13 +193,14 @@ function source:enabled(ctx)
   if ctx and not ctx.cursor and not ctx.line_number and not (ctx.line and ctx.col) then
     return buffer.is_mcdev_completion_context(ctx_bufnr(ctx))
   end
-  return is_owned_context(ctx_bufnr(ctx), ctx_position(ctx))
+  return completion_context(ctx_bufnr(ctx), ctx_position(ctx)) ~= nil
 end
 
 function source:get_completions(ctx, callback)
   local bufnr = ctx_bufnr(ctx)
   local position = ctx_position(ctx)
-  if not is_owned_context(bufnr, position) then
+  local context = completion_context(bufnr, position)
+  if not context then
     callback({
       is_incomplete_forward = false,
       is_incomplete_backward = false,

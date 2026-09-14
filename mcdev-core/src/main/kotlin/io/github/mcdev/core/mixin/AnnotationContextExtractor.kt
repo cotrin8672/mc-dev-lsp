@@ -135,7 +135,10 @@ object AnnotationContextExtractor {
                 continue
             }
             if (immediateParen < 0) {
-                if (annotationSupportsBareForm(annotation) && cursorOffset >= at) {
+                if (annotationSupportsBareForm(annotation) &&
+                    cursorOffset >= at &&
+                    isCursorInAnnotatedMemberDeclaration(source, nameEnd, cursorOffset)
+                ) {
                     return at
                 }
                 continue
@@ -195,6 +198,7 @@ object AnnotationContextExtractor {
         if (explicitImport != null) {
             return MixinAnnotation.fromOfficialFqn(explicitImport)
         }
+        if (token in imports.ambiguousExplicit) return null
         return MixinAnnotation.fromSimpleName(token)
     }
 

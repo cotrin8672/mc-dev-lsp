@@ -7,7 +7,7 @@ local previous_cursor = vim.api.nvim_win_get_cursor(0)
 local bufnr = vim.api.nvim_create_buf(false, true)
 vim.api.nvim_buf_set_name(bufnr, "UnicodeMixin.java")
 vim.bo[bufnr].filetype = "java"
-vim.api.nvim_buf_set_lines(bufnr, 0, -1, false, { "日@Atx" })
+vim.api.nvim_buf_set_lines(bufnr, 0, -1, false, { "😀@Atx" })
 vim.api.nvim_set_current_buf(bufnr)
 
 local original_request = protocol.request
@@ -36,7 +36,9 @@ local result = nil
 cmp.source():complete({
   context = {
     bufnr = bufnr,
-    cursor = { row = 1, col = 7, line = 0, character = 4 },
+    -- row/col points after 😀@A. The conflicting UTF-16 field must not
+    -- override the authoritative nvim byte position.
+    cursor = { row = 1, col = 7, line = 0, character = 1 },
   },
 }, function(items)
   result = items
@@ -45,6 +47,7 @@ end)
 helpers.assert_eq(captured.command, protocol.commands.completion)
 helpers.assert_eq(captured.bufnr, bufnr)
 helpers.assert_eq(captured.payload.context.position.line, 0)
+-- 😀 occupies two UTF-16 code units, followed by @A.
 helpers.assert_eq(captured.payload.context.position.character, 4)
 helpers.assert_not_nil(result)
 helpers.assert_eq(#result.items, 1)

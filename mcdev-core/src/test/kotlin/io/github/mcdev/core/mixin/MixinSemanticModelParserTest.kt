@@ -12,6 +12,41 @@ import kotlin.test.assertTrue
 
 class MixinSemanticModelParserTest {
     @Test
+    fun resolvesOnlyOfficialMixinAnnotationNamespacesWhenKnown() {
+        val source = """
+            import foo.Accessor;
+            import foo.Invoker;
+            import foo.Mixin;
+            import foo.Overwrite;
+            import foo.Shadow;
+
+            @Mixin(Target.class)
+            class CustomMixin {
+                @Shadow private int customShadow;
+                @Accessor abstract int getCustomValue();
+                @Invoker abstract void invokeCustom();
+                @Overwrite void overwriteCustom() {}
+            }
+
+            @org.spongepowered.asm.mixin.Mixin(Target.class)
+            class OfficialMixin {
+                @org.spongepowered.asm.mixin.Shadow private int officialShadow;
+                @org.spongepowered.asm.mixin.gen.Accessor abstract int getOfficialValue();
+                @org.spongepowered.asm.mixin.gen.Invoker abstract void invokeOfficial();
+                @org.spongepowered.asm.mixin.Overwrite void overwriteOfficial() {}
+            }
+        """.trimIndent()
+
+        val model = MixinSemanticModelParser.parse(source, "file:///ExampleMixin.java")
+
+        assertEquals(listOf("Target"), model.targets.map { it.internalName })
+        assertEquals(
+            setOf("officialShadow", "getOfficialValue", "invokeOfficial", "overwriteOfficial"),
+            model.members.map { it.javaName }.toSet(),
+        )
+    }
+
+    @Test
     fun exposesFallbackSemanticModelWithMembers() {
         val source = """
             package com.example.mixin;

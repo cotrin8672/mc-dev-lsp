@@ -106,7 +106,9 @@ Blink:
   dependencies = { "mcdev-nvim" },
   opts = {
     sources = {
-      default = { "lsp", "path", "snippets", "mcdev" },
+      default = function()
+        return require("mcdev.blink").route_sources({ "lsp", "path", "snippets", "mcdev" })()
+      end,
       providers = {
         mcdev = {
           name = "mcdev",
@@ -121,7 +123,7 @@ Blink:
 }
 ```
 
-Do not restrict this provider to `vim.bo.filetype == "java"`: the source already checks its context, and a Java-only predicate disables Access Widener and Access Transformer completion. The score offset prioritizes mcdev's quoted/snippet-aware annotation attributes over JDT LS' plain `name = ` items.
+Do not restrict this provider to `vim.bo.filetype == "java"`: the source already checks its context, and a Java-only predicate disables Access Widener and Access Transformer completion. Use `route_sources` to select the sources for the current input position; setting a score offset alone does not exclude unrelated candidates.
 
 nvim-cmp:
 
@@ -131,18 +133,19 @@ nvim-cmp:
   dependencies = { "mcdev-nvim" },
   config = function()
     local cmp = require("cmp")
-    cmp.register_source("mcdev", require("mcdev.cmp").new())
+    local mcdev_cmp = require("mcdev.cmp")
+    cmp.register_source("mcdev", mcdev_cmp.new())
     cmp.setup({
       sources = {
         { name = "mcdev", priority = 1100 },
-        { name = "nvim_lsp", priority = 1000 },
+        mcdev_cmp.with_exclusive_filter({ name = "nvim_lsp", priority = 1000 }),
       },
     })
   end,
 }
 ```
 
-The explicit priority keeps quoted/snippet-aware mcdev attributes ahead of JDT LS' incomplete annotation stubs.
+Wrap other generic sources, such as `buffer` and `path`, with `with_exclusive_filter` as well. The wrapper preserves their existing options and entry filters, excludes their candidates in Mixin-only input positions, and restores them in ordinary Java positions. The `mcdev` source already checks its position and does not need this wrapper.
 
 Blink, cmp, and omnifunc share the same `mcdev.completion` command path. Do not implement separate semantic behavior in each adapter.
 

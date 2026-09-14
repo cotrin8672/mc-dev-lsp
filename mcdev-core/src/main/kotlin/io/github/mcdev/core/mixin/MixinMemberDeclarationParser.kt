@@ -18,7 +18,49 @@ enum class ParseConfidence {
     LOW,
 }
 
+internal data class MixinMemberNameRange(
+    val start: Int,
+    val end: Int,
+)
+
 internal object MixinMemberDeclarationParser {
+    internal fun findMemberNameRange(
+        source: String,
+        declarationRange: McTextRange,
+        memberName: String,
+        annotationName: String,
+        isMethod: Boolean,
+    ): MixinMemberNameRange? {
+        val start = positionToOffset(source, declarationRange.start).coerceIn(0, source.length)
+        val end = positionToOffset(source, declarationRange.end).coerceIn(start, source.length)
+        val declarationStart = declarationStart(source, start, end, annotationName)
+        val candidates = identifierOccurrences(source, memberName, declarationStart, end)
+        if (candidates.isEmpty()) return null
+
+        if (isMethod) {
+            candidates.firstOrNull { candidate ->
+                var next = candidate + memberName.length
+                while (next < end && source[next].isWhitespace()) next++
+                source.getOrNull(next) == '('
+            }?.let { return MixinMemberNameRange(it, it + memberName.length) }
+        }
+
+        val headerEnd = sequenceOf('=', ';', '{')
+            .mapNotNull { source.indexOf(it, declarationStart).takeIf { index -> index >= 0 && index < end } }
+            .minOrNull() ?: end
+        candidates.lastOrNull { it < headerEnd }?.let { return MixinMemberNameRange(it, it + memberName.length) }
+        return null
+    }
+
+    internal fun findMemberNameTextRange(
+        source: String,
+        declarationRange: McTextRange,
+        memberName: String,
+        annotationName: String,
+        isMethod: Boolean,
+    ): McTextRange? = findMemberNameRange(source, declarationRange, memberName, annotationName, isMethod)
+        ?.let { offsetRange(source, it.start, it.end) }
+
     fun parseShadowDeclarations(source: String, classIndex: ClassIndex? = null): List<ShadowMemberDeclaration> {
         val context = resolutionContext(source, classIndex)
         return parseAnnotatedMembers(source, "Shadow").mapNotNull { member ->
@@ -188,10 +230,18 @@ internal object MixinMemberDeclarationParser {
 
     private fun parseAnnotatedMembers(source: String, annotationSimpleName: String): List<AnnotatedMember> {
         val members = mutableListOf<AnnotatedMember>()
+        val annotation = MixinAnnotation.fromSimpleName(annotationSimpleName)
+        val resolvedOffsets = annotation?.let {
+            AnnotationContextExtractor.findAnnotationOffsets(source, it).toSet()
+        }.orEmpty()
         var search = 0
         while (search < source.length) {
             val at = source.indexOf('@', search)
             if (at < 0) break
+            if (at !in resolvedOffsets) {
+                search = at + 1
+                continue
+            }
             val nameEnd = readQualifiedNameEnd(source, at + 1)
             val simpleName = source.substring(at + 1, nameEnd).substringAfterLast('.')
             if (simpleName != annotationSimpleName) {
@@ -439,6 +489,44 @@ internal object MixinMemberDeclarationParser {
 
     private fun offsetRange(source: String, start: Int, end: Int): McTextRange =
         McTextRange(offsetToPosition(source, start), offsetToPosition(source, end))
+
+    private fun declarationStart(source: String, start: Int, end: Int, annotationName: String): Int {
+        var at = source.indexOf('@', start)
+        while (at >= 0 && at < end) {
+            val nameEnd = readQualifiedNameEnd(source, at + 1)
+            if (source.substring(at + 1, nameEnd).substringAfterLast('.') == annotationName) {
+                return annotationEnd(source, nameEnd).coerceAtMost(end)
+            }
+            at = source.indexOf('@', nameEnd)
+        }
+        return start
+    }
+
+    private fun identifierOccurrences(source: String, name: String, start: Int, end: Int): List<Int> {
+        if (name.isEmpty()) return emptyList()
+        val occurrences = mutableListOf<Int>()
+        var index = source.indexOf(name, start)
+        while (index >= 0 && index + name.length <= end) {
+            val beforeIsIdentifier = index > start && isIdentifierPart(source[index - 1])
+            val afterIndex = index + name.length
+            val afterIsIdentifier = afterIndex < end && isIdentifierPart(source[afterIndex])
+            if (!beforeIsIdentifier && !afterIsIdentifier) occurrences += index
+            index = source.indexOf(name, index + name.length)
+        }
+        return occurrences
+    }
+
+    private fun isIdentifierPart(character: Char): Boolean = character.isJavaIdentifierPart() || character == '$'
+
+    private fun positionToOffset(source: String, position: McTextPosition): Int {
+        var line = 0
+        var offset = 0
+        while (offset < source.length && line < position.line) {
+            if (source[offset] == '\n') line++
+            offset++
+        }
+        return (offset + position.character).coerceAtMost(source.length)
+    }
 
     private fun offsetToPosition(source: String, offset: Int): McTextPosition {
         var line = 0

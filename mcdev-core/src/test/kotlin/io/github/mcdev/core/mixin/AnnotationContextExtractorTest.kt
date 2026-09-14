@@ -93,6 +93,11 @@ class AnnotationContextExtractorTest {
             Case("""@Inject(method = "ti")""", "ti", MixinAnnotation.INJECT),
             Case("""@com.example.Inject(method = "ti")""", "ti", null),
             Case("import com.example.Inject;\n@Inject(method = \"ti\")", "ti", null),
+            Case(
+                "import com.example.Inject;\nimport com.other.Inject;\n@Inject(method = \"ti\")",
+                "ti",
+                null,
+            ),
             Case("""@$localFqn(ord""", "ord", MixinAnnotation.LOCAL),
             Case("import $localFqn;\n@Local(ord", "ord", MixinAnnotation.LOCAL),
             Case("""@Local(ord""", "ord", MixinAnnotation.LOCAL),
