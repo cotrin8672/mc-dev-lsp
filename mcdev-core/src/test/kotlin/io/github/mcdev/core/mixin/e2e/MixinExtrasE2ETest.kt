@@ -344,13 +344,23 @@ class MixinExtrasE2ETest {
 
     @Test
     fun completesMixinExtrasInjectorAnnotationsThroughFacade() {
+        val dependencyIndex = object : io.github.mcdev.core.mixin.ClassIndex by MixinExtrasTestFixtures.classIndex {
+            override fun findClassByFqn(fqn: String): io.github.mcdev.core.mixin.ClassIndexEntry? =
+                if (fqn == "com.llamalad7.mixinextras.injector.v2.WrapWithCondition") {
+                    io.github.mcdev.core.mixin.ClassIndexEntry(
+                        "WrapWithCondition", "com.llamalad7.mixinextras.injector.v2", fqn.replace('.', '/'),
+                    )
+                } else MixinExtrasTestFixtures.classIndex.findClassByFqn(fqn)
+        }
+        val annotationFacade = MixinServiceFacade(dependencyIndex, MixinExtrasTestFixtures.bytecodeIndex)
         val source = wrapMixin("""
             @Wrap
         """)
-        val items = facade.complete(MixinE2ETestSupport.requestAt(source, "@Wrap"))
+        val items = annotationFacade.complete(MixinE2ETestSupport.requestAt(source, "@Wrap"))
 
         assertTrue(items.any { it.insertText.startsWith("WrapOperation") })
         assertTrue(items.any { it.insertText.startsWith("WrapWithCondition") })
+        assertFalse(items.any { it.label == "WrapWithCondition (v1)" })
         assertTrue(items.any { it.insertText.startsWith("WrapMethod") })
     }
 

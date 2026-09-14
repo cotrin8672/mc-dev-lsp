@@ -125,7 +125,11 @@ Blink:
   dependencies = { "mcdev-nvim" },
   opts = {
     sources = {
-      default = { "lsp", "path", "snippets", "mcdev" },
+      default = function()
+        return require("mcdev.blink").route_sources({
+          "snippets", "buffer", "path", "lsp", "mcdev",
+        })()
+      end,
       providers = {
         mcdev = {
           name = "mcdev",
@@ -140,7 +144,14 @@ Blink:
 }
 ```
 
-Keep the provider enabled for Java, Access Widener, and Access Transformer buffers; `mcdev.blink` performs its own context check. The score offset makes mcdev's complete snippets (for example `method = "…"`) win over JDT LS' incomplete `method = ` annotation item.
+`route_sources` keeps `lsp` alongside `mcdev` while typing a Mixin annotation
+name or inside its values and selectors, and removes `mcdev` from the normal
+fallback list. This prevents buffer, snippet, path, and AI words from being
+offered inside selectors while preserving ordinary Java, import, and annotation
+name completion elsewhere. The callback defers loading until Lazy has added the
+plugin to the runtime path. The score offset makes mcdev's complete snippets
+(for example `method = "…"`) win over JDT LS' incomplete `method = ` annotation
+item.
 
 nvim-cmp:
 

@@ -23,6 +23,17 @@ data class McCompletionMetadata(
     val namespace: String? = null,
 )
 
+/**
+ * Source offsets that should be replaced when a completion item is applied.
+ *
+ * The range is exclusive at [endOffset], matching the text-edit model used by
+ * the protocol adapters.
+ */
+data class McCompletionReplacementRange(
+    val startOffset: Int,
+    val endOffset: Int,
+)
+
 data class McCompletionItem(
     val label: String,
     val detail: String?,

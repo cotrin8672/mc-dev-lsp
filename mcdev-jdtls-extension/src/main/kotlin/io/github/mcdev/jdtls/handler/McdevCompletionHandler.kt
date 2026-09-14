@@ -253,6 +253,9 @@ class McdevCompletionHandler(
                 mappingResolver = session.context.mappings.resolver,
                 sourceNamespace = session.context.mappings.sourceNamespace,
                 runtimeNamespace = session.context.mappings.runtimeNamespace,
+                replacementRange = completion.replacementRange?.let {
+                    CompletionReplacementRange(it.startOffset, it.endOffset)
+                },
             ),
         )
         val dtoConvertMs = elapsedMs(dtoStarted)
@@ -355,6 +358,9 @@ class McdevCompletionHandler(
                 annotationContext = bufferOnly.context,
                 classInsertMode = options.classInsertMode,
                 preferredAtTarget = options.preferredAtTarget,
+                replacementRange = completion.replacementRange?.let {
+                    CompletionReplacementRange(it.startOffset, it.endOffset)
+                },
             ),
         )
         val dtoConvertMs = elapsedMs(dtoStarted)

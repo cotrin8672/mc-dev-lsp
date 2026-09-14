@@ -103,7 +103,7 @@ end
 
 function M.when_ready(bufnr, callback, after_generation)
   local client = protocol.active_jdtls_client(bufnr)
-  if not client or not client.id then return function() end end
+  if not client or not client.id then return nil end
   local listeners = ready_listeners[client.id] or {}
   ready_listeners[client.id] = listeners
   local called = false

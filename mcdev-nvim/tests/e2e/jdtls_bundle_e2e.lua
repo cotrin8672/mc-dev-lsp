@@ -31,6 +31,9 @@ helpers.assert_true(vim.fn.isdirectory(workspace) == 1, "workspace must exist: "
 log_step("environment validated")
 
 local fixture_specs = {
+  ["real-cem"] = {
+    mixin = "src/main/java/io/github/cotrin8672/cem/mixin/ItemMixin.java",
+  },
   ["real-sodium"] = {
     mixin = "common/src/main/java/net/caffeinemc/mods/sodium/mixin/features/options/overlays/GuiMixin.java",
   },
@@ -333,6 +336,13 @@ local function capture_notify(callback, timeout_ms)
 end
 
 log_step("bundle provided through init_options.bundles")
+
+if fixture == "real-cem" then
+  dofile(vim.fn.getcwd() .. "/mcdev-nvim/tests/e2e/cem_project_e2e.lua")({
+    helpers = helpers, with_buffer = with_buffer, mixin_file = mixin_file, log_step = log_step,
+  })
+  return
+end
 
 if fixture == "real-sodium" then
   dofile(vim.fn.getcwd() .. "/mcdev-nvim/tests/e2e/real_project_e2e.lua")({

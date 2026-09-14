@@ -179,10 +179,12 @@ internal class JdtProjectSourceQuery(
             if (method == null) {
                 return@mapNotNull null
             }
-            if (invokeIsConstructor(method) != false) {
-                return@mapNotNull null
+            val isConstructor = invokeIsConstructor(method) ?: return@mapNotNull null
+            val name = if (isConstructor) {
+                "<init>"
+            } else {
+                invokeElementName(method) ?: return@mapNotNull null
             }
-            val name = invokeElementName(method) ?: return@mapNotNull null
             val descriptor = methodDescriptor(method, resolver) ?: return@mapNotNull null
             val flags = invokeFlags(method) ?: return@mapNotNull null
             MethodIndexEntry(

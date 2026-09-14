@@ -195,6 +195,12 @@ end
 
 ## Blink.cmp Source
 
+Configure Blink's dynamic default source list with
+`require("mcdev.blink").route_sources(your_default_sources)`. It keeps `lsp`
+and `mcdev` for an annotation-name prefix or an open MCDev annotation value or selector, and returns the
+caller-provided standard sources everywhere else. The fallback list may still
+contain `mcdev`; the helper removes that entry outside an owned context.
+
 The Blink source should:
 
 - check if the active buffer is Java, AW, AT, or relevant JSON

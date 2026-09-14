@@ -5,6 +5,7 @@ import io.github.mcdev.core.bytecode.OccurrenceResultClassification
 import io.github.mcdev.core.completion.McCompletionItem
 import io.github.mcdev.core.completion.McCompletionKind
 import io.github.mcdev.core.completion.McCompletionMetadata
+import io.github.mcdev.core.completion.McCompletionReplacementRange
 import io.github.mcdev.core.descriptor.DescriptorParseResult
 import io.github.mcdev.core.descriptor.JvmType
 import io.github.mcdev.core.descriptor.parseMethodDescriptor
@@ -76,6 +77,7 @@ data class McdevCompletionDebugInfo(
 data class MixinCompletionResult(
     val items: List<McCompletionItem>,
     val debug: McdevCompletionDebugInfo,
+    val replacementRange: McCompletionReplacementRange? = null,
 )
 
 class MixinServiceFacade(
@@ -103,6 +105,7 @@ class MixinServiceFacade(
     private val shareSources: () -> Sequence<String> = { emptySequence() },
     private val expressionSupport: ExpressionSupport = ExpressionSupport(
         ExpressionMemberCompletionService(classIndex, bytecodeIndex),
+        classIndex,
     ),
 ) {
     private val handlerSignatureService = HandlerSignatureService(classIndex, bytecodeIndex)
@@ -173,15 +176,20 @@ class MixinServiceFacade(
             warnings += "FALLBACK_ANNOTATION_CONTEXT_USED: $fallbackAnnotationContextReason"
         }
         val routedItems = context?.let { routeCompletion(effectiveRequest, it, options) }.orEmpty()
+        val featureCompletion = if (routedItems.isEmpty() && !isInsideExpressionValue(context)) {
+            expressionSupport.completeFeatureAnnotationsWithRange(
+                effectiveRequest.bufferText,
+                effectiveRequest.line,
+                effectiveRequest.character,
+            )
+        } else {
+            ExpressionSupport.FeatureAnnotationCompletion.EMPTY
+        }
         val items = routedItems.ifEmpty {
             if (isInsideExpressionValue(context)) {
                 emptyList()
             } else {
-                expressionSupport.completeFeatureAnnotations(
-                    effectiveRequest.bufferText,
-                    effectiveRequest.line,
-                    effectiveRequest.character,
-                )
+                featureCompletion.items
             }
         }
         return MixinCompletionResult(
@@ -197,6 +205,7 @@ class MixinServiceFacade(
                 items = items,
                 warnings = warnings.distinct(),
             ),
+            replacementRange = if (routedItems.isEmpty()) featureCompletion.replacementRange else null,
         )
     }
 

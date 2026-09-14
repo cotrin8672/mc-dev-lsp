@@ -174,8 +174,19 @@ function M.complete(callback, bufnr, position, opts)
   local helper_done = false
   local jdt_failed = false
 
-  local function cancel_auxiliary_requests()
+  local function cancel_ready_wait()
     if operation.cancel_ready then operation.cancel_ready(); operation.cancel_ready = nil end
+    if operation.ready_timer then
+      if not operation.ready_timer:is_closing() then
+        operation.ready_timer:stop()
+        operation.ready_timer:close()
+      end
+      operation.ready_timer = nil
+    end
+  end
+
+  local function cancel_auxiliary_requests()
+    cancel_ready_wait()
     if type(operation.cancel_project) == "function" then
       operation.cancel_project()
       operation.cancel_project = nil
@@ -195,7 +206,7 @@ function M.complete(callback, bufnr, position, opts)
       return
     end
     operation.completed = true
-    if operation.cancel_ready then operation.cancel_ready(); operation.cancel_ready = nil end
+    cancel_ready_wait()
     if active_requests[bufnr] == operation then
       active_requests[bufnr] = nil
     end
@@ -288,6 +299,7 @@ function M.complete(callback, bufnr, position, opts)
     return cancel
   end
 
+  local wait_for_project
   local function on_jdt(envelope, err)
     if operation.cancelled or active_requests[bufnr] ~= operation or operation.completed then
       M.stale_dropped_count = M.stale_dropped_count + 1
@@ -298,6 +310,18 @@ function M.complete(callback, bufnr, position, opts)
       return
     end
 
+    if not err and type(envelope) == "table" and type(envelope.error) == "table"
+      and type(envelope.error.code) == "string"
+      and envelope.error.code:upper() == "INCOMPLETE_PROJECT_CONTEXT" and transport.when_ready then
+      -- Import readiness is temporary. Finalizing the helper's empty subset
+      -- here cancels the listener that could deliver real target members.
+      if wait_for_project() then
+        if helper_stream then
+          callback({ isProvisional = true, isIncomplete = true, items = vim.deepcopy(helper_items) })
+        end
+        return
+      end
+    end
     local result, unwrap_err = decode_completion(envelope, err)
     if unwrap_err then
       jdt_failed = true
@@ -308,6 +332,7 @@ function M.complete(callback, bufnr, position, opts)
       return
     end
 
+    M.last_error = nil
     M.last_debug = result.debug
     local items = merge_items(result.items, helper_items)
     M.last_response_count = #items
@@ -340,13 +365,23 @@ function M.complete(callback, bufnr, position, opts)
   end
 
   local request_project
-  local function wait_for_project()
-    if operation.cancel_ready or not transport.when_ready then return end
+  wait_for_project = function()
+    if operation.cancel_ready then return true end
+    if not transport.when_ready then return false end
     operation.cancel_ready = transport.when_ready(bufnr, function()
       operation.cancel_ready = nil
       if request_is_stale() or operation.completed then return end
       request_project()
     end, operation.project_generation)
+    if not operation.cancel_ready then return false end
+    if not operation.ready_timer then
+      operation.ready_timer = vim.defer_fn(function()
+        if request_is_stale() or operation.completed then return end
+        M.last_error = "mcdev: project dependencies did not become ready within 120 seconds"
+        finish_helper_fallback()
+      end, 120000)
+    end
+    return true
   end
 
   local function on_project(envelope, err)

@@ -2,6 +2,7 @@ package io.github.mcdev.core.mixinextras
 
 import io.github.mcdev.core.completion.McCompletionKind
 import io.github.mcdev.core.bytecode.BytecodeFixtureCompiler
+import io.github.mcdev.core.codeaction.McTextEdit
 import io.github.mcdev.core.mixin.AnnotationContext
 import io.github.mcdev.core.mixin.AnnotationContextExtractor
 import io.github.mcdev.core.mixin.AnnotationSlot
@@ -18,12 +19,13 @@ import io.github.mcdev.core.mixinextras.ExpressionCompletionPosition
 import java.util.concurrent.atomic.AtomicInteger
 import kotlin.test.Test
 import kotlin.test.assertEquals
+import kotlin.test.assertNotNull
 import kotlin.test.assertTrue
 import org.objectweb.asm.Opcodes
 import org.objectweb.asm.Type
 
 class ExpressionSupportTest {
-    private val expressionSupport = ExpressionSupport()
+    private val expressionSupport = ExpressionSupport(classIndex = wrapWithConditionClassIndex())
     private val atValueService = AtValueCompletionService()
 
     @Test
@@ -121,6 +123,113 @@ class ExpressionSupportTest {
 
         assertTrue(items.any { it.insertText == "Expression(\"${'$'}{1}\")${'$'}0" })
         assertTrue(items.any { it.insertText == "Expressions({ ${'$'}{1} })${'$'}0" })
+    }
+
+    @Test
+    fun annotationSnippetsApplyOverOnlyTheTypedNameAndAddImports() {
+        val cases = listOf(
+            "@Mix" to ("Mixin" to "org.spongepowered.asm.mixin.Mixin"),
+            "@Inject" to ("Inject" to "org.spongepowered.asm.mixin.injection.Inject"),
+            "@At" to ("At" to "org.spongepowered.asm.mixin.injection.At"),
+            "@Wrap" to ("WrapOperation" to "com.llamalad7.mixinextras.injector.wrapoperation.WrapOperation"),
+            "@Expr" to ("Expression" to "com.llamalad7.mixinextras.expression.Expression"),
+            "@Definition" to ("Definition" to "com.llamalad7.mixinextras.expression.Definition"),
+            "@Local" to ("Local" to "com.llamalad7.mixinextras.sugar.Local"),
+            "@Cancellable" to ("Cancellable" to "com.llamalad7.mixinextras.sugar.Cancellable"),
+        )
+
+        for ((typed, expected) in cases) {
+            val source = "package demo;\n\n$typed"
+            val offset = source.length
+            val (line, character) = offsetToLineCharacter(source, offset)
+            val completion = expressionSupport.completeFeatureAnnotationsWithRange(source, line, character)
+            val item = completion.items.first { it.label == expected.first }
+            val range = assertNotNull(completion.replacementRange)
+            assertEquals(source.length - typed.length + 1, range.startOffset)
+            assertEquals(source.length, range.endOffset)
+
+            val updated = applyCompletion(source, range, item)
+            assertTrue(updated.contains("@${expected.first}"))
+            assertTrue(updated.contains("import ${expected.second};"))
+        }
+    }
+
+    @Test
+    fun wrapWithConditionUsesIndexedVersionAndImport() {
+        val v2Fqn = "com.llamalad7.mixinextras.injector.v2.WrapWithCondition"
+        val index = FakeClassIndex(
+            classes = listOf(ClassIndexEntry("WrapWithCondition", "com.llamalad7.mixinextras.injector.v2", "com/llamalad7/mixinextras/injector/v2/WrapWithCondition")),
+        )
+        val support = ExpressionSupport(classIndex = index)
+        val source = "package demo;\n\n@Wrap"
+        val (line, character) = offsetToLineCharacter(source, source.length)
+
+        val item = support.completeFeatureAnnotationsWithRange(source, line, character)
+            .items
+            .first { it.label == "WrapWithCondition (v2)" }
+
+        assertTrue(item.additionalEdits.any { it.newText.contains("import $v2Fqn;") })
+        assertTrue(item.additionalEdits.none { it.newText.contains("injector.WrapWithCondition;") && !it.newText.contains("injector.v2") })
+    }
+
+    @Test
+    fun featureCompletionIgnoresAtSignsInStringsAndComments() {
+        val source = """
+            class Example {
+                String text = "@Expr";
+                // @Definition
+                @Expr
+            }
+        """.trimIndent()
+        val offset = source.lastIndexOf("@Expr") + "@Expr".length
+        val (line, character) = offsetToLineCharacter(source, offset)
+
+        val completion = expressionSupport.completeFeatureAnnotationsWithRange(source, line, character)
+
+        assertTrue(completion.items.any { it.label == "Expression" })
+        assertEquals(source.lastIndexOf("Expr"), completion.replacementRange?.startOffset)
+        assertEquals(offset, completion.replacementRange?.endOffset)
+    }
+
+    @Test
+    fun conflictingAnnotationImportUsesQualifiedSnippetWithoutConflictingImport() {
+        val source = "import other.Local;\n\n@Local"
+        val (line, character) = offsetToLineCharacter(source, source.length)
+
+        val completion = expressionSupport.completeFeatureAnnotationsWithRange(source, line, character)
+        val item = completion.items.first { it.label == "Local" }
+
+        assertTrue(item.insertText.startsWith("com.llamalad7.mixinextras.sugar.Local"))
+        assertTrue(item.additionalEdits.none { it.newText.contains("com.llamalad7.mixinextras.sugar.Local;") })
+        val updated = applyCompletion(source, assertNotNull(completion.replacementRange), item)
+        assertTrue(updated.contains("@com.llamalad7.mixinextras.sugar.Local"))
+    }
+
+    @Test
+    fun annotationSnippetReplacesWholeNameWhenCaretIsInsideIt() {
+        val source = "@Inject"
+        val offset = source.indexOf("Inject") + 2
+        val (line, character) = offsetToLineCharacter(source, offset)
+
+        val completion = expressionSupport.completeFeatureAnnotationsWithRange(source, line, character)
+        val item = completion.items.first { it.label == "Inject" }
+        val range = assertNotNull(completion.replacementRange)
+
+        assertEquals(source.indexOf("Inject"), range.startOffset)
+        assertEquals(source.length, range.endOffset)
+        assertEquals("@${item.insertText}", applyCompletion(source, range, item).lineSequence().last())
+    }
+
+    @Test
+    fun annotationSnippetDoesNotDuplicateExistingArgumentListWhenCaretIsInsideName() {
+        val source = "@Inject(existingArgs)"
+        val offset = source.indexOf("Inject") + 2
+        val (line, character) = offsetToLineCharacter(source, offset)
+
+        val completion = expressionSupport.completeFeatureAnnotationsWithRange(source, line, character)
+
+        assertTrue(completion.items.isEmpty())
+        assertEquals(null, completion.replacementRange)
     }
 
     @Test
@@ -826,5 +935,37 @@ class ExpressionSupportTest {
             index++
         }
         return line to character
+    }
+
+    private fun wrapWithConditionClassIndex() = FakeClassIndex(
+        classes = listOf(
+            ClassIndexEntry(
+                "WrapWithCondition",
+                "com.llamalad7.mixinextras.injector",
+                "com/llamalad7/mixinextras/injector/WrapWithCondition",
+            ),
+            ClassIndexEntry(
+                "WrapWithCondition",
+                "com.llamalad7.mixinextras.injector.v2",
+                "com/llamalad7/mixinextras/injector/v2/WrapWithCondition",
+            ),
+        ),
+    )
+
+    private fun applyCompletion(
+        source: String,
+        range: io.github.mcdev.core.completion.McCompletionReplacementRange,
+        item: io.github.mcdev.core.completion.McCompletionItem,
+    ): String {
+        val edits = item.additionalEdits + McTextEdit(
+            startOffset = range.startOffset,
+            endOffset = range.endOffset,
+            newText = item.insertText,
+        )
+        var updated = source
+        edits.sortedByDescending { it.startOffset }.forEach { edit ->
+            updated = updated.replaceRange(edit.startOffset, edit.endOffset, edit.newText)
+        }
+        return updated
     }
 }

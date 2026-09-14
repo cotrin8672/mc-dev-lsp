@@ -277,10 +277,12 @@ do
   local original_complete_for_omnifunc = completion.complete
   local original_timeout = config.options.completion.omnifunc_timeout_ms
   config.options.completion.omnifunc_timeout_ms = 10
-  completion.complete = function() end
+  local cancelled = false
+  completion.complete = function() return function() cancelled = true end end
   local items = omnifunc.complete(0, "")
   helpers.assert_eq(#items, 0)
   helpers.assert_true(omnifunc.last_timeout)
+  helpers.assert_true(cancelled, "omnifunc timeout must cancel its outstanding completion")
   completion.complete = original_complete_for_omnifunc
   config.options.completion.omnifunc_timeout_ms = original_timeout
 end
@@ -1992,6 +1994,8 @@ dofile(vim.fn.getcwd() .. "/mcdev-nvim/tests/protocol_positions.lua")
 dofile(vim.fn.getcwd() .. "/mcdev-nvim/tests/diagnostic_positions.lua")
 dofile(vim.fn.getcwd() .. "/mcdev-nvim/tests/jdtls_workspace.lua")
 dofile(vim.fn.getcwd() .. "/mcdev-nvim/tests/blink_positions.lua")
+dofile(vim.fn.getcwd() .. "/mcdev-nvim/tests/completion_readiness.lua")
+dofile(vim.fn.getcwd() .. "/mcdev-nvim/tests/blink_routing.lua")
 dofile(vim.fn.getcwd() .. "/mcdev-nvim/tests/cmp_positions.lua")
 dofile(vim.fn.getcwd() .. "/mcdev-nvim/tests/transport.lua")
 print("mcdev-nvim adapter tests passed")

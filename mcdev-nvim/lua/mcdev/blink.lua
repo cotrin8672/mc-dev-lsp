@@ -109,14 +109,40 @@ function source:get_trigger_characters()
   return { '"', "/", ".", ":", "@" }
 end
 
+local function is_owned_context(bufnr, position)
+  return buffer.is_mcdev_completion_context_at(bufnr, position)
+end
+
+function source.route_sources(default_sources)
+  local fallback = vim.deepcopy(default_sources or {})
+  return function()
+    local bufnr = vim.api.nvim_get_current_buf()
+    local position = vim.api.nvim_win_get_cursor(0)
+    if is_owned_context(bufnr, position) then
+      return { "lsp", "mcdev" }
+    end
+
+    local sources = {}
+    for _, source_name in ipairs(fallback) do
+      if source_name ~= "mcdev" then
+        sources[#sources + 1] = source_name
+      end
+    end
+    return sources
+  end
+end
+
 function source:enabled(ctx)
-  return buffer.is_mcdev_completion_context(ctx_bufnr(ctx))
+  if ctx and not ctx.cursor and not ctx.line_number and not (ctx.line and ctx.col) then
+    return buffer.is_mcdev_completion_context(ctx_bufnr(ctx))
+  end
+  return is_owned_context(ctx_bufnr(ctx), ctx_position(ctx))
 end
 
 function source:get_completions(ctx, callback)
   local bufnr = ctx_bufnr(ctx)
   local position = ctx_position(ctx)
-  if not buffer.is_mcdev_completion_context(bufnr) then
+  if not is_owned_context(bufnr, position) then
     callback({
       is_incomplete_forward = false,
       is_incomplete_backward = false,
@@ -144,7 +170,9 @@ function source:get_completions(ctx, callback)
     end
     callback({
       is_incomplete_forward = result.isProvisional or result.isIncomplete or false,
-      is_incomplete_backward = result.isProvisional or result.isIncomplete or false,
+      -- The server filters by the current prefix. Blink must refetch after
+      -- backspacing so a result for a longer prefix cannot hide new items.
+      is_incomplete_backward = true,
       items = to_blink_items(items, bufnr, position),
     })
   end, bufnr, position, { source = "blink", stream = true })

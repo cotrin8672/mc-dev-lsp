@@ -21,7 +21,7 @@ local function complete_with(item)
   adapter:get_completions({ bufnr = bufnr, cursor = { 1, #current_line } }, function(value)
     result = value
   end)
-  return result.items[1]
+  return result.items[1], result
 end
 
 set_lines({ current_line, "é😀tail" })
@@ -45,7 +45,9 @@ local server_item = {
   },
   data = { source = "jdt", marker = { kept = true } },
 }
-local converted = complete_with(server_item)
+local converted, converted_result = complete_with(server_item)
+helpers.assert_eq(converted_result.is_incomplete_forward, false)
+helpers.assert_true(converted_result.is_incomplete_backward)
 helpers.assert_eq(converted.textEdit.range.start.character, 24)
 helpers.assert_eq(converted.textEdit.range["end"].character, 26)
 helpers.assert_eq(converted.additionalTextEdits[1].range.start.character, 6)

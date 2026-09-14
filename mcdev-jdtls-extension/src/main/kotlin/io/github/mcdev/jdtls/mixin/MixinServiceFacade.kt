@@ -44,7 +44,7 @@ import java.util.concurrent.CancellationException
 
 internal data class BufferOnlyCompletionResult(
     val result: MixinCompletionResult,
-    val context: AnnotationContext,
+    val context: AnnotationContext?,
 )
 
 private object BufferOnlyNoOpClassIndex : ClassIndex {
@@ -210,8 +210,8 @@ class MixinServiceFacade internal constructor(
             return null
         }
         val offset = AnnotationContextExtractor.toOffset(source, line, character) ?: return null
-        val context = AnnotationContextExtractor.extractAtOffset(source, offset) ?: return null
-        if (!isBufferOnlyEligible(context)) {
+        val context = AnnotationContextExtractor.extractAtOffset(source, offset)
+        if (context != null && !isBufferOnlyEligible(context)) {
             return null
         }
         val lazyJavaProject = lazy { javaProjectResolver(documentUri) }
@@ -240,6 +240,9 @@ class MixinServiceFacade internal constructor(
             command = "mcdev.completion",
             languageId = languageId,
         )
+        if (context == null && (result.items.isEmpty() || result.replacementRange == null)) {
+            return null
+        }
         return BufferOnlyCompletionResult(result = result, context = context)
     }
 
@@ -428,6 +431,7 @@ class MixinServiceFacade internal constructor(
                     bytecodeIndex = bytecodeIndex,
                     reachableMembersCache = sharedCache,
                 ),
+                classIndex,
             )
         } else {
             null
@@ -463,6 +467,7 @@ class MixinServiceFacade internal constructor(
                 shareSources = shareSources,
                 expressionSupport = expressionSupport ?: ExpressionSupport(
                     ExpressionMemberCompletionService(classIndex, bytecodeIndex),
+                    classIndex,
                 ),
             )
 

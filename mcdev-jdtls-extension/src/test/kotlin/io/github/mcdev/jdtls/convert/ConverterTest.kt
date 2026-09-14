@@ -198,6 +198,49 @@ class ConverterTest {
     }
 
     @Test
+    fun completionConverterUsesExplicitPartialAnnotationRangeAndPreservesImports() {
+        val source = "package demo;\n\n@Mix"
+        val item = McCompletionItem(
+            label = "Mixin",
+            detail = "Mixin annotation",
+            documentation = null,
+            filterText = "mixin Mixin",
+            insertText = "Mixin(${ '$' }{1:Target}.class)${ '$' }0",
+            kind = McCompletionKind.KEYWORD,
+            sortKey = "0311_mixin",
+            metadata = McCompletionMetadata(
+                source = "mixin.annotation",
+                owner = "org.spongepowered.asm.mixin.Mixin",
+            ),
+            additionalEdits = listOf(
+                McTextEdit(
+                    startOffset = source.indexOf("package") + "package demo;".length,
+                    endOffset = source.indexOf("package") + "package demo;".length,
+                    newText = "\nimport org.spongepowered.asm.mixin.Mixin;",
+                ),
+            ),
+        )
+        val replacementStart = source.indexOf("Mix")
+        val dto = CompletionItemConverter.toDto(
+            item = item,
+            annotationContext = null,
+            source = source,
+            convertContext = CompletionConvertContext(
+                source = source,
+                annotationContext = null,
+                replacementRange = CompletionReplacementRange(replacementStart, source.length),
+            ),
+        )
+
+        assertEquals("Mixin(${ '$' }{1:Target}.class)${ '$' }0", dto.edit?.newText)
+        assertEquals(2, dto.edit?.range?.start?.line)
+        assertEquals(1, dto.edit?.range?.start?.character)
+        assertEquals(4, dto.edit?.range?.end?.character)
+        assertEquals(1, dto.additionalEdits.size)
+        assertTrue(dto.additionalEdits.single().newText.contains("import org.spongepowered.asm.mixin.Mixin;"))
+    }
+
+    @Test
     fun completionConverterKeepsInjectMethodOpenQuoteOutsideTextEdit() {
         val marker = "/*caret*/"
         val sourceWithMarker = """

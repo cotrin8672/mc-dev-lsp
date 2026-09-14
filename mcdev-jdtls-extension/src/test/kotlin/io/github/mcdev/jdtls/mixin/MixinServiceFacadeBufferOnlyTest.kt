@@ -45,8 +45,8 @@ class MixinServiceFacadeBufferOnlyTest {
         )
 
         assertNotNull(bufferOnly)
-        assertEquals(MixinAnnotation.INJECT, bufferOnly.context.annotation)
-        assertEquals(AnnotationSlot.ATTRIBUTE, bufferOnly.context.slot)
+        assertEquals(MixinAnnotation.INJECT, assertNotNull(bufferOnly.context).annotation)
+        assertEquals(AnnotationSlot.ATTRIBUTE, assertNotNull(bufferOnly.context).slot)
         assertTrue(bufferOnly.result.items.any { it.filterText == "method" })
         assertEquals(0, resolverCalls)
     }
@@ -80,8 +80,8 @@ class MixinServiceFacadeBufferOnlyTest {
         )
 
         assertNotNull(bufferOnly)
-        assertEquals(MixinAnnotation.AT, bufferOnly.context.annotation)
-        assertEquals(AnnotationSlot.VALUE, bufferOnly.context.slot)
+        assertEquals(MixinAnnotation.AT, assertNotNull(bufferOnly.context).annotation)
+        assertEquals(AnnotationSlot.VALUE, assertNotNull(bufferOnly.context).slot)
         assertTrue(bufferOnly.result.items.any { it.insertText == "HEAD" })
         assertEquals(1, resolverCalls)
         assertEquals(1, providerCalls)
@@ -242,6 +242,26 @@ class MixinServiceFacadeBufferOnlyTest {
     }
 
     @Test
+    fun bufferOnlyWrapCompletionOmitsUnknownWrapWithConditionVariants() {
+        val facade = MixinServiceFacade()
+        val source = "@Wrap"
+        val (line, character) = positionAt(source, source.length)
+
+        val bufferOnly = facade.tryCompleteBufferOnly(
+            source = source,
+            line = line,
+            character = character,
+            options = options,
+            documentUri = documentUri,
+            languageId = languageId,
+        )
+
+        assertNotNull(bufferOnly)
+        assertTrue(bufferOnly.result.items.any { it.label == "WrapOperation" })
+        assertTrue(bufferOnly.result.items.none { it.label.startsWith("WrapWithCondition") })
+    }
+
+    @Test
     fun customFacadeFactoryReturnsNull() {
         var factoryCalls = 0
         val facade = MixinServiceFacade(
@@ -289,8 +309,8 @@ class MixinServiceFacadeBufferOnlyTest {
         )
 
         assertNotNull(bufferOnly)
-        assertEquals(MixinAnnotation.EXPRESSION, bufferOnly.context.annotation)
-        assertEquals(AnnotationSlot.VALUE, bufferOnly.context.slot)
+        assertEquals(MixinAnnotation.EXPRESSION, assertNotNull(bufferOnly.context).annotation)
+        assertEquals(AnnotationSlot.VALUE, assertNotNull(bufferOnly.context).slot)
         assertTrue(bufferOnly.result.items.any { it.insertText == "return" })
         assertEquals(0, resolverCalls)
     }
@@ -318,8 +338,8 @@ class MixinServiceFacadeBufferOnlyTest {
         )
 
         assertNotNull(bufferOnly)
-        assertEquals(MixinAnnotation.EXPRESSIONS, bufferOnly.context.annotation)
-        assertEquals(AnnotationSlot.VALUE, bufferOnly.context.slot)
+        assertEquals(MixinAnnotation.EXPRESSIONS, assertNotNull(bufferOnly.context).annotation)
+        assertEquals(AnnotationSlot.VALUE, assertNotNull(bufferOnly.context).slot)
         assertTrue(bufferOnly.result.items.any { it.insertText == "null" })
         assertEquals(0, resolverCalls)
     }
@@ -347,8 +367,8 @@ class MixinServiceFacadeBufferOnlyTest {
         )
 
         assertNotNull(bufferOnly)
-        assertEquals(MixinAnnotation.EXPRESSION, bufferOnly.context.annotation)
-        assertEquals(AnnotationSlot.VALUE, bufferOnly.context.slot)
+        assertEquals(MixinAnnotation.EXPRESSION, assertNotNull(bufferOnly.context).annotation)
+        assertEquals(AnnotationSlot.VALUE, assertNotNull(bufferOnly.context).slot)
         val definitionIds = bufferOnly.result.items
             .filter { it.metadata.source == "mixinextras.definitionId" }
             .map { it.insertText }

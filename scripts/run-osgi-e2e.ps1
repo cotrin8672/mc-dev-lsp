@@ -23,15 +23,23 @@ try {
     }
 
     $powershellCmd = if ($PSVersionTable.PSEdition -eq "Core") { "pwsh" } else { "powershell" }
-    & $powershellCmd -NoProfile -ExecutionPolicy Bypass -File (Join-Path $PSScriptRoot "prepare-e2e-workspace.ps1")
-    if ($LASTEXITCODE -ne 0) { throw "workspace preparation failed" }
+    if ($env:MCDEV_E2E_FIXTURE -eq "real-cem") {
+        if (-not $env:MCDEV_E2E_WORKSPACE -or -not (Test-Path -LiteralPath $env:MCDEV_E2E_WORKSPACE -PathType Container)) {
+            throw "MCDEV_E2E_WORKSPACE must point to an existing CreateEnchantableMachinery checkout"
+        }
+        $workspace = (Resolve-Path -LiteralPath $env:MCDEV_E2E_WORKSPACE).Path
+    } else {
+        $fixture = if ($env:MCDEV_E2E_FIXTURE) { $env:MCDEV_E2E_FIXTURE } else { "fabric-basic" }
+        & $powershellCmd -NoProfile -ExecutionPolicy Bypass -File (Join-Path $PSScriptRoot "prepare-e2e-workspace.ps1") -Fixture $fixture
+        if ($LASTEXITCODE -ne 0) { throw "workspace preparation failed" }
+        $workspace = Join-Path $repoRoot "build/e2e-workspace"
+    }
 
     $bundleJar = Get-ChildItem -LiteralPath (Join-Path $repoRoot "mcdev-jdtls-extension/build/libs") `
         -Filter "io.github.mcdev.jdtls-*.jar" |
         Sort-Object LastWriteTime -Descending |
         Select-Object -First 1 -ExpandProperty FullName
     if (-not $bundleJar) { throw "bundle jar not found" }
-    $workspace = Join-Path $repoRoot "build/e2e-workspace"
     $jdtlsCmd = $env:JDTLS_CMD
     if (-not $jdtlsCmd) {
         $masonJdtls = if ($env:LOCALAPPDATA) {

@@ -442,7 +442,8 @@ class MixinServiceFacadeRoutingTest {
             io.github.mcdev.core.mixin.FakeClassIndex(),
         ).completeFields(context.mixinTargetInternalNames, context.partialValue)
         assertTrue(shadowFields.any { it.name == "currentScreen" })
-        assertTrue(items.isEmpty())
+        assertEquals("Shadow", items.single().label)
+        assertEquals("mixin.annotation", items.single().metadata.source)
     }
 
     @Test

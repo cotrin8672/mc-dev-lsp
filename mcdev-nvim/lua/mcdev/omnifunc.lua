@@ -18,7 +18,7 @@ function M.complete(findstart, base)
   local items = {}
   local done = false
   M.last_timeout = false
-  completion.complete(function(result)
+  local cancel = completion.complete(function(result)
     for _, item in ipairs(result.items or {}) do
       if item.insertTextFormat ~= vim.lsp.protocol.InsertTextFormat.Snippet then
         table.insert(items, {
@@ -35,6 +35,7 @@ function M.complete(findstart, base)
     return done
   end, 20)
   if not completed then
+    cancel()
     M.last_timeout = true
     return {}
   end

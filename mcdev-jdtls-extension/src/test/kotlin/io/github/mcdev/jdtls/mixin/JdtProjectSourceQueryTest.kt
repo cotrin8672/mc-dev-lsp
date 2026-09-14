@@ -342,7 +342,7 @@ class JdtProjectSourceQueryTest {
     }
 
     @Test
-    fun getMethodsExcludesConstructors() {
+    fun getMethodsMapsConstructorsToJvmInitName() {
         val type = sourceType(
             fqn = "com.example.ConstructMe",
             elementName = "ConstructMe",
@@ -367,7 +367,7 @@ class JdtProjectSourceQueryTest {
 
         val methods = query.getMethods("com/example/ConstructMe")
 
-        assertEquals(listOf("run()V"), methods.map { it.name + it.descriptor })
+        assertEquals(listOf("<init>(I)V", "run()V"), methods.map { it.name + it.descriptor })
     }
 
     @Test
