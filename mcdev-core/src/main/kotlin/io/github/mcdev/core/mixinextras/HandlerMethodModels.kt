@@ -8,6 +8,7 @@ data class HandlerParameterSpec(
     val readableType: String,
     val isOperation: Boolean = false,
     val operationGenericDescriptor: String? = null,
+    val genericTypeDescriptor: String? = null,
     /** Additional descriptors accepted when the official expression type is int-like. */
     val acceptedTypeDescriptors: Set<String> = emptySet(),
     /** Additional Operation<T> descriptors accepted for an int-like operation result. */

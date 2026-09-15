@@ -808,6 +808,76 @@ with_buffer(mixin_file, "java", nil, function(bufnr)
     helpers.assert_eq(invoker_debug.fallbackAnnotationContextUsed, false)
     helpers.assert_eq(#(invoker_debug.warnings or {}), 0)
 
+    local handler_source = {
+      "package com.example.mixin;",
+      "",
+      "import com.example.target.SimpleTarget;",
+      "import org.spongepowered.asm.mixin.Mixin;",
+      "import org.spongepowered.asm.mixin.injection.At;",
+      "import org.spongepowered.asm.mixin.injection.Inject;",
+      "import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;",
+      "",
+      "@Mixin(SimpleTarget.class)",
+      "public abstract class HandlerSnippetMixin {",
+      "    @Inject(method = \"draw(Ljava/lang/String;FF)V\", at = @At(\"HEAD\"))",
+      "}",
+    }
+    vim.api.nvim_buf_set_lines(bufnr, 0, -1, false, handler_source)
+    vim.snippet.stop()
+    local handler_line = #handler_source - 1
+    local handler_text = handler_source[handler_line]
+    local handler_result
+    local cancel_handler = completion.complete(function(value)
+      if not value.isProvisional then handler_result = value end
+    end, bufnr, {handler_line, #handler_text}, {source = "e2e-handler-snippet", stream = true})
+    local handler_done = vim.wait(30000, function() return handler_result ~= nil end, 50)
+    if not handler_done then cancel_handler() end
+    helpers.assert_true(handler_done, "handler declaration completion did not finalize")
+    helpers.assert_nil(completion.last_error, "handler declaration completion returned an error")
+    local handler_item = vim.iter(handler_result.items or {}):find(function(item)
+      return item.data and item.data.source == "mixin.handler" and item.data.name == "Inject"
+    end)
+    helpers.assert_not_nil(handler_item,
+      "completed @Inject must offer a handler declaration snippet; project_transport=" ..
+      vim.inspect(completion.last_project_transport_error))
+    if completion.last_project_transport_error ~= nil then
+      log_step("handler declaration validated through native helper/JDT fallback; project transport unavailable: " ..
+        tostring(completion.last_project_transport_error))
+    end
+    helpers.assert_eq(handler_item.insertTextFormat, vim.lsp.protocol.InsertTextFormat.Snippet)
+    helpers.assert_true(handler_item.textEdit ~= nil and handler_item.textEdit.newText ~= nil,
+      "handler declaration must supply a snippet text edit")
+    helpers.assert_true(handler_item.textEdit.newText:find("\n    private void ${1}(", 1, true) ~= nil,
+      "handler snippet must start a private method with an empty name")
+    helpers.assert_true(handler_item.textEdit.newText:find("\n        $0\n        // TODO\n    }", 1, true) ~= nil,
+      "handler body stop must precede the default body")
+
+    local handler_edit = vim.deepcopy(handler_item.textEdit)
+    local insertion_cursor = {handler_edit.range.start.line + 1, handler_edit.range.start.character}
+    local previous_virtualedit = vim.opt_local.virtualedit:get()
+    vim.api.nvim_set_current_buf(bufnr)
+    vim.opt_local.virtualedit = "onemore"
+    vim.api.nvim_win_set_cursor(0, insertion_cursor)
+    helpers.assert_true(vim.deep_equal(vim.api.nvim_win_get_cursor(0), insertion_cursor),
+      "handler snippet expansion cursor must be at the text edit start")
+    local expanded, expand_error = pcall(vim.snippet.expand, handler_item.textEdit.newText)
+    helpers.assert_true(expanded, "native handler snippet expansion failed: " .. tostring(expand_error))
+    helpers.assert_true(type(vim.snippet.active) == "function" and vim.snippet.active({direction = 1}),
+      "handler expansion must activate the empty method-name tabstop")
+    local name_cursor = vim.api.nvim_win_get_cursor(0)
+    local name_line = vim.api.nvim_buf_get_lines(bufnr, name_cursor[1] - 1, name_cursor[1], false)[1]
+    local open_paren = name_line:find("(", 1, true)
+    helpers.assert_not_nil(open_paren, "handler declaration must contain a parameter list")
+    helpers.assert_eq(name_cursor[2], open_paren - 1,
+      "first handler tabstop must select the complete method name")
+    local jumped = vim.snippet.jump(1)
+    helpers.assert_true(jumped ~= false, "handler snippet must expose a body tabstop")
+    local body_cursor = vim.api.nvim_win_get_cursor(0)
+    helpers.assert_true(body_cursor[1] > name_cursor[1],
+      "Tab from the method name must move into the generated body")
+    vim.opt_local.virtualedit = previous_virtualedit
+    vim.snippet.stop()
+
   end
 
   if fixture == "fabric-mixinextras" then

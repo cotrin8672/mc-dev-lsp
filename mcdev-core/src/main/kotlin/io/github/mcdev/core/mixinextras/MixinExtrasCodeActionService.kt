@@ -3,6 +3,10 @@ package io.github.mcdev.core.mixinextras
 import io.github.mcdev.core.codeaction.McFix
 import io.github.mcdev.core.codeaction.McTextEdit
 import io.github.mcdev.core.codeaction.WorkspaceEditFix
+import io.github.mcdev.core.completion.McCompletionInsertTextFormat
+import io.github.mcdev.core.completion.McCompletionItem
+import io.github.mcdev.core.completion.McCompletionKind
+import io.github.mcdev.core.completion.McCompletionMetadata
 import io.github.mcdev.core.diagnostics.McDiagnostic
 import io.github.mcdev.core.diagnostics.McTextRange
 import io.github.mcdev.core.mixin.AnnotationContextExtractor
@@ -254,6 +258,58 @@ class MixinExtrasCodeActionService(
         })
     }
 
+    fun completeHandler(
+        source: String,
+        annotationStartOffset: Int,
+        mixinTargets: List<String>,
+        resolvedContexts: List<ResolvedMixinExtrasContext> = emptyList(),
+        cursorOffset: Int? = null,
+    ): List<McCompletionItem> {
+        val sites = HandlerSignatureService.findSugarHandlerAnnotationSites(source)
+        val selected = sites.filter { site ->
+            site.handlerMethod == null &&
+                rangeStart(source, site.annotationRange) == annotationStartOffset
+        }
+        if (selected.isEmpty()) return emptyList()
+
+        val plans = selected.mapNotNull { site ->
+            agreedHandlerPlan(
+                source = source,
+                site = site,
+                allSites = sites,
+                mixinTargets = mixinTargets,
+                resolvedContexts = resolvedContexts,
+                handlerName = HANDLER_NAME_MARKER,
+            )
+        }
+        val plan = plans.distinctBy { it.text }.singleOrNull() ?: return emptyList()
+        val annotation = selected.first().annotation
+        val annotationEndOffset = AnnotationContextExtractor.annotationEndOffset(source, annotationStartOffset)
+        val insertionOffset = cursorOffset ?: annotationEndOffset
+        return listOf(
+            McCompletionItem(
+                label = "Generate ${annotation.simpleName} handler",
+                detail = "Insert the inferred handler signature",
+                documentation = "Generate a ${annotation.simpleName} handler and edit its method name.",
+                filterText = "${annotation.simpleName} handler",
+                insertText = handlerSnippet(
+                    text = plan.text,
+                    source = source,
+                    annotationEndOffset = annotationEndOffset,
+                    cursorOffset = insertionOffset,
+                ),
+                kind = McCompletionKind.METHOD,
+                sortKey = "0100_handler_${annotation.simpleName}",
+                metadata = McCompletionMetadata(
+                    source = "mixin.handler",
+                    name = annotation.simpleName,
+                ),
+                additionalEdits = buildImportEdits(source, plan.importFqns),
+                insertTextFormat = McCompletionInsertTextFormat.SNIPPET,
+            ),
+        )
+    }
+
     fun applyHandlerFix(
         fix: WorkspaceEditFix,
         currentSource: String,
@@ -344,6 +400,7 @@ class MixinExtrasCodeActionService(
             expected.parameters.forEach { parameter ->
                 if (parameter.isOperation) add(OPERATION_INTERNAL_NAME)
                 descriptorInternalName(parameter.typeDescriptor)?.let(::add)
+                descriptorInternalName(parameter.genericTypeDescriptor)?.let(::add)
                 if (parameter.isOperation) {
                     descriptorInternalName(parameter.operationGenericDescriptor)?.let(::add)
                 }
@@ -376,6 +433,7 @@ class MixinExtrasCodeActionService(
                     parameter.typeDescriptor,
                     parameter.readableType,
                     candidateInternalNames,
+                    parameter.genericTypeDescriptor,
                 )
             }
         }
@@ -397,6 +455,7 @@ class MixinExtrasCodeActionService(
         descriptor: String?,
         fallback: String,
         candidateInternalNames: Set<String>,
+        genericDescriptor: String? = null,
     ): RenderedType {
         val internalName = descriptorInternalName(descriptor) ?: return RenderedType(fallback)
         val depth = descriptor.orEmpty().takeWhile { it == '[' }.length
@@ -405,10 +464,34 @@ class MixinExtrasCodeActionService(
             internalName,
             candidateInternalNames,
         )
+        val generic = genericDescriptor?.let {
+            descriptorTypeReference(
+                source = source,
+                descriptor = it,
+                fallback = boxedReadableType(it),
+                candidateInternalNames = candidateInternalNames,
+            )
+        }
         return RenderedType(
-            text = "${reference.text}${"[]".repeat(depth)}",
-            importFqns = setOfNotNull(reference.importFqn),
+            text = buildString {
+                append(reference.text)
+                generic?.let { append('<').append(it.text).append('>') }
+                append("[]".repeat(depth))
+            },
+            importFqns = setOfNotNull(reference.importFqn) + generic?.importFqns.orEmpty(),
         )
+    }
+
+    private fun boxedReadableType(descriptor: String): String = when (descriptor) {
+        "Z" -> "Boolean"
+        "B" -> "Byte"
+        "C" -> "Character"
+        "S" -> "Short"
+        "I" -> "Integer"
+        "J" -> "Long"
+        "F" -> "Float"
+        "D" -> "Double"
+        else -> OperationSignatureRenderer.readableType(descriptor)
     }
 
     private fun descriptorInternalName(descriptor: String?): String? {
@@ -675,6 +758,52 @@ class MixinExtrasCodeActionService(
     private fun findInsertOffset(source: String, site: MixinExtrasAnnotationSite): Int? =
         rangeEnd(source, site.annotationRange)
 
+    private fun handlerSnippet(
+        text: String,
+        source: String,
+        annotationEndOffset: Int,
+        cursorOffset: Int,
+    ): String {
+        val escaped = text
+            .replace("$", "\\$")
+            .replace(HANDLER_NAME_MARKER, "\${1}")
+        val indentLength = escaped.indexOfFirst { !it.isWhitespace() }.takeIf { it >= 0 } ?: 0
+        val declaration = escaped.substring(indentLength)
+        val withAccess = if (declaration.startsWith("private ")) {
+            escaped
+        } else {
+            escaped.substring(0, indentLength) + "private " + declaration
+        }
+        val closing = withAccess.lastIndexOf("\n    }\n")
+        val withStop = if (closing < 0) {
+            "$withAccess\$0"
+        } else {
+            val methodIndent = withAccess.takeWhile { it == ' ' || it == '\t' }
+            val bodyStart = withAccess.indexOf('\n').takeIf { it >= 0 }?.plus(1) ?: closing
+            val body = withAccess.substring(bodyStart, closing)
+            val indentedBody = body
+                .lineSequence()
+                .joinToString("\n") { line -> if (line.isBlank()) line else methodIndent + line }
+            val bodyCursor = "${methodIndent}    \$0"
+            val bodyContent = if (indentedBody.isBlank()) bodyCursor else "$bodyCursor\n$indentedBody"
+            withAccess.substring(0, bodyStart) + bodyContent + withAccess.substring(closing)
+        }
+        val safeCursor = cursorOffset.coerceIn(0, source.length)
+        val safeAnnotationEnd = annotationEndOffset.coerceIn(0, safeCursor)
+        val afterAnnotation = source.substring(safeAnnotationEnd, safeCursor)
+        val sameLineAsAnnotation = !afterAnnotation.any { it == '\n' || it == '\r' }
+        if (sameLineAsAnnotation) return "\n$withStop"
+
+        val lineStart = source.lastIndexOf('\n', safeCursor - 1).let { if (it < 0) 0 else it + 1 }
+        val existingIndent = source.substring(lineStart, safeCursor)
+        if (existingIndent.isNotEmpty() && existingIndent.all { it == ' ' || it == '\t' }) {
+            val generatedIndent = withStop.takeWhile { it == ' ' || it == '\t' }
+            val consumedIndent = existingIndent.takeIf { generatedIndent.startsWith(it) }.orEmpty()
+            if (consumedIndent.isNotEmpty()) return withStop.removePrefix(consumedIndent)
+        }
+        return withStop
+    }
+
     private fun rangeStart(source: String, range: io.github.mcdev.core.diagnostics.McTextRange): Int? =
         AnnotationContextExtractor.toOffset(source, range.start.line, range.start.character)
 
@@ -682,6 +811,8 @@ class MixinExtrasCodeActionService(
         AnnotationContextExtractor.toOffset(source, range.end.line, range.end.character)
 
     companion object {
+        private const val HANDLER_NAME_MARKER = "__MCDEV_HANDLER_NAME__"
+
         fun deduplicateFixes(fixes: List<McFix>): List<McFix> =
             fixes.distinctBy { fix ->
                 when (fix) {

@@ -157,6 +157,25 @@ class ExpressionSupportTest {
     }
 
     @Test
+    fun completesNoArgMixinMarkerAnnotationsWithImports() {
+        val source = "package demo;\n\n@"
+        val (line, character) = offsetToLineCharacter(source, source.length)
+        val completion = expressionSupport.completeFeatureAnnotationsWithRange(source, line, character)
+        val items = completion.items.associateBy { it.label }
+
+        assertTrue(items.getValue("Final").insertText == "Final${'$'}0")
+        assertTrue(items.getValue("Mutable").insertText == "Mutable${'$'}0")
+        assertTrue(items.getValue("Pseudo").insertText == "Pseudo${'$'}0")
+        assertTrue(items.getValue("SoftOverride").insertText == "SoftOverride${'$'}0")
+        assertTrue(items.getValue("Surrogate").insertText == "Surrogate${'$'}0")
+        assertTrue(items.values
+            .filter { it.label in setOf("Final", "Mutable", "Pseudo", "SoftOverride", "Surrogate") }
+            .all { it.metadata.source == "mixin.annotation" && it.additionalEdits.isNotEmpty() })
+        assertEquals("org.spongepowered.asm.mixin.Final", MixinAnnotation.fromOfficialFqn("org.spongepowered.asm.mixin.Final")?.officialFqns?.single())
+        assertEquals("org.spongepowered.asm.mixin.injection.Surrogate", MixinAnnotation.fromOfficialFqn("org.spongepowered.asm.mixin.injection.Surrogate")?.officialFqns?.single())
+    }
+
+    @Test
     fun nestedCoreAnnotationSnippetsAddImportsAndRespectSimpleNameConflicts() {
         val source = "import other.Interface;\n\n@Impl"
         val (line, character) = offsetToLineCharacter(source, source.length)

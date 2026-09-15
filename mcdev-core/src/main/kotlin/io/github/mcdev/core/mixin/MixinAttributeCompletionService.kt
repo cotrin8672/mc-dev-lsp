@@ -141,6 +141,12 @@ class MixinAttributeCompletionService {
         )
         MixinAnnotation.DEFINITIONS -> listOf(definitionsValue())
         MixinAnnotation.EXPRESSIONS -> listOf(expressionsValue())
+        MixinAnnotation.FINAL,
+        MixinAnnotation.MUTABLE,
+        MixinAnnotation.PSEUDO,
+        MixinAnnotation.SOFT_OVERRIDE,
+        MixinAnnotation.SURROGATE,
+        -> emptyList()
     }
 
     private fun injectorBase(): List<AttributeSnippet> = methodBase() + listOf(

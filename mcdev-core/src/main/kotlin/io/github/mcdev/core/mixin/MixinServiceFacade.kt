@@ -111,6 +111,7 @@ class MixinServiceFacade(
     private val handlerSignatureService = HandlerSignatureService(classIndex, bytecodeIndex)
     private val localCaptureValidation = LocalCaptureValidationService(classIndex, bytecodeIndex)
     private val localCompletion = LocalCompletionService(classIndex)
+    private val mixinDeclarationSnippets = MixinDeclarationSnippetService(classIndex)
     private val mixinExtrasCodeActions = MixinExtrasCodeActionService(classIndex, handlerSignatureService)
     private val mixinExtrasMethodAnnotations = setOf(
         MixinAnnotation.MODIFY_EXPRESSION_VALUE,
@@ -272,6 +273,25 @@ class MixinServiceFacade(
         options: MixinCompletionOptions,
     ): List<McCompletionItem> {
         val source = request.bufferText
+        if (context.slot == AnnotationSlot.HANDLER) {
+            val declarationItems = mixinDeclarationSnippets.complete(
+                source = source,
+                annotation = context.annotation,
+                annotationStartOffset = context.annotationStartOffset,
+                mixinTargets = resolveMixinTargets(request, context),
+                targetPrefix = context.partialValue,
+            )
+            if (declarationItems.isNotEmpty()) {
+                return declarationItems.map { normalizeDeclarationSnippet(source, context, it) }
+            }
+            return mixinExtrasCodeActions.completeHandler(
+                source = source,
+                annotationStartOffset = context.annotationStartOffset,
+                mixinTargets = resolveMixinTargets(request, context),
+                resolvedContexts = request.semanticModel?.resolvedMixinExtrasContexts.orEmpty(),
+                cursorOffset = context.valueEndOffset,
+            )
+        }
         if (context.slot == AnnotationSlot.ATTRIBUTE) {
             val items = attributeCompletion.complete(context)
             if (context.annotation == MixinAnnotation.LOCAL) {
@@ -652,6 +672,32 @@ class MixinServiceFacade(
             AnnotationContextExtractor.resolveRawMixinTargets(source, context.valueStartOffset)
         }
         return MixinTargetResolver.resolveTargets(rawTargets, classIndex, imports)
+    }
+
+    private fun normalizeDeclarationSnippet(
+        source: String,
+        context: AnnotationContext,
+        item: McCompletionItem,
+    ): McCompletionItem {
+        val cursor = context.valueEndOffset.coerceIn(0, source.length)
+        val lineStart = source.lastIndexOf('\n', cursor - 1).let { if (it < 0) 0 else it + 1 }
+        val linePrefix = source.substring(lineStart, cursor)
+        val sameLine = source.substring(context.annotationEndOffset.coerceAtMost(cursor), cursor)
+            .none { it == '\n' || it == '\r' }
+        val memberIndent = if (sameLine) {
+            source.substring(lineStart, context.annotationStartOffset.coerceIn(lineStart, source.length))
+                .takeWhile { it == ' ' || it == '\t' }
+        } else {
+            linePrefix.takeWhile { it == ' ' || it == '\t' }
+        }
+        val continuation = item.insertText
+            .split('\n')
+            .mapIndexed { index, line ->
+                if (index == 0 || line.isBlank()) line else memberIndent + line
+            }
+            .joinToString("\n")
+        val prefix = if (sameLine) "\n$memberIndent" else ""
+        return item.copy(insertText = prefix + continuation)
     }
 
     private fun AnnotationContext.withResolvedMixinTargets(request: MixinFacadeRequest): AnnotationContext =

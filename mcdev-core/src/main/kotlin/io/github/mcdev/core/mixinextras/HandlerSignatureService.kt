@@ -28,6 +28,9 @@ import org.objectweb.asm.ClassReader
 import org.objectweb.asm.MethodVisitor
 import org.objectweb.asm.Opcodes
 import org.objectweb.asm.Type
+import org.objectweb.asm.tree.AbstractInsnNode
+import org.objectweb.asm.tree.ClassNode
+import org.objectweb.asm.tree.VarInsnNode
 
 class HandlerSignatureService(
     private val classIndex: ClassIndex,
@@ -70,22 +73,36 @@ class HandlerSignatureService(
         val explicitDescriptor = if (openParen >= 0) methodAttribute.substring(openParen) else null
         val owners = MixinTargetResolver.resolveTargets(mixinTargets, classIndex)
         if (owners.isEmpty()) return TargetMethodResolution.NotFound
-        val matches = owners.flatMap { owner -> classIndex.getMethods(owner).filter { it.name == name } }
-        if (matches.isEmpty()) return TargetMethodResolution.NotFound
+        val matchesByOwner = owners.map { owner ->
+            classIndex.getMethods(owner).filter { it.name == name }
+        }
+        if (matchesByOwner.any { it.isEmpty() }) return TargetMethodResolution.NotFound
+        val matches = matchesByOwner.flatten()
         if (explicitDescriptor != null) {
-            val exactMatches = matches.filter { it.descriptor == explicitDescriptor }
-            if (exactMatches.isEmpty()) return TargetMethodResolution.NotFound
+            val exactMatchesByOwner = matchesByOwner.map { methods ->
+                methods.filter { it.descriptor == explicitDescriptor }
+            }
+            if (exactMatchesByOwner.any { it.isEmpty() }) return TargetMethodResolution.NotFound
+            if (exactMatchesByOwner.any { it.map { method -> method.isStatic }.distinct().size > 1 }) {
+                return TargetMethodResolution.Ambiguous(exactMatchesByOwner.flatten())
+            }
+            val exactMatches = exactMatchesByOwner.map { ownerMatches ->
+                ownerMatches.singleOrNull() ?: return TargetMethodResolution.Ambiguous(ownerMatches)
+            }
             if (exactMatches.map { it.isStatic }.distinct().size > 1) {
                 return TargetMethodResolution.Ambiguous(exactMatches)
             }
             return TargetMethodResolution.Resolved(exactMatches.first())
         }
-        val distinctDescriptors = matches.map { it.descriptor }.distinct()
-        return if (distinctDescriptors.size == 1 && matches.map { it.isStatic }.distinct().size == 1) {
-            TargetMethodResolution.Resolved(matches.first())
-        } else {
-            TargetMethodResolution.Ambiguous(matches)
+        val ownerKeys = matchesByOwner.map { methods ->
+            methods.map { it.descriptor to it.isStatic }.distinct()
         }
+        if (ownerKeys.any { it.size != 1 } || matchesByOwner.any { it.size != 1 }) {
+            return TargetMethodResolution.Ambiguous(matches)
+        }
+        val commonKey = ownerKeys.first().single()
+        if (ownerKeys.any { it.single() != commonKey }) return TargetMethodResolution.Ambiguous(matches)
+        return TargetMethodResolution.Resolved(matchesByOwner.first().single())
     }
 
     fun expectedSignature(
@@ -98,7 +115,32 @@ class HandlerSignatureService(
             is TargetMethodResolution.Resolved -> resolution.method
             is TargetMethodResolution.Ambiguous, TargetMethodResolution.NotFound -> return null
         }
+        // @Inject constructors are only unambiguously safe at RETURN. The
+        // WrapOperation NEW path has its own bytecode proof for being after
+        // the mandatory super() call; keep that validated path available.
+        if (targetMethod.name == "<init>") {
+            val injectAtReturn = site.annotation == MixinExtrasAnnotation.INJECT &&
+                site.atValue.equals("RETURN", ignoreCase = true)
+            val wrapOperationNew = site.annotation == MixinExtrasAnnotation.WRAP_OPERATION &&
+                site.atValue.equals("NEW", ignoreCase = true)
+            if (!injectAtReturn && !wrapOperationNew) return null
+        }
+        // ARRAYLENGTH and array element get/set operations need dedicated
+        // bytecode-derived parameter semantics. The current target model only
+        // represents ordinary field operations, so do not emit a misleading
+        // field signature for an array selector.
+        if (site.atArgs.any { argument ->
+                argument.substringBefore('=').trim().equals("array", ignoreCase = true)
+            }) {
+            return null
+        }
         return when (site.annotation) {
+            MixinExtrasAnnotation.INJECT -> expectedInject(source, site, targetMethod)
+            MixinExtrasAnnotation.REDIRECT -> expectedRedirect(source, site, targetMethod, mixinTargets)
+            MixinExtrasAnnotation.MODIFY_ARG -> expectedModifyArg(source, site, targetMethod, mixinTargets)
+            MixinExtrasAnnotation.MODIFY_ARGS -> expectedModifyArgs(site)
+            MixinExtrasAnnotation.MODIFY_VARIABLE ->
+                expectedModifyVariable(source, site, targetMethod, mixinTargets)
             MixinExtrasAnnotation.MODIFY_EXPRESSION_VALUE ->
                 expectedModifyExpressionValue(source, site, targetMethod, mixinTargets, resolvedContext)
             MixinExtrasAnnotation.MODIFY_CONSTANT -> expectedModifyConstant(site)
@@ -112,6 +154,401 @@ class HandlerSignatureService(
             MixinExtrasAnnotation.WRAP_METHOD -> expectedWrapMethod(targetMethod)
             else -> null
         }
+    }
+
+    private fun expectedInject(
+        source: String,
+        site: MixinExtrasAnnotationSite,
+        targetMethod: MethodIndexEntry,
+    ): HandlerSignatureSpec? {
+        // @Inject without an injection point is incomplete. Waiting until @At is
+        // present avoids suggesting a declaration while the annotation is still
+        // being typed.
+        if (site.atValue.isNullOrBlank()) return null
+        val localsCapture = annotationAttributeValue(source, site, "locals")
+            ?.substringAfterLast('.')
+            ?.trim()
+        if (localsCapture != null && localsCapture != "NO_CAPTURE") return null
+        val parameters = methodParameterSpecs(targetMethod.descriptor).toMutableList()
+        val returnDescriptor = methodReturnDescriptor(targetMethod.descriptor)
+        val callbackDescriptor: String
+        val callbackReadableType: String
+        val callbackGenericDescriptor: String?
+        if (returnDescriptor == "V") {
+            callbackDescriptor = CALLBACK_INFO_DESCRIPTOR
+            callbackReadableType = "CallbackInfo"
+            callbackGenericDescriptor = null
+        } else {
+            callbackDescriptor = CALLBACK_INFO_RETURNABLE_DESCRIPTOR
+            callbackGenericDescriptor = boxedDescriptor(returnDescriptor)
+            callbackReadableType = buildString {
+                append("CallbackInfoReturnable")
+                callbackGenericDescriptor?.let {
+                    append('<').append(OperationSignatureRenderer.readableType(it)).append('>')
+                }
+            }
+        }
+        parameters += HandlerParameterSpec(
+            name = "ci",
+            typeDescriptor = callbackDescriptor,
+            readableType = callbackReadableType,
+            genericTypeDescriptor = callbackGenericDescriptor,
+        )
+        return HandlerSignatureSpec(
+            returnTypeDescriptor = "V",
+            readableReturnType = "void",
+            parameters = parameters,
+        )
+    }
+
+    private fun expectedRedirect(
+        source: String,
+        site: MixinExtrasAnnotationSite,
+        targetMethod: MethodIndexEntry,
+        mixinTargets: List<String>,
+    ): HandlerSignatureSpec? {
+        return when (site.atValue?.uppercase()) {
+            "INVOKE" -> {
+                val wrapped = parseAtWrapOperationInvokeTarget(
+                    atTarget = site.atTarget,
+                    targetMethod = targetMethod,
+                    mixinTargets = mixinTargets,
+                    atOrdinal = site.atOrdinal,
+                ) ?: return null
+                if (!isKnownMethodTarget(wrapped)) return null
+                val parameters = buildList {
+                    if (!wrapped.isStatic) {
+                        val receiverDescriptor = "L${wrapped.owner};"
+                        add(
+                            HandlerParameterSpec(
+                                name = receiverParameterName(wrapped.owner),
+                                typeDescriptor = receiverDescriptor,
+                                readableType = OperationSignatureRenderer.readableType(receiverDescriptor),
+                            ),
+                        )
+                    }
+                    addAll(methodParameterSpecs(wrapped.parameterDescriptors))
+                }
+                HandlerSignatureSpec(
+                    returnTypeDescriptor = wrapped.returnDescriptor,
+                    readableReturnType = OperationSignatureRenderer.readableType(wrapped.returnDescriptor),
+                    parameters = parameters,
+                )
+            }
+            "FIELD" -> {
+                val field = parseAtFieldTarget(
+                    atTarget = site.atTarget,
+                    targetMethod = targetMethod,
+                    mixinTargets = mixinTargets,
+                    allowedOperationKinds = fieldWrapOperationKinds,
+                    atOrdinal = site.atOrdinal,
+                ) ?: return null
+                val parameters = buildList {
+                    if (field.operationKind == AtTargetOperationKind.FIELD_GET_INSTANCE ||
+                        field.operationKind == AtTargetOperationKind.FIELD_PUT_INSTANCE
+                    ) {
+                        val receiverDescriptor = "L${field.owner};"
+                        add(
+                            HandlerParameterSpec(
+                                name = receiverParameterName(field.owner),
+                                typeDescriptor = receiverDescriptor,
+                                readableType = OperationSignatureRenderer.readableType(receiverDescriptor),
+                            ),
+                        )
+                    }
+                    if (field.operationKind == AtTargetOperationKind.FIELD_PUT_INSTANCE ||
+                        field.operationKind == AtTargetOperationKind.FIELD_PUT_STATIC
+                    ) {
+                        add(
+                            HandlerParameterSpec(
+                                name = "value",
+                                typeDescriptor = field.fieldDescriptor,
+                                readableType = OperationSignatureRenderer.readableType(field.fieldDescriptor),
+                            ),
+                        )
+                    }
+                }
+                val returnDescriptor = if (
+                    field.operationKind == AtTargetOperationKind.FIELD_GET_INSTANCE ||
+                    field.operationKind == AtTargetOperationKind.FIELD_GET_STATIC
+                ) {
+                    field.fieldDescriptor
+                } else {
+                    "V"
+                }
+                HandlerSignatureSpec(
+                    returnTypeDescriptor = returnDescriptor,
+                    readableReturnType = OperationSignatureRenderer.readableType(returnDescriptor),
+                    parameters = parameters,
+                )
+            }
+            "NEW" -> {
+                val operation = expectedWrapOperationNew(site, targetMethod, mixinTargets) ?: return null
+                val original = operation.parameters.lastOrNull()?.takeIf { it.isOperation } ?: return null
+                if (original.operationGenericDescriptor == null) return null
+                operation.copy(
+                    parameters = operation.parameters.dropLast(1),
+                    operationCallArgs = emptyList(),
+                )
+            }
+            else -> null
+        }
+    }
+
+    private fun expectedModifyArg(
+        source: String,
+        site: MixinExtrasAnnotationSite,
+        targetMethod: MethodIndexEntry,
+        mixinTargets: List<String>,
+    ): HandlerSignatureSpec? {
+        if (site.atValue?.uppercase() != "INVOKE") return null
+        val wrapped = parseAtWrapOperationInvokeTarget(
+            atTarget = site.atTarget,
+            targetMethod = targetMethod,
+            mixinTargets = mixinTargets,
+            atOrdinal = site.atOrdinal,
+        ) ?: return null
+        if (!isKnownMethodTarget(wrapped)) return null
+        val index = annotationIntegerAttribute(source, site, "index")
+        val argumentIndex = when {
+            index != null -> index
+            wrapped.parameterDescriptors.size == 1 -> 0
+            else -> return null
+        }
+        val descriptor = wrapped.parameterDescriptors.getOrNull(argumentIndex) ?: return null
+        return HandlerSignatureSpec(
+            returnTypeDescriptor = descriptor,
+            readableReturnType = OperationSignatureRenderer.readableType(descriptor),
+            parameters = listOf(
+                HandlerParameterSpec(
+                    name = "original",
+                    typeDescriptor = descriptor,
+                    readableType = OperationSignatureRenderer.readableType(descriptor),
+                ),
+            ),
+        )
+    }
+
+    private fun expectedModifyArgs(site: MixinExtrasAnnotationSite): HandlerSignatureSpec? {
+        if (site.atValue?.uppercase() != "INVOKE") return null
+        val argsDescriptor = "Lorg/spongepowered/asm/mixin/injection/invoke/arg/Args;"
+        return HandlerSignatureSpec(
+            returnTypeDescriptor = "V",
+            readableReturnType = "void",
+            parameters = listOf(
+                HandlerParameterSpec(
+                    name = "args",
+                    typeDescriptor = argsDescriptor,
+                    readableType = "Args",
+                ),
+            ),
+        )
+    }
+
+    private fun expectedModifyVariable(
+        source: String,
+        site: MixinExtrasAnnotationSite,
+        targetMethod: MethodIndexEntry,
+        mixinTargets: List<String>,
+    ): HandlerSignatureSpec? {
+        val atValue = site.atValue?.uppercase() ?: return null
+        if (atValue != "LOAD" && atValue != "STORE") return null
+        if (site.atShift !is AtShiftSpec.Before) return null
+        val index = annotationIntegerAttribute(source, site, "index")
+        val ordinal = annotationIntegerAttribute(source, site, "ordinal")
+        if (index != null && index < 0 || ordinal != null && ordinal < 0) return null
+        val names = annotationStringArrayAttribute(source, site, "name") +
+            annotationStringArrayAttribute(source, site, "names")
+        val argsOnly = annotationBooleanAttribute(source, site, "argsOnly") ?: false
+        val bytecode = bytecodeIndex ?: return null
+        val owners = MixinTargetResolver.resolveTargets(mixinTargets, classIndex)
+        if (owners.isEmpty()) return null
+        val descriptors = mutableSetOf<String>()
+        for (owner in owners) {
+            val classBytes = bytecode.getClassBytes(owner) ?: return null
+            val localInstructions = localVariableInstructions(
+                classBytes = classBytes,
+                methodName = targetMethod.name,
+                methodDescriptor = targetMethod.descriptor,
+                atValue = atValue,
+            )
+            if (localInstructions.isEmpty()) return null
+            val matchingInstructions = index?.let { slot ->
+                localInstructions.filter { it.slotIndex == slot }
+            } ?: localInstructions
+            if (matchingInstructions.isEmpty()) return null
+            val selectedInstructions = site.atOrdinal?.let { matchingInstructions.getOrNull(it)?.let(::listOf) }
+                ?: matchingInstructions
+                .takeIf { site.atOrdinal == null }
+                ?: return null
+            val captures = LocalCaptureExtractor.extract(
+                classBytes = classBytes,
+                methodName = targetMethod.name,
+                methodDescriptor = targetMethod.descriptor,
+                instructionOccurrenceIndices = selectedInstructions.map { it.occurrenceIndex }.toSet(),
+            )
+            val snapshots = (captures as? LocalCaptureResult.Success)?.snapshots ?: return null
+            for (instruction in selectedInstructions) {
+                val snapshot = snapshots.singleOrNull {
+                    it.instructionOccurrenceIndex == instruction.occurrenceIndex
+                } ?: return null
+                val candidates = snapshot.candidates.filter { candidate ->
+                    (index == null || candidate.slotIndex == index) &&
+                        (!argsOnly || candidate.isArgument) &&
+                        (names.isEmpty() || candidate.name in names) &&
+                        (ordinal == null || candidate.ordinal == ordinal)
+                }
+                val candidate = candidates.singleOrNull() ?: return null
+                descriptors += candidate.descriptor
+            }
+        }
+        val descriptor = descriptors.singleOrNull() ?: return null
+        return HandlerSignatureSpec(
+            returnTypeDescriptor = descriptor,
+            readableReturnType = OperationSignatureRenderer.readableType(descriptor),
+            parameters = listOf(
+                HandlerParameterSpec(
+                    name = "original",
+                    typeDescriptor = descriptor,
+                    readableType = OperationSignatureRenderer.readableType(descriptor),
+                ),
+            ),
+        )
+    }
+
+    private fun isKnownMethodTarget(target: WrappedOperationTarget): Boolean =
+        classIndex.getMethods(target.owner).any {
+            it.descriptor == "(${target.parameterDescriptors.joinToString("")})${target.returnDescriptor}"
+        }
+
+    private fun methodParameterSpecs(descriptor: String): List<HandlerParameterSpec> =
+        methodParameterSpecs(methodParameterDescriptors(descriptor))
+
+    private fun methodParameterSpecs(descriptors: List<String>): List<HandlerParameterSpec> =
+        descriptors.mapIndexed { index, parameterDescriptor ->
+            HandlerParameterSpec(
+                name = "arg$index",
+                typeDescriptor = parameterDescriptor,
+                readableType = OperationSignatureRenderer.readableType(parameterDescriptor),
+            )
+        }
+
+    private fun boxedDescriptor(descriptor: String): String = when (descriptor) {
+        "Z" -> "Ljava/lang/Boolean;"
+        "B" -> "Ljava/lang/Byte;"
+        "C" -> "Ljava/lang/Character;"
+        "S" -> "Ljava/lang/Short;"
+        "I" -> "Ljava/lang/Integer;"
+        "J" -> "Ljava/lang/Long;"
+        "F" -> "Ljava/lang/Float;"
+        "D" -> "Ljava/lang/Double;"
+        else -> descriptor
+    }
+
+    private fun annotationIntegerAttribute(
+        source: String,
+        site: MixinExtrasAnnotationSite,
+        name: String,
+    ): Int? = annotationAttributeValue(source, site, name)?.trim()?.toIntOrNull()
+
+    private fun annotationBooleanAttribute(
+        source: String,
+        site: MixinExtrasAnnotationSite,
+        name: String,
+    ): Boolean? = annotationAttributeValue(source, site, name)?.trim()?.let { value ->
+        when {
+            value.equals("true", ignoreCase = true) -> true
+            value.equals("false", ignoreCase = true) -> false
+            else -> null
+        }
+    }
+
+    private fun annotationStringArrayAttribute(
+        source: String,
+        site: MixinExtrasAnnotationSite,
+        name: String,
+    ): List<String> {
+        val value = annotationAttributeValue(source, site, name)?.trim() ?: return emptyList()
+        return Regex("\\\"([^\\\"]*)\\\"")
+            .findAll(value)
+            .map { it.groupValues[1] }
+            .toList()
+    }
+
+    private fun annotationAttributeValue(
+        source: String,
+        site: MixinExtrasAnnotationSite,
+        name: String,
+    ): String? {
+        val start = positionToOffset(source, site.annotationRange.start)
+        val end = positionToOffset(source, site.annotationRange.end).coerceAtMost(source.length)
+        if (start < 0 || start >= end) return null
+        val annotation = source.substring(start, end)
+        val open = annotation.indexOf('(')
+        val close = annotation.lastIndexOf(')')
+        if (open < 0 || close <= open) return null
+        for (member in splitTopLevelCommas(annotation.substring(open + 1, close))) {
+            val trimmed = member.text.trim()
+            val equals = findTopLevelEquals(trimmed)
+            if (equals < 0) continue
+            if (trimmed.substring(0, equals).trim() == name) {
+                return trimmed.substring(equals + 1).trim()
+            }
+        }
+        return null
+    }
+
+    private data class LocalVariableInstruction(
+        val occurrenceIndex: Int,
+        val slotIndex: Int,
+    )
+
+    private fun localVariableInstructions(
+        classBytes: ByteArray,
+        methodName: String,
+        methodDescriptor: String,
+        atValue: String,
+    ): List<LocalVariableInstruction> {
+        val classNode = ClassNode()
+        try {
+            ClassReader(classBytes).accept(classNode, ClassReader.SKIP_FRAMES)
+        } catch (_: RuntimeException) {
+            return emptyList()
+        }
+        val method = classNode.methods.firstOrNull { it.name == methodName && it.desc == methodDescriptor }
+            ?: return emptyList()
+        val result = mutableListOf<LocalVariableInstruction>()
+        var occurrenceIndex = 0
+        var instruction: AbstractInsnNode? = method.instructions.first
+        while (instruction != null) {
+            val opcode = instruction.opcode
+            if (opcode >= 0) {
+                val variable = instruction as? VarInsnNode
+                if (variable != null && isLocalVariableOpcode(opcode, atValue)) {
+                    result += LocalVariableInstruction(occurrenceIndex, variable.`var`)
+                }
+                occurrenceIndex++
+            }
+            instruction = instruction.next
+        }
+        return result
+    }
+
+    private fun isLocalVariableOpcode(opcode: Int, atValue: String): Boolean = when (atValue) {
+        "LOAD" -> opcode in Opcodes.ILOAD..Opcodes.ALOAD
+        "STORE" -> opcode in Opcodes.ISTORE..Opcodes.ASTORE
+        else -> false
+    }
+
+    private fun positionToOffset(source: String, position: McTextPosition): Int {
+        if (position.line <= 0) return position.character.coerceAtLeast(0)
+        var offset = 0
+        repeat(position.line) {
+            val newline = source.indexOf('\n', offset)
+            if (newline < 0) return source.length
+            offset = newline + 1
+        }
+        return (offset + position.character).coerceAtMost(source.length)
     }
 
     fun generateHandlerStub(
@@ -136,6 +573,16 @@ class HandlerSignatureService(
                 val op = spec.parameters.lastOrNull()?.name ?: "original"
                 val ret = if (spec.returnTypeDescriptor == "V") "" else "return "
                 "${indent}${ret}$op.call($callArgs);\n"
+            }
+            MixinExtrasAnnotation.REDIRECT -> "${indent}throw new UnsupportedOperationException();\n"
+            MixinExtrasAnnotation.MODIFY_ARG,
+            MixinExtrasAnnotation.MODIFY_VARIABLE,
+            -> {
+                if (spec.returnTypeDescriptor == "V" || spec.parameters.isEmpty()) {
+                    "${indent}// TODO\n"
+                } else {
+                    "${indent}return ${spec.parameters.first().name};\n"
+                }
             }
             MixinExtrasAnnotation.MODIFY_EXPRESSION_VALUE,
             MixinExtrasAnnotation.MODIFY_CONSTANT,
@@ -1642,6 +2089,8 @@ class HandlerSignatureService(
         private val newOwners = mutableListOf<String>()
         private val constructorDescriptors = mutableMapOf<Int, String>()
         private val pendingNewStack = ArrayDeque<Int>()
+        private var constructorInitialized = targetMethodName != "<init>"
+        private var newBeforeConstructorInitialization = false
         private var failed = false
 
         override fun visitMethod(
@@ -1657,6 +2106,9 @@ class HandlerSignatureService(
             return object : MethodVisitor(Opcodes.ASM9) {
                 override fun visitTypeInsn(opcode: Int, type: String) {
                     if (opcode != Opcodes.NEW) return
+                    if (targetMethodName == "<init>" && !constructorInitialized) {
+                        newBeforeConstructorInitialization = true
+                    }
                     val index = newOwners.size
                     newOwners += type
                     pendingNewStack.addLast(index)
@@ -1670,10 +2122,24 @@ class HandlerSignatureService(
                     isInterface: Boolean,
                 ) {
                     if (opcode != Opcodes.INVOKESPECIAL || name != "<init>") return
-                    val index = pendingNewStack.removeLastOrNull() ?: return
+                    val index = pendingNewStack.removeLastOrNull()
+                    if (index == null) {
+                        if (targetMethodName == "<init>" && !constructorInitialized) {
+                            // With no outstanding NEW value, the only valid
+                            // uninitialized receiver is this/super.
+                            constructorInitialized = true
+                        }
+                        return
+                    }
                     if (newOwners[index] != owner || constructorDescriptors.containsKey(index)) {
                         failed = true
                         return
+                    }
+                    if (targetMethodName == "<init>" && !constructorInitialized) {
+                        // A constructor call paired with NEW initializes an
+                        // allocated object, so the mandatory this/super call
+                        // has not happened yet. The earlier NEW is unsafe.
+                        newBeforeConstructorInitialization = true
                     }
                     constructorDescriptors[index] = descriptor
                 }
@@ -1687,7 +2153,11 @@ class HandlerSignatureService(
         }
 
         fun buildPairs(): List<PairedNewSite>? {
-            if (failed || newOwners.indices.any { constructorDescriptors[it] == null }) {
+            if (
+                failed ||
+                newBeforeConstructorInitialization ||
+                newOwners.indices.any { constructorDescriptors[it] == null }
+            ) {
                 return null
             }
             val ordinals = mutableMapOf<String, Int>()

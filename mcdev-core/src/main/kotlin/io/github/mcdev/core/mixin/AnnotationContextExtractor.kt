@@ -30,6 +30,12 @@ object AnnotationContextExtractor {
         MixinAnnotation.WRAP_WITH_CONDITION,
         MixinAnnotation.WRAP_METHOD,
     )
+    private val declarationAnnotations = setOf(
+        MixinAnnotation.ACCESSOR,
+        MixinAnnotation.INVOKER,
+        MixinAnnotation.OVERWRITE,
+    )
+    private val handlerAnnotations = injectorAnnotations + declarationAnnotations
 
     fun extract(source: String, line: Int, character: Int): AnnotationContext? {
         val cursorOffset = toOffset(source, line, character) ?: return null
@@ -40,6 +46,21 @@ object AnnotationContextExtractor {
         if (cursorOffset < 0 || cursorOffset > source.length) return null
         val mixinTargets = resolveMixinTargets(source, cursorOffset)
         val imports = JavaTypeDescriptorResolver.importsFor(source)
+        findHandlerAnnotationStart(source, cursorOffset, imports)?.let { start ->
+            val end = skipAnnotation(source, start) ?: return null
+            val annotation = parseAnnotationName(source, start, imports) ?: return null
+            return AnnotationContext(
+                annotation = annotation,
+                slot = AnnotationSlot.HANDLER,
+                partialValue = "",
+                valueStartOffset = cursorOffset,
+                valueEndOffset = cursorOffset,
+                annotationStartOffset = start,
+                annotationEndOffset = end,
+                mixinTargetInternalNames = mixinTargets,
+                resolvedAnnotationFqn = resolveAnnotationFqn(source, start, imports),
+            )
+        }
         val annotationStart = findEnclosingAnnotationStart(source, cursorOffset, imports) ?: return null
         val annotation = parseAnnotationName(source, annotationStart, imports) ?: return null
         val resolvedAnnotationFqn = resolveAnnotationFqn(source, annotationStart, imports)
@@ -856,6 +877,25 @@ object AnnotationContextExtractor {
         )
     }
 
+    private fun findHandlerAnnotationStart(
+        source: String,
+        cursorOffset: Int,
+        imports: JavaSourceImports,
+    ): Int? {
+        val start = findAnnotationImmediatelyBefore(source, cursorOffset) ?: return null
+        val end = skipAnnotation(source, start) ?: return null
+        if (end > cursorOffset || source.substring(end, cursorOffset).any { !it.isWhitespace() }) return null
+        val annotation = parseAnnotationName(source, start, imports) ?: return null
+        return annotation.takeIf { it in handlerAnnotations }?.let { start }
+    }
+
+    private fun skipAnnotation(source: String, atOffset: Int): Int? {
+        if (source.getOrNull(atOffset) != '@') return null
+        val nameEnd = skipAnnotationName(source, atOffset)
+        if (source.getOrNull(nameEnd) != '(') return nameEnd
+        return findMatchingParen(source, nameEnd)?.plus(1)
+    }
+
     private fun decodeUnicodeStringContent(
         source: String,
         contentStart: Int,
@@ -1285,12 +1325,14 @@ object AnnotationContextExtractor {
         }
         if (pos <= 0) return null
 
+        var annotationStart: Int? = null
         val annotationEnd = when {
             source[pos - 1] == ')' -> {
                 val close = pos - 1
                 val open = findMatchingOpenParen(source, close) ?: return null
                 val at = source.lastIndexOf('@', open)
                 if (at < 0) return null
+                annotationStart = at
                 val nameEnd = skipAnnotationName(source, at)
                 if (source.getOrNull(nameEnd) != '(' || nameEnd != open) return null
                 close + 1
@@ -1298,6 +1340,7 @@ object AnnotationContextExtractor {
             else -> {
                 val at = source.lastIndexOf('@', pos - 1)
                 if (at < 0) return null
+                annotationStart = at
                 val nameEnd = skipAnnotationName(source, at)
                 if (source.getOrNull(nameEnd) == '(') return null
                 if (nameEnd != pos) return null
@@ -1305,7 +1348,7 @@ object AnnotationContextExtractor {
             }
         }
 
-        val at = source.lastIndexOf('@', annotationEnd - 1)
+        val at = annotationStart ?: return null
         if (at < 0) return null
         val nameEnd = skipAnnotationName(source, at)
         val computedEnd = if (source.getOrNull(nameEnd) == '(') {

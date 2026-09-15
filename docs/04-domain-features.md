@@ -327,6 +327,53 @@ wrong return type
 unsupported expression context
 ```
 
+### Handler declaration completion
+
+After a supported annotation is complete, invoke the `mcdev` completion source
+and choose the appropriate generated handler or declaration candidate. Injector
+items are labeled `Generate ... handler`; `@Accessor`, `@Invoker`, and
+`@Overwrite` use declaration-specific labels. A bare `@Overwrite` has no
+closing `)`, so it is offered after the annotation itself is complete. The item
+inserts a native snippet: the entire method name is an empty first tab stop
+(`${1}`), and the body is the final tab stop (`$0`). This lets the method name
+be entered without retaining a generated prefix such as `cem$`. The completion
+adds the member newline when the cursor is still after the annotation, and
+reuses existing indentation when the cursor is already on the next blank member
+line.
+
+The declaration generator covers these injector contracts:
+
+```text
+Mixin:      @Inject, @Redirect, @ModifyArg, @ModifyArgs, @ModifyVariable, @ModifyConstant
+MixinExtras: @ModifyExpressionValue, @ModifyReturnValue, @ModifyReceiver,
+             @WrapOperation, @WrapWithCondition, @WrapMethod
+Declarations: @Accessor, @Invoker, @Overwrite
+```
+
+`@Local`, `@Share`, and `@Cancellable` are handler parameter helpers; they do
+not create a second method declaration. Accessor and Invoker instance forms end
+in an abstract declaration, while static forms and Overwrite use a body
+snippet. For Overwrite, the empty method-name tab stop must be changed to the
+selected target method name; it cannot be an arbitrary rename. The generator
+offers a signature only when the target method is uniquely resolved. Redirect
+targets also need a resolved invocation, field operation, or constructor.
+`@ModifyVariable` needs bytecode and a unique `LOAD`/`STORE` local after its
+`index`, `ordinal`, `name`, or `argsOnly` constraints are applied. In ambiguous
+or incomplete project contexts the completion item is omitted so it cannot
+insert a guessed JVM signature. Minimal `@ModifyArg` and `@ModifyVariable`
+stubs return the original value, while non-void `@Redirect` stubs throw
+`UnsupportedOperationException` until their body is implemented. Constructor
+`@Inject` generation is limited to `RETURN`. Constructor `@WrapOperation`
+`NEW` generation is offered only when bytecode proves the allocation occurs
+after mandatory `this()` or `super()` initialization; ambiguous or pre-
+initialization allocations are omitted. Injectors requesting captured locals and Redirect array-length or
+array-element points remain omitted until the bytecode model can describe those
+contracts exactly.
+
+The annotation-name snippets also include the no-argument Mixin markers
+`@Final`, `@Mutable`, `@Pseudo`, `@SoftOverride`, and `@Surrogate`; they add the
+correct official import and place the cursor after the annotation.
+
 ## Access Widener
 
 ### File Detection

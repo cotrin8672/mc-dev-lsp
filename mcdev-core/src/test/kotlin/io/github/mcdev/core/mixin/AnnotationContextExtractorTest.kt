@@ -5,6 +5,7 @@ import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertNotNull
 import kotlin.test.assertNull
+import kotlin.test.assertTrue
 
 class AnnotationContextExtractorTest {
     @Test
@@ -218,6 +219,37 @@ class AnnotationContextExtractorTest {
         val context = assertNotNull(AnnotationContextExtractor.extractAtOffset(source, cursor))
         assertEquals(AnnotationSlot.ATTRIBUTE, context.slot)
         assertEquals(setOf("method", "at"), context.existingAttributes)
+    }
+
+    @Test
+    fun completedHandlerContextDoesNotShadowInnerAnnotationOrMemberContexts() {
+        val annotation = "@Inject(method = \"compute()I\", at = @At(\"RETURN\"))"
+        val source = """
+            @Mixin(SimpleTarget.class)
+            class ExampleMixin {
+                $annotation
+                private void existing() {
+                    compute();
+                }
+            }
+        """.trimIndent()
+        val annotationStart = source.indexOf(annotation)
+        val methodCursor = source.indexOf("compute()I") + "compute()I".length - 1
+        val methodContext = assertNotNull(AnnotationContextExtractor.extractAtOffset(source, methodCursor))
+        assertEquals(AnnotationSlot.METHOD, methodContext.slot)
+
+        val atValueCursor = source.indexOf("RETURN") + "RETURN".length - 1
+        val atContext = assertNotNull(AnnotationContextExtractor.extractAtOffset(source, atValueCursor))
+        assertEquals(MixinAnnotation.AT, atContext.annotation)
+        assertEquals(AnnotationSlot.VALUE, atContext.slot)
+
+        val completedContext = assertNotNull(
+            AnnotationContextExtractor.extractAtOffset(source, annotationStart + annotation.length),
+        )
+        assertEquals(AnnotationSlot.HANDLER, completedContext.slot)
+
+        val memberContext = AnnotationContextExtractor.extractAtOffset(source, source.indexOf("existing()"))
+        assertTrue(memberContext == null || memberContext.slot != AnnotationSlot.HANDLER)
     }
 
     @Test

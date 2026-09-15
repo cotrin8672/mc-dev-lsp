@@ -23,6 +23,10 @@ class ExpressionSupport(
 
     private val coreAnnotationSnippets = listOf(
         FeatureSnippet("mixin", "Mixin", "Mixin(${ '$' }{1:Target}.class)${ '$' }0", MixinAnnotation.MIXIN.officialFqns.toList(), source = "mixin.annotation"),
+        FeatureSnippet("final", "Final", "Final${ '$' }0", MixinAnnotation.FINAL.officialFqns.toList(), source = "mixin.annotation"),
+        FeatureSnippet("mutable", "Mutable", "Mutable${ '$' }0", MixinAnnotation.MUTABLE.officialFqns.toList(), source = "mixin.annotation"),
+        FeatureSnippet("pseudo", "Pseudo", "Pseudo${ '$' }0", MixinAnnotation.PSEUDO.officialFqns.toList(), source = "mixin.annotation"),
+        FeatureSnippet("softoverride", "SoftOverride", "SoftOverride${ '$' }0", MixinAnnotation.SOFT_OVERRIDE.officialFqns.toList(), source = "mixin.annotation"),
         FeatureSnippet("shadow", "Shadow", "Shadow${ '$' }0", MixinAnnotation.SHADOW.officialFqns.toList(), source = "mixin.annotation"),
         FeatureSnippet("accessor", "Accessor", "Accessor(\"${ '$' }{1}\")${ '$' }0", MixinAnnotation.ACCESSOR.officialFqns.toList(), source = "mixin.annotation"),
         FeatureSnippet("invoker", "Invoker", "Invoker(\"${ '$' }{1}\")${ '$' }0", MixinAnnotation.INVOKER.officialFqns.toList(), source = "mixin.annotation"),
@@ -69,6 +73,7 @@ class ExpressionSupport(
             source = "mixin.annotation",
         ),
         FeatureSnippet("overwrite", "Overwrite", "Overwrite${ '$' }0", MixinAnnotation.OVERWRITE.officialFqns.toList(), source = "mixin.annotation"),
+        FeatureSnippet("surrogate", "Surrogate", "Surrogate${ '$' }0", MixinAnnotation.SURROGATE.officialFqns.toList(), source = "mixin.annotation"),
         FeatureSnippet("at", "At", "At(\"${ '$' }{1}\")${ '$' }0", MixinAnnotation.AT.officialFqns.toList(), source = "mixin.annotation"),
         FeatureSnippet("constant", "Constant", "Constant(intValue = ${ '$' }{1:0})${ '$' }0", MixinAnnotation.CONSTANT.officialFqns.toList(), source = "mixin.annotation"),
         FeatureSnippet(

@@ -2017,6 +2017,30 @@ class HandlerSignatureServiceTest {
         assertEquals("Ljava/lang/StringBuilder;", spec.returnTypeDescriptor)
         assertEquals(1, spec.parameters.size)
         assertTrue(spec.parameters.single().isOperation)
+        val stub = caseService.generateHandlerStub(source, site, listOf(owner))
+        assertNotNull(stub)
+        assertFalse(stub.trimStart().startsWith("static "))
+    }
+
+    @Test
+    fun wrapOperationNewBeforeConstructorInitializationIsSuppressed() {
+        val owner = generatedNewOwner()
+        val classBytes = classBytesWithNewBeforeSuperInit(
+            owner = owner,
+            newOwner = "java/lang/StringBuilder",
+            initDescriptor = "()V",
+        )
+        val caseService = newWrapService(
+            newCandidate("java/lang/StringBuilder", ordinal = 0),
+            mixinOwner = owner,
+            methodName = "<init>",
+            methodDescriptor = "()V",
+            classBytes = classBytes,
+        )
+        val source = trimmedSource("""
+            @WrapOperation(method = "<init>()V", at = @At(value = "NEW", target = "Ljava/lang/StringBuilder;"))
+        """)
+        assertNull(caseService.expectedSignature(source, sites(source).first(), listOf(owner)))
     }
 
     @Test
@@ -5734,6 +5758,61 @@ value")""",
             false,
         )
         methodVisitor.visitInsn(org.objectweb.asm.Opcodes.POP)
+        methodVisitor.visitInsn(org.objectweb.asm.Opcodes.RETURN)
+        methodVisitor.visitMaxs(0, 0)
+        methodVisitor.visitEnd()
+        classWriter.visitEnd()
+        return classWriter.toByteArray()
+    }
+
+    private fun classBytesWithNewBeforeSuperInit(
+        owner: String,
+        newOwner: String,
+        initDescriptor: String,
+        methodName: String = "<init>",
+        methodDescriptor: String = "()V",
+    ): ByteArray {
+        val classWriter = org.objectweb.asm.ClassWriter(org.objectweb.asm.ClassWriter.COMPUTE_MAXS)
+        classWriter.visit(
+            org.objectweb.asm.Opcodes.V21,
+            org.objectweb.asm.Opcodes.ACC_PUBLIC,
+            owner,
+            null,
+            "java/lang/Object",
+            null,
+        )
+        val methodVisitor = classWriter.visitMethod(
+            org.objectweb.asm.Opcodes.ACC_PUBLIC,
+            methodName,
+            methodDescriptor,
+            null,
+            null,
+        )
+        methodVisitor.visitCode()
+        methodVisitor.visitTypeInsn(org.objectweb.asm.Opcodes.NEW, newOwner)
+        methodVisitor.visitInsn(org.objectweb.asm.Opcodes.DUP)
+        for (argumentType in Type.getArgumentTypes(initDescriptor)) {
+            when (argumentType.sort) {
+                Type.INT -> methodVisitor.visitIntInsn(org.objectweb.asm.Opcodes.BIPUSH, 42)
+                else -> error("unsupported constructor argument type: ${argumentType.descriptor}")
+            }
+        }
+        methodVisitor.visitMethodInsn(
+            org.objectweb.asm.Opcodes.INVOKESPECIAL,
+            newOwner,
+            "<init>",
+            initDescriptor,
+            false,
+        )
+        methodVisitor.visitInsn(org.objectweb.asm.Opcodes.POP)
+        methodVisitor.visitVarInsn(org.objectweb.asm.Opcodes.ALOAD, 0)
+        methodVisitor.visitMethodInsn(
+            org.objectweb.asm.Opcodes.INVOKESPECIAL,
+            "java/lang/Object",
+            "<init>",
+            "()V",
+            false,
+        )
         methodVisitor.visitInsn(org.objectweb.asm.Opcodes.RETURN)
         methodVisitor.visitMaxs(0, 0)
         methodVisitor.visitEnd()
