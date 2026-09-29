@@ -29,7 +29,9 @@ mcdev.info
 ```
 
 Do not design around arbitrary custom LSP methods unless JDT LS support is confirmed for the specific integration point.
-The current JDT LS bundle exposes mcdev navigation and hover through commands. The Neovim adapter prefers standard `textDocument/definition`, `textDocument/references`, `textDocument/hover`, and `textDocument/codeAction` results when JDT LS provides them, then falls back to mcdev commands when the standard result is empty.
+The current JDT LS bundle exposes mcdev navigation and hover through commands. The Neovim adapter uses the first successful standard `textDocument/definition`, `textDocument/references`, or `textDocument/hover` response once, falling back once only when all results are empty or failed. Code actions merge standard and mcdev candidates, preserving distinct actions with the same title and resolving and executing standard actions on their originating client.
+
+Cursor positions passed to the Lua helpers use Neovim's one-based rows and byte columns. Explicit code-action ranges and mcdev protocol locations use zero-based rows and UTF-16 columns. Standard LSP requests, edits and navigation use each client's negotiated encoding; definition/reference callbacks expose that encoding as their fourth argument, defaulting to UTF-16 for mcdev results.
 
 `mcdev.hover` is a custom `workspace/executeCommand` request. The Neovim adapter binds `K` to this command when navigation support is enabled, so the current hover UI is mcdev-specific rather than the standard LSP hover provider. A future standard hover provider should keep `mcdev.hover` as a compatibility and debug command.
 

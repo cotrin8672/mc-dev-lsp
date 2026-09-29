@@ -45,12 +45,13 @@ return function(h)
 
     local function show_location(location, message)
       local expected_line = location.range.start.line + 1
-      vim.lsp.util.show_document(location, "utf-8", { focus = true })
+      vim.lsp.util.show_document(location, "utf-16", { focus = true })
       helpers.assert_true(vim.wait(10000, function()
         local current_buf = vim.api.nvim_get_current_buf()
         local cursor = vim.api.nvim_win_get_cursor(0)
+        local line = vim.api.nvim_buf_get_lines(current_buf, expected_line - 1, expected_line, false)[1] or ""
         return vim.uri_from_bufnr(current_buf) == location.uri and cursor[1] == expected_line
-          and cursor[2] == location.range.start.character
+          and cursor[2] == vim.str_byteindex(line, "utf-16", location.range.start.character, false)
       end, 25), message .. " did not move the editor to the selected Definition")
       local current_buf = vim.api.nvim_get_current_buf()
       local destination = vim.api.nvim_buf_get_lines(current_buf, expected_line - 1, expected_line, false)[1] or ""

@@ -100,14 +100,6 @@ local function workspace_root(bufnr)
   return vim.uri_from_fname(root)
 end
 
-local function utf16_position(bufnr, position)
-  local line = vim.api.nvim_buf_get_lines(bufnr, position[1] - 1, position[1], false)[1] or ""
-  return {
-    line = position[1] - 1,
-    character = vim.str_utfindex(line, "utf-16", position[2], false),
-  }
-end
-
 function M.context(bufnr, position)
   bufnr = bufnr or vim.api.nvim_get_current_buf()
   position = position or vim.api.nvim_win_get_cursor(0)
@@ -116,7 +108,7 @@ function M.context(bufnr, position)
     workspaceRoot = workspace_root(bufnr),
     documentUri = document_uri(bufnr),
     languageId = buffer.effective_language_id(bufnr),
-    position = utf16_position(bufnr, position),
+    position = convert.to_lsp_position(bufnr, position),
     documentVersion = vim.api.nvim_buf_get_changedtick(bufnr),
     bufferText = table.concat(vim.api.nvim_buf_get_lines(bufnr, 0, -1, false), "\n"),
     client = {

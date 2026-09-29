@@ -1882,11 +1882,14 @@ end
 
 do
   local original_buf_request = vim.lsp.buf_request
+  local original_get_clients = vim.lsp.get_clients
   local original_definition = navigation.definition
   local fallback_used = false
+  vim.lsp.get_clients = function() return { { id = 1 } } end
   vim.lsp.buf_request = function(_, method, _, callback)
     helpers.assert_eq(method, "textDocument/definition")
-    callback(nil, nil)
+    callback(nil, nil, { client_id = 1 })
+    return { [1] = 1 }
   end
   navigation.definition = function(_, _, callback)
     fallback_used = true
@@ -1897,17 +1900,21 @@ do
   end)
   helpers.assert_true(fallback_used)
   vim.lsp.buf_request = original_buf_request
+  vim.lsp.get_clients = original_get_clients
   navigation.definition = original_definition
 end
 
 do
   local original_buf_request_all = vim.lsp.buf_request_all
+  local original_get_clients = vim.lsp.get_clients
   local original_mcdev_code_actions = code_action.code_actions
+  vim.lsp.get_clients = function() return { { id = 1 } } end
   vim.lsp.buf_request_all = function(_, method, _, callback)
     helpers.assert_eq(method, "textDocument/codeAction")
     callback({
       [1] = {
         result = {
+          { title = "Standard fix", kind = "quickfix" },
           { title = "Standard fix", kind = "quickfix" },
         },
       },
@@ -1925,10 +1932,14 @@ do
     merged = actions
   end)
   helpers.assert_not_nil(merged)
-  helpers.assert_eq(#merged, 2)
+  helpers.assert_eq(#merged, 3)
   helpers.assert_eq(merged[1].title, "Standard fix")
   helpers.assert_eq(merged[2].title, "mcdev fix")
+  helpers.assert_eq(merged[3].title, "Standard fix")
+  helpers.assert_eq(merged[1]._mcdev_client_id, 1)
+  helpers.assert_nil(merged[3]._mcdev_client_id)
   vim.lsp.buf_request_all = original_buf_request_all
+  vim.lsp.get_clients = original_get_clients
   code_action.code_actions = original_mcdev_code_actions
 end
 
@@ -1992,6 +2003,7 @@ do
   vim.fn.delete(jar)
 end
 
+dofile(vim.fn.getcwd() .. "/mcdev-nvim/tests/lsp_regressions.lua")
 dofile(vim.fn.getcwd() .. "/mcdev-nvim/tests/protocol_positions.lua")
 dofile(vim.fn.getcwd() .. "/mcdev-nvim/tests/diagnostic_positions.lua")
 dofile(vim.fn.getcwd() .. "/mcdev-nvim/tests/jdtls_workspace.lua")

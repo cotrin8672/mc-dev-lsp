@@ -3,23 +3,28 @@ local navigation = require("mcdev.navigation")
 local code_action = require("mcdev.code_action")
 local hover = require("mcdev.hover")
 local lsp = require("mcdev.lsp")
+local convert = require("mcdev.convert")
 
 local M = {}
 
-local function cursor_range()
-  local position = vim.api.nvim_win_get_cursor(0)
+local function cursor_range(bufnr)
+  local position = convert.to_lsp_position(bufnr, vim.api.nvim_win_get_cursor(0))
   return {
-    start = { line = position[1] - 1, character = position[2] },
-    ["end"] = { line = position[1] - 1, character = position[2] },
+    start = position,
+    ["end"] = position,
   }
 end
 
 local function visual_range(bufnr)
   local start_pos = vim.api.nvim_buf_get_mark(bufnr, "<")
   local end_pos = vim.api.nvim_buf_get_mark(bufnr, ">")
+  if vim.o.selection ~= "exclusive" then
+    -- Adding one byte before conversion rounds up over the entire final codepoint.
+    end_pos[2] = end_pos[2] + 1
+  end
   return {
-    start = { line = start_pos[1] - 1, character = start_pos[2] },
-    ["end"] = { line = end_pos[1] - 1, character = end_pos[2] + 1 },
+    start = convert.to_lsp_position(bufnr, start_pos),
+    ["end"] = convert.to_lsp_position(bufnr, end_pos),
   }
 end
 
@@ -58,24 +63,25 @@ local function request_code_actions(bufnr, range)
   end)
 end
 
-local function goto_location(locations, err, label, raw_locations)
+local function goto_location(locations, err, label, raw_locations, encoding)
+  encoding = encoding or "utf-16"
   if err then
     vim.notify(tostring(err), vim.log.levels.WARN)
     return
   end
   if locations and #locations > 0 then
     if #locations == 1 then
-      vim.lsp.util.show_document(locations[1], "utf-8", { focus = true })
+      vim.lsp.util.show_document(locations[1], encoding, { focus = true })
       return
     end
     vim.ui.select(locations, {
       prompt = "mcdev " .. label .. ":",
       format_item = function(location)
-        return location.uri
+        return location.uri or location.targetUri
       end,
     }, function(choice)
       if choice then
-        vim.lsp.util.show_document(choice, "utf-8", { focus = true })
+        vim.lsp.util.show_document(choice, encoding, { focus = true })
       end
     end)
     return
@@ -99,15 +105,15 @@ function M.setup(bufnr)
   if nav_opts.enable then
     vim.keymap.set("n", "gd", function()
       local provider = config.options.standard_lsp.prefer and lsp.definition or navigation.definition
-      provider(bufnr, nil, function(locations, err, raw_locations)
-        goto_location(locations, err, "definition", raw_locations)
+      provider(bufnr, nil, function(locations, err, raw_locations, encoding)
+        goto_location(locations, err, "definition", raw_locations, encoding)
       end)
     end, { buffer = bufnr, desc = "Mcdev go to definition" })
 
     vim.keymap.set("n", "gr", function()
       local provider = config.options.standard_lsp.prefer and lsp.references or navigation.references
-      provider(bufnr, nil, function(locations, err)
-        goto_location(locations, err, "references")
+      provider(bufnr, nil, function(locations, err, _, encoding)
+        goto_location(locations, err, "references", nil, encoding)
       end)
     end, { buffer = bufnr, desc = "Mcdev find references" })
 
@@ -135,7 +141,7 @@ function M.setup(bufnr)
   local code_action_opts = config.options.code_action or {}
   if code_action_opts.enable then
     vim.keymap.set("n", "<leader>ca", function()
-      request_code_actions(bufnr, cursor_range())
+      request_code_actions(bufnr, cursor_range(bufnr))
     end, { buffer = bufnr, desc = "Mcdev code action" })
     vim.keymap.set("v", "<leader>ca", function()
       request_code_actions(bufnr, visual_range(bufnr))

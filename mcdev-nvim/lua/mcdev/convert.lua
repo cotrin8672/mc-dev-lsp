@@ -20,6 +20,25 @@ function M.unwrap_envelope(envelope, err)
   return envelope.result
 end
 
+function M.to_lsp_position(bufnr, position, encoding)
+  local line = vim.api.nvim_buf_get_lines(bufnr, position[1] - 1, position[1], false)[1] or ""
+  return {
+    line = position[1] - 1,
+    character = vim.str_utfindex(line, encoding or "utf-16", position[2], false),
+  }
+end
+
+-- Public mcdev ranges use UTF-16; standard LSP clients may negotiate another encoding.
+function M.to_lsp_range(bufnr, range, encoding)
+  local result = {}
+  for key, position in pairs(range) do
+    local line = vim.api.nvim_buf_get_lines(bufnr, position.line, position.line + 1, false)[1] or ""
+    local byte = vim.str_byteindex(line, "utf-16", position.character, false)
+    result[key] = M.to_lsp_position(bufnr, { position.line + 1, byte }, encoding)
+  end
+  return result
+end
+
 function M.to_lsp_location(location, fallback_uri)
   local uri = location.documentUri
   if (uri == nil or uri == "") and fallback_uri then
