@@ -351,6 +351,67 @@ class SemanticCompletionContextExtractorTest {
         assertEquals(null, result.debug.zeroItemReason)
     }
 
+    @Test
+    fun completesAtTargetFromLaterConcatenatedLiteralAndKeepsWholeReplacementRange() {
+        val fixture = markedSource(
+            """
+            @Mixin(net.minecraft.client.MinecraftClient.class)
+            class TargetMixin {
+                @Inject(method = "tick", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/MinecraftClient;setPl" + "acedBy/*caret*/(Larg;)" + "V"))
+                private void injected(CallbackInfo ci) {}
+            }
+            """.trimIndent(),
+        )
+        val model = MixinSemanticModelParser.parse(fixture.source, "file:///TargetMixin.java")
+        val context = assertIs<MixinCompletionContext.AtTarget>(
+            SemanticCompletionContextExtractor.extract(
+                source = fixture.source,
+                line = fixture.line,
+                character = fixture.character,
+                model = model,
+            ),
+        )
+        val annotationContext = assertNotNull(
+            SemanticCompletionContextExtractor.toAnnotationContext(
+                source = fixture.source,
+                line = fixture.line,
+                character = fixture.character,
+                model = model,
+                context = context,
+            ),
+        )
+        val targetStart = fixture.source.indexOf("Lnet/minecraft/client/MinecraftClient;setPl")
+        val targetEnd = fixture.source.indexOf("V\"") + 1
+        assertEquals("acedBy", annotationContext.partialValue)
+        assertEquals(targetStart, annotationContext.valueStartOffset)
+        assertEquals(targetEnd, annotationContext.valueEndOffset)
+
+        val candidate = AtTargetCandidate(
+            owner = "net/minecraft/client/MinecraftClient",
+            name = "setPlacedBy",
+            descriptor = "(Larg;)V",
+            displayLabel = "setPlacedBy(Arg): void",
+            detail = "MinecraftClient",
+            kind = AtTargetKind.INVOKE,
+        )
+        val completionFacade = MixinServiceFacade(
+            classIndex = FakeClassIndex(),
+            bytecodeIndex = FakeBytecodeIndex(
+                candidates = mapOf("net/minecraft/client/MinecraftClient#tick#INVOKE" to listOf(candidate)),
+            ),
+        )
+        val result = completionFacade.completeWithDebug(
+            request = request(fixture),
+            options = MixinCompletionOptions(),
+        )
+
+        assertTrue(result.items.any { it.insertText == "Lnet/minecraft/client/MinecraftClient;setPlacedBy(Larg;)V" })
+        assertTrue(result.debug.semanticContextFound)
+        assertFalse(result.debug.fallbackAnnotationContextUsed)
+        assertEquals("AtTarget", result.debug.completionContextKind)
+        assertEquals(null, result.debug.zeroItemReason)
+    }
+
     private fun request(fixture: MarkedSource): MixinFacadeRequest =
         MixinFacadeRequest(
             bufferText = fixture.source,

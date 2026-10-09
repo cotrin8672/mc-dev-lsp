@@ -76,6 +76,73 @@ class MixinSemanticModelParserTest {
     }
 
     @Test
+    fun parsesAtTargetAcrossConcatenatedLiteralsAndLineEndings() {
+        val lf = """
+            @Mixin(MinecraftClient.class)
+            class M {
+                @Inject(method = "tick", at = @At(
+                    value = "INVOKE",
+                    target = "Lnet/minecraft/client/font/TextRenderer;" +
+                        // keep the descriptor split
+                        "draw(Ljava/lang/String;" + "FFI)I",
+                    ordinal = 1
+                ))
+                void m() {}
+            }
+        """.trimIndent()
+        val sources = listOf(
+            lf,
+            lf.replace("\n", "\r\n"),
+            lf.replaceFirst("\n", "\r\n").replaceFirst("\n", "\n"),
+        )
+        val expected = "Lnet/minecraft/client/font/TextRenderer;draw(Ljava/lang/String;FFI)I"
+
+        for (source in sources) {
+            val selector = MixinSemanticModelParser.parse(source).injectors
+                .single().atSelectors.single()
+            assertEquals(expected, selector.target)
+            assertEquals(1, selector.ordinal)
+            val start = source.indexOf("Lnet/minecraft/client/font/TextRenderer;")
+            val lastLiteral = source.indexOf("\"FFI)I\"")
+            val end = lastLiteral + "\"FFI)I\"".length - 1
+            assertEquals(
+                McTextRange(offsetToPosition(source, start), offsetToPosition(source, end)),
+                selector.targetRange,
+            )
+        }
+    }
+
+    @Test
+    fun doesNotUseUnfinishedConcatenatedTargetAsSiblingAttributeText() {
+        val source = """
+            @Mixin(MinecraftClient.class)
+            class M {
+                @Inject(method = "tick", at = @At(value = "INVOKE", target = "Lowner;" + "draw, ordinal = 1))
+                void m() {}
+            }
+        """.trimIndent()
+
+        val targets = MixinSemanticModelParser.parse(source).injectors
+            .flatMap { it.atSelectors }
+            .mapNotNull { it.target }
+        assertTrue(targets.none { "ordinal" in it })
+    }
+
+    private fun offsetToPosition(source: String, offset: Int): McTextPosition {
+        var line = 0
+        var character = 0
+        for (index in 0 until offset) {
+            if (source[index] == '\n') {
+                line++
+                character = 0
+            } else {
+                character++
+            }
+        }
+        return McTextPosition(line, character)
+    }
+
+    @Test
     fun retainsExplicitResolvedMixinExtrasContexts() {
         val handlerRange = McTextRange(McTextPosition(1, 4), McTextPosition(1, 20))
         val context = ExpressionContext(

@@ -178,15 +178,15 @@ Wrap other generic sources, such as `buffer` and `path`, with `with_exclusive_fi
 
 Use your normal Neovim keymap layer for navigation and code actions. The current JDT LS bundle exposes mcdev navigation through `workspace/executeCommand` commands (`mcdev.definition`, `mcdev.references`); it does not contribute to JDT LS `textDocument/definition` directly.
 
-Diagnostics are off by default in `mcdev-nvim` to avoid sending JDT LS work on every edit. Enable them explicitly when you want on-save publication:
+Diagnostics are off by default in `mcdev-nvim`. Enable them explicitly for debounced diagnostics while editing and after saving:
 
 ```lua
 require("mcdev").setup({
   diagnostics = {
     enabled = true,
-    events = { "BufWritePost" },
-    debounce_ms = 1000,
-    insert_mode = false,
+    events = { "TextChanged", "TextChangedI", "TextChangedP", "InsertLeave", "BufWritePost" },
+    debounce_ms = 500,
+    insert_mode = true,
   },
 })
 ```

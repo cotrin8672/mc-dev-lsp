@@ -121,8 +121,8 @@ end
 
 function M.setup_autocmds(opts)
   opts = opts or {}
-  local events = opts.events or { "BufWritePost" }
-  local debounce_ms = opts.debounce_ms or 1000
+  local events = opts.events or { "TextChanged", "TextChangedI", "TextChangedP", "InsertLeave", "BufWritePost" }
+  local debounce_ms = opts.debounce_ms or 500
   augroup = vim.api.nvim_create_augroup("McdevDiagnostics", { clear = true })
   M.running = true
   vim.api.nvim_create_autocmd(events, {

@@ -33,7 +33,7 @@ class ShareCompletionService(
         val currentKeys = sites.asSequence().mapNotNull { site ->
             val handler = site.handlerMethod ?: return@mapNotNull null
             val scope = scopeFor(site, source) ?: return@mapNotNull null
-            val parameter = HandlerSignatureService.enrichHandlerTypes(handler, classIndex).parameters
+            val parameter = HandlerSignatureService.enrichHandlerTypes(handler, classIndex, source).parameters
                 .firstOrNull { it.sugarSpec is HandlerParameterSugarSpec.Share &&
                     contains(source, it.sugarAnnotationRange, context.annotationStartOffset) }
                 ?: return@mapNotNull null
@@ -55,7 +55,7 @@ class ShareCompletionService(
                 val scope = scopeFor(site, candidateSource) ?: continue
                 val targetMethods = resolveTargetMethods(site, scope, candidateImports)
                 if (targetMethods.isEmpty()) continue
-                val enriched = HandlerSignatureService.enrichHandlerTypes(handler, classIndex)
+                val enriched = HandlerSignatureService.enrichHandlerTypes(handler, classIndex, candidateSource)
                 for (parameter in enriched.parameters) {
                     val share = parameter.sugarSpec as? HandlerParameterSugarSpec.Share ?: continue
                     val value = share.value ?: continue

@@ -90,7 +90,7 @@ class MixinExtrasDiagnosticsService(
                 )?.let { diagnostics += it }
             }
             val handler = site.handlerMethod ?: continue
-            val enriched = HandlerSignatureService.enrichHandlerTypes(handler, classIndex)
+            val enriched = HandlerSignatureService.enrichHandlerTypes(handler, classIndex, request.source)
             if (site.annotation == MixinExtrasAnnotation.WRAP_OPERATION ||
                 site.annotation == MixinExtrasAnnotation.WRAP_METHOD
             ) {
@@ -179,7 +179,7 @@ class MixinExtrasDiagnosticsService(
             val siteTargets = MixinTargetResolver.resolveTargets(scope.rawTargets, classIndex, imports)
             val target = signatureService.resolveTargetMethod(siteTargets, site.methodAttribute) ?: continue
             val handler = site.handlerMethod ?: continue
-            val enriched = HandlerSignatureService.enrichHandlerTypes(handler, classIndex)
+            val enriched = HandlerSignatureService.enrichHandlerTypes(handler, classIndex, source)
             for (owner in siteTargets) {
                 if (classIndex.getMethods(owner).count { it.name == target.name && it.descriptor == target.descriptor } != 1) {
                     continue

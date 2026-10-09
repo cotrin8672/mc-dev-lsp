@@ -18,8 +18,10 @@ import io.github.mcdev.core.mixin.AtTargetKind
 import io.github.mcdev.core.mixin.AtTargetOperationKind
 import io.github.mcdev.core.mixin.BytecodeIndex
 import io.github.mcdev.core.mixin.ClassIndex
+import io.github.mcdev.core.mixin.ClassIndexJavaTypeLookup
 import io.github.mcdev.core.mixin.JavaSourceImports
 import io.github.mcdev.core.mixin.JavaTypeDescriptorResolver
+import io.github.mcdev.core.mixin.JavaTypeResolutionContext
 import io.github.mcdev.core.mixin.MethodIndexEntry
 import io.github.mcdev.core.mixin.MixinAnnotation
 import io.github.mcdev.core.mixin.MixinTargetResolver
@@ -4014,21 +4016,36 @@ class HandlerSignatureService(
             return result.toString()
         }
 
-        fun enrichHandlerTypes(handler: HandlerMethodDeclaration, classIndex: ClassIndex): HandlerMethodDeclaration {
-            val returnDescriptor = descriptorFromHandlerType(handler.returnTypeName, classIndex)
+        fun enrichHandlerTypes(
+            handler: HandlerMethodDeclaration,
+            classIndex: ClassIndex,
+            source: String? = null,
+        ): HandlerMethodDeclaration {
+            val imports = source?.let(JavaTypeDescriptorResolver::importsFor)
+            val returnDescriptor = descriptorFromHandlerType(handler.returnTypeName, classIndex, imports)
             val params = handler.parameters.map { param ->
                 param.copy(
                     typeDescriptor = when {
                         param.isOperation -> "Lcom/llamalad7/mixinextras/injector/wrapoperation/Operation;"
-                        else -> descriptorFromHandlerType(param.typeName, classIndex)
+                        else -> descriptorFromHandlerType(param.typeName, classIndex, imports)
                     },
                 )
             }
             return handler.copy(returnTypeDescriptor = returnDescriptor, parameters = params)
         }
 
-        private fun descriptorFromHandlerType(typeName: String, classIndex: ClassIndex): String? =
-            OperationSignatureRenderer.descriptorFromTypeName(typeName, classIndex)
+        private fun descriptorFromHandlerType(
+            typeName: String,
+            classIndex: ClassIndex,
+            imports: JavaSourceImports?,
+        ): String? {
+            if (imports != null) {
+                JavaTypeDescriptorResolver.descriptorOrNull(
+                    typeName,
+                    JavaTypeResolutionContext(imports, ClassIndexJavaTypeLookup(classIndex)),
+                )?.let { return it }
+            }
+            return OperationSignatureRenderer.descriptorFromTypeName(typeName, classIndex)
                 ?: JavaTypeDescriptorResolver.descriptorOrNull(
                     typeName,
                     JavaSourceImports(
@@ -4038,6 +4055,7 @@ class HandlerSignatureService(
                     ),
                 )
                 ?: reflectHandlerTypeDescriptor(typeName)
+        }
 
         private fun reflectHandlerTypeDescriptor(typeName: String): String? {
             var normalized = typeName.trim()

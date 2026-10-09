@@ -36,7 +36,12 @@ object SemanticCompletionContextExtractor {
                 injector.atSelectors
                     .firstOrNull { offset in sourceRange(source, it.range) }
                     ?.let { atSelector ->
-                        if (atSelector.targetRange != null && offset in sourceRange(source, atSelector.targetRange).expandForOpenString(source)) {
+                        val lexicalTarget = lexicalAtTargetContext(source, offset)
+                        if (
+                            (atSelector.targetRange != null &&
+                                offset in sourceRange(source, atSelector.targetRange).expandForOpenString(source)) ||
+                            lexicalTarget != null
+                        ) {
                             val method = injector.methodSelectors.firstOrNull()
                             val parsed = method?.let { parseMethodTarget(it.value) }
                             return MixinCompletionContext.AtTarget(
@@ -45,7 +50,7 @@ object SemanticCompletionContextExtractor {
                                 owner = semanticModel.targets.firstOrNull()?.internalName,
                                 methodName = parsed?.name,
                                 methodDescriptor = parsed?.descriptor,
-                                partialValue = partialValue(source, offset),
+                                partialValue = lexicalTarget?.partialValue ?: partialValue(source, offset),
                             )
                         }
                         return MixinCompletionContext.AtValue(
@@ -122,20 +127,29 @@ object SemanticCompletionContextExtractor {
                 atValue = context.partialValue.trim('"'),
                 parentInjectorAnnotation = context.injector.annotation,
             )
-            is MixinCompletionContext.AtTarget -> AnnotationContext(
-                annotation = MixinAnnotation.AT,
-                slot = AnnotationSlot.TARGET,
-                partialValue = context.partialValue,
-                valueStartOffset = valueStart(source, offset),
-                valueEndOffset = offset,
-                annotationStartOffset = offsetOf(source, context.atSelector.range.start),
-                annotationEndOffset = offsetOf(source, context.atSelector.range.end),
-                mixinTargetInternalNames = targets,
-                injectMethodName = context.methodName?.let { name -> name + (context.methodDescriptor ?: "") }
-                    ?: context.injector.methodSelectors.firstOrNull()?.value,
-                atValue = context.atSelector.value,
-                parentInjectorAnnotation = context.injector.annotation,
-            )
+            is MixinCompletionContext.AtTarget -> {
+                // The semantic model may only range the first literal in a Java string
+                // concatenation. Keep its method/at-value metadata, but use the lexical
+                // target range so accepting completion replaces the complete expression.
+                // `extract` uses the same fallback to classify later concatenation parts.
+                val lexical = lexicalAtTargetContext(source, offset)
+                AnnotationContext(
+                    annotation = MixinAnnotation.AT,
+                    slot = AnnotationSlot.TARGET,
+                    partialValue = lexical?.partialValue ?: context.partialValue,
+                    valueStartOffset = lexical?.valueStartOffset ?: valueStart(source, offset),
+                    valueEndOffset = lexical?.valueEndOffset ?: offset,
+                    annotationStartOffset = lexical?.annotationStartOffset
+                        ?: offsetOf(source, context.atSelector.range.start),
+                    annotationEndOffset = lexical?.annotationEndOffset
+                        ?: offsetOf(source, context.atSelector.range.end),
+                    mixinTargetInternalNames = targets,
+                    injectMethodName = context.methodName?.let { name -> name + (context.methodDescriptor ?: "") }
+                        ?: context.injector.methodSelectors.firstOrNull()?.value,
+                    atValue = context.atSelector.value,
+                    parentInjectorAnnotation = context.injector.annotation,
+                )
+            }
             is MixinCompletionContext.AccessorValue -> AnnotationContext(
                 annotation = MixinAnnotation.ACCESSOR,
                 slot = AnnotationSlot.ACCESSOR_VALUE,
@@ -188,6 +202,10 @@ object SemanticCompletionContextExtractor {
             }
         }
     }
+
+    private fun lexicalAtTargetContext(source: String, offset: Int): AnnotationContext? =
+        AnnotationContextExtractor.extractAtOffset(source, offset)
+            ?.takeIf { it.annotation == MixinAnnotation.AT && it.slot == AnnotationSlot.TARGET }
 
     private fun memberNameContext(
         source: String,

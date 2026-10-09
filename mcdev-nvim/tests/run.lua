@@ -271,7 +271,12 @@ helpers.assert_eq(mcdev.options().insert.inject_method_descriptor, "auto")
 helpers.assert_eq(mcdev.options().completion.omnifunc, false)
 helpers.assert_eq(mcdev.options().completion.omnifunc_timeout_ms, 500)
 helpers.assert_eq(mcdev.options().diagnostics.enabled, false)
-helpers.assert_eq(mcdev.options().diagnostics.events[1], "BufWritePost")
+helpers.assert_eq(
+  table.concat(mcdev.options().diagnostics.events, ","),
+  "TextChanged,TextChangedI,TextChangedP,InsertLeave,BufWritePost"
+)
+helpers.assert_eq(mcdev.options().diagnostics.debounce_ms, 500)
+helpers.assert_eq(mcdev.options().diagnostics.insert_mode, true)
 helpers.assert_eq(diagnostics.running, false)
 helpers.assert_eq(mcdev.options().standard_lsp.prefer, true)
 
@@ -1503,7 +1508,7 @@ with_named_buffer("/project/src/main/java/com/example/mixin/DiagnosticsMixin.jav
 end)
 
 with_named_buffer("/project/src/main/java/com/example/mixin/QueuedDiagnosticsMixin.java", "java", {
-  "@Mixin(SimpleTarget.class)",
+  "@Mixin(MissingTarget.class)",
 }, function(bufnr)
   local protocol_module = package.loaded["mcdev.protocol"]
   local original_diagnostics = protocol_module.diagnostics
@@ -1513,18 +1518,14 @@ with_named_buffer("/project/src/main/java/com/example/mixin/QueuedDiagnosticsMix
   end
 
   diagnostics.refresh(bufnr, { in_flight_policy = "latest", stale_result_policy = "drop" })
-  vim.api.nvim_buf_set_lines(bufnr, 0, 1, false, { "@Mixin(UpdatedTarget.class)" })
-  diagnostics.refresh(bufnr, { in_flight_policy = "latest", stale_result_policy = "drop" })
   helpers.assert_eq(#callbacks, 1)
-  callbacks[1]({ result = { diagnostics = {} } }, nil)
-  helpers.assert_eq(#callbacks, 2)
-  callbacks[2]({
+  callbacks[1]({
     result = {
       diagnostics = {
         {
-          code = "LATEST",
-          severity = "warning",
-          message = "latest result",
+          code = "OLD",
+          severity = "error",
+          message = "old target",
           range = {
             start = { line = 0, character = 0 },
             ["end"] = { line = 0, character = 6 },
@@ -1535,7 +1536,39 @@ with_named_buffer("/project/src/main/java/com/example/mixin/QueuedDiagnosticsMix
   }, nil)
   local published = vim.diagnostic.get(bufnr, { namespace = diagnostics.namespace })
   helpers.assert_eq(#published, 1)
-  helpers.assert_eq(published[1].code, "LATEST")
+  helpers.assert_eq(published[1].code, "OLD")
+
+  vim.api.nvim_buf_set_lines(bufnr, 0, 1, false, { "@Mixin(UpdatedTarget.class)" })
+  diagnostics.refresh(bufnr, { in_flight_policy = "latest", stale_result_policy = "drop" })
+  vim.api.nvim_buf_set_lines(bufnr, 0, 1, false, { "@Mixin(FinalTarget.class)" })
+  diagnostics.refresh(bufnr, { in_flight_policy = "latest", stale_result_policy = "drop" })
+  helpers.assert_eq(#callbacks, 2)
+  callbacks[2]({
+    result = {
+      diagnostics = {
+        {
+          code = "MID",
+          severity = "error",
+          message = "stale target",
+          range = {
+            start = { line = 0, character = 0 },
+            ["end"] = { line = 0, character = 6 },
+          },
+        },
+      },
+    },
+  }, nil)
+  helpers.assert_eq(#callbacks, 3)
+  published = vim.diagnostic.get(bufnr, { namespace = diagnostics.namespace })
+  helpers.assert_eq(#published, 1)
+  helpers.assert_eq(published[1].code, "OLD")
+  callbacks[3]({
+    result = {
+      diagnostics = {},
+    },
+  }, nil)
+  published = vim.diagnostic.get(bufnr, { namespace = diagnostics.namespace })
+  helpers.assert_eq(#published, 0)
   protocol_module.diagnostics = original_diagnostics
 end)
 

@@ -302,8 +302,18 @@ object AnnotationContextExtractor {
             }
 
             val containerValue = readValue(source, index, bodyEnd) ?: break
+            val concatenatedString = if (annotation == MixinAnnotation.AT && attrName == "target") {
+                readConcatenatedString(source, index, bodyEnd, cursorOffset)
+            } else {
+                null
+            }
             val valueInfo = if (source[index] == '{') {
                 findArrayElementAtCursor(source, index, containerValue.contentEnd, cursorOffset) ?: containerValue
+            } else if (concatenatedString != null) {
+                concatenatedString.firstOrNull { cursorOffset in it.contentStart..it.contentEnd }?.copy(
+                    replaceStart = concatenatedString.first().contentStart,
+                    end = concatenatedString.last().end,
+                ) ?: containerValue
             } else {
                 containerValue
             }
@@ -318,7 +328,7 @@ object AnnotationContextExtractor {
                     cursorOffset,
                 )
             }
-            index = containerValue.end
+            index = concatenatedString?.last()?.end ?: containerValue.end
             if (index < bodyEnd && source[index] == ',') {
                 index++
             }
@@ -944,14 +954,14 @@ object AnnotationContextExtractor {
 
     private fun replacementEnd(source: String, valueInfo: ValueInfo, cursorOffset: Int): Int {
         val isString = source.getOrNull(valueInfo.contentStart - 1) == '"'
-        return if (isString && source.getOrNull(valueInfo.contentEnd) != '"') {
-            cursorOffset
-        } else {
-            valueInfo.contentEnd
+        if (!isString) return valueInfo.contentEnd
+        if (valueInfo.end > valueInfo.contentStart && source.getOrNull(valueInfo.end - 1) == '"') {
+            return valueInfo.end - 1
         }
+        return if (source.getOrNull(valueInfo.contentEnd) != '"') cursorOffset else valueInfo.contentEnd
     }
 
-    private data class ValueInfo(
+    internal data class ValueInfo(
         val contentStart: Int,
         val contentEnd: Int,
         val replaceStart: Int,
@@ -990,6 +1000,55 @@ object AnnotationContextExtractor {
                 ValueInfo(start, end, start, end)
             }
         }
+    }
+
+    internal fun readConcatenatedString(
+        source: String,
+        start: Int,
+        bodyEnd: Int,
+        cursorOffset: Int,
+    ): List<ValueInfo>? {
+        if (source.getOrNull(start) != '"') return null
+        val literals = mutableListOf<ValueInfo>()
+        var index = start
+        while (true) {
+            val literal = readValue(source, index, bodyEnd) ?: return null
+            if (source.getOrNull(literal.end - 1) != '"') {
+                if (cursorOffset !in literal.contentStart..bodyEnd || literals.isEmpty()) return null
+                literals += literal.copy(
+                    contentEnd = cursorOffset,
+                    replaceStart = literals.first().contentStart,
+                    end = cursorOffset,
+                )
+                return literals
+            }
+            literals += literal
+            val plus = skipWhitespaceAndComments(source, literal.end, bodyEnd)
+            if (source.getOrNull(plus) != '+') break
+            index = skipWhitespaceAndComments(source, plus + 1, bodyEnd)
+            if (source.getOrNull(index) != '"') return null
+        }
+        return literals.takeIf { it.size > 1 }
+    }
+
+    private fun skipWhitespaceAndComments(source: String, start: Int, end: Int): Int {
+        var index = skipWhitespace(source, start, end)
+        while (index < end) {
+            when {
+                source.startsWith("//", index) -> {
+                    index += 2
+                    while (index < end && source[index] != '\n' && source[index] != '\r') index++
+                }
+                source.startsWith("/*", index) -> {
+                    val close = source.indexOf("*/", index + 2)
+                    if (close < 0 || close + 2 > end) return end
+                    index = close + 2
+                }
+                else -> return index
+            }
+            index = skipWhitespace(source, index, end)
+        }
+        return index
     }
 
     private fun readBareValueEnd(source: String, start: Int, bodyEnd: Int): Int {

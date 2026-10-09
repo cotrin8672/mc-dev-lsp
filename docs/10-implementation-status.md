@@ -73,7 +73,7 @@ Known limits:
 - AW/AT buffer detection (`mcdev.buffer`) and languageId routing for all protocol requests.
 - Definition and references navigation helpers via `mcdev.definition` / `mcdev.references`; no keymaps are installed by default.
 - Code action helper with workspace edit application; no `<leader>ca` keymap is installed by default.
-- Diagnostics publication via `mcdev.diagnostics` with debounced on-save autocmds, stale-result guards, latest-request coalescing, and the `mcdev` diagnostic namespace; `mcdev.context` remains a compatibility alias.
+- Diagnostics publication via `mcdev.diagnostics` with debounced change/save autocmds, stale-result guards, latest-request coalescing, and the `mcdev` diagnostic namespace; `mcdev.context` remains a compatibility alias.
 - Shared DTO converters (`mcdev.convert`) for locations, diagnostics, and code actions.
 - `mcdev.jdtls` helper for Mason `jdtls` startup, repo-built bundle auto-discovery, and bundle injection.
 - Headless Lua adapter tests with mocked JDT LS client absence handling, AW/AT payload checks, navigation, diagnostics, and code action conversion.

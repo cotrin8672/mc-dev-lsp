@@ -189,7 +189,7 @@ protocol.request(protocol.commands.diagnostics, { context = protocol.context() }
 end)
 ```
 
-By default `mcdev-nvim` records configuration and creates commands such as `:McdevInfo`, `:McdevReindex`, `:McdevHealth`, and `:McdevDebugCompletion`; diagnostics publication is opt-in. Enable diagnostics with `events = { "BufWritePost" }` for on-save refresh, or use `:McdevDiagnosticsRefresh` manually. Do not put `TextChangedI` in the default diagnostics events unless you explicitly accept per-edit requests.
+By default `mcdev-nvim` records configuration and creates commands such as `:McdevInfo`, `:McdevReindex`, `:McdevHealth`, and `:McdevDebugCompletion`; diagnostics publication is opt-in. Enable diagnostics with the default debounced text-change, insert-leave, and save events, or use `:McdevDiagnosticsRefresh` manually. Keep the event list explicit if you want save-only refreshes or a different editing cadence.
 
 ### Code actions
 

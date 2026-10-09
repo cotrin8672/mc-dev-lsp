@@ -36,15 +36,25 @@ function M.apply(action, bufnr)
     return
   end
   local encoding = client and client.offset_encoding or "utf-16"
+  local request_params = action._mcdev_request_params
   local function apply(resolved)
     if resolved.edit then
       vim.lsp.util.apply_workspace_edit(resolved.edit, encoding)
     end
     if resolved.command then
-      local command = type(resolved.command) == "table" and resolved.command or resolved
+      local command
+      if type(resolved.command) == "table" then
+        command = resolved.command
+      else
+        command = vim.deepcopy(resolved)
+        command._mcdev_client_id = nil
+        command._mcdev_request_params = nil
+      end
       local command_client = client or protocol.active_jdtls_client(bufnr)
       if command_client then
-        command_client:exec_cmd(command, { bufnr = bufnr })
+        local context = { bufnr = bufnr }
+        if request_params then context.params = request_params end
+        command_client:exec_cmd(command, context)
       else
         vim.notify("mcdev: no client available to execute code action", vim.log.levels.WARN)
       end
@@ -52,6 +62,7 @@ function M.apply(action, bufnr)
   end
   local unresolved = vim.deepcopy(action)
   unresolved._mcdev_client_id = nil
+  unresolved._mcdev_request_params = nil
   if client and type(action.command) ~= "string" and not (action.edit and action.command)
     and client:supports_method("codeAction/resolve", bufnr) then
     local started = client:request("codeAction/resolve", unresolved, function(err, resolved)

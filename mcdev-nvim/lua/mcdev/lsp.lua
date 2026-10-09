@@ -27,6 +27,89 @@ local function text_document_params(bufnr, position, context)
   end
 end
 
+local function compare_positions(left, right)
+  if left.line ~= right.line then
+    return left.line < right.line and -1 or 1
+  end
+  if left.character ~= right.character then
+    return left.character < right.character and -1 or 1
+  end
+  return 0
+end
+
+local function contains_position(range, position)
+  if compare_positions(range.start, range["end"]) == 0 then
+    return compare_positions(range.start, position) == 0
+  end
+  return compare_positions(range.start, position) <= 0
+    and compare_positions(position, range["end"]) < 0
+end
+
+local function ranges_intersect(left, right)
+  local left_point = compare_positions(left.start, left["end"]) == 0
+  local right_point = compare_positions(right.start, right["end"]) == 0
+  if left_point then return contains_position(right, left.start) end
+  if right_point then return contains_position(left, right.start) end
+  return compare_positions(left.start, right["end"]) < 0
+    and compare_positions(right.start, left["end"]) < 0
+end
+
+local jdt_source_aliases = {
+  ["source.generate.constructors"] = true,
+  ["source.generate.toString"] = true,
+  ["source.overrideMethods"] = true,
+  ["source.sortMembers"] = true,
+}
+
+local function command_identity(action)
+  if type(action.command) == "string" then
+    return { command = action.command, arguments = action.arguments }
+  end
+  if type(action.command) ~= "table" or action.command.command == nil then
+    return nil
+  end
+  return { command = action.command.command, arguments = action.command.arguments }
+end
+
+local function same_action(existing, action)
+  if vim.deep_equal(existing, action) then
+    return true
+  end
+  if existing._mcdev_client_id == nil or existing._mcdev_client_id ~= action._mcdev_client_id then
+    return false
+  end
+
+  local existing_command, action_command = command_identity(existing), command_identity(action)
+  if existing_command and action_command
+    and vim.deep_equal(existing_command, action_command)
+    and vim.deep_equal(existing.edit, action.edit)
+    and vim.deep_equal(existing.disabled, action.disabled) then
+    return true
+  end
+
+  if existing.title ~= action.title then
+    return false
+  end
+  local existing_client = vim.lsp.get_client_by_id(existing._mcdev_client_id)
+  if not existing_client or existing_client.name ~= "jdtls" then
+    return false
+  end
+  local source_kind
+  if existing.kind == "quickassist" and jdt_source_aliases[action.kind] then
+    source_kind = action.kind
+  elseif action.kind == "quickassist" and jdt_source_aliases[existing.kind] then
+    source_kind = existing.kind
+  end
+  if not source_kind then
+    return false
+  end
+  -- JDTLS gives these aliases different resolve data; only merge equal effects.
+  return vim.deep_equal(existing.edit, action.edit)
+    and vim.deep_equal(command_identity(existing), command_identity(action))
+    and vim.deep_equal(existing.diagnostics, action.diagnostics)
+    and vim.deep_equal(existing.disabled, action.disabled)
+end
+
 local function request_first(bufnr, method, params, on_result, on_empty)
   local client_count = #vim.lsp.get_clients({ bufnr = bufnr, method = method })
   if client_count == 0 then
@@ -113,18 +196,29 @@ function M.code_actions(bufnr, range, diagnostic_codes, cb)
     ["end"] = cursor,
   }
   local function params(client)
-    local diagnostics = vim.tbl_map(function(diagnostic)
-      local converted = vim.deepcopy(diagnostic.user_data and diagnostic.user_data.lsp or {
-        message = diagnostic.message, severity = diagnostic.severity,
-        code = diagnostic.code, source = diagnostic.source,
-      })
-      converted.range = {
-        start = convert.to_lsp_position(bufnr, { diagnostic.lnum + 1, diagnostic.col }, client.offset_encoding),
-        ["end"] = convert.to_lsp_position(bufnr,
-          { (diagnostic.end_lnum or diagnostic.lnum) + 1, diagnostic.end_col or diagnostic.col }, client.offset_encoding),
+    local diagnostics = {}
+    for _, diagnostic in ipairs(vim.diagnostic.get(bufnr)) do
+      local start = { diagnostic.lnum + 1, diagnostic.col }
+      local finish = {
+        (diagnostic.end_lnum or diagnostic.lnum) + 1,
+        diagnostic.end_col or diagnostic.col,
       }
-      return converted
-    end, vim.diagnostic.get(bufnr))
+      local diagnostic_range = {
+        start = convert.to_lsp_position(bufnr, start, "utf-16"),
+        ["end"] = convert.to_lsp_position(bufnr, finish, "utf-16"),
+      }
+      if ranges_intersect(diagnostic_range, resolved_range) then
+        local converted = vim.deepcopy(diagnostic.user_data and diagnostic.user_data.lsp or {
+          message = diagnostic.message, severity = diagnostic.severity,
+          code = diagnostic.code, source = diagnostic.source,
+        })
+        converted.range = {
+          start = convert.to_lsp_position(bufnr, start, client.offset_encoding),
+          ["end"] = convert.to_lsp_position(bufnr, finish, client.offset_encoding),
+        }
+        diagnostics[#diagnostics + 1] = converted
+      end
+    end
     return {
       textDocument = vim.lsp.util.make_text_document_params(bufnr),
       range = convert.to_lsp_range(bufnr, resolved_range, client.offset_encoding),
@@ -144,7 +238,7 @@ function M.code_actions(bufnr, range, diagnostic_codes, cb)
     for _, actions in ipairs({ standard_actions, mcdev_actions }) do
       for _, action in ipairs(actions) do
         -- ponytail: small action lists; use a keyed index if these become large.
-        if not vim.tbl_contains(merged, function(existing) return vim.deep_equal(existing, action) end, { predicate = true }) then
+        if not vim.tbl_contains(merged, function(existing) return same_action(existing, action) end, { predicate = true }) then
           merged[#merged + 1] = action
         end
       end
@@ -161,9 +255,13 @@ function M.code_actions(bufnr, range, diagnostic_codes, cb)
         standard_error = type(response_error) == "table" and (response_error.message or vim.inspect(response_error))
           or tostring(response_error)
       end
+      local request_context = response.context or response.ctx
       for _, action in ipairs(response.result ~= vim.NIL and response.result or {}) do
         local item = vim.deepcopy(action)
         item._mcdev_client_id = client_id
+        if request_context and request_context.params then
+          item._mcdev_request_params = vim.deepcopy(request_context.params)
+        end
         standard_actions[#standard_actions + 1] = item
       end
     end

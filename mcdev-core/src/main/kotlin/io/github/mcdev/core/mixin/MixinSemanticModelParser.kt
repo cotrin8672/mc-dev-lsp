@@ -451,7 +451,7 @@ object MixinSemanticModelParser {
                 i = close + 1
                 continue
             }
-            val value = readValue(source, i, end) ?: break
+            val value = readAttributeValue(source, i, end, name) ?: break
             val attributeEnd = if (source.getOrNull(value.end) == '"') value.end + 1 else value.end
             if (name in names) {
                 results += value.copy(attributeStart = nameStart, attributeEnd = attributeEnd)
@@ -459,6 +459,27 @@ object MixinSemanticModelParser {
             i = attributeEnd
         }
         return results
+    }
+
+    private fun readAttributeValue(source: String, start: Int, end: Int, name: String): RawValue? {
+        if (name == "target" && source.getOrNull(start) == '"') {
+            val literals = AnnotationContextExtractor.readConcatenatedString(source, start, end, end)
+                ?.takeIf { parts ->
+                    source.getOrNull(parts.lastOrNull()?.end?.minus(1) ?: -1) == '"'
+                }
+            if (literals != null) {
+                val first = literals.first()
+                val last = literals.last()
+                return RawValue(
+                    value = literals.joinToString(separator = "") {
+                        source.substring(it.contentStart, it.contentEnd)
+                    },
+                    start = first.contentStart,
+                    end = last.contentEnd,
+                )
+            }
+        }
+        return readValue(source, start, end)
     }
 
     private fun readValue(source: String, start: Int, end: Int): RawValue? {

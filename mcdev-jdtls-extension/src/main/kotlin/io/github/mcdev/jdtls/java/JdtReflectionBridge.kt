@@ -117,8 +117,12 @@ class JdtReflectionBridge private constructor() {
 
     private fun toResolvedLocation(element: Any, target: McDefinitionTarget): JdtResolvedLocation? {
         jdtUtilsClass?.let { utils ->
-            val location = utils.methods.firstOrNull { it.name == "toLocation" && it.parameterCount == 1 }
-                ?.invoke(null, element)
+            val location = runCatching {
+                utils.getMethod(
+                    "toLocation",
+                    Class.forName("org.eclipse.jdt.core.IJavaElement"),
+                ).invoke(null, element)
+            }.getOrNull()
             if (location != null) {
                 return locationToResolved(location, McdevDefinitionResolution.JDT)
             }
@@ -288,13 +292,50 @@ class JdtReflectionBridge private constructor() {
                 signature.getMethod("getParameterTypes", String::class.java)
                     .invoke(null, descriptor) as? Array<*>
             }.getOrNull() ?: return null
-            return matches.firstOrNull { method ->
+            val normalizedExpected = normalizeParameterTypes(expectedParams, signature) ?: return null
+            val normalizedMatches = matches.filter { method ->
                 val actualParams = runCatching {
                     method?.javaClass?.getMethod("getParameterTypes")?.invoke(method) as? Array<*>
                 }.getOrNull()
-                actualParams != null && actualParams.contentDeepEquals(expectedParams)
+                actualParams != null && normalizeParameterTypes(actualParams, signature) == normalizedExpected
             }
+            return normalizedMatches.singleOrNull()
         }
+
+        private fun normalizeParameterTypes(
+            parameterTypes: Array<*>,
+            signatureClass: Class<*>,
+        ): List<String>? {
+            val normalized = ArrayList<String>(parameterTypes.size)
+            for (parameterType in parameterTypes) {
+                val type = parameterType as? String ?: return null
+                normalized += normalizeTypeSignature(type, signatureClass) ?: return null
+            }
+            return normalized
+        }
+
+        private fun normalizeTypeSignature(type: String, signatureClass: Class<*>): String? {
+            val erased = runCatching {
+                signatureClass.getMethod("getTypeErasure", String::class.java)
+                    .invoke(null, type) as? String
+            }.getOrNull() ?: return null
+            val arrayPrefix = erased.takeWhile { it == '[' }
+            val base = erased.drop(arrayPrefix.length)
+            if (base.length < 2 && base !in PRIMITIVE_SIGNATURES) return null
+            val normalizedBase = when {
+                base.startsWith("L") && base.endsWith(';') -> base
+                base.startsWith("Q") && base.endsWith(';') -> {
+                    val name = base.substring(1, base.length - 1)
+                    if ('.' !in name && '/' !in name) return null
+                    "L$name;"
+                }
+                base.length == 1 && base in PRIMITIVE_SIGNATURES -> base
+                else -> return null
+            }
+            return arrayPrefix + normalizedBase.replace('/', '.')
+        }
+
+        private val PRIMITIVE_SIGNATURES = setOf("B", "C", "D", "F", "I", "J", "S", "Z", "V")
 
         val instance: JdtReflectionBridge? by lazy {
             runCatching { JdtReflectionBridge() }.getOrNull()?.takeIf { it.isAvailable() }

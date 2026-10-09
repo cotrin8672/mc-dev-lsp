@@ -78,6 +78,80 @@ class MixinExtrasDiagnosticsServiceTest {
     }
 
     @Test
+    fun importedWrapOperationTypesRemainValidWithEitherLineEnding() {
+        val targetOwner = "net/createmod/catnip/placement/PlacementOffset"
+        val blockOwner = "net/minecraft/world/level/block/Block"
+        val targetDescriptor =
+            "(Lnet/minecraft/world/level/Level;" +
+                "Lnet/minecraft/core/BlockPos;" +
+                "Lnet/minecraft/world/level/block/state/BlockState;" +
+                "Lnet/minecraft/world/entity/LivingEntity;" +
+                "Lnet/minecraft/world/item/ItemStack;)V"
+        val classIndex = FakeClassIndex(
+            classes = listOf(
+                ClassIndexEntry("PlacementOffset", "net.createmod.catnip.placement", targetOwner),
+                ClassIndexEntry("Block", "net.minecraft.world.level.block", blockOwner),
+                ClassIndexEntry("Level", "net.minecraft.world.level", "net/minecraft/world/level/Level"),
+                ClassIndexEntry("BlockPos", "net.minecraft.core", "net/minecraft/core/BlockPos"),
+                ClassIndexEntry("BlockState", "net.minecraft.world.level.block.state", "net/minecraft/world/level/block/state/BlockState"),
+                ClassIndexEntry("LivingEntity", "net.minecraft.world.entity", "net/minecraft/world/entity/LivingEntity"),
+                ClassIndexEntry("ItemStack", "net.minecraft.world.item", "net/minecraft/world/item/ItemStack"),
+            ),
+            methods = mapOf(
+                targetOwner to listOf(MethodIndexEntry("placeInWorld", "()V", false, "placeInWorld(): void")),
+                blockOwner to listOf(MethodIndexEntry("setPlacedBy", targetDescriptor, false, "setPlacedBy(...): void")),
+            ),
+        )
+        val bytecodeIndex = FakeBytecodeIndex(
+            candidates = mapOf(
+                "$targetOwner#placeInWorld#INVOKE" to listOf(
+                    AtTargetCandidate(
+                        owner = blockOwner,
+                        name = "setPlacedBy",
+                        descriptor = targetDescriptor,
+                        displayLabel = "setPlacedBy(...): void",
+                        detail = "Block",
+                        kind = AtTargetKind.INVOKE,
+                        operationKind = AtTargetOperationKind.INVOKE_VIRTUAL,
+                        instructionOccurrenceIndex = 0,
+                    ),
+                ),
+            ),
+        )
+        val template = """
+            import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
+            import com.llamalad7.mixinextras.injector.wrapoperation.WrapOperation;
+            import net.minecraft.core.BlockPos;
+            import net.minecraft.world.entity.LivingEntity;
+            import net.minecraft.world.item.ItemStack;
+            import net.minecraft.world.level.Level;
+            import net.minecraft.world.level.block.Block;
+            import net.minecraft.world.level.block.state.BlockState;
+            import org.spongepowered.asm.mixin.Mixin;
+            import org.spongepowered.asm.mixin.injection.At;
+
+            @Mixin(net.createmod.catnip.placement.PlacementOffset.class)
+            abstract class PlacementOffsetMixin {
+                @WrapOperation(method = "placeInWorld", at = @At(value = "INVOKE", target = "$blockOwner;setPlacedBy${targetDescriptor}"))
+                private void handler(Block instance, Level level, BlockPos pos, BlockState state, LivingEntity placer, ItemStack stack, Operation<Void> original) {
+                    original.call(instance, level, pos, state, placer, stack);
+                }
+            }
+        """.trimIndent()
+
+        for (lineSeparator in listOf("\n", "\r\n")) {
+            val source = template.replace("\n", lineSeparator)
+            val diagnostics = MixinExtrasDiagnosticsService(classIndex, bytecodeIndex).analyze(
+                MixinExtrasDiagnosticRequest(source, "file:///PlacementOffsetMixin.java"),
+            )
+            assertTrue(
+                diagnostics.none { it.code == MixinExtrasDiagnosticCodes.HANDLER_SIGNATURE_MISMATCH },
+                "line separator ${lineSeparator.replace("\r", "CR").replace("\n", "LF")}: $diagnostics",
+            )
+        }
+    }
+
+    @Test
     fun deduplicatesIdenticalWrongReturnDiagnosticAcrossMultipleAtSites() {
         val source = """
             @Mixin(com.example.target.SimpleTarget.class)

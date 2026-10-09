@@ -41,6 +41,67 @@ local function utf16_to_byte_edit(bufnr, edit)
   end
 end
 
+local function delete_edit(start_position, end_position)
+  return {
+    range = {
+      start = vim.deepcopy(start_position),
+      ["end"] = vim.deepcopy(end_position),
+    },
+    newText = "",
+  }
+end
+
+local function split_multiline_edit(item, bufnr, position)
+  local edit = item.textEdit
+  local range = edit and edit.range
+  if not range or range.start.line == range["end"].line then
+    return
+  end
+
+  local cursor_line = (position[1] or 1) - 1
+  local cursor_col = position[2] or 0
+  if cursor_line < range.start.line or cursor_line > range["end"].line then
+    return
+  end
+
+  local line = vim.api.nvim_buf_get_lines(bufnr, cursor_line, cursor_line + 1, false)[1] or ""
+  local line_length = #line
+  local main_start = cursor_line == range.start.line and range.start.character or 0
+  local main_end = cursor_line == range["end"].line and range["end"].character or line_length
+  if cursor_col < main_start or cursor_col > main_end then
+    return
+  end
+
+  local additional = {}
+  local new_text = edit.newText
+  if cursor_line > range.start.line then
+    local start_line = vim.api.nvim_buf_get_lines(bufnr, range.start.line, range.start.line + 1, false)[1] or ""
+    local prefix = start_line:sub(1, range.start.character)
+    additional[#additional + 1] = delete_edit(
+      { line = range.start.line, character = 0 },
+      { line = cursor_line, character = 0 }
+    )
+    new_text = prefix .. new_text
+  end
+
+  if cursor_line < range["end"].line then
+    additional[#additional + 1] = delete_edit(
+      { line = cursor_line, character = main_end },
+      range["end"]
+    )
+  end
+
+  item.textEdit = {
+    range = {
+      start = { line = cursor_line, character = main_start },
+      ["end"] = { line = cursor_line, character = main_end },
+    },
+    newText = new_text,
+  }
+  vim.list_extend(additional, item.additionalTextEdits or {})
+  item.additionalTextEdits = additional
+end
+
 local function to_blink_item(item, bufnr, position)
   local blink_item = vim.deepcopy(item)
   blink_item.cursor_column = blink_item._mcdev_cursor_column or position[2] or 0
@@ -53,6 +114,8 @@ local function to_blink_item(item, bufnr, position)
   if not is_mixin_item(item) then
     return blink_item
   end
+
+  split_multiline_edit(blink_item, bufnr, position)
 
   blink_item.kind_icon = mixin_icon
   blink_item.kind_name = "Mixin"

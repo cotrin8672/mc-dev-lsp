@@ -181,7 +181,7 @@ require("mcdev").setup({
 The repo-built extension jar is auto-discovered. `jdtls.extension_jar` remains
 an explicit override for jars installed elsewhere.
 
-Defaults do not publish diagnostics. Enable on-save diagnostics explicitly; completion sources, navigation, and code actions remain explicit user choices around the thin `mcdev.*` adapters.
+Defaults do not publish diagnostics. Enable debounced diagnostics explicitly for updates while editing and after saving; completion sources, navigation, and code actions remain explicit user choices around the thin `mcdev.*` adapters.
 
 Example `nvim-jdtls` integration:
 

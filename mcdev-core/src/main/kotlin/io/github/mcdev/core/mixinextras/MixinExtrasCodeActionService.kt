@@ -129,7 +129,7 @@ class MixinExtrasCodeActionService(
         val candidates = resolved.flatMap { (site, handlerAndIndices, targetAndExpected) ->
             val (handler, parameterIndices) = handlerAndIndices
             val (targetMethod, expectedType) = targetAndExpected
-            val enriched = HandlerSignatureService.enrichHandlerTypes(handler, classIndex)
+            val enriched = HandlerSignatureService.enrichHandlerTypes(handler, classIndex, source)
             parameterIndices.mapNotNull { index ->
                 val parameter = handler.parameters[index]
                 if (signatureService.validateCommonSugarConstraints(enriched, targetMethod, site.annotation).none { issue ->
@@ -572,7 +572,7 @@ class MixinExtrasCodeActionService(
                 continue
             }
             val handler = site.handlerMethod ?: continue
-            val enriched = HandlerSignatureService.enrichHandlerTypes(handler, classIndex)
+            val enriched = HandlerSignatureService.enrichHandlerTypes(handler, classIndex, source)
             val resolvedContext = resolvedContextForSite(site, resolvedContexts)
             val expectedSignature = signatureService.expectedSignature(
                 source,
@@ -678,7 +678,7 @@ class MixinExtrasCodeActionService(
         handler: HandlerMethodDeclaration,
         expected: HandlerSignatureSpec,
     ): RenderedSignature? {
-        val actualHandler = HandlerSignatureService.enrichHandlerTypes(handler, classIndex)
+        val actualHandler = HandlerSignatureService.enrichHandlerTypes(handler, classIndex, source)
         val renderExpected = signatureService.specializeIntLikeSignature(expected, actualHandler)
         val renderedExpected = renderExpectedSignature(source, renderExpected)
         val actualParameters = actualHandler.parameters

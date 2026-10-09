@@ -23,9 +23,9 @@ M.options = {
   },
   diagnostics = {
     enabled = false,
-    events = { "BufWritePost" },
-    debounce_ms = 1000,
-    insert_mode = false,
+    events = { "TextChanged", "TextChangedI", "TextChangedP", "InsertLeave", "BufWritePost" },
+    debounce_ms = 500,
+    insert_mode = true,
     in_flight_policy = "latest",
     stale_result_policy = "drop",
   },

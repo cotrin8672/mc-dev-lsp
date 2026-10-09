@@ -8,7 +8,7 @@ Install `jdtls` through your Mason layer, for example Mason UI,
 `github:cotrin8672/mc-dev-lsp` to Mason `registries`; this repository is loaded
 by Lazy.nvim and builds its own extension jar.
 
-Diagnostics are disabled by default and should normally run on save when enabled. Completion adapters are exposed as sources for your completion UI; mcdev does not register them globally. Navigation and code actions remain user keymap choices.
+Diagnostics are disabled by default. When enabled, they run with a debounce while editing and after saving. Completion adapters are exposed as sources for your completion UI; mcdev does not register them globally. Navigation and code actions remain user keymap choices.
 
 ## Full spec
 
@@ -41,9 +41,9 @@ return {
       },
       diagnostics = {
         enabled = true,
-        events = { "BufWritePost" },
-        debounce_ms = 1000,
-        insert_mode = false,
+        events = { "TextChanged", "TextChangedI", "TextChangedP", "InsertLeave", "BufWritePost" },
+        debounce_ms = 500,
+        insert_mode = true,
       },
     },
     config = function(plugin, opts)

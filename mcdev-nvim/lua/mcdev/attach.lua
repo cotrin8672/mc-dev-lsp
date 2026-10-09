@@ -15,7 +15,7 @@ local function cursor_range(bufnr)
   }
 end
 
-local function visual_range(bufnr)
+local function marked_range(bufnr)
   local start_pos = vim.api.nvim_buf_get_mark(bufnr, "<")
   local end_pos = vim.api.nvim_buf_get_mark(bufnr, ">")
   if vim.o.selection ~= "exclusive" then
@@ -26,6 +26,41 @@ local function visual_range(bufnr)
     start = convert.to_lsp_position(bufnr, start_pos),
     ["end"] = convert.to_lsp_position(bufnr, end_pos),
   }
+end
+
+local function line_length(bufnr, line)
+  return #(vim.api.nvim_buf_get_lines(bufnr, line - 1, line, false)[1] or "")
+end
+
+local function visual_range(bufnr)
+  local mode = vim.api.nvim_get_mode().mode
+  if mode == "V" then
+    local anchor = vim.fn.getpos("v")
+    local cursor = vim.api.nvim_win_get_cursor(0)
+    local start_line = math.min(anchor[2], cursor[1])
+    local end_line = math.max(anchor[2], cursor[1])
+    return {
+      start = convert.to_lsp_position(bufnr, { start_line, 0 }),
+      ["end"] = convert.to_lsp_position(bufnr, { end_line, line_length(bufnr, end_line) }),
+    }
+  elseif mode == "v" then
+    local region = vim.fn.getregionpos(vim.fn.getpos("v"), vim.fn.getpos("."), {
+      type = mode,
+      exclusive = vim.o.selection == "exclusive",
+      eol = true,
+    })
+    if #region > 0 then
+      local first = region[1][1]
+      local last = region[#region][2]
+      local start_col = math.max(0, math.min(first[3] - 1, line_length(bufnr, first[2])))
+      local end_col = math.max(0, math.min(last[3], line_length(bufnr, last[2])))
+      return {
+        start = convert.to_lsp_position(bufnr, { first[2], start_col }),
+        ["end"] = convert.to_lsp_position(bufnr, { last[2], end_col }),
+      }
+    end
+  end
+  return marked_range(bufnr)
 end
 
 local function select_code_action(actions, bufnr)

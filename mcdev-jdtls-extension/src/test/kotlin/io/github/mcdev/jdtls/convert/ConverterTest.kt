@@ -9,6 +9,8 @@ import io.github.mcdev.core.codeaction.McTextEdit
 import io.github.mcdev.core.completion.McCompletionItem
 import io.github.mcdev.core.completion.McCompletionKind
 import io.github.mcdev.core.completion.McCompletionMetadata
+import io.github.mcdev.core.descriptor.DescriptorParseResult
+import io.github.mcdev.core.descriptor.MemberTargetParser
 import io.github.mcdev.core.mapping.MappingParseResult
 import io.github.mcdev.core.mapping.TinyV2Parser
 import io.github.mcdev.core.mapping.asResolver
@@ -144,7 +146,7 @@ class ConverterTest {
     }
 
     @Test
-    fun completionConverterUsesShortAtTargetInsertTextWhenSmartTargetIsUnambiguous() {
+    fun completionConverterUsesFullAtTargetInsertTextWhenSmartTargetIsUnambiguous() {
         val mappingsText = FixtureResourceLoader.loadText(FixturePaths.FABRIC_BASIC_MAPPINGS)
         val resolver = assertIs<MappingParseResult.Success>(TinyV2Parser.parse(mappingsText)).mappings.asResolver()
         val item = McCompletionItem(
@@ -173,7 +175,94 @@ class ConverterTest {
                 mappingResolver = resolver,
             ),
         ).single()
-        assertEquals("method_1", dto.insertText)
+        assertEquals(
+            "Lcom/example/target/class_1;method_1(Ljava/lang/String;FF)V",
+            dto.insertText,
+        )
+    }
+
+    @Test
+    fun completionConverterKeepsFullDescriptorsForAmbiguousSmartTargets() {
+        val mappingsText = FixtureResourceLoader.loadText(FixturePaths.FABRIC_BASIC_MAPPINGS)
+        val resolver = assertIs<MappingParseResult.Success>(TinyV2Parser.parse(mappingsText)).mappings.asResolver()
+        val first = McCompletionItem(
+            label = "draw(String, float, float): void",
+            detail = "SimpleTarget",
+            documentation = null,
+            filterText = "draw",
+            insertText = "Lcom/example/target/SimpleTarget;draw(Ljava/lang/String;FF)V",
+            kind = McCompletionKind.METHOD,
+            sortKey = "0400_draw",
+            metadata = McCompletionMetadata(
+                source = "mixin.atTarget",
+                owner = "com/example/target/SimpleTarget",
+                name = "draw",
+                descriptor = "(Ljava/lang/String;FF)V",
+            ),
+        )
+        val second = first.copy(
+            label = "draw(int): void",
+            insertText = "Lcom/example/target/SimpleTarget;draw(I)V",
+            metadata = first.metadata.copy(descriptor = "(I)V"),
+        )
+
+        val dtos = CompletionItemConverter.toDtos(
+            items = listOf(first, second),
+            annotationContext = null,
+            source = "",
+            convertContext = CompletionConvertContext(
+                source = "",
+                annotationContext = null,
+                preferredAtTarget = "smart",
+                mappingResolver = resolver,
+            ),
+        )
+
+        assertEquals(
+            listOf(
+                "Lcom/example/target/class_1;method_1(Ljava/lang/String;FF)V",
+                "Lcom/example/target/SimpleTarget;draw(I)V",
+            ),
+            dtos.map { it.insertText },
+        )
+    }
+
+    @Test
+    fun completionConverterTextEditKeepsPretypedOwnerAndProducesValidTarget() {
+        val mappingsText = FixtureResourceLoader.loadText(FixturePaths.FABRIC_BASIC_MAPPINGS)
+        val resolver = assertIs<MappingParseResult.Success>(TinyV2Parser.parse(mappingsText)).mappings.asResolver()
+        val source = "@At(value = \"INVOKE\", target = \"Lcom/example/target/SimpleTarget;dra\")"
+        val targetStart = source.indexOf("Lcom/example/target/SimpleTarget;")
+        val targetEnd = source.lastIndexOf('"')
+        val item = McCompletionItem(
+            label = "draw(String, float, float): void",
+            detail = "SimpleTarget",
+            documentation = null,
+            filterText = "draw",
+            insertText = "Lcom/example/target/SimpleTarget;draw(Ljava/lang/String;FF)V",
+            kind = McCompletionKind.METHOD,
+            sortKey = "0400_draw",
+            metadata = McCompletionMetadata(
+                source = "mixin.atTarget",
+                owner = "com/example/target/SimpleTarget",
+                name = "draw",
+                descriptor = "(Ljava/lang/String;FF)V",
+            ),
+        )
+        val context = CompletionConvertContext(
+            source = source,
+            annotationContext = null,
+            preferredAtTarget = "smart",
+            mappingResolver = resolver,
+            replacementRange = CompletionReplacementRange(targetStart, targetEnd),
+        )
+
+        val edit = CompletionItemConverter.toDto(item, null, source, context).edit
+        val editedSource = source.substring(0, targetStart) + edit!!.newText + source.substring(targetEnd)
+        val editedTarget = editedSource.substringAfter("target = \"").substringBefore('"')
+
+        assertEquals("Lcom/example/target/class_1;method_1(Ljava/lang/String;FF)V", editedTarget)
+        assertIs<DescriptorParseResult.Success<*>>(MemberTargetParser.parse(editedTarget))
     }
 
     @Test

@@ -13,12 +13,12 @@ local function set_lines(lines)
   current_line = lines[1]
 end
 
-local function complete_with(item)
+local function complete_with(item, cursor)
   local result
   completion.complete = function(callback)
     callback({ isIncomplete = false, items = { item } })
   end
-  adapter:get_completions({ bufnr = bufnr, cursor = { 1, #current_line } }, function(value)
+  adapter:get_completions({ bufnr = bufnr, cursor = cursor or { 1, #current_line } }, function(value)
     result = value
   end)
   return result.items[1], result
@@ -73,6 +73,60 @@ helpers.assert_eq(fallback.textEdit.range.start.character, 24)
 helpers.assert_eq(fallback.textEdit.range["end"].character, 26)
 vim.lsp.util.apply_text_edits({ fallback.textEdit }, bufnr, "utf-8")
 helpers.assert_eq(vim.api.nvim_buf_get_lines(bufnr, 0, 1, false)[1], '@Inject(method = "é😀bar')
+
+local split_lines = {
+  "package p;",
+  '@At(target = "éLnet/minecraft/core/BlockPos;setPl" +',
+  '    "acedBy(" +',
+  '    "tail😀")',
+}
+set_lines(split_lines)
+local split_start_line = split_lines[2]
+local split_end_line = split_lines[4]
+local split_start_byte = #('@At(target = "é')
+local split_end_byte = #('    "tail😀')
+local split_item, split_result = complete_with({
+  label = "FullTarget",
+  textEdit = {
+    range = {
+      start = {
+        line = 1,
+        character = vim.str_utfindex(split_start_line, "utf-16", split_start_byte, false),
+      },
+      ["end"] = {
+        line = 3,
+        character = vim.str_utfindex(split_end_line, "utf-16", split_end_byte, false),
+      },
+    },
+    newText = "FullTarget",
+  },
+  additionalTextEdits = {
+    {
+      range = {
+        start = { line = 0, character = #"package p;" },
+        ["end"] = { line = 0, character = #"package p;" },
+      },
+      newText = "\nimport example.Added;",
+    },
+  },
+  data = { source = "mixin.atTarget" },
+}, { 3, #split_lines[3] })
+helpers.assert_eq(split_result.is_incomplete_forward, false)
+helpers.assert_eq(split_item.textEdit.range.start.line, 2)
+helpers.assert_eq(split_item.textEdit.range["end"].line, 2)
+helpers.assert_eq(split_item.textEdit.range.start.character, 0)
+helpers.assert_eq(split_item.textEdit.newText, '@At(target = "éFullTarget')
+helpers.assert_eq(split_item.additionalTextEdits[1].range.start.line, 1)
+helpers.assert_eq(split_item.additionalTextEdits[1].range.start.character, 0)
+helpers.assert_eq(split_item.additionalTextEdits[1].range["end"].line, 2)
+helpers.assert_eq(split_item.additionalTextEdits[1].range["end"].character, 0)
+local split_edits = { split_item.textEdit }
+vim.list_extend(split_edits, split_item.additionalTextEdits)
+vim.lsp.util.apply_text_edits(split_edits, bufnr, "utf-8")
+helpers.assert_eq(
+  table.concat(vim.api.nvim_buf_get_lines(bufnr, 0, -1, false), "\n"),
+  table.concat({ "package p;", "import example.Added;", '@At(target = "éFullTarget")' }, "\n")
+)
 
 completion.complete = original_complete
 vim.api.nvim_buf_delete(bufnr, { force = true })

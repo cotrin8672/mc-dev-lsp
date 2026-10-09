@@ -277,6 +277,26 @@ class MixinDiagnosticsServiceTest {
     }
 
     @Test
+    fun diagnosticsUseCompleteConcatenatedAtTargetValue() {
+        val source = """
+            @Mixin(MinecraftClient.class)
+            class M {
+                @Inject(method = "tick", at = @At(
+                    value = "INVOKE",
+                    target = "Lnet/minecraft/client/font/TextRenderer;" +
+                        "draw(Ljava/lang/String;" + "FFI)I"
+                ))
+                void m() {}
+            }
+        """.trimIndent()
+
+        val diagnostics = analyze(source)
+
+        assertTrue(diagnostics.none { it.code == MixinDiagnosticCodes.INVALID_AT_TARGET_DESCRIPTOR })
+        assertTrue(diagnostics.none { it.code == MixinDiagnosticCodes.UNRESOLVED_AT_TARGET })
+    }
+
+    @Test
     fun reportsOrdinalOutOfRange() {
         val source = """
             @Mixin(MinecraftClient.class)

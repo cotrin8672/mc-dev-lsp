@@ -796,7 +796,7 @@ class MixinServiceFacade(
             val scope = AnnotationContextExtractor.resolveMixinClassScope(source, annotationOffset) ?: continue
             val mixinTargets = MixinTargetResolver.resolveTargets(scope.rawTargets, classIndex, imports)
             if (mixinTargets.isEmpty()) continue
-            val enriched = HandlerSignatureService.enrichHandlerTypes(handler, classIndex)
+            val enriched = HandlerSignatureService.enrichHandlerTypes(handler, classIndex, source)
             val targetMethod = handlerSignatureService.resolveTargetMethod(mixinTargets, site.methodAttribute)
             val issues = handlerSignatureService.validateCommonSugarConstraints(
                 enriched,

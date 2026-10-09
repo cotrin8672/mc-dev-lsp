@@ -1456,6 +1456,79 @@ class AnnotationContextExtractorTest {
         assertEquals(source.indexOf(partial) + partial.length, context.valueEndOffset)
     }
 
+    @Test
+    fun atTargetConcatenatedStringReplacementCoversWholeExpression() {
+        val source = """@Inject(method = "useItemOn", at = @At(value = "INVOKE", target = "Lowner;setPl" + "(Larg;)" + "V"), ordinal = 1) // keep"""
+        val replacement = "Lowner;setPlacedBy(Larg;)V"
+        val firstCursor = source.indexOf("setPl") + "setPl".length
+        val middleStart = source.indexOf("(Larg;)")
+        val middleCursor = middleStart + "(Larg;)".length
+        val expected = """@Inject(method = "useItemOn", at = @At(value = "INVOKE", target = "$replacement"), ordinal = 1) // keep"""
+
+        for (cursor in listOf(firstCursor, middleCursor)) {
+            val context = assertNotNull(AnnotationContextExtractor.extractAtOffset(source, cursor))
+            assertEquals(AnnotationSlot.TARGET, context.slot)
+            assertEquals(source.indexOf("Lowner;setPl"), context.valueStartOffset)
+            assertEquals(source.indexOf("V\"") + 1, context.valueEndOffset)
+            assertEquals(expected, source.replaceRange(context.valueStartOffset, context.valueEndOffset, replacement))
+        }
+    }
+
+    @Test
+    fun atTargetConcatenatedStringAllowsCommentsBetweenLiterals() {
+        val source = """@Inject(method = "useItemOn", at = @At(value = "INVOKE", target = "Lowner;setPl" /* first */ + // second
+            "(Larg;)" + "V" /* outside */), ordinal = 1) // keep"""
+        val cursor = source.indexOf("(Larg;)") + "(Larg;)".length
+        val context = assertNotNull(AnnotationContextExtractor.extractAtOffset(source, cursor))
+        val replacement = "Lowner;setPlacedBy(Larg;)V"
+
+        assertEquals(source.indexOf("Lowner;setPl"), context.valueStartOffset)
+        assertEquals(source.indexOf("V\"") + 1, context.valueEndOffset)
+        assertEquals(
+            source.replaceRange(context.valueStartOffset, context.valueEndOffset, replacement),
+            """@Inject(method = "useItemOn", at = @At(value = "INVOKE", target = "$replacement" /* outside */), ordinal = 1) // keep""",
+        )
+    }
+
+    @Test
+    fun atTargetUnfinishedConcatenatedLiteralReplacesPriorFragmentsToCursor() {
+        val source = """@At(value = "INVOKE", target = "Lowner;" + "met, ordinal = 1)"""
+        val cursor = source.indexOf(", ordinal")
+        val replacement = "Lowner;method(I)V"
+        val context = assertNotNull(AnnotationContextExtractor.extractAtOffset(source, cursor))
+
+        assertEquals(AnnotationSlot.TARGET, context.slot)
+        assertEquals("met", context.partialValue)
+        assertEquals(source.indexOf("Lowner;"), context.valueStartOffset)
+        assertEquals(cursor, context.valueEndOffset)
+
+        val inserted = source.replaceRange(context.valueStartOffset, context.valueEndOffset, replacement)
+        val quoteOffset = context.valueStartOffset + replacement.length
+        assertEquals(
+            """@At(value = "INVOKE", target = "$replacement", ordinal = 1)""",
+            inserted.substring(0, quoteOffset) + "\"" + inserted.substring(quoteOffset),
+        )
+    }
+
+    @Test
+    fun atTargetStandaloneAndUnfinishedStringRangesStayUnchanged() {
+        val standalone = """@At(target = "Lowner;setPl")"""
+        val standaloneCursor = standalone.indexOf("setPl") + "setPl".length
+        val standaloneContext = assertNotNull(
+            AnnotationContextExtractor.extractAtOffset(standalone, standaloneCursor),
+        )
+        assertEquals(standalone.indexOf("Lowner;setPl"), standaloneContext.valueStartOffset)
+        assertEquals(standalone.indexOf("setPl\"") + "setPl".length, standaloneContext.valueEndOffset)
+
+        val unfinished = """@At(target = "Lowner;setPl"""
+        val unfinishedCursor = unfinished.length
+        val unfinishedContext = assertNotNull(
+            AnnotationContextExtractor.extractAtOffset(unfinished, unfinishedCursor),
+        )
+        assertEquals(unfinished.indexOf("Lowner;setPl"), unfinishedContext.valueStartOffset)
+        assertEquals(unfinishedCursor, unfinishedContext.valueEndOffset)
+    }
+
     private fun extract(source: String, line: Int, character: Int): AnnotationContext? =
         AnnotationContextExtractor.extract(source, line, character)
 }

@@ -56,10 +56,11 @@ class LocalCaptureValidationService(
         if (spec == null || targetDescriptor == null) {
             return points.map(Result::Unavailable)
         }
-        return points.map { validatePoint(it, spec, targetDescriptor, cancellationChecker) }
+        return points.map { validatePoint(source, it, spec, targetDescriptor, cancellationChecker) }
     }
 
     private fun validatePoint(
+        source: String,
         point: Point,
         spec: HandlerParameterSugarSpec.Local,
         targetDescriptor: String,
@@ -71,7 +72,7 @@ class LocalCaptureValidationService(
             return Result.Unavailable(point)
         }
 
-        val site = enrichSite(point.site)
+        val site = enrichSite(point.site, source)
         val indices = occurrenceResolver.resolve(
             owner = point.owner,
             targetMethod = point.targetMethod,
@@ -111,8 +112,8 @@ class LocalCaptureValidationService(
         }
     }
 
-    private fun enrichSite(site: MixinExtrasAnnotationSite): MixinExtrasAnnotationSite {
+    private fun enrichSite(site: MixinExtrasAnnotationSite, source: String): MixinExtrasAnnotationSite {
         val handler = site.handlerMethod ?: return site
-        return site.copy(handlerMethod = HandlerSignatureService.enrichHandlerTypes(handler, classIndex))
+        return site.copy(handlerMethod = HandlerSignatureService.enrichHandlerTypes(handler, classIndex, source))
     }
 }

@@ -9,6 +9,17 @@ local bundle_jar = vim.env.MCDEV_BUNDLE_JAR
 local workspace = vim.env.MCDEV_E2E_WORKSPACE
 local jdtls_cmd = vim.env.JDTLS_CMD
 local fixture = vim.env.MCDEV_E2E_FIXTURE or "fabric-basic"
+
+if fixture == "create-drill-definition-diagnostics" then
+  local blink_rtp = vim.env.MCDEV_E2E_BLINK_RTP
+  local jdtls_rtp = blink_rtp and (vim.fn.fnamemodify(blink_rtp, ":h") .. "/nvim-jdtls") or nil
+  helpers.assert_true(
+    jdtls_rtp ~= nil and vim.fn.isdirectory(jdtls_rtp) == 1,
+    "installed nvim-jdtls checkout must be beside MCDEV_E2E_BLINK_RTP"
+  )
+  vim.opt.runtimepath:prepend(jdtls_rtp)
+  require("jdtls")
+end
 local progress_log = vim.fn.getcwd() .. "/build/e2e-progress.log"
 local health_log = vim.fn.getcwd() .. "/build/e2e-health.log"
 local debug_completion_log = vim.fn.getcwd() .. "/build/e2e-debug-completion.log"
@@ -62,10 +73,15 @@ local fixture_specs = {
     mixin = "src/main/java/com/example/mixin/ForgeExampleMixin.java",
     platform = "forge",
   },
+  ["create-drill-definition-diagnostics"] = {
+    mixin = "src/main/java/io/github/cotrin8672/cem/mixin/DrillBlockMixin.java",
+    placement_mixin = "src/main/java/io/github/cotrin8672/cem/mixin/PlacementOffsetMixin.java",
+  },
 }
 
 local fixture_spec = fixture_specs[fixture] or fixture_specs["fabric-basic"]
 local mixin_file = fixture_spec.mixin and (workspace .. "/" .. fixture_spec.mixin) or nil
+local placement_mixin_file = fixture_spec.placement_mixin and (workspace .. "/" .. fixture_spec.placement_mixin) or nil
 local client_mixin_file = fixture_spec.client_mixin and (workspace .. "/" .. fixture_spec.client_mixin) or nil
 local aw_file = fixture_spec.aw and (workspace .. "/" .. fixture_spec.aw) or nil
 local at_file = fixture_spec.at and (workspace .. "/" .. fixture_spec.at) or nil
@@ -73,6 +89,12 @@ log_step("fixture paths built")
 
 if mixin_file then
   helpers.assert_true(vim.fn.filereadable(mixin_file) == 1, fixture .. " mixin file must exist: " .. mixin_file)
+end
+if placement_mixin_file then
+  helpers.assert_true(
+    vim.fn.filereadable(placement_mixin_file) == 1,
+    fixture .. " placement mixin file must exist: " .. placement_mixin_file
+  )
 end
 if client_mixin_file then
   helpers.assert_true(
@@ -176,6 +198,14 @@ local client_id = vim.lsp.start_client({
   },
   init_options = {
     bundles = { bundle_jar },
+    extendedClientCapabilities = fixture == "create-drill-definition-diagnostics" and {
+      classFileContentsSupport = true,
+      generateConstructorsPromptSupport = true,
+      generateToStringPromptSupport = true,
+      overrideMethodsPromptSupport = true,
+      advancedExtractRefactoringSupport = true,
+      executeClientCommandSupport = true,
+    } or nil,
   },
   settings = vim.env.MCDEV_E2E_GRADLE_JAVA_HOME and {
     java = { import = { gradle = { java = { home = vim.env.MCDEV_E2E_GRADLE_JAVA_HOME } } } },
@@ -352,6 +382,27 @@ if fixture == "real-sodium" then
     log_step = log_step,
   })
   log_step("passed real project completion correctness; latency recorded separately")
+  return
+end
+
+if fixture == "create-drill-definition-diagnostics" then
+  dofile(vim.fn.getcwd() .. "/mcdev-nvim/tests/e2e/create_drill_definition_diagnostics_e2e.lua")({
+    helpers = helpers,
+    with_buffer = with_buffer,
+    mixin_file = mixin_file,
+    build_context = build_context,
+    mcdev_command = mcdev_command,
+    client = client,
+    log_step = log_step,
+  })
+  dofile(vim.fn.getcwd() .. "/mcdev-nvim/tests/e2e/placement_offset_completion_e2e.lua")({
+    helpers = helpers,
+    with_buffer = with_buffer,
+    placement_mixin_file = placement_mixin_file,
+    build_context = build_context,
+    mcdev_command = mcdev_command,
+    log_step = log_step,
+  })
   return
 end
 
