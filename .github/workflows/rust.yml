@@ -1,0 +1,33 @@
+name: Rust
+on:
+  push:
+  pull_request:
+
+jobs:
+  verify:
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, windows-latest]
+    runs-on: ${{ matrix.os }}
+    timeout-minutes: 35
+    steps:
+      - uses: actions/checkout@v4
+      - uses: dtolnay/rust-toolchain@stable
+        with:
+          components: rustfmt
+      - uses: rhysd/action-setup-vim@v1
+        with:
+          version: v0.11.5
+          neovim: true
+      - name: Verify compact runner
+        shell: pwsh
+        run: ./scripts/test-rust-compact-runner.ps1
+      - name: Verify Rust and editor integration
+        shell: pwsh
+        run: ./scripts/run-rust-tests-compact.ps1
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: rust-test-logs-${{ matrix.os }}
+          path: build/rust-test-logs

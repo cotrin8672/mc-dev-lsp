@@ -1,0 +1,17 @@
+[workspace]
+members = ["mcdev-ktlsp"]
+resolver = "2"
+
+[workspace.dependencies]
+ktcore = { git = "https://github.com/cotrin8672/ktlsp", rev = "646d8277e22e53de1a9842c2a74b700f88dc28fb" }
+ktlsp = { git = "https://github.com/cotrin8672/ktlsp", rev = "646d8277e22e53de1a9842c2a74b700f88dc28fb" }
+
+[patch.crates-io]
+ls-types = { git = "https://github.com/cotrin8672/ktlsp", rev = "646d8277e22e53de1a9842c2a74b700f88dc28fb" }
+notify = { git = "https://github.com/cotrin8672/ktlsp", rev = "646d8277e22e53de1a9842c2a74b700f88dc28fb" }
+
+[profile.dev]
+debug = "line-tables-only"
+
+[profile.dev.package."*"]
+debug = false

@@ -1,5 +1,10 @@
 # mc-dev-lsp
 
+This branch also contains the initial Rust integration with ktlsp in
+`mcdev-ktlsp`. See [ktlsp development and setup](docs/ktlsp.md) for its supported
+slice, build instructions, and migration limits. The JDT LS modules and setup
+below remain available.
+
 Minecraft modding semantic support for Neovim through a JDT LS extension.
 
 The repository follows the design dossier in [docs](docs/README.md). Kotlin owns Minecraft modding semantics, the JDT LS bundle owns Java/project integration, and Lua owns only Neovim transport and UI adaptation.
@@ -14,6 +19,7 @@ The repository follows the design dossier in [docs](docs/README.md). Kotlin owns
 
 ## Modules
 
+- `mcdev-ktlsp`: initial Rust Mixin provider and ktlsp-based LSP executable on this branch.
 - `mcdev-core`: editor-independent JVM descriptor, mapping, bytecode, Mixin, MixinExtras, Access Widener, and Access Transformer semantics.
 - `mcdev-protocol`: command payload and response DTOs shared by Neovim and the JDT LS extension.
 - `mcdev-jdtls-extension`: OSGi bundle entry point and JDT LS command integration.

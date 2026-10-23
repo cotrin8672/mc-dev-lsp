@@ -1,5 +1,9 @@
 # Contributing
 
+The Rust/ktlsp work on this branch is documented in [ktlsp development](ktlsp.md).
+Its semantic rules live in `mcdev-ktlsp`; ktlsp supplies the shared Java/Kotlin
+facts. The module boundaries below describe the existing JDT LS implementation.
+
 This guide explains where code belongs in the mcdev monorepo. Read it before adding features so semantic logic stays in Kotlin and Lua remains a thin transport layer.
 
 For agent-oriented checklists, see [Agent Onboarding](08-agent-onboarding.md). For module layout, see [Repository Layout](01-repository-layout.md).
