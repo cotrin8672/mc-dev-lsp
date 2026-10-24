@@ -1,0 +1,1500 @@
+[
+  {
+    "legacyCase": "mcdev-jdtls-extension/src/test/kotlin/io/github/mcdev/jdtls/mixin/JdtProjectSourceQueryTest.kt::binaryTypesAreAcceptedForClassMethodAndFieldLookup",
+    "captureRow1Based": 2,
+    "api": "findClass",
+    "args": {
+      "internalName": "com/example/BinaryOnly"
+    },
+    "classFact": {
+      "status": "known",
+      "value": {
+        "internalName": "com/example/BinaryOnly",
+        "simpleName": "BinaryOnly",
+        "packageName": "com.example",
+        "methods": [
+          {
+            "name": "run",
+            "isConstructor": false,
+            "accessFlags": 0,
+            "parameterTypes": [],
+            "returnType": {
+              "kind": "primitive",
+              "value": "void"
+            }
+          }
+        ],
+        "fields": [
+          {
+            "name": "value",
+            "accessFlags": 0,
+            "fieldType": {
+              "kind": "primitive",
+              "value": "int"
+            }
+          }
+        ],
+        "methodsComplete": true,
+        "fieldsComplete": true
+      }
+    },
+    "error": null,
+    "expected": {
+      "simpleName": "BinaryOnly",
+      "packageName": "com.example",
+      "internalName": "com/example/BinaryOnly"
+    }
+  },
+  {
+    "legacyCase": "mcdev-jdtls-extension/src/test/kotlin/io/github/mcdev/jdtls/mixin/JdtProjectSourceQueryTest.kt::binaryTypesAreAcceptedForClassMethodAndFieldLookup",
+    "captureRow1Based": 4,
+    "api": "findClassByFqn",
+    "args": {
+      "fqn": "com.example.BinaryOnly"
+    },
+    "classFact": {
+      "status": "known",
+      "value": {
+        "internalName": "com/example/BinaryOnly",
+        "simpleName": "BinaryOnly",
+        "packageName": "com.example",
+        "methods": [
+          {
+            "name": "run",
+            "isConstructor": false,
+            "accessFlags": 0,
+            "parameterTypes": [],
+            "returnType": {
+              "kind": "primitive",
+              "value": "void"
+            }
+          }
+        ],
+        "fields": [
+          {
+            "name": "value",
+            "accessFlags": 0,
+            "fieldType": {
+              "kind": "primitive",
+              "value": "int"
+            }
+          }
+        ],
+        "methodsComplete": true,
+        "fieldsComplete": true
+      }
+    },
+    "error": null,
+    "expected": {
+      "simpleName": "BinaryOnly",
+      "packageName": "com.example",
+      "internalName": "com/example/BinaryOnly"
+    }
+  },
+  {
+    "legacyCase": "mcdev-jdtls-extension/src/test/kotlin/io/github/mcdev/jdtls/mixin/JdtProjectSourceQueryTest.kt::binaryTypesAreAcceptedForClassMethodAndFieldLookup",
+    "captureRow1Based": 7,
+    "api": "getMethods",
+    "args": {
+      "ownerInternalName": "com/example/BinaryOnly"
+    },
+    "classFact": {
+      "status": "known",
+      "value": {
+        "internalName": "com/example/BinaryOnly",
+        "simpleName": "BinaryOnly",
+        "packageName": "com.example",
+        "methods": [
+          {
+            "name": "run",
+            "isConstructor": false,
+            "accessFlags": 0,
+            "parameterTypes": [],
+            "returnType": {
+              "kind": "primitive",
+              "value": "void"
+            }
+          }
+        ],
+        "fields": [
+          {
+            "name": "value",
+            "accessFlags": 0,
+            "fieldType": {
+              "kind": "primitive",
+              "value": "int"
+            }
+          }
+        ],
+        "methodsComplete": true,
+        "fieldsComplete": true
+      }
+    },
+    "error": null,
+    "expected": [
+      {
+        "name": "run",
+        "descriptor": "()V",
+        "isStatic": false,
+        "readableSignature": "run(): void"
+      }
+    ]
+  },
+  {
+    "legacyCase": "mcdev-jdtls-extension/src/test/kotlin/io/github/mcdev/jdtls/mixin/JdtProjectSourceQueryTest.kt::binaryTypesAreAcceptedForClassMethodAndFieldLookup",
+    "captureRow1Based": 10,
+    "api": "getFields",
+    "args": {
+      "ownerInternalName": "com/example/BinaryOnly"
+    },
+    "classFact": {
+      "status": "known",
+      "value": {
+        "internalName": "com/example/BinaryOnly",
+        "simpleName": "BinaryOnly",
+        "packageName": "com.example",
+        "methods": [
+          {
+            "name": "run",
+            "isConstructor": false,
+            "accessFlags": 0,
+            "parameterTypes": [],
+            "returnType": {
+              "kind": "primitive",
+              "value": "void"
+            }
+          }
+        ],
+        "fields": [
+          {
+            "name": "value",
+            "accessFlags": 0,
+            "fieldType": {
+              "kind": "primitive",
+              "value": "int"
+            }
+          }
+        ],
+        "methodsComplete": true,
+        "fieldsComplete": true
+      }
+    },
+    "error": null,
+    "expected": [
+      {
+        "name": "value",
+        "descriptor": "I",
+        "isStatic": false,
+        "readableType": "int"
+      }
+    ]
+  },
+  {
+    "legacyCase": "mcdev-jdtls-extension/src/test/kotlin/io/github/mcdev/jdtls/mixin/JdtProjectSourceQueryTest.kt::findClassAndFindClassByFqnResolveExactSourceType",
+    "captureRow1Based": 14,
+    "api": "findClass",
+    "args": {
+      "internalName": "com/example/Sample"
+    },
+    "classFact": {
+      "status": "known",
+      "value": {
+        "internalName": "com/example/Sample",
+        "simpleName": "Sample",
+        "packageName": "com.example",
+        "methods": [],
+        "fields": [],
+        "methodsComplete": true,
+        "fieldsComplete": true
+      }
+    },
+    "error": null,
+    "expected": {
+      "simpleName": "Sample",
+      "packageName": "com.example",
+      "internalName": "com/example/Sample"
+    }
+  },
+  {
+    "legacyCase": "mcdev-jdtls-extension/src/test/kotlin/io/github/mcdev/jdtls/mixin/JdtProjectSourceQueryTest.kt::findClassAndFindClassByFqnResolveExactSourceType",
+    "captureRow1Based": 16,
+    "api": "findClassByFqn",
+    "args": {
+      "fqn": "com.example.Sample"
+    },
+    "classFact": {
+      "status": "known",
+      "value": {
+        "internalName": "com/example/Sample",
+        "simpleName": "Sample",
+        "packageName": "com.example",
+        "methods": [],
+        "fields": [],
+        "methodsComplete": true,
+        "fieldsComplete": true
+      }
+    },
+    "error": null,
+    "expected": {
+      "simpleName": "Sample",
+      "packageName": "com.example",
+      "internalName": "com/example/Sample"
+    }
+  },
+  {
+    "legacyCase": "mcdev-jdtls-extension/src/test/kotlin/io/github/mcdev/jdtls/mixin/JdtProjectSourceQueryTest.kt::findClassBuildsInnerClassInternalNameWithDollarSeparator",
+    "captureRow1Based": 18,
+    "api": "findClass",
+    "args": {
+      "internalName": "com/example/Outer$Inner"
+    },
+    "classFact": {
+      "status": "known",
+      "value": {
+        "internalName": "com/example/Outer$Inner",
+        "simpleName": "Outer$Inner",
+        "packageName": "com.example",
+        "methods": [],
+        "fields": [],
+        "methodsComplete": true,
+        "fieldsComplete": true
+      }
+    },
+    "error": null,
+    "expected": {
+      "simpleName": "Outer$Inner",
+      "packageName": "com.example",
+      "internalName": "com/example/Outer$Inner"
+    }
+  },
+  {
+    "legacyCase": "mcdev-jdtls-extension/src/test/kotlin/io/github/mcdev/jdtls/mixin/JdtProjectSourceQueryTest.kt::findClassPropagatesCancellationFromProjectLookup",
+    "captureRow1Based": 20,
+    "api": "findClass",
+    "args": {
+      "internalName": "com/example.Cancelled"
+    },
+    "classFact": {
+      "status": "unavailable",
+      "value": {
+        "reason": "source type resolution unavailable"
+      }
+    },
+    "error": {
+      "kind": "cancelled",
+      "message": "cancelled"
+    },
+    "expected": null
+  },
+  {
+    "legacyCase": "mcdev-jdtls-extension/src/test/kotlin/io/github/mcdev/jdtls/mixin/JdtProjectSourceQueryTest.kt::findClassPropagatesInterruptedExceptionFromProjectLookup",
+    "captureRow1Based": 22,
+    "api": "findClass",
+    "args": {
+      "internalName": "com/example/Interrupted"
+    },
+    "classFact": {
+      "status": "unavailable",
+      "value": {
+        "reason": "source type resolution unavailable"
+      }
+    },
+    "error": {
+      "kind": "interrupted",
+      "message": "interrupted"
+    },
+    "expected": null
+  },
+  {
+    "legacyCase": "mcdev-jdtls-extension/src/test/kotlin/io/github/mcdev/jdtls/mixin/JdtProjectSourceQueryTest.kt::findClassesReturnsEmptyWhenJdtSearchIsUnavailable",
+    "captureRow1Based": 23,
+    "api": "findClasses",
+    "args": {
+      "prefix": "com",
+      "limit": 10
+    },
+    "classFact": {
+      "status": "unavailable",
+      "value": {
+        "reason": "source type resolution unavailable"
+      }
+    },
+    "error": null,
+    "expected": []
+  },
+  {
+    "legacyCase": "mcdev-jdtls-extension/src/test/kotlin/io/github/mcdev/jdtls/mixin/JdtProjectSourceQueryTest.kt::findClassesReturnsEmptyWhenLimitIsZeroOrNegative",
+    "captureRow1Based": 24,
+    "api": "findClasses",
+    "args": {
+      "prefix": "com",
+      "limit": 0
+    },
+    "classFact": {
+      "status": "unavailable",
+      "value": {
+        "reason": "source type resolution unavailable"
+      }
+    },
+    "error": null,
+    "expected": []
+  },
+  {
+    "legacyCase": "mcdev-jdtls-extension/src/test/kotlin/io/github/mcdev/jdtls/mixin/JdtProjectSourceQueryTest.kt::findClassesReturnsEmptyWhenLimitIsZeroOrNegative",
+    "captureRow1Based": 25,
+    "api": "findClasses",
+    "args": {
+      "prefix": "com",
+      "limit": -1
+    },
+    "classFact": {
+      "status": "unavailable",
+      "value": {
+        "reason": "source type resolution unavailable"
+      }
+    },
+    "error": null,
+    "expected": []
+  },
+  {
+    "legacyCase": "mcdev-jdtls-extension/src/test/kotlin/io/github/mcdev/jdtls/mixin/JdtProjectSourceQueryTest.kt::findTypeFailureDisablesCoversProjectDependenciesForOperation",
+    "captureRow1Based": 27,
+    "api": "findClass",
+    "args": {
+      "internalName": "com/example/Missing"
+    },
+    "classFact": {
+      "status": "unavailable",
+      "value": {
+        "reason": "source type resolution unavailable"
+      }
+    },
+    "error": null,
+    "expected": null
+  },
+  {
+    "legacyCase": "mcdev-jdtls-extension/src/test/kotlin/io/github/mcdev/jdtls/mixin/JdtProjectSourceQueryTest.kt::findTypeFailureOnOneThreadDoesNotAffectExactLookupAuthorityOnAnotherThread",
+    "captureRow1Based": 31,
+    "api": "findClass",
+    "args": {
+      "internalName": "com/example/Authoritative"
+    },
+    "classFact": {
+      "status": "known",
+      "value": {
+        "internalName": "com/example/Authoritative",
+        "simpleName": "Authoritative",
+        "packageName": "com.example",
+        "methods": [],
+        "fields": [],
+        "methodsComplete": true,
+        "fieldsComplete": true
+      }
+    },
+    "error": null,
+    "expected": {
+      "simpleName": "Authoritative",
+      "packageName": "com.example",
+      "internalName": "com/example/Authoritative"
+    }
+  },
+  {
+    "legacyCase": "mcdev-jdtls-extension/src/test/kotlin/io/github/mcdev/jdtls/mixin/JdtProjectSourceQueryTest.kt::findTypeFailureOnOneThreadDoesNotAffectExactLookupAuthorityOnAnotherThread",
+    "captureRow1Based": 33,
+    "api": "findClass",
+    "args": {
+      "internalName": "com/example/Failing"
+    },
+    "classFact": {
+      "status": "unavailable",
+      "value": {
+        "reason": "source type resolution unavailable"
+      }
+    },
+    "error": null,
+    "expected": null
+  },
+  {
+    "legacyCase": "mcdev-jdtls-extension/src/test/kotlin/io/github/mcdev/jdtls/mixin/JdtProjectSourceQueryTest.kt::getFieldsMarksStaticFieldsFromFlags",
+    "captureRow1Based": 38,
+    "api": "getFields",
+    "args": {
+      "ownerInternalName": "com/example/StaticFieldSamples"
+    },
+    "classFact": {
+      "status": "known",
+      "value": {
+        "internalName": "com/example/StaticFieldSamples",
+        "simpleName": "StaticFieldSamples",
+        "packageName": "com.example",
+        "methods": [],
+        "fields": [
+          {
+            "name": "instanceValue",
+            "accessFlags": 0,
+            "fieldType": {
+              "kind": "primitive",
+              "value": "int"
+            }
+          },
+          {
+            "name": "staticValue",
+            "accessFlags": 8,
+            "fieldType": {
+              "kind": "primitive",
+              "value": "int"
+            }
+          }
+        ],
+        "methodsComplete": true,
+        "fieldsComplete": true
+      }
+    },
+    "error": null,
+    "expected": [
+      {
+        "name": "instanceValue",
+        "descriptor": "I",
+        "isStatic": false,
+        "readableType": "int"
+      },
+      {
+        "name": "staticValue",
+        "descriptor": "I",
+        "isStatic": true,
+        "readableType": "int"
+      }
+    ]
+  },
+  {
+    "legacyCase": "mcdev-jdtls-extension/src/test/kotlin/io/github/mcdev/jdtls/mixin/JdtProjectSourceQueryTest.kt::getFieldsReturnsPrimitiveAndResolvedStringDescriptors",
+    "captureRow1Based": 44,
+    "api": "getFields",
+    "args": {
+      "ownerInternalName": "com/example/FieldSamples"
+    },
+    "classFact": {
+      "status": "known",
+      "value": {
+        "internalName": "com/example/FieldSamples",
+        "simpleName": "FieldSamples",
+        "packageName": "com.example",
+        "methods": [],
+        "fields": [
+          {
+            "name": "count",
+            "accessFlags": 0,
+            "fieldType": {
+              "kind": "primitive",
+              "value": "int"
+            }
+          },
+          {
+            "name": "label",
+            "accessFlags": 0,
+            "fieldType": {
+              "kind": "candidates",
+              "value": [
+                {
+                  "kind": "class",
+                  "value": {
+                    "internal_name": "java/lang/String"
+                  }
+                }
+              ]
+            }
+          }
+        ],
+        "methodsComplete": true,
+        "fieldsComplete": true
+      }
+    },
+    "error": null,
+    "expected": [
+      {
+        "name": "count",
+        "descriptor": "I",
+        "isStatic": false,
+        "readableType": "int"
+      },
+      {
+        "name": "label",
+        "descriptor": "Ljava/lang/String;",
+        "isStatic": false,
+        "readableType": "String"
+      }
+    ]
+  },
+  {
+    "legacyCase": "mcdev-jdtls-extension/src/test/kotlin/io/github/mcdev/jdtls/mixin/JdtProjectSourceQueryTest.kt::getFieldsSkipsFieldsWhenReflectionFails",
+    "captureRow1Based": 48,
+    "api": "getFields",
+    "args": {
+      "ownerInternalName": "com/example/ReflectionFieldSamples"
+    },
+    "classFact": {
+      "status": "known",
+      "value": {
+        "internalName": "com/example/ReflectionFieldSamples",
+        "simpleName": "ReflectionFieldSamples",
+        "packageName": "com.example",
+        "methods": [],
+        "fields": [
+          {
+            "name": "keep",
+            "accessFlags": 0,
+            "fieldType": {
+              "kind": "primitive",
+              "value": "int"
+            }
+          },
+          {
+            "name": "missingTypeSignature",
+            "accessFlags": 0,
+            "fieldType": {
+              "kind": "unresolved"
+            }
+          },
+          {
+            "name": "missingFlags",
+            "accessFlags": null,
+            "fieldType": {
+              "kind": "primitive",
+              "value": "int"
+            }
+          }
+        ],
+        "methodsComplete": true,
+        "fieldsComplete": true
+      }
+    },
+    "error": null,
+    "expected": [
+      {
+        "name": "keep",
+        "descriptor": "I",
+        "isStatic": false,
+        "readableType": "int"
+      }
+    ]
+  },
+  {
+    "legacyCase": "mcdev-jdtls-extension/src/test/kotlin/io/github/mcdev/jdtls/mixin/JdtProjectSourceQueryTest.kt::getFieldsSkipsFieldsWithUnresolvedOrAmbiguousResolvedTypes",
+    "captureRow1Based": 56,
+    "api": "getFields",
+    "args": {
+      "ownerInternalName": "com/example/SkipFieldSamples"
+    },
+    "classFact": {
+      "status": "known",
+      "value": {
+        "internalName": "com/example/SkipFieldSamples",
+        "simpleName": "SkipFieldSamples",
+        "packageName": "com.example",
+        "methods": [],
+        "fields": [
+          {
+            "name": "keep",
+            "accessFlags": 0,
+            "fieldType": {
+              "kind": "primitive",
+              "value": "int"
+            }
+          },
+          {
+            "name": "unresolved",
+            "accessFlags": 0,
+            "fieldType": {
+              "kind": "unresolved"
+            }
+          },
+          {
+            "name": "ambiguous",
+            "accessFlags": 0,
+            "fieldType": {
+              "kind": "candidates",
+              "value": [
+                {
+                  "kind": "class",
+                  "value": {
+                    "internal_name": "com/one/Ambiguous"
+                  }
+                },
+                {
+                  "kind": "class",
+                  "value": {
+                    "internal_name": "com/two/Ambiguous"
+                  }
+                }
+              ]
+            }
+          }
+        ],
+        "methodsComplete": true,
+        "fieldsComplete": true
+      }
+    },
+    "error": null,
+    "expected": [
+      {
+        "name": "keep",
+        "descriptor": "I",
+        "isStatic": false,
+        "readableType": "int"
+      }
+    ]
+  },
+  {
+    "legacyCase": "mcdev-jdtls-extension/src/test/kotlin/io/github/mcdev/jdtls/mixin/JdtProjectSourceQueryTest.kt::getMethodsMapsConstructorsToJvmInitName",
+    "captureRow1Based": 61,
+    "api": "getMethods",
+    "args": {
+      "ownerInternalName": "com/example/ConstructMe"
+    },
+    "classFact": {
+      "status": "known",
+      "value": {
+        "internalName": "com/example/ConstructMe",
+        "simpleName": "ConstructMe",
+        "packageName": "com.example",
+        "methods": [
+          {
+            "name": "ConstructMe",
+            "isConstructor": true,
+            "accessFlags": 0,
+            "parameterTypes": [
+              {
+                "kind": "primitive",
+                "value": "int"
+              }
+            ],
+            "returnType": {
+              "kind": "primitive",
+              "value": "void"
+            }
+          },
+          {
+            "name": "run",
+            "isConstructor": false,
+            "accessFlags": 0,
+            "parameterTypes": [],
+            "returnType": {
+              "kind": "primitive",
+              "value": "void"
+            }
+          }
+        ],
+        "fields": [],
+        "methodsComplete": true,
+        "fieldsComplete": true
+      }
+    },
+    "error": null,
+    "expected": [
+      {
+        "name": "<init>",
+        "descriptor": "(I)V",
+        "isStatic": false,
+        "readableSignature": "<init>(int): void"
+      },
+      {
+        "name": "run",
+        "descriptor": "()V",
+        "isStatic": false,
+        "readableSignature": "run(): void"
+      }
+    ]
+  },
+  {
+    "legacyCase": "mcdev-jdtls-extension/src/test/kotlin/io/github/mcdev/jdtls/mixin/JdtProjectSourceQueryTest.kt::getMethodsMarksStaticMethodsFromFlags",
+    "captureRow1Based": 65,
+    "api": "getMethods",
+    "args": {
+      "ownerInternalName": "com/example/StaticSamples"
+    },
+    "classFact": {
+      "status": "known",
+      "value": {
+        "internalName": "com/example/StaticSamples",
+        "simpleName": "StaticSamples",
+        "packageName": "com.example",
+        "methods": [
+          {
+            "name": "instanceRun",
+            "isConstructor": false,
+            "accessFlags": 0,
+            "parameterTypes": [],
+            "returnType": {
+              "kind": "primitive",
+              "value": "void"
+            }
+          },
+          {
+            "name": "staticRun",
+            "isConstructor": false,
+            "accessFlags": 8,
+            "parameterTypes": [],
+            "returnType": {
+              "kind": "primitive",
+              "value": "void"
+            }
+          }
+        ],
+        "fields": [],
+        "methodsComplete": true,
+        "fieldsComplete": true
+      }
+    },
+    "error": null,
+    "expected": [
+      {
+        "name": "instanceRun",
+        "descriptor": "()V",
+        "isStatic": false,
+        "readableSignature": "instanceRun(): void"
+      },
+      {
+        "name": "staticRun",
+        "descriptor": "()V",
+        "isStatic": true,
+        "readableSignature": "staticRun(): void"
+      }
+    ]
+  },
+  {
+    "legacyCase": "mcdev-jdtls-extension/src/test/kotlin/io/github/mcdev/jdtls/mixin/JdtProjectSourceQueryTest.kt::getMethodsReturnsOverloadedPrimitiveAndResolvedStringDescriptors",
+    "captureRow1Based": 73,
+    "api": "getMethods",
+    "args": {
+      "ownerInternalName": "com/example/OverloadSamples"
+    },
+    "classFact": {
+      "status": "known",
+      "value": {
+        "internalName": "com/example/OverloadSamples",
+        "simpleName": "OverloadSamples",
+        "packageName": "com.example",
+        "methods": [
+          {
+            "name": "process",
+            "isConstructor": false,
+            "accessFlags": 0,
+            "parameterTypes": [
+              {
+                "kind": "primitive",
+                "value": "int"
+              }
+            ],
+            "returnType": {
+              "kind": "primitive",
+              "value": "void"
+            }
+          },
+          {
+            "name": "process",
+            "isConstructor": false,
+            "accessFlags": 0,
+            "parameterTypes": [
+              {
+                "kind": "candidates",
+                "value": [
+                  {
+                    "kind": "class",
+                    "value": {
+                      "internal_name": "java/lang/String"
+                    }
+                  }
+                ]
+              }
+            ],
+            "returnType": {
+              "kind": "primitive",
+              "value": "void"
+            }
+          }
+        ],
+        "fields": [],
+        "methodsComplete": true,
+        "fieldsComplete": true
+      }
+    },
+    "error": null,
+    "expected": [
+      {
+        "name": "process",
+        "descriptor": "(I)V",
+        "isStatic": false,
+        "readableSignature": "process(int): void"
+      },
+      {
+        "name": "process",
+        "descriptor": "(Ljava/lang/String;)V",
+        "isStatic": false,
+        "readableSignature": "process(String): void"
+      }
+    ]
+  },
+  {
+    "legacyCase": "mcdev-jdtls-extension/src/test/kotlin/io/github/mcdev/jdtls/mixin/JdtProjectSourceQueryTest.kt::getMethodsSkipsMethodsWhenConstructorOrFlagsReflectionFails",
+    "captureRow1Based": 77,
+    "api": "getMethods",
+    "args": {
+      "ownerInternalName": "com/example/ReflectionSamples"
+    },
+    "classFact": {
+      "status": "known",
+      "value": {
+        "internalName": "com/example/ReflectionSamples",
+        "simpleName": "ReflectionSamples",
+        "packageName": "com.example",
+        "methods": [
+          {
+            "name": "keep",
+            "isConstructor": false,
+            "accessFlags": 0,
+            "parameterTypes": [],
+            "returnType": {
+              "kind": "primitive",
+              "value": "void"
+            }
+          },
+          {
+            "name": "missingConstructorFlag",
+            "isConstructor": null,
+            "accessFlags": 0,
+            "parameterTypes": [],
+            "returnType": {
+              "kind": "primitive",
+              "value": "void"
+            }
+          },
+          {
+            "name": "missingFlags",
+            "isConstructor": false,
+            "accessFlags": null,
+            "parameterTypes": [],
+            "returnType": {
+              "kind": "primitive",
+              "value": "void"
+            }
+          }
+        ],
+        "fields": [],
+        "methodsComplete": true,
+        "fieldsComplete": true
+      }
+    },
+    "error": null,
+    "expected": [
+      {
+        "name": "keep",
+        "descriptor": "()V",
+        "isStatic": false,
+        "readableSignature": "keep(): void"
+      }
+    ]
+  },
+  {
+    "legacyCase": "mcdev-jdtls-extension/src/test/kotlin/io/github/mcdev/jdtls/mixin/JdtProjectSourceQueryTest.kt::getMethodsSkipsMethodsWhenParameterTypesContainNonStringElements",
+    "captureRow1Based": 81,
+    "api": "getMethods",
+    "args": {
+      "ownerInternalName": "com/example/BadParams"
+    },
+    "classFact": {
+      "status": "known",
+      "value": {
+        "internalName": "com/example/BadParams",
+        "simpleName": "BadParams",
+        "packageName": "com.example",
+        "methods": [
+          {
+            "name": "keep",
+            "isConstructor": false,
+            "accessFlags": 0,
+            "parameterTypes": [
+              {
+                "kind": "primitive",
+                "value": "int"
+              }
+            ],
+            "returnType": {
+              "kind": "primitive",
+              "value": "void"
+            }
+          },
+          {
+            "name": "drop",
+            "isConstructor": false,
+            "accessFlags": 0,
+            "parameterTypes": [
+              {
+                "kind": "primitive",
+                "value": "int"
+              },
+              {
+                "kind": "unresolved"
+              }
+            ],
+            "returnType": {
+              "kind": "primitive",
+              "value": "void"
+            }
+          }
+        ],
+        "fields": [],
+        "methodsComplete": true,
+        "fieldsComplete": true
+      }
+    },
+    "error": null,
+    "expected": [
+      {
+        "name": "keep",
+        "descriptor": "(I)V",
+        "isStatic": false,
+        "readableSignature": "keep(int): void"
+      }
+    ]
+  },
+  {
+    "legacyCase": "mcdev-jdtls-extension/src/test/kotlin/io/github/mcdev/jdtls/mixin/JdtProjectSourceQueryTest.kt::getMethodsSkipsMethodsWithUnresolvedOrAmbiguousResolvedTypes",
+    "captureRow1Based": 90,
+    "api": "getMethods",
+    "args": {
+      "ownerInternalName": "com/example/SkipSamples"
+    },
+    "classFact": {
+      "status": "known",
+      "value": {
+        "internalName": "com/example/SkipSamples",
+        "simpleName": "SkipSamples",
+        "packageName": "com.example",
+        "methods": [
+          {
+            "name": "keep",
+            "isConstructor": false,
+            "accessFlags": 0,
+            "parameterTypes": [
+              {
+                "kind": "primitive",
+                "value": "int"
+              }
+            ],
+            "returnType": {
+              "kind": "primitive",
+              "value": "void"
+            }
+          },
+          {
+            "name": "unresolvedParam",
+            "isConstructor": false,
+            "accessFlags": 0,
+            "parameterTypes": [
+              {
+                "kind": "unresolved"
+              }
+            ],
+            "returnType": {
+              "kind": "primitive",
+              "value": "void"
+            }
+          },
+          {
+            "name": "ambiguousReturn",
+            "isConstructor": false,
+            "accessFlags": 0,
+            "parameterTypes": [],
+            "returnType": {
+              "kind": "candidates",
+              "value": [
+                {
+                  "kind": "class",
+                  "value": {
+                    "internal_name": "com/one/Ambiguous"
+                  }
+                },
+                {
+                  "kind": "class",
+                  "value": {
+                    "internal_name": "com/two/Ambiguous"
+                  }
+                }
+              ]
+            }
+          }
+        ],
+        "fields": [],
+        "methodsComplete": true,
+        "fieldsComplete": true
+      }
+    },
+    "error": null,
+    "expected": [
+      {
+        "name": "keep",
+        "descriptor": "(I)V",
+        "isStatic": false,
+        "readableSignature": "keep(int): void"
+      }
+    ]
+  },
+  {
+    "legacyCase": "mcdev-jdtls-extension/src/test/kotlin/io/github/mcdev/jdtls/mixin/JdtProjectSourceQueryTest.kt::incompleteJdtFieldResultKeepsBytecodeFieldsAvailableToMixinCompletion",
+    "captureRow1Based": 95,
+    "api": "getFields",
+    "args": {
+      "ownerInternalName": "com/example/BlockItem"
+    },
+    "classFact": {
+      "status": "known",
+      "value": {
+        "internalName": "com/example/BlockItem",
+        "simpleName": "BlockItem",
+        "packageName": "com.example",
+        "methods": [],
+        "fields": [
+          {
+            "name": "keep",
+            "accessFlags": 0,
+            "fieldType": {
+              "kind": "primitive",
+              "value": "int"
+            }
+          },
+          {
+            "name": "block",
+            "accessFlags": 0,
+            "fieldType": {
+              "kind": "unresolved"
+            }
+          }
+        ],
+        "methodsComplete": true,
+        "fieldsComplete": true
+      }
+    },
+    "error": null,
+    "expected": [
+      {
+        "name": "keep",
+        "descriptor": "I",
+        "isStatic": false,
+        "readableType": "int"
+      }
+    ]
+  },
+  {
+    "legacyCase": "mcdev-jdtls-extension/src/test/kotlin/io/github/mcdev/jdtls/mixin/JdtProjectSourceQueryTest.kt::incompleteJdtFieldResultKeepsBytecodeFieldsAvailableToMixinCompletion",
+    "captureRow1Based": 101,
+    "api": "getFields",
+    "args": {
+      "ownerInternalName": "com/example/BlockItem"
+    },
+    "classFact": {
+      "status": "known",
+      "value": {
+        "internalName": "com/example/BlockItem",
+        "simpleName": "BlockItem",
+        "packageName": "com.example",
+        "methods": [],
+        "fields": [
+          {
+            "name": "keep",
+            "accessFlags": 0,
+            "fieldType": {
+              "kind": "primitive",
+              "value": "int"
+            }
+          },
+          {
+            "name": "block",
+            "accessFlags": 0,
+            "fieldType": {
+              "kind": "unresolved"
+            }
+          }
+        ],
+        "methodsComplete": true,
+        "fieldsComplete": true
+      }
+    },
+    "error": null,
+    "expected": [
+      {
+        "name": "keep",
+        "descriptor": "I",
+        "isStatic": false,
+        "readableType": "int"
+      }
+    ]
+  },
+  {
+    "legacyCase": "mcdev-jdtls-extension/src/test/kotlin/io/github/mcdev/jdtls/mixin/JdtProjectSourceQueryTest.kt::incompleteJdtFieldResultKeepsBytecodeFieldsAvailableToMixinCompletion",
+    "captureRow1Based": 107,
+    "api": "getFields",
+    "args": {
+      "ownerInternalName": "com/example/BlockItem"
+    },
+    "classFact": {
+      "status": "known",
+      "value": {
+        "internalName": "com/example/BlockItem",
+        "simpleName": "BlockItem",
+        "packageName": "com.example",
+        "methods": [],
+        "fields": [
+          {
+            "name": "keep",
+            "accessFlags": 0,
+            "fieldType": {
+              "kind": "primitive",
+              "value": "int"
+            }
+          },
+          {
+            "name": "block",
+            "accessFlags": 0,
+            "fieldType": {
+              "kind": "unresolved"
+            }
+          }
+        ],
+        "methodsComplete": true,
+        "fieldsComplete": true
+      }
+    },
+    "error": null,
+    "expected": [
+      {
+        "name": "keep",
+        "descriptor": "I",
+        "isStatic": false,
+        "readableType": "int"
+      }
+    ]
+  },
+  {
+    "legacyCase": "mcdev-jdtls-extension/src/test/kotlin/io/github/mcdev/jdtls/mixin/JdtProjectSourceQueryTest.kt::incompleteJdtMethodResultKeepsBytecodeMethodsAvailableToMixinCompletion",
+    "captureRow1Based": 113,
+    "api": "getMethods",
+    "args": {
+      "ownerInternalName": "com/example/BlockItem"
+    },
+    "classFact": {
+      "status": "known",
+      "value": {
+        "internalName": "com/example/BlockItem",
+        "simpleName": "BlockItem",
+        "packageName": "com.example",
+        "methods": [
+          {
+            "name": "keep",
+            "isConstructor": false,
+            "accessFlags": 0,
+            "parameterTypes": [],
+            "returnType": {
+              "kind": "primitive",
+              "value": "void"
+            }
+          },
+          {
+            "name": "getBlock",
+            "isConstructor": false,
+            "accessFlags": 0,
+            "parameterTypes": [],
+            "returnType": {
+              "kind": "unresolved"
+            }
+          }
+        ],
+        "fields": [],
+        "methodsComplete": true,
+        "fieldsComplete": true
+      }
+    },
+    "error": null,
+    "expected": [
+      {
+        "name": "keep",
+        "descriptor": "()V",
+        "isStatic": false,
+        "readableSignature": "keep(): void"
+      }
+    ]
+  },
+  {
+    "legacyCase": "mcdev-jdtls-extension/src/test/kotlin/io/github/mcdev/jdtls/mixin/JdtProjectSourceQueryTest.kt::incompleteJdtMethodResultKeepsBytecodeMethodsAvailableToMixinCompletion",
+    "captureRow1Based": 119,
+    "api": "getMethods",
+    "args": {
+      "ownerInternalName": "com/example/BlockItem"
+    },
+    "classFact": {
+      "status": "known",
+      "value": {
+        "internalName": "com/example/BlockItem",
+        "simpleName": "BlockItem",
+        "packageName": "com.example",
+        "methods": [
+          {
+            "name": "keep",
+            "isConstructor": false,
+            "accessFlags": 0,
+            "parameterTypes": [],
+            "returnType": {
+              "kind": "primitive",
+              "value": "void"
+            }
+          },
+          {
+            "name": "getBlock",
+            "isConstructor": false,
+            "accessFlags": 0,
+            "parameterTypes": [],
+            "returnType": {
+              "kind": "unresolved"
+            }
+          }
+        ],
+        "fields": [],
+        "methodsComplete": true,
+        "fieldsComplete": true
+      }
+    },
+    "error": null,
+    "expected": [
+      {
+        "name": "keep",
+        "descriptor": "()V",
+        "isStatic": false,
+        "readableSignature": "keep(): void"
+      }
+    ]
+  },
+  {
+    "legacyCase": "mcdev-jdtls-extension/src/test/kotlin/io/github/mcdev/jdtls/mixin/JdtProjectSourceQueryTest.kt::incompleteJdtMethodResultKeepsBytecodeMethodsAvailableToMixinCompletion",
+    "captureRow1Based": 125,
+    "api": "getMethods",
+    "args": {
+      "ownerInternalName": "com/example/BlockItem"
+    },
+    "classFact": {
+      "status": "known",
+      "value": {
+        "internalName": "com/example/BlockItem",
+        "simpleName": "BlockItem",
+        "packageName": "com.example",
+        "methods": [
+          {
+            "name": "keep",
+            "isConstructor": false,
+            "accessFlags": 0,
+            "parameterTypes": [],
+            "returnType": {
+              "kind": "primitive",
+              "value": "void"
+            }
+          },
+          {
+            "name": "getBlock",
+            "isConstructor": false,
+            "accessFlags": 0,
+            "parameterTypes": [],
+            "returnType": {
+              "kind": "unresolved"
+            }
+          }
+        ],
+        "fields": [],
+        "methodsComplete": true,
+        "fieldsComplete": true
+      }
+    },
+    "error": null,
+    "expected": [
+      {
+        "name": "keep",
+        "descriptor": "()V",
+        "isStatic": false,
+        "readableSignature": "keep(): void"
+      }
+    ]
+  },
+  {
+    "legacyCase": "mcdev-jdtls-extension/src/test/kotlin/io/github/mcdev/jdtls/mixin/JdtProjectSourceQueryTest.kt::missingSourceTypeDoesNotTaintTheNextSuccessfulQuery",
+    "captureRow1Based": 128,
+    "api": "findClass",
+    "args": {
+      "internalName": "com/example/Missing"
+    },
+    "classFact": {
+      "status": "unavailable",
+      "value": {
+        "reason": "source type resolution unavailable"
+      }
+    },
+    "error": null,
+    "expected": null
+  },
+  {
+    "legacyCase": "mcdev-jdtls-extension/src/test/kotlin/io/github/mcdev/jdtls/mixin/JdtProjectSourceQueryTest.kt::missingSourceTypeDoesNotTaintTheNextSuccessfulQuery",
+    "captureRow1Based": 131,
+    "api": "findClass",
+    "args": {
+      "internalName": "com/example/Found"
+    },
+    "classFact": {
+      "status": "known",
+      "value": {
+        "internalName": "com/example/Found",
+        "simpleName": "Found",
+        "packageName": "com.example",
+        "methods": [],
+        "fields": [],
+        "methodsComplete": true,
+        "fieldsComplete": true
+      }
+    },
+    "error": null,
+    "expected": {
+      "simpleName": "Found",
+      "packageName": "com.example",
+      "internalName": "com/example/Found"
+    }
+  },
+  {
+    "legacyCase": "mcdev-jdtls-extension/src/test/kotlin/io/github/mcdev/jdtls/mixin/JdtProjectSourceQueryTest.kt::resolveTypeAcceptsExactlyOneUniquePairAfterDeduplication",
+    "captureRow1Based": 138,
+    "api": "getMethods",
+    "args": {
+      "ownerInternalName": "com/example/DedupSamples"
+    },
+    "classFact": {
+      "status": "known",
+      "value": {
+        "internalName": "com/example/DedupSamples",
+        "simpleName": "DedupSamples",
+        "packageName": "com.example",
+        "methods": [
+          {
+            "name": "resolved",
+            "isConstructor": false,
+            "accessFlags": 0,
+            "parameterTypes": [
+              {
+                "kind": "candidates",
+                "value": [
+                  {
+                    "kind": "class",
+                    "value": {
+                      "internal_name": "java/lang/String"
+                    }
+                  },
+                  {
+                    "kind": "class",
+                    "value": {
+                      "internal_name": "java/lang/String"
+                    }
+                  }
+                ]
+              }
+            ],
+            "returnType": {
+              "kind": "primitive",
+              "value": "void"
+            }
+          }
+        ],
+        "fields": [],
+        "methodsComplete": true,
+        "fieldsComplete": true
+      }
+    },
+    "error": null,
+    "expected": [
+      {
+        "name": "resolved",
+        "descriptor": "(Ljava/lang/String;)V",
+        "isStatic": false,
+        "readableSignature": "resolved(String): void"
+      }
+    ]
+  },
+  {
+    "legacyCase": "mcdev-jdtls-extension/src/test/kotlin/io/github/mcdev/jdtls/mixin/JdtProjectSourceQueryTest.kt::unavailableMemberApiDoesNotSuppressBytecodeFallback",
+    "captureRow1Based": 140,
+    "api": "getMethods",
+    "args": {
+      "ownerInternalName": "example/Target"
+    },
+    "classFact": {
+      "status": "known",
+      "value": {
+        "internalName": "",
+        "simpleName": "",
+        "packageName": "",
+        "methods": [],
+        "fields": [],
+        "methodsComplete": false,
+        "fieldsComplete": false
+      }
+    },
+    "error": null,
+    "expected": []
+  },
+  {
+    "legacyCase": "mcdev-jdtls-extension/src/test/kotlin/io/github/mcdev/jdtls/mixin/JdtProjectSourceQueryTest.kt::unavailableMemberApiDoesNotSuppressBytecodeFallback",
+    "captureRow1Based": 143,
+    "api": "getFields",
+    "args": {
+      "ownerInternalName": "example/Target"
+    },
+    "classFact": {
+      "status": "known",
+      "value": {
+        "internalName": "",
+        "simpleName": "",
+        "packageName": "",
+        "methods": [],
+        "fields": [],
+        "methodsComplete": false,
+        "fieldsComplete": false
+      }
+    },
+    "error": null,
+    "expected": []
+  },
+  {
+    "legacyCase": "mcdev-jdtls-extension/src/test/kotlin/io/github/mcdev/jdtls/mixin/JdtProjectSourceQueryTest.kt::unresolvedTypeDoesNotSuppressBytecodeFallbackDuringProjectImport",
+    "captureRow1Based": 146,
+    "api": "getMethods",
+    "args": {
+      "ownerInternalName": "net/minecraft/client/gui/Gui"
+    },
+    "classFact": {
+      "status": "unavailable",
+      "value": {
+        "reason": "source type resolution unavailable"
+      }
+    },
+    "error": null,
+    "expected": []
+  },
+  {
+    "legacyCase": "mcdev-jdtls-extension/src/test/kotlin/io/github/mcdev/jdtls/mixin/JdtProjectSourceQueryTest.kt::unresolvedTypeDoesNotSuppressBytecodeFallbackDuringProjectImport",
+    "captureRow1Based": 149,
+    "api": "findClass",
+    "args": {
+      "internalName": "net/minecraft/client/gui/Gui"
+    },
+    "classFact": {
+      "status": "unavailable",
+      "value": {
+        "reason": "source type resolution unavailable"
+      }
+    },
+    "error": null,
+    "expected": null
+  }
+]

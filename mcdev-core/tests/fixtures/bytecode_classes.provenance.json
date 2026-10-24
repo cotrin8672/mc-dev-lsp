@@ -1,0 +1,29 @@
+{
+  "compiler": "JDK21 --release 21; same legacy BytecodeFixtureCompiler flags; -proc:none suppresses unrelated annotation processors",
+  "sources": {
+    "ConstantSamples.java": "c9e55846dd746d36a72dc75f3f44ff090e42cae5997cf610f94d8bcba0418fcc",
+    "ExpressionMatchSamples.java": "263bca4db372dedb1e40a97f2612ffed5ee4e4e5e811edad7f8ca86faeecb2fb",
+    "FieldSamples.java": "4d762d637c5aa9c685a77fdb8afe8e8ff41ce0a2d2e19eb8f5cf03e34cf7ebc1",
+    "InvokeSamples.java": "8e948fc08727125cd84a479f3abc7c44e0dd2d27c48c72cf4c4d94efc93344b2",
+    "LocalCaptureSamples.java": "f43415f5c87512c5d3c8f98dbe066817c3ea26a1c41992fe3dea279c05664aeb",
+    "MemberIndexSamples.java": "5738df1f11ed83fbd2bce9050aa697a10a649ea2eb19318dee3997c5b5a942a4",
+    "NewSamples.java": "a3ac450e71b0509d5c67af7cea10388acac1756a1e77ce69c7e79be893214cf1",
+    "ReturnSamples.java": "16a4d1d661745424c4bd692aac55beb1abf3b14fd8a25e10f06b494a0e6f64af",
+    "TypeInstructionSamples.java": "90bba405ebeb4b4f31782687d6d3f13ca26812b37eca534f576fe1ebd0ec36ea"
+  },
+  "classes": {
+    "io/github/mcdev/core/bytecode/fixtures/BaseClass": "f119c168ad7ac27ba14aae9e850d9526202211e212012acbfa155087c7fc1d00",
+    "io/github/mcdev/core/bytecode/fixtures/ConstantSamples": "019b7caacf8c240afdb88b6a101d62ce25acf3d9304659560b2543245d55a6b4",
+    "io/github/mcdev/core/bytecode/fixtures/ExpressionMatchSamples": "c0b5d88d4c3fb33a4c6cb2b0485560701823db182aac2dfdde482ff28bd6cf0e",
+    "io/github/mcdev/core/bytecode/fixtures/FieldSamples": "e5c07f26d4adeb4577e878bad879aac0616387476973d7f25d4fa877387afed3",
+    "io/github/mcdev/core/bytecode/fixtures/InvokeSamples": "e0c3570d964fd0c8c3c9f8315ad21174c0a7944d99abe474d4b56d9c02f0bfc8",
+    "io/github/mcdev/core/bytecode/fixtures/LocalCaptureSamples": "a02835181f7c1d3ae63fc79f0aa5a25a3eb74a79bc7c94a4d34887697454f180",
+    "io/github/mcdev/core/bytecode/fixtures/MemberIndexSamples": "47d6f55140c3f024c61efe299af507673d0f7f6618cc4c4970465bbd2b572a2f",
+    "io/github/mcdev/core/bytecode/fixtures/NewSamples": "81f97b1b06855345c451a85e869dd99a606b17febcc637c60120f5e605c0da72",
+    "io/github/mcdev/core/bytecode/fixtures/ReturnSamples": "061640986c015f44e3c72215378a9aca31880f0ae6be96dd89af6cb47d885fee",
+    "io/github/mcdev/core/bytecode/fixtures/SampleInterface": "8740e00311f8692df895ca92441550c6659d27985f4384b04779736d11d8373d",
+    "io/github/mcdev/core/bytecode/fixtures/TypeInstructionSamples": "837f24f7365b16aff156035687fc41e13b28309e44ce940239197a5b96e66e3e",
+    "com/example/target/SimpleTarget": "4e3b9137c518f0449e9360875173d9dd516e48c58d0005a3a57c9ed5818a47f7"
+  },
+  "simpleTargetSource": "mcdev-test-fixtures\\build\\generated\\fixture-classes\\com\\example\\target\\SimpleTarget.class"
+}

@@ -1,0 +1,22 @@
+{
+  "capturePlatform": "windows",
+  "captureBaseline": "current-20261023",
+  "legacyCases": 106,
+  "capturedApiCalls": 568,
+  "nativePlatformAdaptation": {
+    "apis": ["ProjectTreeWalker.walkRegularFiles", "ProjectTreeWalker.walkMappingDiscoveryRegularFiles", "MappingDiscoveryService.discoverMappingFiles"],
+    "rule": "Only on Unix, compare these path-list APIs in native case-sensitive slash order. Windows retains captured WindowsPath uppercase/backslash comparison. Other arrays retain their captured order."
+  },
+  "runtimeFieldAdaptation": {
+    "capturedAt": "Clock time is normalized; explicit entryTimestamps remain compared.",
+    "resolver": "Trait handle is not serialized; captured resolver operations are replayed against the resolver rebuilt from the same files.",
+    "allEntriesAndEntryCount": "Kotlin derived fields have no Rust serialized fields; the exact ProjectModelTest constructor tests separately assert ordered all_entries and entry_count.",
+    "resourceIssues": "Additional Rust diagnostics are independently tested; this field was absent in the Kotlin DTO."
+  },
+  "pendingHostIntegration": {
+    "legacyCase": "mcdev-jdtls-extension/src/test/kotlin/io/github/mcdev/jdtls/project/FileBasedProjectContextServiceTest.kt::sessionIndexesClasspathClasses",
+    "fixture": "project_files/fabric-basic plus project_files/SimpleTarget.class.bin installed at classpath/com/example/target/SimpleTarget.class",
+    "assertions": ["session.classBytesProvider.classCount() >= 1", "session.context.indexState == READY"],
+    "owner": "HostProjectSession and HostClassBytesProvider adapter; context readiness and an unrelated bytecode count are not proof of session integration."
+  }
+}

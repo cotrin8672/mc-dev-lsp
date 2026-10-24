@@ -1,0 +1,475 @@
+[
+  {
+    "trigger": "mixin",
+    "label": "Mixin",
+    "insertText": "Mixin(${1:Target}.class)$0",
+    "detail": "MixinExtras feature",
+    "source": "mixin.annotation",
+    "imports": [
+      "@Mixin:MIXIN"
+    ]
+  },
+  {
+    "trigger": "final",
+    "label": "Final",
+    "insertText": "Final$0",
+    "detail": "MixinExtras feature",
+    "source": "mixin.annotation",
+    "imports": [
+      "@Mixin:FINAL"
+    ]
+  },
+  {
+    "trigger": "mutable",
+    "label": "Mutable",
+    "insertText": "Mutable$0",
+    "detail": "MixinExtras feature",
+    "source": "mixin.annotation",
+    "imports": [
+      "@Mixin:MUTABLE"
+    ]
+  },
+  {
+    "trigger": "pseudo",
+    "label": "Pseudo",
+    "insertText": "Pseudo$0",
+    "detail": "MixinExtras feature",
+    "source": "mixin.annotation",
+    "imports": [
+      "@Mixin:PSEUDO"
+    ]
+  },
+  {
+    "trigger": "softoverride",
+    "label": "SoftOverride",
+    "insertText": "SoftOverride$0",
+    "detail": "MixinExtras feature",
+    "source": "mixin.annotation",
+    "imports": [
+      "@Mixin:SOFT_OVERRIDE"
+    ]
+  },
+  {
+    "trigger": "shadow",
+    "label": "Shadow",
+    "insertText": "Shadow$0",
+    "detail": "MixinExtras feature",
+    "source": "mixin.annotation",
+    "imports": [
+      "@Mixin:SHADOW"
+    ]
+  },
+  {
+    "trigger": "accessor",
+    "label": "Accessor",
+    "insertText": "Accessor(\"${1}\")$0",
+    "detail": "MixinExtras feature",
+    "source": "mixin.annotation",
+    "imports": [
+      "@Mixin:ACCESSOR"
+    ]
+  },
+  {
+    "trigger": "invoker",
+    "label": "Invoker",
+    "insertText": "Invoker(\"${1}\")$0",
+    "detail": "MixinExtras feature",
+    "source": "mixin.annotation",
+    "imports": [
+      "@Mixin:INVOKER"
+    ]
+  },
+  {
+    "trigger": "inject",
+    "label": "Inject",
+    "insertText": "Inject(method = \"${1}\", at = @At(\"${2}\"))$0",
+    "detail": "MixinExtras feature",
+    "source": "mixin.annotation",
+    "imports": [
+      "@Mixin:INJECT",
+      "@Mixin:AT"
+    ]
+  },
+  {
+    "trigger": "redirect",
+    "label": "Redirect",
+    "insertText": "Redirect(method = \"${1}\", at = @At(value = \"INVOKE\", target = \"${2}\"))$0",
+    "detail": "MixinExtras feature",
+    "source": "mixin.annotation",
+    "imports": [
+      "@Mixin:REDIRECT",
+      "@Mixin:AT"
+    ]
+  },
+  {
+    "trigger": "modifyarg",
+    "label": "ModifyArg",
+    "insertText": "ModifyArg(method = \"${1}\", at = @At(value = \"INVOKE\", target = \"${2}\"))$0",
+    "detail": "MixinExtras feature",
+    "source": "mixin.annotation",
+    "imports": [
+      "@Mixin:MODIFY_ARG",
+      "@Mixin:AT"
+    ]
+  },
+  {
+    "trigger": "modifyargs",
+    "label": "ModifyArgs",
+    "insertText": "ModifyArgs(method = \"${1}\", at = @At(value = \"INVOKE\", target = \"${2}\"))$0",
+    "detail": "MixinExtras feature",
+    "source": "mixin.annotation",
+    "imports": [
+      "@Mixin:MODIFY_ARGS",
+      "@Mixin:AT"
+    ]
+  },
+  {
+    "trigger": "modifyvariable",
+    "label": "ModifyVariable",
+    "insertText": "ModifyVariable(method = \"${1}\", at = @At(\"${2}\"))$0",
+    "detail": "MixinExtras feature",
+    "source": "mixin.annotation",
+    "imports": [
+      "@Mixin:MODIFY_VARIABLE",
+      "@Mixin:AT"
+    ]
+  },
+  {
+    "trigger": "modifyconstant",
+    "label": "ModifyConstant",
+    "insertText": "ModifyConstant(method = \"${1}\", constant = @Constant(intValue = ${2:0}))$0",
+    "detail": "MixinExtras feature",
+    "source": "mixin.annotation",
+    "imports": [
+      "@Mixin:MODIFY_CONSTANT",
+      "@Mixin:CONSTANT"
+    ]
+  },
+  {
+    "trigger": "overwrite",
+    "label": "Overwrite",
+    "insertText": "Overwrite$0",
+    "detail": "MixinExtras feature",
+    "source": "mixin.annotation",
+    "imports": [
+      "@Mixin:OVERWRITE"
+    ]
+  },
+  {
+    "trigger": "surrogate",
+    "label": "Surrogate",
+    "insertText": "Surrogate$0",
+    "detail": "MixinExtras feature",
+    "source": "mixin.annotation",
+    "imports": [
+      "@Mixin:SURROGATE"
+    ]
+  },
+  {
+    "trigger": "at",
+    "label": "At",
+    "insertText": "At(\"${1}\")$0",
+    "detail": "MixinExtras feature",
+    "source": "mixin.annotation",
+    "imports": [
+      "@Mixin:AT"
+    ]
+  },
+  {
+    "trigger": "constant",
+    "label": "Constant",
+    "insertText": "Constant(intValue = ${1:0})$0",
+    "detail": "MixinExtras feature",
+    "source": "mixin.annotation",
+    "imports": [
+      "@Mixin:CONSTANT"
+    ]
+  },
+  {
+    "trigger": "slice",
+    "label": "Slice",
+    "insertText": "Slice(from = @At(\"${1}\"), to = @At(\"${2}\"))$0",
+    "detail": "MixinExtras feature",
+    "source": "mixin.annotation",
+    "imports": [
+      "@Mixin:SLICE",
+      "@Mixin:AT"
+    ]
+  },
+  {
+    "trigger": "group",
+    "label": "Group",
+    "insertText": "Group(name = \"${1}\", min = ${2:-1}, max = ${3:-1})$0",
+    "detail": "MixinExtras feature",
+    "source": "mixin.annotation",
+    "imports": [
+      "org.spongepowered.asm.mixin.injection.Group"
+    ]
+  },
+  {
+    "trigger": "debug",
+    "label": "Debug",
+    "insertText": "Debug(export = ${1:false}, print = ${2:false})$0",
+    "detail": "MixinExtras feature",
+    "source": "mixin.annotation",
+    "imports": [
+      "org.spongepowered.asm.mixin.Debug"
+    ]
+  },
+  {
+    "trigger": "dynamic",
+    "label": "Dynamic",
+    "insertText": "Dynamic(value = \"${1}\", mixin = ${2:Target}.class)$0",
+    "detail": "MixinExtras feature",
+    "source": "mixin.annotation",
+    "imports": [
+      "org.spongepowered.asm.mixin.Dynamic"
+    ]
+  },
+  {
+    "trigger": "unique",
+    "label": "Unique",
+    "insertText": "Unique(silent = ${1:false})$0",
+    "detail": "MixinExtras feature",
+    "source": "mixin.annotation",
+    "imports": [
+      "org.spongepowered.asm.mixin.Unique"
+    ]
+  },
+  {
+    "trigger": "intrinsic",
+    "label": "Intrinsic",
+    "insertText": "Intrinsic(displace = ${1:false})$0",
+    "detail": "MixinExtras feature",
+    "source": "mixin.annotation",
+    "imports": [
+      "org.spongepowered.asm.mixin.Intrinsic"
+    ]
+  },
+  {
+    "trigger": "implements",
+    "label": "Implements",
+    "insertText": "Implements({ @Interface(iface = ${1:Target}.class, prefix = \"${2:prefix\\$}\") })$0",
+    "detail": "MixinExtras feature",
+    "source": "mixin.annotation",
+    "imports": [
+      "org.spongepowered.asm.mixin.Implements",
+      "org.spongepowered.asm.mixin.Interface"
+    ]
+  },
+  {
+    "trigger": "interface",
+    "label": "Interface",
+    "insertText": "Interface(iface = ${1:Target}.class, prefix = \"${2:prefix\\$}\")$0",
+    "detail": "MixinExtras feature",
+    "source": "mixin.annotation",
+    "imports": [
+      "org.spongepowered.asm.mixin.Interface"
+    ]
+  },
+  {
+    "trigger": "desc",
+    "label": "Desc",
+    "insertText": "Desc(value = \"${1}\", owner = ${2:Target}.class, ret = ${3:void}.class, args = { ${4} })$0",
+    "detail": "MixinExtras feature",
+    "source": "mixin.annotation",
+    "imports": [
+      "org.spongepowered.asm.mixin.injection.Desc"
+    ]
+  },
+  {
+    "trigger": "descriptors",
+    "label": "Descriptors",
+    "insertText": "Descriptors({ @Desc(value = \"${1}\", owner = ${2:Target}.class, ret = ${3:void}.class, args = { ${4} }) })$0",
+    "detail": "MixinExtras feature",
+    "source": "mixin.annotation",
+    "imports": [
+      "org.spongepowered.asm.mixin.injection.Descriptors",
+      "org.spongepowered.asm.mixin.injection.Desc"
+    ]
+  },
+  {
+    "trigger": "modifyexpressionvalue",
+    "label": "ModifyExpressionValue",
+    "insertText": "ModifyExpressionValue(method = \"${1}\", at = @At(\"${2}\"))$0",
+    "detail": "MixinExtras feature",
+    "source": "mixinextras.feature",
+    "imports": [
+      "@Mixin:MODIFY_EXPRESSION_VALUE",
+      "@Mixin:AT"
+    ]
+  },
+  {
+    "trigger": "modifyreturnvalue",
+    "label": "ModifyReturnValue",
+    "insertText": "ModifyReturnValue(method = \"${1}\", at = @At(\"RETURN\"))$0",
+    "detail": "MixinExtras feature",
+    "source": "mixinextras.feature",
+    "imports": [
+      "@Mixin:MODIFY_RETURN_VALUE",
+      "@Mixin:AT"
+    ]
+  },
+  {
+    "trigger": "modifyreceiver",
+    "label": "ModifyReceiver",
+    "insertText": "ModifyReceiver(method = \"${1}\", at = @At(value = \"INVOKE\", target = \"${2}\"))$0",
+    "detail": "MixinExtras feature",
+    "source": "mixinextras.feature",
+    "imports": [
+      "@Mixin:MODIFY_RECEIVER",
+      "@Mixin:AT"
+    ]
+  },
+  {
+    "trigger": "wrapoperation",
+    "label": "WrapOperation",
+    "insertText": "WrapOperation(method = \"${1}\", at = @At(value = \"INVOKE\", target = \"${2}\"))$0",
+    "detail": "MixinExtras feature",
+    "source": "mixinextras.feature",
+    "imports": [
+      "@Mixin:WRAP_OPERATION",
+      "@Mixin:AT"
+    ]
+  },
+  {
+    "trigger": "wrapmethod",
+    "label": "WrapMethod",
+    "insertText": "WrapMethod(method = \"${1}\")$0",
+    "detail": "MixinExtras feature",
+    "source": "mixinextras.feature",
+    "imports": [
+      "@Mixin:WRAP_METHOD"
+    ]
+  },
+  {
+    "trigger": "definition",
+    "label": "Definition",
+    "insertText": "Definition(id = \"${1}\")$0",
+    "detail": "MixinExtras feature",
+    "source": "mixinextras.feature",
+    "imports": [
+      "@Mixin:DEFINITION"
+    ]
+  },
+  {
+    "trigger": "definitions",
+    "label": "Definitions",
+    "insertText": "Definitions({ ${1} })$0",
+    "detail": "MixinExtras feature",
+    "source": "mixinextras.feature",
+    "imports": [
+      "@Mixin:DEFINITIONS"
+    ]
+  },
+  {
+    "trigger": "expression",
+    "label": "Expression",
+    "insertText": "Expression(\"${1}\")$0",
+    "detail": "MixinExtras feature",
+    "source": "mixinextras.feature",
+    "imports": [
+      "@Mixin:EXPRESSION"
+    ]
+  },
+  {
+    "trigger": "expressions",
+    "label": "Expressions",
+    "insertText": "Expressions({ ${1} })$0",
+    "detail": "MixinExtras feature",
+    "source": "mixinextras.feature",
+    "imports": [
+      "@Mixin:EXPRESSIONS"
+    ]
+  },
+  {
+    "trigger": "share",
+    "label": "Share",
+    "insertText": "Share(\"${1}\")$0",
+    "detail": "MixinExtras feature",
+    "source": "mixinextras.feature",
+    "imports": [
+      "@Mixin:SHARE"
+    ]
+  },
+  {
+    "trigger": "sharenamespace",
+    "label": "Share namespace",
+    "insertText": "Share(value = \"${1}\", namespace = \"${2}\")$0",
+    "detail": "MixinExtras feature",
+    "source": "mixinextras.feature",
+    "imports": [
+      "@Mixin:SHARE"
+    ]
+  },
+  {
+    "trigger": "local",
+    "label": "Local",
+    "insertText": "Local$0",
+    "detail": "MixinExtras feature",
+    "source": "mixinextras.feature",
+    "imports": [
+      "@Mixin:LOCAL"
+    ]
+  },
+  {
+    "trigger": "localordinal",
+    "label": "Local ordinal",
+    "insertText": "Local(ordinal = ${1:0})$0",
+    "detail": "MixinExtras feature",
+    "source": "mixinextras.feature",
+    "imports": [
+      "@Mixin:LOCAL"
+    ]
+  },
+  {
+    "trigger": "localindex",
+    "label": "Local index",
+    "insertText": "Local(index = ${1:0})$0",
+    "detail": "MixinExtras feature",
+    "source": "mixinextras.feature",
+    "imports": [
+      "@Mixin:LOCAL"
+    ]
+  },
+  {
+    "trigger": "localname",
+    "label": "Local name",
+    "insertText": "Local(name = \"${1}\")$0",
+    "detail": "MixinExtras feature",
+    "source": "mixinextras.feature",
+    "imports": [
+      "@Mixin:LOCAL"
+    ]
+  },
+  {
+    "trigger": "localargsonly",
+    "label": "Local argsOnly",
+    "insertText": "Local(argsOnly = ${1|true,false|})$0",
+    "detail": "MixinExtras feature",
+    "source": "mixinextras.feature",
+    "imports": [
+      "@Mixin:LOCAL"
+    ]
+  },
+  {
+    "trigger": "localtype",
+    "label": "Local type",
+    "insertText": "Local(type = ${1:void}.class)$0",
+    "detail": "MixinExtras feature",
+    "source": "mixinextras.feature",
+    "imports": [
+      "@Mixin:LOCAL"
+    ]
+  },
+  {
+    "trigger": "cancellable",
+    "label": "Cancellable",
+    "insertText": "Cancellable$0",
+    "detail": "MixinExtras feature",
+    "source": "mixinextras.feature",
+    "imports": [
+      "com.llamalad7.mixinextras.sugar.Cancellable"
+    ]
+  }
+]

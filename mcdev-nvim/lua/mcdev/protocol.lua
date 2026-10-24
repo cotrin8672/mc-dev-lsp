@@ -73,29 +73,55 @@ local function inferred_workspace_root(bufnr)
   return normalize_path(vim.fn.getcwd())
 end
 
-function M.active_jdtls_client(bufnr)
-  bufnr = bufnr or 0
-  local clients = vim.lsp.get_clients({ bufnr = bufnr })
-  for _, client in ipairs(clients) do
-    if client.name == "jdtls" then
-      return client
+local function is_host(client)
+  if client.name == "ktlsp" then return true end
+  local init = client.config and client.config.init_options or {}
+  if init.analysisProviders and init.analysisProviders["mcdev.mixin"] then return true end
+  local capability = client.server_capabilities and client.server_capabilities.executeCommandProvider or {}
+  for _, command in ipairs(capability.commands or {}) do
+    for _, expected in pairs(M.commands) do
+      if command == expected then return true end
     end
   end
+  return false
+end
 
+function M.active_ktlsp_client(bufnr)
+  bufnr = bufnr or 0
   local path = buffer_path(bufnr)
   local inferred_root = inferred_workspace_root(bufnr)
-  for _, client in ipairs(vim.lsp.get_clients({ name = "jdtls" })) do
+  local clients = vim.lsp.get_clients({ bufnr = bufnr })
+  for _, client in ipairs(clients) do
     local root = client_root(client)
-    if path_under(root, path) or comparable_path(root) == comparable_path(inferred_root) then
+    if is_host(client) and (not root or path_under(root, path)
+      or (root and inferred_root and comparable_path(root) == comparable_path(inferred_root))) then
       return client
     end
   end
 
-  return nil
+  local selected, selected_length = nil, -1
+  for _, client in ipairs(vim.lsp.get_clients()) do
+    local root = client_root(client)
+    if is_host(client) and (path_under(root, path) or (root and inferred_root
+      and comparable_path(root) == comparable_path(inferred_root))) then
+      if #root > selected_length then selected, selected_length = client, #root end
+    end
+  end
+
+  return selected
+end
+
+function M.command_supported(client, command)
+  local capabilities = client and client.server_capabilities or {}
+  local provider = capabilities.executeCommandProvider or {}
+  for _, registered in ipairs(provider.commands or {}) do
+    if registered == command then return true end
+  end
+  return false
 end
 
 local function workspace_root(bufnr)
-  local client = M.active_jdtls_client(bufnr)
+  local client = M.active_ktlsp_client(bufnr)
   local root = client_root(client) or inferred_workspace_root(bufnr) or vim.fn.getcwd()
   return vim.uri_from_fname(root)
 end
@@ -123,14 +149,21 @@ end
 
 function M.request(command, payload, callback, bufnr)
   bufnr = bufnr or 0
-  local client = M.active_jdtls_client(bufnr)
+  local client = M.active_ktlsp_client(bufnr)
   if not client then
-    local message = "mcdev: no active JDT LS client for this buffer"
+    local message = "mcdev: no active ktlsp client for this buffer"
     if callback then
       callback(nil, message)
       return noop_cancel
     end
     vim.notify(message, vim.log.levels.WARN)
+    return noop_cancel
+  end
+
+  if not M.command_supported(client, command) then
+    local message = "mcdev: ktlsp has not advertised command " .. tostring(command)
+    if callback then callback(nil, message)
+    else vim.notify(message, vim.log.levels.WARN) end
     return noop_cancel
   end
 
@@ -144,7 +177,7 @@ function M.request(command, payload, callback, bufnr)
   end, bufnr)
 
   if not status or not request_id then
-    local message = "mcdev: failed to start JDT LS request"
+    local message = "mcdev: failed to start ktlsp request"
     if callback then
       callback(nil, message)
     else
@@ -249,7 +282,12 @@ function M.info()
       ui.error(unwrap_err)
       return
     end
-    ui.show_report("mcdev info", payload.lines or {})
+    local lines = vim.tbl_map(function(line)
+      return line:gsub("^Extension jar location:", "Companion executable:")
+        :gsub("^Extension build commit:", "Companion build commit:")
+        :gsub("^Extension build time:", "Companion build time:")
+    end, payload.lines or {})
+    ui.show_report("mcdev info", lines)
   end)
 end
 

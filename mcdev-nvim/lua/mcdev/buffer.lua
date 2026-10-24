@@ -1,6 +1,9 @@
 local M = {}
 
 local mcdev_annotation_names = {
+  KMixin = true,
+  KShadow = true,
+  MappingName = true,
   Mixin = true,
   Inject = true,
   At = true,
@@ -41,6 +44,9 @@ local mcdev_annotation_names = {
 }
 
 local mcdev_annotation_fqns = {
+  ["io.github.diskria.lapis.annotations.KMixin"] = "KMixin",
+  ["io.github.diskria.lapis.annotations.KShadow"] = "KShadow",
+  ["io.github.diskria.lapis.annotations.MappingName"] = "MappingName",
   ["org.spongepowered.asm.mixin.Mixin"] = "Mixin",
   ["org.spongepowered.asm.mixin.Shadow"] = "Shadow",
   ["org.spongepowered.asm.mixin.gen.Accessor"] = "Accessor",
@@ -64,6 +70,7 @@ local mcdev_annotation_fqns = {
   ["org.spongepowered.asm.mixin.injection.Slice"] = "Slice",
   ["com.llamalad7.mixinextras.sugar.Local"] = "Local",
   ["com.llamalad7.mixinextras.sugar.Share"] = "Share",
+  ["com.llamalad7.mixinextras.sugar.Cancellable"] = "Cancellable",
   ["com.llamalad7.mixinextras.expression.Definition"] = "Definition",
   ["com.llamalad7.mixinextras.expression.Definitions"] = "Definitions",
   ["com.llamalad7.mixinextras.expression.Expression"] = "Expression",
@@ -119,7 +126,7 @@ end
 function M.is_mcdev_buffer(bufnr)
   bufnr = bufnr or vim.api.nvim_get_current_buf()
   local ft = vim.bo[bufnr].filetype
-  if ft == "java" or ft == "json" then
+  if ft == "java" or ft == "kotlin" or ft == "json" then
     return true
   end
   return M.detect_file_type(bufnr) ~= nil
@@ -155,8 +162,9 @@ local function simple_annotation_name(name)
   return name:match("([%w_]+)$") or name
 end
 
-local function explicit_annotation_imports(text)
-  local imports = {}
+local function explicit_annotation_imports(text, kotlin)
+  local imports = { kotlin = kotlin, wildcards = {} }
+  if kotlin then return imports end
   for line in text:gmatch("[^\n]+") do
     local fqn = line:match("^%s*import%s+([%w_.$]+)%s*;")
     if fqn then
@@ -166,6 +174,18 @@ local function explicit_annotation_imports(text)
   return imports
 end
 
+local function add_kotlin_import(line, imports)
+  line = line:gsub("/[/*].*$", "")
+  local fqn, alias = line:match("^import%s+([%w_.$]+)%s+as%s+([%w_]+)%s*;?%s*$")
+  fqn = fqn or line:match("^import%s+([%w_.$*]+)%s*;?%s*$")
+  if not fqn then return end
+  if fqn:sub(-2) == ".*" then
+    imports.wildcards[#imports.wildcards + 1] = fqn:sub(1, -3)
+  else
+    imports[alias or simple_annotation_name(fqn)] = fqn
+  end
+end
+
 local function resolved_annotation_name(name, imports)
   local simple = simple_annotation_name(name)
   if name:find(".", 1, true) then
@@ -173,6 +193,13 @@ local function resolved_annotation_name(name, imports)
   end
   if imports and imports[simple] then
     return mcdev_annotation_fqns[imports[simple]]
+  end
+  if imports and imports.kotlin then
+    for _, package in ipairs(imports.wildcards) do
+      local resolved = mcdev_annotation_fqns[package .. "." .. simple]
+      if resolved then return resolved end
+    end
+    return nil
   end
   return mcdev_annotation_names[simple] and simple or nil
 end
@@ -190,6 +217,13 @@ local function is_mcdev_annotation_prefix(name, imports)
   if imports and imports[name] then
     return mcdev_annotation_fqns[imports[name]] ~= nil
   end
+  for alias, fqn in pairs(imports or {}) do
+    if type(fqn) == "string" and mcdev_annotation_fqns[fqn]
+      and alias:sub(1, #name):lower() == prefix
+    then
+      return true
+    end
+  end
   for annotation in pairs(mcdev_annotation_names) do
     if annotation:sub(1, #prefix):lower() == prefix then
       return true
@@ -198,12 +232,15 @@ local function is_mcdev_annotation_prefix(name, imports)
   return false
 end
 
--- The Java server knows the complete annotation grammar, but Blink has to
+-- The server knows the complete annotation grammar, but Blink has to
 -- choose its providers before it can ask the server.  Keep this table small:
 -- it only describes values where a normal Java completion is misleading.
 -- Class literals, enum constants, booleans, numbers, and nested annotation
 -- names stay mixed with JDT completion.
 local annotation_attribute_modes = {
+  KMixin = {},
+  KShadow = {},
+  MappingName = { name = "exclusive" },
   Mixin = { targets = "exclusive", target = "exclusive" },
   Inject = { method = "exclusive" },
   Redirect = { method = "exclusive" },
@@ -235,6 +272,7 @@ local annotation_attribute_modes = {
 -- These annotations have completion snippets for their names, but no custom
 -- attribute/value completion. Keep their bodies available to JDT LS.
 local name_only_annotations = {
+  KShadow = true,
   Group = true,
   Debug = true,
   Dynamic = true,
@@ -261,7 +299,7 @@ local function trailing_annotation_prefix(text, scan, imports)
   return nil
 end
 
-local function scan_open_annotations(text, imports)
+local function scan_open_annotations(text, imports, kotlin)
   local frames = {}
   local completed_annotations = {}
   local paren_depth = 0
@@ -271,7 +309,9 @@ local function scan_open_annotations(text, imports)
   local escaped = false
   local line_comment = false
   local block_comment = false
+  local block_depth = 0
   local index = 1
+  local line_start = 1
 
   while index <= #text do
     local char = text:sub(index, index)
@@ -280,12 +320,21 @@ local function scan_open_annotations(text, imports)
     if line_comment then
       if char == "\n" then line_comment = false end
     elseif block_comment then
-      if char == "*" and next_char == "/" then
-        block_comment = false
+      if kotlin and char == "/" and next_char == "*" then
+        block_depth = block_depth + 1
+        index = index + 1
+      elseif char == "*" and next_char == "/" then
+        block_depth = block_depth - 1
+        block_comment = block_depth > 0
         index = index + 1
       end
     elseif quote or char_literal then
-      if escaped then
+      if quote == '"""' then
+        if text:sub(index, index + 2) == '"""' then
+          quote = nil
+          index = index + 2
+        end
+      elseif escaped then
         escaped = false
       elseif char == "\\" then
         escaped = true
@@ -294,7 +343,8 @@ local function scan_open_annotations(text, imports)
         char_literal = false
       end
     elseif char == '"' then
-      quote = char
+      quote = kotlin and text:sub(index, index + 2) == '"""' and '"""' or char
+      if quote == '"""' then index = index + 2 end
       pending_annotation = nil
     elseif char == "'" then
       char_literal = true
@@ -305,6 +355,7 @@ local function scan_open_annotations(text, imports)
       index = index + 1
     elseif char == "/" and next_char == "*" then
       block_comment = true
+      block_depth = 1
       pending_annotation = nil
       index = index + 1
     elseif char == "@" then
@@ -337,6 +388,20 @@ local function scan_open_annotations(text, imports)
         }
       end
       pending_annotation = nil
+    elseif kotlin and char == "i" and text:sub(line_start, index - 1):match("^%s*$")
+      and text:sub(index, index + 5) == "import"
+    then
+      add_kotlin_import(text:match("^[^\n]*", index), imports)
+    elseif kotlin and #frames > 0 and char:match("[%a_$]") then
+      local name = text:match("^([%w_.$]+)", index)
+      local name_end = index + #name - 1
+      local resolved = resolved_annotation_name(name, imports)
+      if resolved then
+        pending_annotation = { name = resolved, recognized = true, at = index, name_end = name_end }
+      else
+        pending_annotation = nil
+      end
+      index = name_end
     elseif char == ")" then
       paren_depth = math.max(paren_depth - 1, 0)
       while #frames > 0 and frames[#frames].depth > paren_depth do
@@ -356,6 +421,7 @@ local function scan_open_annotations(text, imports)
       pending_annotation = nil
     end
 
+    if char == "\n" then line_start = index + 1 end
     index = index + 1
   end
 
@@ -621,7 +687,7 @@ local function member_header_context(text, after, scan)
   }
 end
 
-local function current_annotation_segment(text, frame)
+local function current_annotation_segment(text, frame, kotlin)
   local body = text:sub(frame.open + 1)
   local segment_start = 1
   local after_separator = false
@@ -632,6 +698,7 @@ local function current_annotation_segment(text, frame)
   local escaped = false
   local line_comment = false
   local block_comment = false
+  local block_depth = 0
   local value_started = false
   local value_has_string = false
   local value_has_outside_text = false
@@ -643,12 +710,22 @@ local function current_annotation_segment(text, frame)
     if line_comment then
       if char == "\n" then line_comment = false end
     elseif block_comment then
-      if char == "*" and next_char == "/" then
-        block_comment = false
+      if kotlin and char == "/" and next_char == "*" then
+        block_depth = block_depth + 1
+        index = index + 1
+      elseif char == "*" and next_char == "/" then
+        block_depth = block_depth - 1
+        block_comment = block_depth > 0
         index = index + 1
       end
     elseif quote or char_literal then
-      if escaped then
+      if quote == '"""' then
+        if body:sub(index, index + 2) == '"""' then
+          value_has_string = value_started or value_has_string
+          quote = nil
+          index = index + 2
+        end
+      elseif escaped then
         escaped = false
       elseif char == "\\" then
         escaped = true
@@ -663,7 +740,8 @@ local function current_annotation_segment(text, frame)
       if not value_started then
         value_started = true
       end
-      quote = char
+      quote = kotlin and body:sub(index, index + 2) == '"""' and '"""' or char
+      if quote == '"""' then index = index + 2 end
     elseif char == "'" then
       if not value_started then value_started = true end
       value_has_outside_text = true
@@ -673,6 +751,7 @@ local function current_annotation_segment(text, frame)
       index = index + 1
     elseif char == "/" and next_char == "*" then
       block_comment = true
+      block_depth = 1
       index = index + 1
     elseif char == "(" then
       if value_started then
@@ -681,12 +760,12 @@ local function current_annotation_segment(text, frame)
       paren_depth = paren_depth + 1
     elseif char == ")" then
       paren_depth = math.max(paren_depth - 1, 0)
-    elseif char == "{" then
+    elseif char == "{" or (kotlin and char == "[") then
       if value_started and brace_depth > 0 then
         value_has_outside_text = true
       end
       brace_depth = brace_depth + 1
-    elseif char == "}" then
+    elseif char == "}" or (kotlin and char == "]") then
       if value_started and brace_depth > 1 then
         value_has_outside_text = true
       end
@@ -749,12 +828,12 @@ end
 
 local function attribute_prefix_context(annotation, segment, after_separator)
   if segment == "" then
-    return annotation ~= "Mixin"
+    return annotation ~= "Mixin" and annotation ~= "KMixin"
   end
-  if not after_separator and (annotation == "Mixin" or annotation == "At"
+  if not after_separator and (annotation == "Mixin" or annotation == "KMixin" or annotation == "At"
     or annotation == "Accessor" or annotation == "Invoker" or annotation == "Definition"
     or annotation == "Expression" or annotation == "Expressions" or annotation == "Share"
-    or annotation == "Local" or annotation == "Wrap")
+    or annotation == "Local" or annotation == "Wrap" or annotation == "MappingName")
   then
     return false
   end
@@ -788,7 +867,7 @@ local function exclusive_string_value(segment)
   if value == "" then
     return true
   end
-  if segment.quote == '"' then
+  if segment.quote == '"' or segment.quote == '"""' then
     return true
   end
   if segment.value_has_outside_text then
@@ -797,7 +876,7 @@ local function exclusive_string_value(segment)
   if segment.value_has_string then
     return true
   end
-  return value:sub(1, 1) == "{"
+  return value:sub(1, 1) == "{" or value:sub(1, 1) == "["
 end
 
 function M.completion_context_at(bufnr, position)
@@ -812,14 +891,15 @@ function M.completion_context_at(bufnr, position)
     end
     return nil
   end
-  if vim.bo[bufnr].filetype ~= "java" then
+  local kotlin = vim.bo[bufnr].filetype == "kotlin"
+  if vim.bo[bufnr].filetype ~= "java" and not kotlin then
     return nil
   end
 
   local source = buffer_text(bufnr)
-  local imports = explicit_annotation_imports(source)
+  local imports = explicit_annotation_imports(source, kotlin)
   local text = text_before_cursor(bufnr, position)
-  local scan = scan_open_annotations(text, imports)
+  local scan = scan_open_annotations(text, imports, kotlin)
   if scan.line_comment or scan.block_comment or scan.char_literal then
     return nil
   end
@@ -834,10 +914,11 @@ function M.completion_context_at(bufnr, position)
 
   local frame = scan.frames[#scan.frames]
   if not frame then
+    if kotlin then return nil end
     return member_header_context(text, text_after_cursor(bufnr, position), scan)
   end
 
-  local segment = current_annotation_segment(text, frame)
+  local segment = current_annotation_segment(text, frame, kotlin)
   if name_only_annotations[frame.name] then
     return {
       owned = true,
@@ -863,7 +944,7 @@ function M.completion_context_at(bufnr, position)
   if attribute_prefix_context(frame.name, shorthand, segment.after_separator) then
     return { owned = true, exclusive = true, kind = "attribute", annotation = frame.name }
   end
-  if frame.name == "Mixin" then
+  if frame.name == "Mixin" or frame.name == "KMixin" then
     return { owned = true, exclusive = false, kind = "class", annotation = frame.name }
   end
   if shorthand == "" then
@@ -871,7 +952,7 @@ function M.completion_context_at(bufnr, position)
   end
   if shorthand:sub(1, 1) == '"' and (frame.name == "At" or frame.name == "Accessor" or frame.name == "Invoker"
     or frame.name == "Definition" or frame.name == "Expression" or frame.name == "Expressions"
-    or frame.name == "Share" or frame.name == "Local" or frame.name == "Wrap")
+    or frame.name == "Share" or frame.name == "Local" or frame.name == "Wrap" or frame.name == "MappingName")
   then
     if exclusive_string_value(segment) then
       return { owned = true, exclusive = true, kind = "value", annotation = frame.name }
@@ -890,6 +971,10 @@ function M.is_mcdev_completion_context(bufnr)
   local filetype = vim.bo[bufnr].filetype
   local name = uri_basename(vim.uri_from_bufnr(bufnr))
   local text = buffer_text(bufnr)
+  if filetype == "kotlin" then
+    local scan = scan_open_annotations(text, explicit_annotation_imports(text, true), true)
+    return #scan.frames > 0 or #scan.completed_annotations > 0 or scan.annotation_prefix ~= nil
+  end
   if filetype == "java" then
     if name:find("mixin", 1, true) ~= nil
       or text:find("org.spongepowered.asm.mixin", 1, true) ~= nil
@@ -922,6 +1007,41 @@ end
 
 function M.is_mcdev_completion_context_at(bufnr, position)
   return M.completion_context_at(bufnr, position) ~= nil
+end
+
+
+function M.snapshot(bufnr)
+  bufnr = bufnr and bufnr ~= 0 and bufnr or vim.api.nvim_get_current_buf()
+  if not vim.api.nvim_buf_is_valid(bufnr) then return nil end
+  return {
+    bufnr = bufnr, uri = vim.uri_from_bufnr(bufnr),
+    changedtick = vim.api.nvim_buf_get_changedtick(bufnr),
+    text = table.concat(vim.api.nvim_buf_get_lines(bufnr, 0, -1, false), "\n"),
+    version = vim.lsp.util.buf_versions and vim.lsp.util.buf_versions[bufnr],
+  }
+end
+
+function M.snapshot_current(snapshot)
+  if not snapshot or not vim.api.nvim_buf_is_valid(snapshot.bufnr) then return false end
+  local current = M.snapshot(snapshot.bufnr)
+  return current.uri == snapshot.uri and current.changedtick == snapshot.changedtick
+    and current.text == snapshot.text and current.version == snapshot.version
+end
+
+function M.edit_snapshots(edit, original)
+  local snapshots = original or {}
+  local function capture(uri)
+    if type(uri) ~= "string" or not uri:match("^%a[%w+.-]*:") then return end
+    if snapshots[uri] then return end
+    local bufnr = vim.uri_to_bufnr(uri)
+    vim.fn.bufload(bufnr)
+    snapshots[uri] = M.snapshot(bufnr)
+  end
+  for uri in pairs(edit and edit.changes or {}) do capture(uri) end
+  for _, change in ipairs(edit and edit.documentChanges or {}) do
+    if change.textDocument then capture(change.textDocument.uri) end
+  end
+  return snapshots
 end
 
 return M

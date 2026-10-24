@@ -1,0 +1,12 @@
+[
+  {
+    "legacyCase": "mcdev-jdtls-extension/src/test/kotlin/io/github/mcdev/jdtls/handler/McdevAwAtCodeActionHandlerTest.kt::returnsRemoveDuplicateFixForAccessWidenerBuffer",
+    "api": "McdevCodeActionHandler.handle",
+    "observation": 196,
+    "field": "/result/actions/0/edits/0/edits",
+    "reason": "The approved AWAT format-preserving editor emits one physical-line deletion instead of replacing the whole document. Both edits produce exactly the same original test document.",
+    "old": [{"range":{"start":{"line":0,"character":0},"end":{"line":2,"character":48}},"newText":"accessWidener v2 named\naccessible class com/example/target/SimpleTarget"}],
+    "new": [{"range":{"start":{"line":1,"character":0},"end":{"line":2,"character":0}},"newText":""}],
+    "after": "accessWidener v2 named\naccessible class com/example/target/SimpleTarget"
+  }
+]

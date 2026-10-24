@@ -1,0 +1,172 @@
+{
+  "summary": {
+    "originalCases": 189,
+    "coreCases": 159,
+    "hostCases": 30,
+    "originalAssertionsPassedOnFrozenJvm": true,
+    "successfulApiOutputs": 50566,
+    "throwableEvents": 2,
+    "coreFacadeApiEventsInCoreCorpus": 308,
+    "coreFacadeApiEventsInHostCorpus": 46,
+    "hostFacadeApiEvents": 66,
+    "kotlinCompositeNavigationTailOutputs": 22,
+    "hostNavigationOffsetOutputs": 1,
+    "appliedFixOutputs": 3,
+    "additionalOfficialUtf16Outputs": 30,
+    "normalizationCases": {
+      "bufferOnlyWrapCompletionOmitsUnknownWrapWithConditionVariants": 2,
+      "definitionIdCompletionDoesNotLeakAdjacentHandlerDefinitions": 8,
+      "definitionIdCompletionWorksWithoutJavaProjectResolver": 8
+    },
+    "wireCapabilities": "Host source/semantic SDK wire capabilities remain separately pending; fixtures and native library tests provide complete owned host facts, not zero-filled unknown generations."
+  },
+  "nativeRuns": [
+    {
+      "logDirectory": "build/rust-test-logs/facade-final-affected",
+      "exitCode": 0,
+      "timedOut": false,
+      "pid": 129544,
+      "seconds": 136.0,
+      "testBinaries": 10,
+      "passedTestFunctions": 321,
+      "compilerWarnings": 0
+    },
+    {
+      "logDirectory": "build/rust-test-logs/facade-final-boundary",
+      "exitCode": 0,
+      "timedOut": false,
+      "pid": 151444,
+      "seconds": 69.9,
+      "testBinaries": 3,
+      "passedTestFunctions": 15,
+      "compilerWarnings": 0
+    },
+    {
+      "logDirectory": "build/rust-test-logs/facade-review-laziness-final",
+      "exitCode": 0,
+      "timedOut": false,
+      "pid": 212836,
+      "seconds": 32.2,
+      "testBinaries": 3,
+      "passedTestFunctions": 20,
+      "compilerWarnings": 0
+    }
+  ],
+  "additionalJvmUtf16Oracle": {
+    "cases": 1,
+    "successfulWholeOutputs": 30,
+    "logs": "build/facade-utf16-oracle",
+    "stringRepresentation": "numeric UTF-16 code units; no lossy JSON surrogate encoding"
+  },
+  "originalJvmOracle": {
+    "coreCases": 159,
+    "hostCases": 30,
+    "allOriginalAssertionsPassed": true,
+    "logs": "build/facade-oracle",
+    "immutableBaseline": "build/migration-baseline/current-20261023"
+  },
+  "sourceHashes": {
+    "mcdev-core/src/mixin_facade.rs": "ea9daeebcad4c5aa079f1605cabd5e8d7881a416573f0ee11c11669623ab4f19",
+    "mcdev-core/src/mixin_source.rs": "357dbd2b32effc3f1899bd7085223c1dbedb04e9fdfdb877d0ce72ee56652b5f",
+    "mcdev-core/src/extras_model.rs": "1188ac29d3352380ea1fc2d9204391ce7c6692f6c78d5e90f603168ea4d5cfac",
+    "mcdev-core/src/mixinextras_expression/context.rs": "7e28b6741d3af5f9e89e05b6349d0d16fc7790f1a28cffc4c1064f3c2d45359b",
+    "mcdev-core/src/mixinextras_expression/editing.rs": "cd4928f4b9856f97f15c07afa09bdeeafa471d3d02cc6511e439817e20dfe8cb",
+    "mcdev-core/src/mixinextras_expression/members.rs": "ea74271d974af7431e40a17830bd6da993f7a97f37647f1eaa76e72c78f6e265",
+    "mcdev-core/src/mixinextras_expression/mod.rs": "ce98f77a34c1d62b01d380252471cd1793c126b14ed07b3bd673bd89f4d9f1a5",
+    "mcdev-core/src/mixinextras_expression/parsing.rs": "8a9b6bee1c54520c3a1dce7998f31353174ba973da052167466baf975f15739c",
+    "mcdev-core/src/mixinextras_expression/support.rs": "67c675854c26970745436ae31b969ce3ac92b026254b86670397cd950d08e13e",
+    "mcdev-core/tests/mixin_facade_legacy.rs": "9b16a0fd1e245b9aa49dfed594edcab0ffee54597d168e8edf663f4d2489b80d",
+    "mcdev-core/tests/mixin_facade_utf16.rs": "d6a56c86346ecab104f89d71afd38cbc5b50e337e454437db3241285ed243f30",
+    "mcdev-core/tests/mixin_host_facade_state.rs": "41fbe1f1c9d36afbf313f558d3630f8e405c0a7c1971a43178b79fa9f434d67b",
+    "mcdev-core/tests/mixin_validation_support/mod.rs": "77c5c9eb942835ea3aaa0961ecf66f455e9dc617bf2568f06ada58a56d4c6858",
+    "mcdev-core/tests/fixtures/mixin_facade/replay.rs": "2f2c6833426988e4839ef62dbc495c88bc80fd2ffeaf555730cf07db0be40cdc",
+    "mcdev-core/tests/fixtures/mixin_facade/core-calls.jsonl": "1a0eb1af76ba44ba40c1f5c020e625383f847bf82e3bd7353ca559efc78d71d6",
+    "mcdev-core/tests/fixtures/mixin_facade/host-calls.jsonl": "1ff18a9638de13a5956b5fd232337f9095dd75c6e74cdcbe53a5886e2d19fd27",
+    "mcdev-core/tests/fixtures/mixin_facade/utf16-calls.jsonl": "97290971990f0e3286773b1db96fbd438b19048230ab40c4dace548c7f8d8437",
+    "mcdev-core/tests/fixtures/mixin_facade/coverage.json": "d909c92b6369f1060b796f67d34e4116dc75e47270b05ce3a0875476f21952c5",
+    "mcdev-core/tests/fixtures/mixin_facade/assertion-audit.json": "ab26f88bd46557b75b52cb4f67b83cc4dc2d0b05ab8d260ef1002a884bfca6d7",
+    "mcdev-core/tests/fixtures/mixin_facade/assertion-audit-summary.json": "53d5733eec160b211a644d20e613e3bed2bd97b73c754d483d843107f94ebc6d",
+    "mcdev-core/tests/fixtures/mixin_facade/generate_coverage.py": "844c62447c048136d72bd05d6bd0acf3166b7f47986ea3a81587a8da9df8fc8c",
+    "mcdev-core/tests/fixtures/mixin_facade/audit_assertions.py": "b4cfc5212001fa5761239675e92c76ced2fd2ad23d5f956cc782afdf1da404a0",
+    "mcdev-core/tests/fixtures/mixin_facade/README.md": "7212cd06236224dbd6cdfaa9198829c9d2e9bc008099c642ba410deebf8be171"
+  },
+  "wireIntegrationPending": true,
+  "postReview": {
+    "originalCasesUnchanged": 189,
+    "bodyAudit": {
+      "cases": 189,
+      "explicitBodyAssertionExpressions": 437,
+      "originalAssertionFunctions": {
+        "assertTrue": 193,
+        "assertEquals": 184,
+        "assertNotNull": 26,
+        "assertNotEquals": 3,
+        "assertFalse": 16,
+        "assertIs": 2,
+        "assertNull": 7,
+        "assertProviderObservedSessionEnvironmentSince": 2,
+        "assertSingleSessionEnvironment": 2,
+        "assertClasspathUntouched": 2
+      },
+      "resultProducingProductMethodsChecked": [
+        "analyzeDiagnostics",
+        "applyMethodDescriptorFix",
+        "applyMixinConfigFix",
+        "codeActions",
+        "collectSourceEntries",
+        "complete",
+        "completeFields",
+        "completeWithDebug",
+        "definitions",
+        "definitionsAtOffset",
+        "diagnose",
+        "fixesForDiagnostics",
+        "selectedMixinConfig",
+        "semanticModel",
+        "tryCompleteBufferOnly"
+      ],
+      "missingNativeProductMethodWitnesses": [],
+      "missingOriginalAssertionsFoundByReview": [
+        "generateAccessorFixContainsFieldName",
+        "producesGenerateInvokerFix",
+        "producesGenerateAccessorFix",
+        "routesShadowMemberCompletion",
+        "kotlinSourcesUseSemicolonlessPackagesForConfigAndRegisteredShareLookup"
+      ],
+      "additionalComputedEditTails": [
+        "codeActionFixesWrapOperationBadReturnThroughFacade",
+        "facadeNormalizesDeclarationSnippetIndentationAtBothInsertionBoundaries"
+      ],
+      "originalCaseCountUnchanged": 189,
+      "methodology": "Every frozen original body and explicit assertion expression is retained with a body hash; service/caller calls are audited against whole captured APIs or exact independent native functions. Callback/helper assertions are preserved by strict argument/order/count traces and native same-instance state/authority/live-file tests. Counts are static body expressions, not loop-expanded executions; original JVM assertions still execute unchanged."
+    },
+    "nativeAssertionRepair": "Three exact action finals, one direct Shadow field assertion, selected config/source-entry assertions and two computed edit tails now execute through native production APIs. Source-only traces were insufficient for these final assertions.",
+    "productionParityRepair": {
+      "api": "HostMixinFacade.selected_mixin_config",
+      "originalCase": "MixinServiceFacadeSourceQueryTest.kotlinSourcesUseSemicolonlessPackagesForConfigAndRegisteredShareLookup",
+      "before": "Re-read provider JSON config and returned that parsed ref, changing empty context mixin arrays and performing an extra provider read.",
+      "after": "Select the original owned context config ref, source-set before shared; zero config/unit/file provider reads. build_request still separately reads selected content.",
+      "classification": "Restore immutable original behavior, not an approved legacy behavior change."
+    },
+    "exactFakeClassIndex": {
+      "rust": "mcdev-core/tests/mixin_validation_support/mod.rs::LegacyIndex",
+      "frozenFixture": "build/migration-baseline/current-20261023/mcdev-core/src/test/kotlin/io/github/mcdev/core/mixin/MixinTestFixtures.kt",
+      "sha256": "6f4914f0ed8a4b287f8f6ba924debe717c129d052960e83576b1a60beddfc1f6",
+      "facts": "All four classes, both method owner lists with five methods, and both MinecraftClient fields; independent accessor/invoker/target instances match original construction."
+    },
+    "failedReviewRun": {
+      "logDirectory": "build/rust-test-logs/facade-review-fix",
+      "exitCode": 101,
+      "timedOut": false,
+      "pid": 240124,
+      "seconds": 34.9,
+      "failures": [
+        "Original config ref equality exposed parsed-ref parity bug",
+        "Test-only edit deserialization used wrong field-name conversion; corrected to canonical DTO serde"
+      ]
+    },
+    "finalRun": "build/rust-test-logs/facade-review-laziness-final",
+    "finalNativeTestFunctions": 20,
+    "finalCompilerWarnings": 0
+  }
+}

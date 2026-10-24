@@ -1,9 +1,9 @@
 if vim.fn.has("win32") ~= 1 then
-  print("Windows JDT process-tree regression is not applicable")
+  print("Windows ktlsp process-tree regression is not applicable")
   return
 end
-local java = (vim.env.JAVA_HOME or error("JAVA_HOME is required")) .. "/bin/java.exe"
-local source = vim.fn.getcwd() .. "/mcdev-nvim/tests/e2e/TeardownProcess.java"
+local binary = vim.env.MCDEV_TEARDOWN_BINARY or (vim.fn.getcwd() .. "/target/debug/examples/teardown_process.exe")
+assert(vim.fn.executable(binary) == 1, "build the Rust teardown_process example first")
 
 local function run_snapshot_failure_case(failure_kind)
   local script_path = vim.fn.tempname() .. ".lua"
@@ -15,9 +15,9 @@ local function run_snapshot_failure_case(failure_kind)
   local child_source = string.format([=[
 vim.opt.runtimepath:prepend(%q)
 local ready = %q
-local server = vim.system({ %q, %q, %q, ready }, { stdin = true })
+local server = vim.system({ %q, "--mcdev-test-server", ready }, { stdin = true })
 vim.fn.writefile({ tostring(server.pid) }, %q)
-assert(vim.wait(10000, function() return vim.fn.filereadable(ready) == 1 end, 25), "owned Java child failed to start")
+assert(vim.wait(10000, function() return vim.fn.filereadable(ready) == 1 end, 25), "owned Rust child failed to start")
 local marker = %q
 local report = %q
 local taskkill = %q
@@ -55,7 +55,7 @@ assert(loadfile(%q))()
 ]=],
     vim.fn.getcwd() .. "/mcdev-nvim",
     ready_path,
-    java, source, source,
+    binary,
     server_path,
     marker_path,
     report_path,
@@ -70,6 +70,10 @@ assert(loadfile(%q))()
     child:kill(9)
     result = child:wait(2000)
   end
+  local log = vim.fn.getcwd() .. "/build/nvim-test-logs/snapshot-failure-" .. failure_kind
+  vim.fn.writefile(vim.split(child_source, "\n", { plain = true }), log .. ".lua")
+  vim.fn.writefile(vim.split(result and result.stdout or "", "\n", { plain = true }), log .. ".stdout.log")
+  vim.fn.writefile(vim.split(result and result.stderr or "timeout", "\n", { plain = true }), log .. ".stderr.log")
 
   local report = vim.fn.filereadable(report_path) == 1 and table.concat(vim.fn.readfile(report_path), "\n") or ""
   local taskkill = vim.fn.filereadable(taskkill_path) == 1
@@ -91,22 +95,22 @@ assert(loadfile(%q))()
 
   assert(result, "snapshot-failure child did not terminate")
   assert((result.code or 0) ~= 0 or (result.signal or 0) ~= 0, "snapshot failure must fail the child")
-  assert(report:find("E2E teardown aborted: JDT process snapshot failed", 1, true),
+  assert(report:find("E2E teardown aborted: ktlsp process snapshot failed", 1, true),
     "snapshot failure must be reported: " .. report)
   assert(taskkill == "taskkill.exe|/PID|" .. child.pid .. "|/T|/F",
     "snapshot failure must use native current-tree taskkill: " .. taskkill)
-  assert(owned_reaped, "snapshot failure fallback must reap the owned Java parent and child")
+  assert(owned_reaped, "snapshot failure fallback must reap the owned Rust parent and child")
   assert(not clientStopped, "client.stop must not run without an ownership snapshot")
 end
 
 local function run_case(graceful)
   local ready_file = vim.fn.tempname()
-  local jdtls_exit = { exited = false }
+  local ktlsp_exit = { exited = false }
   local unrelated_exited = false
-  local unrelated = vim.system({ java, source }, {}, function() unrelated_exited = true end)
-  local server = vim.system({ java, "-Declipse.application=org.eclipse.jdt.ls.core.id1", source, source, ready_file },
+  local unrelated = vim.system({ binary }, {}, function() unrelated_exited = true end)
+  local server = vim.system({ binary, "--mcdev-test-server", ready_file },
     { stdin = true }, function(result)
-      jdtls_exit.exited, jdtls_exit.code, jdtls_exit.signal = true, result.code, result.signal
+      ktlsp_exit.exited, ktlsp_exit.code, ktlsp_exit.signal = true, result.code, result.signal
     end)
   local original_dofile, original_clients = dofile, vim.lsp.get_clients
   local original_cmd, original_stderr = vim.cmd, io.stderr
@@ -116,7 +120,7 @@ local function run_case(graceful)
     assert(vim.wait(10000, function() return vim.uv.fs_stat(ready_file) ~= nil end, 25), "test server failed to start")
     child_pid = tonumber(vim.fn.readfile(ready_file)[1])
     assert(child_pid, "server must record its child's PID")
-    _G.mcdev_e2e_jdtls_exit = jdtls_exit
+    _G.mcdev_e2e_ktlsp_exit = ktlsp_exit
     _G.dofile = function() end
     vim.lsp.get_clients = function() return { {
       stop = function(_, force)
@@ -134,26 +138,26 @@ local function run_case(graceful)
     vim.cmd = function(command) commands[#commands + 1] = command end
     io.stderr = { write = function(_, message) errors[#errors + 1] = message end }
     assert(loadfile("mcdev-nvim/tests/e2e/run_bundle_e2e.lua"))()
-    assert(vim.wait(2000, function() return jdtls_exit.exited end, 25), "server transport must settle after cleanup")
+    assert(vim.wait(2000, function() return ktlsp_exit.exited end, 25), "server transport must settle after cleanup")
     if graceful then
       assert(commands[1] == "qa!", "graceful server with inherited child pipes should finish: " .. table.concat(errors))
-      assert(jdtls_exit.code == 0 and jdtls_exit.signal == 0, "server must exit normally")
+      assert(ktlsp_exit.code == 0 and ktlsp_exit.signal == 0, "server must exit normally")
     else
       assert(commands[1] == "cquit 1", "unresponsive server must fail the test")
       assert(table.concat(errors):find("graceful shutdown exceeded", 1, true), "shutdown timeout must be reported")
     end
     assert(vim.uv.kill(server.pid, 0) == nil, "owned server must be reaped")
     assert(vim.uv.kill(child_pid, 0) == nil, "owned child must be reaped")
-    assert(not unrelated_exited and vim.uv.kill(unrelated.pid, 0) ~= nil, "unrelated Java process must survive cleanup")
+    assert(not unrelated_exited and vim.uv.kill(unrelated.pid, 0) ~= nil, "unrelated Rust process must survive cleanup")
   end, debug.traceback)
   _G.dofile, vim.lsp.get_clients = original_dofile, original_clients
   vim.cmd, io.stderr = original_cmd, original_stderr
-  _G.mcdev_e2e_jdtls_exit = nil
+  _G.mcdev_e2e_ktlsp_exit = nil
   -- Always stop only this test's processes, including when the assertion fails.
   if child_pid then vim.uv.kill(child_pid, 9) end
-  if not jdtls_exit.exited then server:kill(9) end
+  if not ktlsp_exit.exited then server:kill(9) end
   unrelated:kill(9)
-  vim.wait(5000, function() return jdtls_exit.exited and unrelated_exited end, 25)
+  vim.wait(5000, function() return ktlsp_exit.exited and unrelated_exited end, 25)
   vim.fn.delete(ready_file)
   assert(ok, err)
 end
@@ -161,4 +165,4 @@ run_case(true)
 run_case(false)
 run_snapshot_failure_case("exit")
 run_snapshot_failure_case("spawn")
-print("E2E normal and hung process teardown passed; inherited children reaped and unrelated Java preserved")
+print("E2E normal and hung process teardown passed; inherited children reaped and unrelated Rust preserved")

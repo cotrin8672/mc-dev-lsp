@@ -1,5 +1,5 @@
 [workspace]
-members = ["mcdev-ktlsp"]
+members = ["mcdev-core", "mcdev-protocol", "mcdev-ktlsp", "mcdev-companion"]
 resolver = "2"
 
 [workspace.dependencies]

@@ -1,9 +1,18 @@
 # mc-dev-lsp
 
-This branch also contains the initial Rust integration with ktlsp in
-`mcdev-ktlsp`. See [ktlsp development and setup](docs/ktlsp.md) for its supported
-slice, build instructions, and migration limits. The JDT LS modules and setup
-below remain available.
+`codex/ktlsp-rust` is the Rust replacement branch, currently under
+implementation and parity verification. The original JDT LS checkout and its uncommitted work remain on
+`main`. The target is stock ktlsp plus a separately built `mcdev-companion`
+executable over versioned stdio JSON-RPC; rebuilding ktlsp with the extension is
+not required.
+
+See [the migration and verification record](docs/rust-migration.md),
+[the companion contract](docs/mcdev-companion-contract.md) and
+[native Neovim configuration](docs/lazy-nvim.md). The linked `mcdev-ktlsp`
+prototype is retained temporarily as a migration oracle. Full feature parity is
+still being verified. The JDT LS description and build instructions below are
+the legacy baseline and are awaiting replacement; use the linked native setup
+for this branch.
 
 Minecraft modding semantic support for Neovim through a JDT LS extension.
 
@@ -29,6 +38,7 @@ The repository follows the design dossier in [docs](docs/README.md). Kotlin owns
 ## User documentation
 
 - [Installation](docs/installation.md) — prerequisites, JDT LS, prebuilt jar, build from source
+- [Native distribution](docs/native-distribution.md) — standalone companion archives and semantic-v1 scope
 - [Mason setup](docs/mason.md) — use Mason for JDT LS while loading the mcdev bundle separately
 - [Lazy.nvim setup](docs/lazy-nvim.md) — full Lazy spec with mcdev-nvim and jdtls bundles
 - [Troubleshooting](docs/troubleshooting.md) — bundle loading, workspace root, AW/AT buffers, diagnostics

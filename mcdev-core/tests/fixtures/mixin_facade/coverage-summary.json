@@ -1,0 +1,21 @@
+{
+  "originalCases": 189,
+  "coreCases": 159,
+  "hostCases": 30,
+  "originalAssertionsPassedOnFrozenJvm": true,
+  "successfulApiOutputs": 50566,
+  "throwableEvents": 2,
+  "coreFacadeApiEventsInCoreCorpus": 308,
+  "coreFacadeApiEventsInHostCorpus": 46,
+  "hostFacadeApiEvents": 66,
+  "kotlinCompositeNavigationTailOutputs": 22,
+  "hostNavigationOffsetOutputs": 1,
+  "appliedFixOutputs": 3,
+  "additionalOfficialUtf16Outputs": 30,
+  "normalizationCases": {
+    "bufferOnlyWrapCompletionOmitsUnknownWrapWithConditionVariants": 2,
+    "definitionIdCompletionDoesNotLeakAdjacentHandlerDefinitions": 8,
+    "definitionIdCompletionWorksWithoutJavaProjectResolver": 8
+  },
+  "wireCapabilities": "Host source/semantic SDK wire capabilities remain separately pending; fixtures and native library tests provide complete owned host facts, not zero-filled unknown generations."
+}

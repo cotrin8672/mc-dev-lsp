@@ -42,7 +42,7 @@ local function endpoint_valid(endpoint)
 end
 
 local function endpoint_for(bufnr)
-  local client = protocol.active_jdtls_client(bufnr)
+  local client = protocol.active_ktlsp_client(bufnr)
   if not client or not client.id then
     return nil, nil
   end
@@ -84,8 +84,7 @@ function M.handle_notification(err, params, ctx)
   if params.command == M.notification_command then
     endpoint = params.arguments and params.arguments[1]
   elseif params[1] then
-    -- JavaClientConnection.sendNotification uses LSP varargs, so
-    -- the endpoint arrives as the first element of the params array.
+    -- Accept the runtime's positional notification envelope as well.
     endpoint = params[1]
   end
   if not endpoint_valid(endpoint) then
@@ -97,13 +96,16 @@ function M.handle_notification(err, params, ctx)
 end
 
 function M.ready_generation(bufnr)
-  local client = protocol.active_jdtls_client(bufnr)
+  local client = protocol.active_ktlsp_client(bufnr)
   return client and (ready_generations[client.id] or 0) or 0
 end
 
 function M.when_ready(bufnr, callback, after_generation)
-  local client = protocol.active_jdtls_client(bufnr)
+  local client = protocol.active_ktlsp_client(bufnr)
   if not client or not client.id then return nil end
+  if not endpoints[client.id] and not protocol.command_supported(client, protocol.commands.completion) then
+    return nil
+  end
   local listeners = ready_listeners[client.id] or {}
   ready_listeners[client.id] = listeners
   local called = false

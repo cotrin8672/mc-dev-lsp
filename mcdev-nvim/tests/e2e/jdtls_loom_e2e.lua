@@ -1,14 +1,15 @@
 local helpers = dofile(vim.fn.getcwd() .. "/mcdev-nvim/tests/test_helpers.lua")
 local buffer = require("mcdev.buffer")
 
-local bundle_jar = vim.env.MCDEV_BUNDLE_JAR
+local companion_cmd = vim.env.MCDEV_E2E_COMPANION
 local workspace = vim.env.MCDEV_E2E_WORKSPACE
-local jdtls_cmd = vim.env.JDTLS_CMD
+local ktlsp_cmd = vim.env.MCDEV_E2E_KTLSP
 
-helpers.assert_not_nil(bundle_jar, "MCDEV_BUNDLE_JAR is required")
+helpers.assert_not_nil(companion_cmd, "MCDEV_E2E_COMPANION is required")
 helpers.assert_not_nil(workspace, "MCDEV_E2E_WORKSPACE is required")
-helpers.assert_not_nil(jdtls_cmd, "JDTLS_CMD is required")
-helpers.assert_true(vim.fn.filereadable(bundle_jar) == 1, "bundle jar must exist: " .. bundle_jar)
+helpers.assert_not_nil(ktlsp_cmd, "MCDEV_E2E_KTLSP is required")
+helpers.assert_true(vim.fn.executable(companion_cmd) == 1, "companion executable must exist: " .. companion_cmd)
+helpers.assert_true(vim.fn.executable(ktlsp_cmd) == 1, "ktlsp executable must exist: " .. ktlsp_cmd)
 helpers.assert_true(vim.fn.isdirectory(workspace) == 1, "workspace must exist: " .. workspace)
 
 local mixin_file = workspace .. "/src/main/java/com/example/mixin/ExampleMixin.java"
@@ -23,42 +24,15 @@ local function workspace_uri(path)
   return vim.uri_from_fname(path)
 end
 
-local data_dir = vim.fn.stdpath("cache") .. "/mcdev-osgi-loom-e2e-jdtls"
-vim.fn.mkdir(data_dir, "p")
-
 local workspace_root_uri = workspace_uri(workspace)
-
-local client_id = vim.lsp.start({
-  name = "jdtls",
-  cmd = { jdtls_cmd, "-data", data_dir },
+require("mcdev").setup({ ktlsp = { cmd = { ktlsp_cmd } }, companion = { cmd = { companion_cmd } } })
+local client_id = require("mcdev.ktlsp").start_or_attach({
   root_dir = workspace,
-  workspace_folders = {
-    {
-      uri = workspace_root_uri,
-      name = "mcdev-loom-e2e-workspace",
-    },
-  },
-  init_options = {
-    bundles = { bundle_jar },
-    settings = {
-      java = {
-        import = {
-          gradle = { enabled = false },
-          maven = { enabled = false },
-        },
-        configuration = {
-          updateBuildConfiguration = "disabled",
-        },
-      },
-    },
-  },
-  capabilities = vim.lsp.protocol.make_client_capabilities(),
-  flags = {
-    debounce_text_changes = 0,
-  },
+  workspace_folders = { { uri = workspace_root_uri, name = "mcdev-loom-e2e-workspace" } },
+  flags = { debounce_text_changes = 0 },
 })
 
-helpers.assert_not_nil(client_id, "failed to start jdtls client")
+helpers.assert_not_nil(client_id, "failed to start ktlsp client")
 
 local initialized = vim.wait(240000, function()
   local client = vim.lsp.get_client_by_id(client_id)
@@ -67,14 +41,14 @@ end, 250)
 
 if not initialized then
   local client = vim.lsp.get_client_by_id(client_id)
-  error("jdtls client did not initialize within 240s: " .. vim.inspect({
+  error("ktlsp client did not initialize within 240s: " .. vim.inspect({
     client_exists = client ~= nil,
     initialized = client and client.initialized or false,
   }))
 end
 
 local client = vim.lsp.get_client_by_id(client_id)
-helpers.assert_not_nil(client, "jdtls client disappeared after initialize")
+helpers.assert_not_nil(client, "ktlsp client disappeared after initialize")
 
 local function sync_request(method, params, timeout_ms)
   local result = nil
@@ -82,7 +56,7 @@ local function sync_request(method, params, timeout_ms)
   client:request(method, params, function(request_err, request_result)
     err = request_err
     result = request_result
-  end, timeout_ms or 120000)
+  end)
   local completed = vim.wait(timeout_ms or 120000, function()
     return result ~= nil or err ~= nil
   end, 100)
@@ -98,12 +72,12 @@ local function mcdev_command(command, payload, timeout_ms)
 end
 
 sync_request("workspace/executeCommand", {
-  command = "java.reloadBundles",
-  arguments = { { bundle_jar } },
+  command = "mcdev.reloadProjectContext",
+  arguments = { { context = require("mcdev.protocol").context() } },
 }, 120000)
 
 vim.wait(60000, function()
-  return #vim.lsp.get_clients({ name = "jdtls" }) > 0
+  return #vim.lsp.get_clients({ name = "ktlsp" }) > 0
 end, 250)
 
 local bufnr = vim.fn.bufadd(mixin_file)

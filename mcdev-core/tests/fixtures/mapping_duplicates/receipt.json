@@ -1,0 +1,39 @@
+{
+  "behavior": "first source-key match in input order, then look up destination on that row; never require duplicate unanimity or skip a missing first destination",
+  "originalSources": {
+    "mcdev-core/src/main/kotlin/io/github/mcdev/core/mapping/MappingModel.kt": "d3eac2992259c7e55cbf3b6143ac9ef54631d2cea2502916f8bae080838b13fd",
+    "mcdev-core/src/main/kotlin/io/github/mcdev/core/mapping/MappingSetResolver.kt": "e89ddb8d6855c9124953f9ea7c924ddc9b404fcea18f46c46d1f39d191f5e4a0",
+    "mcdev-core/src/main/kotlin/io/github/mcdev/core/mapping/CompositeMappingResolver.kt": "7d95c8576ee6f19bea9219d6fb87825b0c1cc1271474d3fc9a86bee85d625d03",
+    "mcdev-core/src/test/kotlin/io/github/mcdev/core/mapping/MappingParserTest.kt": "e820bb2ac27567428e7f5688946111aa10f229a84de08774cde1d6e87c7cd157",
+    "mcdev-core/src/test/kotlin/io/github/mcdev/core/mapping/MappingFixtureRegressionTest.kt": "f033361e5a57b7e50115a7bd4b93f269856f4064f94ad12d718df1bf702b3356"
+  },
+  "oldCompiledOracle": {
+    "log": "build/source-oracle/mapping-duplicates.*",
+    "scenarios": 6,
+    "fullLookupResults": 24,
+    "simpleNameResults": 18
+  },
+  "native": {
+    "functions": 9,
+    "affectedTests": 578,
+    "summaries": [
+      "test result: ok. 27 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.02s",
+      "test result: ok. 157 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.26s",
+      "test result: ok. 13 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.02s",
+      "test result: ok. 27 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.01s",
+      "test result: ok. 9 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.07s",
+      "test result: ok. 21 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.03s",
+      "test result: ok. 12 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.04s",
+      "test result: ok. 162 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 1.60s",
+      "test result: ok. 28 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.22s",
+      "test result: ok. 100 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 3.56s",
+      "test result: ok. 22 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.30s"
+    ],
+    "log": "build/rust-test-logs/mapping-duplicates-final/affected.*",
+    "exitCode": 0,
+    "seconds": 15.6,
+    "timeout": false
+  },
+  "legacyCoverageChange": "none; existing MappingParserTest4 + MappingFixtureRegressionTest5 native case assertions unchanged; nine supplemental duplicate regressions added",
+  "boundary": "Host authority/Unknown and host_facts unchanged; prior lookup failure was MappingLookupResult::Missing, not HostFact::Unknown"
+}

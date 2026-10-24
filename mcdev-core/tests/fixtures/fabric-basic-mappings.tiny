@@ -1,0 +1,5 @@
+tiny	2	0	named	intermediary
+c	com/example/target/SimpleTarget	com/example/target/class_1
+	m	(Ljava/lang/String;FF)V	draw	method_1
+	m	()V	staticMethod	method_2
+	f	I	counter	field_1

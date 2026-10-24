@@ -1,0 +1,753 @@
+//! All unchanged legacy case IDs, including each original table/fixture assertion.
+#[path = "fixtures/bytecode_legacy.rs"]
+mod legacy;
+macro_rules! case {
+    ($name:ident,$class:literal,$case:literal) => {
+        #[test]
+        #[allow(non_snake_case)]
+        fn $name() {
+            legacy::run($class, $case);
+        }
+    };
+}
+case!(
+    BytecodeIndexCacheTest__storesAndRetrievesIndexByClasspathHash,
+    "BytecodeIndexCacheTest",
+    "storesAndRetrievesIndexByClasspathHash"
+);
+case!(
+    BytecodeIndexCacheTest__returnsNullForMismatchedClasspathHash,
+    "BytecodeIndexCacheTest",
+    "returnsNullForMismatchedClasspathHash"
+);
+case!(
+    BytecodeIndexCacheTest__storesAndRetrievesInstructionCache,
+    "BytecodeIndexCacheTest",
+    "storesAndRetrievesInstructionCache"
+);
+case!(
+    BytecodeIndexCacheTest__invalidatesInstructionsForStaleClasspathEntry,
+    "BytecodeIndexCacheTest",
+    "invalidatesInstructionsForStaleClasspathEntry"
+);
+case!(
+    BytecodeIndexCacheTest__clearRemovesAllCachedState,
+    "BytecodeIndexCacheTest",
+    "clearRemovesAllCachedState"
+);
+case!(
+    BytecodeIndexCacheTest__invalidateClassRemovesInstructionCacheEntries,
+    "BytecodeIndexCacheTest",
+    "invalidateClassRemovesInstructionCacheEntries"
+);
+case!(
+    BytecodeIndexCacheTest__cacheKeyForPathUsesFileLastModified,
+    "BytecodeIndexCacheTest",
+    "cacheKeyForPathUsesFileLastModified"
+);
+case!(
+    BytecodeIndexServiceTest__buildsMemberIndexFromProvider,
+    "BytecodeIndexServiceTest",
+    "buildsMemberIndexFromProvider"
+);
+case!(
+    BytecodeIndexServiceTest__cachesIndexByClasspathHash,
+    "BytecodeIndexServiceTest",
+    "cachesIndexByClasspathHash"
+);
+case!(
+    BytecodeIndexServiceTest__extractsInvokeInstructions,
+    "BytecodeIndexServiceTest",
+    "extractsInvokeInstructions"
+);
+case!(
+    BytecodeIndexServiceTest__extractsFieldInstructions,
+    "BytecodeIndexServiceTest",
+    "extractsFieldInstructions"
+);
+case!(
+    BytecodeIndexServiceTest__extractsNewInstructions,
+    "BytecodeIndexServiceTest",
+    "extractsNewInstructions"
+);
+case!(
+    BytecodeIndexServiceTest__extractsConstantInstructions,
+    "BytecodeIndexServiceTest",
+    "extractsConstantInstructions"
+);
+case!(
+    BytecodeIndexServiceTest__extractsReturnInstructions,
+    "BytecodeIndexServiceTest",
+    "extractsReturnInstructions"
+);
+case!(
+    BytecodeIndexServiceTest__cachesExtractedInstructions,
+    "BytecodeIndexServiceTest",
+    "cachesExtractedInstructions"
+);
+case!(
+    BytecodeIndexServiceTest__returnsClassBytesMissingError,
+    "BytecodeIndexServiceTest",
+    "returnsClassBytesMissingError"
+);
+case!(
+    BytecodeIndexServiceTest__returnsMethodNotFoundError,
+    "BytecodeIndexServiceTest",
+    "returnsMethodNotFoundError"
+);
+case!(
+    BytecodeIndexServiceTest__methodNotFoundWhenDescriptorMismatch,
+    "BytecodeIndexServiceTest",
+    "methodNotFoundWhenDescriptorMismatch"
+);
+case!(
+    BytecodeIndexServiceTest__duplicateInvokeOrdinalsThroughService,
+    "BytecodeIndexServiceTest",
+    "duplicateInvokeOrdinalsThroughService"
+);
+case!(
+    ClassMemberIndexTest__indexesClassMetadata,
+    "ClassMemberIndexTest",
+    "indexesClassMetadata"
+);
+case!(
+    ClassMemberIndexTest__indexesInstanceMethods,
+    "ClassMemberIndexTest",
+    "indexesInstanceMethods"
+);
+case!(
+    ClassMemberIndexTest__indexesStaticMethods,
+    "ClassMemberIndexTest",
+    "indexesStaticMethods"
+);
+case!(
+    ClassMemberIndexTest__indexesConstructors,
+    "ClassMemberIndexTest",
+    "indexesConstructors"
+);
+case!(
+    ClassMemberIndexTest__indexesStaticFields,
+    "ClassMemberIndexTest",
+    "indexesStaticFields"
+);
+case!(
+    ClassMemberIndexTest__indexesInstanceFields,
+    "ClassMemberIndexTest",
+    "indexesInstanceFields"
+);
+case!(
+    ClassMemberIndexTest__indexesAllFixtureClasses,
+    "ClassMemberIndexTest",
+    "indexesAllFixtureClasses"
+);
+case!(
+    ClassMemberIndexTest__indexSingleClassFromBytes,
+    "ClassMemberIndexTest",
+    "indexSingleClassFromBytes"
+);
+case!(
+    ClassMemberIndexTest__findMethodReturnsNullForMissingMethod,
+    "ClassMemberIndexTest",
+    "findMethodReturnsNullForMissingMethod"
+);
+case!(
+    ClassMemberIndexTest__findFieldReturnsNullForMissingField,
+    "ClassMemberIndexTest",
+    "findFieldReturnsNullForMissingField"
+);
+case!(
+    InMemoryClassBytesProviderTest__returnsClassBytesByInternalName,
+    "InMemoryClassBytesProviderTest",
+    "returnsClassBytesByInternalName"
+);
+case!(
+    InMemoryClassBytesProviderTest__returnsNullForMissingClass,
+    "InMemoryClassBytesProviderTest",
+    "returnsNullForMissingClass"
+);
+case!(
+    InMemoryClassBytesProviderTest__rejectsDottedInternalNames,
+    "InMemoryClassBytesProviderTest",
+    "rejectsDottedInternalNames"
+);
+case!(
+    InMemoryClassBytesProviderTest__exposesInternalNames,
+    "InMemoryClassBytesProviderTest",
+    "exposesInternalNames"
+);
+case!(
+    InMemoryClassBytesProviderTest__classpathHashChangesWhenBytesChange,
+    "InMemoryClassBytesProviderTest",
+    "classpathHashChangesWhenBytesChange"
+);
+case!(
+    InMemoryClassBytesProviderTest__classpathHashStableForSameContent,
+    "InMemoryClassBytesProviderTest",
+    "classpathHashStableForSameContent"
+);
+case!(
+    InMemoryClassBytesProviderTest__reportsDefaultClasspathEntryId,
+    "InMemoryClassBytesProviderTest",
+    "reportsDefaultClasspathEntryId"
+);
+case!(
+    InMemoryClassBytesProviderTest__reportsConfiguredEntryHashes,
+    "InMemoryClassBytesProviderTest",
+    "reportsConfiguredEntryHashes"
+);
+case!(
+    InstructionExtractorFieldTest__extractsStaticFieldGet,
+    "InstructionExtractorFieldTest",
+    "extractsStaticFieldGet"
+);
+case!(
+    InstructionExtractorFieldTest__extractsStaticFieldPut,
+    "InstructionExtractorFieldTest",
+    "extractsStaticFieldPut"
+);
+case!(
+    InstructionExtractorFieldTest__extractsInstanceFieldGet,
+    "InstructionExtractorFieldTest",
+    "extractsInstanceFieldGet"
+);
+case!(
+    InstructionExtractorFieldTest__extractsInstanceFieldPut,
+    "InstructionExtractorFieldTest",
+    "extractsInstanceFieldPut"
+);
+case!(
+    InstructionExtractorFieldTest__fieldAccessesHaveFourKindsInSample,
+    "InstructionExtractorFieldTest",
+    "fieldAccessesHaveFourKindsInSample"
+);
+case!(
+    InstructionExtractorFieldTest__duplicateFieldGetsReceiveDistinctOrdinals,
+    "InstructionExtractorFieldTest",
+    "duplicateFieldGetsReceiveDistinctOrdinals"
+);
+case!(
+    InstructionExtractorFieldTest__duplicateFieldGetsShareDescriptor,
+    "InstructionExtractorFieldTest",
+    "duplicateFieldGetsShareDescriptor"
+);
+case!(
+    InstructionExtractorInvokeTest__extractsVirtualInvoke,
+    "InstructionExtractorInvokeTest",
+    "extractsVirtualInvoke"
+);
+case!(
+    InstructionExtractorInvokeTest__extractsStaticInvoke,
+    "InstructionExtractorInvokeTest",
+    "extractsStaticInvoke"
+);
+case!(
+    InstructionExtractorInvokeTest__extractsSpecialInvoke,
+    "InstructionExtractorInvokeTest",
+    "extractsSpecialInvoke"
+);
+case!(
+    InstructionExtractorInvokeTest__extractsInterfaceInvoke,
+    "InstructionExtractorInvokeTest",
+    "extractsInterfaceInvoke"
+);
+case!(
+    InstructionExtractorInvokeTest__invokeVirtualHasMethodDescriptor,
+    "InstructionExtractorInvokeTest",
+    "invokeVirtualHasMethodDescriptor"
+);
+case!(
+    InstructionExtractorInvokeTest__invokeStaticHasMethodDescriptor,
+    "InstructionExtractorInvokeTest",
+    "invokeStaticHasMethodDescriptor"
+);
+case!(
+    InstructionExtractorInvokeTest__constructorInvokeIsSpecial,
+    "InstructionExtractorInvokeTest",
+    "constructorInvokeIsSpecial"
+);
+case!(
+    InstructionExtractorInvokeTest__duplicateInvokesReceiveDistinctOrdinals,
+    "InstructionExtractorInvokeTest",
+    "duplicateInvokesReceiveDistinctOrdinals"
+);
+case!(
+    InstructionExtractorInvokeTest__duplicateInvokesShareOwnerAndDescriptor,
+    "InstructionExtractorInvokeTest",
+    "duplicateInvokesShareOwnerAndDescriptor"
+);
+case!(
+    InstructionExtractorInvokeTest__returnsEmptyListForMissingMethod,
+    "InstructionExtractorInvokeTest",
+    "returnsEmptyListForMissingMethod"
+);
+case!(
+    InstructionExtractorInvokeTest__returnsEmptyListForWrongDescriptor,
+    "InstructionExtractorInvokeTest",
+    "returnsEmptyListForWrongDescriptor"
+);
+case!(
+    InstructionExtractorInvokeTest__voidStaticInvokeIsClassifiedAsVoid,
+    "InstructionExtractorInvokeTest",
+    "voidStaticInvokeIsClassifiedAsVoid"
+);
+case!(
+    InstructionExtractorInvokeTest__voidInstanceInvokeIsClassifiedAsVoid,
+    "InstructionExtractorInvokeTest",
+    "voidInstanceInvokeIsClassifiedAsVoid"
+);
+case!(
+    InstructionExtractorInvokeTest__intInvokeFollowedByPopIsImmediatelyPopped,
+    "InstructionExtractorInvokeTest",
+    "intInvokeFollowedByPopIsImmediatelyPopped"
+);
+case!(
+    InstructionExtractorInvokeTest__objectInvokeFollowedByPopIsImmediatelyPopped,
+    "InstructionExtractorInvokeTest",
+    "objectInvokeFollowedByPopIsImmediatelyPopped"
+);
+case!(
+    InstructionExtractorInvokeTest__longInvokeFollowedByPop2IsImmediatelyPopped,
+    "InstructionExtractorInvokeTest",
+    "longInvokeFollowedByPop2IsImmediatelyPopped"
+);
+case!(
+    InstructionExtractorInvokeTest__doubleInvokeFollowedByPop2IsImmediatelyPopped,
+    "InstructionExtractorInvokeTest",
+    "doubleInvokeFollowedByPop2IsImmediatelyPopped"
+);
+case!(
+    InstructionExtractorInvokeTest__longInvokeFollowedByWrongPopIsRetained,
+    "InstructionExtractorInvokeTest",
+    "longInvokeFollowedByWrongPopIsRetained"
+);
+case!(
+    InstructionExtractorInvokeTest__invokeResultStoredIsRetained,
+    "InstructionExtractorInvokeTest",
+    "invokeResultStoredIsRetained"
+);
+case!(
+    InstructionExtractorInvokeTest__invokeResultReturnedIsRetained,
+    "InstructionExtractorInvokeTest",
+    "invokeResultReturnedIsRetained"
+);
+case!(
+    InstructionExtractorInvokeTest__fieldGetFollowedByPopIsRetained,
+    "InstructionExtractorInvokeTest",
+    "fieldGetFollowedByPopIsRetained"
+);
+case!(
+    InstructionExtractorInvokeTest__fieldPutIsClassifiedAsVoid,
+    "InstructionExtractorInvokeTest",
+    "fieldPutIsClassifiedAsVoid"
+);
+case!(
+    InstructionExtractorInvokeTest__labelBetweenInvokeAndPopIsRetained,
+    "InstructionExtractorInvokeTest",
+    "labelBetweenInvokeAndPopIsRetained"
+);
+case!(
+    InstructionExtractorInvokeTest__frameBetweenLongInvokeAndPop2IsRetained,
+    "InstructionExtractorInvokeTest",
+    "frameBetweenLongInvokeAndPop2IsRetained"
+);
+case!(
+    InstructionExtractorInvokeTest__instructionOccurrenceIndexCountsRealInstructionsOnly,
+    "InstructionExtractorInvokeTest",
+    "instructionOccurrenceIndexCountsRealInstructionsOnly"
+);
+case!(
+    InstructionExtractorInvokeTest__extractsUnaryZeroComparisonConditionsAndExcludesOtherJumps,
+    "InstructionExtractorInvokeTest",
+    "extractsUnaryZeroComparisonConditionsAndExcludesOtherJumps"
+);
+case!(
+    InstructionExtractorInvokeTest__excludesUnaryConditionsImmediatelyAfterCompareInstructions,
+    "InstructionExtractorInvokeTest",
+    "excludesUnaryConditionsImmediatelyAfterCompareInstructions"
+);
+case!(
+    InstructionExtractorMiscTest__extractsNewInstructions,
+    "InstructionExtractorMiscTest",
+    "extractsNewInstructions"
+);
+case!(
+    InstructionExtractorMiscTest__extractsClassLiteralConstantsFromCheckcastAndInstanceofOnly,
+    "InstructionExtractorMiscTest",
+    "extractsClassLiteralConstantsFromCheckcastAndInstanceofOnly"
+);
+case!(
+    InstructionExtractorMiscTest__newInstructionDescriptorUsesClassLiteralForm,
+    "InstructionExtractorMiscTest",
+    "newInstructionDescriptorUsesClassLiteralForm"
+);
+case!(
+    InstructionExtractorMiscTest__extractsStringConstant,
+    "InstructionExtractorMiscTest",
+    "extractsStringConstant"
+);
+case!(
+    InstructionExtractorMiscTest__extractsIntConstant,
+    "InstructionExtractorMiscTest",
+    "extractsIntConstant"
+);
+case!(
+    InstructionExtractorMiscTest__extractsLongConstant,
+    "InstructionExtractorMiscTest",
+    "extractsLongConstant"
+);
+case!(
+    InstructionExtractorMiscTest__extractsFloatConstant,
+    "InstructionExtractorMiscTest",
+    "extractsFloatConstant"
+);
+case!(
+    InstructionExtractorMiscTest__extractsDoubleConstant,
+    "InstructionExtractorMiscTest",
+    "extractsDoubleConstant"
+);
+case!(
+    InstructionExtractorMiscTest__extractsClassLiteralConstant,
+    "InstructionExtractorMiscTest",
+    "extractsClassLiteralConstant"
+);
+case!(
+    InstructionExtractorMiscTest__extractsNullConstant,
+    "InstructionExtractorMiscTest",
+    "extractsNullConstant"
+);
+case!(
+    InstructionExtractorMiscTest__extractsSmallIntConstants,
+    "InstructionExtractorMiscTest",
+    "extractsSmallIntConstants"
+);
+case!(
+    InstructionExtractorMiscTest__extractsReturnInstruction,
+    "InstructionExtractorMiscTest",
+    "extractsReturnInstruction"
+);
+case!(
+    InstructionExtractorMiscTest__returnOrdinalsAreDistinctPerReturnSite,
+    "InstructionExtractorMiscTest",
+    "returnOrdinalsAreDistinctPerReturnSite"
+);
+case!(
+    InstructionExtractorMiscTest__intReturnMethodHasReturnCandidate,
+    "InstructionExtractorMiscTest",
+    "intReturnMethodHasReturnCandidate"
+);
+case!(
+    InstructionExtractorMiscTest__objectReturnMethodHasReturnCandidate,
+    "InstructionExtractorMiscTest",
+    "objectReturnMethodHasReturnCandidate"
+);
+case!(
+    OrdinalCalculatorTest__assignsZeroToFirstCandidate,
+    "OrdinalCalculatorTest",
+    "assignsZeroToFirstCandidate"
+);
+case!(
+    OrdinalCalculatorTest__incrementsOrdinalsForDuplicateInvokes,
+    "OrdinalCalculatorTest",
+    "incrementsOrdinalsForDuplicateInvokes"
+);
+case!(
+    OrdinalCalculatorTest__separatesOrdinalsByMethodName,
+    "OrdinalCalculatorTest",
+    "separatesOrdinalsByMethodName"
+);
+case!(
+    OrdinalCalculatorTest__separatesOrdinalsByDescriptor,
+    "OrdinalCalculatorTest",
+    "separatesOrdinalsByDescriptor"
+);
+case!(
+    OrdinalCalculatorTest__separatesOrdinalsByOwner,
+    "OrdinalCalculatorTest",
+    "separatesOrdinalsByOwner"
+);
+case!(
+    OrdinalCalculatorTest__separatesOrdinalsByKind,
+    "OrdinalCalculatorTest",
+    "separatesOrdinalsByKind"
+);
+case!(
+    OrdinalCalculatorTest__fieldOrdinalsIncrementForSameTarget,
+    "OrdinalCalculatorTest",
+    "fieldOrdinalsIncrementForSameTarget"
+);
+case!(
+    OrdinalCalculatorTest__constantOrdinalsDifferByValue,
+    "OrdinalCalculatorTest",
+    "constantOrdinalsDifferByValue"
+);
+case!(
+    OrdinalCalculatorTest__returnOrdinalsIncrementPerReturnSite,
+    "OrdinalCalculatorTest",
+    "returnOrdinalsIncrementPerReturnSite"
+);
+case!(
+    BytecodeAtTargetAdapterTest__simpleTargetReturnCandidates,
+    "BytecodeAtTargetAdapterTest",
+    "simpleTargetReturnCandidates"
+);
+case!(
+    BytecodeAtTargetAdapterTest__simpleTargetReturnOrdinalCount,
+    "BytecodeAtTargetAdapterTest",
+    "simpleTargetReturnOrdinalCount"
+);
+case!(
+    BytecodeAtTargetAdapterTest__invokeSamplesProducesInvokeCandidates,
+    "BytecodeAtTargetAdapterTest",
+    "invokeSamplesProducesInvokeCandidates"
+);
+case!(
+    BytecodeAtTargetAdapterTest__invokeCandidateLabelDiffersFromInsertDescriptor,
+    "BytecodeAtTargetAdapterTest",
+    "invokeCandidateLabelDiffersFromInsertDescriptor"
+);
+case!(
+    BytecodeAtTargetAdapterTest__fieldSamplesProducesFieldCandidates,
+    "BytecodeAtTargetAdapterTest",
+    "fieldSamplesProducesFieldCandidates"
+);
+case!(
+    BytecodeAtTargetAdapterTest__filtersByAtValue,
+    "BytecodeAtTargetAdapterTest",
+    "filtersByAtValue"
+);
+case!(
+    BytecodeAtTargetAdapterTest__returnsEmptyForMissingOwner,
+    "BytecodeAtTargetAdapterTest",
+    "returnsEmptyForMissingOwner"
+);
+case!(
+    BytecodeAtTargetAdapterTest__overloadedMethodWithoutDescriptorReturnsEmpty,
+    "BytecodeAtTargetAdapterTest",
+    "overloadedMethodWithoutDescriptorReturnsEmpty"
+);
+case!(
+    BytecodeAtTargetAdapterTest__getClassBytesReturnsExactProviderBytes,
+    "BytecodeAtTargetAdapterTest",
+    "getClassBytesReturnsExactProviderBytes"
+);
+case!(
+    BytecodeAtTargetAdapterTest__getClassBytesReturnsNullForMissingClass,
+    "BytecodeAtTargetAdapterTest",
+    "getClassBytesReturnsNullForMissingClass"
+);
+case!(
+    BytecodeAtTargetAdapterTest__resolveCommonSuperClassResolvesSiblingSuperclass,
+    "BytecodeAtTargetAdapterTest",
+    "resolveCommonSuperClassResolvesSiblingSuperclass"
+);
+case!(
+    BytecodeAtTargetAdapterTest__getClassBytesAndResolveCommonSuperClassRemainOnDemand,
+    "BytecodeAtTargetAdapterTest",
+    "getClassBytesAndResolveCommonSuperClassRemainOnDemand"
+);
+case!(
+    BytecodeAtTargetAdapterTest__overloadedMethodWithExplicitDescriptorResolvesCorrectOverload,
+    "BytecodeAtTargetAdapterTest",
+    "overloadedMethodWithExplicitDescriptorResolvesCorrectOverload"
+);
+case!(
+    BytecodeClassIndexAdapterTest__findClassByInternalName,
+    "BytecodeClassIndexAdapterTest",
+    "findClassByInternalName"
+);
+case!(
+    BytecodeClassIndexAdapterTest__findClassByFqn,
+    "BytecodeClassIndexAdapterTest",
+    "findClassByFqn"
+);
+case!(
+    BytecodeClassIndexAdapterTest__findClassesByPrefix,
+    "BytecodeClassIndexAdapterTest",
+    "findClassesByPrefix"
+);
+case!(
+    BytecodeClassIndexAdapterTest__exposesDrawMethodWithReadableSignature,
+    "BytecodeClassIndexAdapterTest",
+    "exposesDrawMethodWithReadableSignature"
+);
+case!(
+    BytecodeClassIndexAdapterTest__exposesCounterFieldWithReadableType,
+    "BytecodeClassIndexAdapterTest",
+    "exposesCounterFieldWithReadableType"
+);
+case!(
+    BytecodeClassIndexAdapterTest__projectContextMixinIndexBuildsEquivalentAdapter,
+    "BytecodeClassIndexAdapterTest",
+    "projectContextMixinIndexBuildsEquivalentAdapter"
+);
+case!(
+    BytecodeIndexEntryMapperTest__toMixinAtTargetPropagatesInvokeOccurrenceMetadata,
+    "BytecodeIndexEntryMapperTest",
+    "toMixinAtTargetPropagatesInvokeOccurrenceMetadata"
+);
+case!(
+    BytecodeIndexEntryMapperTest__toMixinAtTargetPreservesConditionOpcode,
+    "BytecodeIndexEntryMapperTest",
+    "toMixinAtTargetPreservesConditionOpcode"
+);
+case!(
+    BytecodeIndexEntryMapperTest__toMixinAtTargetPreservesInvokeOperationKind,
+    "BytecodeIndexEntryMapperTest",
+    "toMixinAtTargetPreservesInvokeOperationKind"
+);
+case!(
+    BytecodeIndexEntryMapperTest__toMixinAtTargetPreservesFieldReadWriteOperationKinds,
+    "BytecodeIndexEntryMapperTest",
+    "toMixinAtTargetPreservesFieldReadWriteOperationKinds"
+);
+case!(
+    BytecodeIndexEntryMapperTest__toMixinAtTargetMapsNonInvokeFieldKindsToNullOperationKind,
+    "BytecodeIndexEntryMapperTest",
+    "toMixinAtTargetMapsNonInvokeFieldKindsToNullOperationKind"
+);
+case!(
+    BytecodeIndexEntryMapperTest__toMixinAtTargetPreservesDefaultOccurrenceMetadata,
+    "BytecodeIndexEntryMapperTest",
+    "toMixinAtTargetPreservesDefaultOccurrenceMetadata"
+);
+case!(
+    ProjectContextMixinIndexTest__buildsClassIndexFromProvider,
+    "ProjectContextMixinIndexTest",
+    "buildsClassIndexFromProvider"
+);
+case!(
+    ProjectContextMixinIndexTest__buildsBytecodeIndexFromProvider,
+    "ProjectContextMixinIndexTest",
+    "buildsBytecodeIndexFromProvider"
+);
+case!(
+    ProjectContextMixinIndexTest__classAndBytecodeIndexShareClasspath,
+    "ProjectContextMixinIndexTest",
+    "classAndBytecodeIndexShareClasspath"
+);
+case!(
+    BytecodeIndexDefaultTest__fakeBytecodeIndexUsesDefaultNullGetClassBytes,
+    "BytecodeIndexDefaultTest",
+    "fakeBytecodeIndexUsesDefaultNullGetClassBytes"
+);
+case!(
+    BytecodeIndexDefaultTest__fakeBytecodeIndexUsesDefaultNullResolveCommonSuperClass,
+    "BytecodeIndexDefaultTest",
+    "fakeBytecodeIndexUsesDefaultNullResolveCommonSuperClass"
+);
+case!(
+    BytecodeCommonSuperClassResolverTest__equalDescriptorsReturnUnchanged,
+    "BytecodeCommonSuperClassResolverTest",
+    "equalDescriptorsReturnUnchanged"
+);
+case!(
+    BytecodeCommonSuperClassResolverTest__siblingsShareCommonBase,
+    "BytecodeCommonSuperClassResolverTest",
+    "siblingsShareCommonBase"
+);
+case!(
+    BytecodeCommonSuperClassResolverTest__superclassBothArgumentOrders,
+    "BytecodeCommonSuperClassResolverTest",
+    "superclassBothArgumentOrders"
+);
+case!(
+    BytecodeCommonSuperClassResolverTest__interfaceImplementation,
+    "BytecodeCommonSuperClassResolverTest",
+    "interfaceImplementation"
+);
+case!(
+    BytecodeCommonSuperClassResolverTest__unrelatedReferencesReturnObject,
+    "BytecodeCommonSuperClassResolverTest",
+    "unrelatedReferencesReturnObject"
+);
+case!(
+    BytecodeCommonSuperClassResolverTest__arraysPreserveCompatibleReferenceComponentAndDimensions,
+    "BytecodeCommonSuperClassResolverTest",
+    "arraysPreserveCompatibleReferenceComponentAndDimensions"
+);
+case!(BytecodeCommonSuperClassResolverTest__stringOneDimensionalWithStringTwoDimensionalReturnsObjectOneDimensional,"BytecodeCommonSuperClassResolverTest","stringOneDimensionalWithStringTwoDimensionalReturnsObjectOneDimensional");
+case!(BytecodeCommonSuperClassResolverTest__stringTwoDimensionalWithObjectOneDimensionalReturnsObjectOneDimensional,"BytecodeCommonSuperClassResolverTest","stringTwoDimensionalWithObjectOneDimensionalReturnsObjectOneDimensional");
+case!(
+    BytecodeCommonSuperClassResolverTest__arraysAreAssignableToCloneableAndSerializable,
+    "BytecodeCommonSuperClassResolverTest",
+    "arraysAreAssignableToCloneableAndSerializable"
+);
+case!(
+    BytecodeCommonSuperClassResolverTest__equalPrimitiveArraysReturnUnchanged,
+    "BytecodeCommonSuperClassResolverTest",
+    "equalPrimitiveArraysReturnUnchanged"
+);
+case!(
+    BytecodeCommonSuperClassResolverTest__incompatiblePrimitiveArraysReturnObject,
+    "BytecodeCommonSuperClassResolverTest",
+    "incompatiblePrimitiveArraysReturnObject"
+);
+case!(BytecodeCommonSuperClassResolverTest__incompatiblePrimitiveArraysReturnObjectArrayAtMatchingDimensions,"BytecodeCommonSuperClassResolverTest","incompatiblePrimitiveArraysReturnObjectArrayAtMatchingDimensions");
+case!(BytecodeCommonSuperClassResolverTest__incompatiblePrimitiveArraysReturnObjectArrayAtThreeMatchingDimensions,"BytecodeCommonSuperClassResolverTest","incompatiblePrimitiveArraysReturnObjectArrayAtThreeMatchingDimensions");
+case!(
+    BytecodeCommonSuperClassResolverTest__incompatiblePrimitiveArraysAcrossDimensionsReturnObject,
+    "BytecodeCommonSuperClassResolverTest",
+    "incompatiblePrimitiveArraysAcrossDimensionsReturnObject"
+);
+case!(
+    BytecodeCommonSuperClassResolverTest__mixedPrimitiveAndReferenceArraysReturnObject,
+    "BytecodeCommonSuperClassResolverTest",
+    "mixedPrimitiveAndReferenceArraysReturnObject"
+);
+case!(BytecodeCommonSuperClassResolverTest__arrayDimensionMismatchWithSharedComponentTypeReturnsObjectArray,"BytecodeCommonSuperClassResolverTest","arrayDimensionMismatchWithSharedComponentTypeReturnsObjectArray");
+case!(BytecodeCommonSuperClassResolverTest__arrayDimensionMismatchWithRelatedComponentTypesReturnsObjectArray,"BytecodeCommonSuperClassResolverTest","arrayDimensionMismatchWithRelatedComponentTypesReturnsObjectArray");
+case!(
+    BytecodeCommonSuperClassResolverTest__unequalPrimitiveDescriptorsReturnNull,
+    "BytecodeCommonSuperClassResolverTest",
+    "unequalPrimitiveDescriptorsReturnNull"
+);
+case!(
+    BytecodeCommonSuperClassResolverTest__invalidDescriptorsReturnNull,
+    "BytecodeCommonSuperClassResolverTest",
+    "invalidDescriptorsReturnNull"
+);
+case!(
+    BytecodeCommonSuperClassResolverTest__equalInvalidDescriptorsReturnNull,
+    "BytecodeCommonSuperClassResolverTest",
+    "equalInvalidDescriptorsReturnNull"
+);
+case!(
+    BytecodeCommonSuperClassResolverTest__missingBytesReturnNull,
+    "BytecodeCommonSuperClassResolverTest",
+    "missingBytesReturnNull"
+);
+case!(
+    BytecodeCommonSuperClassResolverTest__corruptBytesReturnNull,
+    "BytecodeCommonSuperClassResolverTest",
+    "corruptBytesReturnNull"
+);
+case!(
+    BytecodeCommonSuperClassResolverTest__cacheReusesHierarchyAndPairResults,
+    "BytecodeCommonSuperClassResolverTest",
+    "cacheReusesHierarchyAndPairResults"
+);
+case!(
+    BytecodeCommonSuperClassResolverTest__everyReferenceIsAssignableToObjectWithoutHierarchyBytes,
+    "BytecodeCommonSuperClassResolverTest",
+    "everyReferenceIsAssignableToObjectWithoutHierarchyBytes"
+);
+case!(
+    BytecodeCommonSuperClassResolverTest__arraysAreAssignableToObject,
+    "BytecodeCommonSuperClassResolverTest",
+    "arraysAreAssignableToObject"
+);
+case!(
+    BytecodeCommonSuperClassResolverTest__cyclicHierarchyDoesNotLoop,
+    "BytecodeCommonSuperClassResolverTest",
+    "cyclicHierarchyDoesNotLoop"
+);
+case!(
+    BytecodeCommonSuperClassResolverTest__missingBytesAreCachedWithoutRepeatedLookup,
+    "BytecodeCommonSuperClassResolverTest",
+    "missingBytesAreCachedWithoutRepeatedLookup"
+);
+case!(
+    BytecodeCommonSuperClassResolverTest__nonPositiveCacheSizesAreRejected,
+    "BytecodeCommonSuperClassResolverTest",
+    "nonPositiveCacheSizesAreRejected"
+);

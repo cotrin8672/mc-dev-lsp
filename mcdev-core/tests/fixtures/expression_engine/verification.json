@@ -1,0 +1,31 @@
+{
+  "originalBytecodeCases": 153,
+  "originalOfficialEngineCases": 82,
+  "originalCases": 235,
+  "additionalOracleCases": 6,
+  "nativeTestFunctions": 212,
+  "nativeTestBinaries": 9,
+  "nativeEvidence": "build/rust-test-logs/expression-engine-20261024/owned-final-parity.stdout.log",
+  "nativeCompilerEvidence": "build/rust-test-logs/expression-engine-20261024/owned-final-parity.stderr.log",
+  "originalEngineApiCalls": 432,
+  "additionalEngineApiCalls": 5276,
+  "engineCallsByApi": {
+    "OfficialExpressionParser.parse": 2860,
+    "OfficialExpressionMatcher.match": 1350,
+    "OfficialExpressionIdentifierPoolBuilder.build": 43,
+    "OfficialExpressionMemberCompletionProbes.build": 63,
+    "OfficialExpressionMatcher.completeReceiverMembers": 33,
+    "IdentifierPool.matchesMember": 29,
+    "IdentifierPool.matchesType": 17,
+    "MemberDefinition.matches": 17,
+    "IdentifierPool.memberExists": 11,
+    "IdentifierPool.typeExists": 4,
+    "OfficialExpressionMatcher.matchComponents": 1281
+  },
+  "legacyEngineSha256": "5731580a5f6b0de5e9d66e30dbafcb2a03864171728369e294fc3d7abf4b3a8f",
+  "identityAmbiguityGroups": 17,
+  "jsrFatalDeltaRows": 12,
+  "bytecodeCases": "mcdev-core/tests/fixtures/bytecode_legacy_coverage.json",
+  "engineCases": "mcdev-core/tests/fixtures/expression_engine/case_coverage.json",
+  "remainingOwnedImplementationGaps": []
+}

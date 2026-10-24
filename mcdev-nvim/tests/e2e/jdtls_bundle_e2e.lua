@@ -5,21 +5,11 @@ local convert = require("mcdev.convert")
 local completion = require("mcdev.completion")
 local health = require("mcdev.health")
 
-local bundle_jar = vim.env.MCDEV_BUNDLE_JAR
+local companion_cmd = vim.env.MCDEV_E2E_COMPANION
 local workspace = vim.env.MCDEV_E2E_WORKSPACE
-local jdtls_cmd = vim.env.JDTLS_CMD
+local ktlsp_cmd = vim.env.MCDEV_E2E_KTLSP
 local fixture = vim.env.MCDEV_E2E_FIXTURE or "fabric-basic"
 
-if fixture == "create-drill-definition-diagnostics" then
-  local blink_rtp = vim.env.MCDEV_E2E_BLINK_RTP
-  local jdtls_rtp = blink_rtp and (vim.fn.fnamemodify(blink_rtp, ":h") .. "/nvim-jdtls") or nil
-  helpers.assert_true(
-    jdtls_rtp ~= nil and vim.fn.isdirectory(jdtls_rtp) == 1,
-    "installed nvim-jdtls checkout must be beside MCDEV_E2E_BLINK_RTP"
-  )
-  vim.opt.runtimepath:prepend(jdtls_rtp)
-  require("jdtls")
-end
 local progress_log = vim.fn.getcwd() .. "/build/e2e-progress.log"
 local health_log = vim.fn.getcwd() .. "/build/e2e-health.log"
 local debug_completion_log = vim.fn.getcwd() .. "/build/e2e-debug-completion.log"
@@ -32,12 +22,13 @@ end
 vim.fn.writefile({}, progress_log)
 vim.fn.writefile({}, health_log)
 vim.fn.writefile({}, debug_completion_log)
-log_step("starting osgi bundle e2e for " .. fixture)
+log_step("starting native ktlsp companion e2e for " .. fixture)
 
-helpers.assert_not_nil(bundle_jar, "MCDEV_BUNDLE_JAR is required")
+helpers.assert_not_nil(companion_cmd, "MCDEV_E2E_COMPANION is required")
 helpers.assert_not_nil(workspace, "MCDEV_E2E_WORKSPACE is required")
-helpers.assert_not_nil(jdtls_cmd, "JDTLS_CMD is required")
-helpers.assert_true(vim.fn.filereadable(bundle_jar) == 1, "bundle jar must exist: " .. bundle_jar)
+helpers.assert_not_nil(ktlsp_cmd, "MCDEV_E2E_KTLSP is required")
+helpers.assert_true(vim.fn.executable(companion_cmd) == 1, "companion executable must exist: " .. companion_cmd)
+helpers.assert_true(vim.fn.executable(ktlsp_cmd) == 1, "ktlsp executable must exist: " .. ktlsp_cmd)
 helpers.assert_true(vim.fn.isdirectory(workspace) == 1, "workspace must exist: " .. workspace)
 log_step("environment validated")
 
@@ -114,115 +105,26 @@ local function workspace_uri(path)
   return vim.uri_from_fname(path)
 end
 
-local data_dir = vim.fn.stdpath("cache") .. "/mcdev-osgi-e2e-jdtls"
-local preserve_data = vim.env.MCDEV_E2E_KEEP_JDTLS_DATA == "1"
-if not preserve_data then
-  vim.fn.delete(data_dir, "rf")
-end
-vim.fn.mkdir(data_dir, "p")
-log_step(preserve_data and "data dir prepared (preserved)" or "data dir prepared (cold/reset)")
-local bundle_snapshot = data_dir .. "/mcdev-bundle-" .. vim.fn.getpid() .. ".jar"
-local copied, copy_error = vim.uv.fs_copyfile(bundle_jar, bundle_snapshot)
-helpers.assert_true(copied == true, "cannot snapshot E2E bundle: " .. tostring(copy_error))
-bundle_jar = bundle_snapshot
-log_step("bundle snapshot: " .. bundle_jar)
-
 local workspace_root_uri = workspace_uri(workspace)
-log_step("workspace uri built")
-
 local function first_glob(pattern)
   local matches = vim.fn.glob(pattern, false, true)
   return matches and matches[1] or nil
 end
-
-local function mason_jdtls_base_from_cmd(cmd)
-  local normalized = cmd:gsub("\\", "/")
-  local mason_bin = "/mason/bin/jdtls.cmd"
-  if normalized:lower():sub(-#mason_bin) ~= mason_bin then
-    return nil
-  end
-  return normalized:sub(1, #normalized - #mason_bin) .. "/mason/packages/jdtls"
-end
-
-local function direct_java_jdtls_cmd(cmd)
-  if vim.fn.has("win32") ~= 1 or cmd:lower():sub(-4) ~= ".cmd" then
-    return nil
-  end
-  local base = mason_jdtls_base_from_cmd(cmd)
-  if not base then
-    return nil
-  end
-  local launcher = first_glob(base .. "/plugins/org.eclipse.equinox.launcher_*.jar")
-    or first_glob(base .. "/plugins/org.eclipse.equinox.launcher.jar")
-  if not launcher then
-    return nil
-  end
-  return {
-    "java",
-    "-Declipse.application=org.eclipse.jdt.ls.core.id1",
-    "-Dosgi.bundles.defaultStartLevel=4",
-    "-Declipse.product=org.eclipse.jdt.ls.core.product",
-    "-Dosgi.checkConfiguration=true",
-    "-Dosgi.sharedConfiguration.area=" .. base .. "/config_win",
-    "-Dosgi.sharedConfiguration.area.readOnly=true",
-    "-Dosgi.configuration.cascaded=true",
-    "-Xms1G",
-    "--add-modules=ALL-SYSTEM",
-    "--add-opens",
-    "java.base/java.util=ALL-UNNAMED",
-    "--add-opens",
-    "java.base/java.lang=ALL-UNNAMED",
-    "-jar",
-    launcher,
-    "-data",
-    data_dir,
-  }
-end
-local jdtls_launch_cmd = direct_java_jdtls_cmd(jdtls_cmd) or { jdtls_cmd, "-data", data_dir }
-if vim.fn.has("win32") == 1 and jdtls_launch_cmd[1]:lower():sub(-4) == ".cmd" then
-  jdtls_launch_cmd = { "cmd.exe", "/C", (jdtls_cmd:gsub("\\", "/")), "-data", (data_dir:gsub("\\", "/")) }
-end
-log_step("jdtls launch cmd: " .. table.concat(jdtls_launch_cmd, " "))
-
-local jdtls_exit = { exited = false, code = nil, signal = nil }
-_G.mcdev_e2e_jdtls_exit = jdtls_exit
-local client_id = vim.lsp.start_client({
-  name = "jdtls",
-  cmd = jdtls_launch_cmd,
-  root_dir = workspace,
-  workspace_folders = {
-    {
-      uri = workspace_root_uri,
-      name = "mcdev-e2e-workspace",
-    },
-  },
-  init_options = {
-    bundles = { bundle_jar },
-    extendedClientCapabilities = fixture == "create-drill-definition-diagnostics" and {
-      classFileContentsSupport = true,
-      generateConstructorsPromptSupport = true,
-      generateToStringPromptSupport = true,
-      overrideMethodsPromptSupport = true,
-      advancedExtractRefactoringSupport = true,
-      executeClientCommandSupport = true,
-    } or nil,
-  },
-  settings = vim.env.MCDEV_E2E_GRADLE_JAVA_HOME and {
-    java = { import = { gradle = { java = { home = vim.env.MCDEV_E2E_GRADLE_JAVA_HOME } } } },
-  } or nil,
+local ktlsp_exit = { exited = false, code = nil, signal = nil }
+_G.mcdev_e2e_ktlsp_exit = ktlsp_exit
+mcdev.setup({ ktlsp = { cmd = { ktlsp_cmd } }, companion = { cmd = { companion_cmd } } })
+local host_config = assert(require("mcdev.ktlsp").extend_config({
+  name = "ktlsp", cmd = { ktlsp_cmd }, root_dir = workspace,
+  workspace_folders = { { uri = workspace_root_uri, name = "mcdev-e2e-workspace" } },
   capabilities = vim.lsp.protocol.make_client_capabilities(),
-  flags = {
-    debounce_text_changes = 0,
-  },
+  flags = { debounce_text_changes = 0 },
   on_exit = function(code, signal)
-    jdtls_exit.exited = true
-    jdtls_exit.code = code
-    jdtls_exit.signal = signal
+    ktlsp_exit.exited, ktlsp_exit.code, ktlsp_exit.signal = true, code, signal
   end,
-})
-
-helpers.assert_not_nil(client_id, "failed to start jdtls client")
-log_step("started jdtls client " .. tostring(client_id))
+}))
+local client_id = vim.lsp.start_client(host_config)
+helpers.assert_not_nil(client_id, "failed to start ktlsp client")
+log_step("started ktlsp client " .. tostring(client_id))
 
 local initialized = vim.wait(180000, function()
   local client = vim.lsp.get_client_by_id(client_id)
@@ -231,7 +133,7 @@ end, 250)
 
 if not initialized then
   local client = vim.lsp.get_client_by_id(client_id)
-  error("jdtls client did not initialize within 180s: " .. vim.inspect({
+  error("ktlsp client did not initialize within 180s: " .. vim.inspect({
     client_exists = client ~= nil,
     initialized = client and client.initialized or false,
     is_stopped = client and client.is_stopped(client) or true,
@@ -239,14 +141,17 @@ if not initialized then
 end
 
 local client = vim.lsp.get_client_by_id(client_id)
-helpers.assert_not_nil(client, "jdtls client disappeared after initialize")
-log_step("jdtls initialized")
+helpers.assert_not_nil(client, "ktlsp client disappeared after initialize")
+log_step("ktlsp initialized")
 
-mcdev.setup({
-  jdtls = {
-    extension_jar = bundle_jar,
-  },
-})
+local protocol = require("mcdev.protocol")
+local commands_ready = vim.wait(120000, function()
+  for _, command in pairs(protocol.commands) do
+    if not protocol.command_supported(client, command) then return false end
+  end
+  return true
+end, 100)
+helpers.assert_true(commands_ready, "ktlsp must advertise every MC command before indexed E2E; this contract is not yet available on older hosts")
 
 local function sync_request(method, params, timeout_ms)
   log_step("request " .. method)
@@ -255,7 +160,7 @@ local function sync_request(method, params, timeout_ms)
   client:request(method, params, function(request_err, request_result)
     err = request_err
     result = request_result
-  end, timeout_ms or 60000)
+  end)
   local completed = vim.wait(timeout_ms or 60000, function()
     return result ~= nil or err ~= nil
   end, 100)
@@ -293,36 +198,39 @@ local function build_context(bufnr, position)
   }
 end
 
+local compile_sequence = 0
 local function compile_single_java_source(source_path)
-  local gradle_cache = vim.fn.expand("~/.gradle/caches/modules-2/files-2.1")
-  local mixin_jar = first_glob(gradle_cache .. "/org.spongepowered/mixin/0.8.7/*/mixin-0.8.7.jar")
-  local mixinextras_jar = first_glob(
-    gradle_cache .. "/io.github.llamalad7/mixinextras-fabric/0.5.5/*/mixinextras-fabric-0.5.5.jar"
-  )
-  helpers.assert_not_nil(mixin_jar, "Mixin 0.8.7 jar is required for javac E2E verification")
-  helpers.assert_not_nil(mixinextras_jar, "MixinExtras Fabric 0.5.5 jar is required for javac E2E verification")
-
-  local output_dir = workspace .. "/build/mcdev-e2e-compile"
-  vim.fn.delete(output_dir, "rf")
-  vim.fn.mkdir(output_dir, "p")
-  local path_separator = package.config:sub(1, 1) == "\\" and ";" or ":"
-  local classpath = table.concat({ workspace .. "/classpath", mixin_jar, mixinextras_jar }, path_separator)
-  local output = vim.fn.systemlist({
-    "javac",
-    "-proc:none",
-    "-encoding",
-    "UTF-8",
-    "-classpath",
-    classpath,
-    "-d",
-    output_dir,
-    source_path,
-  })
-  helpers.assert_eq(
-    vim.v.shell_error,
-    0,
-    "javac failed for " .. source_path .. ": " .. table.concat(output or {}, "\n")
-  )
+  -- This is the real mod project's toolchain, never a Java LSP/helper process.
+  local normalized = vim.fs.normalize(vim.fn.fnamemodify(source_path, ":p"))
+  local project_root = vim.fs.normalize(vim.fn.fnamemodify(workspace, ":p")):gsub("/+$", "")
+  helpers.assert_true(normalized:sub(1, #project_root + 1) == project_root .. "/",
+    "compile verification must stay in its explicitly selected project")
+  local wrapper = workspace .. (vim.fn.has("win32") == 1 and "/gradlew.bat" or "/gradlew")
+  helpers.assert_true(vim.fn.filereadable(wrapper) == 1, "real mod Gradle wrapper is required")
+  local relative = normalized:sub(#project_root + 2)
+  local module = relative:match("^(.-)/src/") or ""
+  local task = relative:find("/src/client/", 1, true) and "compileClientJava" or "compileJava"
+  if module ~= "" then task = ":" .. module:gsub("/", ":") .. ":" .. task end
+  local command = { wrapper, task, "--no-daemon", "--console=plain" }
+  if vim.fn.has("win32") == 1 then
+    command = { "cmd.exe", "/d", "/c", wrapper, task, "--no-daemon", "--console=plain" }
+  end
+  local result
+  local process = vim.system(command, { cwd = workspace, text = true }, function(value) result = value end)
+  local settled = vim.wait(120000, function() return result ~= nil end, 25)
+  if not settled then
+    if vim.fn.has("win32") == 1 then
+      local cleanup = vim.system({ "taskkill.exe", "/PID", tostring(process.pid), "/T", "/F" }, { text = true })
+      cleanup:wait(5000)
+    end
+    process:kill(9)
+    vim.wait(2000, function() return result ~= nil end, 25)
+  end
+  compile_sequence = compile_sequence + 1
+  local prefix = vim.fn.getcwd() .. "/build/nvim-test-logs/e2e-gradle-compile-" .. compile_sequence
+  vim.fn.writefile(vim.split(result and result.stdout or "", "\n", { plain = true }), prefix .. ".stdout.log")
+  vim.fn.writefile(vim.split(result and result.stderr or "timeout", "\n", { plain = true }), prefix .. ".stderr.log")
+  helpers.assert_eq(settled and result.code or 124, 0, "Gradle compile failed for " .. source_path .. "; logs " .. prefix)
 end
 
 local function with_buffer(file_path, filetype, lines, callback)
@@ -335,7 +243,7 @@ local function with_buffer(file_path, filetype, lines, callback)
   end
   vim.lsp.buf_attach_client(bufnr, client_id)
   vim.wait(1000, function()
-    return vim.lsp.get_clients({ bufnr = bufnr, name = "jdtls" })[1] ~= nil
+    return vim.lsp.get_clients({ bufnr = bufnr, name = "ktlsp" })[1] ~= nil
   end, 50)
   callback(bufnr)
 end
@@ -495,7 +403,7 @@ with_buffer(mixin_file, "java", nil, function(bufnr)
   helpers.assert_true(#info_lines > 0, "mcdev.info returned no lines")
   helpers.assert_not_nil(info_result.result.buildCommit, "mcdev.info should include extension build commit")
   helpers.assert_not_nil(info_result.result.buildTime, "mcdev.info should include extension build time")
-  helpers.assert_not_nil(info_result.result.jarLocation, "mcdev.info should include extension jar location")
+  helpers.assert_not_nil(info_result.result.executableLocation or info_result.result.jarLocation, "mcdev.info should include native executable location")
   helpers.assert_true(
     vim.tbl_contains(info_result.result.registeredCommands or {}, "mcdev.completion"),
     "mcdev.info should include registered mcdev.completion command"
@@ -543,10 +451,10 @@ with_buffer(mixin_file, "java", nil, function(bufnr)
   log_step("completion debug: " .. vim.inspect(debug))
   helpers.assert_eq(debug.command, "mcdev.completion")
   helpers.assert_eq(debug.zeroItemReason, nil)
-  helpers.assert_eq(debug.parseSource, "JDT_AST")
-  helpers.assert_eq(debug.usedCompilationUnit, true)
-  helpers.assert_eq(debug.usedJavaProject, true)
-  helpers.assert_true((debug.bindingResolvedCount or 0) > 0, "completion debug should resolve JDT bindings")
+  helpers.assert_eq(debug.parseSource, "HOST_NORMALIZED")
+  helpers.assert_eq(debug.parseConfidence, "HIGH")
+  helpers.assert_true((debug.projectSessionVersion or 0) > 0, "authoritative project session is required")
+  helpers.assert_true((debug.bindingResolvedCount or 0) > 0, "completion debug should resolve host bindings")
   helpers.assert_eq(debug.semanticContextFound, true)
   helpers.assert_eq(debug.fallbackAnnotationContextUsed, false)
   helpers.assert_eq(#(debug.warnings or {}), 0)
@@ -596,9 +504,9 @@ with_buffer(mixin_file, "java", nil, function(bufnr)
         end, client_items)[1],
         "client source-set completion should return SimpleTarget from classpath"
       )
-      helpers.assert_eq(client_debug.parseSource, "JDT_AST")
-      helpers.assert_eq(client_debug.usedCompilationUnit, true)
-      helpers.assert_eq(client_debug.usedJavaProject, true)
+      helpers.assert_eq(client_debug.parseSource, "HOST_NORMALIZED")
+      helpers.assert_eq(client_debug.parseConfidence, "HIGH")
+      helpers.assert_true((client_debug.projectSessionVersion or 0) > 0, "authoritative project session is required")
       helpers.assert_eq(client_debug.semanticContextFound, true)
       helpers.assert_eq(#(client_debug.warnings or {}), 0)
     end)
@@ -613,14 +521,14 @@ with_buffer(mixin_file, "java", nil, function(bufnr)
   helpers.assert_true(health_output:find("mcdev.info ping: OK", 1, true) ~= nil, health_output)
   helpers.assert_true(health_output:find("mcdev.completion ping: OK", 1, true) ~= nil, health_output)
   helpers.assert_true(health_output:find("extension build commit:", 1, true) ~= nil, health_output)
-  helpers.assert_true(health_output:find("usedCompilationUnit: true", 1, true) ~= nil, health_output)
+  helpers.assert_true(health_output:find("parseConfidence: HIGH", 1, true) ~= nil, health_output)
   helpers.assert_true(health_output:find("fallbackAnnotationContextUsed: false", 1, true) ~= nil, health_output)
 
   local debug_completion_output = capture_notify(function()
     health.debug_completion(bufnr)
   end, 60000)
   vim.fn.writefile(vim.split(debug_completion_output, "\n", { plain = true }), debug_completion_log)
-  helpers.assert_true(debug_completion_output:find("parse source: JDT_AST", 1, true) ~= nil, debug_completion_output)
+  helpers.assert_true(debug_completion_output:find("parse source: HOST_NORMALIZED", 1, true) ~= nil, debug_completion_output)
   helpers.assert_true(
     debug_completion_output:find("used compilation unit/project: true/true", 1, true) ~= nil,
     debug_completion_output
@@ -698,10 +606,10 @@ with_buffer(mixin_file, "java", nil, function(bufnr)
     log_step("inject completion debug: " .. vim.inspect(inject_debug))
     helpers.assert_eq(inject_debug.command, "mcdev.completion")
     helpers.assert_eq(inject_debug.zeroItemReason, nil)
-    helpers.assert_eq(inject_debug.parseSource, "JDT_AST")
-    helpers.assert_eq(inject_debug.usedCompilationUnit, true)
-    helpers.assert_eq(inject_debug.usedJavaProject, true)
-    helpers.assert_true((inject_debug.bindingResolvedCount or 0) > 0, "inject completion debug should resolve JDT bindings")
+    helpers.assert_eq(inject_debug.parseSource, "HOST_NORMALIZED")
+    helpers.assert_eq(inject_debug.parseConfidence, "HIGH")
+    helpers.assert_true((inject_debug.projectSessionVersion or 0) > 0, "authoritative project session is required")
+    helpers.assert_true((inject_debug.bindingResolvedCount or 0) > 0, "inject completion debug should resolve host bindings")
     helpers.assert_eq(inject_debug.semanticContextFound, true)
     helpers.assert_eq(inject_debug.fallbackAnnotationContextUsed, false)
     helpers.assert_eq(#(inject_debug.warnings or {}), 0)
@@ -761,9 +669,9 @@ with_buffer(mixin_file, "java", nil, function(bufnr)
         end, mixin_class_items)[1],
         "source-only @Mixin class completion should return SourceOnlyTarget"
       )
-      helpers.assert_eq(mixin_class_debug.parseSource, "JDT_AST")
-      helpers.assert_eq(mixin_class_debug.usedJavaProject, true)
-      helpers.assert_eq(mixin_class_debug.usedCompilationUnit, true)
+      helpers.assert_eq(mixin_class_debug.parseSource, "HOST_NORMALIZED")
+      helpers.assert_true((mixin_class_debug.projectSessionVersion or 0) > 0, "authoritative project session is required")
+      helpers.assert_eq(mixin_class_debug.parseConfidence, "HIGH")
       helpers.assert_eq(mixin_class_debug.fallbackAnnotationContextUsed, false)
 
       local source_only_inject_source = {
@@ -806,9 +714,9 @@ with_buffer(mixin_file, "java", nil, function(bufnr)
       local source_only_inject_items = source_only_inject_result.result and source_only_inject_result.result.items or {}
       local source_only_inject_debug = source_only_inject_result.result and source_only_inject_result.result.debug or {}
       log_step("source-only inject completion debug: " .. vim.inspect(source_only_inject_debug))
-      helpers.assert_eq(source_only_inject_debug.parseSource, "JDT_AST")
-      helpers.assert_eq(source_only_inject_debug.usedJavaProject, true)
-      helpers.assert_eq(source_only_inject_debug.usedCompilationUnit, true)
+      helpers.assert_eq(source_only_inject_debug.parseSource, "HOST_NORMALIZED")
+      helpers.assert_true((source_only_inject_debug.projectSessionVersion or 0) > 0, "authoritative project session is required")
+      helpers.assert_eq(source_only_inject_debug.parseConfidence, "HIGH")
       helpers.assert_eq(source_only_inject_debug.fallbackAnnotationContextUsed, false)
       helpers.assert_true(
         vim.tbl_filter(function(item)
@@ -851,10 +759,10 @@ with_buffer(mixin_file, "java", nil, function(bufnr)
     helpers.assert_nil(invoker_err, "mixin invoker mcdev.completion failed: " .. vim.inspect(invoker_err))
     local invoker_debug = invoker_result.result and invoker_result.result.debug or {}
     log_step("invoker completion debug: " .. vim.inspect(invoker_debug))
-    helpers.assert_eq(invoker_debug.parseSource, "JDT_AST")
-    helpers.assert_eq(invoker_debug.usedCompilationUnit, true)
-    helpers.assert_eq(invoker_debug.usedJavaProject, true)
-    helpers.assert_true((invoker_debug.bindingResolvedCount or 0) > 0, "invoker completion debug should resolve JDT bindings")
+    helpers.assert_eq(invoker_debug.parseSource, "HOST_NORMALIZED")
+    helpers.assert_eq(invoker_debug.parseConfidence, "HIGH")
+    helpers.assert_true((invoker_debug.projectSessionVersion or 0) > 0, "authoritative project session is required")
+    helpers.assert_true((invoker_debug.bindingResolvedCount or 0) > 0, "invoker completion debug should resolve host bindings")
     helpers.assert_eq(invoker_debug.semanticContextFound, true)
     helpers.assert_eq(invoker_debug.fallbackAnnotationContextUsed, false)
     helpers.assert_eq(#(invoker_debug.warnings or {}), 0)
@@ -892,7 +800,7 @@ with_buffer(mixin_file, "java", nil, function(bufnr)
       "completed @Inject must offer a handler declaration snippet; project_transport=" ..
       vim.inspect(completion.last_project_transport_error))
     if completion.last_project_transport_error ~= nil then
-      log_step("handler declaration validated through native helper/JDT fallback; project transport unavailable: " ..
+      log_step("handler declaration validated through native helper/host fallback; project transport unavailable: " ..
         tostring(completion.last_project_transport_error))
     end
     helpers.assert_eq(handler_item.insertTextFormat, vim.lsp.protocol.InsertTextFormat.Snippet)
@@ -991,9 +899,9 @@ with_buffer(mixin_file, "java", nil, function(bufnr)
         vim.inspect(share_debug.warnings or {})
       )
     )
-    helpers.assert_eq(share_debug.parseSource, "JDT_AST")
-    helpers.assert_eq(share_debug.usedCompilationUnit, true)
-    helpers.assert_eq(share_debug.usedJavaProject, true)
+    helpers.assert_eq(share_debug.parseSource, "HOST_NORMALIZED")
+    helpers.assert_eq(share_debug.parseConfidence, "HIGH")
+    helpers.assert_true((share_debug.projectSessionVersion or 0) > 0, "authoritative project session is required")
 
     local namespaced_share_line, namespaced_share_character
     for index, line in ipairs(share_source) do
@@ -1070,9 +978,9 @@ with_buffer(mixin_file, "java", nil, function(bufnr)
       end, method_items)[1] ~= nil,
       "mixinextras method completion should return draw"
     )
-    helpers.assert_eq(method_debug.parseSource, "JDT_AST")
-    helpers.assert_eq(method_debug.usedCompilationUnit, true)
-    helpers.assert_eq(method_debug.usedJavaProject, true)
+    helpers.assert_eq(method_debug.parseSource, "HOST_NORMALIZED")
+    helpers.assert_eq(method_debug.parseConfidence, "HIGH")
+    helpers.assert_true((method_debug.projectSessionVersion or 0) > 0, "authoritative project session is required")
 
     local target_source = {
       "package com.example.mixin;",

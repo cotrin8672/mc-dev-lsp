@@ -1,0 +1,1073 @@
+[
+  {
+    "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/bytecode/BytecodeIndexCacheTest.kt::storesAndRetrievesIndexByClasspathHash",
+    "rustTest": "mcdev-core/tests/bytecode_legacy.rs::BytecodeIndexCacheTest__storesAndRetrievesIndexByClasspathHash",
+    "fixture": "mcdev-core/tests/fixtures/bytecode_classes.json and native class writer",
+    "status": "passed",
+    "evidence": "build/rust-test-logs/expression-engine-20261024/owned-final-parity.stdout.log"
+  },
+  {
+    "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/bytecode/BytecodeIndexCacheTest.kt::returnsNullForMismatchedClasspathHash",
+    "rustTest": "mcdev-core/tests/bytecode_legacy.rs::BytecodeIndexCacheTest__returnsNullForMismatchedClasspathHash",
+    "fixture": "mcdev-core/tests/fixtures/bytecode_classes.json and native class writer",
+    "status": "passed",
+    "evidence": "build/rust-test-logs/expression-engine-20261024/owned-final-parity.stdout.log"
+  },
+  {
+    "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/bytecode/BytecodeIndexCacheTest.kt::storesAndRetrievesInstructionCache",
+    "rustTest": "mcdev-core/tests/bytecode_legacy.rs::BytecodeIndexCacheTest__storesAndRetrievesInstructionCache",
+    "fixture": "mcdev-core/tests/fixtures/bytecode_classes.json and native class writer",
+    "status": "passed",
+    "evidence": "build/rust-test-logs/expression-engine-20261024/owned-final-parity.stdout.log"
+  },
+  {
+    "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/bytecode/BytecodeIndexCacheTest.kt::invalidatesInstructionsForStaleClasspathEntry",
+    "rustTest": "mcdev-core/tests/bytecode_legacy.rs::BytecodeIndexCacheTest__invalidatesInstructionsForStaleClasspathEntry",
+    "fixture": "mcdev-core/tests/fixtures/bytecode_classes.json and native class writer",
+    "status": "passed",
+    "evidence": "build/rust-test-logs/expression-engine-20261024/owned-final-parity.stdout.log"
+  },
+  {
+    "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/bytecode/BytecodeIndexCacheTest.kt::clearRemovesAllCachedState",
+    "rustTest": "mcdev-core/tests/bytecode_legacy.rs::BytecodeIndexCacheTest__clearRemovesAllCachedState",
+    "fixture": "mcdev-core/tests/fixtures/bytecode_classes.json and native class writer",
+    "status": "passed",
+    "evidence": "build/rust-test-logs/expression-engine-20261024/owned-final-parity.stdout.log"
+  },
+  {
+    "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/bytecode/BytecodeIndexCacheTest.kt::invalidateClassRemovesInstructionCacheEntries",
+    "rustTest": "mcdev-core/tests/bytecode_legacy.rs::BytecodeIndexCacheTest__invalidateClassRemovesInstructionCacheEntries",
+    "fixture": "mcdev-core/tests/fixtures/bytecode_classes.json and native class writer",
+    "status": "passed",
+    "evidence": "build/rust-test-logs/expression-engine-20261024/owned-final-parity.stdout.log"
+  },
+  {
+    "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/bytecode/BytecodeIndexCacheTest.kt::cacheKeyForPathUsesFileLastModified",
+    "rustTest": "mcdev-core/tests/bytecode_legacy.rs::BytecodeIndexCacheTest__cacheKeyForPathUsesFileLastModified",
+    "fixture": "mcdev-core/tests/fixtures/bytecode_classes.json and native class writer",
+    "status": "passed",
+    "evidence": "build/rust-test-logs/expression-engine-20261024/owned-final-parity.stdout.log"
+  },
+  {
+    "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/bytecode/BytecodeIndexServiceTest.kt::buildsMemberIndexFromProvider",
+    "rustTest": "mcdev-core/tests/bytecode_legacy.rs::BytecodeIndexServiceTest__buildsMemberIndexFromProvider",
+    "fixture": "mcdev-core/tests/fixtures/bytecode_classes.json and native class writer",
+    "status": "passed",
+    "evidence": "build/rust-test-logs/expression-engine-20261024/owned-final-parity.stdout.log"
+  },
+  {
+    "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/bytecode/BytecodeIndexServiceTest.kt::cachesIndexByClasspathHash",
+    "rustTest": "mcdev-core/tests/bytecode_legacy.rs::BytecodeIndexServiceTest__cachesIndexByClasspathHash",
+    "fixture": "mcdev-core/tests/fixtures/bytecode_classes.json and native class writer",
+    "status": "passed",
+    "evidence": "build/rust-test-logs/expression-engine-20261024/owned-final-parity.stdout.log"
+  },
+  {
+    "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/bytecode/BytecodeIndexServiceTest.kt::extractsInvokeInstructions",
+    "rustTest": "mcdev-core/tests/bytecode_legacy.rs::BytecodeIndexServiceTest__extractsInvokeInstructions",
+    "fixture": "mcdev-core/tests/fixtures/bytecode_classes.json and native class writer",
+    "status": "passed",
+    "evidence": "build/rust-test-logs/expression-engine-20261024/owned-final-parity.stdout.log"
+  },
+  {
+    "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/bytecode/BytecodeIndexServiceTest.kt::extractsFieldInstructions",
+    "rustTest": "mcdev-core/tests/bytecode_legacy.rs::BytecodeIndexServiceTest__extractsFieldInstructions",
+    "fixture": "mcdev-core/tests/fixtures/bytecode_classes.json and native class writer",
+    "status": "passed",
+    "evidence": "build/rust-test-logs/expression-engine-20261024/owned-final-parity.stdout.log"
+  },
+  {
+    "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/bytecode/BytecodeIndexServiceTest.kt::extractsNewInstructions",
+    "rustTest": "mcdev-core/tests/bytecode_legacy.rs::BytecodeIndexServiceTest__extractsNewInstructions",
+    "fixture": "mcdev-core/tests/fixtures/bytecode_classes.json and native class writer",
+    "status": "passed",
+    "evidence": "build/rust-test-logs/expression-engine-20261024/owned-final-parity.stdout.log"
+  },
+  {
+    "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/bytecode/BytecodeIndexServiceTest.kt::extractsConstantInstructions",
+    "rustTest": "mcdev-core/tests/bytecode_legacy.rs::BytecodeIndexServiceTest__extractsConstantInstructions",
+    "fixture": "mcdev-core/tests/fixtures/bytecode_classes.json and native class writer",
+    "status": "passed",
+    "evidence": "build/rust-test-logs/expression-engine-20261024/owned-final-parity.stdout.log"
+  },
+  {
+    "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/bytecode/BytecodeIndexServiceTest.kt::extractsReturnInstructions",
+    "rustTest": "mcdev-core/tests/bytecode_legacy.rs::BytecodeIndexServiceTest__extractsReturnInstructions",
+    "fixture": "mcdev-core/tests/fixtures/bytecode_classes.json and native class writer",
+    "status": "passed",
+    "evidence": "build/rust-test-logs/expression-engine-20261024/owned-final-parity.stdout.log"
+  },
+  {
+    "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/bytecode/BytecodeIndexServiceTest.kt::cachesExtractedInstructions",
+    "rustTest": "mcdev-core/tests/bytecode_legacy.rs::BytecodeIndexServiceTest__cachesExtractedInstructions",
+    "fixture": "mcdev-core/tests/fixtures/bytecode_classes.json and native class writer",
+    "status": "passed",
+    "evidence": "build/rust-test-logs/expression-engine-20261024/owned-final-parity.stdout.log"
+  },
+  {
+    "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/bytecode/BytecodeIndexServiceTest.kt::returnsClassBytesMissingError",
+    "rustTest": "mcdev-core/tests/bytecode_legacy.rs::BytecodeIndexServiceTest__returnsClassBytesMissingError",
+    "fixture": "mcdev-core/tests/fixtures/bytecode_classes.json and native class writer",
+    "status": "passed",
+    "evidence": "build/rust-test-logs/expression-engine-20261024/owned-final-parity.stdout.log"
+  },
+  {
+    "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/bytecode/BytecodeIndexServiceTest.kt::returnsMethodNotFoundError",
+    "rustTest": "mcdev-core/tests/bytecode_legacy.rs::BytecodeIndexServiceTest__returnsMethodNotFoundError",
+    "fixture": "mcdev-core/tests/fixtures/bytecode_classes.json and native class writer",
+    "status": "passed",
+    "evidence": "build/rust-test-logs/expression-engine-20261024/owned-final-parity.stdout.log"
+  },
+  {
+    "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/bytecode/BytecodeIndexServiceTest.kt::methodNotFoundWhenDescriptorMismatch",
+    "rustTest": "mcdev-core/tests/bytecode_legacy.rs::BytecodeIndexServiceTest__methodNotFoundWhenDescriptorMismatch",
+    "fixture": "mcdev-core/tests/fixtures/bytecode_classes.json and native class writer",
+    "status": "passed",
+    "evidence": "build/rust-test-logs/expression-engine-20261024/owned-final-parity.stdout.log"
+  },
+  {
+    "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/bytecode/BytecodeIndexServiceTest.kt::duplicateInvokeOrdinalsThroughService",
+    "rustTest": "mcdev-core/tests/bytecode_legacy.rs::BytecodeIndexServiceTest__duplicateInvokeOrdinalsThroughService",
+    "fixture": "mcdev-core/tests/fixtures/bytecode_classes.json and native class writer",
+    "status": "passed",
+    "evidence": "build/rust-test-logs/expression-engine-20261024/owned-final-parity.stdout.log"
+  },
+  {
+    "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/bytecode/ClassMemberIndexTest.kt::indexesClassMetadata",
+    "rustTest": "mcdev-core/tests/bytecode_legacy.rs::ClassMemberIndexTest__indexesClassMetadata",
+    "fixture": "mcdev-core/tests/fixtures/bytecode_classes.json and native class writer",
+    "status": "passed",
+    "evidence": "build/rust-test-logs/expression-engine-20261024/owned-final-parity.stdout.log"
+  },
+  {
+    "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/bytecode/ClassMemberIndexTest.kt::indexesInstanceMethods",
+    "rustTest": "mcdev-core/tests/bytecode_legacy.rs::ClassMemberIndexTest__indexesInstanceMethods",
+    "fixture": "mcdev-core/tests/fixtures/bytecode_classes.json and native class writer",
+    "status": "passed",
+    "evidence": "build/rust-test-logs/expression-engine-20261024/owned-final-parity.stdout.log"
+  },
+  {
+    "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/bytecode/ClassMemberIndexTest.kt::indexesStaticMethods",
+    "rustTest": "mcdev-core/tests/bytecode_legacy.rs::ClassMemberIndexTest__indexesStaticMethods",
+    "fixture": "mcdev-core/tests/fixtures/bytecode_classes.json and native class writer",
+    "status": "passed",
+    "evidence": "build/rust-test-logs/expression-engine-20261024/owned-final-parity.stdout.log"
+  },
+  {
+    "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/bytecode/ClassMemberIndexTest.kt::indexesConstructors",
+    "rustTest": "mcdev-core/tests/bytecode_legacy.rs::ClassMemberIndexTest__indexesConstructors",
+    "fixture": "mcdev-core/tests/fixtures/bytecode_classes.json and native class writer",
+    "status": "passed",
+    "evidence": "build/rust-test-logs/expression-engine-20261024/owned-final-parity.stdout.log"
+  },
+  {
+    "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/bytecode/ClassMemberIndexTest.kt::indexesStaticFields",
+    "rustTest": "mcdev-core/tests/bytecode_legacy.rs::ClassMemberIndexTest__indexesStaticFields",
+    "fixture": "mcdev-core/tests/fixtures/bytecode_classes.json and native class writer",
+    "status": "passed",
+    "evidence": "build/rust-test-logs/expression-engine-20261024/owned-final-parity.stdout.log"
+  },
+  {
+    "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/bytecode/ClassMemberIndexTest.kt::indexesInstanceFields",
+    "rustTest": "mcdev-core/tests/bytecode_legacy.rs::ClassMemberIndexTest__indexesInstanceFields",
+    "fixture": "mcdev-core/tests/fixtures/bytecode_classes.json and native class writer",
+    "status": "passed",
+    "evidence": "build/rust-test-logs/expression-engine-20261024/owned-final-parity.stdout.log"
+  },
+  {
+    "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/bytecode/ClassMemberIndexTest.kt::indexesAllFixtureClasses",
+    "rustTest": "mcdev-core/tests/bytecode_legacy.rs::ClassMemberIndexTest__indexesAllFixtureClasses",
+    "fixture": "mcdev-core/tests/fixtures/bytecode_classes.json and native class writer",
+    "status": "passed",
+    "evidence": "build/rust-test-logs/expression-engine-20261024/owned-final-parity.stdout.log"
+  },
+  {
+    "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/bytecode/ClassMemberIndexTest.kt::indexSingleClassFromBytes",
+    "rustTest": "mcdev-core/tests/bytecode_legacy.rs::ClassMemberIndexTest__indexSingleClassFromBytes",
+    "fixture": "mcdev-core/tests/fixtures/bytecode_classes.json and native class writer",
+    "status": "passed",
+    "evidence": "build/rust-test-logs/expression-engine-20261024/owned-final-parity.stdout.log"
+  },
+  {
+    "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/bytecode/ClassMemberIndexTest.kt::findMethodReturnsNullForMissingMethod",
+    "rustTest": "mcdev-core/tests/bytecode_legacy.rs::ClassMemberIndexTest__findMethodReturnsNullForMissingMethod",
+    "fixture": "mcdev-core/tests/fixtures/bytecode_classes.json and native class writer",
+    "status": "passed",
+    "evidence": "build/rust-test-logs/expression-engine-20261024/owned-final-parity.stdout.log"
+  },
+  {
+    "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/bytecode/ClassMemberIndexTest.kt::findFieldReturnsNullForMissingField",
+    "rustTest": "mcdev-core/tests/bytecode_legacy.rs::ClassMemberIndexTest__findFieldReturnsNullForMissingField",
+    "fixture": "mcdev-core/tests/fixtures/bytecode_classes.json and native class writer",
+    "status": "passed",
+    "evidence": "build/rust-test-logs/expression-engine-20261024/owned-final-parity.stdout.log"
+  },
+  {
+    "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/bytecode/InMemoryClassBytesProviderTest.kt::returnsClassBytesByInternalName",
+    "rustTest": "mcdev-core/tests/bytecode_legacy.rs::InMemoryClassBytesProviderTest__returnsClassBytesByInternalName",
+    "fixture": "mcdev-core/tests/fixtures/bytecode_classes.json and native class writer",
+    "status": "passed",
+    "evidence": "build/rust-test-logs/expression-engine-20261024/owned-final-parity.stdout.log"
+  },
+  {
+    "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/bytecode/InMemoryClassBytesProviderTest.kt::returnsNullForMissingClass",
+    "rustTest": "mcdev-core/tests/bytecode_legacy.rs::InMemoryClassBytesProviderTest__returnsNullForMissingClass",
+    "fixture": "mcdev-core/tests/fixtures/bytecode_classes.json and native class writer",
+    "status": "passed",
+    "evidence": "build/rust-test-logs/expression-engine-20261024/owned-final-parity.stdout.log"
+  },
+  {
+    "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/bytecode/InMemoryClassBytesProviderTest.kt::rejectsDottedInternalNames",
+    "rustTest": "mcdev-core/tests/bytecode_legacy.rs::InMemoryClassBytesProviderTest__rejectsDottedInternalNames",
+    "fixture": "mcdev-core/tests/fixtures/bytecode_classes.json and native class writer",
+    "status": "passed",
+    "evidence": "build/rust-test-logs/expression-engine-20261024/owned-final-parity.stdout.log"
+  },
+  {
+    "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/bytecode/InMemoryClassBytesProviderTest.kt::exposesInternalNames",
+    "rustTest": "mcdev-core/tests/bytecode_legacy.rs::InMemoryClassBytesProviderTest__exposesInternalNames",
+    "fixture": "mcdev-core/tests/fixtures/bytecode_classes.json and native class writer",
+    "status": "passed",
+    "evidence": "build/rust-test-logs/expression-engine-20261024/owned-final-parity.stdout.log"
+  },
+  {
+    "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/bytecode/InMemoryClassBytesProviderTest.kt::classpathHashChangesWhenBytesChange",
+    "rustTest": "mcdev-core/tests/bytecode_legacy.rs::InMemoryClassBytesProviderTest__classpathHashChangesWhenBytesChange",
+    "fixture": "mcdev-core/tests/fixtures/bytecode_classes.json and native class writer",
+    "status": "passed",
+    "evidence": "build/rust-test-logs/expression-engine-20261024/owned-final-parity.stdout.log"
+  },
+  {
+    "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/bytecode/InMemoryClassBytesProviderTest.kt::classpathHashStableForSameContent",
+    "rustTest": "mcdev-core/tests/bytecode_legacy.rs::InMemoryClassBytesProviderTest__classpathHashStableForSameContent",
+    "fixture": "mcdev-core/tests/fixtures/bytecode_classes.json and native class writer",
+    "status": "passed",
+    "evidence": "build/rust-test-logs/expression-engine-20261024/owned-final-parity.stdout.log"
+  },
+  {
+    "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/bytecode/InMemoryClassBytesProviderTest.kt::reportsDefaultClasspathEntryId",
+    "rustTest": "mcdev-core/tests/bytecode_legacy.rs::InMemoryClassBytesProviderTest__reportsDefaultClasspathEntryId",
+    "fixture": "mcdev-core/tests/fixtures/bytecode_classes.json and native class writer",
+    "status": "passed",
+    "evidence": "build/rust-test-logs/expression-engine-20261024/owned-final-parity.stdout.log"
+  },
+  {
+    "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/bytecode/InMemoryClassBytesProviderTest.kt::reportsConfiguredEntryHashes",
+    "rustTest": "mcdev-core/tests/bytecode_legacy.rs::InMemoryClassBytesProviderTest__reportsConfiguredEntryHashes",
+    "fixture": "mcdev-core/tests/fixtures/bytecode_classes.json and native class writer",
+    "status": "passed",
+    "evidence": "build/rust-test-logs/expression-engine-20261024/owned-final-parity.stdout.log"
+  },
+  {
+    "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/bytecode/InstructionExtractorFieldTest.kt::extractsStaticFieldGet",
+    "rustTest": "mcdev-core/tests/bytecode_legacy.rs::InstructionExtractorFieldTest__extractsStaticFieldGet",
+    "fixture": "mcdev-core/tests/fixtures/bytecode_classes.json and native class writer",
+    "status": "passed",
+    "evidence": "build/rust-test-logs/expression-engine-20261024/owned-final-parity.stdout.log"
+  },
+  {
+    "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/bytecode/InstructionExtractorFieldTest.kt::extractsStaticFieldPut",
+    "rustTest": "mcdev-core/tests/bytecode_legacy.rs::InstructionExtractorFieldTest__extractsStaticFieldPut",
+    "fixture": "mcdev-core/tests/fixtures/bytecode_classes.json and native class writer",
+    "status": "passed",
+    "evidence": "build/rust-test-logs/expression-engine-20261024/owned-final-parity.stdout.log"
+  },
+  {
+    "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/bytecode/InstructionExtractorFieldTest.kt::extractsInstanceFieldGet",
+    "rustTest": "mcdev-core/tests/bytecode_legacy.rs::InstructionExtractorFieldTest__extractsInstanceFieldGet",
+    "fixture": "mcdev-core/tests/fixtures/bytecode_classes.json and native class writer",
+    "status": "passed",
+    "evidence": "build/rust-test-logs/expression-engine-20261024/owned-final-parity.stdout.log"
+  },
+  {
+    "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/bytecode/InstructionExtractorFieldTest.kt::extractsInstanceFieldPut",
+    "rustTest": "mcdev-core/tests/bytecode_legacy.rs::InstructionExtractorFieldTest__extractsInstanceFieldPut",
+    "fixture": "mcdev-core/tests/fixtures/bytecode_classes.json and native class writer",
+    "status": "passed",
+    "evidence": "build/rust-test-logs/expression-engine-20261024/owned-final-parity.stdout.log"
+  },
+  {
+    "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/bytecode/InstructionExtractorFieldTest.kt::fieldAccessesHaveFourKindsInSample",
+    "rustTest": "mcdev-core/tests/bytecode_legacy.rs::InstructionExtractorFieldTest__fieldAccessesHaveFourKindsInSample",
+    "fixture": "mcdev-core/tests/fixtures/bytecode_classes.json and native class writer",
+    "status": "passed",
+    "evidence": "build/rust-test-logs/expression-engine-20261024/owned-final-parity.stdout.log"
+  },
+  {
+    "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/bytecode/InstructionExtractorFieldTest.kt::duplicateFieldGetsReceiveDistinctOrdinals",
+    "rustTest": "mcdev-core/tests/bytecode_legacy.rs::InstructionExtractorFieldTest__duplicateFieldGetsReceiveDistinctOrdinals",
+    "fixture": "mcdev-core/tests/fixtures/bytecode_classes.json and native class writer",
+    "status": "passed",
+    "evidence": "build/rust-test-logs/expression-engine-20261024/owned-final-parity.stdout.log"
+  },
+  {
+    "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/bytecode/InstructionExtractorFieldTest.kt::duplicateFieldGetsShareDescriptor",
+    "rustTest": "mcdev-core/tests/bytecode_legacy.rs::InstructionExtractorFieldTest__duplicateFieldGetsShareDescriptor",
+    "fixture": "mcdev-core/tests/fixtures/bytecode_classes.json and native class writer",
+    "status": "passed",
+    "evidence": "build/rust-test-logs/expression-engine-20261024/owned-final-parity.stdout.log"
+  },
+  {
+    "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/bytecode/InstructionExtractorInvokeTest.kt::extractsVirtualInvoke",
+    "rustTest": "mcdev-core/tests/bytecode_legacy.rs::InstructionExtractorInvokeTest__extractsVirtualInvoke",
+    "fixture": "mcdev-core/tests/fixtures/bytecode_classes.json and native class writer",
+    "status": "passed",
+    "evidence": "build/rust-test-logs/expression-engine-20261024/owned-final-parity.stdout.log"
+  },
+  {
+    "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/bytecode/InstructionExtractorInvokeTest.kt::extractsStaticInvoke",
+    "rustTest": "mcdev-core/tests/bytecode_legacy.rs::InstructionExtractorInvokeTest__extractsStaticInvoke",
+    "fixture": "mcdev-core/tests/fixtures/bytecode_classes.json and native class writer",
+    "status": "passed",
+    "evidence": "build/rust-test-logs/expression-engine-20261024/owned-final-parity.stdout.log"
+  },
+  {
+    "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/bytecode/InstructionExtractorInvokeTest.kt::extractsSpecialInvoke",
+    "rustTest": "mcdev-core/tests/bytecode_legacy.rs::InstructionExtractorInvokeTest__extractsSpecialInvoke",
+    "fixture": "mcdev-core/tests/fixtures/bytecode_classes.json and native class writer",
+    "status": "passed",
+    "evidence": "build/rust-test-logs/expression-engine-20261024/owned-final-parity.stdout.log"
+  },
+  {
+    "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/bytecode/InstructionExtractorInvokeTest.kt::extractsInterfaceInvoke",
+    "rustTest": "mcdev-core/tests/bytecode_legacy.rs::InstructionExtractorInvokeTest__extractsInterfaceInvoke",
+    "fixture": "mcdev-core/tests/fixtures/bytecode_classes.json and native class writer",
+    "status": "passed",
+    "evidence": "build/rust-test-logs/expression-engine-20261024/owned-final-parity.stdout.log"
+  },
+  {
+    "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/bytecode/InstructionExtractorInvokeTest.kt::invokeVirtualHasMethodDescriptor",
+    "rustTest": "mcdev-core/tests/bytecode_legacy.rs::InstructionExtractorInvokeTest__invokeVirtualHasMethodDescriptor",
+    "fixture": "mcdev-core/tests/fixtures/bytecode_classes.json and native class writer",
+    "status": "passed",
+    "evidence": "build/rust-test-logs/expression-engine-20261024/owned-final-parity.stdout.log"
+  },
+  {
+    "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/bytecode/InstructionExtractorInvokeTest.kt::invokeStaticHasMethodDescriptor",
+    "rustTest": "mcdev-core/tests/bytecode_legacy.rs::InstructionExtractorInvokeTest__invokeStaticHasMethodDescriptor",
+    "fixture": "mcdev-core/tests/fixtures/bytecode_classes.json and native class writer",
+    "status": "passed",
+    "evidence": "build/rust-test-logs/expression-engine-20261024/owned-final-parity.stdout.log"
+  },
+  {
+    "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/bytecode/InstructionExtractorInvokeTest.kt::constructorInvokeIsSpecial",
+    "rustTest": "mcdev-core/tests/bytecode_legacy.rs::InstructionExtractorInvokeTest__constructorInvokeIsSpecial",
+    "fixture": "mcdev-core/tests/fixtures/bytecode_classes.json and native class writer",
+    "status": "passed",
+    "evidence": "build/rust-test-logs/expression-engine-20261024/owned-final-parity.stdout.log"
+  },
+  {
+    "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/bytecode/InstructionExtractorInvokeTest.kt::duplicateInvokesReceiveDistinctOrdinals",
+    "rustTest": "mcdev-core/tests/bytecode_legacy.rs::InstructionExtractorInvokeTest__duplicateInvokesReceiveDistinctOrdinals",
+    "fixture": "mcdev-core/tests/fixtures/bytecode_classes.json and native class writer",
+    "status": "passed",
+    "evidence": "build/rust-test-logs/expression-engine-20261024/owned-final-parity.stdout.log"
+  },
+  {
+    "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/bytecode/InstructionExtractorInvokeTest.kt::duplicateInvokesShareOwnerAndDescriptor",
+    "rustTest": "mcdev-core/tests/bytecode_legacy.rs::InstructionExtractorInvokeTest__duplicateInvokesShareOwnerAndDescriptor",
+    "fixture": "mcdev-core/tests/fixtures/bytecode_classes.json and native class writer",
+    "status": "passed",
+    "evidence": "build/rust-test-logs/expression-engine-20261024/owned-final-parity.stdout.log"
+  },
+  {
+    "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/bytecode/InstructionExtractorInvokeTest.kt::returnsEmptyListForMissingMethod",
+    "rustTest": "mcdev-core/tests/bytecode_legacy.rs::InstructionExtractorInvokeTest__returnsEmptyListForMissingMethod",
+    "fixture": "mcdev-core/tests/fixtures/bytecode_classes.json and native class writer",
+    "status": "passed",
+    "evidence": "build/rust-test-logs/expression-engine-20261024/owned-final-parity.stdout.log"
+  },
+  {
+    "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/bytecode/InstructionExtractorInvokeTest.kt::returnsEmptyListForWrongDescriptor",
+    "rustTest": "mcdev-core/tests/bytecode_legacy.rs::InstructionExtractorInvokeTest__returnsEmptyListForWrongDescriptor",
+    "fixture": "mcdev-core/tests/fixtures/bytecode_classes.json and native class writer",
+    "status": "passed",
+    "evidence": "build/rust-test-logs/expression-engine-20261024/owned-final-parity.stdout.log"
+  },
+  {
+    "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/bytecode/InstructionExtractorInvokeTest.kt::voidStaticInvokeIsClassifiedAsVoid",
+    "rustTest": "mcdev-core/tests/bytecode_legacy.rs::InstructionExtractorInvokeTest__voidStaticInvokeIsClassifiedAsVoid",
+    "fixture": "mcdev-core/tests/fixtures/bytecode_classes.json and native class writer",
+    "status": "passed",
+    "evidence": "build/rust-test-logs/expression-engine-20261024/owned-final-parity.stdout.log"
+  },
+  {
+    "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/bytecode/InstructionExtractorInvokeTest.kt::voidInstanceInvokeIsClassifiedAsVoid",
+    "rustTest": "mcdev-core/tests/bytecode_legacy.rs::InstructionExtractorInvokeTest__voidInstanceInvokeIsClassifiedAsVoid",
+    "fixture": "mcdev-core/tests/fixtures/bytecode_classes.json and native class writer",
+    "status": "passed",
+    "evidence": "build/rust-test-logs/expression-engine-20261024/owned-final-parity.stdout.log"
+  },
+  {
+    "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/bytecode/InstructionExtractorInvokeTest.kt::intInvokeFollowedByPopIsImmediatelyPopped",
+    "rustTest": "mcdev-core/tests/bytecode_legacy.rs::InstructionExtractorInvokeTest__intInvokeFollowedByPopIsImmediatelyPopped",
+    "fixture": "mcdev-core/tests/fixtures/bytecode_classes.json and native class writer",
+    "status": "passed",
+    "evidence": "build/rust-test-logs/expression-engine-20261024/owned-final-parity.stdout.log"
+  },
+  {
+    "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/bytecode/InstructionExtractorInvokeTest.kt::objectInvokeFollowedByPopIsImmediatelyPopped",
+    "rustTest": "mcdev-core/tests/bytecode_legacy.rs::InstructionExtractorInvokeTest__objectInvokeFollowedByPopIsImmediatelyPopped",
+    "fixture": "mcdev-core/tests/fixtures/bytecode_classes.json and native class writer",
+    "status": "passed",
+    "evidence": "build/rust-test-logs/expression-engine-20261024/owned-final-parity.stdout.log"
+  },
+  {
+    "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/bytecode/InstructionExtractorInvokeTest.kt::longInvokeFollowedByPop2IsImmediatelyPopped",
+    "rustTest": "mcdev-core/tests/bytecode_legacy.rs::InstructionExtractorInvokeTest__longInvokeFollowedByPop2IsImmediatelyPopped",
+    "fixture": "mcdev-core/tests/fixtures/bytecode_classes.json and native class writer",
+    "status": "passed",
+    "evidence": "build/rust-test-logs/expression-engine-20261024/owned-final-parity.stdout.log"
+  },
+  {
+    "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/bytecode/InstructionExtractorInvokeTest.kt::doubleInvokeFollowedByPop2IsImmediatelyPopped",
+    "rustTest": "mcdev-core/tests/bytecode_legacy.rs::InstructionExtractorInvokeTest__doubleInvokeFollowedByPop2IsImmediatelyPopped",
+    "fixture": "mcdev-core/tests/fixtures/bytecode_classes.json and native class writer",
+    "status": "passed",
+    "evidence": "build/rust-test-logs/expression-engine-20261024/owned-final-parity.stdout.log"
+  },
+  {
+    "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/bytecode/InstructionExtractorInvokeTest.kt::longInvokeFollowedByWrongPopIsRetained",
+    "rustTest": "mcdev-core/tests/bytecode_legacy.rs::InstructionExtractorInvokeTest__longInvokeFollowedByWrongPopIsRetained",
+    "fixture": "mcdev-core/tests/fixtures/bytecode_classes.json and native class writer",
+    "status": "passed",
+    "evidence": "build/rust-test-logs/expression-engine-20261024/owned-final-parity.stdout.log"
+  },
+  {
+    "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/bytecode/InstructionExtractorInvokeTest.kt::invokeResultStoredIsRetained",
+    "rustTest": "mcdev-core/tests/bytecode_legacy.rs::InstructionExtractorInvokeTest__invokeResultStoredIsRetained",
+    "fixture": "mcdev-core/tests/fixtures/bytecode_classes.json and native class writer",
+    "status": "passed",
+    "evidence": "build/rust-test-logs/expression-engine-20261024/owned-final-parity.stdout.log"
+  },
+  {
+    "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/bytecode/InstructionExtractorInvokeTest.kt::invokeResultReturnedIsRetained",
+    "rustTest": "mcdev-core/tests/bytecode_legacy.rs::InstructionExtractorInvokeTest__invokeResultReturnedIsRetained",
+    "fixture": "mcdev-core/tests/fixtures/bytecode_classes.json and native class writer",
+    "status": "passed",
+    "evidence": "build/rust-test-logs/expression-engine-20261024/owned-final-parity.stdout.log"
+  },
+  {
+    "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/bytecode/InstructionExtractorInvokeTest.kt::fieldGetFollowedByPopIsRetained",
+    "rustTest": "mcdev-core/tests/bytecode_legacy.rs::InstructionExtractorInvokeTest__fieldGetFollowedByPopIsRetained",
+    "fixture": "mcdev-core/tests/fixtures/bytecode_classes.json and native class writer",
+    "status": "passed",
+    "evidence": "build/rust-test-logs/expression-engine-20261024/owned-final-parity.stdout.log"
+  },
+  {
+    "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/bytecode/InstructionExtractorInvokeTest.kt::fieldPutIsClassifiedAsVoid",
+    "rustTest": "mcdev-core/tests/bytecode_legacy.rs::InstructionExtractorInvokeTest__fieldPutIsClassifiedAsVoid",
+    "fixture": "mcdev-core/tests/fixtures/bytecode_classes.json and native class writer",
+    "status": "passed",
+    "evidence": "build/rust-test-logs/expression-engine-20261024/owned-final-parity.stdout.log"
+  },
+  {
+    "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/bytecode/InstructionExtractorInvokeTest.kt::labelBetweenInvokeAndPopIsRetained",
+    "rustTest": "mcdev-core/tests/bytecode_legacy.rs::InstructionExtractorInvokeTest__labelBetweenInvokeAndPopIsRetained",
+    "fixture": "mcdev-core/tests/fixtures/bytecode_classes.json and native class writer",
+    "status": "passed",
+    "evidence": "build/rust-test-logs/expression-engine-20261024/owned-final-parity.stdout.log"
+  },
+  {
+    "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/bytecode/InstructionExtractorInvokeTest.kt::frameBetweenLongInvokeAndPop2IsRetained",
+    "rustTest": "mcdev-core/tests/bytecode_legacy.rs::InstructionExtractorInvokeTest__frameBetweenLongInvokeAndPop2IsRetained",
+    "fixture": "mcdev-core/tests/fixtures/bytecode_classes.json and native class writer",
+    "status": "passed",
+    "evidence": "build/rust-test-logs/expression-engine-20261024/owned-final-parity.stdout.log"
+  },
+  {
+    "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/bytecode/InstructionExtractorInvokeTest.kt::instructionOccurrenceIndexCountsRealInstructionsOnly",
+    "rustTest": "mcdev-core/tests/bytecode_legacy.rs::InstructionExtractorInvokeTest__instructionOccurrenceIndexCountsRealInstructionsOnly",
+    "fixture": "mcdev-core/tests/fixtures/bytecode_classes.json and native class writer",
+    "status": "passed",
+    "evidence": "build/rust-test-logs/expression-engine-20261024/owned-final-parity.stdout.log"
+  },
+  {
+    "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/bytecode/InstructionExtractorInvokeTest.kt::extractsUnaryZeroComparisonConditionsAndExcludesOtherJumps",
+    "rustTest": "mcdev-core/tests/bytecode_legacy.rs::InstructionExtractorInvokeTest__extractsUnaryZeroComparisonConditionsAndExcludesOtherJumps",
+    "fixture": "mcdev-core/tests/fixtures/bytecode_classes.json and native class writer",
+    "status": "passed",
+    "evidence": "build/rust-test-logs/expression-engine-20261024/owned-final-parity.stdout.log"
+  },
+  {
+    "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/bytecode/InstructionExtractorInvokeTest.kt::excludesUnaryConditionsImmediatelyAfterCompareInstructions",
+    "rustTest": "mcdev-core/tests/bytecode_legacy.rs::InstructionExtractorInvokeTest__excludesUnaryConditionsImmediatelyAfterCompareInstructions",
+    "fixture": "mcdev-core/tests/fixtures/bytecode_classes.json and native class writer",
+    "status": "passed",
+    "evidence": "build/rust-test-logs/expression-engine-20261024/owned-final-parity.stdout.log"
+  },
+  {
+    "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/bytecode/InstructionExtractorMiscTest.kt::extractsNewInstructions",
+    "rustTest": "mcdev-core/tests/bytecode_legacy.rs::InstructionExtractorMiscTest__extractsNewInstructions",
+    "fixture": "mcdev-core/tests/fixtures/bytecode_classes.json and native class writer",
+    "status": "passed",
+    "evidence": "build/rust-test-logs/expression-engine-20261024/owned-final-parity.stdout.log"
+  },
+  {
+    "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/bytecode/InstructionExtractorMiscTest.kt::extractsClassLiteralConstantsFromCheckcastAndInstanceofOnly",
+    "rustTest": "mcdev-core/tests/bytecode_legacy.rs::InstructionExtractorMiscTest__extractsClassLiteralConstantsFromCheckcastAndInstanceofOnly",
+    "fixture": "mcdev-core/tests/fixtures/bytecode_classes.json and native class writer",
+    "status": "passed",
+    "evidence": "build/rust-test-logs/expression-engine-20261024/owned-final-parity.stdout.log"
+  },
+  {
+    "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/bytecode/InstructionExtractorMiscTest.kt::newInstructionDescriptorUsesClassLiteralForm",
+    "rustTest": "mcdev-core/tests/bytecode_legacy.rs::InstructionExtractorMiscTest__newInstructionDescriptorUsesClassLiteralForm",
+    "fixture": "mcdev-core/tests/fixtures/bytecode_classes.json and native class writer",
+    "status": "passed",
+    "evidence": "build/rust-test-logs/expression-engine-20261024/owned-final-parity.stdout.log"
+  },
+  {
+    "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/bytecode/InstructionExtractorMiscTest.kt::extractsStringConstant",
+    "rustTest": "mcdev-core/tests/bytecode_legacy.rs::InstructionExtractorMiscTest__extractsStringConstant",
+    "fixture": "mcdev-core/tests/fixtures/bytecode_classes.json and native class writer",
+    "status": "passed",
+    "evidence": "build/rust-test-logs/expression-engine-20261024/owned-final-parity.stdout.log"
+  },
+  {
+    "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/bytecode/InstructionExtractorMiscTest.kt::extractsIntConstant",
+    "rustTest": "mcdev-core/tests/bytecode_legacy.rs::InstructionExtractorMiscTest__extractsIntConstant",
+    "fixture": "mcdev-core/tests/fixtures/bytecode_classes.json and native class writer",
+    "status": "passed",
+    "evidence": "build/rust-test-logs/expression-engine-20261024/owned-final-parity.stdout.log"
+  },
+  {
+    "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/bytecode/InstructionExtractorMiscTest.kt::extractsLongConstant",
+    "rustTest": "mcdev-core/tests/bytecode_legacy.rs::InstructionExtractorMiscTest__extractsLongConstant",
+    "fixture": "mcdev-core/tests/fixtures/bytecode_classes.json and native class writer",
+    "status": "passed",
+    "evidence": "build/rust-test-logs/expression-engine-20261024/owned-final-parity.stdout.log"
+  },
+  {
+    "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/bytecode/InstructionExtractorMiscTest.kt::extractsFloatConstant",
+    "rustTest": "mcdev-core/tests/bytecode_legacy.rs::InstructionExtractorMiscTest__extractsFloatConstant",
+    "fixture": "mcdev-core/tests/fixtures/bytecode_classes.json and native class writer",
+    "status": "passed",
+    "evidence": "build/rust-test-logs/expression-engine-20261024/owned-final-parity.stdout.log"
+  },
+  {
+    "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/bytecode/InstructionExtractorMiscTest.kt::extractsDoubleConstant",
+    "rustTest": "mcdev-core/tests/bytecode_legacy.rs::InstructionExtractorMiscTest__extractsDoubleConstant",
+    "fixture": "mcdev-core/tests/fixtures/bytecode_classes.json and native class writer",
+    "status": "passed",
+    "evidence": "build/rust-test-logs/expression-engine-20261024/owned-final-parity.stdout.log"
+  },
+  {
+    "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/bytecode/InstructionExtractorMiscTest.kt::extractsClassLiteralConstant",
+    "rustTest": "mcdev-core/tests/bytecode_legacy.rs::InstructionExtractorMiscTest__extractsClassLiteralConstant",
+    "fixture": "mcdev-core/tests/fixtures/bytecode_classes.json and native class writer",
+    "status": "passed",
+    "evidence": "build/rust-test-logs/expression-engine-20261024/owned-final-parity.stdout.log"
+  },
+  {
+    "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/bytecode/InstructionExtractorMiscTest.kt::extractsNullConstant",
+    "rustTest": "mcdev-core/tests/bytecode_legacy.rs::InstructionExtractorMiscTest__extractsNullConstant",
+    "fixture": "mcdev-core/tests/fixtures/bytecode_classes.json and native class writer",
+    "status": "passed",
+    "evidence": "build/rust-test-logs/expression-engine-20261024/owned-final-parity.stdout.log"
+  },
+  {
+    "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/bytecode/InstructionExtractorMiscTest.kt::extractsSmallIntConstants",
+    "rustTest": "mcdev-core/tests/bytecode_legacy.rs::InstructionExtractorMiscTest__extractsSmallIntConstants",
+    "fixture": "mcdev-core/tests/fixtures/bytecode_classes.json and native class writer",
+    "status": "passed",
+    "evidence": "build/rust-test-logs/expression-engine-20261024/owned-final-parity.stdout.log"
+  },
+  {
+    "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/bytecode/InstructionExtractorMiscTest.kt::extractsReturnInstruction",
+    "rustTest": "mcdev-core/tests/bytecode_legacy.rs::InstructionExtractorMiscTest__extractsReturnInstruction",
+    "fixture": "mcdev-core/tests/fixtures/bytecode_classes.json and native class writer",
+    "status": "passed",
+    "evidence": "build/rust-test-logs/expression-engine-20261024/owned-final-parity.stdout.log"
+  },
+  {
+    "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/bytecode/InstructionExtractorMiscTest.kt::returnOrdinalsAreDistinctPerReturnSite",
+    "rustTest": "mcdev-core/tests/bytecode_legacy.rs::InstructionExtractorMiscTest__returnOrdinalsAreDistinctPerReturnSite",
+    "fixture": "mcdev-core/tests/fixtures/bytecode_classes.json and native class writer",
+    "status": "passed",
+    "evidence": "build/rust-test-logs/expression-engine-20261024/owned-final-parity.stdout.log"
+  },
+  {
+    "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/bytecode/InstructionExtractorMiscTest.kt::intReturnMethodHasReturnCandidate",
+    "rustTest": "mcdev-core/tests/bytecode_legacy.rs::InstructionExtractorMiscTest__intReturnMethodHasReturnCandidate",
+    "fixture": "mcdev-core/tests/fixtures/bytecode_classes.json and native class writer",
+    "status": "passed",
+    "evidence": "build/rust-test-logs/expression-engine-20261024/owned-final-parity.stdout.log"
+  },
+  {
+    "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/bytecode/InstructionExtractorMiscTest.kt::objectReturnMethodHasReturnCandidate",
+    "rustTest": "mcdev-core/tests/bytecode_legacy.rs::InstructionExtractorMiscTest__objectReturnMethodHasReturnCandidate",
+    "fixture": "mcdev-core/tests/fixtures/bytecode_classes.json and native class writer",
+    "status": "passed",
+    "evidence": "build/rust-test-logs/expression-engine-20261024/owned-final-parity.stdout.log"
+  },
+  {
+    "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/bytecode/OrdinalCalculatorTest.kt::assignsZeroToFirstCandidate",
+    "rustTest": "mcdev-core/tests/bytecode_legacy.rs::OrdinalCalculatorTest__assignsZeroToFirstCandidate",
+    "fixture": "mcdev-core/tests/fixtures/bytecode_classes.json and native class writer",
+    "status": "passed",
+    "evidence": "build/rust-test-logs/expression-engine-20261024/owned-final-parity.stdout.log"
+  },
+  {
+    "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/bytecode/OrdinalCalculatorTest.kt::incrementsOrdinalsForDuplicateInvokes",
+    "rustTest": "mcdev-core/tests/bytecode_legacy.rs::OrdinalCalculatorTest__incrementsOrdinalsForDuplicateInvokes",
+    "fixture": "mcdev-core/tests/fixtures/bytecode_classes.json and native class writer",
+    "status": "passed",
+    "evidence": "build/rust-test-logs/expression-engine-20261024/owned-final-parity.stdout.log"
+  },
+  {
+    "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/bytecode/OrdinalCalculatorTest.kt::separatesOrdinalsByMethodName",
+    "rustTest": "mcdev-core/tests/bytecode_legacy.rs::OrdinalCalculatorTest__separatesOrdinalsByMethodName",
+    "fixture": "mcdev-core/tests/fixtures/bytecode_classes.json and native class writer",
+    "status": "passed",
+    "evidence": "build/rust-test-logs/expression-engine-20261024/owned-final-parity.stdout.log"
+  },
+  {
+    "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/bytecode/OrdinalCalculatorTest.kt::separatesOrdinalsByDescriptor",
+    "rustTest": "mcdev-core/tests/bytecode_legacy.rs::OrdinalCalculatorTest__separatesOrdinalsByDescriptor",
+    "fixture": "mcdev-core/tests/fixtures/bytecode_classes.json and native class writer",
+    "status": "passed",
+    "evidence": "build/rust-test-logs/expression-engine-20261024/owned-final-parity.stdout.log"
+  },
+  {
+    "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/bytecode/OrdinalCalculatorTest.kt::separatesOrdinalsByOwner",
+    "rustTest": "mcdev-core/tests/bytecode_legacy.rs::OrdinalCalculatorTest__separatesOrdinalsByOwner",
+    "fixture": "mcdev-core/tests/fixtures/bytecode_classes.json and native class writer",
+    "status": "passed",
+    "evidence": "build/rust-test-logs/expression-engine-20261024/owned-final-parity.stdout.log"
+  },
+  {
+    "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/bytecode/OrdinalCalculatorTest.kt::separatesOrdinalsByKind",
+    "rustTest": "mcdev-core/tests/bytecode_legacy.rs::OrdinalCalculatorTest__separatesOrdinalsByKind",
+    "fixture": "mcdev-core/tests/fixtures/bytecode_classes.json and native class writer",
+    "status": "passed",
+    "evidence": "build/rust-test-logs/expression-engine-20261024/owned-final-parity.stdout.log"
+  },
+  {
+    "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/bytecode/OrdinalCalculatorTest.kt::fieldOrdinalsIncrementForSameTarget",
+    "rustTest": "mcdev-core/tests/bytecode_legacy.rs::OrdinalCalculatorTest__fieldOrdinalsIncrementForSameTarget",
+    "fixture": "mcdev-core/tests/fixtures/bytecode_classes.json and native class writer",
+    "status": "passed",
+    "evidence": "build/rust-test-logs/expression-engine-20261024/owned-final-parity.stdout.log"
+  },
+  {
+    "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/bytecode/OrdinalCalculatorTest.kt::constantOrdinalsDifferByValue",
+    "rustTest": "mcdev-core/tests/bytecode_legacy.rs::OrdinalCalculatorTest__constantOrdinalsDifferByValue",
+    "fixture": "mcdev-core/tests/fixtures/bytecode_classes.json and native class writer",
+    "status": "passed",
+    "evidence": "build/rust-test-logs/expression-engine-20261024/owned-final-parity.stdout.log"
+  },
+  {
+    "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/bytecode/OrdinalCalculatorTest.kt::returnOrdinalsIncrementPerReturnSite",
+    "rustTest": "mcdev-core/tests/bytecode_legacy.rs::OrdinalCalculatorTest__returnOrdinalsIncrementPerReturnSite",
+    "fixture": "mcdev-core/tests/fixtures/bytecode_classes.json and native class writer",
+    "status": "passed",
+    "evidence": "build/rust-test-logs/expression-engine-20261024/owned-final-parity.stdout.log"
+  },
+  {
+    "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/index/BytecodeAtTargetAdapterTest.kt::simpleTargetReturnCandidates",
+    "rustTest": "mcdev-core/tests/bytecode_legacy.rs::BytecodeAtTargetAdapterTest__simpleTargetReturnCandidates",
+    "fixture": "mcdev-core/tests/fixtures/bytecode_classes.json and native class writer",
+    "status": "passed",
+    "evidence": "build/rust-test-logs/expression-engine-20261024/owned-final-parity.stdout.log"
+  },
+  {
+    "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/index/BytecodeAtTargetAdapterTest.kt::simpleTargetReturnOrdinalCount",
+    "rustTest": "mcdev-core/tests/bytecode_legacy.rs::BytecodeAtTargetAdapterTest__simpleTargetReturnOrdinalCount",
+    "fixture": "mcdev-core/tests/fixtures/bytecode_classes.json and native class writer",
+    "status": "passed",
+    "evidence": "build/rust-test-logs/expression-engine-20261024/owned-final-parity.stdout.log"
+  },
+  {
+    "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/index/BytecodeAtTargetAdapterTest.kt::invokeSamplesProducesInvokeCandidates",
+    "rustTest": "mcdev-core/tests/bytecode_legacy.rs::BytecodeAtTargetAdapterTest__invokeSamplesProducesInvokeCandidates",
+    "fixture": "mcdev-core/tests/fixtures/bytecode_classes.json and native class writer",
+    "status": "passed",
+    "evidence": "build/rust-test-logs/expression-engine-20261024/owned-final-parity.stdout.log"
+  },
+  {
+    "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/index/BytecodeAtTargetAdapterTest.kt::invokeCandidateLabelDiffersFromInsertDescriptor",
+    "rustTest": "mcdev-core/tests/bytecode_legacy.rs::BytecodeAtTargetAdapterTest__invokeCandidateLabelDiffersFromInsertDescriptor",
+    "fixture": "mcdev-core/tests/fixtures/bytecode_classes.json and native class writer",
+    "status": "passed",
+    "evidence": "build/rust-test-logs/expression-engine-20261024/owned-final-parity.stdout.log"
+  },
+  {
+    "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/index/BytecodeAtTargetAdapterTest.kt::fieldSamplesProducesFieldCandidates",
+    "rustTest": "mcdev-core/tests/bytecode_legacy.rs::BytecodeAtTargetAdapterTest__fieldSamplesProducesFieldCandidates",
+    "fixture": "mcdev-core/tests/fixtures/bytecode_classes.json and native class writer",
+    "status": "passed",
+    "evidence": "build/rust-test-logs/expression-engine-20261024/owned-final-parity.stdout.log"
+  },
+  {
+    "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/index/BytecodeAtTargetAdapterTest.kt::filtersByAtValue",
+    "rustTest": "mcdev-core/tests/bytecode_legacy.rs::BytecodeAtTargetAdapterTest__filtersByAtValue",
+    "fixture": "mcdev-core/tests/fixtures/bytecode_classes.json and native class writer",
+    "status": "passed",
+    "evidence": "build/rust-test-logs/expression-engine-20261024/owned-final-parity.stdout.log"
+  },
+  {
+    "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/index/BytecodeAtTargetAdapterTest.kt::returnsEmptyForMissingOwner",
+    "rustTest": "mcdev-core/tests/bytecode_legacy.rs::BytecodeAtTargetAdapterTest__returnsEmptyForMissingOwner",
+    "fixture": "mcdev-core/tests/fixtures/bytecode_classes.json and native class writer",
+    "status": "passed",
+    "evidence": "build/rust-test-logs/expression-engine-20261024/owned-final-parity.stdout.log"
+  },
+  {
+    "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/index/BytecodeAtTargetAdapterTest.kt::overloadedMethodWithoutDescriptorReturnsEmpty",
+    "rustTest": "mcdev-core/tests/bytecode_legacy.rs::BytecodeAtTargetAdapterTest__overloadedMethodWithoutDescriptorReturnsEmpty",
+    "fixture": "mcdev-core/tests/fixtures/bytecode_classes.json and native class writer",
+    "status": "passed",
+    "evidence": "build/rust-test-logs/expression-engine-20261024/owned-final-parity.stdout.log"
+  },
+  {
+    "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/index/BytecodeAtTargetAdapterTest.kt::getClassBytesReturnsExactProviderBytes",
+    "rustTest": "mcdev-core/tests/bytecode_legacy.rs::BytecodeAtTargetAdapterTest__getClassBytesReturnsExactProviderBytes",
+    "fixture": "mcdev-core/tests/fixtures/bytecode_classes.json and native class writer",
+    "status": "passed",
+    "evidence": "build/rust-test-logs/expression-engine-20261024/owned-final-parity.stdout.log"
+  },
+  {
+    "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/index/BytecodeAtTargetAdapterTest.kt::getClassBytesReturnsNullForMissingClass",
+    "rustTest": "mcdev-core/tests/bytecode_legacy.rs::BytecodeAtTargetAdapterTest__getClassBytesReturnsNullForMissingClass",
+    "fixture": "mcdev-core/tests/fixtures/bytecode_classes.json and native class writer",
+    "status": "passed",
+    "evidence": "build/rust-test-logs/expression-engine-20261024/owned-final-parity.stdout.log"
+  },
+  {
+    "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/index/BytecodeAtTargetAdapterTest.kt::resolveCommonSuperClassResolvesSiblingSuperclass",
+    "rustTest": "mcdev-core/tests/bytecode_legacy.rs::BytecodeAtTargetAdapterTest__resolveCommonSuperClassResolvesSiblingSuperclass",
+    "fixture": "mcdev-core/tests/fixtures/bytecode_classes.json and native class writer",
+    "status": "passed",
+    "evidence": "build/rust-test-logs/expression-engine-20261024/owned-final-parity.stdout.log"
+  },
+  {
+    "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/index/BytecodeAtTargetAdapterTest.kt::getClassBytesAndResolveCommonSuperClassRemainOnDemand",
+    "rustTest": "mcdev-core/tests/bytecode_legacy.rs::BytecodeAtTargetAdapterTest__getClassBytesAndResolveCommonSuperClassRemainOnDemand",
+    "fixture": "mcdev-core/tests/fixtures/bytecode_classes.json and native class writer",
+    "status": "passed",
+    "evidence": "build/rust-test-logs/expression-engine-20261024/owned-final-parity.stdout.log"
+  },
+  {
+    "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/index/BytecodeAtTargetAdapterTest.kt::overloadedMethodWithExplicitDescriptorResolvesCorrectOverload",
+    "rustTest": "mcdev-core/tests/bytecode_legacy.rs::BytecodeAtTargetAdapterTest__overloadedMethodWithExplicitDescriptorResolvesCorrectOverload",
+    "fixture": "mcdev-core/tests/fixtures/bytecode_classes.json and native class writer",
+    "status": "passed",
+    "evidence": "build/rust-test-logs/expression-engine-20261024/owned-final-parity.stdout.log"
+  },
+  {
+    "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/index/BytecodeClassIndexAdapterTest.kt::findClassByInternalName",
+    "rustTest": "mcdev-core/tests/bytecode_legacy.rs::BytecodeClassIndexAdapterTest__findClassByInternalName",
+    "fixture": "mcdev-core/tests/fixtures/bytecode_classes.json and native class writer",
+    "status": "passed",
+    "evidence": "build/rust-test-logs/expression-engine-20261024/owned-final-parity.stdout.log"
+  },
+  {
+    "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/index/BytecodeClassIndexAdapterTest.kt::findClassByFqn",
+    "rustTest": "mcdev-core/tests/bytecode_legacy.rs::BytecodeClassIndexAdapterTest__findClassByFqn",
+    "fixture": "mcdev-core/tests/fixtures/bytecode_classes.json and native class writer",
+    "status": "passed",
+    "evidence": "build/rust-test-logs/expression-engine-20261024/owned-final-parity.stdout.log"
+  },
+  {
+    "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/index/BytecodeClassIndexAdapterTest.kt::findClassesByPrefix",
+    "rustTest": "mcdev-core/tests/bytecode_legacy.rs::BytecodeClassIndexAdapterTest__findClassesByPrefix",
+    "fixture": "mcdev-core/tests/fixtures/bytecode_classes.json and native class writer",
+    "status": "passed",
+    "evidence": "build/rust-test-logs/expression-engine-20261024/owned-final-parity.stdout.log"
+  },
+  {
+    "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/index/BytecodeClassIndexAdapterTest.kt::exposesDrawMethodWithReadableSignature",
+    "rustTest": "mcdev-core/tests/bytecode_legacy.rs::BytecodeClassIndexAdapterTest__exposesDrawMethodWithReadableSignature",
+    "fixture": "mcdev-core/tests/fixtures/bytecode_classes.json and native class writer",
+    "status": "passed",
+    "evidence": "build/rust-test-logs/expression-engine-20261024/owned-final-parity.stdout.log"
+  },
+  {
+    "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/index/BytecodeClassIndexAdapterTest.kt::exposesCounterFieldWithReadableType",
+    "rustTest": "mcdev-core/tests/bytecode_legacy.rs::BytecodeClassIndexAdapterTest__exposesCounterFieldWithReadableType",
+    "fixture": "mcdev-core/tests/fixtures/bytecode_classes.json and native class writer",
+    "status": "passed",
+    "evidence": "build/rust-test-logs/expression-engine-20261024/owned-final-parity.stdout.log"
+  },
+  {
+    "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/index/BytecodeClassIndexAdapterTest.kt::projectContextMixinIndexBuildsEquivalentAdapter",
+    "rustTest": "mcdev-core/tests/bytecode_legacy.rs::BytecodeClassIndexAdapterTest__projectContextMixinIndexBuildsEquivalentAdapter",
+    "fixture": "mcdev-core/tests/fixtures/bytecode_classes.json and native class writer",
+    "status": "passed",
+    "evidence": "build/rust-test-logs/expression-engine-20261024/owned-final-parity.stdout.log"
+  },
+  {
+    "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/index/BytecodeIndexEntryMapperTest.kt::toMixinAtTargetPropagatesInvokeOccurrenceMetadata",
+    "rustTest": "mcdev-core/tests/bytecode_legacy.rs::BytecodeIndexEntryMapperTest__toMixinAtTargetPropagatesInvokeOccurrenceMetadata",
+    "fixture": "mcdev-core/tests/fixtures/bytecode_classes.json and native class writer",
+    "status": "passed",
+    "evidence": "build/rust-test-logs/expression-engine-20261024/owned-final-parity.stdout.log"
+  },
+  {
+    "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/index/BytecodeIndexEntryMapperTest.kt::toMixinAtTargetPreservesConditionOpcode",
+    "rustTest": "mcdev-core/tests/bytecode_legacy.rs::BytecodeIndexEntryMapperTest__toMixinAtTargetPreservesConditionOpcode",
+    "fixture": "mcdev-core/tests/fixtures/bytecode_classes.json and native class writer",
+    "status": "passed",
+    "evidence": "build/rust-test-logs/expression-engine-20261024/owned-final-parity.stdout.log"
+  },
+  {
+    "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/index/BytecodeIndexEntryMapperTest.kt::toMixinAtTargetPreservesInvokeOperationKind",
+    "rustTest": "mcdev-core/tests/bytecode_legacy.rs::BytecodeIndexEntryMapperTest__toMixinAtTargetPreservesInvokeOperationKind",
+    "fixture": "mcdev-core/tests/fixtures/bytecode_classes.json and native class writer",
+    "status": "passed",
+    "evidence": "build/rust-test-logs/expression-engine-20261024/owned-final-parity.stdout.log"
+  },
+  {
+    "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/index/BytecodeIndexEntryMapperTest.kt::toMixinAtTargetPreservesFieldReadWriteOperationKinds",
+    "rustTest": "mcdev-core/tests/bytecode_legacy.rs::BytecodeIndexEntryMapperTest__toMixinAtTargetPreservesFieldReadWriteOperationKinds",
+    "fixture": "mcdev-core/tests/fixtures/bytecode_classes.json and native class writer",
+    "status": "passed",
+    "evidence": "build/rust-test-logs/expression-engine-20261024/owned-final-parity.stdout.log"
+  },
+  {
+    "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/index/BytecodeIndexEntryMapperTest.kt::toMixinAtTargetMapsNonInvokeFieldKindsToNullOperationKind",
+    "rustTest": "mcdev-core/tests/bytecode_legacy.rs::BytecodeIndexEntryMapperTest__toMixinAtTargetMapsNonInvokeFieldKindsToNullOperationKind",
+    "fixture": "mcdev-core/tests/fixtures/bytecode_classes.json and native class writer",
+    "status": "passed",
+    "evidence": "build/rust-test-logs/expression-engine-20261024/owned-final-parity.stdout.log"
+  },
+  {
+    "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/index/BytecodeIndexEntryMapperTest.kt::toMixinAtTargetPreservesDefaultOccurrenceMetadata",
+    "rustTest": "mcdev-core/tests/bytecode_legacy.rs::BytecodeIndexEntryMapperTest__toMixinAtTargetPreservesDefaultOccurrenceMetadata",
+    "fixture": "mcdev-core/tests/fixtures/bytecode_classes.json and native class writer",
+    "status": "passed",
+    "evidence": "build/rust-test-logs/expression-engine-20261024/owned-final-parity.stdout.log"
+  },
+  {
+    "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/index/ProjectContextMixinIndexTest.kt::buildsClassIndexFromProvider",
+    "rustTest": "mcdev-core/tests/bytecode_legacy.rs::ProjectContextMixinIndexTest__buildsClassIndexFromProvider",
+    "fixture": "mcdev-core/tests/fixtures/bytecode_classes.json and native class writer",
+    "status": "passed",
+    "evidence": "build/rust-test-logs/expression-engine-20261024/owned-final-parity.stdout.log"
+  },
+  {
+    "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/index/ProjectContextMixinIndexTest.kt::buildsBytecodeIndexFromProvider",
+    "rustTest": "mcdev-core/tests/bytecode_legacy.rs::ProjectContextMixinIndexTest__buildsBytecodeIndexFromProvider",
+    "fixture": "mcdev-core/tests/fixtures/bytecode_classes.json and native class writer",
+    "status": "passed",
+    "evidence": "build/rust-test-logs/expression-engine-20261024/owned-final-parity.stdout.log"
+  },
+  {
+    "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/index/ProjectContextMixinIndexTest.kt::classAndBytecodeIndexShareClasspath",
+    "rustTest": "mcdev-core/tests/bytecode_legacy.rs::ProjectContextMixinIndexTest__classAndBytecodeIndexShareClasspath",
+    "fixture": "mcdev-core/tests/fixtures/bytecode_classes.json and native class writer",
+    "status": "passed",
+    "evidence": "build/rust-test-logs/expression-engine-20261024/owned-final-parity.stdout.log"
+  },
+  {
+    "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixin/BytecodeIndexDefaultTest.kt::fakeBytecodeIndexUsesDefaultNullGetClassBytes",
+    "rustTest": "mcdev-core/tests/bytecode_legacy.rs::BytecodeIndexDefaultTest__fakeBytecodeIndexUsesDefaultNullGetClassBytes",
+    "fixture": "mcdev-core/tests/fixtures/bytecode_classes.json and native class writer",
+    "status": "passed",
+    "evidence": "build/rust-test-logs/expression-engine-20261024/owned-final-parity.stdout.log"
+  },
+  {
+    "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixin/BytecodeIndexDefaultTest.kt::fakeBytecodeIndexUsesDefaultNullResolveCommonSuperClass",
+    "rustTest": "mcdev-core/tests/bytecode_legacy.rs::BytecodeIndexDefaultTest__fakeBytecodeIndexUsesDefaultNullResolveCommonSuperClass",
+    "fixture": "mcdev-core/tests/fixtures/bytecode_classes.json and native class writer",
+    "status": "passed",
+    "evidence": "build/rust-test-logs/expression-engine-20261024/owned-final-parity.stdout.log"
+  },
+  {
+    "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixinextras/BytecodeCommonSuperClassResolverTest.kt::equalDescriptorsReturnUnchanged",
+    "rustTest": "mcdev-core/tests/bytecode_legacy.rs::BytecodeCommonSuperClassResolverTest__equalDescriptorsReturnUnchanged",
+    "fixture": "mcdev-core/tests/fixtures/bytecode_classes.json and native class writer",
+    "status": "passed",
+    "evidence": "build/rust-test-logs/expression-engine-20261024/owned-final-parity.stdout.log"
+  },
+  {
+    "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixinextras/BytecodeCommonSuperClassResolverTest.kt::siblingsShareCommonBase",
+    "rustTest": "mcdev-core/tests/bytecode_legacy.rs::BytecodeCommonSuperClassResolverTest__siblingsShareCommonBase",
+    "fixture": "mcdev-core/tests/fixtures/bytecode_classes.json and native class writer",
+    "status": "passed",
+    "evidence": "build/rust-test-logs/expression-engine-20261024/owned-final-parity.stdout.log"
+  },
+  {
+    "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixinextras/BytecodeCommonSuperClassResolverTest.kt::superclassBothArgumentOrders",
+    "rustTest": "mcdev-core/tests/bytecode_legacy.rs::BytecodeCommonSuperClassResolverTest__superclassBothArgumentOrders",
+    "fixture": "mcdev-core/tests/fixtures/bytecode_classes.json and native class writer",
+    "status": "passed",
+    "evidence": "build/rust-test-logs/expression-engine-20261024/owned-final-parity.stdout.log"
+  },
+  {
+    "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixinextras/BytecodeCommonSuperClassResolverTest.kt::interfaceImplementation",
+    "rustTest": "mcdev-core/tests/bytecode_legacy.rs::BytecodeCommonSuperClassResolverTest__interfaceImplementation",
+    "fixture": "mcdev-core/tests/fixtures/bytecode_classes.json and native class writer",
+    "status": "passed",
+    "evidence": "build/rust-test-logs/expression-engine-20261024/owned-final-parity.stdout.log"
+  },
+  {
+    "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixinextras/BytecodeCommonSuperClassResolverTest.kt::unrelatedReferencesReturnObject",
+    "rustTest": "mcdev-core/tests/bytecode_legacy.rs::BytecodeCommonSuperClassResolverTest__unrelatedReferencesReturnObject",
+    "fixture": "mcdev-core/tests/fixtures/bytecode_classes.json and native class writer",
+    "status": "passed",
+    "evidence": "build/rust-test-logs/expression-engine-20261024/owned-final-parity.stdout.log"
+  },
+  {
+    "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixinextras/BytecodeCommonSuperClassResolverTest.kt::arraysPreserveCompatibleReferenceComponentAndDimensions",
+    "rustTest": "mcdev-core/tests/bytecode_legacy.rs::BytecodeCommonSuperClassResolverTest__arraysPreserveCompatibleReferenceComponentAndDimensions",
+    "fixture": "mcdev-core/tests/fixtures/bytecode_classes.json and native class writer",
+    "status": "passed",
+    "evidence": "build/rust-test-logs/expression-engine-20261024/owned-final-parity.stdout.log"
+  },
+  {
+    "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixinextras/BytecodeCommonSuperClassResolverTest.kt::stringOneDimensionalWithStringTwoDimensionalReturnsObjectOneDimensional",
+    "rustTest": "mcdev-core/tests/bytecode_legacy.rs::BytecodeCommonSuperClassResolverTest__stringOneDimensionalWithStringTwoDimensionalReturnsObjectOneDimensional",
+    "fixture": "mcdev-core/tests/fixtures/bytecode_classes.json and native class writer",
+    "status": "passed",
+    "evidence": "build/rust-test-logs/expression-engine-20261024/owned-final-parity.stdout.log"
+  },
+  {
+    "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixinextras/BytecodeCommonSuperClassResolverTest.kt::stringTwoDimensionalWithObjectOneDimensionalReturnsObjectOneDimensional",
+    "rustTest": "mcdev-core/tests/bytecode_legacy.rs::BytecodeCommonSuperClassResolverTest__stringTwoDimensionalWithObjectOneDimensionalReturnsObjectOneDimensional",
+    "fixture": "mcdev-core/tests/fixtures/bytecode_classes.json and native class writer",
+    "status": "passed",
+    "evidence": "build/rust-test-logs/expression-engine-20261024/owned-final-parity.stdout.log"
+  },
+  {
+    "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixinextras/BytecodeCommonSuperClassResolverTest.kt::arraysAreAssignableToCloneableAndSerializable",
+    "rustTest": "mcdev-core/tests/bytecode_legacy.rs::BytecodeCommonSuperClassResolverTest__arraysAreAssignableToCloneableAndSerializable",
+    "fixture": "mcdev-core/tests/fixtures/bytecode_classes.json and native class writer",
+    "status": "passed",
+    "evidence": "build/rust-test-logs/expression-engine-20261024/owned-final-parity.stdout.log"
+  },
+  {
+    "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixinextras/BytecodeCommonSuperClassResolverTest.kt::equalPrimitiveArraysReturnUnchanged",
+    "rustTest": "mcdev-core/tests/bytecode_legacy.rs::BytecodeCommonSuperClassResolverTest__equalPrimitiveArraysReturnUnchanged",
+    "fixture": "mcdev-core/tests/fixtures/bytecode_classes.json and native class writer",
+    "status": "passed",
+    "evidence": "build/rust-test-logs/expression-engine-20261024/owned-final-parity.stdout.log"
+  },
+  {
+    "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixinextras/BytecodeCommonSuperClassResolverTest.kt::incompatiblePrimitiveArraysReturnObject",
+    "rustTest": "mcdev-core/tests/bytecode_legacy.rs::BytecodeCommonSuperClassResolverTest__incompatiblePrimitiveArraysReturnObject",
+    "fixture": "mcdev-core/tests/fixtures/bytecode_classes.json and native class writer",
+    "status": "passed",
+    "evidence": "build/rust-test-logs/expression-engine-20261024/owned-final-parity.stdout.log"
+  },
+  {
+    "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixinextras/BytecodeCommonSuperClassResolverTest.kt::incompatiblePrimitiveArraysReturnObjectArrayAtMatchingDimensions",
+    "rustTest": "mcdev-core/tests/bytecode_legacy.rs::BytecodeCommonSuperClassResolverTest__incompatiblePrimitiveArraysReturnObjectArrayAtMatchingDimensions",
+    "fixture": "mcdev-core/tests/fixtures/bytecode_classes.json and native class writer",
+    "status": "passed",
+    "evidence": "build/rust-test-logs/expression-engine-20261024/owned-final-parity.stdout.log"
+  },
+  {
+    "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixinextras/BytecodeCommonSuperClassResolverTest.kt::incompatiblePrimitiveArraysReturnObjectArrayAtThreeMatchingDimensions",
+    "rustTest": "mcdev-core/tests/bytecode_legacy.rs::BytecodeCommonSuperClassResolverTest__incompatiblePrimitiveArraysReturnObjectArrayAtThreeMatchingDimensions",
+    "fixture": "mcdev-core/tests/fixtures/bytecode_classes.json and native class writer",
+    "status": "passed",
+    "evidence": "build/rust-test-logs/expression-engine-20261024/owned-final-parity.stdout.log"
+  },
+  {
+    "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixinextras/BytecodeCommonSuperClassResolverTest.kt::incompatiblePrimitiveArraysAcrossDimensionsReturnObject",
+    "rustTest": "mcdev-core/tests/bytecode_legacy.rs::BytecodeCommonSuperClassResolverTest__incompatiblePrimitiveArraysAcrossDimensionsReturnObject",
+    "fixture": "mcdev-core/tests/fixtures/bytecode_classes.json and native class writer",
+    "status": "passed",
+    "evidence": "build/rust-test-logs/expression-engine-20261024/owned-final-parity.stdout.log"
+  },
+  {
+    "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixinextras/BytecodeCommonSuperClassResolverTest.kt::mixedPrimitiveAndReferenceArraysReturnObject",
+    "rustTest": "mcdev-core/tests/bytecode_legacy.rs::BytecodeCommonSuperClassResolverTest__mixedPrimitiveAndReferenceArraysReturnObject",
+    "fixture": "mcdev-core/tests/fixtures/bytecode_classes.json and native class writer",
+    "status": "passed",
+    "evidence": "build/rust-test-logs/expression-engine-20261024/owned-final-parity.stdout.log"
+  },
+  {
+    "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixinextras/BytecodeCommonSuperClassResolverTest.kt::arrayDimensionMismatchWithSharedComponentTypeReturnsObjectArray",
+    "rustTest": "mcdev-core/tests/bytecode_legacy.rs::BytecodeCommonSuperClassResolverTest__arrayDimensionMismatchWithSharedComponentTypeReturnsObjectArray",
+    "fixture": "mcdev-core/tests/fixtures/bytecode_classes.json and native class writer",
+    "status": "passed",
+    "evidence": "build/rust-test-logs/expression-engine-20261024/owned-final-parity.stdout.log"
+  },
+  {
+    "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixinextras/BytecodeCommonSuperClassResolverTest.kt::arrayDimensionMismatchWithRelatedComponentTypesReturnsObjectArray",
+    "rustTest": "mcdev-core/tests/bytecode_legacy.rs::BytecodeCommonSuperClassResolverTest__arrayDimensionMismatchWithRelatedComponentTypesReturnsObjectArray",
+    "fixture": "mcdev-core/tests/fixtures/bytecode_classes.json and native class writer",
+    "status": "passed",
+    "evidence": "build/rust-test-logs/expression-engine-20261024/owned-final-parity.stdout.log"
+  },
+  {
+    "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixinextras/BytecodeCommonSuperClassResolverTest.kt::unequalPrimitiveDescriptorsReturnNull",
+    "rustTest": "mcdev-core/tests/bytecode_legacy.rs::BytecodeCommonSuperClassResolverTest__unequalPrimitiveDescriptorsReturnNull",
+    "fixture": "mcdev-core/tests/fixtures/bytecode_classes.json and native class writer",
+    "status": "passed",
+    "evidence": "build/rust-test-logs/expression-engine-20261024/owned-final-parity.stdout.log"
+  },
+  {
+    "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixinextras/BytecodeCommonSuperClassResolverTest.kt::invalidDescriptorsReturnNull",
+    "rustTest": "mcdev-core/tests/bytecode_legacy.rs::BytecodeCommonSuperClassResolverTest__invalidDescriptorsReturnNull",
+    "fixture": "mcdev-core/tests/fixtures/bytecode_classes.json and native class writer",
+    "status": "passed",
+    "evidence": "build/rust-test-logs/expression-engine-20261024/owned-final-parity.stdout.log"
+  },
+  {
+    "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixinextras/BytecodeCommonSuperClassResolverTest.kt::equalInvalidDescriptorsReturnNull",
+    "rustTest": "mcdev-core/tests/bytecode_legacy.rs::BytecodeCommonSuperClassResolverTest__equalInvalidDescriptorsReturnNull",
+    "fixture": "mcdev-core/tests/fixtures/bytecode_classes.json and native class writer",
+    "status": "passed",
+    "evidence": "build/rust-test-logs/expression-engine-20261024/owned-final-parity.stdout.log"
+  },
+  {
+    "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixinextras/BytecodeCommonSuperClassResolverTest.kt::missingBytesReturnNull",
+    "rustTest": "mcdev-core/tests/bytecode_legacy.rs::BytecodeCommonSuperClassResolverTest__missingBytesReturnNull",
+    "fixture": "mcdev-core/tests/fixtures/bytecode_classes.json and native class writer",
+    "status": "passed",
+    "evidence": "build/rust-test-logs/expression-engine-20261024/owned-final-parity.stdout.log"
+  },
+  {
+    "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixinextras/BytecodeCommonSuperClassResolverTest.kt::corruptBytesReturnNull",
+    "rustTest": "mcdev-core/tests/bytecode_legacy.rs::BytecodeCommonSuperClassResolverTest__corruptBytesReturnNull",
+    "fixture": "mcdev-core/tests/fixtures/bytecode_classes.json and native class writer",
+    "status": "passed",
+    "evidence": "build/rust-test-logs/expression-engine-20261024/owned-final-parity.stdout.log"
+  },
+  {
+    "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixinextras/BytecodeCommonSuperClassResolverTest.kt::cacheReusesHierarchyAndPairResults",
+    "rustTest": "mcdev-core/tests/bytecode_legacy.rs::BytecodeCommonSuperClassResolverTest__cacheReusesHierarchyAndPairResults",
+    "fixture": "mcdev-core/tests/fixtures/bytecode_classes.json and native class writer",
+    "status": "passed",
+    "evidence": "build/rust-test-logs/expression-engine-20261024/owned-final-parity.stdout.log"
+  },
+  {
+    "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixinextras/BytecodeCommonSuperClassResolverTest.kt::everyReferenceIsAssignableToObjectWithoutHierarchyBytes",
+    "rustTest": "mcdev-core/tests/bytecode_legacy.rs::BytecodeCommonSuperClassResolverTest__everyReferenceIsAssignableToObjectWithoutHierarchyBytes",
+    "fixture": "mcdev-core/tests/fixtures/bytecode_classes.json and native class writer",
+    "status": "passed",
+    "evidence": "build/rust-test-logs/expression-engine-20261024/owned-final-parity.stdout.log"
+  },
+  {
+    "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixinextras/BytecodeCommonSuperClassResolverTest.kt::arraysAreAssignableToObject",
+    "rustTest": "mcdev-core/tests/bytecode_legacy.rs::BytecodeCommonSuperClassResolverTest__arraysAreAssignableToObject",
+    "fixture": "mcdev-core/tests/fixtures/bytecode_classes.json and native class writer",
+    "status": "passed",
+    "evidence": "build/rust-test-logs/expression-engine-20261024/owned-final-parity.stdout.log"
+  },
+  {
+    "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixinextras/BytecodeCommonSuperClassResolverTest.kt::cyclicHierarchyDoesNotLoop",
+    "rustTest": "mcdev-core/tests/bytecode_legacy.rs::BytecodeCommonSuperClassResolverTest__cyclicHierarchyDoesNotLoop",
+    "fixture": "mcdev-core/tests/fixtures/bytecode_classes.json and native class writer",
+    "status": "passed",
+    "evidence": "build/rust-test-logs/expression-engine-20261024/owned-final-parity.stdout.log"
+  },
+  {
+    "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixinextras/BytecodeCommonSuperClassResolverTest.kt::missingBytesAreCachedWithoutRepeatedLookup",
+    "rustTest": "mcdev-core/tests/bytecode_legacy.rs::BytecodeCommonSuperClassResolverTest__missingBytesAreCachedWithoutRepeatedLookup",
+    "fixture": "mcdev-core/tests/fixtures/bytecode_classes.json and native class writer",
+    "status": "passed",
+    "evidence": "build/rust-test-logs/expression-engine-20261024/owned-final-parity.stdout.log"
+  },
+  {
+    "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixinextras/BytecodeCommonSuperClassResolverTest.kt::nonPositiveCacheSizesAreRejected",
+    "rustTest": "mcdev-core/tests/bytecode_legacy.rs::BytecodeCommonSuperClassResolverTest__nonPositiveCacheSizesAreRejected",
+    "fixture": "mcdev-core/tests/fixtures/bytecode_classes.json and native class writer",
+    "status": "passed",
+    "evidence": "build/rust-test-logs/expression-engine-20261024/owned-final-parity.stdout.log"
+  }
+]

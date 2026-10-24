@@ -24,8 +24,8 @@ return function(h)
       local hover_done, hover_result, hover_err, hover_ms = phase ~= "startup"
       local hover_client, hover_request
       if phase == "startup" then
-        hover_client = vim.lsp.get_clients({ bufnr = bufnr, name = "jdtls" })[1]
-        h.helpers.assert_not_nil(hover_client, "real Java hover requires the attached JDT client")
+        hover_client = vim.lsp.get_clients({ bufnr = bufnr, name = "ktlsp" })[1]
+        h.helpers.assert_not_nil(hover_client, "real Java hover requires the attached ktlsp client")
         local hover_position
         for index, line in ipairs(original) do
           local start = line:find("@Mixin(Gui.class)", 1, true)
@@ -72,8 +72,8 @@ return function(h)
       -- usedJavaProject describes AST binding, not the origin of the member index.
       -- The guarded project transport may correctly use its full bytecode index
       -- when JDT AST parsing is temporarily unavailable.
-      if debug.parseSource == "JDT_AST" then
-        h.helpers.assert_true(debug.usedJavaProject == true and debug.usedCompilationUnit == true,
+      if debug.parseSource == "HOST_NORMALIZED" then
+        h.helpers.assert_true((debug.projectSessionVersion or 0) > 0 and debug.parseConfidence == "HIGH",
           "AST response must resolve the actual project compilation unit")
       else
         h.helpers.assert_eq(debug.parseSource, "HAND_WRITTEN_FALLBACK")

@@ -12,7 +12,6 @@ local navigation = require("mcdev.navigation")
 local diagnostics = require("mcdev.diagnostics")
 local code_action = require("mcdev.code_action")
 local hover = require("mcdev.hover")
-local jdtls_helper = require("mcdev.jdtls")
 local health = require("mcdev.health")
 local lsp_adapter = require("mcdev.lsp")
 local omnifunc = require("mcdev.omnifunc")
@@ -20,73 +19,31 @@ local stdio = require("mcdev.stdio")
 local completion_transport = require("mcdev.transport")
 
 mcdev.setup({
-  jdtls = {
-    extension_jar = "build/libs/io.github.mcdev.jdtls.jar",
-  },
-  insert = {
-    at_target = "smart",
-    mixin_class_import = true,
-    inject_method_descriptor = "auto",
-  },
+  ktlsp = { cmd = { "ktlsp" } },
+  companion = { cmd = { vim.v.progpath } },
+  insert = { at_target = "smart", mixin_class_import = true, inject_method_descriptor = "auto" },
 })
-
-helpers.assert_eq(mcdev.extension_jar(), "build/libs/io.github.mcdev.jdtls.jar")
-
-local original_jdtls_options = vim.deepcopy(config.options.jdtls)
-local mason_root = vim.fn.tempname()
-local mason_jar = mason_root .. "/share/mcdev-jdtls-extension/io.github.mcdev.jdtls.jar"
-vim.fn.mkdir(vim.fn.fnamemodify(mason_jar, ":h"), "p")
-vim.fn.writefile({}, mason_jar)
-config.options.jdtls.extension_jar = nil
-config.options.jdtls.mason = {
-  enabled = true,
-  package = "mcdev-jdtls-extension",
-  jar = "io.github.mcdev.jdtls.jar",
-  root = mason_root,
-}
-config.options.jdtls.repo_root = mason_root .. "/not-a-repository"
-helpers.assert_eq(mcdev.extension_jar(), mason_jar)
-
-local jdtls_config = {
-  init_options = {
-    bundles = { "existing.jar" },
-  },
-}
-helpers.assert_eq(jdtls_helper.extend_config(jdtls_config), jdtls_config)
-helpers.assert_eq(#jdtls_config.init_options.bundles, 2)
-helpers.assert_eq(jdtls_config.init_options.bundles[2], mason_jar)
-jdtls_helper.extend_config(jdtls_config)
-helpers.assert_eq(#jdtls_config.init_options.bundles, 2)
-
+local ktlsp_helper = require("mcdev.ktlsp")
+helpers.assert_eq(ktlsp_helper.companion_command()[1], vim.v.progpath)
+local client_config = { init_options = {
+  existing = true, analysisProviders = { other = { command = { "other" } } },
+} }
+helpers.assert_eq(ktlsp_helper.extend_config(client_config), client_config)
+helpers.assert_eq(client_config.init_options.existing, true)
+helpers.assert_eq(client_config.init_options.analysisProviders.other.command[1], "other")
+helpers.assert_eq(client_config.init_options.analysisProviders["mcdev.mixin"].command[1], vim.v.progpath)
+helpers.assert_eq(client_config.init_options.analysisProviders["mcdev.mixin"].enabled, true)
+ktlsp_helper.extend_config(client_config)
+helpers.assert_eq(vim.tbl_count(client_config.init_options.analysisProviders), 2)
 local original_lsp_start = vim.lsp.start
-local started_config = nil
-vim.lsp.start = function(start_opts)
-  started_config = start_opts
-  return 42
-end
-helpers.assert_eq(jdtls_helper.start_or_attach({
-  root_dir = "/project",
-  cmd = { "jdtls" },
-  init_options = {
-    bundles = { "debug.jar" },
-  },
-}), 42)
-helpers.assert_eq(started_config.init_options.bundles[1], "debug.jar")
-helpers.assert_eq(started_config.init_options.bundles[2], mason_jar)
+local started_config
+vim.lsp.start = function(opts) started_config = opts; return 42 end
+helpers.assert_eq(ktlsp_helper.start_or_attach({ root_dir = "/project", cmd = { vim.v.progpath },
+  init_options = { existing = true } }), 42)
+helpers.assert_eq(started_config.init_options.existing, true)
+helpers.assert_eq(started_config.init_options.analysisProviders["mcdev.mixin"].command[1], vim.v.progpath)
 vim.lsp.start = original_lsp_start
-config.options.jdtls = original_jdtls_options
-
-local fake_repo = vim.fn.tempname()
-local fake_built_jar = fake_repo .. "/mcdev-jdtls-extension/build/libs/io.github.mcdev.jdtls-9.8.7.jar"
-vim.fn.mkdir(vim.fn.fnamemodify(fake_built_jar, ":h"), "p")
-vim.fn.writefile({}, fake_built_jar)
-local configured_jar = config.options.jdtls.extension_jar
-config.options.jdtls.extension_jar = nil
-helpers.assert_eq(
-  vim.fs.normalize(jdtls_helper.resolve_extension_jar({ repo_root = fake_repo, mason = { enabled = false } })),
-  vim.fs.normalize(fake_built_jar)
-)
-config.options.jdtls.extension_jar = configured_jar
+config.options.companion.cmd = nil
 
 local item = completion.to_lsp_item({
   label = "setScreen(Screen): void",
@@ -147,7 +104,7 @@ vim.notify = function(message)
   notify_message = message
 end
 protocol.request("mcdev.completion", payload, nil)
-helpers.assert_eq(notify_message, "mcdev: no active JDT LS client for this buffer")
+helpers.assert_eq(notify_message, "mcdev: no active ktlsp client for this buffer")
 vim.lsp.get_clients = original_get_clients
 vim.notify = original_notify
 
@@ -155,7 +112,7 @@ local callback_error = nil
 protocol.request("mcdev.completion", payload, function(_, err)
   callback_error = err
 end)
-helpers.assert_eq(callback_error, "mcdev: no active JDT LS client for this buffer")
+helpers.assert_eq(callback_error, "mcdev: no active ktlsp client for this buffer")
 
 local blink_adapter = blink.source()
 helpers.assert_eq(#blink_adapter:get_trigger_characters(), 5)
@@ -364,7 +321,8 @@ local function install_tracked_completion_client(bufnr, root_dir)
   local pending_by_id = {}
   local cancel_calls = {}
   local fake_client = {
-    name = "jdtls",
+    name = "ktlsp",
+    server_capabilities = { executeCommandProvider = { commands = vim.tbl_values(protocol.commands) } },
     config = { root_dir = root_dir or "/project" },
     request = function(self, _, params, handler, request_bufnr)
       next_request_id = next_request_id + 1
@@ -383,7 +341,7 @@ local function install_tracked_completion_client(bufnr, root_dir)
     if opts and opts.bufnr and opts.bufnr ~= bufnr then
       return {}
     end
-    if opts and opts.name == "jdtls" then
+    if not opts or opts.name == "ktlsp" then
       return { fake_client }
     end
     if opts and opts.bufnr == bufnr then
@@ -608,7 +566,8 @@ with_named_buffer("/project/src/main/java/com/example/mixin/RequestStartFailureM
   local request_count = 0
   local pending = nil
   local fake_client = {
-    name = "jdtls",
+    name = "ktlsp",
+    server_capabilities = { executeCommandProvider = { commands = vim.tbl_values(protocol.commands) } },
     config = { root_dir = "/project" },
     request = function(self, _, _, handler)
       request_count = request_count + 1
@@ -631,7 +590,7 @@ with_named_buffer("/project/src/main/java/com/example/mixin/RequestStartFailureM
   helpers.assert_not_nil(failed)
   helpers.assert_true(failed.isIncomplete)
   helpers.assert_eq(#failed.items, 0)
-  helpers.assert_eq(completion.last_error, "mcdev: failed to start JDT LS request")
+  helpers.assert_eq(completion.last_error, "mcdev: failed to start ktlsp request")
 
   local recovered = nil
   completion.complete(function(result)
@@ -1410,14 +1369,16 @@ with_named_buffer("/other-project/src/main/java/com/example/mixin/ExampleMixin.j
     if opts and opts.bufnr == bufnr then
       return {
         {
-          name = "jdtls",
+          name = "ktlsp",
+    server_capabilities = { executeCommandProvider = { commands = vim.tbl_values(protocol.commands) } },
           config = { root_dir = "/other-project" },
         },
       }
     end
     return {
       {
-        name = "jdtls",
+        name = "ktlsp",
+    server_capabilities = { executeCommandProvider = { commands = vim.tbl_values(protocol.commands) } },
         config = { root_dir = "/current-project" },
       },
     }
@@ -1434,7 +1395,8 @@ with_named_buffer("/project/src/main/resources/mod.accesswidener", "accesswidene
   local requested_command = nil
   local requested_bufnr = nil
   local fallback_client = {
-    name = "jdtls",
+    name = "ktlsp",
+    server_capabilities = { executeCommandProvider = { commands = vim.tbl_values(protocol.commands) } },
     config = { root_dir = "/project" },
     request = function(self, method, params, handler, request_bufnr)
       requested_command = params.command
@@ -1447,7 +1409,7 @@ with_named_buffer("/project/src/main/resources/mod.accesswidener", "accesswidene
     if opts and opts.bufnr == bufnr then
       return {}
     end
-    if opts and opts.name == "jdtls" then
+    if not opts or opts.name == "ktlsp" then
       return { fallback_client }
     end
     return {}
@@ -1455,7 +1417,7 @@ with_named_buffer("/project/src/main/resources/mod.accesswidener", "accesswidene
 
   local ctx = protocol.context(bufnr, { 2, 4 })
   helpers.assert_true(ctx.workspaceRoot:find("/project", 1, true) ~= nil, ctx.workspaceRoot)
-  helpers.assert_eq(protocol.active_jdtls_client(bufnr), fallback_client)
+  helpers.assert_eq(protocol.active_ktlsp_client(bufnr), fallback_client)
 
   local request_result = nil
   protocol.request("mcdev.completion", { context = ctx }, function(result, err)
@@ -1580,7 +1542,8 @@ with_named_buffer("/project/src/main/java/com/example/mixin/FailedDiagnosticsMix
   local request_count = 0
   local errors = {}
   local fake_client = {
-    name = "jdtls",
+    name = "ktlsp",
+    server_capabilities = { executeCommandProvider = { commands = vim.tbl_values(protocol.commands) } },
     config = { root_dir = "/project" },
     request = function()
       request_count = request_count + 1
@@ -1735,7 +1698,7 @@ end
 navigation.definition(0, { 1, 1 }, function(_, err)
   nav_error = err
 end)
-helpers.assert_eq(nav_error, "mcdev: no active JDT LS client for this buffer")
+helpers.assert_eq(nav_error, "mcdev: no active ktlsp client for this buffer")
 vim.lsp.get_clients = original_get_clients
 
 local hover_result = nil
@@ -1847,7 +1810,8 @@ do
   local commands_seen = {}
   local fake_client = {
     id = 99,
-    name = "jdtls",
+    name = "ktlsp",
+    server_capabilities = { executeCommandProvider = { commands = vim.tbl_values(protocol.commands) } },
     config = { root_dir = vim.fn.getcwd() },
     request = function(self, method, params, handler, request_bufnr)
       helpers.assert_eq(method, "workspace/executeCommand")
@@ -1855,10 +1819,10 @@ do
       if params.command == "mcdev.info" then
         handler(nil, {
           result = {
-            lines = { "Extension loaded: true" },
+            lines = { "Rust companion available: true" },
             buildCommit = "test-commit",
             buildTime = "test-time",
-            jarLocation = "file:///test.jar",
+            executableLocation = "file:///companion.exe",
             registeredCommands = { "mcdev.info", "mcdev.completion" },
           },
         })
@@ -1870,10 +1834,10 @@ do
             },
             debug = {
               zeroItemReason = vim.NIL,
-              parseSource = "JDT_AST",
+              parseSource = "HOST_NORMALIZED",
               parseConfidence = "HIGH",
-              usedCompilationUnit = true,
-              usedJavaProject = true,
+              usedCompilationUnit = false,
+              usedJavaProject = false,
               bindingResolvedCount = 1,
               bindingFailedCount = 0,
               semanticContextFound = true,
@@ -1892,7 +1856,7 @@ do
     end,
   }
   vim.lsp.get_clients = function(opts)
-    if opts and (opts.bufnr == 0 or opts.name == "jdtls") then
+    if opts and (opts.bufnr == 0 or opts.name == "ktlsp") then
       return { fake_client }
     end
     return {}
@@ -1907,7 +1871,7 @@ do
   helpers.assert_true(commands_seen["mcdev.hover"])
   helpers.assert_true(health_message:find("mcdev.info ping: OK", 1, true) ~= nil, health_message)
   helpers.assert_true(health_message:find("mcdev.completion itemCount: 1", 1, true) ~= nil, health_message)
-  helpers.assert_true(health_message:find("usedCompilationUnit: true", 1, true) ~= nil, health_message)
+  helpers.assert_true(health_message:find("parseConfidence: HIGH", 1, true) ~= nil, health_message)
   helpers.assert_true(health_message:find("fallbackAnnotationContextUsed: false", 1, true) ~= nil, health_message)
   vim.lsp.get_clients = original_get_clients_for_health
   vim.notify = original_notify_for_health
@@ -1977,8 +1941,6 @@ do
 end
 
 do
-  local jar = vim.fn.tempname()
-  vim.fn.writefile({}, jar)
   local original_jobstart = vim.fn.jobstart
   local original_jobstop = vim.fn.jobstop
   local original_chansend = vim.fn.chansend
@@ -2002,7 +1964,7 @@ do
   local first_error = nil
   stdio.request({}, function(_, err)
     first_error = err
-  end, { extension_jar = jar, java = "java" })
+  end, { companion = { cmd = { vim.v.progpath } } })
   vim.wait(100, function()
     return first_error ~= nil
   end, 10)
@@ -2014,7 +1976,7 @@ do
   stdio.request({}, function(result, err)
     second_result = result
     second_error = err
-  end, { extension_jar = jar, java = "java" })
+  end, { companion = { cmd = { vim.v.progpath } } })
   helpers.assert_eq(next_job, 2)
   local request = jobs[2].request
   jobs[2].opts.on_stdout(2, {
@@ -2033,7 +1995,6 @@ do
   vim.fn.jobstart = original_jobstart
   vim.fn.jobstop = original_jobstop
   vim.fn.chansend = original_chansend
-  vim.fn.delete(jar)
 end
 
 dofile(vim.fn.getcwd() .. "/mcdev-nvim/tests/lsp_regressions.lua")
@@ -2046,5 +2007,6 @@ dofile(vim.fn.getcwd() .. "/mcdev-nvim/tests/blink_routing.lua")
 dofile(vim.fn.getcwd() .. "/mcdev-nvim/tests/cmp_positions.lua")
 dofile(vim.fn.getcwd() .. "/mcdev-nvim/tests/cmp_routing.lua")
 dofile(vim.fn.getcwd() .. "/mcdev-nvim/tests/transport.lua")
+dofile(vim.fn.getcwd() .. "/mcdev-nvim/tests/backend_contract.lua")
 print("mcdev-nvim adapter tests passed")
 vim.cmd("qa!")

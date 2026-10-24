@@ -1,0 +1,14 @@
+[
+  {
+    "legacyCase": "mcdev-core/tests/fixtures/mixinextras_locals/LocalFlowOracle.kt::absentDebugFramesPreserveLoopExceptionMergeWideAndConstructorFacts",
+    "legacyClass": "io.github.mcdev.core.mixinextras.LocalFlowOracle",
+    "status": "passed",
+    "calls": 97
+  },
+  {
+    "legacyCase": "mcdev-core/tests/fixtures/mixinextras_locals/LocalFlowOracle.kt::debugFramesPreserveLoopExceptionMergeWideConstructorAndUnicodeFacts",
+    "legacyClass": "io.github.mcdev.core.mixinextras.LocalFlowOracle",
+    "status": "passed",
+    "calls": 97
+  }
+]

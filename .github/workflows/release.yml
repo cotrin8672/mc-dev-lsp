@@ -7,7 +7,7 @@ on:
   workflow_dispatch:
     inputs:
       version:
-        description: "Release version without the leading v, for example 0.1.0"
+        description: "Release version without the leading v, for example 0.7.7"
         required: true
         type: string
 
@@ -15,33 +15,23 @@ permissions:
   contents: write
 
 jobs:
-  release:
-    name: Build and publish JDT LS bundle
+  resolve_version:
+    name: Resolve release version
     runs-on: ubuntu-latest
-
+    outputs:
+      version: ${{ steps.version.outputs.version }}
+      tag: ${{ steps.version.outputs.tag }}
     steps:
-      - name: Check out repository
-        uses: actions/checkout@v4
-
-      - name: Set up Java
-        uses: actions/setup-java@v4
-        with:
-          distribution: temurin
-          java-version: "21"
-
-      - name: Set up Gradle
-        uses: gradle/actions/setup-gradle@v4
-        with:
-          gradle-version: "9.5.1"
-
       - name: Resolve release version
         id: version
         shell: bash
+        env:
+          RELEASE_INPUT_VERSION: ${{ inputs.version }}
         run: |
           if [[ "${GITHUB_REF_TYPE}" == "tag" ]]; then
             version="${GITHUB_REF_NAME#v}"
           else
-            version="${{ inputs.version }}"
+            version="${RELEASE_INPUT_VERSION}"
           fi
           if [[ ! "${version}" =~ ^[0-9]+\.[0-9]+\.[0-9]+$ ]]; then
             echo "version must look like 0.1.0, got: ${version}" >&2
@@ -50,22 +40,65 @@ jobs:
           echo "version=${version}" >> "${GITHUB_OUTPUT}"
           echo "tag=v${version}" >> "${GITHUB_OUTPUT}"
 
-      - name: Build bundle
-        run: gradle :mcdev-jdtls-extension:jar :mcdev-jdtls-extension:checkBundle
+  native:
+    name: Build native companion (${{ matrix.os }})
+    needs: resolve_version
+    timeout-minutes: 35
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, windows-latest]
+    runs-on: ${{ matrix.os }}
 
-      - name: Prepare release asset
-        shell: bash
-        run: |
-          mkdir -p build/release
-          cp mcdev-jdtls-extension/build/libs/io.github.mcdev.jdtls-*.jar \
-            "build/release/io.github.mcdev.jdtls-${{ steps.version.outputs.version }}.jar"
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Set up Rust
+        uses: dtolnay/rust-toolchain@stable
+
+      - name: Set up Neovim
+        uses: rhysd/action-setup-vim@v1
+        with:
+          neovim: true
+          version: v0.11.5
+
+      - name: Build and package native companion
+        shell: pwsh
+        run: ./scripts/build-native-release.ps1 -Version '${{ needs.resolve_version.outputs.version }}'
+
+      - name: Upload native release asset
+        uses: actions/upload-artifact@v4
+        with:
+          name: native-companion-${{ matrix.os }}
+          path: build/release/native/*.zip
+          if-no-files-found: error
+
+  publish:
+    name: Publish release assets
+    needs: [resolve_version, native]
+    runs-on: ubuntu-latest
+    steps:
+      - name: Download native Linux asset
+        uses: actions/download-artifact@v4
+        with:
+          name: native-companion-ubuntu-latest
+          path: build/release/native
+
+      - name: Download native Windows asset
+        uses: actions/download-artifact@v4
+        with:
+          name: native-companion-windows-latest
+          path: build/release/native
 
       - name: Publish GitHub Release
         uses: softprops/action-gh-release@v2
         with:
-          tag_name: ${{ steps.version.outputs.tag }}
-          name: ${{ steps.version.outputs.tag }}
+          tag_name: ${{ needs.resolve_version.outputs.tag }}
+          name: ${{ needs.resolve_version.outputs.tag }}
           target_commitish: ${{ github.sha }}
-          files: build/release/io.github.mcdev.jdtls-${{ steps.version.outputs.version }}.jar
+          files: |
+            build/release/native/mcdev-companion-${{ needs.resolve_version.outputs.version }}-linux-x86_64.zip
+            build/release/native/mcdev-companion-${{ needs.resolve_version.outputs.version }}-windows-x86_64.zip
           fail_on_unmatched_files: true
           generate_release_notes: true

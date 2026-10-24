@@ -1,14 +1,8 @@
 local M = {}
 
 M.options = {
-  jdtls = {
-    extension_jar = nil,
-    mason = {
-      enabled = false,
-      package = "mcdev-jdtls-extension",
-      jar = "io.github.mcdev.jdtls.jar",
-    },
-  },
+  ktlsp = { cmd = nil },
+  companion = { cmd = nil },
   insert = {
     at_target = "smart",
     mixin_class_import = true,
@@ -44,6 +38,9 @@ local function merge(base, override)
 end
 
 function M.setup(opts)
+  if opts and opts.jdtls then
+    error("mcdev: jdtls options were replaced by ktlsp.cmd and companion.cmd (explicit executable argv)")
+  end
   M.options = merge(M.options, opts or {})
 end
 

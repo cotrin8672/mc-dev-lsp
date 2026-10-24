@@ -1,98 +1,81 @@
-# Lazy.nvim Setup
+# Lazy.nvim setup
 
-This is a complete Lazy.nvim example for mcdev with Mason `jdtls`, a repo-built
-mcdev JDT LS extension jar, and `nvim-jdtls`.
+mcdev uses your existing ktlsp LSP client and an independent Rust companion.
+Configure both executables as argv lists. The companion is registered under
+`init_options.analysisProviders["mcdev.mixin"]`; it is not a second LSP server
+and does not create another project index. No JDT LS extension, Mason bundle,
+extension JAR, Java subprocess helper, or repository executable discovery is used.
 
-Install `jdtls` through your Mason layer, for example Mason UI,
-`:MasonInstall`, or an ensure-installed plugin. Do not add
-`github:cotrin8672/mc-dev-lsp` to Mason `registries`; this repository is loaded
-by Lazy.nvim and builds its own extension jar.
-
-Diagnostics are disabled by default. When enabled, they run with a debounce while editing and after saving. Completion adapters are exposed as sources for your completion UI; mcdev does not register them globally. Navigation and code actions remain user keymap choices.
-
-## Full spec
+Diagnostics remain disabled by default. Completion sources, mappings, navigation,
+and code-action keymaps are opt-in. Loading the plugin does not start either
+executable. Supply executables you installed or built explicitly.
 
 ```lua
-return {
-  -- Optional example. Use Mason UI or another ensure-installed layer if you
-  -- already manage tools elsewhere.
-  {
-    "WhoIsSethDaniel/mason-tool-installer.nvim",
-    dependencies = { "mason-org/mason.nvim" },
-    opts = {
-      ensure_installed = {
-        "jdtls",
-      },
-    },
-  },
-
-  {
-    "cotrin8672/mc-dev-lsp",
-    name = "mcdev-nvim",
-    build = "gradle :mcdev-jdtls-extension:jar --no-daemon",
-    init = function(plugin)
-      vim.opt.rtp:prepend(plugin.dir .. "/mcdev-nvim")
-    end,
-    opts = {
+{
+  "cotrin8672/mc-dev-lsp",
+  name = "mcdev-nvim",
+  init = function(plugin)
+    vim.opt.rtp:prepend(plugin.dir .. "/mcdev-nvim")
+  end,
+  config = function()
+    require("mcdev").setup({
+      ktlsp = { cmd = { "/absolute/path/to/ktlsp" } },
+      companion = { cmd = { "/absolute/path/to/mcdev-companion" } },
       insert = {
-        at_target = "smart",
-        mixin_class_import = true,
+        at_target = "smart", mixin_class_import = true,
         inject_method_descriptor = "auto",
       },
       diagnostics = {
-        enabled = true,
+        enabled = false, debounce_ms = 500, insert_mode = true,
         events = { "TextChanged", "TextChangedI", "TextChangedP", "InsertLeave", "BufWritePost" },
-        debounce_ms = 500,
-        insert_mode = true,
+        in_flight_policy = "latest", stale_result_policy = "drop",
       },
-    },
-    config = function(plugin, opts)
-      vim.opt.rtp:prepend(plugin.dir .. "/mcdev-nvim")
-      require("mcdev").setup(opts)
-    end,
-  },
-
-  {
-    "mfussenegger/nvim-jdtls",
-    dependencies = { "mcdev-nvim" },
-    ft = "java",
-    config = function()
-      local jdtls = require("jdtls")
-      local config = require("my.java.jdtls").config()
-
-      if require("mcdev.jdtls").extend_config(config) then
-        jdtls.start_or_attach(config)
-      end
-    end,
-  },
+    })
+  end,
 }
 ```
 
-## Alternative: mcdev.jdtls starter
+Windows argv entries can be absolute `.exe` paths. Pass arguments as separate
+array entries rather than shell command strings. Build the Rust companion with
+`cargo build --release --bin mcdev-companion`; install/build ktlsp separately.
 
-The repository includes a thin `mcdev.jdtls` starter that picks Mason `jdtls`,
-auto-discovers the newest repo-built extension jar, validates it, and injects
-`init_options.bundles`:
+## Keep an existing ktlsp setup
 
-```lua
-require("mcdev").setup()
-require("mcdev.jdtls").start_or_attach()
-```
-
-Set `jdtls.extension_jar` or `MCDEV_JDTLS_EXTENSION_JAR` only when the jar lives
-outside the checked-out repository.
-
-If you already have a detailed `nvim-jdtls` setup, keep it and add mcdev before `start_or_attach`:
+Before starting your existing client, merge the provider into its configuration:
 
 ```lua
-local config = require("my.java.jdtls").config()
-
-if require("mcdev.jdtls").extend_config(config) then
-  require("jdtls").start_or_attach(config)
-end
+local config = require("my.ktlsp").config()
+local merged, err = require("mcdev.ktlsp").extend_config(config)
+assert(merged, err)
+vim.lsp.start(merged)
 ```
 
-`extend_config(config)` only appends `init_options.bundles`; it does not change your command, root detection, settings, or capabilities.
+This preserves your command, root, settings, capabilities, initialization options,
+other providers, and an explicitly configured `mcdev.mixin` command,
+configuration, or disabled state. To override the companion for this config,
+pass `{ companion = { cmd = { "/explicit/companion" } } }` as the second argument.
+Repeated merges are idempotent and do not share mutable provider tables between
+workspace configs.
+
+Alternatively, explicitly call `require("mcdev.ktlsp").start_or_attach({
+root_dir = "/project" })` after setup. It uses the configured host argv and a
+normalized workspace root. No JVM `-data` directory is needed. ktlsp owns all
+workspace sessions and indexing.
+
+## Capability and readiness
+
+Indexed MC commands are used only when the selected host advertises them through
+`executeCommandProvider.commands`. An unadvertised command returns an explicit
+unavailable error. Readiness notifications and the authenticated loopback
+completion endpoint resume requests only for the selected workspace client.
+The standalone `--stdio-completion` mode provides the existing no-index subset
+while the project is unavailable. It does not claim target-member or project
+index completion. Standard LSP preference/fallback remains unchanged.
+
+The full indexed MC command/resource wire is still being connected in ktlsp;
+older hosts can provide standard language features and the no-index subset.
+`McdevHealth` reports the actual advertised/available behavior rather than
+reporting an extension loaded successfully.
 
 ## Completion Sources
 
@@ -169,20 +152,23 @@ vim.keymap.set("n", "gd", function()
 end)
 ```
 
-The current JDT LS bundle exposes mcdev navigation through `mcdev.definition` / `mcdev.references` commands. It does not extend JDT LS `textDocument/definition` directly.
+The client prefers standard LSP navigation and falls back to advertised
+`mcdev.definition` / `mcdev.references` commands when needed.
 
-mcdev hover currently uses the `mcdev.hover` command over `workspace/executeCommand`, not standard `textDocument/hover`. When `navigation.enable` is true, the Neovim adapter binds `K` to that custom hover UI. Keep using `vim.lsp.buf.hover()` separately if you also want the standard JDT LS hover behavior.
+When `navigation.enable` is true, `K` uses standard hover first when
+`standard_lsp.prefer` is enabled, then the advertised MC hover fallback.
 
 ## AW and AT filetypes
 
-JDT LS may not attach to Access Widener or Access Transformer buffers. mcdev still works when:
+The host need not attach its ordinary language providers to AW/AT buffers. MC
+commands can select the running ktlsp client from the matching workspace when:
 
-1. A JDT LS client is running for the mod project workspace.
+1. A ktlsp client is running for the mod project workspace and advertises MC commands.
 2. The file extension is recognized by `mcdev.buffer`: `.accesswidener`, `.aw`, `_at.cfg`, `accesstransformer.cfg`, or `.at`.
 
 You do not need to add global Neovim filetype rules for mcdev itself. If you want syntax highlighting or other plugins to see custom filetypes, configure that separately in your editor layer.
 
-Open AW/AT files from the same workspace root JDT LS uses so `workspaceRoot` resolves correctly.
+Open AW/AT files from the same workspace root ktlsp uses so `workspaceRoot` resolves correctly.
 
 ## Commands
 
@@ -192,22 +178,22 @@ After setup, these user commands are available:
 |---|---|---|
 | `:McdevInfo` | `mcdev.info` | Show project platform, mappings, configs, index state |
 | `:McdevReindex` | `mcdev.reindex` | Request classpath/bytecode index rebuild |
+| `:McdevReloadProjectContext` | `mcdev.reloadProjectContext` | Reload the selected project context |
+| `:McdevDumpContext` | `mcdev.dumpContext` | Inspect the project context |
+| `:McdevDiagnosticsRefresh` | `mcdev.diagnostics` | Refresh this buffer's MC diagnostics |
+| `:McdevDiagnosticsStart` / `Stop` / `Status` | Local scheduler | Control or inspect diagnostic updates |
+| `:McdevHealth` | Advertised MC probes | Show real backend availability |
+| `:McdevDebugCompletion` / `DebugDiagnostics` | Advertised MC probes | Inspect actual requests and results |
 
-## Reloading the bundle after rebuild
+## Updating the companion
 
-When iterating on the extension jar, reload bundles without restarting Neovim:
-
-```vim
-:lua vim.lsp.buf_request(0, 'workspace/executeCommand', {
-\  command = 'java.reloadBundles',
-\  arguments = { { require('mcdev').extension_jar() } },
-\}, function() end)
-```
-
-Then run `:McdevInfo` to confirm the extension responds.
+Rebuild/reinstall the executable at the configured argv path, then restart its
+ktlsp provider/client. `:McdevReloadProjectContext` refreshes project context
+when that command is advertised; it does not hot-load executable code. Run
+`:McdevInfo` to inspect the actual backend artifact/build metadata.
 
 ## Related docs
 
 - [Installation](installation.md)
 - [Troubleshooting](troubleshooting.md)
-- [Local OSGi Bundle E2E](local-osgi-e2e.md)
+- [Native Neovim host-contract migration](neovim-host-contract.md)

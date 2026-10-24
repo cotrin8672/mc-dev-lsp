@@ -1,0 +1,2 @@
+# Golden data and original fixtures retain their exact bytes across platforms.
+mcdev-*/tests/fixtures/** -text

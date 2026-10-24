@@ -1,0 +1,412 @@
+[
+  {
+    "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixinextras/OfficialExpressionParserTest.kt::parseFailureCases",
+    "status": "passed",
+    "calls": 6
+  },
+  {
+    "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixinextras/OfficialExpressionParserTest.kt::parseSuccessCases",
+    "status": "passed",
+    "calls": 37
+  },
+  {
+    "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixinextras/OfficialExpressionParserTest.kt::preservesOfficialErrorMessageAndCause",
+    "status": "passed",
+    "calls": 6
+  },
+  {
+    "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixinextras/OfficialExpressionMatcherTest.kt::capturesArithmeticExpression",
+    "status": "passed",
+    "calls": 2
+  },
+  {
+    "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixinextras/OfficialExpressionMatcherTest.kt::capturesArrayLoadExpression",
+    "status": "passed",
+    "calls": 2
+  },
+  {
+    "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixinextras/OfficialExpressionMatcherTest.kt::capturesArrayStoreExpression",
+    "status": "passed",
+    "calls": 2
+  },
+  {
+    "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixinextras/OfficialExpressionMatcherTest.kt::capturesCheckcastTypeOperationMetadata",
+    "status": "passed",
+    "calls": 2
+  },
+  {
+    "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixinextras/OfficialExpressionMatcherTest.kt::capturesComparisonVirtualExpansion",
+    "status": "passed",
+    "calls": 2
+  },
+  {
+    "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixinextras/OfficialExpressionMatcherTest.kt::capturesComparisonWrapOperation",
+    "status": "passed",
+    "calls": 2
+  },
+  {
+    "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixinextras/OfficialExpressionMatcherTest.kt::capturesFieldReadMetadata",
+    "status": "passed",
+    "calls": 2
+  },
+  {
+    "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixinextras/OfficialExpressionMatcherTest.kt::capturesFieldWriteMetadata",
+    "status": "passed",
+    "calls": 2
+  },
+  {
+    "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixinextras/OfficialExpressionMatcherTest.kt::capturesInstanceofTypeOperationMetadata",
+    "status": "passed",
+    "calls": 2
+  },
+  {
+    "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixinextras/OfficialExpressionMatcherTest.kt::capturesMethodInvocationMetadata",
+    "status": "passed",
+    "calls": 2
+  },
+  {
+    "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixinextras/OfficialExpressionMatcherTest.kt::capturesNewTypeOperationMetadata",
+    "status": "passed",
+    "calls": 2
+  },
+  {
+    "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixinextras/OfficialExpressionMatcherTest.kt::capturesStringConcatVirtualExpansion",
+    "status": "passed",
+    "calls": 2
+  },
+  {
+    "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixinextras/OfficialExpressionMatcherTest.kt::capturesStringLiteralExpression",
+    "status": "passed",
+    "calls": 2
+  },
+  {
+    "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixinextras/OfficialExpressionMatcherTest.kt::extractsModifyExpressionValueDecorations",
+    "status": "passed",
+    "calls": 2
+  },
+  {
+    "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixinextras/OfficialExpressionMatcherTest.kt::extractsWrapOperationDecorations",
+    "status": "passed",
+    "calls": 2
+  },
+  {
+    "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixinextras/OfficialExpressionMatcherTest.kt::labelLineAndFrameNodesDoNotShiftPhysicalInstructionIndex",
+    "status": "passed",
+    "calls": 2
+  },
+  {
+    "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixinextras/OfficialExpressionMatcherTest.kt::matchesDefinedFieldIdentifierFromBuiltPool",
+    "status": "passed",
+    "calls": 3
+  },
+  {
+    "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixinextras/OfficialExpressionMatcherTest.kt::matchesDefinedMethodIdentifierFromBuiltPool",
+    "status": "passed",
+    "calls": 3
+  },
+  {
+    "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixinextras/OfficialExpressionMatcherTest.kt::matchesDefinedTypeIdentifierFromBuiltPool",
+    "status": "passed",
+    "calls": 3
+  },
+  {
+    "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixinextras/OfficialExpressionMatcherTest.kt::preservesExpressionAndBytecodeOrderForMultipleExpressions",
+    "status": "passed",
+    "calls": 15
+  },
+  {
+    "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixinextras/OfficialExpressionMatcherTest.kt::propagatesCancellationFromFlowInterpreter",
+    "status": "passed",
+    "calls": 1
+  },
+  {
+    "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixinextras/OfficialExpressionMatcherTest.kt::propagatesCancellationFromGuardedExpressionMatches",
+    "status": "passed",
+    "calls": 1
+  },
+  {
+    "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixinextras/OfficialExpressionMatcherTest.kt::propagatesCancellationFromMatchFailureRecheck",
+    "status": "passed",
+    "calls": 1
+  },
+  {
+    "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixinextras/OfficialExpressionMatcherTest.kt::returnsUnavailableForCorruptClassBytes",
+    "status": "passed",
+    "calls": 2
+  },
+  {
+    "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixinextras/OfficialExpressionMatcherTest.kt::returnsUnavailableForEmptyClassBytes",
+    "status": "passed",
+    "calls": 2
+  },
+  {
+    "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixinextras/OfficialExpressionMatcherTest.kt::returnsUnavailableForMissingMethod",
+    "status": "passed",
+    "calls": 2
+  },
+  {
+    "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixinextras/OfficialExpressionMatcherTest.kt::returnsUnavailableForSyntaxFailure",
+    "status": "passed",
+    "calls": 2
+  },
+  {
+    "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixinextras/OfficialExpressionMatcherTest.kt::returnsUnavailableForTruncatedClassBytes",
+    "status": "passed",
+    "calls": 2
+  },
+  {
+    "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixinextras/OfficialExpressionMatcherTest.kt::returnsUnavailableForUndeclaredMemberIdentifier",
+    "status": "passed",
+    "calls": 2
+  },
+  {
+    "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixinextras/OfficialExpressionMatcherTest.kt::returnsUnavailableForUndeclaredTypeIdentifier",
+    "status": "passed",
+    "calls": 2
+  },
+  {
+    "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixinextras/OfficialExpressionMatcherTest.kt::typedLocalDefinitionsResolveOrdinalNameIndexAndArgsOnlyAgainstLiveFrames",
+    "status": "passed",
+    "calls": 24
+  },
+  {
+    "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixinextras/OfficialExpressionMatcherMemberCompletionTest.kt::compoundProbeBuilderRejectsMalformedOrLiteralReceivers",
+    "status": "passed",
+    "calls": 5
+  },
+  {
+    "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixinextras/OfficialExpressionMatcherMemberCompletionTest.kt::compoundProbesWildcardOnlyUndeclaredNames",
+    "status": "passed",
+    "calls": 6
+  },
+  {
+    "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixinextras/OfficialExpressionMatcherMemberCompletionTest.kt::deduplicatesCandidatesBySemanticKey",
+    "status": "passed",
+    "calls": 25
+  },
+  {
+    "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixinextras/OfficialExpressionMatcherMemberCompletionTest.kt::filtersCandidatesByMemberPrefix",
+    "status": "passed",
+    "calls": 10
+  },
+  {
+    "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixinextras/OfficialExpressionMatcherMemberCompletionTest.kt::labelLineAndFrameNodesDoNotShiftPhysicalInstructionIndex",
+    "status": "passed",
+    "calls": 5
+  },
+  {
+    "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixinextras/OfficialExpressionMatcherMemberCompletionTest.kt::malformedCompoundReceiverNeverProducesBytecodeCandidates",
+    "status": "passed",
+    "calls": 3
+  },
+  {
+    "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixinextras/OfficialExpressionMatcherMemberCompletionTest.kt::matchesMembersAfterCompoundOfficialReceivers",
+    "status": "passed",
+    "calls": 30
+  },
+  {
+    "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixinextras/OfficialExpressionMatcherMemberCompletionTest.kt::preservesDefinedCallIdentifierAndExcludesOtherReachablePath",
+    "status": "passed",
+    "calls": 6
+  },
+  {
+    "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixinextras/OfficialExpressionMatcherMemberCompletionTest.kt::preservesDefinedReceiverIdentifierAndExcludesMismatches",
+    "status": "passed",
+    "calls": 11
+  },
+  {
+    "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixinextras/OfficialExpressionMatcherMemberCompletionTest.kt::preservesStableBytecodeOrderAcrossRepeatedCalls",
+    "status": "passed",
+    "calls": 25
+  },
+  {
+    "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixinextras/OfficialExpressionMatcherMemberCompletionTest.kt::propagatesCancellationFromFlowInterpreter",
+    "status": "passed",
+    "calls": 4
+  },
+  {
+    "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixinextras/OfficialExpressionMatcherMemberCompletionTest.kt::propagatesCancellationFromGuardedExpressionMatches",
+    "status": "passed",
+    "calls": 4
+  },
+  {
+    "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixinextras/OfficialExpressionMatcherMemberCompletionTest.kt::returnsCandidatesForUnresolvedReceiverIdentifier",
+    "status": "passed",
+    "calls": 5
+  },
+  {
+    "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixinextras/OfficialExpressionMatcherMemberCompletionTest.kt::returnsFieldCandidateWithExactMetadata",
+    "status": "passed",
+    "calls": 5
+  },
+  {
+    "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixinextras/OfficialExpressionMatcherMemberCompletionTest.kt::returnsMethodCandidateForMatchingReceiver",
+    "status": "passed",
+    "calls": 5
+  },
+  {
+    "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixinextras/OfficialExpressionMatcherMemberCompletionTest.kt::returnsMethodCandidateWithExactMetadata",
+    "status": "passed",
+    "calls": 5
+  },
+  {
+    "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixinextras/OfficialExpressionMatcherMemberCompletionTest.kt::returnsUnavailableForCorruptClassBytes",
+    "status": "passed",
+    "calls": 5
+  },
+  {
+    "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixinextras/OfficialExpressionMatcherMemberCompletionTest.kt::returnsUnavailableForEmptyClassBytes",
+    "status": "passed",
+    "calls": 5
+  },
+  {
+    "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixinextras/OfficialExpressionMatcherMemberCompletionTest.kt::returnsUnavailableForMalformedReceiver",
+    "status": "passed",
+    "calls": 2
+  },
+  {
+    "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixinextras/OfficialExpressionMatcherMemberCompletionTest.kt::returnsUnavailableForMissingMethod",
+    "status": "passed",
+    "calls": 5
+  },
+  {
+    "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixinextras/OfficialExpressionIdentifierPoolBuilderTest.kt::appliesTerminalNameStarAsExactNameWithAnyDescriptor",
+    "status": "passed",
+    "calls": 6
+  },
+  {
+    "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixinextras/OfficialExpressionIdentifierPoolBuilderTest.kt::appliesTerminalNameStarAsExactNameWithAnyDescriptorForField",
+    "status": "passed",
+    "calls": 5
+  },
+  {
+    "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixinextras/OfficialExpressionIdentifierPoolBuilderTest.kt::combinesMultipleMethodValuesForSameDefinitionAsAlternatives",
+    "status": "passed",
+    "calls": 3
+  },
+  {
+    "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixinextras/OfficialExpressionIdentifierPoolBuilderTest.kt::combinesMultipleSameIdAlternativesInDeclarationOrder",
+    "status": "passed",
+    "calls": 4
+  },
+  {
+    "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixinextras/OfficialExpressionIdentifierPoolBuilderTest.kt::combinesMultipleSameIdFieldAlternativesInDeclarationOrder",
+    "status": "passed",
+    "calls": 4
+  },
+  {
+    "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixinextras/OfficialExpressionIdentifierPoolBuilderTest.kt::combinesMultipleSameIdTypeAlternativesInDeclarationOrder",
+    "status": "passed",
+    "calls": 4
+  },
+  {
+    "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixinextras/OfficialExpressionIdentifierPoolBuilderTest.kt::combinesMultipleTypeValuesForSameDefinitionAsAlternatives",
+    "status": "passed",
+    "calls": 3
+  },
+  {
+    "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixinextras/OfficialExpressionIdentifierPoolBuilderTest.kt::matchesAllowedHandleTagsOnly",
+    "status": "passed",
+    "calls": 6
+  },
+  {
+    "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixinextras/OfficialExpressionIdentifierPoolBuilderTest.kt::matchesOmittedOwnerAndDescriptor",
+    "status": "passed",
+    "calls": 3
+  },
+  {
+    "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixinextras/OfficialExpressionIdentifierPoolBuilderTest.kt::matchesOmittedOwnerAndDescriptorForField",
+    "status": "passed",
+    "calls": 3
+  },
+  {
+    "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixinextras/OfficialExpressionIdentifierPoolBuilderTest.kt::registersExactFieldSelector",
+    "status": "passed",
+    "calls": 3
+  },
+  {
+    "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixinextras/OfficialExpressionIdentifierPoolBuilderTest.kt::registersExactFullyQualifiedObjectType",
+    "status": "passed",
+    "calls": 3
+  },
+  {
+    "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixinextras/OfficialExpressionIdentifierPoolBuilderTest.kt::registersExactMethodSelector",
+    "status": "passed",
+    "calls": 3
+  },
+  {
+    "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixinextras/OfficialExpressionIdentifierPoolBuilderTest.kt::registersExactNestedBinaryObjectType",
+    "status": "passed",
+    "calls": 3
+  },
+  {
+    "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixinextras/OfficialExpressionIdentifierPoolBuilderTest.kt::registersExactPrimitiveArrayType",
+    "status": "passed",
+    "calls": 3
+  },
+  {
+    "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixinextras/OfficialExpressionIdentifierPoolBuilderTest.kt::registersExactPrimitiveType",
+    "status": "passed",
+    "calls": 3
+  },
+  {
+    "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixinextras/OfficialExpressionIdentifierPoolBuilderTest.kt::registersTypedLocalDiscriminatorsAndRejectsMissingTypes",
+    "status": "passed",
+    "calls": 14
+  },
+  {
+    "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixinextras/OfficialExpressionIdentifierPoolBuilderTest.kt::rejectsExactTypeMismatch",
+    "status": "passed",
+    "calls": 2
+  },
+  {
+    "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixinextras/OfficialExpressionIdentifierPoolBuilderTest.kt::rejectsInjectedResolverReturningMethodType",
+    "status": "passed",
+    "calls": 2
+  },
+  {
+    "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixinextras/OfficialExpressionIdentifierPoolBuilderTest.kt::rejectsMethodInsnAndAllHandleTagsForFieldDefinition",
+    "status": "passed",
+    "calls": 11
+  },
+  {
+    "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixinextras/OfficialExpressionIdentifierPoolBuilderTest.kt::reportsInvalidTypeDescriptorWithoutRegistering",
+    "status": "passed",
+    "calls": 2
+  },
+  {
+    "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixinextras/OfficialExpressionIdentifierPoolBuilderTest.kt::reportsMalformedFieldSelectorWithoutRegisteringBroadMatch",
+    "status": "passed",
+    "calls": 4
+  },
+  {
+    "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixinextras/OfficialExpressionIdentifierPoolBuilderTest.kt::reportsMalformedSelectorWithoutRegisteringBroadMatch",
+    "status": "passed",
+    "calls": 4
+  },
+  {
+    "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixinextras/OfficialExpressionIdentifierPoolBuilderTest.kt::reportsMissingIdForFieldValuesWithoutRegistering",
+    "status": "passed",
+    "calls": 2
+  },
+  {
+    "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixinextras/OfficialExpressionIdentifierPoolBuilderTest.kt::reportsMissingIdForMethodValuesWithoutRegistering",
+    "status": "passed",
+    "calls": 2
+  },
+  {
+    "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixinextras/OfficialExpressionIdentifierPoolBuilderTest.kt::reportsMissingIdForTypeValuesWithoutRegistering",
+    "status": "passed",
+    "calls": 2
+  },
+  {
+    "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixinextras/OfficialExpressionIdentifierPoolBuilderTest.kt::reportsMixedValidAndUnresolvedTypeValuesWithoutBlockingValidSiblings",
+    "status": "passed",
+    "calls": 4
+  },
+  {
+    "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixinextras/OfficialExpressionIdentifierPoolBuilderTest.kt::resolvesSimpleNameWithInjectedResolver",
+    "status": "passed",
+    "calls": 2
+  }
+]

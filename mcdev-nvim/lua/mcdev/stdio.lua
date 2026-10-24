@@ -1,12 +1,14 @@
-local jdtls = require("mcdev.jdtls")
+local ktlsp = require("mcdev.ktlsp")
 
 local M = {}
 
 M.timeout_ms = 5000
+M.last_stderr = ""
+M.last_error = nil
 
 local state = {
   job_id = nil,
-  jar = nil,
+  command = nil,
   next_id = 0,
   pending = {},
   stdout = "",
@@ -35,6 +37,7 @@ local function request_key(id)
 end
 
 local function fail_pending(message)
+  M.last_error = message
   local pending = state.pending
   state.pending = {}
   for _, request in pairs(pending) do
@@ -64,13 +67,15 @@ local function handle_response(line)
   request.timer = nil
 
   if response.handled ~= true then
-    request.callback(nil, response_error(response))
+    M.last_error = response_error(response)
+    request.callback(nil, M.last_error)
     return
   end
   if type(response.response) ~= "table" then
     request.callback(nil, "mcdev: stdio helper response is missing its payload")
     return
   end
+  M.last_error = nil
   request.callback(response.response, nil)
 end
 
@@ -100,65 +105,45 @@ local function on_exit(job_id)
     return
   end
   state.job_id = nil
-  state.jar = nil
+  state.command = nil
   state.stdout = ""
   fail_pending("mcdev: stdio helper exited")
 end
 
-local function java_command()
-  local java_home = vim.env.JAVA_HOME
-  if java_home and java_home ~= "" then
-    local suffix = package.config:sub(1, 1) == "\\" and "/bin/java.exe" or "/bin/java"
-    local candidate = java_home:gsub("[\\/]$", "") .. suffix
-    if vim.fn.executable(candidate) == 1 then
-      return candidate
-    end
-  end
-  local java = vim.fn.exepath("java")
-  if java and java ~= "" then
-    return java
-  end
-  if vim.fn.executable("java") == 1 then
-    return "java"
-  end
-  return nil
-end
-
 function M.start(opts)
   opts = opts or {}
-  local jar = jdtls.resolve_extension_jar(opts)
-  if not jar or vim.fn.filereadable(jar) ~= 1 then
-    return nil, "mcdev: extension jar is not readable"
+  local command = ktlsp.companion_command(opts)
+  if not command or vim.fn.executable(command[1]) ~= 1 then
+    return nil, "mcdev: companion executable is not configured or available"
   end
-
-  if state.job_id and state.jar == jar then
+  command[#command + 1] = "--stdio-completion"
+  if state.job_id and vim.deep_equal(state.command, command) then
     return state.job_id
   end
   if state.job_id then
     M.stop("mcdev: restarting stdio helper")
   end
 
-  local java = opts.java
-  if not java or java == "" then
-    java = java_command()
-  end
-  if not java then
-    return nil, "mcdev: java executable is not available"
-  end
-
-  local ok, job_id = pcall(vim.fn.jobstart, { java, "-cp", jar, "io.github.mcdev.jdtls.stdio.McdevStdioMain" }, {
+  local ok, job_id = pcall(vim.fn.jobstart, command, {
     rpc = false,
     stdin = "pipe",
     stdout_buffered = false,
     stderr_buffered = false,
     on_stdout = on_stdout,
+    on_stderr = function(id, data)
+      if id == state.job_id then
+        M.last_stderr = (M.last_stderr .. table.concat(data or {}, "\n")):sub(-65536)
+      end
+    end,
     on_exit = on_exit,
   })
   if not ok or type(job_id) ~= "number" or job_id <= 0 then
     return nil, "mcdev: failed to start stdio helper"
   end
   state.job_id = job_id
-  state.jar = jar
+  state.command = command
+  M.last_stderr = ""
+  M.last_error = nil
   state.stdout = ""
   return job_id
 end
@@ -213,7 +198,7 @@ end
 function M.stop(reason)
   local job_id = state.job_id
   state.job_id = nil
-  state.jar = nil
+  state.command = nil
   state.stdout = ""
   fail_pending(reason or "mcdev: stdio helper stopped")
   if job_id then

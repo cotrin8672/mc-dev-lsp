@@ -54,7 +54,7 @@ local function ranges_intersect(left, right)
     and compare_positions(right.start, left["end"]) < 0
 end
 
-local jdt_source_aliases = {
+local source_aliases = {
   ["source.generate.constructors"] = true,
   ["source.generate.toString"] = true,
   ["source.overrideMethods"] = true,
@@ -91,19 +91,19 @@ local function same_action(existing, action)
     return false
   end
   local existing_client = vim.lsp.get_client_by_id(existing._mcdev_client_id)
-  if not existing_client or existing_client.name ~= "jdtls" then
+  if not existing_client then
     return false
   end
   local source_kind
-  if existing.kind == "quickassist" and jdt_source_aliases[action.kind] then
+  if existing.kind == "quickassist" and source_aliases[action.kind] then
     source_kind = action.kind
-  elseif action.kind == "quickassist" and jdt_source_aliases[existing.kind] then
+  elseif action.kind == "quickassist" and source_aliases[existing.kind] then
     source_kind = existing.kind
   end
   if not source_kind then
     return false
   end
-  -- JDTLS gives these aliases different resolve data; only merge equal effects.
+  -- Alias resolve data can differ; merge only equal effects from the same client.
   return vim.deep_equal(existing.edit, action.edit)
     and vim.deep_equal(command_identity(existing), command_identity(action))
     and vim.deep_equal(existing.diagnostics, action.diagnostics)
@@ -190,6 +190,8 @@ end
 
 function M.code_actions(bufnr, range, diagnostic_codes, cb)
   bufnr = bufnr and bufnr ~= 0 and bufnr or vim.api.nvim_get_current_buf()
+  local buffer = require("mcdev.buffer")
+  local snapshot = buffer.snapshot(bufnr)
   local cursor = convert.to_lsp_position(bufnr, vim.api.nvim_win_get_cursor(0))
   local resolved_range = range or {
     start = cursor,
@@ -258,6 +260,7 @@ function M.code_actions(bufnr, range, diagnostic_codes, cb)
       local request_context = response.context or response.ctx
       for _, action in ipairs(response.result ~= vim.NIL and response.result or {}) do
         local item = vim.deepcopy(action)
+        item._mcdev_snapshots = buffer.edit_snapshots(item.edit, snapshot and { [snapshot.uri] = snapshot } or {})
         item._mcdev_client_id = client_id
         if request_context and request_context.params then
           item._mcdev_request_params = vim.deepcopy(request_context.params)

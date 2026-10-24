@@ -1,66 +1,56 @@
-local helpers = dofile(vim.fn.getcwd() .. "/mcdev-nvim/tests/test_helpers.lua")
-local jdtls = require("mcdev.jdtls")
-
-local original_start = vim.lsp.start
-local original_resolve_extension_jar = jdtls.resolve_extension_jar
-local original_executable = vim.fn.executable
-local original_filereadable = vim.fn.filereadable
-local original_mkdir = vim.fn.mkdir
-local fake_jar = "mcdev-jdtls-workspace-test.jar"
+-- Legacy file ID retained: JDT per-workspace state becomes ktlsp root isolation.
+local h = dofile(vim.fn.getcwd() .. "/mcdev-nvim/tests/test_helpers.lua")
+local ktlsp = require("mcdev.ktlsp")
+local config = require("mcdev.config")
+local original_start, original_exec = vim.lsp.start, vim.fn.executable
+local original_options = vim.deepcopy(config.options)
 local started = {}
-local mkdir_calls = {}
-
-vim.lsp.start = function(start_opts)
-  started[#started + 1] = start_opts
-  return #started
-end
-jdtls.resolve_extension_jar = function()
-  return fake_jar
-end
-vim.fn.executable = function(path)
-  return path == "jdtls" and 1 or 0
-end
-vim.fn.filereadable = function(path)
-  return path == fake_jar and 1 or original_filereadable(path)
-end
-vim.fn.mkdir = function(path, mode)
-  mkdir_calls[#mkdir_calls + 1] = { path, mode }
-end
-
-local function expected_data_dir(root_dir)
-  return vim.fn.stdpath("cache")
-    .. "/mcdev-jdtls/"
-    .. vim.fn.sha256(vim.fs.normalize(vim.fn.fnamemodify(root_dir, ":p")))
-end
-
-local root_a = "mcdev-jdtls-workspace-a"
-local root_b = "mcdev-jdtls-workspace-b"
-helpers.assert_eq(jdtls.start_or_attach({ root_dir = root_a }), 1)
-helpers.assert_eq(started[1].cmd[1], "jdtls")
-helpers.assert_eq(started[1].cmd[2], "-data")
-helpers.assert_eq(started[1].cmd[3], expected_data_dir(root_a))
-
-helpers.assert_eq(jdtls.start_or_attach({ root_dir = "./" .. root_a }), 2)
-helpers.assert_eq(started[2].cmd[3], started[1].cmd[3])
-
-helpers.assert_eq(jdtls.start_or_attach({ root_dir = root_b }), 3)
-helpers.assert_true(started[3].cmd[3] ~= started[1].cmd[3], "different roots need different data dirs")
-
-local explicit_data_dir = "C:/custom-jdtls-data"
-helpers.assert_eq(jdtls.start_or_attach({ root_dir = root_a, data_dir = explicit_data_dir }), 4)
-helpers.assert_eq(started[4].cmd[3], explicit_data_dir)
-
-local explicit_cmd = { "custom-jdtls", "--no-data" }
-helpers.assert_eq(jdtls.start_or_attach({ root_dir = root_a, cmd = explicit_cmd }), 5)
-helpers.assert_eq(started[5].cmd[1], explicit_cmd[1])
-helpers.assert_eq(started[5].cmd[2], explicit_cmd[2])
-helpers.assert_eq(#started[5].cmd, #explicit_cmd)
-helpers.assert_eq(#mkdir_calls, 4)
-
-vim.lsp.start = original_start
-jdtls.resolve_extension_jar = original_resolve_extension_jar
-vim.fn.executable = original_executable
-vim.fn.filereadable = original_filereadable
-vim.fn.mkdir = original_mkdir
-
-print("mcdev-nvim jdtls workspace tests passed")
+vim.lsp.start = function(opts) started[#started + 1] = opts; return #started end
+vim.fn.executable = function(path) return path == "ktlsp" and 1 or 0 end
+config.options.ktlsp.cmd = { "ktlsp" }
+config.options.companion.cmd = { "companion", "--explicit-option" }
+local root_a, root_b = "mcdev-workspace-a", "mcdev-workspace-b"
+h.assert_eq(ktlsp.start_or_attach({ root_dir = root_a }), 1)
+h.assert_eq(started[1].cmd[1], "ktlsp")
+h.assert_eq(#started[1].cmd, 1)
+h.assert_eq(started[1].root_dir, vim.fs.normalize(vim.fn.fnamemodify(root_a, ":p")):gsub("/+$", ""))
+h.assert_eq(ktlsp.start_or_attach({ root_dir = "./" .. root_a }), 2)
+h.assert_eq(started[2].root_dir, started[1].root_dir)
+h.assert_eq(ktlsp.start_or_attach({ root_dir = root_b }), 3)
+h.assert_true(started[3].root_dir ~= started[1].root_dir, "different workspaces must remain separate")
+local explicit = { "ktlsp", "--custom-option" }
+h.assert_eq(ktlsp.start_or_attach({ root_dir = root_a, cmd = explicit }), 4)
+h.assert_eq(started[4].cmd[1], explicit[1])
+h.assert_eq(started[4].cmd[2], explicit[2])
+h.assert_eq(#started[4].cmd, #explicit)
+local provider = started[1].init_options.analysisProviders["mcdev.mixin"]
+h.assert_eq(provider.command[1], "companion")
+h.assert_eq(provider.command[2], "--explicit-option")
+h.assert_eq(provider.enabled, true)
+h.assert_eq(vim.tbl_count(provider.configuration), 0)
+h.assert_true(started[1].init_options ~= started[2].init_options)
+provider.command[1] = "changed"
+h.assert_eq(started[2].init_options.analysisProviders["mcdev.mixin"].command[1], "companion")
+h.assert_eq(config.options.companion.cmd[1], "companion")
+local manual = { cmd = { "custom-host" }, name = "my-ktlsp", init_options = {
+  custom = true, analysisProviders = { other = { enabled = false }, ["mcdev.mixin"] = {
+    command = { "manual-companion" }, enabled = false, configuration = { preserved = true },
+  } },
+} }
+h.assert_eq(ktlsp.extend_config(manual), manual)
+h.assert_eq(manual.name, "my-ktlsp")
+h.assert_eq(manual.cmd[1], "custom-host")
+h.assert_eq(manual.init_options.custom, true)
+h.assert_eq(manual.init_options.analysisProviders.other.enabled, false)
+h.assert_eq(manual.init_options.analysisProviders["mcdev.mixin"].command[1], "manual-companion")
+h.assert_eq(manual.init_options.analysisProviders["mcdev.mixin"].enabled, false)
+h.assert_eq(manual.init_options.analysisProviders["mcdev.mixin"].configuration.preserved, true)
+ktlsp.extend_config(manual, { companion = { cmd = { "override" } } })
+h.assert_eq(manual.init_options.analysisProviders["mcdev.mixin"].command[1], "override")
+config.options.companion.cmd = nil
+local missing, err = ktlsp.extend_config({})
+h.assert_nil(missing)
+h.assert_true(err:find("explicit executable argv", 1, true) ~= nil)
+vim.lsp.start, vim.fn.executable = original_start, original_exec
+config.options = original_options
+print("mcdev-nvim ktlsp workspace and manual configuration tests passed")

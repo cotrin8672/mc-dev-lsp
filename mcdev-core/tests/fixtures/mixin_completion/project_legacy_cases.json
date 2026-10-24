@@ -1,0 +1,638 @@
+[
+  {
+    "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/project/AwAtDiscoveryServiceTest.kt::discoversAccessTransformerFilesInTree",
+    "legacyClass": "io.github.mcdev.core.project.AwAtDiscoveryServiceTest",
+    "status": "passed",
+    "calls": 20
+  },
+  {
+    "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/project/AwAtDiscoveryServiceTest.kt::discoversAccessWidenerFilesInTree",
+    "legacyClass": "io.github.mcdev.core.project.AwAtDiscoveryServiceTest",
+    "status": "passed",
+    "calls": 31
+  },
+  {
+    "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/project/AwAtDiscoveryServiceTest.kt::excludesBuildDirectoryAwAtFiles",
+    "legacyClass": "io.github.mcdev.core.project.AwAtDiscoveryServiceTest",
+    "status": "passed",
+    "calls": 19
+  },
+  {
+    "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/project/AwAtDiscoveryServiceTest.kt::excludesGradleDirectoryAwAtFiles",
+    "legacyClass": "io.github.mcdev.core.project.AwAtDiscoveryServiceTest",
+    "status": "passed",
+    "calls": 19
+  },
+  {
+    "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/project/AwAtDiscoveryServiceTest.kt::excludesNodeModulesDirectoryAwAtFiles",
+    "legacyClass": "io.github.mcdev.core.project.AwAtDiscoveryServiceTest",
+    "status": "passed",
+    "calls": 19
+  },
+  {
+    "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/project/AwAtDiscoveryServiceTest.kt::identifiesAccessTransformerFiles",
+    "legacyClass": "io.github.mcdev.core.project.AwAtDiscoveryServiceTest",
+    "status": "passed",
+    "calls": 2
+  },
+  {
+    "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/project/AwAtDiscoveryServiceTest.kt::identifiesAccessWidenerExtensions",
+    "legacyClass": "io.github.mcdev.core.project.AwAtDiscoveryServiceTest",
+    "status": "passed",
+    "calls": 2
+  },
+  {
+    "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/project/AwAtDiscoveryServiceTest.kt::parsesInvalidAccessTransformerWithoutParsedModel",
+    "legacyClass": "io.github.mcdev.core.project.AwAtDiscoveryServiceTest",
+    "status": "passed",
+    "calls": 1
+  },
+  {
+    "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/project/AwAtDiscoveryServiceTest.kt::parsesInvalidAccessWidenerWithoutParsedModel",
+    "legacyClass": "io.github.mcdev.core.project.AwAtDiscoveryServiceTest",
+    "status": "passed",
+    "calls": 1
+  },
+  {
+    "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/project/AwAtDiscoveryServiceTest.kt::parsesValidAccessTransformer",
+    "legacyClass": "io.github.mcdev.core.project.AwAtDiscoveryServiceTest",
+    "status": "passed",
+    "calls": 1
+  },
+  {
+    "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/project/AwAtDiscoveryServiceTest.kt::parsesValidAccessWidener",
+    "legacyClass": "io.github.mcdev.core.project.AwAtDiscoveryServiceTest",
+    "status": "passed",
+    "calls": 1
+  },
+  {
+    "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/project/InfoServiceTest.kt::formatJoinsLinesWithNewlines",
+    "legacyClass": "io.github.mcdev.core.project.InfoServiceTest",
+    "status": "passed",
+    "calls": 6
+  },
+  {
+    "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/project/InfoServiceTest.kt::formatsCompleteFabricProjectInfo",
+    "legacyClass": "io.github.mcdev.core.project.InfoServiceTest",
+    "status": "passed",
+    "calls": 1
+  },
+  {
+    "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/project/InfoServiceTest.kt::formatsDiscoveredMappingSourceAndSourceSetCount",
+    "legacyClass": "io.github.mcdev.core.project.InfoServiceTest",
+    "status": "passed",
+    "calls": 4
+  },
+  {
+    "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/project/InfoServiceTest.kt::formatsIndexStates",
+    "legacyClass": "io.github.mcdev.core.project.InfoServiceTest",
+    "status": "passed",
+    "calls": 12
+  },
+  {
+    "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/project/InfoServiceTest.kt::formatsPartialContextWithNoMappings",
+    "legacyClass": "io.github.mcdev.core.project.InfoServiceTest",
+    "status": "passed",
+    "calls": 4
+  },
+  {
+    "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/project/InfoServiceTest.kt::formatsPartialMappingsAsPartialStatus",
+    "legacyClass": "io.github.mcdev.core.project.InfoServiceTest",
+    "status": "passed",
+    "calls": 1
+  },
+  {
+    "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/project/InfoServiceTest.kt::formatsUnknownPlatform",
+    "legacyClass": "io.github.mcdev.core.project.InfoServiceTest",
+    "status": "passed",
+    "calls": 4
+  },
+  {
+    "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/project/InfoServiceTest.kt::usesClasspathMinecraftJarsWhenContextListEmpty",
+    "legacyClass": "io.github.mcdev.core.project.InfoServiceTest",
+    "status": "passed",
+    "calls": 1
+  },
+  {
+    "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/project/MappingDiscoveryServiceTest.kt::buildMappingContextFromExplicitFileList",
+    "legacyClass": "io.github.mcdev.core.project.MappingDiscoveryServiceTest",
+    "status": "passed",
+    "calls": 2
+  },
+  {
+    "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/project/MappingDiscoveryServiceTest.kt::buildsFabricMappingContextFromTinyFile",
+    "legacyClass": "io.github.mcdev.core.project.MappingDiscoveryServiceTest",
+    "status": "passed",
+    "calls": 7
+  },
+  {
+    "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/project/MappingDiscoveryServiceTest.kt::buildsForgeMappingContextFromSrgFile",
+    "legacyClass": "io.github.mcdev.core.project.MappingDiscoveryServiceTest",
+    "status": "passed",
+    "calls": 6
+  },
+  {
+    "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/project/MappingDiscoveryServiceTest.kt::discoversSrgMappingFiles",
+    "legacyClass": "io.github.mcdev.core.project.MappingDiscoveryServiceTest",
+    "status": "passed",
+    "calls": 3
+  },
+  {
+    "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/project/MappingDiscoveryServiceTest.kt::discoversTinyMappingFiles",
+    "legacyClass": "io.github.mcdev.core.project.MappingDiscoveryServiceTest",
+    "status": "passed",
+    "calls": 4
+  },
+  {
+    "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/project/MappingDiscoveryServiceTest.kt::emptyMappingContextWhenNoFilesFound",
+    "legacyClass": "io.github.mcdev.core.project.MappingDiscoveryServiceTest",
+    "status": "passed",
+    "calls": 4
+  },
+  {
+    "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/project/MappingDiscoveryServiceTest.kt::excludesBuildDirectoryMappings",
+    "legacyClass": "io.github.mcdev.core.project.MappingDiscoveryServiceTest",
+    "status": "passed",
+    "calls": 5
+  },
+  {
+    "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/project/MappingDiscoveryServiceTest.kt::excludesUnrelatedGradleBuildAndNodeModulesMappings",
+    "legacyClass": "io.github.mcdev.core.project.MappingDiscoveryServiceTest",
+    "status": "passed",
+    "calls": 9
+  },
+  {
+    "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/project/MappingDiscoveryServiceTest.kt::includesBuildLoomCacheAndForgeTmpMappings",
+    "legacyClass": "io.github.mcdev.core.project.MappingDiscoveryServiceTest",
+    "status": "passed",
+    "calls": 13
+  },
+  {
+    "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/project/MappingDiscoveryServiceTest.kt::includesGradleFabricLoomCacheMappings",
+    "legacyClass": "io.github.mcdev.core.project.MappingDiscoveryServiceTest",
+    "status": "passed",
+    "calls": 7
+  },
+  {
+    "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/project/MappingDiscoveryServiceTest.kt::includesGradleLoomCacheMappings",
+    "legacyClass": "io.github.mcdev.core.project.MappingDiscoveryServiceTest",
+    "status": "passed",
+    "calls": 8
+  },
+  {
+    "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/project/MappingDiscoveryServiceTest.kt::includesGradleModuleCacheMappings",
+    "legacyClass": "io.github.mcdev.core.project.MappingDiscoveryServiceTest",
+    "status": "passed",
+    "calls": 22
+  },
+  {
+    "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/project/MappingDiscoveryServiceTest.kt::includesNestedWhitelistMappingPaths",
+    "legacyClass": "io.github.mcdev.core.project.MappingDiscoveryServiceTest",
+    "status": "passed",
+    "calls": 14
+  },
+  {
+    "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/project/MappingDiscoveryServiceTest.kt::mergesMultipleTinyMappingFilesForLookup",
+    "legacyClass": "io.github.mcdev.core.project.MappingDiscoveryServiceTest",
+    "status": "passed",
+    "calls": 5
+  },
+  {
+    "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/project/MappingDiscoveryServiceTest.kt::mergesTinyAndSrgMappingFilesForLookup",
+    "legacyClass": "io.github.mcdev.core.project.MappingDiscoveryServiceTest",
+    "status": "passed",
+    "calls": 5
+  },
+  {
+    "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/project/MappingDiscoveryServiceTest.kt::parsesSrgMappingFile",
+    "legacyClass": "io.github.mcdev.core.project.MappingDiscoveryServiceTest",
+    "status": "passed",
+    "calls": 1
+  },
+  {
+    "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/project/MappingDiscoveryServiceTest.kt::parsesTinyMappingFile",
+    "legacyClass": "io.github.mcdev.core.project.MappingDiscoveryServiceTest",
+    "status": "passed",
+    "calls": 1
+  },
+  {
+    "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/project/MappingDiscoveryServiceTest.kt::returnsEmptyListForNonexistentRoot",
+    "legacyClass": "io.github.mcdev.core.project.MappingDiscoveryServiceTest",
+    "status": "passed",
+    "calls": 1
+  },
+  {
+    "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/project/MixinConfigDiscoveryServiceTest.kt::configsForSourceSetExcludesPathsOutsideProjectRoot",
+    "legacyClass": "io.github.mcdev.core.project.MixinConfigDiscoveryServiceTest",
+    "status": "passed",
+    "calls": 2
+  },
+  {
+    "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/project/MixinConfigDiscoveryServiceTest.kt::configsForSourceSetFallsBackToRootSharedWhenSelectedSourceSetHasNoConfig",
+    "legacyClass": "io.github.mcdev.core.project.MixinConfigDiscoveryServiceTest",
+    "status": "passed",
+    "calls": 2
+  },
+  {
+    "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/project/MixinConfigDiscoveryServiceTest.kt::configsForSourceSetPrefersLocalResourcesOverRootShared",
+    "legacyClass": "io.github.mcdev.core.project.MixinConfigDiscoveryServiceTest",
+    "status": "passed",
+    "calls": 1
+  },
+  {
+    "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/project/MixinConfigDiscoveryServiceTest.kt::configsForSourceSetReturnsEmptyWhenOnlySiblingSourceSetHasConfigs",
+    "legacyClass": "io.github.mcdev.core.project.MixinConfigDiscoveryServiceTest",
+    "status": "passed",
+    "calls": 2
+  },
+  {
+    "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/project/MixinConfigDiscoveryServiceTest.kt::configsForSourceSetReturnsSelectedFabricOrForgeResources",
+    "legacyClass": "io.github.mcdev.core.project.MixinConfigDiscoveryServiceTest",
+    "status": "passed",
+    "calls": 2
+  },
+  {
+    "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/project/MixinConfigDiscoveryServiceTest.kt::discoversMixinConfigsInProjectTree",
+    "legacyClass": "io.github.mcdev.core.project.MixinConfigDiscoveryServiceTest",
+    "status": "passed",
+    "calls": 13
+  },
+  {
+    "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/project/MixinConfigDiscoveryServiceTest.kt::excludesBuildDirectoryMixinConfigs",
+    "legacyClass": "io.github.mcdev.core.project.MixinConfigDiscoveryServiceTest",
+    "status": "passed",
+    "calls": 10
+  },
+  {
+    "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/project/MixinConfigDiscoveryServiceTest.kt::excludesGradleDirectoryMixinConfigs",
+    "legacyClass": "io.github.mcdev.core.project.MixinConfigDiscoveryServiceTest",
+    "status": "passed",
+    "calls": 10
+  },
+  {
+    "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/project/MixinConfigDiscoveryServiceTest.kt::excludesNodeModulesDirectoryMixinConfigs",
+    "legacyClass": "io.github.mcdev.core.project.MixinConfigDiscoveryServiceTest",
+    "status": "passed",
+    "calls": 10
+  },
+  {
+    "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/project/MixinConfigDiscoveryServiceTest.kt::identifiesMixinNamedJson5File",
+    "legacyClass": "io.github.mcdev.core.project.MixinConfigDiscoveryServiceTest",
+    "status": "passed",
+    "calls": 1
+  },
+  {
+    "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/project/MixinConfigDiscoveryServiceTest.kt::identifiesMixinNamedJsonFile",
+    "legacyClass": "io.github.mcdev.core.project.MixinConfigDiscoveryServiceTest",
+    "status": "passed",
+    "calls": 1
+  },
+  {
+    "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/project/MixinConfigDiscoveryServiceTest.kt::identifiesMixinsJson5File",
+    "legacyClass": "io.github.mcdev.core.project.MixinConfigDiscoveryServiceTest",
+    "status": "passed",
+    "calls": 1
+  },
+  {
+    "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/project/MixinConfigDiscoveryServiceTest.kt::identifiesMixinsJsonFile",
+    "legacyClass": "io.github.mcdev.core.project.MixinConfigDiscoveryServiceTest",
+    "status": "passed",
+    "calls": 1
+  },
+  {
+    "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/project/MixinConfigDiscoveryServiceTest.kt::identifiesModMixinsJsonFile",
+    "legacyClass": "io.github.mcdev.core.project.MixinConfigDiscoveryServiceTest",
+    "status": "passed",
+    "calls": 1
+  },
+  {
+    "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/project/MixinConfigDiscoveryServiceTest.kt::parsesJson5ConfigWithCommentsAndTrailingCommas",
+    "legacyClass": "io.github.mcdev.core.project.MixinConfigDiscoveryServiceTest",
+    "status": "passed",
+    "calls": 2
+  },
+  {
+    "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/project/MixinConfigDiscoveryServiceTest.kt::parsesMixinConfigContent",
+    "legacyClass": "io.github.mcdev.core.project.MixinConfigDiscoveryServiceTest",
+    "status": "passed",
+    "calls": 2
+  },
+  {
+    "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/project/MixinConfigDiscoveryServiceTest.kt::parsesMixinConfigWithMissingOptionalFields",
+    "legacyClass": "io.github.mcdev.core.project.MixinConfigDiscoveryServiceTest",
+    "status": "passed",
+    "calls": 2
+  },
+  {
+    "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/project/MixinConfigDiscoveryServiceTest.kt::rejectsNonMixinJsonFile",
+    "legacyClass": "io.github.mcdev.core.project.MixinConfigDiscoveryServiceTest",
+    "status": "passed",
+    "calls": 1
+  },
+  {
+    "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/project/MixinConfigDiscoveryServiceTest.kt::returnsNullForInvalidJson",
+    "legacyClass": "io.github.mcdev.core.project.MixinConfigDiscoveryServiceTest",
+    "status": "passed",
+    "calls": 2
+  },
+  {
+    "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/project/MixinConfigDiscoveryServiceTest.kt::returnsNullForJsonArrayRoot",
+    "legacyClass": "io.github.mcdev.core.project.MixinConfigDiscoveryServiceTest",
+    "status": "passed",
+    "calls": 2
+  },
+  {
+    "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/project/MixinConfigDiscoveryServiceTest.kt::returnsNullWhenEqualLongestPackagePrefixIsAmbiguous",
+    "legacyClass": "io.github.mcdev.core.project.MixinConfigDiscoveryServiceTest",
+    "status": "passed",
+    "calls": 1
+  },
+  {
+    "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/project/MixinConfigDiscoveryServiceTest.kt::returnsNullWhenMultipleConfigsListMixinClass",
+    "legacyClass": "io.github.mcdev.core.project.MixinConfigDiscoveryServiceTest",
+    "status": "passed",
+    "calls": 1
+  },
+  {
+    "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/project/MixinConfigDiscoveryServiceTest.kt::returnsNullWhenMultipleConfigsMatchPackage",
+    "legacyClass": "io.github.mcdev.core.project.MixinConfigDiscoveryServiceTest",
+    "status": "passed",
+    "calls": 1
+  },
+  {
+    "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/project/MixinConfigDiscoveryServiceTest.kt::returnsNullWhenNoSelectionEvidence",
+    "legacyClass": "io.github.mcdev.core.project.MixinConfigDiscoveryServiceTest",
+    "status": "passed",
+    "calls": 1
+  },
+  {
+    "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/project/MixinConfigDiscoveryServiceTest.kt::selectsConfigListingMixinClassOverEarlierConfig",
+    "legacyClass": "io.github.mcdev.core.project.MixinConfigDiscoveryServiceTest",
+    "status": "passed",
+    "calls": 1
+  },
+  {
+    "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/project/MixinConfigDiscoveryServiceTest.kt::selectsConfigListingRelativeSubpackageEntry",
+    "legacyClass": "io.github.mcdev.core.project.MixinConfigDiscoveryServiceTest",
+    "status": "passed",
+    "calls": 1
+  },
+  {
+    "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/project/MixinConfigDiscoveryServiceTest.kt::selectsMoreSpecificPackagePrefixOverBroaderOne",
+    "legacyClass": "io.github.mcdev.core.project.MixinConfigDiscoveryServiceTest",
+    "status": "passed",
+    "calls": 1
+  },
+  {
+    "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/project/MixinConfigDiscoveryServiceTest.kt::selectsPackageMatchingConfigWhenClassIsNotListed",
+    "legacyClass": "io.github.mcdev.core.project.MixinConfigDiscoveryServiceTest",
+    "status": "passed",
+    "calls": 1
+  },
+  {
+    "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/project/MixinConfigDiscoveryServiceTest.kt::selectsParentConfigPackageForSubpackageMixin",
+    "legacyClass": "io.github.mcdev.core.project.MixinConfigDiscoveryServiceTest",
+    "status": "passed",
+    "calls": 1
+  },
+  {
+    "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/project/MixinConfigDiscoveryServiceTest.kt::sharedConfigsReturnsRootUnownedConfigsOnly",
+    "legacyClass": "io.github.mcdev.core.project.MixinConfigDiscoveryServiceTest",
+    "status": "passed",
+    "calls": 1
+  },
+  {
+    "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/project/PlatformDetectorTest.kt::combinesMultipleGradleFilesForDetection",
+    "legacyClass": "io.github.mcdev.core.project.PlatformDetectorTest",
+    "status": "passed",
+    "calls": 2
+  },
+  {
+    "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/project/PlatformDetectorTest.kt::detectsFabricFromFabricLoomCoordinate",
+    "legacyClass": "io.github.mcdev.core.project.PlatformDetectorTest",
+    "status": "passed",
+    "calls": 1
+  },
+  {
+    "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/project/PlatformDetectorTest.kt::detectsFabricFromFabricLoomPlugin",
+    "legacyClass": "io.github.mcdev.core.project.PlatformDetectorTest",
+    "status": "passed",
+    "calls": 1
+  },
+  {
+    "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/project/PlatformDetectorTest.kt::detectsForgeFromForgeGradle",
+    "legacyClass": "io.github.mcdev.core.project.PlatformDetectorTest",
+    "status": "passed",
+    "calls": 1
+  },
+  {
+    "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/project/PlatformDetectorTest.kt::detectsForgeFromForgeGradleLegacyMarker",
+    "legacyClass": "io.github.mcdev.core.project.PlatformDetectorTest",
+    "status": "passed",
+    "calls": 1
+  },
+  {
+    "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/project/PlatformDetectorTest.kt::detectsFromRootGradleFiles",
+    "legacyClass": "io.github.mcdev.core.project.PlatformDetectorTest",
+    "status": "passed",
+    "calls": 2
+  },
+  {
+    "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/project/PlatformDetectorTest.kt::detectsNeoForgeFromModdevGradle",
+    "legacyClass": "io.github.mcdev.core.project.PlatformDetectorTest",
+    "status": "passed",
+    "calls": 1
+  },
+  {
+    "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/project/PlatformDetectorTest.kt::detectsNeoForgeFromNeoforgedGradleCoordinate",
+    "legacyClass": "io.github.mcdev.core.project.PlatformDetectorTest",
+    "status": "passed",
+    "calls": 1
+  },
+  {
+    "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/project/PlatformDetectorTest.kt::neoforgeTakesPriorityOverForgeWhenBothPresent",
+    "legacyClass": "io.github.mcdev.core.project.PlatformDetectorTest",
+    "status": "passed",
+    "calls": 1
+  },
+  {
+    "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/project/PlatformDetectorTest.kt::returnsUnknownForEmptyGradleContents",
+    "legacyClass": "io.github.mcdev.core.project.PlatformDetectorTest",
+    "status": "passed",
+    "calls": 1
+  },
+  {
+    "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/project/PlatformDetectorTest.kt::returnsUnknownForPlainJavaProject",
+    "legacyClass": "io.github.mcdev.core.project.PlatformDetectorTest",
+    "status": "passed",
+    "calls": 1
+  },
+  {
+    "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/project/ProjectContextBuilderTest.kt::buildsEmptyContextWithExplicitUnknownPlatform",
+    "legacyClass": "io.github.mcdev.core.project.ProjectContextBuilderTest",
+    "status": "passed",
+    "calls": 3
+  },
+  {
+    "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/project/ProjectContextBuilderTest.kt::buildsFabricContextFromGradleAndDiscoveredFiles",
+    "legacyClass": "io.github.mcdev.core.project.ProjectContextBuilderTest",
+    "status": "passed",
+    "calls": 64
+  },
+  {
+    "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/project/ProjectContextBuilderTest.kt::detectsPlatformFromGradleContentsWhenRootFilesMissing",
+    "legacyClass": "io.github.mcdev.core.project.ProjectContextBuilderTest",
+    "status": "passed",
+    "calls": 11
+  },
+  {
+    "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/project/ProjectContextBuilderTest.kt::preservesClasspathSnapshotInBuiltContext",
+    "legacyClass": "io.github.mcdev.core.project.ProjectContextBuilderTest",
+    "status": "passed",
+    "calls": 12
+  },
+  {
+    "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/project/ProjectContextBuilderTest.kt::usesExplicitPlatformOverGradleDetection",
+    "legacyClass": "io.github.mcdev.core.project.ProjectContextBuilderTest",
+    "status": "passed",
+    "calls": 13
+  },
+  {
+    "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/project/ProjectContextBuilderTest.kt::usesProvidedMappingsWithoutRediscovery",
+    "legacyClass": "io.github.mcdev.core.project.ProjectContextBuilderTest",
+    "status": "passed",
+    "calls": 7
+  },
+  {
+    "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/project/ProjectModelTest.kt::classpathSnapshotAggregatesAllEntryTypes",
+    "legacyClass": "io.github.mcdev.core.project.ProjectModelTest",
+    "status": "passed",
+    "calls": 0
+  },
+  {
+    "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/project/ProjectModelTest.kt::classpathSnapshotEmptyDefaults",
+    "legacyClass": "io.github.mcdev.core.project.ProjectModelTest",
+    "status": "passed",
+    "calls": 0
+  },
+  {
+    "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/project/ProjectModelTest.kt::mixinConfigRefDefaultsToEmptyLists",
+    "legacyClass": "io.github.mcdev.core.project.ProjectModelTest",
+    "status": "passed",
+    "calls": 0
+  },
+  {
+    "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/project/ProjectModelTest.kt::modPlatformHasSupportedValues",
+    "legacyClass": "io.github.mcdev.core.project.ProjectModelTest",
+    "status": "passed",
+    "calls": 0
+  },
+  {
+    "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/project/ProjectModelTest.kt::projectIndexStateHasAllLifecycleValues",
+    "legacyClass": "io.github.mcdev.core.project.ProjectModelTest",
+    "status": "passed",
+    "calls": 0
+  },
+  {
+    "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/project/ProjectModelTest.kt::sourceSetContextStoresDirectories",
+    "legacyClass": "io.github.mcdev.core.project.ProjectModelTest",
+    "status": "passed",
+    "calls": 0
+  },
+  {
+    "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/project/ProjectTreeWalkerTest.kt::includesSimilarlyNamedDirectories",
+    "legacyClass": "io.github.mcdev.core.project.ProjectTreeWalkerTest",
+    "status": "passed",
+    "calls": 4
+  },
+  {
+    "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/project/ProjectTreeWalkerTest.kt::mappingWalkCoversAllMappingWhitelistPrefixes",
+    "legacyClass": "io.github.mcdev.core.project.ProjectTreeWalkerTest",
+    "status": "passed",
+    "calls": 30
+  },
+  {
+    "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/project/ProjectTreeWalkerTest.kt::mappingWalkDescendsThroughNestedWhitelistPaths",
+    "legacyClass": "io.github.mcdev.core.project.ProjectTreeWalkerTest",
+    "status": "passed",
+    "calls": 11
+  },
+  {
+    "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/project/ProjectTreeWalkerTest.kt::mappingWalkPrunesIrrelevantBuildAndGradleSubtrees",
+    "legacyClass": "io.github.mcdev.core.project.ProjectTreeWalkerTest",
+    "status": "passed",
+    "calls": 8
+  },
+  {
+    "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/project/ProjectTreeWalkerTest.kt::mappingWalkReturnsDeterministicSortedOrder",
+    "legacyClass": "io.github.mcdev.core.project.ProjectTreeWalkerTest",
+    "status": "passed",
+    "calls": 6
+  },
+  {
+    "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/project/ProjectTreeWalkerTest.kt::mappingWalkReturnsEmptyForMissingRoot",
+    "legacyClass": "io.github.mcdev.core.project.ProjectTreeWalkerTest",
+    "status": "passed",
+    "calls": 1
+  },
+  {
+    "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/project/ProjectTreeWalkerTest.kt::returnsDeterministicSortedOrder",
+    "legacyClass": "io.github.mcdev.core.project.ProjectTreeWalkerTest",
+    "status": "passed",
+    "calls": 6
+  },
+  {
+    "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/project/ProjectTreeWalkerTest.kt::returnsEmptyForMissingRoot",
+    "legacyClass": "io.github.mcdev.core.project.ProjectTreeWalkerTest",
+    "status": "passed",
+    "calls": 1
+  },
+  {
+    "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/project/ProjectTreeWalkerTest.kt::shouldPruneMappingDiscoveryDirectoryMatchesWhitelistSemantics",
+    "legacyClass": "io.github.mcdev.core.project.ProjectTreeWalkerTest",
+    "status": "passed",
+    "calls": 21
+  },
+  {
+    "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/project/ProjectTreeWalkerTest.kt::skipsExcludedSubtreesWithoutVisitingThem",
+    "legacyClass": "io.github.mcdev.core.project.ProjectTreeWalkerTest",
+    "status": "passed",
+    "calls": 3
+  },
+  {
+    "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/project/ProjectTreeWalkerTest.kt::skipsNestedExcludedDirectorySegments",
+    "legacyClass": "io.github.mcdev.core.project.ProjectTreeWalkerTest",
+    "status": "passed",
+    "calls": 4
+  },
+  {
+    "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/project/SourceSetResolverTest.kt::prefersNestedMostSpecificSourceRoot",
+    "legacyClass": "io.github.mcdev.core.project.SourceSetResolverTest",
+    "status": "passed",
+    "calls": 1
+  },
+  {
+    "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/project/SourceSetResolverTest.kt::resolvesMainAndClientSourceSets",
+    "legacyClass": "io.github.mcdev.core.project.SourceSetResolverTest",
+    "status": "passed",
+    "calls": 2
+  },
+  {
+    "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/project/SourceSetResolverTest.kt::resolvesMappedSourcesToMainSourceSet",
+    "legacyClass": "io.github.mcdev.core.project.SourceSetResolverTest",
+    "status": "passed",
+    "calls": 1
+  },
+  {
+    "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/project/SourceSetResolverTest.kt::returnsNullForUnknownDocumentPath",
+    "legacyClass": "io.github.mcdev.core.project.SourceSetResolverTest",
+    "status": "passed",
+    "calls": 1
+  },
+  {
+    "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/project/SourceSetResolverTest.kt::returnsNullWhenEqualSpecificityTie",
+    "legacyClass": "io.github.mcdev.core.project.SourceSetResolverTest",
+    "status": "passed",
+    "calls": 1
+  }
+]

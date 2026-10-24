@@ -4,3 +4,4 @@ build/
 nvim.log
 *.log
 /target/
+__pycache__/

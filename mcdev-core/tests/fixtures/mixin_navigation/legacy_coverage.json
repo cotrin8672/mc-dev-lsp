@@ -1,0 +1,554 @@
+[
+  {
+    "legacyTestPath": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixin/MixinDefinitionServiceTest.kt",
+    "legacyClass": "MixinDefinitionServiceTest",
+    "legacyCase": "atTargetParserParsesFieldDescriptor",
+    "baselineSha256": "6d4a8adb3150efd1f6a338620f1094d2bd48d3422a6667719410b688c19d0758",
+    "status": "pending_native_replay",
+    "rustTest": "mcdev-core/tests/mixin_navigation_legacy.rs::mixin_definition_service_test_at_target_parser_parses_field_descriptor"
+  },
+  {
+    "legacyTestPath": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixin/MixinDefinitionServiceTest.kt",
+    "legacyClass": "MixinDefinitionServiceTest",
+    "legacyCase": "atTargetParserParsesMethodDescriptor",
+    "baselineSha256": "6d4a8adb3150efd1f6a338620f1094d2bd48d3422a6667719410b688c19d0758",
+    "status": "pending_native_replay",
+    "rustTest": "mcdev-core/tests/mixin_navigation_legacy.rs::mixin_definition_service_test_at_target_parser_parses_method_descriptor"
+  },
+  {
+    "legacyTestPath": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixin/MixinDefinitionServiceTest.kt",
+    "legacyClass": "MixinDefinitionServiceTest",
+    "legacyCase": "definitionCursorOutsideValueReturnsEmpty",
+    "baselineSha256": "6d4a8adb3150efd1f6a338620f1094d2bd48d3422a6667719410b688c19d0758",
+    "status": "pending_native_replay",
+    "rustTest": "mcdev-core/tests/mixin_navigation_legacy.rs::mixin_definition_service_test_definition_cursor_outside_value_returns_empty"
+  },
+  {
+    "legacyTestPath": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixin/MixinDefinitionServiceTest.kt",
+    "legacyClass": "MixinDefinitionServiceTest",
+    "legacyCase": "definitionDoesNotMatchCommentString",
+    "baselineSha256": "6d4a8adb3150efd1f6a338620f1094d2bd48d3422a6667719410b688c19d0758",
+    "status": "pending_native_replay",
+    "rustTest": "mcdev-core/tests/mixin_navigation_legacy.rs::mixin_definition_service_test_definition_does_not_match_comment_string"
+  },
+  {
+    "legacyTestPath": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixin/MixinDefinitionServiceTest.kt",
+    "legacyClass": "MixinDefinitionServiceTest",
+    "legacyCase": "definitionDoesNotMatchUnrelatedHandlerMethodString",
+    "baselineSha256": "6d4a8adb3150efd1f6a338620f1094d2bd48d3422a6667719410b688c19d0758",
+    "status": "pending_native_replay",
+    "rustTest": "mcdev-core/tests/mixin_navigation_legacy.rs::mixin_definition_service_test_definition_does_not_match_unrelated_handler_method_string"
+  },
+  {
+    "legacyTestPath": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixin/MixinDefinitionServiceTest.kt",
+    "legacyClass": "MixinDefinitionServiceTest",
+    "legacyCase": "definitionExactMethodDoesNotSetDirectSourceDocumentUri",
+    "baselineSha256": "6d4a8adb3150efd1f6a338620f1094d2bd48d3422a6667719410b688c19d0758",
+    "status": "pending_native_replay",
+    "rustTest": "mcdev-core/tests/mixin_navigation_legacy.rs::mixin_definition_service_test_definition_exact_method_does_not_set_direct_source_document_uri"
+  },
+  {
+    "legacyTestPath": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixin/MixinDefinitionServiceTest.kt",
+    "legacyClass": "MixinDefinitionServiceTest",
+    "legacyCase": "definitionLocalTypeAmbiguousWildcardClassLiteralReturnsEmpty",
+    "baselineSha256": "6d4a8adb3150efd1f6a338620f1094d2bd48d3422a6667719410b688c19d0758",
+    "status": "pending_native_replay",
+    "rustTest": "mcdev-core/tests/mixin_navigation_legacy.rs::mixin_definition_service_test_definition_local_type_ambiguous_wildcard_class_literal_returns_empty"
+  },
+  {
+    "legacyTestPath": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixin/MixinDefinitionServiceTest.kt",
+    "legacyClass": "MixinDefinitionServiceTest",
+    "legacyCase": "definitionLocalTypeUnknownClassLiteralReturnsEmpty",
+    "baselineSha256": "6d4a8adb3150efd1f6a338620f1094d2bd48d3422a6667719410b688c19d0758",
+    "status": "pending_native_replay",
+    "rustTest": "mcdev-core/tests/mixin_navigation_legacy.rs::mixin_definition_service_test_definition_local_type_unknown_class_literal_returns_empty"
+  },
+  {
+    "legacyTestPath": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixin/MixinDefinitionServiceTest.kt",
+    "legacyClass": "MixinDefinitionServiceTest",
+    "legacyCase": "definitionMalformedSelectorReturnsEmpty",
+    "baselineSha256": "6d4a8adb3150efd1f6a338620f1094d2bd48d3422a6667719410b688c19d0758",
+    "status": "pending_native_replay",
+    "rustTest": "mcdev-core/tests/mixin_navigation_legacy.rs::mixin_definition_service_test_definition_malformed_selector_returns_empty"
+  },
+  {
+    "legacyTestPath": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixin/MixinDefinitionServiceTest.kt",
+    "legacyClass": "MixinDefinitionServiceTest",
+    "legacyCase": "definitionOmittedDescriptorReturnsEmpty",
+    "baselineSha256": "6d4a8adb3150efd1f6a338620f1094d2bd48d3422a6667719410b688c19d0758",
+    "status": "pending_native_replay",
+    "rustTest": "mcdev-core/tests/mixin_navigation_legacy.rs::mixin_definition_service_test_definition_omitted_descriptor_returns_empty"
+  },
+  {
+    "legacyTestPath": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixin/MixinDefinitionServiceTest.kt",
+    "legacyClass": "MixinDefinitionServiceTest",
+    "legacyCase": "definitionWildcardSelectorReturnsEmpty",
+    "baselineSha256": "6d4a8adb3150efd1f6a338620f1094d2bd48d3422a6667719410b688c19d0758",
+    "status": "pending_native_replay",
+    "rustTest": "mcdev-core/tests/mixin_navigation_legacy.rs::mixin_definition_service_test_definition_wildcard_selector_returns_empty"
+  },
+  {
+    "legacyTestPath": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixin/MixinDefinitionServiceTest.kt",
+    "legacyClass": "MixinDefinitionServiceTest",
+    "legacyCase": "expressionDefinitionIdSetsDirectSourceDocumentUriWhenProvided",
+    "baselineSha256": "6d4a8adb3150efd1f6a338620f1094d2bd48d3422a6667719410b688c19d0758",
+    "status": "pending_native_replay",
+    "rustTest": "mcdev-core/tests/mixin_navigation_legacy.rs::mixin_definition_service_test_expression_definition_id_sets_direct_source_document_uri_when_provided"
+  },
+  {
+    "legacyTestPath": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixin/MixinDefinitionServiceTest.kt",
+    "legacyClass": "MixinDefinitionServiceTest",
+    "legacyCase": "invokerDefinitionDoesNotFallbackToWrongOverload",
+    "baselineSha256": "6d4a8adb3150efd1f6a338620f1094d2bd48d3422a6667719410b688c19d0758",
+    "status": "pending_native_replay",
+    "rustTest": "mcdev-core/tests/mixin_navigation_legacy.rs::mixin_definition_service_test_invoker_definition_does_not_fallback_to_wrong_overload"
+  },
+  {
+    "legacyTestPath": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixin/MixinDefinitionServiceTest.kt",
+    "legacyClass": "MixinDefinitionServiceTest",
+    "legacyCase": "invokerDefinitionDoesNotResolveWhenDescriptorContainsUnknownType",
+    "baselineSha256": "6d4a8adb3150efd1f6a338620f1094d2bd48d3422a6667719410b688c19d0758",
+    "status": "pending_native_replay",
+    "rustTest": "mcdev-core/tests/mixin_navigation_legacy.rs::mixin_definition_service_test_invoker_definition_does_not_resolve_when_descriptor_contains_unknown_type"
+  },
+  {
+    "legacyTestPath": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixin/MixinDefinitionServiceTest.kt",
+    "legacyClass": "MixinDefinitionServiceTest",
+    "legacyCase": "isolatesExpressionDefinitionIdByHandler",
+    "baselineSha256": "6d4a8adb3150efd1f6a338620f1094d2bd48d3422a6667719410b688c19d0758",
+    "status": "pending_native_replay",
+    "rustTest": "mcdev-core/tests/mixin_navigation_legacy.rs::mixin_definition_service_test_isolates_expression_definition_id_by_handler"
+  },
+  {
+    "legacyTestPath": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixin/MixinDefinitionServiceTest.kt",
+    "legacyClass": "MixinDefinitionServiceTest",
+    "legacyCase": "preservesDefinitionExactMethodNavigation",
+    "baselineSha256": "6d4a8adb3150efd1f6a338620f1094d2bd48d3422a6667719410b688c19d0758",
+    "status": "pending_native_replay",
+    "rustTest": "mcdev-core/tests/mixin_navigation_legacy.rs::mixin_definition_service_test_preserves_definition_exact_method_navigation"
+  },
+  {
+    "legacyTestPath": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixin/MixinDefinitionServiceTest.kt",
+    "legacyClass": "MixinDefinitionServiceTest",
+    "legacyCase": "preservesRawExpressionTokenOffsetsForOctalEscapedIdentifier",
+    "baselineSha256": "6d4a8adb3150efd1f6a338620f1094d2bd48d3422a6667719410b688c19d0758",
+    "status": "pending_native_replay",
+    "rustTest": "mcdev-core/tests/mixin_navigation_legacy.rs::mixin_definition_service_test_preserves_raw_expression_token_offsets_for_octal_escaped_identifier"
+  },
+  {
+    "legacyTestPath": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixin/MixinDefinitionServiceTest.kt",
+    "legacyClass": "MixinDefinitionServiceTest",
+    "legacyCase": "rejectsAmbiguousInjectorMethodAndNonMethodAttribute",
+    "baselineSha256": "6d4a8adb3150efd1f6a338620f1094d2bd48d3422a6667719410b688c19d0758",
+    "status": "pending_native_replay",
+    "rustTest": "mcdev-core/tests/mixin_navigation_legacy.rs::mixin_definition_service_test_rejects_ambiguous_injector_method_and_non_method_attribute"
+  },
+  {
+    "legacyTestPath": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixin/MixinDefinitionServiceTest.kt",
+    "legacyClass": "MixinDefinitionServiceTest",
+    "legacyCase": "rejectsExpressionIdAttributeSelection",
+    "baselineSha256": "6d4a8adb3150efd1f6a338620f1094d2bd48d3422a6667719410b688c19d0758",
+    "status": "pending_native_replay",
+    "rustTest": "mcdev-core/tests/mixin_navigation_legacy.rs::mixin_definition_service_test_rejects_expression_id_attribute_selection"
+  },
+  {
+    "legacyTestPath": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixin/MixinDefinitionServiceTest.kt",
+    "legacyClass": "MixinDefinitionServiceTest",
+    "legacyCase": "rejectsExpressionIdentifierAfterDotMemberName",
+    "baselineSha256": "6d4a8adb3150efd1f6a338620f1094d2bd48d3422a6667719410b688c19d0758",
+    "status": "pending_native_replay",
+    "rustTest": "mcdev-core/tests/mixin_navigation_legacy.rs::mixin_definition_service_test_rejects_expression_identifier_after_dot_member_name"
+  },
+  {
+    "legacyTestPath": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixin/MixinDefinitionServiceTest.kt",
+    "legacyClass": "MixinDefinitionServiceTest",
+    "legacyCase": "rejectsExpressionIdentifierInCommentStringFake",
+    "baselineSha256": "6d4a8adb3150efd1f6a338620f1094d2bd48d3422a6667719410b688c19d0758",
+    "status": "pending_native_replay",
+    "rustTest": "mcdev-core/tests/mixin_navigation_legacy.rs::mixin_definition_service_test_rejects_expression_identifier_in_comment_string_fake"
+  },
+  {
+    "legacyTestPath": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixin/MixinDefinitionServiceTest.kt",
+    "legacyClass": "MixinDefinitionServiceTest",
+    "legacyCase": "rejectsExpressionIdentifierWithLeadingBackslashAfterJavaDecode",
+    "baselineSha256": "6d4a8adb3150efd1f6a338620f1094d2bd48d3422a6667719410b688c19d0758",
+    "status": "pending_native_replay",
+    "rustTest": "mcdev-core/tests/mixin_navigation_legacy.rs::mixin_definition_service_test_rejects_expression_identifier_with_leading_backslash_after_java_decode"
+  },
+  {
+    "legacyTestPath": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixin/MixinDefinitionServiceTest.kt",
+    "legacyClass": "MixinDefinitionServiceTest",
+    "legacyCase": "rejectsExpressionKeywordIdentifier",
+    "baselineSha256": "6d4a8adb3150efd1f6a338620f1094d2bd48d3422a6667719410b688c19d0758",
+    "status": "pending_native_replay",
+    "rustTest": "mcdev-core/tests/mixin_navigation_legacy.rs::mixin_definition_service_test_rejects_expression_keyword_identifier"
+  },
+  {
+    "legacyTestPath": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixin/MixinDefinitionServiceTest.kt",
+    "legacyClass": "MixinDefinitionServiceTest",
+    "legacyCase": "rejectsMissingExpressionDefinitionId",
+    "baselineSha256": "6d4a8adb3150efd1f6a338620f1094d2bd48d3422a6667719410b688c19d0758",
+    "status": "pending_native_replay",
+    "rustTest": "mcdev-core/tests/mixin_navigation_legacy.rs::mixin_definition_service_test_rejects_missing_expression_definition_id"
+  },
+  {
+    "legacyTestPath": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixin/MixinDefinitionServiceTest.kt",
+    "legacyClass": "MixinDefinitionServiceTest",
+    "legacyCase": "rejectsPartialExpressionDefinitionIdentifier",
+    "baselineSha256": "6d4a8adb3150efd1f6a338620f1094d2bd48d3422a6667719410b688c19d0758",
+    "status": "pending_native_replay",
+    "rustTest": "mcdev-core/tests/mixin_navigation_legacy.rs::mixin_definition_service_test_rejects_partial_expression_definition_identifier"
+  },
+  {
+    "legacyTestPath": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixin/MixinDefinitionServiceTest.kt",
+    "legacyClass": "MixinDefinitionServiceTest",
+    "legacyCase": "resolvesAccessorField",
+    "baselineSha256": "6d4a8adb3150efd1f6a338620f1094d2bd48d3422a6667719410b688c19d0758",
+    "status": "pending_native_replay",
+    "rustTest": "mcdev-core/tests/mixin_navigation_legacy.rs::mixin_definition_service_test_resolves_accessor_field"
+  },
+  {
+    "legacyTestPath": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixin/MixinDefinitionServiceTest.kt",
+    "legacyClass": "MixinDefinitionServiceTest",
+    "legacyCase": "resolvesAtTargetInvokeMember",
+    "baselineSha256": "6d4a8adb3150efd1f6a338620f1094d2bd48d3422a6667719410b688c19d0758",
+    "status": "pending_native_replay",
+    "rustTest": "mcdev-core/tests/mixin_navigation_legacy.rs::mixin_definition_service_test_resolves_at_target_invoke_member"
+  },
+  {
+    "legacyTestPath": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixin/MixinDefinitionServiceTest.kt",
+    "legacyClass": "MixinDefinitionServiceTest",
+    "legacyCase": "resolvesCompleteMixinTargetBeforeAmbiguousPartialPrefix",
+    "baselineSha256": "6d4a8adb3150efd1f6a338620f1094d2bd48d3422a6667719410b688c19d0758",
+    "status": "pending_native_replay",
+    "rustTest": "mcdev-core/tests/mixin_navigation_legacy.rs::mixin_definition_service_test_resolves_complete_mixin_target_before_ambiguous_partial_prefix"
+  },
+  {
+    "legacyTestPath": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixin/MixinDefinitionServiceTest.kt",
+    "legacyClass": "MixinDefinitionServiceTest",
+    "legacyCase": "resolvesDefinitionExactField",
+    "baselineSha256": "6d4a8adb3150efd1f6a338620f1094d2bd48d3422a6667719410b688c19d0758",
+    "status": "pending_native_replay",
+    "rustTest": "mcdev-core/tests/mixin_navigation_legacy.rs::mixin_definition_service_test_resolves_definition_exact_field"
+  },
+  {
+    "legacyTestPath": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixin/MixinDefinitionServiceTest.kt",
+    "legacyClass": "MixinDefinitionServiceTest",
+    "legacyCase": "resolvesDefinitionExactMethod",
+    "baselineSha256": "6d4a8adb3150efd1f6a338620f1094d2bd48d3422a6667719410b688c19d0758",
+    "status": "pending_native_replay",
+    "rustTest": "mcdev-core/tests/mixin_navigation_legacy.rs::mixin_definition_service_test_resolves_definition_exact_method"
+  },
+  {
+    "legacyTestPath": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixin/MixinDefinitionServiceTest.kt",
+    "legacyClass": "MixinDefinitionServiceTest",
+    "legacyCase": "resolvesDefinitionLocalTypeClassLiteral",
+    "baselineSha256": "6d4a8adb3150efd1f6a338620f1094d2bd48d3422a6667719410b688c19d0758",
+    "status": "pending_native_replay",
+    "rustTest": "mcdev-core/tests/mixin_navigation_legacy.rs::mixin_definition_service_test_resolves_definition_local_type_class_literal"
+  },
+  {
+    "legacyTestPath": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixin/MixinDefinitionServiceTest.kt",
+    "legacyClass": "MixinDefinitionServiceTest",
+    "legacyCase": "resolvesDefinitionLocalTypeImplicitJavaLangClassLiteral",
+    "baselineSha256": "6d4a8adb3150efd1f6a338620f1094d2bd48d3422a6667719410b688c19d0758",
+    "status": "pending_native_replay",
+    "rustTest": "mcdev-core/tests/mixin_navigation_legacy.rs::mixin_definition_service_test_resolves_definition_local_type_implicit_java_lang_class_literal"
+  },
+  {
+    "legacyTestPath": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixin/MixinDefinitionServiceTest.kt",
+    "legacyClass": "MixinDefinitionServiceTest",
+    "legacyCase": "resolvesDefinitionLocalTypeNestedClassThroughImport",
+    "baselineSha256": "6d4a8adb3150efd1f6a338620f1094d2bd48d3422a6667719410b688c19d0758",
+    "status": "pending_native_replay",
+    "rustTest": "mcdev-core/tests/mixin_navigation_legacy.rs::mixin_definition_service_test_resolves_definition_local_type_nested_class_through_import"
+  },
+  {
+    "legacyTestPath": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixin/MixinDefinitionServiceTest.kt",
+    "legacyClass": "MixinDefinitionServiceTest",
+    "legacyCase": "resolvesDefinitionLocalTypeThroughExplicitImport",
+    "baselineSha256": "6d4a8adb3150efd1f6a338620f1094d2bd48d3422a6667719410b688c19d0758",
+    "status": "pending_native_replay",
+    "rustTest": "mcdev-core/tests/mixin_navigation_legacy.rs::mixin_definition_service_test_resolves_definition_local_type_through_explicit_import"
+  },
+  {
+    "legacyTestPath": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixin/MixinDefinitionServiceTest.kt",
+    "legacyClass": "MixinDefinitionServiceTest",
+    "legacyCase": "resolvesDefinitionTypeClassLiteral",
+    "baselineSha256": "6d4a8adb3150efd1f6a338620f1094d2bd48d3422a6667719410b688c19d0758",
+    "status": "pending_native_replay",
+    "rustTest": "mcdev-core/tests/mixin_navigation_legacy.rs::mixin_definition_service_test_resolves_definition_type_class_literal"
+  },
+  {
+    "legacyTestPath": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixin/MixinDefinitionServiceTest.kt",
+    "legacyClass": "MixinDefinitionServiceTest",
+    "legacyCase": "resolvesEachLocalTypeInsideDefinitionArray",
+    "baselineSha256": "6d4a8adb3150efd1f6a338620f1094d2bd48d3422a6667719410b688c19d0758",
+    "status": "pending_native_replay",
+    "rustTest": "mcdev-core/tests/mixin_navigation_legacy.rs::mixin_definition_service_test_resolves_each_local_type_inside_definition_array"
+  },
+  {
+    "legacyTestPath": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixin/MixinDefinitionServiceTest.kt",
+    "legacyClass": "MixinDefinitionServiceTest",
+    "legacyCase": "resolvesExpressionIdentifierFromNestedDefinitions",
+    "baselineSha256": "6d4a8adb3150efd1f6a338620f1094d2bd48d3422a6667719410b688c19d0758",
+    "status": "pending_native_replay",
+    "rustTest": "mcdev-core/tests/mixin_navigation_legacy.rs::mixin_definition_service_test_resolves_expression_identifier_from_nested_definitions"
+  },
+  {
+    "legacyTestPath": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixin/MixinDefinitionServiceTest.kt",
+    "legacyClass": "MixinDefinitionServiceTest",
+    "legacyCase": "resolvesExpressionIdentifierToUniqueDefinitionId",
+    "baselineSha256": "6d4a8adb3150efd1f6a338620f1094d2bd48d3422a6667719410b688c19d0758",
+    "status": "pending_native_replay",
+    "rustTest": "mcdev-core/tests/mixin_navigation_legacy.rs::mixin_definition_service_test_resolves_expression_identifier_to_unique_definition_id"
+  },
+  {
+    "legacyTestPath": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixin/MixinDefinitionServiceTest.kt",
+    "legacyClass": "MixinDefinitionServiceTest",
+    "legacyCase": "resolvesExpressionIdentifierWithDefinitionsAfterInjector",
+    "baselineSha256": "6d4a8adb3150efd1f6a338620f1094d2bd48d3422a6667719410b688c19d0758",
+    "status": "pending_native_replay",
+    "rustTest": "mcdev-core/tests/mixin_navigation_legacy.rs::mixin_definition_service_test_resolves_expression_identifier_with_definitions_after_injector"
+  },
+  {
+    "legacyTestPath": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixin/MixinDefinitionServiceTest.kt",
+    "legacyClass": "MixinDefinitionServiceTest",
+    "legacyCase": "resolvesExpressionIdentifierWithFqnAnnotations",
+    "baselineSha256": "6d4a8adb3150efd1f6a338620f1094d2bd48d3422a6667719410b688c19d0758",
+    "status": "pending_native_replay",
+    "rustTest": "mcdev-core/tests/mixin_navigation_legacy.rs::mixin_definition_service_test_resolves_expression_identifier_with_fqn_annotations"
+  },
+  {
+    "legacyTestPath": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixin/MixinDefinitionServiceTest.kt",
+    "legacyClass": "MixinDefinitionServiceTest",
+    "legacyCase": "resolvesExpressionMemberAndMethodReferenceDefinitionIds",
+    "baselineSha256": "6d4a8adb3150efd1f6a338620f1094d2bd48d3422a6667719410b688c19d0758",
+    "status": "pending_native_replay",
+    "rustTest": "mcdev-core/tests/mixin_navigation_legacy.rs::mixin_definition_service_test_resolves_expression_member_and_method_reference_definition_ids"
+  },
+  {
+    "legacyTestPath": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixin/MixinDefinitionServiceTest.kt",
+    "legacyClass": "MixinDefinitionServiceTest",
+    "legacyCase": "resolvesExpressionsContainerIdentifierToDefinitionId",
+    "baselineSha256": "6d4a8adb3150efd1f6a338620f1094d2bd48d3422a6667719410b688c19d0758",
+    "status": "pending_native_replay",
+    "rustTest": "mcdev-core/tests/mixin_navigation_legacy.rs::mixin_definition_service_test_resolves_expressions_container_identifier_to_definition_id"
+  },
+  {
+    "legacyTestPath": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixin/MixinDefinitionServiceTest.kt",
+    "legacyClass": "MixinDefinitionServiceTest",
+    "legacyCase": "resolvesFullyQualifiedDefinitionExactMethod",
+    "baselineSha256": "6d4a8adb3150efd1f6a338620f1094d2bd48d3422a6667719410b688c19d0758",
+    "status": "pending_native_replay",
+    "rustTest": "mcdev-core/tests/mixin_navigation_legacy.rs::mixin_definition_service_test_resolves_fully_qualified_definition_exact_method"
+  },
+  {
+    "legacyTestPath": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixin/MixinDefinitionServiceTest.kt",
+    "legacyClass": "MixinDefinitionServiceTest",
+    "legacyCase": "resolvesInjectorMethodForInjectAndMixinExtras",
+    "baselineSha256": "6d4a8adb3150efd1f6a338620f1094d2bd48d3422a6667719410b688c19d0758",
+    "status": "pending_native_replay",
+    "rustTest": "mcdev-core/tests/mixin_navigation_legacy.rs::mixin_definition_service_test_resolves_injector_method_for_inject_and_mixin_extras"
+  },
+  {
+    "legacyTestPath": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixin/MixinDefinitionServiceTest.kt",
+    "legacyClass": "MixinDefinitionServiceTest",
+    "legacyCase": "resolvesInvokerMethod",
+    "baselineSha256": "6d4a8adb3150efd1f6a338620f1094d2bd48d3422a6667719410b688c19d0758",
+    "status": "pending_native_replay",
+    "rustTest": "mcdev-core/tests/mixin_navigation_legacy.rs::mixin_definition_service_test_resolves_invoker_method"
+  },
+  {
+    "legacyTestPath": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixin/MixinDefinitionServiceTest.kt",
+    "legacyClass": "MixinDefinitionServiceTest",
+    "legacyCase": "resolvesKotlinDefinitionAndLocalClassLiteralsWithOriginalRanges",
+    "baselineSha256": "6d4a8adb3150efd1f6a338620f1094d2bd48d3422a6667719410b688c19d0758",
+    "status": "pending_native_replay",
+    "rustTest": "mcdev-core/tests/mixin_navigation_legacy.rs::mixin_definition_service_test_resolves_kotlin_definition_and_local_class_literals_with_original_ranges"
+  },
+  {
+    "legacyTestPath": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixin/MixinDefinitionServiceTest.kt",
+    "legacyClass": "MixinDefinitionServiceTest",
+    "legacyCase": "resolvesMixinClassTarget",
+    "baselineSha256": "6d4a8adb3150efd1f6a338620f1094d2bd48d3422a6667719410b688c19d0758",
+    "status": "pending_native_replay",
+    "rustTest": "mcdev-core/tests/mixin_navigation_legacy.rs::mixin_definition_service_test_resolves_mixin_class_target"
+  },
+  {
+    "legacyTestPath": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixin/MixinDefinitionServiceTest.kt",
+    "legacyClass": "MixinDefinitionServiceTest",
+    "legacyCase": "resolvesMixinTargetsString",
+    "baselineSha256": "6d4a8adb3150efd1f6a338620f1094d2bd48d3422a6667719410b688c19d0758",
+    "status": "pending_native_replay",
+    "rustTest": "mcdev-core/tests/mixin_navigation_legacy.rs::mixin_definition_service_test_resolves_mixin_targets_string"
+  },
+  {
+    "legacyTestPath": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixin/MixinDefinitionServiceTest.kt",
+    "legacyClass": "MixinDefinitionServiceTest",
+    "legacyCase": "resolvesNestedDefinitionFieldInDefinitionsArray",
+    "baselineSha256": "6d4a8adb3150efd1f6a338620f1094d2bd48d3422a6667719410b688c19d0758",
+    "status": "pending_native_replay",
+    "rustTest": "mcdev-core/tests/mixin_navigation_legacy.rs::mixin_definition_service_test_resolves_nested_definition_field_in_definitions_array"
+  },
+  {
+    "legacyTestPath": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixin/MixinDefinitionServiceTest.kt",
+    "legacyClass": "MixinDefinitionServiceTest",
+    "legacyCase": "resolvesOctalEscapedExpressionTokenToPlainDefinitionId",
+    "baselineSha256": "6d4a8adb3150efd1f6a338620f1094d2bd48d3422a6667719410b688c19d0758",
+    "status": "pending_native_replay",
+    "rustTest": "mcdev-core/tests/mixin_navigation_legacy.rs::mixin_definition_service_test_resolves_octal_escaped_expression_token_to_plain_definition_id"
+  },
+  {
+    "legacyTestPath": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixin/MixinDefinitionServiceTest.kt",
+    "legacyClass": "MixinDefinitionServiceTest",
+    "legacyCase": "resolvesPlainExpressionTokenToOctalEscapedDefinitionId",
+    "baselineSha256": "6d4a8adb3150efd1f6a338620f1094d2bd48d3422a6667719410b688c19d0758",
+    "status": "pending_native_replay",
+    "rustTest": "mcdev-core/tests/mixin_navigation_legacy.rs::mixin_definition_service_test_resolves_plain_expression_token_to_octal_escaped_definition_id"
+  },
+  {
+    "legacyTestPath": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixin/MixinDefinitionServiceTest.kt",
+    "legacyClass": "MixinDefinitionServiceTest",
+    "legacyCase": "resolvesShadowField",
+    "baselineSha256": "6d4a8adb3150efd1f6a338620f1094d2bd48d3422a6667719410b688c19d0758",
+    "status": "pending_native_replay",
+    "rustTest": "mcdev-core/tests/mixin_navigation_legacy.rs::mixin_definition_service_test_resolves_shadow_field"
+  },
+  {
+    "legacyTestPath": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixin/MixinDefinitionServiceTest.kt",
+    "legacyClass": "MixinDefinitionServiceTest",
+    "legacyCase": "resolvesShadowMembersWhenTheCaretIsAtTheNameEnd",
+    "baselineSha256": "6d4a8adb3150efd1f6a338620f1094d2bd48d3422a6667719410b688c19d0758",
+    "status": "pending_native_replay",
+    "rustTest": "mcdev-core/tests/mixin_navigation_legacy.rs::mixin_definition_service_test_resolves_shadow_members_when_the_caret_is_at_the_name_end"
+  },
+  {
+    "legacyTestPath": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixin/MixinDefinitionServiceTest.kt",
+    "legacyClass": "MixinDefinitionServiceTest",
+    "legacyCase": "resolvesShadowMethod",
+    "baselineSha256": "6d4a8adb3150efd1f6a338620f1094d2bd48d3422a6667719410b688c19d0758",
+    "status": "pending_native_replay",
+    "rustTest": "mcdev-core/tests/mixin_navigation_legacy.rs::mixin_definition_service_test_resolves_shadow_method"
+  },
+  {
+    "legacyTestPath": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixin/MixinDefinitionServiceTest.kt",
+    "legacyClass": "MixinDefinitionServiceTest",
+    "legacyCase": "resolvesSimpleTargetMixinClassFromBytecodeIndex",
+    "baselineSha256": "6d4a8adb3150efd1f6a338620f1094d2bd48d3422a6667719410b688c19d0758",
+    "status": "pending_native_replay",
+    "rustTest": "mcdev-core/tests/mixin_navigation_legacy.rs::mixin_definition_service_test_resolves_simple_target_mixin_class_from_bytecode_index"
+  },
+  {
+    "legacyTestPath": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixin/MixinDefinitionServiceTest.kt",
+    "legacyClass": "MixinDefinitionServiceTest",
+    "legacyCase": "returnsEmptyOutsideMixinContext",
+    "baselineSha256": "6d4a8adb3150efd1f6a338620f1094d2bd48d3422a6667719410b688c19d0758",
+    "status": "pending_native_replay",
+    "rustTest": "mcdev-core/tests/mixin_navigation_legacy.rs::mixin_definition_service_test_returns_empty_outside_mixin_context"
+  },
+  {
+    "legacyTestPath": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixin/MixinDefinitionServiceTest.kt",
+    "legacyClass": "MixinDefinitionServiceTest",
+    "legacyCase": "returnsEquivalentPlainAndEscapedDefinitionIds",
+    "baselineSha256": "6d4a8adb3150efd1f6a338620f1094d2bd48d3422a6667719410b688c19d0758",
+    "status": "pending_native_replay",
+    "rustTest": "mcdev-core/tests/mixin_navigation_legacy.rs::mixin_definition_service_test_returns_equivalent_plain_and_escaped_definition_ids"
+  },
+  {
+    "legacyTestPath": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixin/MixinDefinitionServiceTest.kt",
+    "legacyClass": "MixinDefinitionServiceTest",
+    "legacyCase": "returnsEveryDefinitionOfRepeatedIdentifier",
+    "baselineSha256": "6d4a8adb3150efd1f6a338620f1094d2bd48d3422a6667719410b688c19d0758",
+    "status": "pending_native_replay",
+    "rustTest": "mcdev-core/tests/mixin_navigation_legacy.rs::mixin_definition_service_test_returns_every_definition_of_repeated_identifier"
+  },
+  {
+    "legacyTestPath": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixin/MixinDefinitionServiceTest.kt",
+    "legacyClass": "MixinDefinitionServiceTest",
+    "legacyCase": "semanticMemberDefinitionsOnlyResolveTheExactNameToken",
+    "baselineSha256": "6d4a8adb3150efd1f6a338620f1094d2bd48d3422a6667719410b688c19d0758",
+    "status": "pending_native_replay",
+    "rustTest": "mcdev-core/tests/mixin_navigation_legacy.rs::mixin_definition_service_test_semantic_member_definitions_only_resolve_the_exact_name_token"
+  },
+  {
+    "legacyTestPath": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixin/MixinReferenceServiceTest.kt",
+    "legacyClass": "MixinReferenceServiceTest",
+    "legacyCase": "doesNotMatchInjectMethodNameByPrefix",
+    "baselineSha256": "2f53e6093a99ce1b88f2d36b7ed90b91a4ebd44bf9cf36298e3cf4b169fce06a",
+    "status": "pending_native_replay",
+    "rustTest": "mcdev-core/tests/mixin_navigation_legacy.rs::mixin_reference_service_test_does_not_match_inject_method_name_by_prefix"
+  },
+  {
+    "legacyTestPath": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixin/MixinReferenceServiceTest.kt",
+    "legacyClass": "MixinReferenceServiceTest",
+    "legacyCase": "findsAccessTransformerFieldReferences",
+    "baselineSha256": "2f53e6093a99ce1b88f2d36b7ed90b91a4ebd44bf9cf36298e3cf4b169fce06a",
+    "status": "pending_native_replay",
+    "rustTest": "mcdev-core/tests/mixin_navigation_legacy.rs::mixin_reference_service_test_finds_access_transformer_field_references"
+  },
+  {
+    "legacyTestPath": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixin/MixinReferenceServiceTest.kt",
+    "legacyClass": "MixinReferenceServiceTest",
+    "legacyCase": "findsAccessWidenerMethodReferences",
+    "baselineSha256": "2f53e6093a99ce1b88f2d36b7ed90b91a4ebd44bf9cf36298e3cf4b169fce06a",
+    "status": "pending_native_replay",
+    "rustTest": "mcdev-core/tests/mixin_navigation_legacy.rs::mixin_reference_service_test_finds_access_widener_method_references"
+  },
+  {
+    "legacyTestPath": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixin/MixinReferenceServiceTest.kt",
+    "legacyClass": "MixinReferenceServiceTest",
+    "legacyCase": "findsAccessorFieldReferences",
+    "baselineSha256": "2f53e6093a99ce1b88f2d36b7ed90b91a4ebd44bf9cf36298e3cf4b169fce06a",
+    "status": "pending_native_replay",
+    "rustTest": "mcdev-core/tests/mixin_navigation_legacy.rs::mixin_reference_service_test_finds_accessor_field_references"
+  },
+  {
+    "legacyTestPath": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixin/MixinReferenceServiceTest.kt",
+    "legacyClass": "MixinReferenceServiceTest",
+    "legacyCase": "findsInvokerReferences",
+    "baselineSha256": "2f53e6093a99ce1b88f2d36b7ed90b91a4ebd44bf9cf36298e3cf4b169fce06a",
+    "status": "pending_native_replay",
+    "rustTest": "mcdev-core/tests/mixin_navigation_legacy.rs::mixin_reference_service_test_finds_invoker_references"
+  },
+  {
+    "legacyTestPath": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixin/MixinReferenceServiceTest.kt",
+    "legacyClass": "MixinReferenceServiceTest",
+    "legacyCase": "findsMixinClassReferences",
+    "baselineSha256": "2f53e6093a99ce1b88f2d36b7ed90b91a4ebd44bf9cf36298e3cf4b169fce06a",
+    "status": "pending_native_replay",
+    "rustTest": "mcdev-core/tests/mixin_navigation_legacy.rs::mixin_reference_service_test_finds_mixin_class_references"
+  },
+  {
+    "legacyTestPath": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixin/MixinReferenceServiceTest.kt",
+    "legacyClass": "MixinReferenceServiceTest",
+    "legacyCase": "findsReferencesAcrossMultipleSources",
+    "baselineSha256": "2f53e6093a99ce1b88f2d36b7ed90b91a4ebd44bf9cf36298e3cf4b169fce06a",
+    "status": "pending_native_replay",
+    "rustTest": "mcdev-core/tests/mixin_navigation_legacy.rs::mixin_reference_service_test_finds_references_across_multiple_sources"
+  },
+  {
+    "legacyTestPath": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixin/MixinReferenceServiceTest.kt",
+    "legacyClass": "MixinReferenceServiceTest",
+    "legacyCase": "findsShadowFieldReferences",
+    "baselineSha256": "2f53e6093a99ce1b88f2d36b7ed90b91a4ebd44bf9cf36298e3cf4b169fce06a",
+    "status": "pending_native_replay",
+    "rustTest": "mcdev-core/tests/mixin_navigation_legacy.rs::mixin_reference_service_test_finds_shadow_field_references"
+  },
+  {
+    "legacyTestPath": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixin/MixinReferenceServiceTest.kt",
+    "legacyClass": "MixinReferenceServiceTest",
+    "legacyCase": "matchesInjectMethodDescriptorExactly",
+    "baselineSha256": "2f53e6093a99ce1b88f2d36b7ed90b91a4ebd44bf9cf36298e3cf4b169fce06a",
+    "status": "pending_native_replay",
+    "rustTest": "mcdev-core/tests/mixin_navigation_legacy.rs::mixin_reference_service_test_matches_inject_method_descriptor_exactly"
+  },
+  {
+    "legacyTestPath": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixin/MixinReferenceServiceTest.kt",
+    "legacyClass": "MixinReferenceServiceTest",
+    "legacyCase": "returnsEmptyWhenNoMatches",
+    "baselineSha256": "2f53e6093a99ce1b88f2d36b7ed90b91a4ebd44bf9cf36298e3cf4b169fce06a",
+    "status": "pending_native_replay",
+    "rustTest": "mcdev-core/tests/mixin_navigation_legacy.rs::mixin_reference_service_test_returns_empty_when_no_matches"
+  }
+]

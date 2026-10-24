@@ -1,0 +1,29 @@
+{
+  "services": {
+    "AtTargetCompletionService": ["complete", "formatTarget"],
+    "AtTargetInsertFormatter": ["formatInsert"],
+    "AtValueCompletionService": ["complete"],
+    "ConstantAtHintFormatter": ["hintFor"],
+    "InjectMethodCompletionService": ["complete"],
+    "MixinAttributeCompletionService": ["complete"],
+    "MixinTargetCompletionService": ["complete"],
+    "MixinDeclarationSnippetService": ["complete"],
+    "MixinImportEditBuilder": ["referenceForInternalName", "buildImportEdit", "needsImport"],
+    "MixinConfigEditor": ["parse", "containsEntry", "addEntry", "listMixinClasses"],
+    "MixinSideResolver": ["explicitSideFromSource"]
+  },
+  "testClasses": [
+    "AtCompletionServiceTest", "InjectMethodCompletionServiceTest",
+    "MixinAttributeCompletionServiceTest", "MixinTargetCompletionServiceTest",
+    "MixinDeclarationSnippetServiceTest", "MixinImportEditBuilderTest",
+    "MixinConfigEditorTest", "MixinSideResolverTest", "KotlinCompletionEditingTest",
+    "AtTargetMappingTest"
+  ],
+  "selectedTestMethods": {
+    "MixinEdgeCasesTest": [
+      "completesClassInsideMixinArrayFormUsingManualContext",
+      "constantAtCompletionIncludesStringValueHint",
+      "constantAtCompletionIncludesIntValueHint"
+    ]
+  }
+}

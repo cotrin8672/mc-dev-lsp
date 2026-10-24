@@ -1,9 +1,11 @@
 local convert = require("mcdev.convert")
 local protocol = require("mcdev.protocol")
+local buffer = require("mcdev.buffer")
 
 local M = {}
 
 function M.code_actions(bufnr, range, diagnostic_codes, cb)
+  local snapshot = buffer.snapshot(bufnr)
   protocol.code_action(bufnr, range, diagnostic_codes, function(envelope, err)
     local result, unwrap_err = convert.unwrap_envelope(envelope, err)
     if unwrap_err then
@@ -14,7 +16,9 @@ function M.code_actions(bufnr, range, diagnostic_codes, cb)
     end
     local actions = {}
     for _, action in ipairs((result and result.actions) or {}) do
-      table.insert(actions, convert.to_lsp_code_action(action))
+      local item = convert.to_lsp_code_action(action)
+      item._mcdev_snapshots = buffer.edit_snapshots(item.edit, snapshot and { [snapshot.uri] = snapshot } or {})
+      table.insert(actions, item)
     end
     if cb then
       cb(actions, nil)
@@ -37,7 +41,19 @@ function M.apply(action, bufnr)
   end
   local encoding = client and client.offset_encoding or "utf-16"
   local request_params = action._mcdev_request_params
+  local snapshots = buffer.edit_snapshots(action.edit, vim.deepcopy(action._mcdev_snapshots or {}))
+  if next(snapshots) == nil then
+    local snapshot = buffer.snapshot(bufnr)
+    if snapshot then snapshots[snapshot.uri] = snapshot end
+  end
   local function apply(resolved)
+    buffer.edit_snapshots(resolved.edit, snapshots)
+    for _, snapshot in pairs(snapshots) do
+      if not buffer.snapshot_current(snapshot) then
+        vim.notify("mcdev: code action source changed; request actions again", vim.log.levels.WARN)
+        return
+      end
+    end
     if resolved.edit then
       vim.lsp.util.apply_workspace_edit(resolved.edit, encoding)
     end
@@ -49,8 +65,9 @@ function M.apply(action, bufnr)
         command = vim.deepcopy(resolved)
         command._mcdev_client_id = nil
         command._mcdev_request_params = nil
+        command._mcdev_snapshots = nil
       end
-      local command_client = client or protocol.active_jdtls_client(bufnr)
+      local command_client = client or protocol.active_ktlsp_client(bufnr)
       if command_client then
         local context = { bufnr = bufnr }
         if request_params then context.params = request_params end
@@ -63,6 +80,7 @@ function M.apply(action, bufnr)
   local unresolved = vim.deepcopy(action)
   unresolved._mcdev_client_id = nil
   unresolved._mcdev_request_params = nil
+  unresolved._mcdev_snapshots = nil
   if client and type(action.command) ~= "string" and not (action.edit and action.command)
     and client:supports_method("codeAction/resolve", bufnr) then
     local started = client:request("codeAction/resolve", unresolved, function(err, resolved)

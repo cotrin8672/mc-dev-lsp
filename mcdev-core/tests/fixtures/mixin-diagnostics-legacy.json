@@ -1,0 +1,716 @@
+[
+  {
+    "id": "MixinDiagnosticsServiceTest.reportsUnresolvedMixinClassTarget",
+    "source": "@Mixin(UnknownClass.class) class M {}",
+    "uri": "file:///Mixin.java",
+    "config": null,
+    "mixin_class": null,
+    "package": null,
+    "config_path": null,
+    "assertions": [
+      {
+        "kind": "any",
+        "code": "MIXIN_UNRESOLVED_TARGET",
+        "metadata": {},
+        "message_contains": null
+      }
+    ],
+    "selected_code": null,
+    "metadata_equals": {},
+    "range_checks": [],
+    "original_test_body": "\n        val source = \"\"\"@Mixin(UnknownClass.class) class M {}\"\"\"\n        val diagnostics = analyze(source)\n        assertTrue(diagnostics.any { it.code == MixinDiagnosticCodes.UNRESOLVED_MIXIN_TARGET })\n    "
+  },
+  {
+    "id": "MixinDiagnosticsServiceTest.reportsUnresolvedMixinStringTarget",
+    "source": "@Mixin(targets = \"com.unknown.Missing\") class M {}",
+    "uri": "file:///Mixin.java",
+    "config": null,
+    "mixin_class": null,
+    "package": null,
+    "config_path": null,
+    "assertions": [
+      {
+        "kind": "any",
+        "code": "MIXIN_UNRESOLVED_TARGET",
+        "metadata": {},
+        "message_contains": null
+      }
+    ],
+    "selected_code": null,
+    "metadata_equals": {},
+    "range_checks": [],
+    "original_test_body": "\n        val source = \"\"\"@Mixin(targets = \"com.unknown.Missing\") class M {}\"\"\"\n        val diagnostics = analyze(source)\n        assertTrue(diagnostics.any { it.code == MixinDiagnosticCodes.UNRESOLVED_MIXIN_TARGET })\n    "
+  },
+  {
+    "id": "MixinDiagnosticsServiceTest.noUnresolvedForValidClassTarget",
+    "source": "@Mixin(MinecraftClient.class) class M {}",
+    "uri": "file:///Mixin.java",
+    "config": null,
+    "mixin_class": null,
+    "package": null,
+    "config_path": null,
+    "assertions": [
+      {
+        "kind": "none",
+        "code": "MIXIN_UNRESOLVED_TARGET",
+        "metadata": {},
+        "message_contains": null
+      }
+    ],
+    "selected_code": null,
+    "metadata_equals": {},
+    "range_checks": [],
+    "original_test_body": "\n        val source = \"\"\"@Mixin(MinecraftClient.class) class M {}\"\"\"\n        val diagnostics = analyze(source)\n        assertTrue(diagnostics.none { it.code == MixinDiagnosticCodes.UNRESOLVED_MIXIN_TARGET })\n    "
+  },
+  {
+    "id": "MixinDiagnosticsServiceTest.reportsMissingMixinConfigEntry",
+    "source": "@Mixin(MinecraftClient.class) class ExampleMixin {}",
+    "uri": "file:///Mixin.java",
+    "config": "{ \"package\": \"example.mixin\", \"mixins\": [] }",
+    "mixin_class": "ExampleMixin",
+    "package": "example.mixin",
+    "config_path": "mixins.json",
+    "assertions": [
+      {
+        "kind": "single",
+        "code": "MIXIN_CLASS_NOT_LISTED_IN_CONFIG",
+        "metadata": {},
+        "message_contains": null
+      }
+    ],
+    "selected_code": "MIXIN_CLASS_NOT_LISTED_IN_CONFIG",
+    "metadata_equals": {
+      "configPath": "mixins.json"
+    },
+    "range_checks": [
+      {
+        "document": "source",
+        "text": "class ExampleMixin"
+      }
+    ],
+    "original_test_body": "\n        val source = \"\"\"@Mixin(MinecraftClient.class) class ExampleMixin {}\"\"\"\n        val config = \"\"\"{ \"package\": \"example.mixin\", \"mixins\": [] }\"\"\"\n        val diagnostics = service.analyze(\n            MixinDiagnosticRequest(\n                source = source,\n                documentUri = \"file:///Mixin.java\",\n                mixinClassName = \"ExampleMixin\",\n                mixinPackage = \"example.mixin\",\n                mixinConfigContent = config,\n                mixinConfigPath = \"mixins.json\",\n            ),\n        )\n        val diagnostic = diagnostics.single { it.code == MixinDiagnosticCodes.MIXIN_CLASS_NOT_LISTED_IN_CONFIG }\n        assertRangeCovers(source, diagnostic.range, \"class ExampleMixin\")\n        assertEquals(\"mixins.json\", diagnostic.metadata[\"configPath\"])\n    "
+  },
+  {
+    "id": "MixinDiagnosticsServiceTest.acceptsRelativeEntryForMixinSubpackage",
+    "source": "package com.example.mixin.client;\n@Mixin(MinecraftClient.class) class ClientMixin {}",
+    "uri": "file:///ClientMixin.java",
+    "config": "{ \"package\": \"com.example.mixin\", \"client\": [\"client.ClientMixin\"] }",
+    "mixin_class": "ClientMixin",
+    "package": "com.example.mixin.client",
+    "config_path": "mixins.json",
+    "assertions": [
+      {
+        "kind": "none",
+        "code": "MIXIN_CLASS_NOT_LISTED_IN_CONFIG",
+        "metadata": {},
+        "message_contains": null
+      }
+    ],
+    "selected_code": null,
+    "metadata_equals": {},
+    "range_checks": [],
+    "original_test_body": "\n        val source = \"\"\"\n            package com.example.mixin.client;\n            @Mixin(MinecraftClient.class) class ClientMixin {}\n        \"\"\".trimIndent()\n        val config = \"\"\"{ \"package\": \"com.example.mixin\", \"client\": [\"client.ClientMixin\"] }\"\"\"\n        val diagnostics = service.analyze(\n            MixinDiagnosticRequest(\n                source = source,\n                documentUri = \"file:///ClientMixin.java\",\n                mixinClassName = \"ClientMixin\",\n                mixinPackage = \"com.example.mixin.client\",\n                mixinConfigContent = config,\n                mixinConfigPath = \"mixins.json\",\n            ),\n        )\n        assertTrue(diagnostics.none { it.code == MixinDiagnosticCodes.MIXIN_CLASS_NOT_LISTED_IN_CONFIG })\n    "
+  },
+  {
+    "id": "MixinDiagnosticsServiceTest.rejectsSimpleEntryForMixinSubpackage",
+    "source": "package com.example.mixin.client;\n@Mixin(MinecraftClient.class) class ClientMixin {}",
+    "uri": "file:///ClientMixin.java",
+    "config": "{ \"package\": \"com.example.mixin\", \"client\": [\"ClientMixin\"] }",
+    "mixin_class": "ClientMixin",
+    "package": "com.example.mixin.client",
+    "config_path": "mixins.json",
+    "assertions": [
+      {
+        "kind": "single",
+        "code": "MIXIN_CLASS_NOT_LISTED_IN_CONFIG",
+        "metadata": {},
+        "message_contains": null
+      }
+    ],
+    "selected_code": "MIXIN_CLASS_NOT_LISTED_IN_CONFIG",
+    "metadata_equals": {
+      "mixinClass": "client.ClientMixin"
+    },
+    "range_checks": [],
+    "original_test_body": "\n        val source = \"\"\"\n            package com.example.mixin.client;\n            @Mixin(MinecraftClient.class) class ClientMixin {}\n        \"\"\".trimIndent()\n        val diagnostics = service.analyze(\n            MixinDiagnosticRequest(\n                source = source,\n                documentUri = \"file:///ClientMixin.java\",\n                mixinClassName = \"ClientMixin\",\n                mixinPackage = \"com.example.mixin.client\",\n                mixinConfigContent = \"\"\"{ \"package\": \"com.example.mixin\", \"client\": [\"ClientMixin\"] }\"\"\",\n                mixinConfigPath = \"mixins.json\",\n            ),\n        )\n        val diagnostic = diagnostics.single { it.code == MixinDiagnosticCodes.MIXIN_CLASS_NOT_LISTED_IN_CONFIG }\n        assertEquals(\"client.ClientMixin\", diagnostic.metadata[\"mixinClass\"])\n    "
+  },
+  {
+    "id": "MixinDiagnosticsServiceTest.missingSubpackageEntryUsesConfigRelativeName",
+    "source": "package com.example.mixin.client;\n@Mixin(MinecraftClient.class) class ClientMixin {}",
+    "uri": "file:///ClientMixin.java",
+    "config": "{ \"package\": \"com.example.mixin\", \"client\": [] }",
+    "mixin_class": "ClientMixin",
+    "package": "com.example.mixin.client",
+    "config_path": "mixins.json",
+    "assertions": [
+      {
+        "kind": "single",
+        "code": "MIXIN_CLASS_NOT_LISTED_IN_CONFIG",
+        "metadata": {},
+        "message_contains": null
+      }
+    ],
+    "selected_code": "MIXIN_CLASS_NOT_LISTED_IN_CONFIG",
+    "metadata_equals": {
+      "mixinClass": "client.ClientMixin"
+    },
+    "range_checks": [],
+    "original_test_body": "\n        val source = \"\"\"\n            package com.example.mixin.client;\n            @Mixin(MinecraftClient.class) class ClientMixin {}\n        \"\"\".trimIndent()\n        val config = \"\"\"{ \"package\": \"com.example.mixin\", \"client\": [] }\"\"\"\n        val diagnostics = service.analyze(\n            MixinDiagnosticRequest(\n                source = source,\n                documentUri = \"file:///ClientMixin.java\",\n                mixinClassName = \"ClientMixin\",\n                mixinPackage = \"com.example.mixin.client\",\n                mixinConfigContent = config,\n                mixinConfigPath = \"mixins.json\",\n            ),\n        )\n        val diagnostic = diagnostics.single { it.code == MixinDiagnosticCodes.MIXIN_CLASS_NOT_LISTED_IN_CONFIG }\n        assertEquals(\"client.ClientMixin\", diagnostic.metadata[\"mixinClass\"])\n    "
+  },
+  {
+    "id": "MixinDiagnosticsServiceTest.duplicateMixinConfigEntryRangesConfigEntry",
+    "source": "@Mixin(MinecraftClient.class) class ExampleMixin {}",
+    "uri": "file:///Mixin.java",
+    "config": "{\n  \"package\": \"example.mixin\",\n  \"mixins\": [\"ExampleMixin\", \"ExampleMixin\"]\n}",
+    "mixin_class": "ExampleMixin",
+    "package": "example.mixin",
+    "config_path": "mixins.json",
+    "assertions": [
+      {
+        "kind": "single",
+        "code": "MIXIN_DUPLICATE_CONFIG_ENTRY",
+        "metadata": {},
+        "message_contains": null
+      }
+    ],
+    "selected_code": "MIXIN_DUPLICATE_CONFIG_ENTRY",
+    "metadata_equals": {},
+    "range_checks": [
+      {
+        "document": "config",
+        "text": "ExampleMixin"
+      }
+    ],
+    "original_test_body": "\n        val source = \"\"\"@Mixin(MinecraftClient.class) class ExampleMixin {}\"\"\"\n        val config = \"\"\"\n            {\n              \"package\": \"example.mixin\",\n              \"mixins\": [\"ExampleMixin\", \"ExampleMixin\"]\n            }\n        \"\"\".trimIndent()\n        val diagnostics = service.analyze(\n            MixinDiagnosticRequest(\n                source = source,\n                documentUri = \"file:///Mixin.java\",\n                mixinClassName = \"ExampleMixin\",\n                mixinPackage = \"example.mixin\",\n                mixinConfigContent = config,\n                mixinConfigPath = \"mixins.json\",\n            ),\n        )\n        val diagnostic = diagnostics.single { it.code == MixinDiagnosticCodes.DUPLICATE_MIXIN_CONFIG_ENTRY }\n        assertRangeCovers(config, diagnostic.range, \"ExampleMixin\")\n        assertTrue(diagnostic.range.start != McTextPosition(0, 0))\n    "
+  },
+  {
+    "id": "MixinDiagnosticsServiceTest.reportsUnresolvedInjectMethod",
+    "source": "@Mixin(MinecraftClient.class)\nclass M {\n    @Inject(method = \"missing\", at = @At(\"HEAD\"))\n    void m() {}\n}",
+    "uri": "file:///Mixin.java",
+    "config": null,
+    "mixin_class": null,
+    "package": null,
+    "config_path": null,
+    "assertions": [
+      {
+        "kind": "any",
+        "code": "MIXIN_UNRESOLVED_INJECT_METHOD",
+        "metadata": {},
+        "message_contains": null
+      }
+    ],
+    "selected_code": null,
+    "metadata_equals": {},
+    "range_checks": [],
+    "original_test_body": "\n        val source = \"\"\"\n            @Mixin(MinecraftClient.class)\n            class M {\n                @Inject(method = \"missing\", at = @At(\"HEAD\"))\n                void m() {}\n            }\n        \"\"\".trimIndent()\n        val diagnostics = analyze(source)\n        assertTrue(diagnostics.any { it.code == MixinDiagnosticCodes.UNRESOLVED_INJECT_METHOD })\n    "
+  },
+  {
+    "id": "MixinDiagnosticsServiceTest.reportsAmbiguousInjectMethod",
+    "source": "@Mixin(MinecraftClient.class)\nclass M {\n    @Inject(method = \"render\", at = @At(\"HEAD\"))\n    void m() {}\n}",
+    "uri": "file:///Mixin.java",
+    "config": null,
+    "mixin_class": null,
+    "package": null,
+    "config_path": null,
+    "assertions": [
+      {
+        "kind": "any",
+        "code": "MIXIN_AMBIGUOUS_INJECT_METHOD",
+        "metadata": {},
+        "message_contains": null
+      }
+    ],
+    "selected_code": null,
+    "metadata_equals": {},
+    "range_checks": [],
+    "original_test_body": "\n        val source = \"\"\"\n            @Mixin(MinecraftClient.class)\n            class M {\n                @Inject(method = \"render\", at = @At(\"HEAD\"))\n                void m() {}\n            }\n        \"\"\".trimIndent()\n        val diagnostics = analyze(source)\n        assertTrue(diagnostics.any { it.code == MixinDiagnosticCodes.AMBIGUOUS_INJECT_METHOD })\n    "
+  },
+  {
+    "id": "MixinDiagnosticsServiceTest.reportsUnresolvedJavaTypeInInvokerDeclaration",
+    "source": "@Mixin(MinecraftClient.class)\nclass M {\n    @Invoker(\"setScreen\")\n    abstract void invokeSetScreen(UnknownScreen screen);\n}",
+    "uri": "file:///Mixin.java",
+    "config": null,
+    "mixin_class": null,
+    "package": null,
+    "config_path": null,
+    "assertions": [
+      {
+        "kind": "any",
+        "code": "MIXIN_UNRESOLVED_JAVA_TYPE",
+        "metadata": {
+          "normalizedType": "UnknownScreen"
+        },
+        "message_contains": null
+      }
+    ],
+    "selected_code": null,
+    "metadata_equals": {},
+    "range_checks": [],
+    "original_test_body": "\n        val source = \"\"\"\n            @Mixin(MinecraftClient.class)\n            class M {\n                @Invoker(\"setScreen\")\n                abstract void invokeSetScreen(UnknownScreen screen);\n            }\n        \"\"\".trimIndent()\n\n        val diagnostics = analyze(source)\n\n        assertTrue(diagnostics.any {\n            it.code == MixinDiagnosticCodes.UNRESOLVED_JAVA_TYPE &&\n                it.metadata[\"normalizedType\"] == \"UnknownScreen\"\n        })\n    "
+  },
+  {
+    "id": "MixinDiagnosticsServiceTest.analyzesInjectMethodArray",
+    "source": "@Mixin(MinecraftClient.class)\nclass M {\n    @Inject(\n        method = {\n            \"tick\",\n            \"missing\"\n        },\n        at = @At(\"HEAD\")\n    )\n    void m() {}\n}",
+    "uri": "file:///Mixin.java",
+    "config": null,
+    "mixin_class": null,
+    "package": null,
+    "config_path": null,
+    "assertions": [
+      {
+        "kind": "any",
+        "code": "MIXIN_UNRESOLVED_INJECT_METHOD",
+        "metadata": {
+          "method": "missing"
+        },
+        "message_contains": null
+      }
+    ],
+    "selected_code": null,
+    "metadata_equals": {},
+    "range_checks": [],
+    "original_test_body": "\n        val source = \"\"\"\n            @Mixin(MinecraftClient.class)\n            class M {\n                @Inject(\n                    method = {\n                        \"tick\",\n                        \"missing\"\n                    },\n                    at = @At(\"HEAD\")\n                )\n                void m() {}\n            }\n        \"\"\".trimIndent()\n        val diagnostics = analyze(source)\n        assertTrue(diagnostics.any {\n            it.code == MixinDiagnosticCodes.UNRESOLVED_INJECT_METHOD &&\n                it.metadata[\"method\"] == \"missing\"\n        })\n    "
+  },
+  {
+    "id": "MixinDiagnosticsServiceTest.reportsDescriptorMismatchForInjectMethod",
+    "source": "@Mixin(MinecraftClient.class)\nclass M {\n    @Inject(method = \"tick(I)V\", at = @At(\"HEAD\"))\n    void m() {}\n}",
+    "uri": "file:///Mixin.java",
+    "config": null,
+    "mixin_class": null,
+    "package": null,
+    "config_path": null,
+    "assertions": [
+      {
+        "kind": "any",
+        "code": "MIXIN_DESCRIPTOR_MISMATCH",
+        "metadata": {},
+        "message_contains": null
+      }
+    ],
+    "selected_code": null,
+    "metadata_equals": {},
+    "range_checks": [],
+    "original_test_body": "\n        val source = \"\"\"\n            @Mixin(MinecraftClient.class)\n            class M {\n                @Inject(method = \"tick(I)V\", at = @At(\"HEAD\"))\n                void m() {}\n            }\n        \"\"\".trimIndent()\n        val diagnostics = analyze(source)\n        assertTrue(diagnostics.any { it.code == MixinDiagnosticCodes.DESCRIPTOR_MISMATCH })\n    "
+  },
+  {
+    "id": "MixinDiagnosticsServiceTest.reportsUnresolvedAtTarget",
+    "source": "@Mixin(MinecraftClient.class)\nclass M {\n    @Inject(method = \"tick\", at = @At(value = \"INVOKE\", target = \"Lmissing/Class;draw()V\"))\n    void m() {}\n}",
+    "uri": "file:///Mixin.java",
+    "config": null,
+    "mixin_class": null,
+    "package": null,
+    "config_path": null,
+    "assertions": [
+      {
+        "kind": "any",
+        "code": "MIXIN_UNRESOLVED_AT_TARGET",
+        "metadata": {},
+        "message_contains": null
+      }
+    ],
+    "selected_code": null,
+    "metadata_equals": {},
+    "range_checks": [],
+    "original_test_body": "\n        val source = \"\"\"\n            @Mixin(MinecraftClient.class)\n            class M {\n                @Inject(method = \"tick\", at = @At(value = \"INVOKE\", target = \"Lmissing/Class;draw()V\"))\n                void m() {}\n            }\n        \"\"\".trimIndent()\n        val diagnostics = analyze(source)\n        assertTrue(diagnostics.any { it.code == MixinDiagnosticCodes.UNRESOLVED_AT_TARGET })\n    "
+  },
+  {
+    "id": "MixinDiagnosticsServiceTest.analyzesAtArraySeparately",
+    "source": "@Mixin(MinecraftClient.class)\nclass M {\n    @Inject(\n        method = \"tick\",\n        at = {\n            @At(\"HEAD\"),\n            @At(value = \"INVOKE\", target = \"Lmissing/Class;draw()V\")\n        }\n    )\n    void m() {}\n}",
+    "uri": "file:///Mixin.java",
+    "config": null,
+    "mixin_class": null,
+    "package": null,
+    "config_path": null,
+    "assertions": [
+      {
+        "kind": "any",
+        "code": "MIXIN_UNRESOLVED_AT_TARGET",
+        "metadata": {
+          "target": "Lmissing/Class;draw()V"
+        },
+        "message_contains": null
+      }
+    ],
+    "selected_code": null,
+    "metadata_equals": {},
+    "range_checks": [],
+    "original_test_body": "\n        val source = \"\"\"\n            @Mixin(MinecraftClient.class)\n            class M {\n                @Inject(\n                    method = \"tick\",\n                    at = {\n                        @At(\"HEAD\"),\n                        @At(value = \"INVOKE\", target = \"Lmissing/Class;draw()V\")\n                    }\n                )\n                void m() {}\n            }\n        \"\"\".trimIndent()\n        val diagnostics = analyze(source)\n        assertTrue(diagnostics.any {\n            it.code == MixinDiagnosticCodes.UNRESOLVED_AT_TARGET &&\n                it.metadata[\"target\"] == \"Lmissing/Class;draw()V\"\n        })\n    "
+  },
+  {
+    "id": "MixinDiagnosticsServiceTest.reportsUnresolvedAtTargetForDescriptorBearingInjectMethod",
+    "source": "@Mixin(MinecraftClient.class)\nclass M {\n    @Inject(method = \"tick()V\", at = @At(value = \"INVOKE\", target = \"Lmissing/Class;draw()V\"))\n    void m() {}\n}",
+    "uri": "file:///Mixin.java",
+    "config": null,
+    "mixin_class": null,
+    "package": null,
+    "config_path": null,
+    "assertions": [
+      {
+        "kind": "any",
+        "code": "MIXIN_UNRESOLVED_AT_TARGET",
+        "metadata": {},
+        "message_contains": null
+      }
+    ],
+    "selected_code": null,
+    "metadata_equals": {},
+    "range_checks": [],
+    "original_test_body": "\n        val source = \"\"\"\n            @Mixin(MinecraftClient.class)\n            class M {\n                @Inject(method = \"tick()V\", at = @At(value = \"INVOKE\", target = \"Lmissing/Class;draw()V\"))\n                void m() {}\n            }\n        \"\"\".trimIndent()\n        val diagnostics = analyze(source)\n        assertTrue(diagnostics.any { it.code == MixinDiagnosticCodes.UNRESOLVED_AT_TARGET })\n    "
+  },
+  {
+    "id": "MixinDiagnosticsServiceTest.reportsInvalidAtTargetDescriptor",
+    "source": "@Mixin(MinecraftClient.class)\nclass M {\n    @Inject(method = \"tick\", at = @At(value = \"INVOKE\", target = \"invalid\"))\n    void m() {}\n}",
+    "uri": "file:///Mixin.java",
+    "config": null,
+    "mixin_class": null,
+    "package": null,
+    "config_path": null,
+    "assertions": [
+      {
+        "kind": "any",
+        "code": "MIXIN_INVALID_AT_TARGET_DESCRIPTOR",
+        "metadata": {},
+        "message_contains": null
+      }
+    ],
+    "selected_code": null,
+    "metadata_equals": {},
+    "range_checks": [],
+    "original_test_body": "\n        val source = \"\"\"\n            @Mixin(MinecraftClient.class)\n            class M {\n                @Inject(method = \"tick\", at = @At(value = \"INVOKE\", target = \"invalid\"))\n                void m() {}\n            }\n        \"\"\".trimIndent()\n        val diagnostics = analyze(source)\n        assertTrue(diagnostics.any { it.code == MixinDiagnosticCodes.INVALID_AT_TARGET_DESCRIPTOR })\n    "
+  },
+  {
+    "id": "MixinDiagnosticsServiceTest.diagnosticsUseCompleteConcatenatedAtTargetValue",
+    "source": "@Mixin(MinecraftClient.class)\nclass M {\n    @Inject(method = \"tick\", at = @At(\n        value = \"INVOKE\",\n        target = \"Lnet/minecraft/client/font/TextRenderer;\" +\n            \"draw(Ljava/lang/String;\" + \"FFI)I\"\n    ))\n    void m() {}\n}",
+    "uri": "file:///Mixin.java",
+    "config": null,
+    "mixin_class": null,
+    "package": null,
+    "config_path": null,
+    "assertions": [
+      {
+        "kind": "none",
+        "code": "MIXIN_INVALID_AT_TARGET_DESCRIPTOR",
+        "metadata": {},
+        "message_contains": null
+      },
+      {
+        "kind": "none",
+        "code": "MIXIN_UNRESOLVED_AT_TARGET",
+        "metadata": {},
+        "message_contains": null
+      }
+    ],
+    "selected_code": null,
+    "metadata_equals": {},
+    "range_checks": [],
+    "original_test_body": "\n        val source = \"\"\"\n            @Mixin(MinecraftClient.class)\n            class M {\n                @Inject(method = \"tick\", at = @At(\n                    value = \"INVOKE\",\n                    target = \"Lnet/minecraft/client/font/TextRenderer;\" +\n                        \"draw(Ljava/lang/String;\" + \"FFI)I\"\n                ))\n                void m() {}\n            }\n        \"\"\".trimIndent()\n\n        val diagnostics = analyze(source)\n\n        assertTrue(diagnostics.none { it.code == MixinDiagnosticCodes.INVALID_AT_TARGET_DESCRIPTOR })\n        assertTrue(diagnostics.none { it.code == MixinDiagnosticCodes.UNRESOLVED_AT_TARGET })\n    "
+  },
+  {
+    "id": "MixinDiagnosticsServiceTest.reportsOrdinalOutOfRange",
+    "source": "@Mixin(MinecraftClient.class)\nclass M {\n    @Inject(method = \"tick\", at = @At(value = \"RETURN\", ordinal = 5))\n    void m() {}\n}",
+    "uri": "file:///Mixin.java",
+    "config": null,
+    "mixin_class": null,
+    "package": null,
+    "config_path": null,
+    "assertions": [
+      {
+        "kind": "any",
+        "code": "MIXIN_ORDINAL_OUT_OF_RANGE",
+        "metadata": {},
+        "message_contains": null
+      }
+    ],
+    "selected_code": null,
+    "metadata_equals": {},
+    "range_checks": [],
+    "original_test_body": "\n        val source = \"\"\"\n            @Mixin(MinecraftClient.class)\n            class M {\n                @Inject(method = \"tick\", at = @At(value = \"RETURN\", ordinal = 5))\n                void m() {}\n            }\n        \"\"\".trimIndent()\n        val diagnostics = analyze(source)\n        assertTrue(diagnostics.any { it.code == MixinDiagnosticCodes.ORDINAL_OUT_OF_RANGE })\n    "
+  },
+  {
+    "id": "MixinDiagnosticsServiceTest.noDiagnosticForValidAtTarget",
+    "source": "@Mixin(MinecraftClient.class)\nclass M {\n    @Inject(method = \"tick\", at = @At(value = \"INVOKE\", target = \"Lnet/minecraft/client/font/TextRenderer;draw(Ljava/lang/String;FFI)I\"))\n    void m() {}\n}",
+    "uri": "file:///Mixin.java",
+    "config": null,
+    "mixin_class": null,
+    "package": null,
+    "config_path": null,
+    "assertions": [
+      {
+        "kind": "none",
+        "code": "MIXIN_UNRESOLVED_AT_TARGET",
+        "metadata": {},
+        "message_contains": null
+      }
+    ],
+    "selected_code": null,
+    "metadata_equals": {},
+    "range_checks": [],
+    "original_test_body": "\n        val source = \"\"\"\n            @Mixin(MinecraftClient.class)\n            class M {\n                @Inject(method = \"tick\", at = @At(value = \"INVOKE\", target = \"Lnet/minecraft/client/font/TextRenderer;draw(Ljava/lang/String;FFI)I\"))\n                void m() {}\n            }\n        \"\"\".trimIndent()\n        val diagnostics = analyze(source)\n        assertTrue(diagnostics.none { it.code == MixinDiagnosticCodes.UNRESOLVED_AT_TARGET })\n    "
+  },
+  {
+    "id": "MixinDiagnosticsServiceTest.injectMethodDiagnosticUsesAbsoluteSourceOffset",
+    "source": "@Mixin(MinecraftClient.class)\nclass M {\n    @Inject(\n        method = \"missing\",\n        at = @At(\"HEAD\")\n    )\n    void m() {}\n}",
+    "uri": "file:///Mixin.java",
+    "config": null,
+    "mixin_class": null,
+    "package": null,
+    "config_path": null,
+    "assertions": [
+      {
+        "kind": "single",
+        "code": "MIXIN_UNRESOLVED_INJECT_METHOD",
+        "metadata": {},
+        "message_contains": null
+      }
+    ],
+    "selected_code": "MIXIN_UNRESOLVED_INJECT_METHOD",
+    "metadata_equals": {},
+    "range_checks": [
+      {
+        "document": "source",
+        "text": "method = \"missing\""
+      }
+    ],
+    "original_test_body": "\n        val source = \"\"\"\n            @Mixin(MinecraftClient.class)\n            class M {\n                @Inject(\n                    method = \"missing\",\n                    at = @At(\"HEAD\")\n                )\n                void m() {}\n            }\n        \"\"\".trimIndent()\n        val diagnostics = analyze(source)\n        val diagnostic = diagnostics.single { it.code == MixinDiagnosticCodes.UNRESOLVED_INJECT_METHOD }\n        assertRangeCovers(source, diagnostic.range, \"method = \\\"missing\\\"\")\n    "
+  },
+  {
+    "id": "MixinDiagnosticsServiceTest.injectMethodDiagnosticUsesAbsoluteSourceOffsetWithCrlf",
+    "source": "@Mixin(MinecraftClient.class)\r\nclass M {\r\n    @Inject(method = \"missing\", at = @At(\"HEAD\"))\r\n    void m() {}\r\n}",
+    "uri": "file:///Mixin.java",
+    "config": null,
+    "mixin_class": null,
+    "package": null,
+    "config_path": null,
+    "assertions": [
+      {
+        "kind": "single",
+        "code": "MIXIN_UNRESOLVED_INJECT_METHOD",
+        "metadata": {},
+        "message_contains": null
+      }
+    ],
+    "selected_code": "MIXIN_UNRESOLVED_INJECT_METHOD",
+    "metadata_equals": {},
+    "range_checks": [
+      {
+        "document": "source",
+        "text": "method = \"missing\""
+      }
+    ],
+    "original_test_body": "\n        val source = \"@Mixin(MinecraftClient.class)\\r\\nclass M {\\r\\n    @Inject(method = \\\"missing\\\", at = @At(\\\"HEAD\\\"))\\r\\n    void m() {}\\r\\n}\"\n        val diagnostics = analyze(source)\n        val diagnostic = diagnostics.single { it.code == MixinDiagnosticCodes.UNRESOLVED_INJECT_METHOD }\n        assertRangeCovers(source, diagnostic.range, \"method = \\\"missing\\\"\")\n    "
+  },
+  {
+    "id": "MixinDiagnosticsServiceTest.atTargetDiagnosticRangesTargetValueInSource",
+    "source": "@Mixin(MinecraftClient.class)\nclass M {\n    @Inject(method = \"tick\", at = @At(value = \"INVOKE\", target = \"Lmissing/Class;draw()V\"))\n    void m() {}\n}",
+    "uri": "file:///Mixin.java",
+    "config": null,
+    "mixin_class": null,
+    "package": null,
+    "config_path": null,
+    "assertions": [
+      {
+        "kind": "single",
+        "code": "MIXIN_UNRESOLVED_AT_TARGET",
+        "metadata": {},
+        "message_contains": null
+      }
+    ],
+    "selected_code": "MIXIN_UNRESOLVED_AT_TARGET",
+    "metadata_equals": {},
+    "range_checks": [
+      {
+        "document": "source",
+        "text": "Lmissing/Class;draw()V"
+      }
+    ],
+    "original_test_body": "\n        val source = \"\"\"\n            @Mixin(MinecraftClient.class)\n            class M {\n                @Inject(method = \"tick\", at = @At(value = \"INVOKE\", target = \"Lmissing/Class;draw()V\"))\n                void m() {}\n            }\n        \"\"\".trimIndent()\n        val diagnostics = analyze(source)\n        val diagnostic = diagnostics.single { it.code == MixinDiagnosticCodes.UNRESOLVED_AT_TARGET }\n        assertRangeCovers(source, diagnostic.range, \"Lmissing/Class;draw()V\")\n        assertTrue(diagnostic.range.start != McTextPosition(0, 0))\n    "
+  },
+  {
+    "id": "MixinDiagnosticsServiceTest.returnOrdinalValidationUsesContainingInjectorMethod",
+    "source": "@Mixin(MinecraftClient.class)\nclass M {\n    @Inject(method = \"foo\", at = @At(value = \"RETURN\", ordinal = 5))\n    void onFoo() {}\n\n    @Inject(method = \"bar\", at = @At(value = \"RETURN\", ordinal = 5))\n    void onBar() {}\n}",
+    "uri": "file:///Mixin.java",
+    "config": null,
+    "mixin_class": null,
+    "package": null,
+    "config_path": null,
+    "assertions": [],
+    "selected_code": null,
+    "metadata_equals": {},
+    "range_checks": [],
+    "original_test_body": "\n        val classIndex = FakeClassIndex(\n            methods = FakeClassIndex.defaultMethods() + mapOf(\n                \"net/minecraft/client/MinecraftClient\" to listOf(\n                    MethodIndexEntry(\"foo\", \"()V\", false, \"foo(): void\"),\n                    MethodIndexEntry(\"bar\", \"()V\", false, \"bar(): void\"),\n                ),\n            ),\n        )\n        val bytecodeIndex = FakeBytecodeIndex(\n            returnCounts = mapOf(\n                \"net/minecraft/client/MinecraftClient#foo\" to 10,\n                \"net/minecraft/client/MinecraftClient#bar\" to 2,\n            ),\n        )\n        val service = MixinDiagnosticsService(classIndex, bytecodeIndex)\n        val source = \"\"\"\n            @Mixin(MinecraftClient.class)\n            class M {\n                @Inject(method = \"foo\", at = @At(value = \"RETURN\", ordinal = 5))\n                void onFoo() {}\n\n                @Inject(method = \"bar\", at = @At(value = \"RETURN\", ordinal = 5))\n                void onBar() {}\n            }\n        \"\"\".trimIndent()\n        val diagnostics = service.analyze(\n            MixinDiagnosticRequest(\n                source = source,\n                documentUri = \"file:///Mixin.java\",\n                mixinClassName = null,\n                mixinPackage = null,\n                mixinConfigContent = null,\n                mixinConfigPath = null,\n            ),\n        )\n        val ordinalDiagnostics = diagnostics.filter { it.code == MixinDiagnosticCodes.ORDINAL_OUT_OF_RANGE }\n        assertEquals(1, ordinalDiagnostics.size)\n        assertRangeCovers(\n            source,\n            ordinalDiagnostics.single().range,\n            \"ordinal = 5\",\n            fromIndex = source.indexOf(\"method = \\\"bar\\\"\"),\n        )\n    "
+  },
+  {
+    "id": "MixinDiagnosticsServiceTest.reportsUnresolvedFullyQualifiedMixinClassTarget",
+    "source": "@org.spongepowered.asm.mixin.Mixin(com.example.missing.Unknown.class) class M {}",
+    "uri": "file:///Mixin.java",
+    "config": null,
+    "mixin_class": null,
+    "package": null,
+    "config_path": null,
+    "assertions": [
+      {
+        "kind": "any",
+        "code": "MIXIN_UNRESOLVED_TARGET",
+        "metadata": {},
+        "message_contains": "com/example/missing/Unknown"
+      }
+    ],
+    "selected_code": null,
+    "metadata_equals": {},
+    "range_checks": [],
+    "original_test_body": "\n        val source = \"\"\"@org.spongepowered.asm.mixin.Mixin(com.example.missing.Unknown.class) class M {}\"\"\"\n        val diagnostics = analyze(source)\n        assertTrue(diagnostics.any {\n            it.code == MixinDiagnosticCodes.UNRESOLVED_MIXIN_TARGET &&\n                it.message.contains(\"com/example/missing/Unknown\")\n        })\n    "
+  },
+  {
+    "id": "MixinDiagnosticsServiceTest.reportsUnresolvedFullyQualifiedMixinArrayTarget",
+    "source": "@org.spongepowered.asm.mixin.Mixin({ com.example.missing.A.class, MinecraftClient.class }) class M {}",
+    "uri": "file:///Mixin.java",
+    "config": null,
+    "mixin_class": null,
+    "package": null,
+    "config_path": null,
+    "assertions": [
+      {
+        "kind": "any",
+        "code": "MIXIN_UNRESOLVED_TARGET",
+        "metadata": {},
+        "message_contains": "com/example/missing/A"
+      },
+      {
+        "kind": "none",
+        "code": "MIXIN_UNRESOLVED_TARGET",
+        "metadata": {},
+        "message_contains": "MinecraftClient"
+      }
+    ],
+    "selected_code": null,
+    "metadata_equals": {},
+    "range_checks": [],
+    "original_test_body": "\n        val source = \"\"\"@org.spongepowered.asm.mixin.Mixin({ com.example.missing.A.class, MinecraftClient.class }) class M {}\"\"\"\n        val diagnostics = analyze(source)\n        assertTrue(diagnostics.any {\n            it.code == MixinDiagnosticCodes.UNRESOLVED_MIXIN_TARGET &&\n                it.message.contains(\"com/example/missing/A\")\n        })\n        assertTrue(diagnostics.none {\n            it.code == MixinDiagnosticCodes.UNRESOLVED_MIXIN_TARGET &&\n                it.message.contains(\"MinecraftClient\")\n        })\n    "
+  },
+  {
+    "id": "MixinEdgeCasesTest.overwriteValidationPassesForMatchingTargetMethod",
+    "source": "@Mixin(MinecraftClient.class)\nclass ExampleMixin {\n    @Overwrite\n    public void tick() {}\n}",
+    "uri": "file:///Mixin.java",
+    "config": null,
+    "mixin_class": null,
+    "package": null,
+    "config_path": null,
+    "assertions": [
+      {
+        "kind": "none",
+        "code": "MIXIN_OVERWRITE_TARGET_NOT_FOUND",
+        "metadata": {},
+        "message_contains": null
+      }
+    ],
+    "selected_code": null,
+    "metadata_equals": {},
+    "range_checks": [],
+    "original_test_body": "\n        val source = \"\"\"\n            @Mixin(MinecraftClient.class)\n            class ExampleMixin {\n                @Overwrite\n                public void tick() {}\n            }\n        \"\"\".trimIndent()\n        val diagnostics = diagnosticsService.analyze(\n            MixinDiagnosticRequest(\n                source = source,\n                documentUri = \"file:///Mixin.java\",\n                mixinClassName = null,\n                mixinPackage = null,\n                mixinConfigContent = null,\n                mixinConfigPath = null,\n            ),\n        )\n        assertTrue(diagnostics.none { it.code == MixinDiagnosticCodes.OVERWRITE_TARGET_NOT_FOUND })\n    "
+  },
+  {
+    "id": "MixinEdgeCasesTest.overwriteValidationReportsMissingTargetMethod",
+    "source": "@Mixin(MinecraftClient.class)\nclass ExampleMixin {\n    @Overwrite\n    public void missingMethod() {}\n}",
+    "uri": "file:///Mixin.java",
+    "config": null,
+    "mixin_class": null,
+    "package": null,
+    "config_path": null,
+    "assertions": [
+      {
+        "kind": "any",
+        "code": "MIXIN_OVERWRITE_TARGET_NOT_FOUND",
+        "metadata": {},
+        "message_contains": null
+      }
+    ],
+    "selected_code": null,
+    "metadata_equals": {},
+    "range_checks": [],
+    "original_test_body": "\n        val source = \"\"\"\n            @Mixin(MinecraftClient.class)\n            class ExampleMixin {\n                @Overwrite\n                public void missingMethod() {}\n            }\n        \"\"\".trimIndent()\n        val diagnostics = diagnosticsService.analyze(\n            MixinDiagnosticRequest(\n                source = source,\n                documentUri = \"file:///Mixin.java\",\n                mixinClassName = null,\n                mixinPackage = null,\n                mixinConfigContent = null,\n                mixinConfigPath = null,\n            ),\n        )\n        assertTrue(diagnostics.any { it.code == MixinDiagnosticCodes.OVERWRITE_TARGET_NOT_FOUND })\n    "
+  },
+  {
+    "id": "MixinEdgeCasesTest.reportsDuplicateMixinClassTargetInArrayForm",
+    "source": "@Mixin({ MinecraftClient.class, MinecraftClient.class }) class M {}",
+    "uri": "file:///Mixin.java",
+    "config": null,
+    "mixin_class": null,
+    "package": null,
+    "config_path": null,
+    "assertions": [
+      {
+        "kind": "any",
+        "code": "MIXIN_DUPLICATE_TARGET",
+        "metadata": {},
+        "message_contains": null
+      }
+    ],
+    "selected_code": null,
+    "metadata_equals": {},
+    "range_checks": [],
+    "original_test_body": "\n        val source = \"\"\"@Mixin({ MinecraftClient.class, MinecraftClient.class }) class M {}\"\"\"\n        val diagnostics = diagnosticsService.analyze(\n            MixinDiagnosticRequest(\n                source = source,\n                documentUri = \"file:///Mixin.java\",\n                mixinClassName = null,\n                mixinPackage = null,\n                mixinConfigContent = null,\n                mixinConfigPath = null,\n            ),\n        )\n        assertTrue(diagnostics.any { it.code == MixinDiagnosticCodes.DUPLICATE_MIXIN_TARGET })\n    "
+  },
+  {
+    "id": "MixinEdgeCasesTest.reportsDuplicateMixinStringTarget",
+    "source": "@Mixin(targets = { \"net.minecraft.client.MinecraftClient\", \"net.minecraft.client.MinecraftClient\" }) class M {}",
+    "uri": "file:///Mixin.java",
+    "config": null,
+    "mixin_class": null,
+    "package": null,
+    "config_path": null,
+    "assertions": [
+      {
+        "kind": "any",
+        "code": "MIXIN_DUPLICATE_TARGET",
+        "metadata": {},
+        "message_contains": null
+      }
+    ],
+    "selected_code": null,
+    "metadata_equals": {},
+    "range_checks": [],
+    "original_test_body": "\n        val source = \"\"\"@Mixin(targets = { \"net.minecraft.client.MinecraftClient\", \"net.minecraft.client.MinecraftClient\" }) class M {}\"\"\"\n        val diagnostics = diagnosticsService.analyze(\n            MixinDiagnosticRequest(\n                source = source,\n                documentUri = \"file:///Mixin.java\",\n                mixinClassName = null,\n                mixinPackage = null,\n                mixinConfigContent = null,\n                mixinConfigPath = null,\n            ),\n        )\n        assertTrue(diagnostics.any { it.code == MixinDiagnosticCodes.DUPLICATE_MIXIN_TARGET })\n    "
+  },
+  {
+    "id": "MixinEdgeCasesTest.reportsDuplicateMixinConfigEntry",
+    "source": "@Mixin(MinecraftClient.class) class ExampleMixin {}",
+    "uri": "file:///Mixin.java",
+    "config": "{ \"package\": \"example.mixin\", \"mixins\": [\"ExampleMixin\", \"OtherMixin\", \"ExampleMixin\"] }",
+    "mixin_class": "ExampleMixin",
+    "package": "example.mixin",
+    "config_path": "mixins.json",
+    "assertions": [
+      {
+        "kind": "any",
+        "code": "MIXIN_DUPLICATE_CONFIG_ENTRY",
+        "metadata": {},
+        "message_contains": null
+      }
+    ],
+    "selected_code": null,
+    "metadata_equals": {},
+    "range_checks": [],
+    "original_test_body": "\n        val source = \"\"\"@Mixin(MinecraftClient.class) class ExampleMixin {}\"\"\"\n        val config = \"\"\"{ \"package\": \"example.mixin\", \"mixins\": [\"ExampleMixin\", \"OtherMixin\", \"ExampleMixin\"] }\"\"\"\n        val diagnostics = diagnosticsService.analyze(\n            MixinDiagnosticRequest(\n                source = source,\n                documentUri = \"file:///Mixin.java\",\n                mixinClassName = \"ExampleMixin\",\n                mixinPackage = \"example.mixin\",\n                mixinConfigContent = config,\n                mixinConfigPath = \"mixins.json\",\n            ),\n        )\n        assertTrue(diagnostics.any { it.code == MixinDiagnosticCodes.DUPLICATE_MIXIN_CONFIG_ENTRY })\n    "
+  },
+  {
+    "id": "MixinEdgeCasesTest.reportsOrdinalOutOfRangeForReturnAt",
+    "source": "@Mixin(MinecraftClient.class)\nclass M {\n    @Inject(method = \"tick\", at = @At(value = \"RETURN\", ordinal = 5))\n    void m() {}\n}",
+    "uri": "file:///Mixin.java",
+    "config": null,
+    "mixin_class": null,
+    "package": null,
+    "config_path": null,
+    "assertions": [
+      {
+        "kind": "any",
+        "code": "MIXIN_ORDINAL_OUT_OF_RANGE",
+        "metadata": {},
+        "message_contains": null
+      }
+    ],
+    "selected_code": null,
+    "metadata_equals": {},
+    "range_checks": [],
+    "original_test_body": "\n        val source = \"\"\"\n            @Mixin(MinecraftClient.class)\n            class M {\n                @Inject(method = \"tick\", at = @At(value = \"RETURN\", ordinal = 5))\n                void m() {}\n            }\n        \"\"\".trimIndent()\n        val diagnostics = diagnosticsService.analyze(\n            MixinDiagnosticRequest(\n                source = source,\n                documentUri = \"file:///Mixin.java\",\n                mixinClassName = null,\n                mixinPackage = null,\n                mixinConfigContent = null,\n                mixinConfigPath = null,\n            ),\n        )\n        assertTrue(diagnostics.any { it.code == MixinDiagnosticCodes.ORDINAL_OUT_OF_RANGE })\n    "
+  }
+]

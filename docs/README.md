@@ -47,6 +47,8 @@ The explicit non-goals are:
 
 - [Installation](installation.md)
   Prerequisites, prebuilt jar setup, and build from source.
+- [Native distribution](native-distribution.md)
+  Standalone companion archives, checksums, installation, and current scope.
 - [Mason Setup](mason.md)
   Install JDT LS with Mason and inject the separately built mcdev bundle.
 - [Lazy.nvim Setup](lazy-nvim.md)

@@ -1,0 +1,2093 @@
+[
+  {
+    "legacyAssertionId": "mcdev-nvim/tests/e2e/create_drill_definition_diagnostics_e2e.lua::assert@56",
+    "oldCall": "helpers.assert_true(started, method .. \" request did not start\")",
+    "newAssertionIds": [
+      "mcdev-nvim/tests/e2e/create_drill_definition_diagnostics_e2e.lua::assert@56"
+    ],
+    "newAssertions": [
+      {
+        "line": 56,
+        "call": "helpers.assert_true(ok, \"selected dependency source read failed: \" .. tostring(lines))"
+      }
+    ],
+    "mapping": "explicit replacement-hunk assertion mapping",
+    "reason": "This original editor-host operation remains pending real MC host observation; no client-only equivalent is claimed as an E2E pass.",
+    "equivalentObservation": "Observe the replacement assertion site(s) mcdev-nvim/tests/e2e/create_drill_definition_diagnostics_e2e.lua::assert@56 and preserve the original input/result relationship for mcdev-nvim/tests/e2e/create_drill_definition_diagnostics_e2e.lua::assert@56.",
+    "nativeStatus": "pending real host E2E",
+    "evidence": "build/nvim-test-logs/native-client-final-syntax"
+  },
+  {
+    "legacyAssertionId": "mcdev-nvim/tests/e2e/create_drill_definition_diagnostics_e2e.lua::assert@57",
+    "oldCall": "helpers.assert_true(\n      vim.wait(timeout_ms or 60000, function()\n        return done\n      end, 100),\n      method .. \" timed out\"\n    )",
+    "newAssertionIds": [
+      "mcdev-nvim/tests/e2e/create_drill_definition_diagnostics_e2e.lua::assert@56"
+    ],
+    "newAssertions": [
+      {
+        "line": 56,
+        "call": "helpers.assert_true(ok, \"selected dependency source read failed: \" .. tostring(lines))"
+      }
+    ],
+    "mapping": "explicit replacement-hunk assertion mapping",
+    "reason": "This original editor-host operation remains pending real MC host observation; no client-only equivalent is claimed as an E2E pass.",
+    "equivalentObservation": "Observe the replacement assertion site(s) mcdev-nvim/tests/e2e/create_drill_definition_diagnostics_e2e.lua::assert@56 and preserve the original input/result relationship for mcdev-nvim/tests/e2e/create_drill_definition_diagnostics_e2e.lua::assert@57.",
+    "nativeStatus": "pending real host E2E",
+    "evidence": "build/nvim-test-logs/native-client-final-syntax"
+  },
+  {
+    "legacyAssertionId": "mcdev-nvim/tests/e2e/create_drill_definition_diagnostics_e2e.lua::assert@63",
+    "oldCall": "helpers.assert_nil(request_error, method .. \" failed: \" .. vim.inspect(request_error))",
+    "newAssertionIds": [
+      "mcdev-nvim/tests/e2e/create_drill_definition_diagnostics_e2e.lua::assert@56"
+    ],
+    "newAssertions": [
+      {
+        "line": 56,
+        "call": "helpers.assert_true(ok, \"selected dependency source read failed: \" .. tostring(lines))"
+      }
+    ],
+    "mapping": "explicit replacement-hunk assertion mapping",
+    "reason": "This original editor-host operation remains pending real MC host observation; no client-only equivalent is claimed as an E2E pass.",
+    "equivalentObservation": "Observe the replacement assertion site(s) mcdev-nvim/tests/e2e/create_drill_definition_diagnostics_e2e.lua::assert@56 and preserve the original input/result relationship for mcdev-nvim/tests/e2e/create_drill_definition_diagnostics_e2e.lua::assert@63.",
+    "nativeStatus": "pending real host E2E",
+    "evidence": "build/nvim-test-logs/native-client-final-syntax"
+  },
+  {
+    "legacyAssertionId": "mcdev-nvim/tests/e2e/create_drill_definition_diagnostics_e2e.lua::assert@94",
+    "oldCall": "helpers.assert_eq(method_location.resolution, \"jdt\")",
+    "newAssertionIds": [
+      "mcdev-nvim/tests/e2e/create_drill_definition_diagnostics_e2e.lua::assert@87"
+    ],
+    "newAssertions": [
+      {
+        "line": 87,
+        "call": "helpers.assert_eq(method_location.resolution, \"source\")"
+      }
+    ],
+    "mapping": "explicit replacement-hunk assertion mapping",
+    "reason": "Existing generic selected-source file URI/read replaces JDT virtual classfile source; same declaration identity/text/range remains required.",
+    "equivalentObservation": "Observe the replacement assertion site(s) mcdev-nvim/tests/e2e/create_drill_definition_diagnostics_e2e.lua::assert@87 and preserve the original input/result relationship for mcdev-nvim/tests/e2e/create_drill_definition_diagnostics_e2e.lua::assert@94.",
+    "nativeStatus": "pending real host E2E",
+    "evidence": "build/nvim-test-logs/native-client-final-syntax"
+  },
+  {
+    "legacyAssertionId": "mcdev-nvim/tests/e2e/create_drill_definition_diagnostics_e2e.lua::assert@95",
+    "oldCall": "helpers.assert_true(\n      method_location.documentUri:find(\"jdt://contents/create-1.21.1-6.0.10-280.jar/\", 1, true) ~= nil,\n      \"definition must use the JDT classfile URI: \" .. vim.inspect(method_location)\n    )",
+    "newAssertionIds": [],
+    "newAssertions": [],
+    "mapping": "explicit host-pending assertion with required observer",
+    "reason": "Existing generic selected-source file URI/read replaces JDT virtual classfile source; same declaration identity/text/range remains required.",
+    "equivalentObservation": "Pending real indexed editor/MC host observation: execute the original input against the native host and compare the original expected result; this record does not claim a client-only pass.",
+    "nativeStatus": "pending real host E2E",
+    "evidence": "build/nvim-test-logs/native-client-final-syntax"
+  },
+  {
+    "legacyAssertionId": "mcdev-nvim/tests/e2e/create_drill_definition_diagnostics_e2e.lua::assert@104",
+    "oldCall": "helpers.assert_true(type(attached_source) == \"string\", \"JDT attached source must be text\")",
+    "newAssertionIds": [
+      "mcdev-nvim/tests/e2e/create_drill_definition_diagnostics_e2e.lua::assert@97"
+    ],
+    "newAssertions": [
+      {
+        "line": 97,
+        "call": "helpers.assert_true(type(attached_source) == \"string\", \"selected dependency source must be text\")"
+      }
+    ],
+    "mapping": "explicit replacement-hunk assertion mapping",
+    "reason": "Host-neutral client naming or typed native metadata; original semantic effect and routing/cancellation assertion retained. Unavailable real host operations stay pending.",
+    "equivalentObservation": "Observe the replacement assertion site(s) mcdev-nvim/tests/e2e/create_drill_definition_diagnostics_e2e.lua::assert@97 and preserve the original input/result relationship for mcdev-nvim/tests/e2e/create_drill_definition_diagnostics_e2e.lua::assert@104.",
+    "nativeStatus": "pending real host E2E",
+    "evidence": "build/nvim-test-logs/native-client-final-syntax"
+  },
+  {
+    "legacyAssertionId": "mcdev-nvim/tests/e2e/create_drill_definition_diagnostics_e2e.lua::assert@105",
+    "oldCall": "helpers.assert_true(\n      attached_source:find(\"useItemOn\", 1, true) ~= nil,\n      \"JDT attached source must contain useItemOn\"\n    )",
+    "newAssertionIds": [],
+    "newAssertions": [],
+    "mapping": "explicit host-pending assertion with required observer",
+    "reason": "Host-neutral client naming or typed native metadata; original semantic effect and routing/cancellation assertion retained. Unavailable real host operations stay pending.",
+    "equivalentObservation": "Pending real indexed editor/MC host observation: execute the original input against the native host and compare the original expected result; this record does not claim a client-only pass.",
+    "nativeStatus": "pending real host E2E",
+    "evidence": "build/nvim-test-logs/native-client-final-syntax"
+  },
+  {
+    "legacyAssertionId": "mcdev-nvim/tests/e2e/jdt_action_aliases_e2e.lua::assert@9",
+    "oldCall": "helpers.assert_true(original_name ~= \"\", \"JDT code action alias check requires a named fixture buffer\")",
+    "newAssertionIds": [
+      "mcdev-nvim/tests/e2e/jdt_action_aliases_e2e.lua::assert@9"
+    ],
+    "newAssertions": [
+      {
+        "line": 9,
+        "call": "helpers.assert_true(original_name ~= \"\", \"host code action alias check requires a named fixture buffer\")"
+      }
+    ],
+    "mapping": "explicit replacement-hunk assertion mapping",
+    "reason": "Host-neutral client naming or typed native metadata; original semantic effect and routing/cancellation assertion retained. Unavailable real host operations stay pending.",
+    "equivalentObservation": "Observe the replacement assertion site(s) mcdev-nvim/tests/e2e/jdt_action_aliases_e2e.lua::assert@9 and preserve the original input/result relationship for mcdev-nvim/tests/e2e/jdt_action_aliases_e2e.lua::assert@9.",
+    "nativeStatus": "pending real host E2E",
+    "evidence": "build/nvim-test-logs/native-client-final-syntax"
+  },
+  {
+    "legacyAssertionId": "mcdev-nvim/tests/e2e/jdt_action_aliases_e2e.lua::assert@45",
+    "oldCall": "helpers.assert_true(attached, \"fresh JDT code action buffer did not attach to jdtls\")",
+    "newAssertionIds": [
+      "mcdev-nvim/tests/e2e/jdt_action_aliases_e2e.lua::assert@48"
+    ],
+    "newAssertions": [
+      {
+        "line": 48,
+        "call": "helpers.assert_true(attached, \"fresh host code action buffer did not attach to ktlsp\")"
+      }
+    ],
+    "mapping": "explicit replacement-hunk assertion mapping",
+    "reason": "Host-neutral client naming or typed native metadata; original semantic effect and routing/cancellation assertion retained. Unavailable real host operations stay pending.",
+    "equivalentObservation": "Observe the replacement assertion site(s) mcdev-nvim/tests/e2e/jdt_action_aliases_e2e.lua::assert@48 and preserve the original input/result relationship for mcdev-nvim/tests/e2e/jdt_action_aliases_e2e.lua::assert@45.",
+    "nativeStatus": "pending real host E2E",
+    "evidence": "build/nvim-test-logs/native-client-final-syntax"
+  },
+  {
+    "legacyAssertionId": "mcdev-nvim/tests/e2e/jdt_action_aliases_e2e.lua::assert@63",
+    "oldCall": "helpers.assert_true(started, \"raw JDT code action request did not start\")",
+    "newAssertionIds": [
+      "mcdev-nvim/tests/e2e/jdt_action_aliases_e2e.lua::assert@66"
+    ],
+    "newAssertions": [
+      {
+        "line": 66,
+        "call": "helpers.assert_true(started, \"raw host code action request did not start\")"
+      }
+    ],
+    "mapping": "explicit replacement-hunk assertion mapping",
+    "reason": "Host-neutral client naming or typed native metadata; original semantic effect and routing/cancellation assertion retained. Unavailable real host operations stay pending.",
+    "equivalentObservation": "Observe the replacement assertion site(s) mcdev-nvim/tests/e2e/jdt_action_aliases_e2e.lua::assert@66 and preserve the original input/result relationship for mcdev-nvim/tests/e2e/jdt_action_aliases_e2e.lua::assert@63.",
+    "nativeStatus": "pending real host E2E",
+    "evidence": "build/nvim-test-logs/native-client-final-syntax"
+  },
+  {
+    "legacyAssertionId": "mcdev-nvim/tests/e2e/jdt_action_aliases_e2e.lua::assert@68",
+    "oldCall": "helpers.assert_true(settled, \"raw JDT code action request timed out\")",
+    "newAssertionIds": [
+      "mcdev-nvim/tests/e2e/jdt_action_aliases_e2e.lua::assert@71"
+    ],
+    "newAssertions": [
+      {
+        "line": 71,
+        "call": "helpers.assert_true(settled, \"raw host code action request timed out\")"
+      }
+    ],
+    "mapping": "explicit replacement-hunk assertion mapping",
+    "reason": "Host-neutral client naming or typed native metadata; original semantic effect and routing/cancellation assertion retained. Unavailable real host operations stay pending.",
+    "equivalentObservation": "Observe the replacement assertion site(s) mcdev-nvim/tests/e2e/jdt_action_aliases_e2e.lua::assert@71 and preserve the original input/result relationship for mcdev-nvim/tests/e2e/jdt_action_aliases_e2e.lua::assert@68.",
+    "nativeStatus": "pending real host E2E",
+    "evidence": "build/nvim-test-logs/native-client-final-syntax"
+  },
+  {
+    "legacyAssertionId": "mcdev-nvim/tests/e2e/jdt_action_aliases_e2e.lua::assert@69",
+    "oldCall": "helpers.assert_nil(request_error, \"raw JDT code action request failed\")",
+    "newAssertionIds": [
+      "mcdev-nvim/tests/e2e/jdt_action_aliases_e2e.lua::assert@72"
+    ],
+    "newAssertions": [
+      {
+        "line": 72,
+        "call": "helpers.assert_nil(request_error, \"raw host code action request failed\")"
+      }
+    ],
+    "mapping": "explicit replacement-hunk assertion mapping",
+    "reason": "Host-neutral client naming or typed native metadata; original semantic effect and routing/cancellation assertion retained. Unavailable real host operations stay pending.",
+    "equivalentObservation": "Observe the replacement assertion site(s) mcdev-nvim/tests/e2e/jdt_action_aliases_e2e.lua::assert@72 and preserve the original input/result relationship for mcdev-nvim/tests/e2e/jdt_action_aliases_e2e.lua::assert@69.",
+    "nativeStatus": "pending real host E2E",
+    "evidence": "build/nvim-test-logs/native-client-final-syntax"
+  },
+  {
+    "legacyAssertionId": "mcdev-nvim/tests/e2e/jdt_action_aliases_e2e.lua::assert@102",
+    "oldCall": "helpers.assert_true(\n    #raw_alias_titles > 0,\n    \"real JDT code actions did not expose a known quickassist/source alias pair\"\n  )",
+    "newAssertionIds": [
+      "mcdev-nvim/tests/e2e/jdt_action_aliases_e2e.lua::assert@83"
+    ],
+    "newAssertions": [
+      {
+        "line": 83,
+        "call": "helpers.assert_true(client.server_capabilities.codeActionProvider.resolveProvider == false,\n    \"native action fixture must use the advertised materialized-action surface\")"
+      }
+    ],
+    "mapping": "explicit replacement-hunk assertion mapping",
+    "reason": "Host-neutral client naming or typed native metadata; original semantic effect and routing/cancellation assertion retained. Unavailable real host operations stay pending.",
+    "equivalentObservation": "Observe the replacement assertion site(s) mcdev-nvim/tests/e2e/jdt_action_aliases_e2e.lua::assert@83 and preserve the original input/result relationship for mcdev-nvim/tests/e2e/jdt_action_aliases_e2e.lua::assert@102.",
+    "nativeStatus": "pending real host E2E",
+    "evidence": "build/nvim-test-logs/native-client-final-syntax"
+  },
+  {
+    "legacyAssertionId": "mcdev-nvim/tests/e2e/jdt_action_aliases_e2e.lua::assert@121",
+    "oldCall": "helpers.assert_eq(count, 1, \"merged JDT alias should appear once: \" .. title)",
+    "newAssertionIds": [
+      "mcdev-nvim/tests/e2e/jdt_action_aliases_e2e.lua::assert@97"
+    ],
+    "newAssertions": [
+      {
+        "line": 97,
+        "call": "helpers.assert_eq(#matching_effects, 1, \"native materialized effect should appear once in the merged picker\")"
+      }
+    ],
+    "mapping": "explicit replacement-hunk assertion mapping",
+    "reason": "Host-neutral client naming or typed native metadata; original semantic effect and routing/cancellation assertion retained. Unavailable real host operations stay pending.",
+    "equivalentObservation": "Observe the replacement assertion site(s) mcdev-nvim/tests/e2e/jdt_action_aliases_e2e.lua::assert@97 and preserve the original input/result relationship for mcdev-nvim/tests/e2e/jdt_action_aliases_e2e.lua::assert@121.",
+    "nativeStatus": "pending real host E2E",
+    "evidence": "build/nvim-test-logs/native-client-final-syntax"
+  },
+  {
+    "legacyAssertionId": "mcdev-nvim/tests/e2e/jdt_action_aliases_e2e.lua::assert@152",
+    "oldCall": "helpers.assert_true(\n    type(extract_action.command) == \"table\"\n      and extract_action.command.command == \"java.action.applyRefactoringCommand\",\n    \"Extract to local variable should use JDT's client-side refactoring command\"\n  )",
+    "newAssertionIds": [],
+    "newAssertions": [],
+    "mapping": "explicit host-pending assertion with required observer",
+    "reason": "Host-neutral client naming or typed native metadata; original semantic effect and routing/cancellation assertion retained. Unavailable real host operations stay pending.",
+    "equivalentObservation": "Pending real indexed editor/MC host observation: execute the original input against the native host and compare the original expected result; this record does not claim a client-only pass.",
+    "nativeStatus": "pending real host E2E",
+    "evidence": "build/nvim-test-logs/native-client-final-syntax"
+  },
+  {
+    "legacyAssertionId": "mcdev-nvim/tests/e2e/jdt_action_aliases_e2e.lua::assert@173",
+    "oldCall": "helpers.assert_true(extracted, \"JDT Extract to local variable was not applied\")",
+    "newAssertionIds": [
+      "mcdev-nvim/tests/e2e/jdt_action_aliases_e2e.lua::assert@149"
+    ],
+    "newAssertions": [
+      {
+        "line": 149,
+        "call": "helpers.assert_true(extracted, \"host Extract to local variable was not applied\")"
+      }
+    ],
+    "mapping": "explicit replacement-hunk assertion mapping",
+    "reason": "Host-neutral client naming or typed native metadata; original semantic effect and routing/cancellation assertion retained. Unavailable real host operations stay pending.",
+    "equivalentObservation": "Observe the replacement assertion site(s) mcdev-nvim/tests/e2e/jdt_action_aliases_e2e.lua::assert@149 and preserve the original input/result relationship for mcdev-nvim/tests/e2e/jdt_action_aliases_e2e.lua::assert@173.",
+    "nativeStatus": "pending real host E2E",
+    "evidence": "build/nvim-test-logs/native-client-final-syntax"
+  },
+  {
+    "legacyAssertionId": "mcdev-nvim/tests/e2e/jdtls_bundle_e2e.lua::assert@16",
+    "oldCall": "helpers.assert_true(\n    jdtls_rtp ~= nil and vim.fn.isdirectory(jdtls_rtp) == 1,\n    \"installed nvim-jdtls checkout must be beside MCDEV_E2E_BLINK_RTP\"\n  )",
+    "newAssertionIds": [],
+    "newAssertions": [],
+    "mapping": "explicit host-pending assertion with required observer",
+    "reason": "Native executable availability/artifact identity replaces a JVM extension artifact and JDT launcher.",
+    "equivalentObservation": "Pending real indexed editor/MC host observation: execute the original input against the native host and compare the original expected result; this record does not claim a client-only pass.",
+    "nativeStatus": "pending real host E2E",
+    "evidence": "build/nvim-test-logs/native-client-final-syntax"
+  },
+  {
+    "legacyAssertionId": "mcdev-nvim/tests/e2e/jdtls_bundle_e2e.lua::assert@40",
+    "oldCall": "helpers.assert_true(vim.fn.filereadable(bundle_jar) == 1, \"bundle jar must exist: \" .. bundle_jar)",
+    "newAssertionIds": [
+      "mcdev-nvim/tests/e2e/jdtls_bundle_e2e.lua::assert@31"
+    ],
+    "newAssertions": [
+      {
+        "line": 31,
+        "call": "helpers.assert_true(vim.fn.executable(ktlsp_cmd) == 1, \"ktlsp executable must exist: \" .. ktlsp_cmd)"
+      }
+    ],
+    "mapping": "explicit replacement-hunk assertion mapping",
+    "reason": "Native executable availability/artifact identity replaces a JVM extension artifact and JDT launcher.",
+    "equivalentObservation": "Observe the replacement assertion site(s) mcdev-nvim/tests/e2e/jdtls_bundle_e2e.lua::assert@31 and preserve the original input/result relationship for mcdev-nvim/tests/e2e/jdtls_bundle_e2e.lua::assert@40.",
+    "nativeStatus": "pending real host E2E",
+    "evidence": "build/nvim-test-logs/native-client-final-syntax"
+  },
+  {
+    "legacyAssertionId": "mcdev-nvim/tests/e2e/jdtls_bundle_e2e.lua::assert@126",
+    "oldCall": "helpers.assert_true(copied == true, \"cannot snapshot E2E bundle: \" .. tostring(copy_error))",
+    "newAssertionIds": [],
+    "newAssertions": [],
+    "mapping": "explicit host-pending assertion with required observer",
+    "reason": "This original editor-host operation remains pending real MC host observation; no client-only equivalent is claimed as an E2E pass.",
+    "equivalentObservation": "Pending real indexed editor/MC host observation: execute the original input against the native host and compare the original expected result; this record does not claim a client-only pass.",
+    "nativeStatus": "pending real host E2E",
+    "evidence": "build/nvim-test-logs/native-client-final-syntax"
+  },
+  {
+    "legacyAssertionId": "mcdev-nvim/tests/e2e/jdtls_bundle_e2e.lua::assert@321",
+    "oldCall": "helpers.assert_eq(\n    vim.v.shell_error,\n    0,\n    \"javac failed for \" .. source_path .. \": \" .. table.concat(output or {}, \"\\n\")\n  )",
+    "newAssertionIds": [
+      "mcdev-nvim/tests/e2e/jdtls_bundle_e2e.lua::assert@233"
+    ],
+    "newAssertions": [
+      {
+        "line": 233,
+        "call": "helpers.assert_eq(settled and result.code or 124, 0, \"Gradle compile failed for \" .. source_path .. \"; logs \" .. prefix)"
+      }
+    ],
+    "mapping": "explicit replacement-hunk assertion mapping",
+    "reason": "This original editor-host operation remains pending real MC host observation; no client-only equivalent is claimed as an E2E pass.",
+    "equivalentObservation": "Observe the replacement assertion site(s) mcdev-nvim/tests/e2e/jdtls_bundle_e2e.lua::assert@233 and preserve the original input/result relationship for mcdev-nvim/tests/e2e/jdtls_bundle_e2e.lua::assert@321.",
+    "nativeStatus": "pending real host E2E",
+    "evidence": "build/nvim-test-logs/native-client-final-syntax"
+  },
+  {
+    "legacyAssertionId": "mcdev-nvim/tests/e2e/jdtls_bundle_e2e.lua::assert@430",
+    "oldCall": "helpers.assert_eq(#vim.lsp.get_clients({ bufnr = kotlin_buf, name = \"jdtls\" }), 0,\n      \"JDTLS must not attach to Kotlin\")",
+    "newAssertionIds": [],
+    "newAssertions": [],
+    "mapping": "explicit host-pending assertion with required observer",
+    "reason": "Host-neutral client naming or typed native metadata; original semantic effect and routing/cancellation assertion retained. Unavailable real host operations stay pending.",
+    "equivalentObservation": "Pending real indexed editor/MC host observation: execute the original input against the native host and compare the original expected result; this record does not claim a client-only pass.",
+    "nativeStatus": "pending real host E2E",
+    "evidence": "build/nvim-test-logs/native-client-final-syntax"
+  },
+  {
+    "legacyAssertionId": "mcdev-nvim/tests/e2e/jdtls_bundle_e2e.lua::assert@432",
+    "oldCall": "helpers.assert_eq(protocol.active_jdtls_client(kotlin_buf).id, client_id,\n      \"Kotlin must reuse the prepared workspace JDTLS client\")",
+    "newAssertionIds": [],
+    "newAssertions": [],
+    "mapping": "explicit host-pending assertion with required observer",
+    "reason": "Host-neutral client naming or typed native metadata; original semantic effect and routing/cancellation assertion retained. Unavailable real host operations stay pending.",
+    "equivalentObservation": "Pending real indexed editor/MC host observation: execute the original input against the native host and compare the original expected result; this record does not claim a client-only pass.",
+    "nativeStatus": "pending real host E2E",
+    "evidence": "build/nvim-test-logs/native-client-final-syntax"
+  },
+  {
+    "legacyAssertionId": "mcdev-nvim/tests/e2e/jdtls_bundle_e2e.lua::assert@440",
+    "oldCall": "helpers.assert_eq(payload.context.documentUri, kotlin_uri)",
+    "newAssertionIds": [],
+    "newAssertions": [],
+    "mapping": "explicit host-pending assertion with required observer",
+    "reason": "This original editor-host operation remains pending real MC host observation; no client-only equivalent is claimed as an E2E pass.",
+    "equivalentObservation": "Pending real indexed editor/MC host observation: execute the original input against the native host and compare the original expected result; this record does not claim a client-only pass.",
+    "nativeStatus": "pending real host E2E",
+    "evidence": "build/nvim-test-logs/native-client-final-syntax"
+  },
+  {
+    "legacyAssertionId": "mcdev-nvim/tests/e2e/jdtls_bundle_e2e.lua::assert@441",
+    "oldCall": "helpers.assert_eq(payload.context.languageId, \"kotlin\")",
+    "newAssertionIds": [],
+    "newAssertions": [],
+    "mapping": "explicit host-pending assertion with required observer",
+    "reason": "This original editor-host operation remains pending real MC host observation; no client-only equivalent is claimed as an E2E pass.",
+    "equivalentObservation": "Pending real indexed editor/MC host observation: execute the original input against the native host and compare the original expected result; this record does not claim a client-only pass.",
+    "nativeStatus": "pending real host E2E",
+    "evidence": "build/nvim-test-logs/native-client-final-syntax"
+  },
+  {
+    "legacyAssertionId": "mcdev-nvim/tests/e2e/jdtls_bundle_e2e.lua::assert@442",
+    "oldCall": "helpers.assert_eq(payload.context.workspaceRoot, workspace_root_uri)",
+    "newAssertionIds": [],
+    "newAssertions": [],
+    "mapping": "explicit host-pending assertion with required observer",
+    "reason": "This original editor-host operation remains pending real MC host observation; no client-only equivalent is claimed as an E2E pass.",
+    "equivalentObservation": "Pending real indexed editor/MC host observation: execute the original input against the native host and compare the original expected result; this record does not claim a client-only pass.",
+    "nativeStatus": "pending real host E2E",
+    "evidence": "build/nvim-test-logs/native-client-final-syntax"
+  },
+  {
+    "legacyAssertionId": "mcdev-nvim/tests/e2e/jdtls_bundle_e2e.lua::assert@443",
+    "oldCall": "helpers.assert_eq(payload.context.bufferText or payload.context.bufferTextFallback, before)",
+    "newAssertionIds": [],
+    "newAssertions": [],
+    "mapping": "explicit host-pending assertion with required observer",
+    "reason": "This original editor-host operation remains pending real MC host observation; no client-only equivalent is claimed as an E2E pass.",
+    "equivalentObservation": "Pending real indexed editor/MC host observation: execute the original input against the native host and compare the original expected result; this record does not claim a client-only pass.",
+    "nativeStatus": "pending real host E2E",
+    "evidence": "build/nvim-test-logs/native-client-final-syntax"
+  },
+  {
+    "legacyAssertionId": "mcdev-nvim/tests/e2e/jdtls_bundle_e2e.lua::assert@456",
+    "oldCall": "helpers.assert_nil(err, command .. \" Kotlin request failed\")",
+    "newAssertionIds": [],
+    "newAssertions": [],
+    "mapping": "explicit host-pending assertion with required observer",
+    "reason": "This original editor-host operation remains pending real MC host observation; no client-only equivalent is claimed as an E2E pass.",
+    "equivalentObservation": "Pending real indexed editor/MC host observation: execute the original input against the native host and compare the original expected result; this record does not claim a client-only pass.",
+    "nativeStatus": "pending real host E2E",
+    "evidence": "build/nvim-test-logs/native-client-final-syntax"
+  },
+  {
+    "legacyAssertionId": "mcdev-nvim/tests/e2e/jdtls_bundle_e2e.lua::assert@458",
+    "oldCall": "helpers.assert_eq(kotlin_text(), before, command .. \" must not mutate unsaved Kotlin\")",
+    "newAssertionIds": [],
+    "newAssertions": [],
+    "mapping": "explicit host-pending assertion with required observer",
+    "reason": "This original editor-host operation remains pending real MC host observation; no client-only equivalent is claimed as an E2E pass.",
+    "equivalentObservation": "Pending real indexed editor/MC host observation: execute the original input against the native host and compare the original expected result; this record does not claim a client-only pass.",
+    "nativeStatus": "pending real host E2E",
+    "evidence": "build/nvim-test-logs/native-client-final-syntax"
+  },
+  {
+    "legacyAssertionId": "mcdev-nvim/tests/e2e/jdtls_bundle_e2e.lua::assert@459",
+    "oldCall": "helpers.assert_eq(vim.uri_from_bufnr(kotlin_buf), kotlin_uri)",
+    "newAssertionIds": [],
+    "newAssertions": [],
+    "mapping": "explicit host-pending assertion with required observer",
+    "reason": "This original editor-host operation remains pending real MC host observation; no client-only equivalent is claimed as an E2E pass.",
+    "equivalentObservation": "Pending real indexed editor/MC host observation: execute the original input against the native host and compare the original expected result; this record does not claim a client-only pass.",
+    "nativeStatus": "pending real host E2E",
+    "evidence": "build/nvim-test-logs/native-client-final-syntax"
+  },
+  {
+    "legacyAssertionId": "mcdev-nvim/tests/e2e/jdtls_bundle_e2e.lua::assert@466",
+    "oldCall": "helpers.assert_eq(result.debug.parseSource, \"HAND_WRITTEN_FALLBACK\")",
+    "newAssertionIds": [],
+    "newAssertions": [],
+    "mapping": "explicit host-pending assertion with required observer",
+    "reason": "This original editor-host operation remains pending real MC host observation; no client-only equivalent is claimed as an E2E pass.",
+    "equivalentObservation": "Pending real indexed editor/MC host observation: execute the original input against the native host and compare the original expected result; this record does not claim a client-only pass.",
+    "nativeStatus": "pending real host E2E",
+    "evidence": "build/nvim-test-logs/native-client-final-syntax"
+  },
+  {
+    "legacyAssertionId": "mcdev-nvim/tests/e2e/jdtls_bundle_e2e.lua::assert@467",
+    "oldCall": "helpers.assert_eq(result.debug.usedCompilationUnit, false)",
+    "newAssertionIds": [],
+    "newAssertions": [],
+    "mapping": "explicit host-pending assertion with required observer",
+    "reason": "Use HOST_NORMALIZED, HIGH confidence and an authoritative projectSessionVersion; never claim JDT object use.",
+    "equivalentObservation": "Pending real indexed editor/MC host observation: execute the original input against the native host and compare the original expected result; this record does not claim a client-only pass.",
+    "nativeStatus": "pending real host E2E",
+    "evidence": "build/nvim-test-logs/native-client-final-syntax"
+  },
+  {
+    "legacyAssertionId": "mcdev-nvim/tests/e2e/jdtls_bundle_e2e.lua::assert@472",
+    "oldCall": "helpers.assert_eq(#(item.additionalEdits or {}), 0, \"Kotlin value completion must not add Java imports\")",
+    "newAssertionIds": [],
+    "newAssertions": [],
+    "mapping": "explicit host-pending assertion with required observer",
+    "reason": "This original editor-host operation remains pending real MC host observation; no client-only equivalent is claimed as an E2E pass.",
+    "equivalentObservation": "Pending real indexed editor/MC host observation: execute the original input against the native host and compare the original expected result; this record does not claim a client-only pass.",
+    "nativeStatus": "pending real host E2E",
+    "evidence": "build/nvim-test-logs/native-client-final-syntax"
+  },
+  {
+    "legacyAssertionId": "mcdev-nvim/tests/e2e/jdtls_bundle_e2e.lua::assert@474",
+    "oldCall": "helpers.assert_eq(kotlin_text(), replace_once(before, partial, expected),\n      \"completion must edit only the original Kotlin value\")",
+    "newAssertionIds": [],
+    "newAssertions": [],
+    "mapping": "explicit host-pending assertion with required observer",
+    "reason": "This original editor-host operation remains pending real MC host observation; no client-only equivalent is claimed as an E2E pass.",
+    "equivalentObservation": "Pending real indexed editor/MC host observation: execute the original input against the native host and compare the original expected result; this record does not claim a client-only pass.",
+    "nativeStatus": "pending real host E2E",
+    "evidence": "build/nvim-test-logs/native-client-final-syntax"
+  },
+  {
+    "legacyAssertionId": "mcdev-nvim/tests/e2e/jdtls_bundle_e2e.lua::assert@476",
+    "oldCall": "helpers.assert_true(not kotlin_text():find(\".class\", 1, true), \"Kotlin must not contain Java class literals\")",
+    "newAssertionIds": [],
+    "newAssertions": [],
+    "mapping": "explicit host-pending assertion with required observer",
+    "reason": "This original editor-host operation remains pending real MC host observation; no client-only equivalent is claimed as an E2E pass.",
+    "equivalentObservation": "Pending real indexed editor/MC host observation: execute the original input against the native host and compare the original expected result; this record does not claim a client-only pass.",
+    "nativeStatus": "pending real host E2E",
+    "evidence": "build/nvim-test-logs/native-client-final-syntax"
+  },
+  {
+    "legacyAssertionId": "mcdev-nvim/tests/e2e/jdtls_bundle_e2e.lua::assert@477",
+    "oldCall": "helpers.assert_true(not kotlin_text():match(\"import[^\\n]*;\"), \"Kotlin imports must not have semicolons\")",
+    "newAssertionIds": [],
+    "newAssertions": [],
+    "mapping": "explicit host-pending assertion with required observer",
+    "reason": "This original editor-host operation remains pending real MC host observation; no client-only equivalent is claimed as an E2E pass.",
+    "equivalentObservation": "Pending real indexed editor/MC host observation: execute the original input against the native host and compare the original expected result; this record does not claim a client-only pass.",
+    "nativeStatus": "pending real host E2E",
+    "evidence": "build/nvim-test-logs/native-client-final-syntax"
+  },
+  {
+    "legacyAssertionId": "mcdev-nvim/tests/e2e/jdtls_bundle_e2e.lua::assert@478",
+    "oldCall": "helpers.assert_true(not kotlin_text():find(\"@At\", 1, true), \"Kotlin nested annotations must use At(...)\")",
+    "newAssertionIds": [],
+    "newAssertions": [],
+    "mapping": "explicit host-pending assertion with required observer",
+    "reason": "This original editor-host operation remains pending real MC host observation; no client-only equivalent is claimed as an E2E pass.",
+    "equivalentObservation": "Pending real indexed editor/MC host observation: execute the original input against the native host and compare the original expected result; this record does not claim a client-only pass.",
+    "nativeStatus": "pending real host E2E",
+    "evidence": "build/nvim-test-logs/native-client-final-syntax"
+  },
+  {
+    "legacyAssertionId": "mcdev-nvim/tests/e2e/jdtls_bundle_e2e.lua::assert@485",
+    "oldCall": "helpers.assert_eq(#errors, 0, \"valid Kotlin MC diagnostics: \" .. vim.inspect(errors))",
+    "newAssertionIds": [],
+    "newAssertions": [],
+    "mapping": "explicit host-pending assertion with required observer",
+    "reason": "This original editor-host operation remains pending real MC host observation; no client-only equivalent is claimed as an E2E pass.",
+    "equivalentObservation": "Pending real indexed editor/MC host observation: execute the original input against the native host and compare the original expected result; this record does not claim a client-only pass.",
+    "nativeStatus": "pending real host E2E",
+    "evidence": "build/nvim-test-logs/native-client-final-syntax"
+  },
+  {
+    "legacyAssertionId": "mcdev-nvim/tests/e2e/jdtls_bundle_e2e.lua::assert@513",
+    "oldCall": "helpers.assert_eq(method_item.metadata.owner, \"com/simibubi/create/content/kinetics/drill/DrillBlock\")",
+    "newAssertionIds": [],
+    "newAssertions": [],
+    "mapping": "explicit host-pending assertion with required observer",
+    "reason": "This original editor-host operation remains pending real MC host observation; no client-only equivalent is claimed as an E2E pass.",
+    "equivalentObservation": "Pending real indexed editor/MC host observation: execute the original input against the native host and compare the original expected result; this record does not claim a client-only pass.",
+    "nativeStatus": "pending real host E2E",
+    "evidence": "build/nvim-test-logs/native-client-final-syntax"
+  },
+  {
+    "legacyAssertionId": "mcdev-nvim/tests/e2e/jdtls_bundle_e2e.lua::assert@514",
+    "oldCall": "helpers.assert_eq(method_item.metadata.descriptor, drill_descriptor)",
+    "newAssertionIds": [],
+    "newAssertions": [],
+    "mapping": "explicit host-pending assertion with required observer",
+    "reason": "This original editor-host operation remains pending real MC host observation; no client-only equivalent is claimed as an E2E pass.",
+    "equivalentObservation": "Pending real indexed editor/MC host observation: execute the original input against the native host and compare the original expected result; this record does not claim a client-only pass.",
+    "nativeStatus": "pending real host E2E",
+    "evidence": "build/nvim-test-logs/native-client-final-syntax"
+  },
+  {
+    "legacyAssertionId": "mcdev-nvim/tests/e2e/jdtls_bundle_e2e.lua::assert@518",
+    "oldCall": "helpers.assert_true(table.concat(hover.contents or {}, \"\\n\"):find(\"useItemOn\", 1, true) ~= nil,\n    \"Kotlin hover must resolve the unsaved method selector\")",
+    "newAssertionIds": [],
+    "newAssertions": [],
+    "mapping": "explicit host-pending assertion with required observer",
+    "reason": "This original editor-host operation remains pending real MC host observation; no client-only equivalent is claimed as an E2E pass.",
+    "equivalentObservation": "Pending real indexed editor/MC host observation: execute the original input against the native host and compare the original expected result; this record does not claim a client-only pass.",
+    "nativeStatus": "pending real host E2E",
+    "evidence": "build/nvim-test-logs/native-client-final-syntax"
+  },
+  {
+    "legacyAssertionId": "mcdev-nvim/tests/e2e/jdtls_bundle_e2e.lua::assert@525",
+    "oldCall": "helpers.assert_eq(method_location.metadata.descriptor, drill_descriptor)",
+    "newAssertionIds": [],
+    "newAssertions": [],
+    "mapping": "explicit host-pending assertion with required observer",
+    "reason": "This original editor-host operation remains pending real MC host observation; no client-only equivalent is claimed as an E2E pass.",
+    "equivalentObservation": "Pending real indexed editor/MC host observation: execute the original input against the native host and compare the original expected result; this record does not claim a client-only pass.",
+    "nativeStatus": "pending real host E2E",
+    "evidence": "build/nvim-test-logs/native-client-final-syntax"
+  },
+  {
+    "legacyAssertionId": "mcdev-nvim/tests/e2e/jdtls_bundle_e2e.lua::assert@526",
+    "oldCall": "helpers.assert_eq(method_location.resolution, \"jdt\")",
+    "newAssertionIds": [],
+    "newAssertions": [],
+    "mapping": "explicit host-pending assertion with required observer",
+    "reason": "Existing generic selected-source file URI/read replaces JDT virtual classfile source; same declaration identity/text/range remains required.",
+    "equivalentObservation": "Pending real indexed editor/MC host observation: execute the original input against the native host and compare the original expected result; this record does not claim a client-only pass.",
+    "nativeStatus": "pending real host E2E",
+    "evidence": "build/nvim-test-logs/native-client-final-syntax"
+  },
+  {
+    "legacyAssertionId": "mcdev-nvim/tests/e2e/jdtls_bundle_e2e.lua::assert@527",
+    "oldCall": "helpers.assert_true(method_location.documentUri:find(\"DrillBlock.java\", 1, true) ~= nil,\n    \"Kotlin definition must reuse the real Java dependency source\")",
+    "newAssertionIds": [],
+    "newAssertions": [],
+    "mapping": "explicit host-pending assertion with required observer",
+    "reason": "This original editor-host operation remains pending real MC host observation; no client-only equivalent is claimed as an E2E pass.",
+    "equivalentObservation": "Pending real indexed editor/MC host observation: execute the original input against the native host and compare the original expected result; this record does not claim a client-only pass.",
+    "nativeStatus": "pending real host E2E",
+    "evidence": "build/nvim-test-logs/native-client-final-syntax"
+  },
+  {
+    "legacyAssertionId": "mcdev-nvim/tests/e2e/jdtls_bundle_e2e.lua::assert@531",
+    "oldCall": "helpers.assert_true(vim.tbl_filter(function(diagnostic)\n    return diagnostic.code == \"MIXIN_UNRESOLVED_INJECT_METHOD\"\n  end, bad_diagnostics)[1] ~= nil, \"bad unsaved Kotlin selector must be diagnosed\")",
+    "newAssertionIds": [],
+    "newAssertions": [],
+    "mapping": "explicit host-pending assertion with required observer",
+    "reason": "This original editor-host operation remains pending real MC host observation; no client-only equivalent is claimed as an E2E pass.",
+    "equivalentObservation": "Pending real indexed editor/MC host observation: execute the original input against the native host and compare the original expected result; this record does not claim a client-only pass.",
+    "nativeStatus": "pending real host E2E",
+    "evidence": "build/nvim-test-logs/native-client-final-syntax"
+  },
+  {
+    "legacyAssertionId": "mcdev-nvim/tests/e2e/jdtls_bundle_e2e.lua::assert@558",
+    "oldCall": "helpers.assert_eq(target_item.metadata.name, \"setPlacedBy\")",
+    "newAssertionIds": [],
+    "newAssertions": [],
+    "mapping": "explicit host-pending assertion with required observer",
+    "reason": "This original editor-host operation remains pending real MC host observation; no client-only equivalent is claimed as an E2E pass.",
+    "equivalentObservation": "Pending real indexed editor/MC host observation: execute the original input against the native host and compare the original expected result; this record does not claim a client-only pass.",
+    "nativeStatus": "pending real host E2E",
+    "evidence": "build/nvim-test-logs/native-client-final-syntax"
+  },
+  {
+    "legacyAssertionId": "mcdev-nvim/tests/e2e/jdtls_bundle_e2e.lua::assert@560",
+    "oldCall": "helpers.assert_eq(#vim.lsp.get_clients({ bufnr = kotlin_buf, name = \"jdtls\" }), 0)",
+    "newAssertionIds": [],
+    "newAssertions": [],
+    "mapping": "explicit host-pending assertion with required observer",
+    "reason": "Host-neutral client naming or typed native metadata; original semantic effect and routing/cancellation assertion retained. Unavailable real host operations stay pending.",
+    "equivalentObservation": "Pending real indexed editor/MC host observation: execute the original input against the native host and compare the original expected result; this record does not claim a client-only pass.",
+    "nativeStatus": "pending real host E2E",
+    "evidence": "build/nvim-test-logs/native-client-final-syntax"
+  },
+  {
+    "legacyAssertionId": "mcdev-nvim/tests/e2e/jdtls_bundle_e2e.lua::assert@561",
+    "oldCall": "helpers.assert_eq(vim.fn.filereadable(kotlin_file), 0, \"Kotlin request source must remain unsaved\")",
+    "newAssertionIds": [],
+    "newAssertions": [],
+    "mapping": "explicit host-pending assertion with required observer",
+    "reason": "This original editor-host operation remains pending real MC host observation; no client-only equivalent is claimed as an E2E pass.",
+    "equivalentObservation": "Pending real indexed editor/MC host observation: execute the original input against the native host and compare the original expected result; this record does not claim a client-only pass.",
+    "nativeStatus": "pending real host E2E",
+    "evidence": "build/nvim-test-logs/native-client-final-syntax"
+  },
+  {
+    "legacyAssertionId": "mcdev-nvim/tests/e2e/jdtls_bundle_e2e.lua::assert@703",
+    "oldCall": "helpers.assert_eq(debug.parseSource, \"JDT_AST\")",
+    "newAssertionIds": [
+      "mcdev-nvim/tests/e2e/jdtls_bundle_e2e.lua::assert@454"
+    ],
+    "newAssertions": [
+      {
+        "line": 454,
+        "call": "helpers.assert_eq(debug.parseSource, \"HOST_NORMALIZED\")"
+      }
+    ],
+    "mapping": "explicit replacement-hunk assertion mapping",
+    "reason": "Use HOST_NORMALIZED, HIGH confidence and an authoritative projectSessionVersion; never claim JDT object use.",
+    "equivalentObservation": "Observe the replacement assertion site(s) mcdev-nvim/tests/e2e/jdtls_bundle_e2e.lua::assert@454 and preserve the original input/result relationship for mcdev-nvim/tests/e2e/jdtls_bundle_e2e.lua::assert@703.",
+    "nativeStatus": "pending real host E2E",
+    "evidence": "build/nvim-test-logs/native-client-final-syntax"
+  },
+  {
+    "legacyAssertionId": "mcdev-nvim/tests/e2e/jdtls_bundle_e2e.lua::assert@704",
+    "oldCall": "helpers.assert_eq(debug.usedCompilationUnit, true)",
+    "newAssertionIds": [
+      "mcdev-nvim/tests/e2e/jdtls_bundle_e2e.lua::assert@455"
+    ],
+    "newAssertions": [
+      {
+        "line": 455,
+        "call": "helpers.assert_eq(debug.parseConfidence, \"HIGH\")"
+      }
+    ],
+    "mapping": "explicit replacement-hunk assertion mapping",
+    "reason": "Use HOST_NORMALIZED, HIGH confidence and an authoritative projectSessionVersion; never claim JDT object use.",
+    "equivalentObservation": "Observe the replacement assertion site(s) mcdev-nvim/tests/e2e/jdtls_bundle_e2e.lua::assert@455 and preserve the original input/result relationship for mcdev-nvim/tests/e2e/jdtls_bundle_e2e.lua::assert@704.",
+    "nativeStatus": "pending real host E2E",
+    "evidence": "build/nvim-test-logs/native-client-final-syntax"
+  },
+  {
+    "legacyAssertionId": "mcdev-nvim/tests/e2e/jdtls_bundle_e2e.lua::assert@705",
+    "oldCall": "helpers.assert_eq(debug.usedJavaProject, true)",
+    "newAssertionIds": [
+      "mcdev-nvim/tests/e2e/jdtls_bundle_e2e.lua::assert@455"
+    ],
+    "newAssertions": [
+      {
+        "line": 455,
+        "call": "helpers.assert_eq(debug.parseConfidence, \"HIGH\")"
+      }
+    ],
+    "mapping": "explicit replacement-hunk assertion mapping",
+    "reason": "Use HOST_NORMALIZED, HIGH confidence and an authoritative projectSessionVersion; never claim JDT object use.",
+    "equivalentObservation": "Observe the replacement assertion site(s) mcdev-nvim/tests/e2e/jdtls_bundle_e2e.lua::assert@455 and preserve the original input/result relationship for mcdev-nvim/tests/e2e/jdtls_bundle_e2e.lua::assert@705.",
+    "nativeStatus": "pending real host E2E",
+    "evidence": "build/nvim-test-logs/native-client-final-syntax"
+  },
+  {
+    "legacyAssertionId": "mcdev-nvim/tests/e2e/jdtls_bundle_e2e.lua::assert@706",
+    "oldCall": "helpers.assert_true((debug.bindingResolvedCount or 0) > 0, \"completion debug should resolve JDT bindings\")",
+    "newAssertionIds": [
+      "mcdev-nvim/tests/e2e/jdtls_bundle_e2e.lua::assert@457"
+    ],
+    "newAssertions": [
+      {
+        "line": 457,
+        "call": "helpers.assert_true((debug.bindingResolvedCount or 0) > 0, \"completion debug should resolve host bindings\")"
+      }
+    ],
+    "mapping": "explicit replacement-hunk assertion mapping",
+    "reason": "Host-neutral client naming or typed native metadata; original semantic effect and routing/cancellation assertion retained. Unavailable real host operations stay pending.",
+    "equivalentObservation": "Observe the replacement assertion site(s) mcdev-nvim/tests/e2e/jdtls_bundle_e2e.lua::assert@457 and preserve the original input/result relationship for mcdev-nvim/tests/e2e/jdtls_bundle_e2e.lua::assert@706.",
+    "nativeStatus": "pending real host E2E",
+    "evidence": "build/nvim-test-logs/native-client-final-syntax"
+  },
+  {
+    "legacyAssertionId": "mcdev-nvim/tests/e2e/jdtls_bundle_e2e.lua::assert@756",
+    "oldCall": "helpers.assert_eq(client_debug.parseSource, \"JDT_AST\")",
+    "newAssertionIds": [
+      "mcdev-nvim/tests/e2e/jdtls_bundle_e2e.lua::assert@507"
+    ],
+    "newAssertions": [
+      {
+        "line": 507,
+        "call": "helpers.assert_eq(client_debug.parseSource, \"HOST_NORMALIZED\")"
+      }
+    ],
+    "mapping": "explicit replacement-hunk assertion mapping",
+    "reason": "Use HOST_NORMALIZED, HIGH confidence and an authoritative projectSessionVersion; never claim JDT object use.",
+    "equivalentObservation": "Observe the replacement assertion site(s) mcdev-nvim/tests/e2e/jdtls_bundle_e2e.lua::assert@507 and preserve the original input/result relationship for mcdev-nvim/tests/e2e/jdtls_bundle_e2e.lua::assert@756.",
+    "nativeStatus": "pending real host E2E",
+    "evidence": "build/nvim-test-logs/native-client-final-syntax"
+  },
+  {
+    "legacyAssertionId": "mcdev-nvim/tests/e2e/jdtls_bundle_e2e.lua::assert@757",
+    "oldCall": "helpers.assert_eq(client_debug.usedCompilationUnit, true)",
+    "newAssertionIds": [
+      "mcdev-nvim/tests/e2e/jdtls_bundle_e2e.lua::assert@508"
+    ],
+    "newAssertions": [
+      {
+        "line": 508,
+        "call": "helpers.assert_eq(client_debug.parseConfidence, \"HIGH\")"
+      }
+    ],
+    "mapping": "explicit replacement-hunk assertion mapping",
+    "reason": "Use HOST_NORMALIZED, HIGH confidence and an authoritative projectSessionVersion; never claim JDT object use.",
+    "equivalentObservation": "Observe the replacement assertion site(s) mcdev-nvim/tests/e2e/jdtls_bundle_e2e.lua::assert@508 and preserve the original input/result relationship for mcdev-nvim/tests/e2e/jdtls_bundle_e2e.lua::assert@757.",
+    "nativeStatus": "pending real host E2E",
+    "evidence": "build/nvim-test-logs/native-client-final-syntax"
+  },
+  {
+    "legacyAssertionId": "mcdev-nvim/tests/e2e/jdtls_bundle_e2e.lua::assert@758",
+    "oldCall": "helpers.assert_eq(client_debug.usedJavaProject, true)",
+    "newAssertionIds": [
+      "mcdev-nvim/tests/e2e/jdtls_bundle_e2e.lua::assert@508"
+    ],
+    "newAssertions": [
+      {
+        "line": 508,
+        "call": "helpers.assert_eq(client_debug.parseConfidence, \"HIGH\")"
+      }
+    ],
+    "mapping": "explicit replacement-hunk assertion mapping",
+    "reason": "Use HOST_NORMALIZED, HIGH confidence and an authoritative projectSessionVersion; never claim JDT object use.",
+    "equivalentObservation": "Observe the replacement assertion site(s) mcdev-nvim/tests/e2e/jdtls_bundle_e2e.lua::assert@508 and preserve the original input/result relationship for mcdev-nvim/tests/e2e/jdtls_bundle_e2e.lua::assert@758.",
+    "nativeStatus": "pending real host E2E",
+    "evidence": "build/nvim-test-logs/native-client-final-syntax"
+  },
+  {
+    "legacyAssertionId": "mcdev-nvim/tests/e2e/jdtls_bundle_e2e.lua::assert@773",
+    "oldCall": "helpers.assert_true(health_output:find(\"usedCompilationUnit: true\", 1, true) ~= nil, health_output)",
+    "newAssertionIds": [
+      "mcdev-nvim/tests/e2e/jdtls_bundle_e2e.lua::assert@524"
+    ],
+    "newAssertions": [
+      {
+        "line": 524,
+        "call": "helpers.assert_true(health_output:find(\"parseConfidence: HIGH\", 1, true) ~= nil, health_output)"
+      }
+    ],
+    "mapping": "explicit replacement-hunk assertion mapping",
+    "reason": "Use HOST_NORMALIZED, HIGH confidence and an authoritative projectSessionVersion; never claim JDT object use.",
+    "equivalentObservation": "Observe the replacement assertion site(s) mcdev-nvim/tests/e2e/jdtls_bundle_e2e.lua::assert@524 and preserve the original input/result relationship for mcdev-nvim/tests/e2e/jdtls_bundle_e2e.lua::assert@773.",
+    "nativeStatus": "pending real host E2E",
+    "evidence": "build/nvim-test-logs/native-client-final-syntax"
+  },
+  {
+    "legacyAssertionId": "mcdev-nvim/tests/e2e/jdtls_bundle_e2e.lua::assert@780",
+    "oldCall": "helpers.assert_true(debug_completion_output:find(\"parse source: JDT_AST\", 1, true) ~= nil, debug_completion_output)",
+    "newAssertionIds": [
+      "mcdev-nvim/tests/e2e/jdtls_bundle_e2e.lua::assert@531"
+    ],
+    "newAssertions": [
+      {
+        "line": 531,
+        "call": "helpers.assert_true(debug_completion_output:find(\"parse source: HOST_NORMALIZED\", 1, true) ~= nil, debug_completion_output)"
+      }
+    ],
+    "mapping": "explicit replacement-hunk assertion mapping",
+    "reason": "Use HOST_NORMALIZED, HIGH confidence and an authoritative projectSessionVersion; never claim JDT object use.",
+    "equivalentObservation": "Observe the replacement assertion site(s) mcdev-nvim/tests/e2e/jdtls_bundle_e2e.lua::assert@531 and preserve the original input/result relationship for mcdev-nvim/tests/e2e/jdtls_bundle_e2e.lua::assert@780.",
+    "nativeStatus": "pending real host E2E",
+    "evidence": "build/nvim-test-logs/native-client-final-syntax"
+  },
+  {
+    "legacyAssertionId": "mcdev-nvim/tests/e2e/jdtls_bundle_e2e.lua::assert@858",
+    "oldCall": "helpers.assert_eq(inject_debug.parseSource, \"JDT_AST\")",
+    "newAssertionIds": [
+      "mcdev-nvim/tests/e2e/jdtls_bundle_e2e.lua::assert@609"
+    ],
+    "newAssertions": [
+      {
+        "line": 609,
+        "call": "helpers.assert_eq(inject_debug.parseSource, \"HOST_NORMALIZED\")"
+      }
+    ],
+    "mapping": "explicit replacement-hunk assertion mapping",
+    "reason": "Use HOST_NORMALIZED, HIGH confidence and an authoritative projectSessionVersion; never claim JDT object use.",
+    "equivalentObservation": "Observe the replacement assertion site(s) mcdev-nvim/tests/e2e/jdtls_bundle_e2e.lua::assert@609 and preserve the original input/result relationship for mcdev-nvim/tests/e2e/jdtls_bundle_e2e.lua::assert@858.",
+    "nativeStatus": "pending real host E2E",
+    "evidence": "build/nvim-test-logs/native-client-final-syntax"
+  },
+  {
+    "legacyAssertionId": "mcdev-nvim/tests/e2e/jdtls_bundle_e2e.lua::assert@859",
+    "oldCall": "helpers.assert_eq(inject_debug.usedCompilationUnit, true)",
+    "newAssertionIds": [
+      "mcdev-nvim/tests/e2e/jdtls_bundle_e2e.lua::assert@610"
+    ],
+    "newAssertions": [
+      {
+        "line": 610,
+        "call": "helpers.assert_eq(inject_debug.parseConfidence, \"HIGH\")"
+      }
+    ],
+    "mapping": "explicit replacement-hunk assertion mapping",
+    "reason": "Use HOST_NORMALIZED, HIGH confidence and an authoritative projectSessionVersion; never claim JDT object use.",
+    "equivalentObservation": "Observe the replacement assertion site(s) mcdev-nvim/tests/e2e/jdtls_bundle_e2e.lua::assert@610 and preserve the original input/result relationship for mcdev-nvim/tests/e2e/jdtls_bundle_e2e.lua::assert@859.",
+    "nativeStatus": "pending real host E2E",
+    "evidence": "build/nvim-test-logs/native-client-final-syntax"
+  },
+  {
+    "legacyAssertionId": "mcdev-nvim/tests/e2e/jdtls_bundle_e2e.lua::assert@860",
+    "oldCall": "helpers.assert_eq(inject_debug.usedJavaProject, true)",
+    "newAssertionIds": [
+      "mcdev-nvim/tests/e2e/jdtls_bundle_e2e.lua::assert@610"
+    ],
+    "newAssertions": [
+      {
+        "line": 610,
+        "call": "helpers.assert_eq(inject_debug.parseConfidence, \"HIGH\")"
+      }
+    ],
+    "mapping": "explicit replacement-hunk assertion mapping",
+    "reason": "Use HOST_NORMALIZED, HIGH confidence and an authoritative projectSessionVersion; never claim JDT object use.",
+    "equivalentObservation": "Observe the replacement assertion site(s) mcdev-nvim/tests/e2e/jdtls_bundle_e2e.lua::assert@610 and preserve the original input/result relationship for mcdev-nvim/tests/e2e/jdtls_bundle_e2e.lua::assert@860.",
+    "nativeStatus": "pending real host E2E",
+    "evidence": "build/nvim-test-logs/native-client-final-syntax"
+  },
+  {
+    "legacyAssertionId": "mcdev-nvim/tests/e2e/jdtls_bundle_e2e.lua::assert@861",
+    "oldCall": "helpers.assert_true((inject_debug.bindingResolvedCount or 0) > 0, \"inject completion debug should resolve JDT bindings\")",
+    "newAssertionIds": [
+      "mcdev-nvim/tests/e2e/jdtls_bundle_e2e.lua::assert@612"
+    ],
+    "newAssertions": [
+      {
+        "line": 612,
+        "call": "helpers.assert_true((inject_debug.bindingResolvedCount or 0) > 0, \"inject completion debug should resolve host bindings\")"
+      }
+    ],
+    "mapping": "explicit replacement-hunk assertion mapping",
+    "reason": "Host-neutral client naming or typed native metadata; original semantic effect and routing/cancellation assertion retained. Unavailable real host operations stay pending.",
+    "equivalentObservation": "Observe the replacement assertion site(s) mcdev-nvim/tests/e2e/jdtls_bundle_e2e.lua::assert@612 and preserve the original input/result relationship for mcdev-nvim/tests/e2e/jdtls_bundle_e2e.lua::assert@861.",
+    "nativeStatus": "pending real host E2E",
+    "evidence": "build/nvim-test-logs/native-client-final-syntax"
+  },
+  {
+    "legacyAssertionId": "mcdev-nvim/tests/e2e/jdtls_bundle_e2e.lua::assert@921",
+    "oldCall": "helpers.assert_eq(mixin_class_debug.parseSource, \"JDT_AST\")",
+    "newAssertionIds": [
+      "mcdev-nvim/tests/e2e/jdtls_bundle_e2e.lua::assert@672"
+    ],
+    "newAssertions": [
+      {
+        "line": 672,
+        "call": "helpers.assert_eq(mixin_class_debug.parseSource, \"HOST_NORMALIZED\")"
+      }
+    ],
+    "mapping": "explicit replacement-hunk assertion mapping",
+    "reason": "Use HOST_NORMALIZED, HIGH confidence and an authoritative projectSessionVersion; never claim JDT object use.",
+    "equivalentObservation": "Observe the replacement assertion site(s) mcdev-nvim/tests/e2e/jdtls_bundle_e2e.lua::assert@672 and preserve the original input/result relationship for mcdev-nvim/tests/e2e/jdtls_bundle_e2e.lua::assert@921.",
+    "nativeStatus": "pending real host E2E",
+    "evidence": "build/nvim-test-logs/native-client-final-syntax"
+  },
+  {
+    "legacyAssertionId": "mcdev-nvim/tests/e2e/jdtls_bundle_e2e.lua::assert@922",
+    "oldCall": "helpers.assert_eq(mixin_class_debug.usedJavaProject, true)",
+    "newAssertionIds": [
+      "mcdev-nvim/tests/e2e/jdtls_bundle_e2e.lua::assert@674"
+    ],
+    "newAssertions": [
+      {
+        "line": 674,
+        "call": "helpers.assert_eq(mixin_class_debug.parseConfidence, \"HIGH\")"
+      }
+    ],
+    "mapping": "explicit replacement-hunk assertion mapping",
+    "reason": "Use HOST_NORMALIZED, HIGH confidence and an authoritative projectSessionVersion; never claim JDT object use.",
+    "equivalentObservation": "Observe the replacement assertion site(s) mcdev-nvim/tests/e2e/jdtls_bundle_e2e.lua::assert@674 and preserve the original input/result relationship for mcdev-nvim/tests/e2e/jdtls_bundle_e2e.lua::assert@922.",
+    "nativeStatus": "pending real host E2E",
+    "evidence": "build/nvim-test-logs/native-client-final-syntax"
+  },
+  {
+    "legacyAssertionId": "mcdev-nvim/tests/e2e/jdtls_bundle_e2e.lua::assert@923",
+    "oldCall": "helpers.assert_eq(mixin_class_debug.usedCompilationUnit, true)",
+    "newAssertionIds": [
+      "mcdev-nvim/tests/e2e/jdtls_bundle_e2e.lua::assert@674"
+    ],
+    "newAssertions": [
+      {
+        "line": 674,
+        "call": "helpers.assert_eq(mixin_class_debug.parseConfidence, \"HIGH\")"
+      }
+    ],
+    "mapping": "explicit replacement-hunk assertion mapping",
+    "reason": "Use HOST_NORMALIZED, HIGH confidence and an authoritative projectSessionVersion; never claim JDT object use.",
+    "equivalentObservation": "Observe the replacement assertion site(s) mcdev-nvim/tests/e2e/jdtls_bundle_e2e.lua::assert@674 and preserve the original input/result relationship for mcdev-nvim/tests/e2e/jdtls_bundle_e2e.lua::assert@923.",
+    "nativeStatus": "pending real host E2E",
+    "evidence": "build/nvim-test-logs/native-client-final-syntax"
+  },
+  {
+    "legacyAssertionId": "mcdev-nvim/tests/e2e/jdtls_bundle_e2e.lua::assert@966",
+    "oldCall": "helpers.assert_eq(source_only_inject_debug.parseSource, \"JDT_AST\")",
+    "newAssertionIds": [
+      "mcdev-nvim/tests/e2e/jdtls_bundle_e2e.lua::assert@717"
+    ],
+    "newAssertions": [
+      {
+        "line": 717,
+        "call": "helpers.assert_eq(source_only_inject_debug.parseSource, \"HOST_NORMALIZED\")"
+      }
+    ],
+    "mapping": "explicit replacement-hunk assertion mapping",
+    "reason": "Use HOST_NORMALIZED, HIGH confidence and an authoritative projectSessionVersion; never claim JDT object use.",
+    "equivalentObservation": "Observe the replacement assertion site(s) mcdev-nvim/tests/e2e/jdtls_bundle_e2e.lua::assert@717 and preserve the original input/result relationship for mcdev-nvim/tests/e2e/jdtls_bundle_e2e.lua::assert@966.",
+    "nativeStatus": "pending real host E2E",
+    "evidence": "build/nvim-test-logs/native-client-final-syntax"
+  },
+  {
+    "legacyAssertionId": "mcdev-nvim/tests/e2e/jdtls_bundle_e2e.lua::assert@967",
+    "oldCall": "helpers.assert_eq(source_only_inject_debug.usedJavaProject, true)",
+    "newAssertionIds": [
+      "mcdev-nvim/tests/e2e/jdtls_bundle_e2e.lua::assert@719"
+    ],
+    "newAssertions": [
+      {
+        "line": 719,
+        "call": "helpers.assert_eq(source_only_inject_debug.parseConfidence, \"HIGH\")"
+      }
+    ],
+    "mapping": "explicit replacement-hunk assertion mapping",
+    "reason": "Use HOST_NORMALIZED, HIGH confidence and an authoritative projectSessionVersion; never claim JDT object use.",
+    "equivalentObservation": "Observe the replacement assertion site(s) mcdev-nvim/tests/e2e/jdtls_bundle_e2e.lua::assert@719 and preserve the original input/result relationship for mcdev-nvim/tests/e2e/jdtls_bundle_e2e.lua::assert@967.",
+    "nativeStatus": "pending real host E2E",
+    "evidence": "build/nvim-test-logs/native-client-final-syntax"
+  },
+  {
+    "legacyAssertionId": "mcdev-nvim/tests/e2e/jdtls_bundle_e2e.lua::assert@968",
+    "oldCall": "helpers.assert_eq(source_only_inject_debug.usedCompilationUnit, true)",
+    "newAssertionIds": [
+      "mcdev-nvim/tests/e2e/jdtls_bundle_e2e.lua::assert@719"
+    ],
+    "newAssertions": [
+      {
+        "line": 719,
+        "call": "helpers.assert_eq(source_only_inject_debug.parseConfidence, \"HIGH\")"
+      }
+    ],
+    "mapping": "explicit replacement-hunk assertion mapping",
+    "reason": "Use HOST_NORMALIZED, HIGH confidence and an authoritative projectSessionVersion; never claim JDT object use.",
+    "equivalentObservation": "Observe the replacement assertion site(s) mcdev-nvim/tests/e2e/jdtls_bundle_e2e.lua::assert@719 and preserve the original input/result relationship for mcdev-nvim/tests/e2e/jdtls_bundle_e2e.lua::assert@968.",
+    "nativeStatus": "pending real host E2E",
+    "evidence": "build/nvim-test-logs/native-client-final-syntax"
+  },
+  {
+    "legacyAssertionId": "mcdev-nvim/tests/e2e/jdtls_bundle_e2e.lua::assert@1011",
+    "oldCall": "helpers.assert_eq(invoker_debug.parseSource, \"JDT_AST\")",
+    "newAssertionIds": [
+      "mcdev-nvim/tests/e2e/jdtls_bundle_e2e.lua::assert@762"
+    ],
+    "newAssertions": [
+      {
+        "line": 762,
+        "call": "helpers.assert_eq(invoker_debug.parseSource, \"HOST_NORMALIZED\")"
+      }
+    ],
+    "mapping": "explicit replacement-hunk assertion mapping",
+    "reason": "Use HOST_NORMALIZED, HIGH confidence and an authoritative projectSessionVersion; never claim JDT object use.",
+    "equivalentObservation": "Observe the replacement assertion site(s) mcdev-nvim/tests/e2e/jdtls_bundle_e2e.lua::assert@762 and preserve the original input/result relationship for mcdev-nvim/tests/e2e/jdtls_bundle_e2e.lua::assert@1011.",
+    "nativeStatus": "pending real host E2E",
+    "evidence": "build/nvim-test-logs/native-client-final-syntax"
+  },
+  {
+    "legacyAssertionId": "mcdev-nvim/tests/e2e/jdtls_bundle_e2e.lua::assert@1012",
+    "oldCall": "helpers.assert_eq(invoker_debug.usedCompilationUnit, true)",
+    "newAssertionIds": [
+      "mcdev-nvim/tests/e2e/jdtls_bundle_e2e.lua::assert@763"
+    ],
+    "newAssertions": [
+      {
+        "line": 763,
+        "call": "helpers.assert_eq(invoker_debug.parseConfidence, \"HIGH\")"
+      }
+    ],
+    "mapping": "explicit replacement-hunk assertion mapping",
+    "reason": "Use HOST_NORMALIZED, HIGH confidence and an authoritative projectSessionVersion; never claim JDT object use.",
+    "equivalentObservation": "Observe the replacement assertion site(s) mcdev-nvim/tests/e2e/jdtls_bundle_e2e.lua::assert@763 and preserve the original input/result relationship for mcdev-nvim/tests/e2e/jdtls_bundle_e2e.lua::assert@1012.",
+    "nativeStatus": "pending real host E2E",
+    "evidence": "build/nvim-test-logs/native-client-final-syntax"
+  },
+  {
+    "legacyAssertionId": "mcdev-nvim/tests/e2e/jdtls_bundle_e2e.lua::assert@1013",
+    "oldCall": "helpers.assert_eq(invoker_debug.usedJavaProject, true)",
+    "newAssertionIds": [
+      "mcdev-nvim/tests/e2e/jdtls_bundle_e2e.lua::assert@763"
+    ],
+    "newAssertions": [
+      {
+        "line": 763,
+        "call": "helpers.assert_eq(invoker_debug.parseConfidence, \"HIGH\")"
+      }
+    ],
+    "mapping": "explicit replacement-hunk assertion mapping",
+    "reason": "Use HOST_NORMALIZED, HIGH confidence and an authoritative projectSessionVersion; never claim JDT object use.",
+    "equivalentObservation": "Observe the replacement assertion site(s) mcdev-nvim/tests/e2e/jdtls_bundle_e2e.lua::assert@763 and preserve the original input/result relationship for mcdev-nvim/tests/e2e/jdtls_bundle_e2e.lua::assert@1013.",
+    "nativeStatus": "pending real host E2E",
+    "evidence": "build/nvim-test-logs/native-client-final-syntax"
+  },
+  {
+    "legacyAssertionId": "mcdev-nvim/tests/e2e/jdtls_bundle_e2e.lua::assert@1014",
+    "oldCall": "helpers.assert_true((invoker_debug.bindingResolvedCount or 0) > 0, \"invoker completion debug should resolve JDT bindings\")",
+    "newAssertionIds": [
+      "mcdev-nvim/tests/e2e/jdtls_bundle_e2e.lua::assert@765"
+    ],
+    "newAssertions": [
+      {
+        "line": 765,
+        "call": "helpers.assert_true((invoker_debug.bindingResolvedCount or 0) > 0, \"invoker completion debug should resolve host bindings\")"
+      }
+    ],
+    "mapping": "explicit replacement-hunk assertion mapping",
+    "reason": "Host-neutral client naming or typed native metadata; original semantic effect and routing/cancellation assertion retained. Unavailable real host operations stay pending.",
+    "equivalentObservation": "Observe the replacement assertion site(s) mcdev-nvim/tests/e2e/jdtls_bundle_e2e.lua::assert@765 and preserve the original input/result relationship for mcdev-nvim/tests/e2e/jdtls_bundle_e2e.lua::assert@1014.",
+    "nativeStatus": "pending real host E2E",
+    "evidence": "build/nvim-test-logs/native-client-final-syntax"
+  },
+  {
+    "legacyAssertionId": "mcdev-nvim/tests/e2e/jdtls_bundle_e2e.lua::assert@1151",
+    "oldCall": "helpers.assert_eq(share_debug.parseSource, \"JDT_AST\")",
+    "newAssertionIds": [
+      "mcdev-nvim/tests/e2e/jdtls_bundle_e2e.lua::assert@902"
+    ],
+    "newAssertions": [
+      {
+        "line": 902,
+        "call": "helpers.assert_eq(share_debug.parseSource, \"HOST_NORMALIZED\")"
+      }
+    ],
+    "mapping": "explicit replacement-hunk assertion mapping",
+    "reason": "Use HOST_NORMALIZED, HIGH confidence and an authoritative projectSessionVersion; never claim JDT object use.",
+    "equivalentObservation": "Observe the replacement assertion site(s) mcdev-nvim/tests/e2e/jdtls_bundle_e2e.lua::assert@902 and preserve the original input/result relationship for mcdev-nvim/tests/e2e/jdtls_bundle_e2e.lua::assert@1151.",
+    "nativeStatus": "pending real host E2E",
+    "evidence": "build/nvim-test-logs/native-client-final-syntax"
+  },
+  {
+    "legacyAssertionId": "mcdev-nvim/tests/e2e/jdtls_bundle_e2e.lua::assert@1152",
+    "oldCall": "helpers.assert_eq(share_debug.usedCompilationUnit, true)",
+    "newAssertionIds": [
+      "mcdev-nvim/tests/e2e/jdtls_bundle_e2e.lua::assert@903"
+    ],
+    "newAssertions": [
+      {
+        "line": 903,
+        "call": "helpers.assert_eq(share_debug.parseConfidence, \"HIGH\")"
+      }
+    ],
+    "mapping": "explicit replacement-hunk assertion mapping",
+    "reason": "Use HOST_NORMALIZED, HIGH confidence and an authoritative projectSessionVersion; never claim JDT object use.",
+    "equivalentObservation": "Observe the replacement assertion site(s) mcdev-nvim/tests/e2e/jdtls_bundle_e2e.lua::assert@903 and preserve the original input/result relationship for mcdev-nvim/tests/e2e/jdtls_bundle_e2e.lua::assert@1152.",
+    "nativeStatus": "pending real host E2E",
+    "evidence": "build/nvim-test-logs/native-client-final-syntax"
+  },
+  {
+    "legacyAssertionId": "mcdev-nvim/tests/e2e/jdtls_bundle_e2e.lua::assert@1153",
+    "oldCall": "helpers.assert_eq(share_debug.usedJavaProject, true)",
+    "newAssertionIds": [
+      "mcdev-nvim/tests/e2e/jdtls_bundle_e2e.lua::assert@903"
+    ],
+    "newAssertions": [
+      {
+        "line": 903,
+        "call": "helpers.assert_eq(share_debug.parseConfidence, \"HIGH\")"
+      }
+    ],
+    "mapping": "explicit replacement-hunk assertion mapping",
+    "reason": "Use HOST_NORMALIZED, HIGH confidence and an authoritative projectSessionVersion; never claim JDT object use.",
+    "equivalentObservation": "Observe the replacement assertion site(s) mcdev-nvim/tests/e2e/jdtls_bundle_e2e.lua::assert@903 and preserve the original input/result relationship for mcdev-nvim/tests/e2e/jdtls_bundle_e2e.lua::assert@1153.",
+    "nativeStatus": "pending real host E2E",
+    "evidence": "build/nvim-test-logs/native-client-final-syntax"
+  },
+  {
+    "legacyAssertionId": "mcdev-nvim/tests/e2e/jdtls_bundle_e2e.lua::assert@1230",
+    "oldCall": "helpers.assert_eq(method_debug.parseSource, \"JDT_AST\")",
+    "newAssertionIds": [
+      "mcdev-nvim/tests/e2e/jdtls_bundle_e2e.lua::assert@981"
+    ],
+    "newAssertions": [
+      {
+        "line": 981,
+        "call": "helpers.assert_eq(method_debug.parseSource, \"HOST_NORMALIZED\")"
+      }
+    ],
+    "mapping": "explicit replacement-hunk assertion mapping",
+    "reason": "Use HOST_NORMALIZED, HIGH confidence and an authoritative projectSessionVersion; never claim JDT object use.",
+    "equivalentObservation": "Observe the replacement assertion site(s) mcdev-nvim/tests/e2e/jdtls_bundle_e2e.lua::assert@981 and preserve the original input/result relationship for mcdev-nvim/tests/e2e/jdtls_bundle_e2e.lua::assert@1230.",
+    "nativeStatus": "pending real host E2E",
+    "evidence": "build/nvim-test-logs/native-client-final-syntax"
+  },
+  {
+    "legacyAssertionId": "mcdev-nvim/tests/e2e/jdtls_bundle_e2e.lua::assert@1231",
+    "oldCall": "helpers.assert_eq(method_debug.usedCompilationUnit, true)",
+    "newAssertionIds": [
+      "mcdev-nvim/tests/e2e/jdtls_bundle_e2e.lua::assert@982"
+    ],
+    "newAssertions": [
+      {
+        "line": 982,
+        "call": "helpers.assert_eq(method_debug.parseConfidence, \"HIGH\")"
+      }
+    ],
+    "mapping": "explicit replacement-hunk assertion mapping",
+    "reason": "Use HOST_NORMALIZED, HIGH confidence and an authoritative projectSessionVersion; never claim JDT object use.",
+    "equivalentObservation": "Observe the replacement assertion site(s) mcdev-nvim/tests/e2e/jdtls_bundle_e2e.lua::assert@982 and preserve the original input/result relationship for mcdev-nvim/tests/e2e/jdtls_bundle_e2e.lua::assert@1231.",
+    "nativeStatus": "pending real host E2E",
+    "evidence": "build/nvim-test-logs/native-client-final-syntax"
+  },
+  {
+    "legacyAssertionId": "mcdev-nvim/tests/e2e/jdtls_bundle_e2e.lua::assert@1232",
+    "oldCall": "helpers.assert_eq(method_debug.usedJavaProject, true)",
+    "newAssertionIds": [
+      "mcdev-nvim/tests/e2e/jdtls_bundle_e2e.lua::assert@982"
+    ],
+    "newAssertions": [
+      {
+        "line": 982,
+        "call": "helpers.assert_eq(method_debug.parseConfidence, \"HIGH\")"
+      }
+    ],
+    "mapping": "explicit replacement-hunk assertion mapping",
+    "reason": "Use HOST_NORMALIZED, HIGH confidence and an authoritative projectSessionVersion; never claim JDT object use.",
+    "equivalentObservation": "Observe the replacement assertion site(s) mcdev-nvim/tests/e2e/jdtls_bundle_e2e.lua::assert@982 and preserve the original input/result relationship for mcdev-nvim/tests/e2e/jdtls_bundle_e2e.lua::assert@1232.",
+    "nativeStatus": "pending real host E2E",
+    "evidence": "build/nvim-test-logs/native-client-final-syntax"
+  },
+  {
+    "legacyAssertionId": "mcdev-nvim/tests/e2e/jdtls_loom_e2e.lua::assert@11",
+    "oldCall": "helpers.assert_true(vim.fn.filereadable(bundle_jar) == 1, \"bundle jar must exist: \" .. bundle_jar)",
+    "newAssertionIds": [
+      "mcdev-nvim/tests/e2e/jdtls_loom_e2e.lua::assert@12"
+    ],
+    "newAssertions": [
+      {
+        "line": 12,
+        "call": "helpers.assert_true(vim.fn.executable(ktlsp_cmd) == 1, \"ktlsp executable must exist: \" .. ktlsp_cmd)"
+      }
+    ],
+    "mapping": "explicit replacement-hunk assertion mapping",
+    "reason": "Native executable availability/artifact identity replaces a JVM extension artifact and JDT launcher.",
+    "equivalentObservation": "Observe the replacement assertion site(s) mcdev-nvim/tests/e2e/jdtls_loom_e2e.lua::assert@12 and preserve the original input/result relationship for mcdev-nvim/tests/e2e/jdtls_loom_e2e.lua::assert@11.",
+    "nativeStatus": "pending real host E2E",
+    "evidence": "build/nvim-test-logs/native-client-final-syntax"
+  },
+  {
+    "legacyAssertionId": "mcdev-nvim/tests/e2e/real_project_e2e.lua::assert@76",
+    "oldCall": "h.helpers.assert_true(debug.usedJavaProject == true and debug.usedCompilationUnit == true,\n          \"AST response must resolve the actual project compilation unit\")",
+    "newAssertionIds": [
+      "mcdev-nvim/tests/e2e/real_project_e2e.lua::assert@76"
+    ],
+    "newAssertions": [
+      {
+        "line": 76,
+        "call": "h.helpers.assert_true((debug.projectSessionVersion or 0) > 0 and debug.parseConfidence == \"HIGH\",\n          \"AST response must resolve the actual project compilation unit\")"
+      }
+    ],
+    "mapping": "explicit replacement-hunk assertion mapping",
+    "reason": "Use HOST_NORMALIZED, HIGH confidence and an authoritative projectSessionVersion; never claim JDT object use.",
+    "equivalentObservation": "Observe the replacement assertion site(s) mcdev-nvim/tests/e2e/real_project_e2e.lua::assert@76 and preserve the original input/result relationship for mcdev-nvim/tests/e2e/real_project_e2e.lua::assert@76.",
+    "nativeStatus": "pending real host E2E",
+    "evidence": "build/nvim-test-logs/native-client-final-syntax"
+  },
+  {
+    "legacyAssertionId": "mcdev-nvim/tests/e2e/teardown_process_test.lua::assert@94",
+    "oldCall": "assert(report:find(\"E2E teardown aborted: JDT process snapshot failed\", 1, true),\n    \"snapshot failure must be reported: \" .. report)",
+    "newAssertionIds": [
+      "mcdev-nvim/tests/e2e/teardown_process_test.lua::assert@98"
+    ],
+    "newAssertions": [
+      {
+        "line": 98,
+        "call": "assert(report:find(\"E2E teardown aborted: ktlsp process snapshot failed\", 1, true),\n    \"snapshot failure must be reported: \" .. report)"
+      }
+    ],
+    "mapping": "explicit replacement-hunk assertion mapping",
+    "reason": "Host-neutral client naming or typed native metadata; original semantic effect and routing/cancellation assertion retained. Unavailable real host operations stay pending.",
+    "equivalentObservation": "Observe the replacement assertion site(s) mcdev-nvim/tests/e2e/teardown_process_test.lua::assert@98 and preserve the original input/result relationship for mcdev-nvim/tests/e2e/teardown_process_test.lua::assert@94.",
+    "nativeStatus": "passed",
+    "evidence": "build/nvim-test-logs/native-client-final-teardown-process"
+  },
+  {
+    "legacyAssertionId": "mcdev-nvim/tests/e2e/teardown_process_test.lua::assert@98",
+    "oldCall": "assert(owned_reaped, \"snapshot failure fallback must reap the owned Java parent and child\")",
+    "newAssertionIds": [
+      "mcdev-nvim/tests/e2e/teardown_process_test.lua::assert@102"
+    ],
+    "newAssertions": [
+      {
+        "line": 102,
+        "call": "assert(owned_reaped, \"snapshot failure fallback must reap the owned Rust parent and child\")"
+      }
+    ],
+    "mapping": "explicit replacement-hunk assertion mapping",
+    "reason": "This original editor-host operation remains pending real MC host observation; no client-only equivalent is claimed as an E2E pass.",
+    "equivalentObservation": "Observe the replacement assertion site(s) mcdev-nvim/tests/e2e/teardown_process_test.lua::assert@102 and preserve the original input/result relationship for mcdev-nvim/tests/e2e/teardown_process_test.lua::assert@98.",
+    "nativeStatus": "passed",
+    "evidence": "build/nvim-test-logs/native-client-final-teardown-process"
+  },
+  {
+    "legacyAssertionId": "mcdev-nvim/tests/e2e/teardown_process_test.lua::assert@137",
+    "oldCall": "assert(vim.wait(2000, function() return jdtls_exit.exited end, 25), \"server transport must settle after cleanup\")",
+    "newAssertionIds": [
+      "mcdev-nvim/tests/e2e/teardown_process_test.lua::assert@141"
+    ],
+    "newAssertions": [
+      {
+        "line": 141,
+        "call": "assert(vim.wait(2000, function() return ktlsp_exit.exited end, 25), \"server transport must settle after cleanup\")"
+      }
+    ],
+    "mapping": "explicit replacement-hunk assertion mapping",
+    "reason": "Host-neutral client naming or typed native metadata; original semantic effect and routing/cancellation assertion retained. Unavailable real host operations stay pending.",
+    "equivalentObservation": "Observe the replacement assertion site(s) mcdev-nvim/tests/e2e/teardown_process_test.lua::assert@141 and preserve the original input/result relationship for mcdev-nvim/tests/e2e/teardown_process_test.lua::assert@137.",
+    "nativeStatus": "passed",
+    "evidence": "build/nvim-test-logs/native-client-final-teardown-process"
+  },
+  {
+    "legacyAssertionId": "mcdev-nvim/tests/e2e/teardown_process_test.lua::assert@140",
+    "oldCall": "assert(jdtls_exit.code == 0 and jdtls_exit.signal == 0, \"server must exit normally\")",
+    "newAssertionIds": [
+      "mcdev-nvim/tests/e2e/teardown_process_test.lua::assert@144"
+    ],
+    "newAssertions": [
+      {
+        "line": 144,
+        "call": "assert(ktlsp_exit.code == 0 and ktlsp_exit.signal == 0, \"server must exit normally\")"
+      }
+    ],
+    "mapping": "explicit replacement-hunk assertion mapping",
+    "reason": "Host-neutral client naming or typed native metadata; original semantic effect and routing/cancellation assertion retained. Unavailable real host operations stay pending.",
+    "equivalentObservation": "Observe the replacement assertion site(s) mcdev-nvim/tests/e2e/teardown_process_test.lua::assert@144 and preserve the original input/result relationship for mcdev-nvim/tests/e2e/teardown_process_test.lua::assert@140.",
+    "nativeStatus": "passed",
+    "evidence": "build/nvim-test-logs/native-client-final-teardown-process"
+  },
+  {
+    "legacyAssertionId": "mcdev-nvim/tests/e2e/teardown_process_test.lua::assert@147",
+    "oldCall": "assert(not unrelated_exited and vim.uv.kill(unrelated.pid, 0) ~= nil, \"unrelated Java process must survive cleanup\")",
+    "newAssertionIds": [
+      "mcdev-nvim/tests/e2e/teardown_process_test.lua::assert@151"
+    ],
+    "newAssertions": [
+      {
+        "line": 151,
+        "call": "assert(not unrelated_exited and vim.uv.kill(unrelated.pid, 0) ~= nil, \"unrelated Rust process must survive cleanup\")"
+      }
+    ],
+    "mapping": "explicit replacement-hunk assertion mapping",
+    "reason": "This original editor-host operation remains pending real MC host observation; no client-only equivalent is claimed as an E2E pass.",
+    "equivalentObservation": "Observe the replacement assertion site(s) mcdev-nvim/tests/e2e/teardown_process_test.lua::assert@151 and preserve the original input/result relationship for mcdev-nvim/tests/e2e/teardown_process_test.lua::assert@147.",
+    "nativeStatus": "passed",
+    "evidence": "build/nvim-test-logs/native-client-final-teardown-process"
+  },
+  {
+    "legacyAssertionId": "mcdev-nvim/tests/jdtls_workspace.lua::assert@42",
+    "oldCall": "helpers.assert_eq(jdtls.start_or_attach({ root_dir = root_a }), 1)",
+    "newAssertionIds": [
+      "mcdev-nvim/tests/jdtls_workspace.lua::assert@13"
+    ],
+    "newAssertions": [
+      {
+        "line": 13,
+        "call": "h.assert_eq(ktlsp.start_or_attach({ root_dir = root_a }), 1)"
+      }
+    ],
+    "mapping": "explicit replacement-hunk assertion mapping",
+    "reason": "Authorized removal of JVM/JAR/Mason/-data workflow; observe explicit argv, idempotent provider merge and workspace isolation instead.",
+    "equivalentObservation": "Observe the replacement assertion site(s) mcdev-nvim/tests/jdtls_workspace.lua::assert@13 and preserve the original input/result relationship for mcdev-nvim/tests/jdtls_workspace.lua::assert@42.",
+    "nativeStatus": "passed",
+    "evidence": "build/nvim-test-logs/native-client-final-adapters"
+  },
+  {
+    "legacyAssertionId": "mcdev-nvim/tests/jdtls_workspace.lua::assert@43",
+    "oldCall": "helpers.assert_eq(started[1].cmd[1], \"jdtls\")",
+    "newAssertionIds": [
+      "mcdev-nvim/tests/jdtls_workspace.lua::assert@14"
+    ],
+    "newAssertions": [
+      {
+        "line": 14,
+        "call": "h.assert_eq(started[1].cmd[1], \"ktlsp\")"
+      }
+    ],
+    "mapping": "explicit replacement-hunk assertion mapping",
+    "reason": "Authorized removal of JVM/JAR/Mason/-data workflow; observe explicit argv, idempotent provider merge and workspace isolation instead.",
+    "equivalentObservation": "Observe the replacement assertion site(s) mcdev-nvim/tests/jdtls_workspace.lua::assert@14 and preserve the original input/result relationship for mcdev-nvim/tests/jdtls_workspace.lua::assert@43.",
+    "nativeStatus": "passed",
+    "evidence": "build/nvim-test-logs/native-client-final-adapters"
+  },
+  {
+    "legacyAssertionId": "mcdev-nvim/tests/jdtls_workspace.lua::assert@44",
+    "oldCall": "helpers.assert_eq(started[1].cmd[2], \"-data\")",
+    "newAssertionIds": [
+      "mcdev-nvim/tests/jdtls_workspace.lua::assert@14"
+    ],
+    "newAssertions": [
+      {
+        "line": 14,
+        "call": "h.assert_eq(started[1].cmd[1], \"ktlsp\")"
+      }
+    ],
+    "mapping": "explicit replacement-hunk assertion mapping",
+    "reason": "Authorized removal of JVM/JAR/Mason/-data workflow; observe explicit argv, idempotent provider merge and workspace isolation instead.",
+    "equivalentObservation": "Observe the replacement assertion site(s) mcdev-nvim/tests/jdtls_workspace.lua::assert@14 and preserve the original input/result relationship for mcdev-nvim/tests/jdtls_workspace.lua::assert@44.",
+    "nativeStatus": "passed",
+    "evidence": "build/nvim-test-logs/native-client-final-adapters"
+  },
+  {
+    "legacyAssertionId": "mcdev-nvim/tests/jdtls_workspace.lua::assert@45",
+    "oldCall": "helpers.assert_eq(started[1].cmd[3], expected_data_dir(root_a))",
+    "newAssertionIds": [
+      "mcdev-nvim/tests/jdtls_workspace.lua::assert@23"
+    ],
+    "newAssertions": [
+      {
+        "line": 23,
+        "call": "h.assert_eq(started[4].cmd[1], explicit[1])"
+      }
+    ],
+    "mapping": "explicit replacement-hunk assertion mapping",
+    "reason": "Authorized removal of JVM/JAR/Mason/-data workflow; observe explicit argv, idempotent provider merge and workspace isolation instead.",
+    "equivalentObservation": "Observe the replacement assertion site(s) mcdev-nvim/tests/jdtls_workspace.lua::assert@23 and preserve the original input/result relationship for mcdev-nvim/tests/jdtls_workspace.lua::assert@45.",
+    "nativeStatus": "passed",
+    "evidence": "build/nvim-test-logs/native-client-final-adapters"
+  },
+  {
+    "legacyAssertionId": "mcdev-nvim/tests/jdtls_workspace.lua::assert@47",
+    "oldCall": "helpers.assert_eq(jdtls.start_or_attach({ root_dir = \"./\" .. root_a }), 2)",
+    "newAssertionIds": [
+      "mcdev-nvim/tests/jdtls_workspace.lua::assert@17"
+    ],
+    "newAssertions": [
+      {
+        "line": 17,
+        "call": "h.assert_eq(ktlsp.start_or_attach({ root_dir = \"./\" .. root_a }), 2)"
+      }
+    ],
+    "mapping": "explicit replacement-hunk assertion mapping",
+    "reason": "Authorized removal of JVM/JAR/Mason/-data workflow; observe explicit argv, idempotent provider merge and workspace isolation instead.",
+    "equivalentObservation": "Observe the replacement assertion site(s) mcdev-nvim/tests/jdtls_workspace.lua::assert@17 and preserve the original input/result relationship for mcdev-nvim/tests/jdtls_workspace.lua::assert@47.",
+    "nativeStatus": "passed",
+    "evidence": "build/nvim-test-logs/native-client-final-adapters"
+  },
+  {
+    "legacyAssertionId": "mcdev-nvim/tests/jdtls_workspace.lua::assert@48",
+    "oldCall": "helpers.assert_eq(started[2].cmd[3], started[1].cmd[3])",
+    "newAssertionIds": [
+      "mcdev-nvim/tests/jdtls_workspace.lua::assert@18"
+    ],
+    "newAssertions": [
+      {
+        "line": 18,
+        "call": "h.assert_eq(started[2].root_dir, started[1].root_dir)"
+      }
+    ],
+    "mapping": "explicit replacement-hunk assertion mapping",
+    "reason": "Authorized removal of JVM/JAR/Mason/-data workflow; observe explicit argv, idempotent provider merge and workspace isolation instead.",
+    "equivalentObservation": "Observe the replacement assertion site(s) mcdev-nvim/tests/jdtls_workspace.lua::assert@18 and preserve the original input/result relationship for mcdev-nvim/tests/jdtls_workspace.lua::assert@48.",
+    "nativeStatus": "passed",
+    "evidence": "build/nvim-test-logs/native-client-final-adapters"
+  },
+  {
+    "legacyAssertionId": "mcdev-nvim/tests/jdtls_workspace.lua::assert@50",
+    "oldCall": "helpers.assert_eq(jdtls.start_or_attach({ root_dir = root_b }), 3)",
+    "newAssertionIds": [
+      "mcdev-nvim/tests/jdtls_workspace.lua::assert@19"
+    ],
+    "newAssertions": [
+      {
+        "line": 19,
+        "call": "h.assert_eq(ktlsp.start_or_attach({ root_dir = root_b }), 3)"
+      }
+    ],
+    "mapping": "explicit replacement-hunk assertion mapping",
+    "reason": "Authorized removal of JVM/JAR/Mason/-data workflow; observe explicit argv, idempotent provider merge and workspace isolation instead.",
+    "equivalentObservation": "Observe the replacement assertion site(s) mcdev-nvim/tests/jdtls_workspace.lua::assert@19 and preserve the original input/result relationship for mcdev-nvim/tests/jdtls_workspace.lua::assert@50.",
+    "nativeStatus": "passed",
+    "evidence": "build/nvim-test-logs/native-client-final-adapters"
+  },
+  {
+    "legacyAssertionId": "mcdev-nvim/tests/jdtls_workspace.lua::assert@51",
+    "oldCall": "helpers.assert_true(started[3].cmd[3] ~= started[1].cmd[3], \"different roots need different data dirs\")",
+    "newAssertionIds": [
+      "mcdev-nvim/tests/jdtls_workspace.lua::assert@20"
+    ],
+    "newAssertions": [
+      {
+        "line": 20,
+        "call": "h.assert_true(started[3].root_dir ~= started[1].root_dir, \"different workspaces must remain separate\")"
+      }
+    ],
+    "mapping": "explicit replacement-hunk assertion mapping",
+    "reason": "Authorized removal of JVM/JAR/Mason/-data workflow; observe explicit argv, idempotent provider merge and workspace isolation instead.",
+    "equivalentObservation": "Observe the replacement assertion site(s) mcdev-nvim/tests/jdtls_workspace.lua::assert@20 and preserve the original input/result relationship for mcdev-nvim/tests/jdtls_workspace.lua::assert@51.",
+    "nativeStatus": "passed",
+    "evidence": "build/nvim-test-logs/native-client-final-adapters"
+  },
+  {
+    "legacyAssertionId": "mcdev-nvim/tests/jdtls_workspace.lua::assert@54",
+    "oldCall": "helpers.assert_eq(jdtls.start_or_attach({ root_dir = root_a, data_dir = explicit_data_dir }), 4)",
+    "newAssertionIds": [
+      "mcdev-nvim/tests/jdtls_workspace.lua::assert@22"
+    ],
+    "newAssertions": [
+      {
+        "line": 22,
+        "call": "h.assert_eq(ktlsp.start_or_attach({ root_dir = root_a, cmd = explicit }), 4)"
+      }
+    ],
+    "mapping": "explicit replacement-hunk assertion mapping",
+    "reason": "Authorized removal of JVM/JAR/Mason/-data workflow; observe explicit argv, idempotent provider merge and workspace isolation instead.",
+    "equivalentObservation": "Observe the replacement assertion site(s) mcdev-nvim/tests/jdtls_workspace.lua::assert@22 and preserve the original input/result relationship for mcdev-nvim/tests/jdtls_workspace.lua::assert@54.",
+    "nativeStatus": "passed",
+    "evidence": "build/nvim-test-logs/native-client-final-adapters"
+  },
+  {
+    "legacyAssertionId": "mcdev-nvim/tests/jdtls_workspace.lua::assert@55",
+    "oldCall": "helpers.assert_eq(started[4].cmd[3], explicit_data_dir)",
+    "newAssertionIds": [
+      "mcdev-nvim/tests/jdtls_workspace.lua::assert@23"
+    ],
+    "newAssertions": [
+      {
+        "line": 23,
+        "call": "h.assert_eq(started[4].cmd[1], explicit[1])"
+      }
+    ],
+    "mapping": "explicit replacement-hunk assertion mapping",
+    "reason": "Authorized removal of JVM/JAR/Mason/-data workflow; observe explicit argv, idempotent provider merge and workspace isolation instead.",
+    "equivalentObservation": "Observe the replacement assertion site(s) mcdev-nvim/tests/jdtls_workspace.lua::assert@23 and preserve the original input/result relationship for mcdev-nvim/tests/jdtls_workspace.lua::assert@55.",
+    "nativeStatus": "passed",
+    "evidence": "build/nvim-test-logs/native-client-final-adapters"
+  },
+  {
+    "legacyAssertionId": "mcdev-nvim/tests/jdtls_workspace.lua::assert@58",
+    "oldCall": "helpers.assert_eq(jdtls.start_or_attach({ root_dir = root_a, cmd = explicit_cmd }), 5)",
+    "newAssertionIds": [
+      "mcdev-nvim/tests/jdtls_workspace.lua::assert@22"
+    ],
+    "newAssertions": [
+      {
+        "line": 22,
+        "call": "h.assert_eq(ktlsp.start_or_attach({ root_dir = root_a, cmd = explicit }), 4)"
+      }
+    ],
+    "mapping": "explicit replacement-hunk assertion mapping",
+    "reason": "Authorized removal of JVM/JAR/Mason/-data workflow; observe explicit argv, idempotent provider merge and workspace isolation instead.",
+    "equivalentObservation": "Observe the replacement assertion site(s) mcdev-nvim/tests/jdtls_workspace.lua::assert@22 and preserve the original input/result relationship for mcdev-nvim/tests/jdtls_workspace.lua::assert@58.",
+    "nativeStatus": "passed",
+    "evidence": "build/nvim-test-logs/native-client-final-adapters"
+  },
+  {
+    "legacyAssertionId": "mcdev-nvim/tests/jdtls_workspace.lua::assert@59",
+    "oldCall": "helpers.assert_eq(started[5].cmd[1], explicit_cmd[1])",
+    "newAssertionIds": [
+      "mcdev-nvim/tests/jdtls_workspace.lua::assert@23"
+    ],
+    "newAssertions": [
+      {
+        "line": 23,
+        "call": "h.assert_eq(started[4].cmd[1], explicit[1])"
+      }
+    ],
+    "mapping": "explicit replacement-hunk assertion mapping",
+    "reason": "Authorized removal of JVM/JAR/Mason/-data workflow; observe explicit argv, idempotent provider merge and workspace isolation instead.",
+    "equivalentObservation": "Observe the replacement assertion site(s) mcdev-nvim/tests/jdtls_workspace.lua::assert@23 and preserve the original input/result relationship for mcdev-nvim/tests/jdtls_workspace.lua::assert@59.",
+    "nativeStatus": "passed",
+    "evidence": "build/nvim-test-logs/native-client-final-adapters"
+  },
+  {
+    "legacyAssertionId": "mcdev-nvim/tests/jdtls_workspace.lua::assert@60",
+    "oldCall": "helpers.assert_eq(started[5].cmd[2], explicit_cmd[2])",
+    "newAssertionIds": [
+      "mcdev-nvim/tests/jdtls_workspace.lua::assert@24"
+    ],
+    "newAssertions": [
+      {
+        "line": 24,
+        "call": "h.assert_eq(started[4].cmd[2], explicit[2])"
+      }
+    ],
+    "mapping": "explicit replacement-hunk assertion mapping",
+    "reason": "Authorized removal of JVM/JAR/Mason/-data workflow; observe explicit argv, idempotent provider merge and workspace isolation instead.",
+    "equivalentObservation": "Observe the replacement assertion site(s) mcdev-nvim/tests/jdtls_workspace.lua::assert@24 and preserve the original input/result relationship for mcdev-nvim/tests/jdtls_workspace.lua::assert@60.",
+    "nativeStatus": "passed",
+    "evidence": "build/nvim-test-logs/native-client-final-adapters"
+  },
+  {
+    "legacyAssertionId": "mcdev-nvim/tests/jdtls_workspace.lua::assert@61",
+    "oldCall": "helpers.assert_eq(#started[5].cmd, #explicit_cmd)",
+    "newAssertionIds": [
+      "mcdev-nvim/tests/jdtls_workspace.lua::assert@25"
+    ],
+    "newAssertions": [
+      {
+        "line": 25,
+        "call": "h.assert_eq(#started[4].cmd, #explicit)"
+      }
+    ],
+    "mapping": "explicit replacement-hunk assertion mapping",
+    "reason": "Authorized removal of JVM/JAR/Mason/-data workflow; observe explicit argv, idempotent provider merge and workspace isolation instead.",
+    "equivalentObservation": "Observe the replacement assertion site(s) mcdev-nvim/tests/jdtls_workspace.lua::assert@25 and preserve the original input/result relationship for mcdev-nvim/tests/jdtls_workspace.lua::assert@61.",
+    "nativeStatus": "passed",
+    "evidence": "build/nvim-test-logs/native-client-final-adapters"
+  },
+  {
+    "legacyAssertionId": "mcdev-nvim/tests/jdtls_workspace.lua::assert@62",
+    "oldCall": "helpers.assert_eq(#mkdir_calls, 4)",
+    "newAssertionIds": [
+      "mcdev-nvim/tests/jdtls_workspace.lua::assert@15"
+    ],
+    "newAssertions": [
+      {
+        "line": 15,
+        "call": "h.assert_eq(#started[1].cmd, 1)"
+      }
+    ],
+    "mapping": "explicit replacement-hunk assertion mapping",
+    "reason": "Authorized removal of JVM/JAR/Mason/-data workflow; observe explicit argv, idempotent provider merge and workspace isolation instead.",
+    "equivalentObservation": "Observe the replacement assertion site(s) mcdev-nvim/tests/jdtls_workspace.lua::assert@15 and preserve the original input/result relationship for mcdev-nvim/tests/jdtls_workspace.lua::assert@62.",
+    "nativeStatus": "passed",
+    "evidence": "build/nvim-test-logs/native-client-final-adapters"
+  },
+  {
+    "legacyAssertionId": "mcdev-nvim/tests/jdtls_workspace.lua::assert@63",
+    "oldCall": "helpers.assert_nil(launch_options[5], \"Java startup must keep Neovim's default attach behavior\")",
+    "newAssertionIds": [
+      "mcdev-nvim/tests/jdtls_workspace.lua::assert@44"
+    ],
+    "newAssertions": [
+      {
+        "line": 44,
+        "call": "h.assert_eq(manual.init_options.analysisProviders.other.enabled, false)"
+      }
+    ],
+    "mapping": "explicit replacement-hunk assertion mapping",
+    "reason": "Authorized removal of JVM/JAR/Mason/-data workflow; observe explicit argv, idempotent provider merge and workspace isolation instead.",
+    "equivalentObservation": "Observe the replacement assertion site(s) mcdev-nvim/tests/jdtls_workspace.lua::assert@44 and preserve the original input/result relationship for mcdev-nvim/tests/jdtls_workspace.lua::assert@63.",
+    "nativeStatus": "passed",
+    "evidence": "build/nvim-test-logs/native-client-final-adapters"
+  },
+  {
+    "legacyAssertionId": "mcdev-nvim/tests/jdtls_workspace.lua::assert@73",
+    "oldCall": "helpers.assert_eq(jdtls.start_or_attach(kotlin_opts), 6)",
+    "newAssertionIds": [
+      "mcdev-nvim/tests/jdtls_workspace.lua::assert@13"
+    ],
+    "newAssertions": [
+      {
+        "line": 13,
+        "call": "h.assert_eq(ktlsp.start_or_attach({ root_dir = root_a }), 1)"
+      }
+    ],
+    "mapping": "explicit replacement-hunk assertion mapping",
+    "reason": "Authorized removal of JVM/JAR/Mason/-data workflow; observe explicit argv, idempotent provider merge and workspace isolation instead.",
+    "equivalentObservation": "Observe the replacement assertion site(s) mcdev-nvim/tests/jdtls_workspace.lua::assert@13 and preserve the original input/result relationship for mcdev-nvim/tests/jdtls_workspace.lua::assert@73.",
+    "nativeStatus": "passed",
+    "evidence": "build/nvim-test-logs/native-client-final-adapters"
+  },
+  {
+    "legacyAssertionId": "mcdev-nvim/tests/jdtls_workspace.lua::assert@74",
+    "oldCall": "helpers.assert_eq(launch_options[6].attach, false, \"Kotlin must not attach to JDT LS\")",
+    "newAssertionIds": [
+      "mcdev-nvim/tests/jdtls_workspace.lua::assert@43"
+    ],
+    "newAssertions": [
+      {
+        "line": 43,
+        "call": "h.assert_eq(manual.init_options.custom, true)"
+      }
+    ],
+    "mapping": "explicit replacement-hunk assertion mapping",
+    "reason": "Authorized removal of JVM/JAR/Mason/-data workflow; observe explicit argv, idempotent provider merge and workspace isolation instead.",
+    "equivalentObservation": "Observe the replacement assertion site(s) mcdev-nvim/tests/jdtls_workspace.lua::assert@43 and preserve the original input/result relationship for mcdev-nvim/tests/jdtls_workspace.lua::assert@74.",
+    "nativeStatus": "passed",
+    "evidence": "build/nvim-test-logs/native-client-final-adapters"
+  },
+  {
+    "legacyAssertionId": "mcdev-nvim/tests/jdtls_workspace.lua::assert@75",
+    "oldCall": "helpers.assert_nil(launch_options[6].reuse_client, \"workspace/name reuse must remain Neovim's default\")",
+    "newAssertionIds": [
+      "mcdev-nvim/tests/jdtls_workspace.lua::assert@20"
+    ],
+    "newAssertions": [
+      {
+        "line": 20,
+        "call": "h.assert_true(started[3].root_dir ~= started[1].root_dir, \"different workspaces must remain separate\")"
+      }
+    ],
+    "mapping": "explicit replacement-hunk assertion mapping",
+    "reason": "Authorized removal of JVM/JAR/Mason/-data workflow; observe explicit argv, idempotent provider merge and workspace isolation instead.",
+    "equivalentObservation": "Observe the replacement assertion site(s) mcdev-nvim/tests/jdtls_workspace.lua::assert@20 and preserve the original input/result relationship for mcdev-nvim/tests/jdtls_workspace.lua::assert@75.",
+    "nativeStatus": "passed",
+    "evidence": "build/nvim-test-logs/native-client-final-adapters"
+  },
+  {
+    "legacyAssertionId": "mcdev-nvim/tests/jdtls_workspace.lua::assert@76",
+    "oldCall": "helpers.assert_eq(started[6].root_dir, kotlin_opts.root_dir)",
+    "newAssertionIds": [
+      "mcdev-nvim/tests/jdtls_workspace.lua::assert@18"
+    ],
+    "newAssertions": [
+      {
+        "line": 18,
+        "call": "h.assert_eq(started[2].root_dir, started[1].root_dir)"
+      }
+    ],
+    "mapping": "explicit replacement-hunk assertion mapping",
+    "reason": "Authorized removal of JVM/JAR/Mason/-data workflow; observe explicit argv, idempotent provider merge and workspace isolation instead.",
+    "equivalentObservation": "Observe the replacement assertion site(s) mcdev-nvim/tests/jdtls_workspace.lua::assert@18 and preserve the original input/result relationship for mcdev-nvim/tests/jdtls_workspace.lua::assert@76.",
+    "nativeStatus": "passed",
+    "evidence": "build/nvim-test-logs/native-client-final-adapters"
+  },
+  {
+    "legacyAssertionId": "mcdev-nvim/tests/jdtls_workspace.lua::assert@77",
+    "oldCall": "helpers.assert_eq(started[6].name, kotlin_opts.name)",
+    "newAssertionIds": [
+      "mcdev-nvim/tests/jdtls_workspace.lua::assert@14"
+    ],
+    "newAssertions": [
+      {
+        "line": 14,
+        "call": "h.assert_eq(started[1].cmd[1], \"ktlsp\")"
+      }
+    ],
+    "mapping": "explicit replacement-hunk assertion mapping",
+    "reason": "Authorized removal of JVM/JAR/Mason/-data workflow; observe explicit argv, idempotent provider merge and workspace isolation instead.",
+    "equivalentObservation": "Observe the replacement assertion site(s) mcdev-nvim/tests/jdtls_workspace.lua::assert@14 and preserve the original input/result relationship for mcdev-nvim/tests/jdtls_workspace.lua::assert@77.",
+    "nativeStatus": "passed",
+    "evidence": "build/nvim-test-logs/native-client-final-adapters"
+  },
+  {
+    "legacyAssertionId": "mcdev-nvim/tests/jdtls_workspace.lua::assert@78",
+    "oldCall": "helpers.assert_eq(started[6].capabilities, kotlin_opts.capabilities)",
+    "newAssertionIds": [
+      "mcdev-nvim/tests/jdtls_workspace.lua::assert@14"
+    ],
+    "newAssertions": [
+      {
+        "line": 14,
+        "call": "h.assert_eq(started[1].cmd[1], \"ktlsp\")"
+      }
+    ],
+    "mapping": "explicit replacement-hunk assertion mapping",
+    "reason": "Authorized removal of JVM/JAR/Mason/-data workflow; observe explicit argv, idempotent provider merge and workspace isolation instead.",
+    "equivalentObservation": "Observe the replacement assertion site(s) mcdev-nvim/tests/jdtls_workspace.lua::assert@14 and preserve the original input/result relationship for mcdev-nvim/tests/jdtls_workspace.lua::assert@78.",
+    "nativeStatus": "passed",
+    "evidence": "build/nvim-test-logs/native-client-final-adapters"
+  },
+  {
+    "legacyAssertionId": "mcdev-nvim/tests/jdtls_workspace.lua::assert@79",
+    "oldCall": "helpers.assert_eq(started[6].settings, kotlin_opts.settings)",
+    "newAssertionIds": [
+      "mcdev-nvim/tests/jdtls_workspace.lua::assert@14"
+    ],
+    "newAssertions": [
+      {
+        "line": 14,
+        "call": "h.assert_eq(started[1].cmd[1], \"ktlsp\")"
+      }
+    ],
+    "mapping": "explicit replacement-hunk assertion mapping",
+    "reason": "Authorized removal of JVM/JAR/Mason/-data workflow; observe explicit argv, idempotent provider merge and workspace isolation instead.",
+    "equivalentObservation": "Observe the replacement assertion site(s) mcdev-nvim/tests/jdtls_workspace.lua::assert@14 and preserve the original input/result relationship for mcdev-nvim/tests/jdtls_workspace.lua::assert@79.",
+    "nativeStatus": "passed",
+    "evidence": "build/nvim-test-logs/native-client-final-adapters"
+  },
+  {
+    "legacyAssertionId": "mcdev-nvim/tests/jdtls_workspace.lua::assert@80",
+    "oldCall": "helpers.assert_nil(kotlin_opts.init_options, \"the caller's config must not be mutated\")",
+    "newAssertionIds": [
+      "mcdev-nvim/tests/jdtls_workspace.lua::assert@43"
+    ],
+    "newAssertions": [
+      {
+        "line": 43,
+        "call": "h.assert_eq(manual.init_options.custom, true)"
+      }
+    ],
+    "mapping": "explicit replacement-hunk assertion mapping",
+    "reason": "Authorized removal of JVM/JAR/Mason/-data workflow; observe explicit argv, idempotent provider merge and workspace isolation instead.",
+    "equivalentObservation": "Observe the replacement assertion site(s) mcdev-nvim/tests/jdtls_workspace.lua::assert@43 and preserve the original input/result relationship for mcdev-nvim/tests/jdtls_workspace.lua::assert@80.",
+    "nativeStatus": "passed",
+    "evidence": "build/nvim-test-logs/native-client-final-adapters"
+  },
+  {
+    "legacyAssertionId": "mcdev-nvim/tests/jdtls_workspace.lua::assert@81",
+    "oldCall": "helpers.assert_eq(jdtls.start_or_attach(kotlin_opts), 7)",
+    "newAssertionIds": [
+      "mcdev-nvim/tests/jdtls_workspace.lua::assert@13"
+    ],
+    "newAssertions": [
+      {
+        "line": 13,
+        "call": "h.assert_eq(ktlsp.start_or_attach({ root_dir = root_a }), 1)"
+      }
+    ],
+    "mapping": "explicit replacement-hunk assertion mapping",
+    "reason": "Authorized removal of JVM/JAR/Mason/-data workflow; observe explicit argv, idempotent provider merge and workspace isolation instead.",
+    "equivalentObservation": "Observe the replacement assertion site(s) mcdev-nvim/tests/jdtls_workspace.lua::assert@13 and preserve the original input/result relationship for mcdev-nvim/tests/jdtls_workspace.lua::assert@81.",
+    "nativeStatus": "passed",
+    "evidence": "build/nvim-test-logs/native-client-final-adapters"
+  },
+  {
+    "legacyAssertionId": "mcdev-nvim/tests/jdtls_workspace.lua::assert@82",
+    "oldCall": "helpers.assert_eq(launch_options[7].attach, false)",
+    "newAssertionIds": [
+      "mcdev-nvim/tests/jdtls_workspace.lua::assert@43"
+    ],
+    "newAssertions": [
+      {
+        "line": 43,
+        "call": "h.assert_eq(manual.init_options.custom, true)"
+      }
+    ],
+    "mapping": "explicit replacement-hunk assertion mapping",
+    "reason": "Authorized removal of JVM/JAR/Mason/-data workflow; observe explicit argv, idempotent provider merge and workspace isolation instead.",
+    "equivalentObservation": "Observe the replacement assertion site(s) mcdev-nvim/tests/jdtls_workspace.lua::assert@43 and preserve the original input/result relationship for mcdev-nvim/tests/jdtls_workspace.lua::assert@82.",
+    "nativeStatus": "passed",
+    "evidence": "build/nvim-test-logs/native-client-final-adapters"
+  },
+  {
+    "legacyAssertionId": "mcdev-nvim/tests/jdtls_workspace.lua::assert@83",
+    "oldCall": "helpers.assert_eq(started[7].root_dir, started[6].root_dir)",
+    "newAssertionIds": [
+      "mcdev-nvim/tests/jdtls_workspace.lua::assert@18"
+    ],
+    "newAssertions": [
+      {
+        "line": 18,
+        "call": "h.assert_eq(started[2].root_dir, started[1].root_dir)"
+      }
+    ],
+    "mapping": "explicit replacement-hunk assertion mapping",
+    "reason": "Authorized removal of JVM/JAR/Mason/-data workflow; observe explicit argv, idempotent provider merge and workspace isolation instead.",
+    "equivalentObservation": "Observe the replacement assertion site(s) mcdev-nvim/tests/jdtls_workspace.lua::assert@18 and preserve the original input/result relationship for mcdev-nvim/tests/jdtls_workspace.lua::assert@83.",
+    "nativeStatus": "passed",
+    "evidence": "build/nvim-test-logs/native-client-final-adapters"
+  },
+  {
+    "legacyAssertionId": "mcdev-nvim/tests/jdtls_workspace.lua::assert@84",
+    "oldCall": "helpers.assert_eq(started[7].name, started[6].name)",
+    "newAssertionIds": [
+      "mcdev-nvim/tests/jdtls_workspace.lua::assert@18"
+    ],
+    "newAssertions": [
+      {
+        "line": 18,
+        "call": "h.assert_eq(started[2].root_dir, started[1].root_dir)"
+      }
+    ],
+    "mapping": "explicit replacement-hunk assertion mapping",
+    "reason": "Authorized removal of JVM/JAR/Mason/-data workflow; observe explicit argv, idempotent provider merge and workspace isolation instead.",
+    "equivalentObservation": "Observe the replacement assertion site(s) mcdev-nvim/tests/jdtls_workspace.lua::assert@18 and preserve the original input/result relationship for mcdev-nvim/tests/jdtls_workspace.lua::assert@84.",
+    "nativeStatus": "passed",
+    "evidence": "build/nvim-test-logs/native-client-final-adapters"
+  },
+  {
+    "legacyAssertionId": "mcdev-nvim/tests/jdtls_workspace.lua::assert@87",
+    "oldCall": "helpers.assert_eq(jdtls.start_or_attach(kotlin_opts), 8)",
+    "newAssertionIds": [
+      "mcdev-nvim/tests/jdtls_workspace.lua::assert@13"
+    ],
+    "newAssertions": [
+      {
+        "line": 13,
+        "call": "h.assert_eq(ktlsp.start_or_attach({ root_dir = root_a }), 1)"
+      }
+    ],
+    "mapping": "explicit replacement-hunk assertion mapping",
+    "reason": "Authorized removal of JVM/JAR/Mason/-data workflow; observe explicit argv, idempotent provider merge and workspace isolation instead.",
+    "equivalentObservation": "Observe the replacement assertion site(s) mcdev-nvim/tests/jdtls_workspace.lua::assert@13 and preserve the original input/result relationship for mcdev-nvim/tests/jdtls_workspace.lua::assert@87.",
+    "nativeStatus": "passed",
+    "evidence": "build/nvim-test-logs/native-client-final-adapters"
+  },
+  {
+    "legacyAssertionId": "mcdev-nvim/tests/jdtls_workspace.lua::assert@88",
+    "oldCall": "helpers.assert_nil(launch_options[8], \"Java startup after Kotlin must still attach normally\")",
+    "newAssertionIds": [
+      "mcdev-nvim/tests/jdtls_workspace.lua::assert@31"
+    ],
+    "newAssertions": [
+      {
+        "line": 31,
+        "call": "h.assert_true(started[1].init_options ~= started[2].init_options)"
+      }
+    ],
+    "mapping": "explicit replacement-hunk assertion mapping",
+    "reason": "Authorized removal of JVM/JAR/Mason/-data workflow; observe explicit argv, idempotent provider merge and workspace isolation instead.",
+    "equivalentObservation": "Observe the replacement assertion site(s) mcdev-nvim/tests/jdtls_workspace.lua::assert@31 and preserve the original input/result relationship for mcdev-nvim/tests/jdtls_workspace.lua::assert@88.",
+    "nativeStatus": "passed",
+    "evidence": "build/nvim-test-logs/native-client-final-adapters"
+  },
+  {
+    "legacyAssertionId": "mcdev-nvim/tests/run.lua::assert@33",
+    "oldCall": "helpers.assert_eq(mcdev.extension_jar(), \"build/libs/io.github.mcdev.jdtls.jar\")",
+    "newAssertionIds": [
+      "mcdev-nvim/tests/run.lua::assert@31"
+    ],
+    "newAssertions": [
+      {
+        "line": 31,
+        "call": "helpers.assert_eq(ktlsp_helper.extend_config(client_config), client_config)"
+      }
+    ],
+    "mapping": "explicit replacement-hunk assertion mapping",
+    "reason": "Authorized removal of JVM/JAR/Mason/-data workflow; observe explicit argv, idempotent provider merge and workspace isolation instead.",
+    "equivalentObservation": "Observe the replacement assertion site(s) mcdev-nvim/tests/run.lua::assert@31 and preserve the original input/result relationship for mcdev-nvim/tests/run.lua::assert@33.",
+    "nativeStatus": "passed",
+    "evidence": "build/nvim-test-logs/native-client-final-adapters"
+  },
+  {
+    "legacyAssertionId": "mcdev-nvim/tests/run.lua::assert@48",
+    "oldCall": "helpers.assert_eq(mcdev.extension_jar(), mason_jar)",
+    "newAssertionIds": [
+      "mcdev-nvim/tests/run.lua::assert@31"
+    ],
+    "newAssertions": [
+      {
+        "line": 31,
+        "call": "helpers.assert_eq(ktlsp_helper.extend_config(client_config), client_config)"
+      }
+    ],
+    "mapping": "explicit replacement-hunk assertion mapping",
+    "reason": "Authorized removal of JVM/JAR/Mason/-data workflow; observe explicit argv, idempotent provider merge and workspace isolation instead.",
+    "equivalentObservation": "Observe the replacement assertion site(s) mcdev-nvim/tests/run.lua::assert@31 and preserve the original input/result relationship for mcdev-nvim/tests/run.lua::assert@48.",
+    "nativeStatus": "passed",
+    "evidence": "build/nvim-test-logs/native-client-final-adapters"
+  },
+  {
+    "legacyAssertionId": "mcdev-nvim/tests/run.lua::assert@55",
+    "oldCall": "helpers.assert_eq(jdtls_helper.extend_config(jdtls_config), jdtls_config)",
+    "newAssertionIds": [
+      "mcdev-nvim/tests/run.lua::assert@31"
+    ],
+    "newAssertions": [
+      {
+        "line": 31,
+        "call": "helpers.assert_eq(ktlsp_helper.extend_config(client_config), client_config)"
+      }
+    ],
+    "mapping": "explicit replacement-hunk assertion mapping",
+    "reason": "Authorized removal of JVM/JAR/Mason/-data workflow; observe explicit argv, idempotent provider merge and workspace isolation instead.",
+    "equivalentObservation": "Observe the replacement assertion site(s) mcdev-nvim/tests/run.lua::assert@31 and preserve the original input/result relationship for mcdev-nvim/tests/run.lua::assert@55.",
+    "nativeStatus": "passed",
+    "evidence": "build/nvim-test-logs/native-client-final-adapters"
+  },
+  {
+    "legacyAssertionId": "mcdev-nvim/tests/run.lua::assert@56",
+    "oldCall": "helpers.assert_eq(#jdtls_config.init_options.bundles, 2)",
+    "newAssertionIds": [
+      "mcdev-nvim/tests/run.lua::assert@32"
+    ],
+    "newAssertions": [
+      {
+        "line": 32,
+        "call": "helpers.assert_eq(client_config.init_options.existing, true)"
+      }
+    ],
+    "mapping": "explicit replacement-hunk assertion mapping",
+    "reason": "Authorized removal of JVM/JAR/Mason/-data workflow; observe explicit argv, idempotent provider merge and workspace isolation instead.",
+    "equivalentObservation": "Observe the replacement assertion site(s) mcdev-nvim/tests/run.lua::assert@32 and preserve the original input/result relationship for mcdev-nvim/tests/run.lua::assert@56.",
+    "nativeStatus": "passed",
+    "evidence": "build/nvim-test-logs/native-client-final-adapters"
+  },
+  {
+    "legacyAssertionId": "mcdev-nvim/tests/run.lua::assert@57",
+    "oldCall": "helpers.assert_eq(jdtls_config.init_options.bundles[2], mason_jar)",
+    "newAssertionIds": [
+      "mcdev-nvim/tests/run.lua::assert@32"
+    ],
+    "newAssertions": [
+      {
+        "line": 32,
+        "call": "helpers.assert_eq(client_config.init_options.existing, true)"
+      }
+    ],
+    "mapping": "explicit replacement-hunk assertion mapping",
+    "reason": "Authorized removal of JVM/JAR/Mason/-data workflow; observe explicit argv, idempotent provider merge and workspace isolation instead.",
+    "equivalentObservation": "Observe the replacement assertion site(s) mcdev-nvim/tests/run.lua::assert@32 and preserve the original input/result relationship for mcdev-nvim/tests/run.lua::assert@57.",
+    "nativeStatus": "passed",
+    "evidence": "build/nvim-test-logs/native-client-final-adapters"
+  },
+  {
+    "legacyAssertionId": "mcdev-nvim/tests/run.lua::assert@59",
+    "oldCall": "helpers.assert_eq(#jdtls_config.init_options.bundles, 2)",
+    "newAssertionIds": [
+      "mcdev-nvim/tests/run.lua::assert@32"
+    ],
+    "newAssertions": [
+      {
+        "line": 32,
+        "call": "helpers.assert_eq(client_config.init_options.existing, true)"
+      }
+    ],
+    "mapping": "explicit replacement-hunk assertion mapping",
+    "reason": "Authorized removal of JVM/JAR/Mason/-data workflow; observe explicit argv, idempotent provider merge and workspace isolation instead.",
+    "equivalentObservation": "Observe the replacement assertion site(s) mcdev-nvim/tests/run.lua::assert@32 and preserve the original input/result relationship for mcdev-nvim/tests/run.lua::assert@59.",
+    "nativeStatus": "passed",
+    "evidence": "build/nvim-test-logs/native-client-final-adapters"
+  },
+  {
+    "legacyAssertionId": "mcdev-nvim/tests/run.lua::assert@67",
+    "oldCall": "helpers.assert_eq(jdtls_helper.start_or_attach({\r\n  root_dir = \"/project\",\r\n  cmd = { \"jdtls\" },\r\n  init_options = {\r\n    bundles = { \"debug.jar\" },\r\n  },\r\n}), 42)",
+    "newAssertionIds": [
+      "mcdev-nvim/tests/run.lua::assert@41"
+    ],
+    "newAssertions": [
+      {
+        "line": 41,
+        "call": "helpers.assert_eq(ktlsp_helper.start_or_attach({ root_dir = \"/project\", cmd = { vim.v.progpath },\n  init_options = { existing = true } }), 42)"
+      }
+    ],
+    "mapping": "explicit replacement-hunk assertion mapping",
+    "reason": "Authorized removal of JVM/JAR/Mason/-data workflow; observe explicit argv, idempotent provider merge and workspace isolation instead.",
+    "equivalentObservation": "Observe the replacement assertion site(s) mcdev-nvim/tests/run.lua::assert@41 and preserve the original input/result relationship for mcdev-nvim/tests/run.lua::assert@67.",
+    "nativeStatus": "passed",
+    "evidence": "build/nvim-test-logs/native-client-final-adapters"
+  },
+  {
+    "legacyAssertionId": "mcdev-nvim/tests/run.lua::assert@74",
+    "oldCall": "helpers.assert_eq(started_config.init_options.bundles[1], \"debug.jar\")",
+    "newAssertionIds": [
+      "mcdev-nvim/tests/run.lua::assert@43"
+    ],
+    "newAssertions": [
+      {
+        "line": 43,
+        "call": "helpers.assert_eq(started_config.init_options.existing, true)"
+      }
+    ],
+    "mapping": "explicit replacement-hunk assertion mapping",
+    "reason": "Authorized removal of JVM/JAR/Mason/-data workflow; observe explicit argv, idempotent provider merge and workspace isolation instead.",
+    "equivalentObservation": "Observe the replacement assertion site(s) mcdev-nvim/tests/run.lua::assert@43 and preserve the original input/result relationship for mcdev-nvim/tests/run.lua::assert@74.",
+    "nativeStatus": "passed",
+    "evidence": "build/nvim-test-logs/native-client-final-adapters"
+  },
+  {
+    "legacyAssertionId": "mcdev-nvim/tests/run.lua::assert@75",
+    "oldCall": "helpers.assert_eq(started_config.init_options.bundles[2], mason_jar)",
+    "newAssertionIds": [
+      "mcdev-nvim/tests/run.lua::assert@43"
+    ],
+    "newAssertions": [
+      {
+        "line": 43,
+        "call": "helpers.assert_eq(started_config.init_options.existing, true)"
+      }
+    ],
+    "mapping": "explicit replacement-hunk assertion mapping",
+    "reason": "Authorized removal of JVM/JAR/Mason/-data workflow; observe explicit argv, idempotent provider merge and workspace isolation instead.",
+    "equivalentObservation": "Observe the replacement assertion site(s) mcdev-nvim/tests/run.lua::assert@43 and preserve the original input/result relationship for mcdev-nvim/tests/run.lua::assert@75.",
+    "nativeStatus": "passed",
+    "evidence": "build/nvim-test-logs/native-client-final-adapters"
+  },
+  {
+    "legacyAssertionId": "mcdev-nvim/tests/run.lua::assert@85",
+    "oldCall": "helpers.assert_eq(\r\n  vim.fs.normalize(jdtls_helper.resolve_extension_jar({ repo_root = fake_repo, mason = { enabled = false } })),\r\n  vim.fs.normalize(fake_built_jar)\r\n)",
+    "newAssertionIds": [],
+    "newAssertions": [],
+    "mapping": "explicit backend assertion removal with host observer",
+    "reason": "Authorized removal of JVM/JAR/Mason/-data workflow; observe explicit argv, idempotent provider merge and workspace isolation instead.",
+    "equivalentObservation": "No direct replacement assertion exists; the native host must expose the original observable result through the scoped command/session contract before this case can pass.",
+    "nativeStatus": "passed",
+    "evidence": "build/nvim-test-logs/native-client-final-adapters"
+  },
+  {
+    "legacyAssertionId": "mcdev-nvim/tests/run.lua::assert@150",
+    "oldCall": "helpers.assert_eq(notify_message, \"mcdev: no active JDT LS client for this buffer\")",
+    "newAssertionIds": [
+      "mcdev-nvim/tests/run.lua::assert@107"
+    ],
+    "newAssertions": [
+      {
+        "line": 107,
+        "call": "helpers.assert_eq(notify_message, \"mcdev: no active ktlsp client for this buffer\")"
+      }
+    ],
+    "mapping": "explicit replacement-hunk assertion mapping",
+    "reason": "Host-neutral client naming or typed native metadata; original semantic effect and routing/cancellation assertion retained. Unavailable real host operations stay pending.",
+    "equivalentObservation": "Observe the replacement assertion site(s) mcdev-nvim/tests/run.lua::assert@107 and preserve the original input/result relationship for mcdev-nvim/tests/run.lua::assert@150.",
+    "nativeStatus": "passed",
+    "evidence": "build/nvim-test-logs/native-client-final-adapters"
+  },
+  {
+    "legacyAssertionId": "mcdev-nvim/tests/run.lua::assert@158",
+    "oldCall": "helpers.assert_eq(callback_error, \"mcdev: no active JDT LS client for this buffer\")",
+    "newAssertionIds": [
+      "mcdev-nvim/tests/run.lua::assert@115"
+    ],
+    "newAssertions": [
+      {
+        "line": 115,
+        "call": "helpers.assert_eq(callback_error, \"mcdev: no active ktlsp client for this buffer\")"
+      }
+    ],
+    "mapping": "explicit replacement-hunk assertion mapping",
+    "reason": "Host-neutral client naming or typed native metadata; original semantic effect and routing/cancellation assertion retained. Unavailable real host operations stay pending.",
+    "equivalentObservation": "Observe the replacement assertion site(s) mcdev-nvim/tests/run.lua::assert@115 and preserve the original input/result relationship for mcdev-nvim/tests/run.lua::assert@158.",
+    "nativeStatus": "passed",
+    "evidence": "build/nvim-test-logs/native-client-final-adapters"
+  },
+  {
+    "legacyAssertionId": "mcdev-nvim/tests/run.lua::assert@634",
+    "oldCall": "helpers.assert_eq(completion.last_error, \"mcdev: failed to start JDT LS request\")",
+    "newAssertionIds": [
+      "mcdev-nvim/tests/run.lua::assert@593"
+    ],
+    "newAssertions": [
+      {
+        "line": 593,
+        "call": "helpers.assert_eq(completion.last_error, \"mcdev: failed to start ktlsp request\")"
+      }
+    ],
+    "mapping": "explicit replacement-hunk assertion mapping",
+    "reason": "Host-neutral client naming or typed native metadata; original semantic effect and routing/cancellation assertion retained. Unavailable real host operations stay pending.",
+    "equivalentObservation": "Observe the replacement assertion site(s) mcdev-nvim/tests/run.lua::assert@593 and preserve the original input/result relationship for mcdev-nvim/tests/run.lua::assert@634.",
+    "nativeStatus": "passed",
+    "evidence": "build/nvim-test-logs/native-client-final-adapters"
+  },
+  {
+    "legacyAssertionId": "mcdev-nvim/tests/run.lua::assert@1458",
+    "oldCall": "helpers.assert_eq(protocol.active_jdtls_client(bufnr), fallback_client)",
+    "newAssertionIds": [
+      "mcdev-nvim/tests/run.lua::assert@1420"
+    ],
+    "newAssertions": [
+      {
+        "line": 1420,
+        "call": "helpers.assert_eq(protocol.active_ktlsp_client(bufnr), fallback_client)"
+      }
+    ],
+    "mapping": "explicit replacement-hunk assertion mapping",
+    "reason": "Host-neutral client naming or typed native metadata; original semantic effect and routing/cancellation assertion retained. Unavailable real host operations stay pending.",
+    "equivalentObservation": "Observe the replacement assertion site(s) mcdev-nvim/tests/run.lua::assert@1420 and preserve the original input/result relationship for mcdev-nvim/tests/run.lua::assert@1458.",
+    "nativeStatus": "passed",
+    "evidence": "build/nvim-test-logs/native-client-final-adapters"
+  },
+  {
+    "legacyAssertionId": "mcdev-nvim/tests/run.lua::assert@1738",
+    "oldCall": "helpers.assert_eq(nav_error, \"mcdev: no active JDT LS client for this buffer\")",
+    "newAssertionIds": [
+      "mcdev-nvim/tests/run.lua::assert@1701"
+    ],
+    "newAssertions": [
+      {
+        "line": 1701,
+        "call": "helpers.assert_eq(nav_error, \"mcdev: no active ktlsp client for this buffer\")"
+      }
+    ],
+    "mapping": "explicit replacement-hunk assertion mapping",
+    "reason": "Host-neutral client naming or typed native metadata; original semantic effect and routing/cancellation assertion retained. Unavailable real host operations stay pending.",
+    "equivalentObservation": "Observe the replacement assertion site(s) mcdev-nvim/tests/run.lua::assert@1701 and preserve the original input/result relationship for mcdev-nvim/tests/run.lua::assert@1738.",
+    "nativeStatus": "passed",
+    "evidence": "build/nvim-test-logs/native-client-final-adapters"
+  },
+  {
+    "legacyAssertionId": "mcdev-nvim/tests/run.lua::assert@1910",
+    "oldCall": "helpers.assert_true(health_message:find(\"usedCompilationUnit: true\", 1, true) ~= nil, health_message)",
+    "newAssertionIds": [
+      "mcdev-nvim/tests/run.lua::assert@1874"
+    ],
+    "newAssertions": [
+      {
+        "line": 1874,
+        "call": "helpers.assert_true(health_message:find(\"parseConfidence: HIGH\", 1, true) ~= nil, health_message)"
+      }
+    ],
+    "mapping": "explicit replacement-hunk assertion mapping",
+    "reason": "Use HOST_NORMALIZED, HIGH confidence and an authoritative projectSessionVersion; never claim JDT object use.",
+    "equivalentObservation": "Observe the replacement assertion site(s) mcdev-nvim/tests/run.lua::assert@1874 and preserve the original input/result relationship for mcdev-nvim/tests/run.lua::assert@1910.",
+    "nativeStatus": "passed",
+    "evidence": "build/nvim-test-logs/native-client-final-adapters"
+  }
+]

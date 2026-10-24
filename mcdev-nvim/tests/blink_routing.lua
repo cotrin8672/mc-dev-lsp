@@ -13,10 +13,11 @@ local function assert_sources(actual, expected, message)
   end
 end
 
-local function with_buffer(lines, callback)
+local function with_buffer(lines, callback, filetype)
+  filetype = filetype or "java"
   local bufnr = vim.api.nvim_create_buf(false, true)
-  vim.api.nvim_buf_set_name(bufnr, "/project/src/main/java/com/example/Example.java")
-  vim.bo[bufnr].filetype = "java"
+  vim.api.nvim_buf_set_name(bufnr, "/project/src/main/" .. filetype .. "/com/example/Example." .. (filetype == "kotlin" and "kt" or "java"))
+  vim.bo[bufnr].filetype = filetype
   vim.api.nvim_buf_set_lines(bufnr, 0, -1, false, lines)
   vim.api.nvim_set_current_buf(bufnr)
   callback(bufnr)
@@ -348,5 +349,104 @@ end
 
 helpers.assert_eq(source_requests, 9)
 completion.complete = original_complete
+
+local kotlin_imports = {
+  "import io.github.diskria.lapis.annotations.*",
+  "import org.spongepowered.asm.mixin.injection.Inject as Hook // unsaved alias",
+  "import org.spongepowered.asm.mixin.injection.At as Point",
+  "import org.spongepowered.asm.mixin.Overwrite",
+}
+
+for _, case in ipairs({
+  { '@Hook(method = ["ti', "Inject", "method" },
+  { '@Hook(method = ["tick", ', "Inject", "method" },
+  { '@Hook(method = ["tick", /* comma, */ ', "Inject", "method" },
+  { '@Hook(at = [Point("HE', "At" },
+  { '@Hook(at = [Point(value = "INVOKE", target = "Lfoo/', "At", "target" },
+  { '@Hook(at = [Point("HEAD"), Point("RE', "At" },
+  { '@MappingName("secret', "MappingName" },
+  { '@MappingName(name = "secret', "MappingName", "name" },
+  { '@Hook(method = ["""tick', "Inject", "method" },
+  { '@org.spongepowered.asm.mixin.injection.Inject(method = ["ti', "Inject", "method" },
+}) do
+  local lines = vim.list_extend(vim.deepcopy(kotlin_imports), { case[1] })
+  with_buffer(lines, function(bufnr)
+    local position = { #lines, #case[1] }
+    vim.api.nvim_win_set_cursor(0, position)
+    helpers.assert_true(buffer.is_mcdev_buffer(bufnr), case[1])
+    helpers.assert_eq(buffer.effective_language_id(bufnr), "kotlin", case[1])
+    helpers.assert_true(buffer.is_mcdev_completion_context(bufnr), case[1])
+    local context = buffer.completion_context_at(bufnr, position)
+    helpers.assert_true(context ~= nil, case[1])
+    helpers.assert_eq(context.annotation, case[2], case[1])
+    helpers.assert_eq(context.attribute, case[3], case[1])
+    assert_sources(routed_sources(), { "mcdev" }, case[1])
+  end, "kotlin")
+end
+
+for _, line in ipairs({
+  "@KMixin(Target::cla",
+  "@KMixin(target = Target::cla",
+  "@KShadow(PRIVA",
+  "@Hook(method = [TARGET_METHOD",
+  '@Hook(method = ["prefix" + TARGET_METHOD',
+  "@Hook(at = [Point",
+  '@Hook(at = [Point("HEAD"), Poi',
+}) do
+  local lines = vim.list_extend(vim.deepcopy(kotlin_imports), { line })
+  with_buffer(lines, function(bufnr)
+    local position = { #lines, #line }
+    vim.api.nvim_win_set_cursor(0, position)
+    local context = buffer.completion_context_at(bufnr, position)
+    helpers.assert_true(context ~= nil, line)
+    helpers.assert_eq(context.exclusive, false, line)
+    assert_sources(routed_sources(), { "lsp", "mcdev" }, line)
+  end, "kotlin")
+end
+
+for _, lines in ipairs({
+  { "import unrelated.Inject", '@Inject(method = ["not mixin' },
+  { "import unrelated.Inject as Hook", '@Hook(method = ["not mixin' },
+  { "import unrelated.KMixin", "@KMixin(Target::class)" },
+  { "import unrelated.*", '@Inject(method = ["not mixin' },
+  { '@unrelated.Inject(method = ["not mixin' },
+  { "/*", "import org.spongepowered.asm.mixin.injection.Inject", "*/", '@Inject(method = ["not mixin' },
+  { 'val text = """', "import org.spongepowered.asm.mixin.injection.Inject", '"""', '@Inject(method = ["not mixin' },
+  { 'val text = """@org.spongepowered.asm.mixin.injection.Inject(method = ["fake' },
+  { "/* outer /* nested */ @org.spongepowered.asm.mixin.injection.Inject(method = [\"fake" },
+  { "fun ordinary() = listOf(1, 2).ma" },
+}) do
+  with_buffer(lines, function(bufnr)
+    local position = { #lines, #lines[#lines] }
+    vim.api.nvim_win_set_cursor(0, position)
+    helpers.assert_eq(buffer.is_mcdev_completion_context_at(bufnr, position), false, lines[#lines])
+    helpers.assert_eq(buffer.is_mcdev_completion_context(bufnr), false, lines[#lines])
+    assert_sources(routed_sources(), normal_sources, lines[#lines])
+  end, "kotlin")
+end
+
+for _, line in ipairs({ "@KShadow abstract fun sec", "@Overwrite fun rep", "fun ordinary() = target.me" }) do
+  local lines = vim.list_extend(vim.deepcopy(kotlin_imports), { line })
+  with_buffer(lines, function(bufnr)
+    local position = { #lines, #line }
+    vim.api.nvim_win_set_cursor(0, position)
+    helpers.assert_eq(buffer.is_mcdev_completion_context_at(bufnr, position), false, line)
+    assert_sources(routed_sources(), normal_sources, line)
+  end, "kotlin")
+end
+
+with_buffer({ "import io.github.diskria.lapis.annotations.KMixin as Patch", "@Pat " }, function(bufnr)
+  local position = { 2, #"@Pat" }
+  vim.api.nvim_win_set_cursor(0, position)
+  helpers.assert_eq(buffer.completion_context_at(bufnr, position).kind, "annotation_name")
+  assert_sources(routed_sources(), { "lsp", "mcdev" })
+end, "kotlin")
+
+with_buffer({ "import org.spongepowered.asm.mixin.injection.*", '@Inject(at = [At("INVOKE", target = "Lfoo/' }, function(bufnr)
+  local position = { 2, #'@Inject(at = [At("INVOKE", target = "Lfoo/' }
+  vim.api.nvim_win_set_cursor(0, position)
+  helpers.assert_eq(buffer.completion_context_at(bufnr, position).annotation, "At")
+  assert_sources(routed_sources(), { "mcdev" })
+end, "kotlin")
 
 print("mcdev-nvim blink routing tests passed")

@@ -121,7 +121,7 @@ local function to_blink_item(item, bufnr, position)
   blink_item.kind_name = "Mixin"
 
   if item_source(blink_item) == "mixin.attribute" then
-    -- Attribute snippets must outrank JDT LS' incomplete `name = ` items.
+    -- Attribute snippets must outrank the host's incomplete `name = ` items.
     blink_item.score_offset = math.max(blink_item.score_offset or 0, 100)
   end
 
@@ -261,6 +261,7 @@ end
 
 function source:get_completions(ctx, callback)
   local bufnr = ctx_bufnr(ctx)
+  local snapshot = buffer.snapshot(bufnr)
   local position = ctx_position(ctx)
   local context = completion_context(bufnr, position)
   if not context then
@@ -289,14 +290,26 @@ function source:get_completions(ctx, callback)
         items[#items + 1] = item
       end
     end
+    local converted = to_blink_items(items, bufnr, position)
+    for _, item in ipairs(converted) do item._mcdev_snapshot = snapshot end
     callback({
       is_incomplete_forward = result.isProvisional or result.isIncomplete or false,
       -- The server filters by the current prefix. Blink must refetch after
       -- backspacing so a result for a longer prefix cannot hide new items.
       is_incomplete_backward = true,
-      items = to_blink_items(items, bufnr, position),
+      items = converted,
     })
   end, bufnr, position, { source = "blink", stream = true })
+end
+
+function source:execute(_, item, callback, default_implementation)
+  if item._mcdev_snapshot and not buffer.snapshot_current(item._mcdev_snapshot) then
+    vim.notify("mcdev: completion source changed; request completion again", vim.log.levels.WARN)
+    callback()
+    return
+  end
+  default_implementation()
+  callback()
 end
 
 return source

@@ -48,20 +48,13 @@ return function(h)
     return original_publish(bufnr, values)
   end
 
-  local function jdt_request(method, params, timeout_ms)
-    local result, request_error, done = nil, nil, false
-    local started = h.client:request(method, params, function(err, response)
-      request_error, result, done = err, response, true
-    end)
-    helpers.assert_true(started, method .. " request did not start")
-    helpers.assert_true(
-      vim.wait(timeout_ms or 60000, function()
-        return done
-      end, 100),
-      method .. " timed out"
-    )
-    helpers.assert_nil(request_error, method .. " failed: " .. vim.inspect(request_error))
-    return result
+  local function read_selected_source(uri)
+    helpers.assert_true(uri:sub(1, 7) == "file://", "ktlsp must expose its selected source file")
+    local path = vim.uri_to_fname(uri)
+    helpers.assert_true(vim.fn.filereadable(path) == 1, "selected dependency source must be readable: " .. path)
+    local ok, lines = pcall(vim.fn.readfile, path)
+    helpers.assert_true(ok, "selected dependency source read failed: " .. tostring(lines))
+    return table.concat(lines, "\n")
   end
 
   h.with_buffer(h.mixin_file, "java", nil, function(bufnr)
@@ -91,20 +84,20 @@ return function(h)
     )
     helpers.assert_eq(method_location.metadata.owner, "com/simibubi/create/content/kinetics/drill/DrillBlock")
     helpers.assert_eq(method_location.metadata.descriptor, expected_descriptor)
-    helpers.assert_eq(method_location.resolution, "jdt")
+    helpers.assert_eq(method_location.resolution, "source")
     helpers.assert_true(
-      method_location.documentUri:find("jdt://contents/create-1.21.1-6.0.10-280.jar/", 1, true) ~= nil,
-      "definition must use the JDT classfile URI: " .. vim.inspect(method_location)
+      method_location.documentUri:sub(1, 7) == "file://",
+      "definition must use ktlsp's selected dependency source URI: " .. vim.inspect(method_location)
     )
     helpers.assert_true(
       method_location.documentUri:find("DrillBlock.java", 1, true) ~= nil,
       "definition must point at DrillBlock.java: " .. vim.inspect(method_location)
     )
-    local attached_source = jdt_request("java/classFileContents", { uri = method_location.documentUri }, 120000)
-    helpers.assert_true(type(attached_source) == "string", "JDT attached source must be text")
+    local attached_source = read_selected_source(method_location.documentUri)
+    helpers.assert_true(type(attached_source) == "string", "selected dependency source must be text")
     helpers.assert_true(
       attached_source:find("useItemOn", 1, true) ~= nil,
-      "JDT attached source must contain useItemOn"
+      "selected dependency source must contain useItemOn"
     )
     local source_lines = vim.split(attached_source:gsub("\r\n", "\n"), "\n", { plain = true })
     local range_line = method_location.range and method_location.range.start and method_location.range.start.line

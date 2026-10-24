@@ -1,0 +1,2687 @@
+{
+  "originalTestAndSupportFiles": 27,
+  "originalLuaModules": 20,
+  "originalStaticAssertionCallSites": 1014,
+  "loadedClientModules": [
+    "mcdev",
+    "mcdev.attach",
+    "mcdev.blink",
+    "mcdev.buffer",
+    "mcdev.cmp",
+    "mcdev.code_action",
+    "mcdev.completion",
+    "mcdev.config",
+    "mcdev.convert",
+    "mcdev.diagnostics",
+    "mcdev.health",
+    "mcdev.hover",
+    "mcdev.ktlsp",
+    "mcdev.lsp",
+    "mcdev.navigation",
+    "mcdev.omnifunc",
+    "mcdev.protocol",
+    "mcdev.stdio",
+    "mcdev.transport",
+    "mcdev.ui"
+  ],
+  "nativeAssertCallsByFile": {
+    "mcdev-nvim/tests/syntax_load.lua": 50,
+    "mcdev-nvim/tests/run.lua": 375,
+    "mcdev-nvim/tests/protocol_positions.lua": 13,
+    "mcdev-nvim/tests/diagnostic_positions.lua": 6,
+    "mcdev-nvim/tests/completion_readiness.lua": 31,
+    "mcdev-nvim/tests/jdtls_workspace.lua": 30,
+    "mcdev-nvim/tests/blink_routing.lua": 601,
+    "mcdev-nvim/tests/lsp_regressions.lua": 219,
+    "mcdev-nvim/tests/cmp_routing.lua": 32,
+    "mcdev-nvim/tests/blink_positions.lua": 26,
+    "mcdev-nvim/tests/transport.lua": 27,
+    "mcdev-nvim/tests/backend_contract.lua": 37,
+    "mcdev-nvim/tests/cmp_positions.lua": 7,
+    "mcdev-nvim/tests/native_helper.lua": 26,
+    "mcdev-nvim/tests/e2e/teardown_test.lua": 6,
+    "mcdev-nvim/tests/e2e/teardown_process_test.lua": 35
+  },
+  "nativeAssertCallTotal": 1521,
+  "nativeAssertionCountsBySite": {
+    "mcdev-nvim/tests/syntax_load.lua:3:assert": 50,
+    "mcdev-nvim/tests/run.lua:1564:assert_eq": 1,
+    "mcdev-nvim/tests/run.lua:1565:assert_eq": 1,
+    "mcdev-nvim/tests/run.lua:1573:assert_eq": 1,
+    "mcdev-nvim/tests/run.lua:1574:assert_eq": 1,
+    "mcdev-nvim/tests/run.lua:1583:assert_eq": 1,
+    "mcdev-nvim/tests/run.lua:1584:assert_eq": 1,
+    "mcdev-nvim/tests/run.lua:1590:assert_eq": 1,
+    "mcdev-nvim/tests/run.lua:1591:assert_eq": 1,
+    "mcdev-nvim/tests/run.lua:1599:assert_eq": 1,
+    "mcdev-nvim/tests/run.lua:1600:assert_eq": 1,
+    "mcdev-nvim/tests/run.lua:1601:assert_eq": 1,
+    "mcdev-nvim/tests/run.lua:1602:assert_true": 1,
+    "mcdev-nvim/tests/run.lua:1613:assert_eq": 1,
+    "mcdev-nvim/tests/run.lua:1614:assert_eq": 1,
+    "mcdev-nvim/tests/run.lua:1625:assert_eq": 1,
+    "mcdev-nvim/tests/run.lua:1626:assert_eq": 1,
+    "mcdev-nvim/tests/run.lua:1164:assert_not_nil": 1,
+    "mcdev-nvim/tests/run.lua:1184:assert_eq": 1,
+    "mcdev-nvim/tests/run.lua:1185:assert_eq": 1,
+    "mcdev-nvim/tests/protocol_positions.lua:25:assert_eq": 1,
+    "mcdev-nvim/tests/protocol_positions.lua:26:assert_eq": 1,
+    "mcdev-nvim/tests/protocol_positions.lua:27:assert_eq": 1,
+    "mcdev-nvim/tests/protocol_positions.lua:35:assert_eq": 1,
+    "mcdev-nvim/tests/protocol_positions.lua:36:assert_eq": 1,
+    "mcdev-nvim/tests/run.lua:27:assert_eq": 1,
+    "mcdev-nvim/tests/run.lua:31:assert_eq": 1,
+    "mcdev-nvim/tests/run.lua:32:assert_eq": 1,
+    "mcdev-nvim/tests/run.lua:33:assert_eq": 1,
+    "mcdev-nvim/tests/run.lua:34:assert_eq": 1,
+    "mcdev-nvim/tests/run.lua:35:assert_eq": 1,
+    "mcdev-nvim/tests/run.lua:37:assert_eq": 1,
+    "mcdev-nvim/tests/run.lua:41:assert_eq": 1,
+    "mcdev-nvim/tests/run.lua:43:assert_eq": 1,
+    "mcdev-nvim/tests/run.lua:44:assert_eq": 1,
+    "mcdev-nvim/tests/run.lua:63:assert_eq": 1,
+    "mcdev-nvim/tests/run.lua:64:assert_eq": 1,
+    "mcdev-nvim/tests/run.lua:65:assert_eq": 1,
+    "mcdev-nvim/tests/run.lua:66:assert_true": 1,
+    "mcdev-nvim/tests/run.lua:78:assert_eq": 1,
+    "mcdev-nvim/tests/run.lua:79:assert_eq": 1,
+    "mcdev-nvim/tests/diagnostic_positions.lua:25:assert_eq": 1,
+    "mcdev-nvim/tests/diagnostic_positions.lua:26:assert_eq": 1,
+    "mcdev-nvim/tests/diagnostic_positions.lua:27:assert_eq": 1,
+    "mcdev-nvim/tests/diagnostic_positions.lua:28:assert_eq": 1,
+    "mcdev-nvim/tests/diagnostic_positions.lua:29:assert_eq": 1,
+    "mcdev-nvim/tests/diagnostic_positions.lua:42:assert_eq": 1,
+    "mcdev-nvim/tests/completion_readiness.lua:41:assert_true": 2,
+    "mcdev-nvim/tests/completion_readiness.lua:42:assert_not_nil": 2,
+    "mcdev-nvim/tests/completion_readiness.lua:43:assert_eq": 2,
+    "mcdev-nvim/tests/completion_readiness.lua:49:assert_eq": 1,
+    "mcdev-nvim/tests/completion_readiness.lua:50:assert_eq": 1,
+    "mcdev-nvim/tests/completion_readiness.lua:51:assert_true": 1,
+    "mcdev-nvim/tests/completion_readiness.lua:57:assert_eq": 1,
+    "mcdev-nvim/tests/completion_readiness.lua:59:assert_eq": 1,
+    "mcdev-nvim/tests/completion_readiness.lua:71:assert_true": 1,
+    "mcdev-nvim/tests/completion_readiness.lua:72:assert_eq": 1,
+    "mcdev-nvim/tests/completion_readiness.lua:76:assert_eq": 1,
+    "mcdev-nvim/tests/completion_readiness.lua:77:assert_eq": 1,
+    "mcdev-nvim/tests/completion_readiness.lua:78:assert_nil": 1,
+    "mcdev-nvim/tests/completion_readiness.lua:84:assert_eq": 1,
+    "mcdev-nvim/tests/completion_readiness.lua:87:assert_eq": 1,
+    "mcdev-nvim/tests/completion_readiness.lua:88:assert_true": 1,
+    "mcdev-nvim/tests/completion_readiness.lua:89:assert_true": 1,
+    "mcdev-nvim/tests/completion_readiness.lua:90:assert_true": 1,
+    "mcdev-nvim/tests/completion_readiness.lua:92:assert_eq": 1,
+    "mcdev-nvim/tests/completion_readiness.lua:99:assert_eq": 1,
+    "mcdev-nvim/tests/jdtls_workspace.lua:13:assert_eq": 1,
+    "mcdev-nvim/tests/jdtls_workspace.lua:14:assert_eq": 1,
+    "mcdev-nvim/tests/jdtls_workspace.lua:15:assert_eq": 1,
+    "mcdev-nvim/tests/jdtls_workspace.lua:16:assert_eq": 1,
+    "mcdev-nvim/tests/jdtls_workspace.lua:17:assert_eq": 1,
+    "mcdev-nvim/tests/jdtls_workspace.lua:18:assert_eq": 1,
+    "mcdev-nvim/tests/blink_routing.lua:245:assert_true": 8,
+    "mcdev-nvim/tests/jdtls_workspace.lua:19:assert_eq": 1,
+    "mcdev-nvim/tests/jdtls_workspace.lua:20:assert_true": 1,
+    "mcdev-nvim/tests/jdtls_workspace.lua:22:assert_eq": 1,
+    "mcdev-nvim/tests/jdtls_workspace.lua:23:assert_eq": 1,
+    "mcdev-nvim/tests/jdtls_workspace.lua:24:assert_eq": 1,
+    "mcdev-nvim/tests/jdtls_workspace.lua:25:assert_eq": 1,
+    "mcdev-nvim/tests/jdtls_workspace.lua:27:assert_eq": 1,
+    "mcdev-nvim/tests/jdtls_workspace.lua:28:assert_eq": 1,
+    "mcdev-nvim/tests/jdtls_workspace.lua:29:assert_eq": 1,
+    "mcdev-nvim/tests/jdtls_workspace.lua:30:assert_eq": 1,
+    "mcdev-nvim/tests/jdtls_workspace.lua:31:assert_true": 1,
+    "mcdev-nvim/tests/jdtls_workspace.lua:33:assert_eq": 1,
+    "mcdev-nvim/tests/jdtls_workspace.lua:34:assert_eq": 1,
+    "mcdev-nvim/tests/jdtls_workspace.lua:40:assert_eq": 1,
+    "mcdev-nvim/tests/jdtls_workspace.lua:41:assert_eq": 1,
+    "mcdev-nvim/tests/jdtls_workspace.lua:42:assert_eq": 1,
+    "mcdev-nvim/tests/jdtls_workspace.lua:43:assert_eq": 1,
+    "mcdev-nvim/tests/jdtls_workspace.lua:44:assert_eq": 1,
+    "mcdev-nvim/tests/jdtls_workspace.lua:45:assert_eq": 1,
+    "mcdev-nvim/tests/jdtls_workspace.lua:46:assert_eq": 1,
+    "mcdev-nvim/tests/jdtls_workspace.lua:47:assert_eq": 1,
+    "mcdev-nvim/tests/jdtls_workspace.lua:49:assert_eq": 1,
+    "mcdev-nvim/tests/jdtls_workspace.lua:52:assert_nil": 1,
+    "mcdev-nvim/tests/jdtls_workspace.lua:53:assert_true": 1,
+    "mcdev-nvim/tests/run.lua:1817:assert_eq": 4,
+    "mcdev-nvim/tests/blink_routing.lua:260:assert_true": 2,
+    "mcdev-nvim/tests/blink_routing.lua:31:assert_true": 1,
+    "mcdev-nvim/tests/blink_routing.lua:32:assert_true": 1,
+    "mcdev-nvim/tests/blink_routing.lua:10:assert_eq": 107,
+    "mcdev-nvim/tests/blink_routing.lua:12:assert_eq": 283,
+    "mcdev-nvim/tests/blink_routing.lua:39:assert_true": 1,
+    "mcdev-nvim/tests/blink_routing.lua:40:assert_eq": 1,
+    "mcdev-nvim/tests/blink_routing.lua:47:assert_eq": 1,
+    "mcdev-nvim/tests/lsp_regressions.lua:98:assert_eq": 6,
+    "mcdev-nvim/tests/lsp_regressions.lua:100:assert_eq": 18,
+    "mcdev-nvim/tests/lsp_regressions.lua:101:assert_eq": 18,
+    "mcdev-nvim/tests/lsp_regressions.lua:97:assert_eq": 12,
+    "mcdev-nvim/tests/lsp_regressions.lua:107:assert_eq": 3,
+    "mcdev-nvim/tests/lsp_regressions.lua:111:assert_eq": 3,
+    "mcdev-nvim/tests/lsp_regressions.lua:136:assert_eq": 12,
+    "mcdev-nvim/tests/run.lua:591:assert_true": 1,
+    "mcdev-nvim/tests/run.lua:592:assert_eq": 1,
+    "mcdev-nvim/tests/run.lua:593:assert_eq": 1,
+    "mcdev-nvim/tests/run.lua:599:assert_eq": 1,
+    "mcdev-nvim/tests/run.lua:601:assert_not_nil": 1,
+    "mcdev-nvim/tests/run.lua:602:assert_eq": 1,
+    "mcdev-nvim/tests/lsp_regressions.lua:144:assert_eq": 3,
+    "mcdev-nvim/tests/lsp_regressions.lua:153:assert_eq": 1,
+    "mcdev-nvim/tests/cmp_routing.lua:63:assert_true": 1,
+    "mcdev-nvim/tests/cmp_routing.lua:71:assert_not_nil": 1,
+    "mcdev-nvim/tests/cmp_routing.lua:72:assert_eq": 1,
+    "mcdev-nvim/tests/cmp_routing.lua:73:assert_eq": 1,
+    "mcdev-nvim/tests/cmp_routing.lua:74:assert_eq": 1,
+    "mcdev-nvim/tests/cmp_routing.lua:75:assert_eq": 1,
+    "mcdev-nvim/tests/cmp_routing.lua:76:assert_eq": 1,
+    "mcdev-nvim/tests/cmp_routing.lua:77:assert_true": 1,
+    "mcdev-nvim/tests/cmp_routing.lua:84:assert_eq": 1,
+    "mcdev-nvim/tests/cmp_routing.lua:91:assert_not_nil": 1,
+    "mcdev-nvim/tests/cmp_routing.lua:92:assert_eq": 1,
+    "mcdev-nvim/tests/cmp_routing.lua:93:assert_eq": 1,
+    "mcdev-nvim/tests/cmp_routing.lua:103:assert_true": 1,
+    "mcdev-nvim/tests/cmp_routing.lua:111:assert_not_nil": 1,
+    "mcdev-nvim/tests/run.lua:622:assert_eq": 1,
+    "mcdev-nvim/tests/run.lua:623:assert_eq": 1,
+    "mcdev-nvim/tests/run.lua:624:assert_eq": 1,
+    "mcdev-nvim/tests/run.lua:625:assert_eq": 1,
+    "mcdev-nvim/tests/run.lua:641:assert_nil": 1,
+    "mcdev-nvim/tests/cmp_routing.lua:130:assert_not_nil": 1,
+    "mcdev-nvim/tests/run.lua:643:assert_not_nil": 1,
+    "mcdev-nvim/tests/run.lua:644:assert_eq": 1,
+    "mcdev-nvim/tests/run.lua:645:assert_eq": 1,
+    "mcdev-nvim/tests/cmp_routing.lua:152:assert_eq": 1,
+    "mcdev-nvim/tests/blink_routing.lua:401:assert_true": 7,
+    "mcdev-nvim/tests/blink_routing.lua:402:assert_eq": 7,
+    "mcdev-nvim/tests/cmp_routing.lua:155:assert_eq": 1,
+    "mcdev-nvim/tests/cmp_routing.lua:156:assert_eq": 1,
+    "mcdev-nvim/tests/lsp_regressions.lua:173:assert_eq": 3,
+    "mcdev-nvim/tests/lsp_regressions.lua:174:assert_eq": 3,
+    "mcdev-nvim/tests/lsp_regressions.lua:175:assert_eq": 3,
+    "mcdev-nvim/tests/lsp_regressions.lua:177:assert_eq": 3,
+    "mcdev-nvim/tests/lsp_regressions.lua:178:assert_eq": 3,
+    "mcdev-nvim/tests/lsp_regressions.lua:179:assert_eq": 3,
+    "mcdev-nvim/tests/lsp_regressions.lua:180:assert_nil": 3,
+    "mcdev-nvim/tests/lsp_regressions.lua:182:assert_eq": 1,
+    "mcdev-nvim/tests/lsp_regressions.lua:188:assert_eq": 1,
+    "mcdev-nvim/tests/lsp_regressions.lua:189:assert_eq": 1,
+    "mcdev-nvim/tests/lsp_regressions.lua:194:assert_eq": 2,
+    "mcdev-nvim/tests/lsp_regressions.lua:195:assert_eq": 2,
+    "mcdev-nvim/tests/lsp_regressions.lua:196:assert_eq": 2,
+    "mcdev-nvim/tests/lsp_regressions.lua:215:assert_eq": 4,
+    "mcdev-nvim/tests/lsp_regressions.lua:218:assert_eq": 4,
+    "mcdev-nvim/tests/lsp_regressions.lua:219:assert_eq": 4,
+    "mcdev-nvim/tests/lsp_regressions.lua:220:assert_eq": 4,
+    "mcdev-nvim/tests/lsp_regressions.lua:221:assert_eq": 4,
+    "mcdev-nvim/tests/lsp_regressions.lua:253:assert_eq": 1,
+    "mcdev-nvim/tests/lsp_regressions.lua:69:assert_eq": 9,
+    "mcdev-nvim/tests/lsp_regressions.lua:70:assert_eq": 9,
+    "mcdev-nvim/tests/lsp_regressions.lua:72:assert_true": 1,
+    "mcdev-nvim/tests/lsp_regressions.lua:279:assert_eq": 2,
+    "mcdev-nvim/tests/lsp_regressions.lua:291:assert_eq": 3,
+    "mcdev-nvim/tests/lsp_regressions.lua:292:assert_true": 3,
+    "mcdev-nvim/tests/lsp_regressions.lua:293:assert_true": 3,
+    "mcdev-nvim/tests/blink_positions.lua:49:assert_eq": 1,
+    "mcdev-nvim/tests/blink_positions.lua:50:assert_true": 1,
+    "mcdev-nvim/tests/blink_positions.lua:51:assert_eq": 1,
+    "mcdev-nvim/tests/blink_positions.lua:52:assert_eq": 1,
+    "mcdev-nvim/tests/blink_positions.lua:53:assert_eq": 1,
+    "mcdev-nvim/tests/blink_positions.lua:54:assert_eq": 1,
+    "mcdev-nvim/tests/blink_positions.lua:55:assert_eq": 1,
+    "mcdev-nvim/tests/blink_positions.lua:56:assert_eq": 1,
+    "mcdev-nvim/tests/blink_positions.lua:57:assert_true": 1,
+    "mcdev-nvim/tests/blink_positions.lua:58:assert_eq": 1,
+    "mcdev-nvim/tests/blink_positions.lua:59:assert_eq": 1,
+    "mcdev-nvim/tests/transport.lua:68:assert_nil": 1,
+    "mcdev-nvim/tests/transport.lua:69:assert_true": 1,
+    "mcdev-nvim/tests/blink_routing.lua:422:assert_eq": 10,
+    "mcdev-nvim/tests/blink_positions.lua:63:assert_eq": 1,
+    "mcdev-nvim/tests/blink_positions.lua:64:assert_eq": 1,
+    "mcdev-nvim/tests/blink_positions.lua:72:assert_eq": 1,
+    "mcdev-nvim/tests/blink_positions.lua:73:assert_eq": 1,
+    "mcdev-nvim/tests/blink_positions.lua:75:assert_eq": 1,
+    "mcdev-nvim/tests/run.lua:1264:assert_eq": 1,
+    "mcdev-nvim/tests/run.lua:1265:assert_not_nil": 1,
+    "mcdev-nvim/tests/run.lua:1266:assert_eq": 1,
+    "mcdev-nvim/tests/run.lua:394:assert_eq": 2,
+    "mcdev-nvim/tests/run.lua:395:assert_eq": 2,
+    "mcdev-nvim/tests/run.lua:1286:assert_eq": 1,
+    "mcdev-nvim/tests/blink_positions.lua:114:assert_eq": 1,
+    "mcdev-nvim/tests/blink_positions.lua:115:assert_eq": 1,
+    "mcdev-nvim/tests/blink_positions.lua:116:assert_eq": 1,
+    "mcdev-nvim/tests/blink_positions.lua:117:assert_eq": 1,
+    "mcdev-nvim/tests/blink_positions.lua:118:assert_eq": 1,
+    "mcdev-nvim/tests/blink_positions.lua:119:assert_eq": 1,
+    "mcdev-nvim/tests/blink_positions.lua:120:assert_eq": 1,
+    "mcdev-nvim/tests/blink_positions.lua:121:assert_eq": 1,
+    "mcdev-nvim/tests/blink_positions.lua:122:assert_eq": 1,
+    "mcdev-nvim/tests/transport.lua:112:assert": 1,
+    "mcdev-nvim/tests/blink_positions.lua:126:assert_eq": 1,
+    "mcdev-nvim/tests/run.lua:1305:assert_eq": 1,
+    "mcdev-nvim/tests/transport.lua:129:assert": 1,
+    "mcdev-nvim/tests/run.lua:1316:assert_eq": 1,
+    "mcdev-nvim/tests/run.lua:1330:assert_eq": 1,
+    "mcdev-nvim/tests/run.lua:1331:assert_eq": 1,
+    "mcdev-nvim/tests/run.lua:1334:assert_eq": 1,
+    "mcdev-nvim/tests/transport.lua:133:assert_true": 1,
+    "mcdev-nvim/tests/transport.lua:139:assert_true": 1,
+    "mcdev-nvim/tests/transport.lua:140:assert_nil": 1,
+    "mcdev-nvim/tests/transport.lua:141:assert_eq": 1,
+    "mcdev-nvim/tests/blink_routing.lua:286:assert_eq": 4,
+    "mcdev-nvim/tests/run.lua:904:assert_eq": 1,
+    "mcdev-nvim/tests/run.lua:905:assert_eq": 1,
+    "mcdev-nvim/tests/run.lua:907:assert_eq": 1,
+    "mcdev-nvim/tests/run.lua:909:assert_eq": 1,
+    "mcdev-nvim/tests/run.lua:910:assert_eq": 1,
+    "mcdev-nvim/tests/run.lua:940:assert_eq": 1,
+    "mcdev-nvim/tests/run.lua:941:assert_not_nil": 1,
+    "mcdev-nvim/tests/run.lua:942:assert_eq": 1,
+    "mcdev-nvim/tests/completion_readiness.lua:10:assert_eq": 4,
+    "mcdev-nvim/tests/completion_readiness.lua:40:assert_eq": 2,
+    "mcdev-nvim/tests/blink_routing.lua:68:assert_true": 6,
+    "mcdev-nvim/tests/blink_routing.lua:69:assert_true": 6,
+    "mcdev-nvim/tests/blink_routing.lua:54:assert_true": 1,
+    "mcdev-nvim/tests/run.lua:973:assert_not_nil": 2,
+    "mcdev-nvim/tests/run.lua:974:assert_eq": 2,
+    "mcdev-nvim/tests/run.lua:980:assert_eq": 2,
+    "mcdev-nvim/tests/run.lua:981:assert_true": 2,
+    "mcdev-nvim/tests/run.lua:983:assert_eq": 2,
+    "mcdev-nvim/tests/run.lua:463:assert_eq": 1,
+    "mcdev-nvim/tests/run.lua:465:assert_eq": 1,
+    "mcdev-nvim/tests/blink_routing.lua:433:assert_eq": 3,
+    "mcdev-nvim/tests/run.lua:166:assert_eq": 1,
+    "mcdev-nvim/tests/run.lua:168:assert_eq": 1,
+    "mcdev-nvim/tests/blink_routing.lua:99:assert_true": 17,
+    "mcdev-nvim/tests/run.lua:196:assert_eq": 1,
+    "mcdev-nvim/tests/run.lua:1934:assert_eq": 1,
+    "mcdev-nvim/tests/run.lua:86:assert_eq": 1,
+    "mcdev-nvim/tests/blink_routing.lua:61:assert_true": 1,
+    "mcdev-nvim/tests/run.lua:397:assert_eq": 2,
+    "mcdev-nvim/tests/run.lua:204:assert_not_nil": 1,
+    "mcdev-nvim/tests/run.lua:406:assert_eq": 2,
+    "mcdev-nvim/tests/run.lua:1669:assert_eq": 1,
+    "mcdev-nvim/tests/run.lua:1668:assert_eq": 1,
+    "mcdev-nvim/tests/run.lua:1667:assert_eq": 1,
+    "mcdev-nvim/tests/run.lua:1251:assert_eq": 1,
+    "mcdev-nvim/tests/blink_routing.lua:441:assert_eq": 1,
+    "mcdev-nvim/tests/run.lua:1252:assert_eq": 1,
+    "mcdev-nvim/tests/run.lua:713:assert_true": 1,
+    "mcdev-nvim/tests/run.lua:249:assert_true": 1,
+    "mcdev-nvim/tests/run.lua:1273:assert_eq": 1,
+    "mcdev-nvim/tests/backend_contract.lua:16:assert_true": 3,
+    "mcdev-nvim/tests/blink_routing.lua:448:assert_eq": 1,
+    "mcdev-nvim/tests/backend_contract.lua:15:assert_eq": 3,
+    "mcdev-nvim/tests/cmp_routing.lua:112:assert_eq": 1,
+    "mcdev-nvim/tests/transport.lua:117:assert": 1,
+    "mcdev-nvim/tests/transport.lua:115:assert": 1,
+    "mcdev-nvim/tests/transport.lua:114:assert": 1,
+    "mcdev-nvim/tests/transport.lua:113:assert": 1,
+    "mcdev-nvim/tests/transport.lua:110:assert": 1,
+    "mcdev-nvim/tests/transport.lua:109:assert": 1,
+    "mcdev-nvim/tests/transport.lua:106:assert_eq": 1,
+    "mcdev-nvim/tests/transport.lua:101:assert_true": 1,
+    "mcdev-nvim/tests/transport.lua:97:assert_eq": 1,
+    "mcdev-nvim/tests/transport.lua:94:assert_eq": 1,
+    "mcdev-nvim/tests/transport.lua:88:assert_eq": 1,
+    "mcdev-nvim/tests/transport.lua:87:assert_eq": 1,
+    "mcdev-nvim/tests/transport.lua:76:assert_nil": 1,
+    "mcdev-nvim/tests/transport.lua:74:assert_nil": 1,
+    "mcdev-nvim/tests/transport.lua:64:assert_nil": 1,
+    "mcdev-nvim/tests/transport.lua:56:assert_eq": 1,
+    "mcdev-nvim/tests/transport.lua:44:assert_eq": 1,
+    "mcdev-nvim/tests/transport.lua:23:assert_eq": 1,
+    "mcdev-nvim/tests/transport.lua:9:assert_true": 1,
+    "mcdev-nvim/tests/cmp_routing.lua:171:assert_eq": 1,
+    "mcdev-nvim/tests/cmp_routing.lua:167:assert_eq": 1,
+    "mcdev-nvim/tests/cmp_routing.lua:163:assert_eq": 1,
+    "mcdev-nvim/tests/cmp_routing.lua:160:assert_eq": 1,
+    "mcdev-nvim/tests/cmp_routing.lua:154:assert_eq": 1,
+    "mcdev-nvim/tests/cmp_routing.lua:153:assert_eq": 1,
+    "mcdev-nvim/tests/cmp_routing.lua:151:assert_true": 1,
+    "mcdev-nvim/tests/cmp_routing.lua:132:assert_eq": 1,
+    "mcdev-nvim/tests/cmp_routing.lua:131:assert_eq": 1,
+    "mcdev-nvim/tests/backend_contract.lua:14:assert_true": 3,
+    "mcdev-nvim/tests/run.lua:737:assert_eq": 1,
+    "mcdev-nvim/tests/cmp_positions.lua:47:assert_eq": 1,
+    "mcdev-nvim/tests/cmp_positions.lua:48:assert_eq": 1,
+    "mcdev-nvim/tests/run.lua:745:assert_not_nil": 1,
+    "mcdev-nvim/tests/run.lua:746:assert_eq": 1,
+    "mcdev-nvim/tests/run.lua:747:assert_eq": 1,
+    "mcdev-nvim/tests/run.lua:748:assert_eq": 1,
+    "mcdev-nvim/tests/cmp_positions.lua:54:assert_eq": 1,
+    "mcdev-nvim/tests/cmp_routing.lua:56:assert_eq": 1,
+    "mcdev-nvim/tests/cmp_routing.lua:55:assert_eq": 1,
+    "mcdev-nvim/tests/run.lua:1627:assert_eq": 1,
+    "mcdev-nvim/tests/run.lua:1628:assert_eq": 1,
+    "mcdev-nvim/tests/run.lua:1640:assert_eq": 1,
+    "mcdev-nvim/tests/run.lua:1641:assert_eq": 1,
+    "mcdev-nvim/tests/run.lua:1642:assert_eq": 1,
+    "mcdev-nvim/tests/run.lua:1643:assert_eq": 1,
+    "mcdev-nvim/tests/run.lua:1644:assert_eq": 1,
+    "mcdev-nvim/tests/run.lua:1665:assert_eq": 1,
+    "mcdev-nvim/tests/run.lua:213:assert_not_nil": 1,
+    "mcdev-nvim/tests/run.lua:214:assert_not_nil": 1,
+    "mcdev-nvim/tests/run.lua:215:assert_not_nil": 1,
+    "mcdev-nvim/tests/run.lua:216:assert_not_nil": 1,
+    "mcdev-nvim/tests/run.lua:217:assert_not_nil": 1,
+    "mcdev-nvim/tests/run.lua:774:assert_true": 1,
+    "mcdev-nvim/tests/run.lua:775:assert_nil": 1,
+    "mcdev-nvim/tests/run.lua:776:assert_nil": 1,
+    "mcdev-nvim/tests/run.lua:221:assert_not_nil": 1,
+    "mcdev-nvim/tests/run.lua:222:assert_not_nil": 1,
+    "mcdev-nvim/tests/run.lua:223:assert_not_nil": 1,
+    "mcdev-nvim/tests/run.lua:225:assert_eq": 1,
+    "mcdev-nvim/tests/run.lua:226:assert_eq": 1,
+    "mcdev-nvim/tests/run.lua:790:assert_not_nil": 1,
+    "mcdev-nvim/tests/run.lua:791:assert_true": 1,
+    "mcdev-nvim/tests/run.lua:792:assert_eq": 1,
+    "mcdev-nvim/tests/run.lua:230:assert_eq": 1,
+    "mcdev-nvim/tests/run.lua:231:assert_eq": 1,
+    "mcdev-nvim/tests/run.lua:235:assert_eq": 1,
+    "mcdev-nvim/tests/run.lua:236:assert_eq": 1,
+    "mcdev-nvim/tests/run.lua:801:assert_eq": 1,
+    "mcdev-nvim/tests/run.lua:238:assert_eq": 1,
+    "mcdev-nvim/tests/run.lua:247:assert_eq": 1,
+    "mcdev-nvim/tests/run.lua:248:assert_true": 1,
+    "mcdev-nvim/tests/run.lua:811:assert_eq": 1,
+    "mcdev-nvim/tests/run.lua:813:assert_not_nil": 1,
+    "mcdev-nvim/tests/run.lua:264:assert_eq": 1,
+    "mcdev-nvim/tests/run.lua:265:assert_eq": 1,
+    "mcdev-nvim/tests/run.lua:824:assert_nil": 1,
+    "mcdev-nvim/tests/cmp_routing.lua:54:assert_not_nil": 1,
+    "mcdev-nvim/tests/cmp_routing.lua:46:assert_eq": 1,
+    "mcdev-nvim/tests/cmp_positions.lua:53:assert_eq": 1,
+    "mcdev-nvim/tests/cmp_positions.lua:52:assert_not_nil": 1,
+    "mcdev-nvim/tests/cmp_positions.lua:51:assert_eq": 1,
+    "mcdev-nvim/tests/cmp_positions.lua:49:assert_eq": 1,
+    "mcdev-nvim/tests/blink_routing.lua:423:assert_eq": 10,
+    "mcdev-nvim/tests/run.lua:525:assert_eq": 1,
+    "mcdev-nvim/tests/run.lua:526:assert_eq": 1,
+    "mcdev-nvim/tests/run.lua:527:assert_nil": 1,
+    "mcdev-nvim/tests/blink_routing.lua:382:assert_eq": 10,
+    "mcdev-nvim/tests/run.lua:536:assert_eq": 1,
+    "mcdev-nvim/tests/run.lua:537:assert_not_nil": 1,
+    "mcdev-nvim/tests/run.lua:538:assert_eq": 1,
+    "mcdev-nvim/tests/run.lua:539:assert_eq": 1,
+    "mcdev-nvim/tests/run.lua:237:assert_eq": 1,
+    "mcdev-nvim/tests/run.lua:840:assert_not_nil": 3,
+    "mcdev-nvim/tests/run.lua:396:assert_eq": 2,
+    "mcdev-nvim/tests/run.lua:865:assert_eq": 1,
+    "mcdev-nvim/tests/run.lua:398:assert_eq": 2,
+    "mcdev-nvim/tests/run.lua:867:assert_eq": 1,
+    "mcdev-nvim/tests/run.lua:870:assert_eq": 1,
+    "mcdev-nvim/tests/run.lua:871:assert_true": 1,
+    "mcdev-nvim/tests/run.lua:872:assert_eq": 1,
+    "mcdev-nvim/tests/run.lua:873:assert_eq": 1,
+    "mcdev-nvim/tests/run.lua:1750:assert_eq": 1,
+    "mcdev-nvim/tests/run.lua:876:assert_eq": 1,
+    "mcdev-nvim/tests/run.lua:877:assert_eq": 1,
+    "mcdev-nvim/tests/run.lua:878:assert_eq": 1,
+    "mcdev-nvim/tests/run.lua:879:assert_eq": 1,
+    "mcdev-nvim/tests/run.lua:887:assert_eq": 1,
+    "mcdev-nvim/tests/run.lua:888:assert_eq": 1,
+    "mcdev-nvim/tests/run.lua:890:assert_eq": 1,
+    "mcdev-nvim/tests/run.lua:891:assert_eq": 1,
+    "mcdev-nvim/tests/run.lua:893:assert_eq": 1,
+    "mcdev-nvim/tests/run.lua:894:assert_eq": 1,
+    "mcdev-nvim/tests/run.lua:895:assert_eq": 1,
+    "mcdev-nvim/tests/run.lua:896:assert_eq": 1,
+    "mcdev-nvim/tests/run.lua:897:assert_true": 1,
+    "mcdev-nvim/tests/run.lua:898:assert_eq": 1,
+    "mcdev-nvim/tests/blink_routing.lua:380:assert_true": 10,
+    "mcdev-nvim/tests/run.lua:821:assert_eq": 1,
+    "mcdev-nvim/tests/blink_routing.lua:377:assert_eq": 10,
+    "mcdev-nvim/tests/blink_routing.lua:376:assert_true": 10,
+    "mcdev-nvim/tests/blink_routing.lua:350:assert_eq": 1,
+    "mcdev-nvim/tests/blink_routing.lua:346:assert_eq": 9,
+    "mcdev-nvim/tests/blink_routing.lua:345:assert_true": 9,
+    "mcdev-nvim/tests/blink_routing.lua:325:assert_true": 1,
+    "mcdev-nvim/tests/blink_routing.lua:320:assert_eq": 2,
+    "mcdev-nvim/tests/blink_routing.lua:135:assert_true": 4,
+    "mcdev-nvim/tests/blink_routing.lua:136:assert_eq": 4,
+    "mcdev-nvim/tests/blink_routing.lua:308:assert_true": 10,
+    "mcdev-nvim/tests/blink_routing.lua:272:assert_true": 2,
+    "mcdev-nvim/tests/blink_routing.lua:247:assert_eq": 4,
+    "mcdev-nvim/tests/blink_routing.lua:120:assert_eq": 8,
+    "mcdev-nvim/tests/blink_routing.lua:119:assert_true": 8,
+    "mcdev-nvim/tests/completion_readiness.lua:101:assert_eq": 1,
+    "mcdev-nvim/tests/completion_readiness.lua:100:assert_true": 1,
+    "mcdev-nvim/tests/run.lua:1296:assert_eq": 1,
+    "mcdev-nvim/tests/run.lua:1295:assert_true": 1,
+    "mcdev-nvim/tests/run.lua:1533:assert_eq": 1,
+    "mcdev-nvim/tests/run.lua:1288:assert_eq": 1,
+    "mcdev-nvim/tests/run.lua:1287:assert_not_nil": 1,
+    "mcdev-nvim/tests/run.lua:1274:assert_eq": 1,
+    "mcdev-nvim/tests/backend_contract.lua:28:assert_eq": 1,
+    "mcdev-nvim/tests/run.lua:803:assert_not_nil": 1,
+    "mcdev-nvim/tests/backend_contract.lua:31:assert_eq": 1,
+    "mcdev-nvim/tests/backend_contract.lua:32:assert_true": 1,
+    "mcdev-nvim/tests/backend_contract.lua:35:assert_true": 11,
+    "mcdev-nvim/tests/backend_contract.lua:38:assert_eq": 1,
+    "mcdev-nvim/tests/run.lua:1666:assert_eq": 1,
+    "mcdev-nvim/tests/backend_contract.lua:50:assert_eq": 1,
+    "mcdev-nvim/tests/backend_contract.lua:52:assert_eq": 1,
+    "mcdev-nvim/tests/backend_contract.lua:53:assert_true": 1,
+    "mcdev-nvim/tests/backend_contract.lua:59:assert_eq": 1,
+    "mcdev-nvim/tests/backend_contract.lua:62:assert_eq": 1,
+    "mcdev-nvim/tests/backend_contract.lua:63:assert_eq": 1,
+    "mcdev-nvim/tests/backend_contract.lua:64:assert_true": 1,
+    "mcdev-nvim/tests/backend_contract.lua:69:assert_eq": 1,
+    "mcdev-nvim/tests/backend_contract.lua:76:assert_eq": 1,
+    "mcdev-nvim/tests/backend_contract.lua:77:assert_true": 1,
+    "mcdev-nvim/tests/backend_contract.lua:80:assert_nil": 1,
+    "mcdev-nvim/tests/backend_contract.lua:82:assert_nil": 1,
+    "mcdev-nvim/tests/backend_contract.lua:83:assert_true": 1,
+    "mcdev-nvim/tests/run.lua:462:assert_eq": 1,
+    "mcdev-nvim/tests/run.lua:461:assert_eq": 1,
+    "mcdev-nvim/tests/run.lua:164:assert_eq": 1,
+    "mcdev-nvim/tests/run.lua:459:assert_not_nil": 1,
+    "mcdev-nvim/tests/run.lua:162:assert_eq": 1,
+    "mcdev-nvim/tests/run.lua:161:assert_eq": 1,
+    "mcdev-nvim/tests/run.lua:160:assert_eq": 1,
+    "mcdev-nvim/tests/run.lua:159:assert_eq": 1,
+    "mcdev-nvim/tests/run.lua:158:assert_eq": 1,
+    "mcdev-nvim/tests/run.lua:729:assert_eq": 1,
+    "mcdev-nvim/tests/run.lua:156:assert_eq": 1,
+    "mcdev-nvim/tests/run.lua:155:assert_eq": 1,
+    "mcdev-nvim/tests/run.lua:154:assert_eq": 1,
+    "mcdev-nvim/tests/run.lua:153:assert_eq": 1,
+    "mcdev-nvim/tests/run.lua:152:assert_eq": 1,
+    "mcdev-nvim/tests/run.lua:151:assert_eq": 1,
+    "mcdev-nvim/tests/run.lua:726:assert_eq": 1,
+    "mcdev-nvim/tests/run.lua:1110:assert_eq": 1,
+    "mcdev-nvim/tests/run.lua:1109:assert_eq": 1,
+    "mcdev-nvim/tests/run.lua:1869:assert_true": 1,
+    "mcdev-nvim/tests/run.lua:1804:assert_true": 1,
+    "mcdev-nvim/tests/run.lua:1201:assert_eq": 1,
+    "mcdev-nvim/tests/run.lua:1802:assert_not_nil": 1,
+    "mcdev-nvim/tests/run.lua:716:assert_eq": 1,
+    "mcdev-nvim/tests/run.lua:1801:assert_not_nil": 1,
+    "mcdev-nvim/tests/run.lua:714:assert_true": 1,
+    "mcdev-nvim/tests/run.lua:115:assert_eq": 1,
+    "mcdev-nvim/tests/run.lua:1210:assert_eq": 1,
+    "mcdev-nvim/tests/run.lua:712:assert_not_nil": 1,
+    "mcdev-nvim/tests/run.lua:1799:assert_not_nil": 1,
+    "mcdev-nvim/tests/run.lua:1796:assert_eq": 1,
+    "mcdev-nvim/tests/run.lua:1758:assert_eq": 1,
+    "mcdev-nvim/tests/run.lua:1757:assert_eq": 1,
+    "mcdev-nvim/tests/run.lua:1342:assert_true": 1,
+    "mcdev-nvim/tests/run.lua:1343:assert_eq": 1,
+    "mcdev-nvim/tests/run.lua:1352:assert_eq": 1,
+    "mcdev-nvim/tests/run.lua:701:assert_eq": 1,
+    "mcdev-nvim/tests/run.lua:1754:assert_not_nil": 1,
+    "mcdev-nvim/tests/run.lua:1751:assert_eq": 1,
+    "mcdev-nvim/tests/run.lua:1082:assert_eq": 1,
+    "mcdev-nvim/tests/run.lua:1359:assert_eq": 1,
+    "mcdev-nvim/tests/run.lua:1360:assert_eq": 1,
+    "mcdev-nvim/tests/run.lua:1081:assert_eq": 1,
+    "mcdev-nvim/tests/run.lua:1080:assert_eq": 1,
+    "mcdev-nvim/tests/run.lua:1079:assert_eq": 1,
+    "mcdev-nvim/tests/run.lua:1077:assert_eq": 1,
+    "mcdev-nvim/tests/run.lua:83:assert_eq": 1,
+    "mcdev-nvim/tests/run.lua:82:assert_not_nil": 1,
+    "mcdev-nvim/tests/run.lua:1717:assert_nil": 1,
+    "mcdev-nvim/tests/run.lua:1701:assert_eq": 1,
+    "mcdev-nvim/tests/run.lua:1212:assert_eq": 1,
+    "mcdev-nvim/tests/run.lua:1213:assert_true": 1,
+    "mcdev-nvim/tests/run.lua:1362:assert_eq": 1,
+    "mcdev-nvim/tests/run.lua:1691:assert_eq": 1,
+    "mcdev-nvim/tests/run.lua:1690:assert_eq": 1,
+    "mcdev-nvim/tests/run.lua:1219:assert_eq": 1,
+    "mcdev-nvim/tests/run.lua:227:assert_eq": 1,
+    "mcdev-nvim/tests/run.lua:266:assert_eq": 1,
+    "mcdev-nvim/tests/run.lua:228:assert_eq": 1,
+    "mcdev-nvim/tests/run.lua:229:assert_eq": 1,
+    "mcdev-nvim/tests/run.lua:786:assert_eq": 1,
+    "mcdev-nvim/tests/run.lua:773:assert_not_nil": 1,
+    "mcdev-nvim/tests/lsp_regressions.lua:294:assert_true": 3,
+    "mcdev-nvim/tests/lsp_regressions.lua:295:assert_true": 3,
+    "mcdev-nvim/tests/lsp_regressions.lua:307:assert_eq": 3,
+    "mcdev-nvim/tests/lsp_regressions.lua:308:assert_true": 3,
+    "mcdev-nvim/tests/lsp_regressions.lua:309:assert_true": 3,
+    "mcdev-nvim/tests/lsp_regressions.lua:310:assert_eq": 3,
+    "mcdev-nvim/tests/lsp_regressions.lua:311:assert_eq": 3,
+    "mcdev-nvim/tests/lsp_regressions.lua:322:assert_eq": 1,
+    "mcdev-nvim/tests/lsp_regressions.lua:323:assert_eq": 1,
+    "mcdev-nvim/tests/lsp_regressions.lua:324:assert_eq": 1,
+    "mcdev-nvim/tests/run.lua:1228:assert_nil": 1,
+    "mcdev-nvim/tests/run.lua:1229:assert_true": 1,
+    "mcdev-nvim/tests/run.lua:1230:assert_true": 1,
+    "mcdev-nvim/tests/run.lua:1721:assert_eq": 1,
+    "mcdev-nvim/tests/run.lua:1800:assert_not_nil": 1,
+    "mcdev-nvim/tests/run.lua:263:assert_eq": 1,
+    "mcdev-nvim/tests/run.lua:1749:assert_nil": 1,
+    "mcdev-nvim/tests/run.lua:87:assert_eq": 1,
+    "mcdev-nvim/tests/lsp_regressions.lua:328:assert_eq": 1,
+    "mcdev-nvim/tests/lsp_regressions.lua:329:assert_eq": 1,
+    "mcdev-nvim/tests/run.lua:1720:assert_not_nil": 1,
+    "mcdev-nvim/tests/lsp_regressions.lua:333:assert_eq": 1,
+    "mcdev-nvim/tests/lsp_regressions.lua:335:assert_eq": 1,
+    "mcdev-nvim/tests/lsp_regressions.lua:338:assert_eq": 1,
+    "mcdev-nvim/tests/lsp_regressions.lua:343:assert_eq": 1,
+    "mcdev-nvim/tests/lsp_regressions.lua:354:assert_eq": 1,
+    "mcdev-nvim/tests/lsp_regressions.lua:358:assert_eq": 1,
+    "mcdev-nvim/tests/lsp_regressions.lua:360:assert_eq": 1,
+    "mcdev-nvim/tests/lsp_regressions.lua:361:assert_true": 1,
+    "mcdev-nvim/tests/lsp_regressions.lua:362:assert_nil": 1,
+    "mcdev-nvim/tests/lsp_regressions.lua:368:assert_eq": 1,
+    "mcdev-nvim/tests/lsp_regressions.lua:369:assert_eq": 1,
+    "mcdev-nvim/tests/lsp_regressions.lua:370:assert_eq": 1,
+    "mcdev-nvim/tests/lsp_regressions.lua:371:assert_eq": 1,
+    "mcdev-nvim/tests/lsp_regressions.lua:372:assert_eq": 1,
+    "mcdev-nvim/tests/run.lua:220:assert_not_nil": 1,
+    "mcdev-nvim/tests/lsp_regressions.lua:375:assert_eq": 1,
+    "mcdev-nvim/tests/lsp_regressions.lua:376:assert_true": 1,
+    "mcdev-nvim/tests/lsp_regressions.lua:393:assert_eq": 1,
+    "mcdev-nvim/tests/lsp_regressions.lua:397:assert_nil": 1,
+    "mcdev-nvim/tests/lsp_regressions.lua:398:assert_nil": 1,
+    "mcdev-nvim/tests/lsp_regressions.lua:399:assert_nil": 1,
+    "mcdev-nvim/tests/lsp_regressions.lua:404:assert_eq": 1,
+    "mcdev-nvim/tests/lsp_regressions.lua:405:assert_true": 1,
+    "mcdev-nvim/tests/lsp_regressions.lua:418:assert_eq": 3,
+    "mcdev-nvim/tests/lsp_regressions.lua:437:assert_eq": 1,
+    "mcdev-nvim/tests/lsp_regressions.lua:438:assert_eq": 1,
+    "mcdev-nvim/tests/lsp_regressions.lua:439:assert_nil": 1,
+    "mcdev-nvim/tests/lsp_regressions.lua:451:assert_eq": 1,
+    "mcdev-nvim/tests/lsp_regressions.lua:465:assert_eq": 1,
+    "mcdev-nvim/tests/lsp_regressions.lua:466:assert_eq": 1,
+    "mcdev-nvim/tests/lsp_regressions.lua:467:assert_eq": 1,
+    "mcdev-nvim/tests/lsp_regressions.lua:468:assert_true": 1,
+    "mcdev-nvim/tests/lsp_regressions.lua:481:assert_eq": 1,
+    "mcdev-nvim/tests/lsp_regressions.lua:489:assert_not_nil": 1,
+    "mcdev-nvim/tests/lsp_regressions.lua:490:assert_eq": 1,
+    "mcdev-nvim/tests/run.lua:1010:assert_eq": 1,
+    "mcdev-nvim/tests/run.lua:1012:assert_eq": 1,
+    "mcdev-nvim/tests/run.lua:1013:assert_true": 1,
+    "mcdev-nvim/tests/run.lua:1014:assert_eq": 1,
+    "mcdev-nvim/tests/run.lua:219:assert_not_nil": 1,
+    "mcdev-nvim/tests/run.lua:218:assert_not_nil": 1,
+    "mcdev-nvim/tests/run.lua:407:assert_eq": 2,
+    "mcdev-nvim/tests/run.lua:603:assert_eq": 1,
+    "mcdev-nvim/tests/run.lua:590:assert_not_nil": 1,
+    "mcdev-nvim/tests/run.lua:452:assert_eq": 1,
+    "mcdev-nvim/tests/run.lua:451:assert_eq": 1,
+    "mcdev-nvim/tests/run.lua:558:assert_eq": 1,
+    "mcdev-nvim/tests/run.lua:557:assert_eq": 1,
+    "mcdev-nvim/tests/run.lua:556:assert_not_nil": 1,
+    "mcdev-nvim/tests/run.lua:1250:assert_true": 1,
+    "mcdev-nvim/tests/run.lua:1243:assert_eq": 1,
+    "mcdev-nvim/tests/run.lua:1234:assert_eq": 1,
+    "mcdev-nvim/tests/run.lua:1232:assert_eq": 1,
+    "mcdev-nvim/tests/run.lua:1043:assert_eq": 1,
+    "mcdev-nvim/tests/run.lua:1045:assert_eq": 1,
+    "mcdev-nvim/tests/run.lua:1046:assert_true": 1,
+    "mcdev-nvim/tests/run.lua:1047:assert_eq": 1,
+    "mcdev-nvim/tests/run.lua:1048:assert_eq": 1,
+    "mcdev-nvim/tests/run.lua:789:assert_eq": 1,
+    "mcdev-nvim/tests/run.lua:1222:assert_true": 1,
+    "mcdev-nvim/tests/run.lua:1221:assert_eq": 1,
+    "mcdev-nvim/tests/run.lua:1674:assert_nil": 1,
+    "mcdev-nvim/tests/run.lua:1675:assert_eq": 1,
+    "mcdev-nvim/tests/run.lua:1387:assert_true": 1,
+    "mcdev-nvim/tests/run.lua:1680:assert_eq": 1,
+    "mcdev-nvim/tests/run.lua:1689:assert_eq": 1,
+    "mcdev-nvim/tests/run.lua:1419:assert_true": 1,
+    "mcdev-nvim/tests/run.lua:1420:assert_eq": 1,
+    "mcdev-nvim/tests/run.lua:1424:assert_nil": 1,
+    "mcdev-nvim/tests/run.lua:1427:assert_not_nil": 1,
+    "mcdev-nvim/tests/run.lua:1428:assert_eq": 1,
+    "mcdev-nvim/tests/run.lua:1429:assert_eq": 1,
+    "mcdev-nvim/tests/run.lua:84:assert_eq": 1,
+    "mcdev-nvim/tests/run.lua:85:assert_eq": 1,
+    "mcdev-nvim/tests/run.lua:1447:assert_eq": 1,
+    "mcdev-nvim/tests/run.lua:1459:assert_eq": 1,
+    "mcdev-nvim/tests/run.lua:88:assert_eq": 1,
+    "mcdev-nvim/tests/run.lua:89:assert_eq": 1,
+    "mcdev-nvim/tests/run.lua:90:assert_eq": 1,
+    "mcdev-nvim/tests/run.lua:91:assert_eq": 1,
+    "mcdev-nvim/tests/run.lua:92:assert_not_nil": 1,
+    "mcdev-nvim/tests/run.lua:93:assert_eq": 1,
+    "mcdev-nvim/tests/run.lua:94:assert_nil": 1,
+    "mcdev-nvim/tests/run.lua:95:assert_not_nil": 1,
+    "mcdev-nvim/tests/run.lua:107:assert_eq": 1,
+    "mcdev-nvim/tests/run.lua:1467:assert_eq": 1,
+    "mcdev-nvim/tests/run.lua:118:assert_eq": 1,
+    "mcdev-nvim/tests/run.lua:715:assert_eq": 1,
+    "mcdev-nvim/tests/run.lua:1483:assert_eq": 1,
+    "mcdev-nvim/tests/run.lua:717:assert_eq": 1,
+    "mcdev-nvim/tests/run.lua:1803:assert_not_nil": 1,
+    "mcdev-nvim/tests/run.lua:1106:assert_not_nil": 1,
+    "mcdev-nvim/tests/run.lua:1108:assert_not_nil": 1,
+    "mcdev-nvim/tests/run.lua:1868:assert_true": 1,
+    "mcdev-nvim/tests/run.lua:725:assert_not_nil": 1,
+    "mcdev-nvim/tests/run.lua:150:assert_not_nil": 1,
+    "mcdev-nvim/tests/run.lua:727:assert_eq": 1,
+    "mcdev-nvim/tests/run.lua:1872:assert_true": 1,
+    "mcdev-nvim/tests/run.lua:1873:assert_true": 1,
+    "mcdev-nvim/tests/run.lua:1874:assert_true": 1,
+    "mcdev-nvim/tests/run.lua:1875:assert_true": 1,
+    "mcdev-nvim/tests/run.lua:1887:assert_eq": 1,
+    "mcdev-nvim/tests/run.lua:157:assert_eq": 1,
+    "mcdev-nvim/tests/run.lua:1898:assert_true": 1,
+    "mcdev-nvim/tests/run.lua:1910:assert_eq": 1,
+    "mcdev-nvim/tests/run.lua:1928:assert_nil": 1,
+    "mcdev-nvim/tests/run.lua:1931:assert_not_nil": 1,
+    "mcdev-nvim/tests/run.lua:1932:assert_eq": 1,
+    "mcdev-nvim/tests/run.lua:163:assert_eq": 1,
+    "mcdev-nvim/tests/run.lua:1140:assert_eq": 1,
+    "mcdev-nvim/tests/run.lua:1935:assert_eq": 1,
+    "mcdev-nvim/tests/run.lua:1936:assert_eq": 1,
+    "mcdev-nvim/tests/run.lua:1937:assert_nil": 1,
+    "mcdev-nvim/tests/run.lua:1870:assert_true": 1,
+    "mcdev-nvim/tests/run.lua:1871:assert_true": 1,
+    "mcdev-nvim/tests/run.lua:1971:assert_eq": 1,
+    "mcdev-nvim/tests/run.lua:1972:assert_eq": 1,
+    "mcdev-nvim/tests/run.lua:1896:assert_nil": 1,
+    "mcdev-nvim/tests/run.lua:1933:assert_eq": 1,
+    "mcdev-nvim/tests/run.lua:1980:assert_eq": 1,
+    "mcdev-nvim/tests/run.lua:197:assert_eq": 1,
+    "mcdev-nvim/tests/run.lua:405:assert_eq": 2,
+    "mcdev-nvim/tests/run.lua:1990:assert_not_nil": 1,
+    "mcdev-nvim/tests/run.lua:1991:assert_nil": 1,
+    "mcdev-nvim/tests/run.lua:205:assert_eq": 1,
+    "mcdev-nvim/tests/run.lua:206:assert_eq": 1,
+    "mcdev-nvim/tests/run.lua:207:assert_eq": 1,
+    "mcdev-nvim/tests/run.lua:208:assert_eq": 1,
+    "mcdev-nvim/tests/run.lua:209:assert_eq": 1,
+    "mcdev-nvim/tests/run.lua:804:assert_eq": 1,
+    "mcdev-nvim/tests/run.lua:1526:assert_eq": 1,
+    "mcdev-nvim/tests/run.lua:866:assert_eq": 1,
+    "mcdev-nvim/tests/run.lua:841:assert_not_nil": 3,
+    "mcdev-nvim/tests/run.lua:460:assert_eq": 1,
+    "mcdev-nvim/tests/blink_routing.lua:378:assert_true": 10,
+    "mcdev-nvim/tests/run.lua:814:assert_eq": 1,
+    "mcdev-nvim/tests/run.lua:1500:assert_eq": 1,
+    "mcdev-nvim/tests/run.lua:1501:assert_eq": 1,
+    "mcdev-nvim/tests/blink_routing.lua:381:assert_eq": 10,
+    "mcdev-nvim/tests/run.lua:1507:assert_eq": 1,
+    "mcdev-nvim/tests/run.lua:1523:assert_eq": 1,
+    "mcdev-nvim/tests/run.lua:1525:assert_eq": 1,
+    "mcdev-nvim/tests/protocol_positions.lua:17:assert_eq": 3,
+    "mcdev-nvim/tests/protocol_positions.lua:18:assert_eq": 3,
+    "mcdev-nvim/tests/run.lua:1795:assert_not_nil": 1,
+    "mcdev-nvim/tests/run.lua:1792:assert_nil": 1,
+    "mcdev-nvim/tests/protocol_positions.lua:37:assert_eq": 1,
+    "mcdev-nvim/tests/protocol_positions.lua:38:assert_eq": 1,
+    "mcdev-nvim/tests/run.lua:943:assert_eq": 1,
+    "mcdev-nvim/tests/native_helper.lua:48:assert_nil": 1,
+    "mcdev-nvim/tests/native_helper.lua:49:assert_true": 1,
+    "mcdev-nvim/tests/native_helper.lua:50:assert": 1,
+    "mcdev-nvim/tests/native_helper.lua:52:assert_true": 1,
+    "mcdev-nvim/tests/native_helper.lua:53:assert_eq": 1,
+    "mcdev-nvim/tests/native_helper.lua:22:assert_eq": 1,
+    "mcdev-nvim/tests/native_helper.lua:55:assert_nil": 1,
+    "mcdev-nvim/tests/native_helper.lua:56:assert_true": 1,
+    "mcdev-nvim/tests/native_helper.lua:45:assert_eq": 1,
+    "mcdev-nvim/tests/native_helper.lua:46:assert_eq": 1,
+    "mcdev-nvim/tests/native_helper.lua:38:assert_nil": 4,
+    "mcdev-nvim/tests/native_helper.lua:39:assert_not_nil": 4,
+    "mcdev-nvim/tests/native_helper.lua:44:assert_nil": 1,
+    "mcdev-nvim/tests/native_helper.lua:59:assert_nil": 1,
+    "mcdev-nvim/tests/native_helper.lua:60:assert_true": 1,
+    "mcdev-nvim/tests/native_helper.lua:62:assert_eq": 1,
+    "mcdev-nvim/tests/native_helper.lua:40:assert_true": 4,
+    "mcdev-nvim/tests/e2e/teardown_test.lua:32:assert": 1,
+    "mcdev-nvim/tests/e2e/teardown_test.lua:33:assert": 1,
+    "mcdev-nvim/tests/e2e/teardown_test.lua:25:assert": 1,
+    "mcdev-nvim/tests/e2e/teardown_test.lua:35:assert": 1,
+    "mcdev-nvim/tests/e2e/teardown_test.lua:30:assert": 1,
+    "mcdev-nvim/tests/e2e/teardown_test.lua:31:assert": 1,
+    "mcdev-nvim/tests/e2e/teardown_process_test.lua:65:assert": 2,
+    "mcdev-nvim/tests/e2e/teardown_process_test.lua:120:assert": 2,
+    "mcdev-nvim/tests/e2e/teardown_process_test.lua:122:assert": 2,
+    "mcdev-nvim/tests/e2e/teardown_process_test.lua:6:assert": 1,
+    "mcdev-nvim/tests/e2e/teardown_process_test.lua:96:assert": 2,
+    "mcdev-nvim/tests/e2e/teardown_process_test.lua:97:assert": 2,
+    "mcdev-nvim/tests/e2e/teardown_process_test.lua:98:assert": 2,
+    "mcdev-nvim/tests/e2e/teardown_process_test.lua:100:assert": 2,
+    "mcdev-nvim/tests/e2e/teardown_process_test.lua:102:assert": 2,
+    "mcdev-nvim/tests/e2e/teardown_process_test.lua:146:assert": 1,
+    "mcdev-nvim/tests/e2e/teardown_process_test.lua:141:assert": 2,
+    "mcdev-nvim/tests/e2e/teardown_process_test.lua:143:assert": 1,
+    "mcdev-nvim/tests/e2e/teardown_process_test.lua:144:assert": 1,
+    "mcdev-nvim/tests/e2e/teardown_process_test.lua:149:assert": 2,
+    "mcdev-nvim/tests/e2e/teardown_process_test.lua:150:assert": 2,
+    "mcdev-nvim/tests/e2e/teardown_process_test.lua:151:assert": 2,
+    "mcdev-nvim/tests/e2e/teardown_process_test.lua:162:assert": 2,
+    "mcdev-nvim/tests/e2e/teardown_process_test.lua:103:assert": 2,
+    "mcdev-nvim/tests/e2e/teardown_process_test.lua:140:assert": 2,
+    "mcdev-nvim/tests/e2e/teardown_process_test.lua:147:assert": 1
+  },
+  "nativeLoopExecutionByFile": {
+    "mcdev-nvim/tests/blink_routing.lua": [
+      {
+        "line": 65,
+        "tableEndLine": 65,
+        "bodyEndLine": 71,
+        "inputRows": [
+          {
+            "index": 1,
+            "input": "\"Wrap\"",
+            "rowObservation": "unknown"
+          },
+          {
+            "index": 2,
+            "input": "\"WrapOperation\"",
+            "rowObservation": "unknown"
+          },
+          {
+            "index": 3,
+            "input": "\"Expression\"",
+            "rowObservation": "unknown"
+          },
+          {
+            "index": 4,
+            "input": "\"Definition\"",
+            "rowObservation": "unknown"
+          },
+          {
+            "index": 5,
+            "input": "\"Local\"",
+            "rowObservation": "unknown"
+          },
+          {
+            "index": 6,
+            "input": "\"Share\"",
+            "rowObservation": "unknown"
+          }
+        ],
+        "observedLoopIterations": null,
+        "inferredLoopIterations": 6,
+        "expectedLoopIterations": 6,
+        "allRowsObserved": null,
+        "allRowsInferred": true,
+        "runtimeAssertionCounts": {
+          "68": 6,
+          "69": 6
+        },
+        "aggregateAssertionCalls": 12,
+        "runtimeIterationLowerBound": 6,
+        "rowAttribution": "unknown",
+        "observer": "Per-site counters are aggregate over the loop body. No row-specific pass count is claimed.",
+        "inferenceBasis": "Static table has 6 rows and the aggregate body assertion count is 12; this is an inference, not row-level observation."
+      },
+      {
+        "line": 76,
+        "tableEndLine": 94,
+        "bodyEndLine": 101,
+        "inputRows": [
+          {
+            "index": 1,
+            "input": "{ \"@Mixin(Item.cla\", \"class literal\" }",
+            "rowObservation": "unknown"
+          },
+          {
+            "index": 2,
+            "input": "{ \"@Mixin({Item.class, Other.cla\", \"class literal array\" }",
+            "rowObservation": "unknown"
+          },
+          {
+            "index": 3,
+            "input": "{ \"@Mixin(In\", \"Mixin class prefix collision\" }",
+            "rowObservation": "unknown"
+          },
+          {
+            "index": 4,
+            "input": "{ \"@Mixin(Re\", \"Mixin class prefix collision\" }",
+            "rowObservation": "unknown"
+          },
+          {
+            "index": 5,
+            "input": "{ \"@At(In\", \"At value prefix collision\" }",
+            "rowObservation": "unknown"
+          },
+          {
+            "index": 6,
+            "input": "{ \"@Definition(type = String.cla\", \"Definition type\" }",
+            "rowObservation": "unknown"
+          },
+          {
+            "index": 7,
+            "input": "{ \"@Inject(locals = LocalCapture.CAP\", \"enum constant\" }",
+            "rowObservation": "unknown"
+          },
+          {
+            "index": 8,
+            "input": "{ \"@Inject(at = @At\", \"nested annotation name\" }",
+            "rowObservation": "unknown"
+          },
+          {
+            "index": 9,
+            "input": "{ \"@Inject(method = TARGET_METHOD\", \"static final selector\" }",
+            "rowObservation": "unknown"
+          },
+          {
+            "index": 10,
+            "input": "{ \"@Inject(method = {TARGET_METHOD\", \"static final selector array\" }",
+            "rowObservation": "unknown"
+          },
+          {
+            "index": 11,
+            "input": "{ '@Inject(method = \"prefix\" + TARGET_METHOD', \"string constant expression\" }",
+            "rowObservation": "unknown"
+          },
+          {
+            "index": 12,
+            "input": "{ '@Inject(method = {\"tick\" + TARGET_METHOD', \"string array constant expression\" }",
+            "rowObservation": "unknown"
+          },
+          {
+            "index": 13,
+            "input": "{ '@At(\"INVOKE\" + AT_SUFFIX', \"At shorthand string constant expression\" }",
+            "rowObservation": "unknown"
+          },
+          {
+            "index": 14,
+            "input": "{ '@Expression(\"this.\" + EXPRESSION_SUFFIX', \"Expression shorthand string constant expression\" }",
+            "rowObservation": "unknown"
+          },
+          {
+            "index": 15,
+            "input": "{ \"@At(target = TARGET_TARGET\", \"static final At target\" }",
+            "rowObservation": "unknown"
+          },
+          {
+            "index": 16,
+            "input": "{ \"@ModifyConstant(constant = CONSTANT\", \"constant expression\" }",
+            "rowObservation": "unknown"
+          },
+          {
+            "index": 17,
+            "input": "{ \"@Constant(stringValue = STRING_CONSTANT\", \"constant string expression\" }",
+            "rowObservation": "unknown"
+          }
+        ],
+        "observedLoopIterations": null,
+        "inferredLoopIterations": 17,
+        "expectedLoopIterations": 17,
+        "allRowsObserved": null,
+        "allRowsInferred": true,
+        "runtimeAssertionCounts": {
+          "99": 17
+        },
+        "aggregateAssertionCalls": 17,
+        "runtimeIterationLowerBound": 17,
+        "rowAttribution": "unknown",
+        "observer": "Per-site counters are aggregate over the loop body. No row-specific pass count is claimed.",
+        "inferenceBasis": "Static table has 17 rows and the aggregate body assertion count is 17; this is an inference, not row-level observation."
+      },
+      {
+        "line": 105,
+        "tableEndLine": 114,
+        "bodyEndLine": 123,
+        "inputRows": [
+          {
+            "index": 1,
+            "input": "{ \"@Group(\", \"Group body\" }",
+            "rowObservation": "unknown"
+          },
+          {
+            "index": 2,
+            "input": "{ \"@Debug(\", \"Debug body\" }",
+            "rowObservation": "unknown"
+          },
+          {
+            "index": 3,
+            "input": "{ \"@Dynamic(\", \"Dynamic body\" }",
+            "rowObservation": "unknown"
+          },
+          {
+            "index": 4,
+            "input": "{ \"@Unique(\", \"Unique body\" }",
+            "rowObservation": "unknown"
+          },
+          {
+            "index": 5,
+            "input": "{ \"@Intrinsic(\", \"Intrinsic body\" }",
+            "rowObservation": "unknown"
+          },
+          {
+            "index": 6,
+            "input": "{ \"@Implements({ @Interface(\", \"nested Interface body\" }",
+            "rowObservation": "unknown"
+          },
+          {
+            "index": 7,
+            "input": "{ \"@Desc(\", \"Desc body\" }",
+            "rowObservation": "unknown"
+          },
+          {
+            "index": 8,
+            "input": "{ \"@Descriptors({ @Desc(\", \"nested Desc body\" }",
+            "rowObservation": "unknown"
+          }
+        ],
+        "observedLoopIterations": null,
+        "inferredLoopIterations": 8,
+        "expectedLoopIterations": 8,
+        "allRowsObserved": null,
+        "allRowsInferred": true,
+        "runtimeAssertionCounts": {
+          "119": 8,
+          "120": 8
+        },
+        "aggregateAssertionCalls": 16,
+        "runtimeIterationLowerBound": 8,
+        "rowAttribution": "unknown",
+        "observer": "Per-site counters are aggregate over the loop body. No row-specific pass count is claimed.",
+        "inferenceBasis": "Static table has 8 rows and the aggregate body assertion count is 16; this is an inference, not row-level observation."
+      },
+      {
+        "line": 125,
+        "tableEndLine": 130,
+        "bodyEndLine": 139,
+        "inputRows": [
+          {
+            "index": 1,
+            "input": "{ \"@Gro\", \"Group name prefix\" }",
+            "rowObservation": "unknown"
+          },
+          {
+            "index": 2,
+            "input": "{ \"@Implem\", \"Implements name prefix\" }",
+            "rowObservation": "unknown"
+          },
+          {
+            "index": 3,
+            "input": "{ \"@org.spongepowered.asm.mixin.injection.Gr\", \"Group FQN name prefix\" }",
+            "rowObservation": "unknown"
+          },
+          {
+            "index": 4,
+            "input": "{ \"@Descriptors({ @Desc\", \"nested Desc name prefix\" }",
+            "rowObservation": "unknown"
+          }
+        ],
+        "observedLoopIterations": null,
+        "inferredLoopIterations": 4,
+        "expectedLoopIterations": 4,
+        "allRowsObserved": null,
+        "allRowsInferred": true,
+        "runtimeAssertionCounts": {
+          "135": 4,
+          "136": 4
+        },
+        "aggregateAssertionCalls": 8,
+        "runtimeIterationLowerBound": 4,
+        "rowAttribution": "unknown",
+        "observer": "Per-site counters are aggregate over the loop body. No row-specific pass count is claimed.",
+        "inferenceBasis": "Static table has 4 rows and the aggregate body assertion count is 8; this is an inference, not row-level observation."
+      },
+      {
+        "line": 142,
+        "tableEndLine": 239,
+        "bodyEndLine": 248,
+        "inputRows": [
+          {
+            "index": 1,
+            "input": "{ { \"@Overwrite public Block getBlock(){return null;}\" }, 1, #'@Overwrite public Block getBlo', { \"mcdev\" }, true, \"complete Overwrite member header\", }",
+            "rowObservation": "unknown"
+          },
+          {
+            "index": 2,
+            "input": "{ { \"@Overwrite public Block getBlo\" }, 1, #'@Overwrite public Block getBlo', { \"mcdev\" }, true, \"incomplete Overwrite member header\", }",
+            "rowObservation": "unknown"
+          },
+          {
+            "index": 3,
+            "input": "{ { \"@Shadow public Block getBlock(){return null;}\" }, 1, #'@Shadow public Block getBlo', { \"mcdev\" }, true, \"complete Shadow method header\", }",
+            "rowObservation": "unknown"
+          },
+          {
+            "index": 4,
+            "input": "{ { \"@Shadow public Block getBlo\" }, 1, #'@Shadow public Block getBlo', { \"lsp\", \"mcdev\" }, true, \"incomplete Shadow member header\", }",
+            "rowObservation": "unknown"
+          },
+          {
+            "index": 5,
+            "input": "{ { \"@Overwrite public Block getBlock(){return null;}\" }, 1, #'@Overwrite public Blo', normal_sources, false, \"return type stays JDT-owned\", }",
+            "rowObservation": "unknown"
+          },
+          {
+            "index": 6,
+            "input": "{ { \"@Overwrite public Block getBlock(){return null;}\" }, 1, #'@Overwrite public Block getBlock(){return nul', normal_sources, false, \"method body stays ordinary Java\", }",
+            "rowObservation": "unknown"
+          },
+          {
+            "index": 7,
+            "input": "{ { \"@Overwrite public Block getBlock(){return null;}\", \"public Block other\" }, 2, #\"public Block other\", normal_sources, false, \"next member stays ordinary Java\", }",
+            "rowObservation": "unknown"
+          },
+          {
+            "index": 8,
+            "input": "{ { \"@Shadow private Block block;\" }, 1, #'@Shadow private Block blo', { \"mcdev\" }, true, \"complete Shadow field header\", }",
+            "rowObservation": "unknown"
+          },
+          {
+            "index": 9,
+            "input": "{ { \"@Shadow @Final private Block block;\" }, 1, #'@Shadow @Final private Block blo', { \"mcdev\" }, true, \"Shadow field with a following annotation\", }",
+            "rowObservation": "unknown"
+          },
+          {
+            "index": 10,
+            "input": "{ { \"@Shadow @Nullable public Block getBlock(){return null;}\" }, 1, #'@Shadow @Nullable public Block getBlo', { \"mcdev\" }, true, \"Shadow method with a following annotation\", }",
+            "rowObservation": "unknown"
+          },
+          {
+            "index": 11,
+            "input": "{ { \"@Shadow @Nullable public Blo\" }, 1, #'@Shadow @Nullable public Blo', normal_sources, false, \"Shadow return type with a following annotation stays Java\", }",
+            "rowObservation": "unknown"
+          },
+          {
+            "index": 12,
+            "input": "{ { \"@Shadow private Block blo\" }, 1, #'@Shadow private Block blo', { \"lsp\", \"mcdev\" }, true, \"incomplete Shadow field header\", }",
+            "rowObservation": "unknown"
+          }
+        ],
+        "observedLoopIterations": null,
+        "inferredLoopIterations": 12,
+        "expectedLoopIterations": 12,
+        "allRowsObserved": null,
+        "allRowsInferred": true,
+        "runtimeAssertionCounts": {
+          "245": 8,
+          "247": 4
+        },
+        "aggregateAssertionCalls": 12,
+        "runtimeIterationLowerBound": 8,
+        "rowAttribution": "unknown",
+        "observer": "Per-site counters are aggregate over the loop body. No row-specific pass count is claimed.",
+        "inferenceBasis": "Static table has 12 rows and the aggregate body assertion count is 12; this is an inference, not row-level observation."
+      },
+      {
+        "line": 252,
+        "tableEndLine": 255,
+        "bodyEndLine": 262,
+        "inputRows": [
+          {
+            "index": 1,
+            "input": "{ { \"@org.spongepowered.asm.mixin.injection.Inject(method = \\\"ti\" }, \"official FQN\" }",
+            "rowObservation": "unknown"
+          },
+          {
+            "index": 2,
+            "input": "{ { \"import org.spongepowered.asm.mixin.injection.Inject;\", \"@Inject(method = \\\"ti\" }, \"official import\" }",
+            "rowObservation": "unknown"
+          }
+        ],
+        "observedLoopIterations": null,
+        "inferredLoopIterations": 2,
+        "expectedLoopIterations": 2,
+        "allRowsObserved": null,
+        "allRowsInferred": true,
+        "runtimeAssertionCounts": {
+          "260": 2
+        },
+        "aggregateAssertionCalls": 2,
+        "runtimeIterationLowerBound": 2,
+        "rowAttribution": "unknown",
+        "observer": "Per-site counters are aggregate over the loop body. No row-specific pass count is claimed.",
+        "inferenceBasis": "Static table has 2 rows and the aggregate body assertion count is 2; this is an inference, not row-level observation."
+      },
+      {
+        "line": 264,
+        "tableEndLine": 267,
+        "bodyEndLine": 274,
+        "inputRows": [
+          {
+            "index": 1,
+            "input": "{ { \"@org.spongepowered.asm.mixin.injection.Group(\" }, \"new official FQN\" }",
+            "rowObservation": "unknown"
+          },
+          {
+            "index": 2,
+            "input": "{ { \"import org.spongepowered.asm.mixin.injection.Group;\", \"@Group(\" }, \"new official import\" }",
+            "rowObservation": "unknown"
+          }
+        ],
+        "observedLoopIterations": null,
+        "inferredLoopIterations": 2,
+        "expectedLoopIterations": 2,
+        "allRowsObserved": null,
+        "allRowsInferred": true,
+        "runtimeAssertionCounts": {
+          "272": 2
+        },
+        "aggregateAssertionCalls": 2,
+        "runtimeIterationLowerBound": 2,
+        "rowAttribution": "unknown",
+        "observer": "Per-site counters are aggregate over the loop body. No row-specific pass count is claimed.",
+        "inferenceBasis": "Static table has 2 rows and the aggregate body assertion count is 2; this is an inference, not row-level observation."
+      },
+      {
+        "line": 276,
+        "tableEndLine": 281,
+        "bodyEndLine": 288,
+        "inputRows": [
+          {
+            "index": 1,
+            "input": "{ { \"@com.example.Inject(method = \\\"ti\" }, \"non-Mixin FQN\" }",
+            "rowObservation": "unknown"
+          },
+          {
+            "index": 2,
+            "input": "{ { \"import com.example.Inject;\", \"@Inject(method = \\\"ti\" }, \"non-Mixin import\" }",
+            "rowObservation": "unknown"
+          },
+          {
+            "index": 3,
+            "input": "{ { \"@com.example.Group(\" }, \"new non-Mixin FQN\" }",
+            "rowObservation": "unknown"
+          },
+          {
+            "index": 4,
+            "input": "{ { \"import com.example.Group;\", \"@Group(\" }, \"new non-Mixin import\" }",
+            "rowObservation": "unknown"
+          }
+        ],
+        "observedLoopIterations": null,
+        "inferredLoopIterations": 4,
+        "expectedLoopIterations": 4,
+        "allRowsObserved": null,
+        "allRowsInferred": true,
+        "runtimeAssertionCounts": {
+          "286": 4
+        },
+        "aggregateAssertionCalls": 4,
+        "runtimeIterationLowerBound": 4,
+        "rowAttribution": "unknown",
+        "observer": "Per-site counters are aggregate over the loop body. No row-specific pass count is claimed.",
+        "inferenceBasis": "Static table has 4 rows and the aggregate body assertion count is 4; this is an inference, not row-level observation."
+      },
+      {
+        "line": 292,
+        "tableEndLine": 303,
+        "bodyEndLine": 310,
+        "inputRows": [
+          {
+            "index": 1,
+            "input": "{ '@Inject(method = \"ti', \"method selector\" }",
+            "rowObservation": "unknown"
+          },
+          {
+            "index": 2,
+            "input": "{ '@Inject(method = {\"tick\", \"re', \"method array\" }",
+            "rowObservation": "unknown"
+          },
+          {
+            "index": 3,
+            "input": "{ '@Inject(method = {\"tick\", ', \"method array next element\" }",
+            "rowObservation": "unknown"
+          },
+          {
+            "index": 4,
+            "input": "{ '@Inject(method = {\"tick\", /* comma, */ ', \"array comment comma\" }",
+            "rowObservation": "unknown"
+          },
+          {
+            "index": 5,
+            "input": "{ '@Inject(at = @At(value = \"INVOKE\", target = \"Lcom/example/', \"At target\" }",
+            "rowObservation": "unknown"
+          },
+          {
+            "index": 6,
+            "input": "{ '@Expression(\"this.', \"Expression DSL\" }",
+            "rowObservation": "unknown"
+          },
+          {
+            "index": 7,
+            "input": "{ '@Definition(id = \"ma', \"Definition id\" }",
+            "rowObservation": "unknown"
+          },
+          {
+            "index": 8,
+            "input": "{ '@Definition(method = \"Lcom/example/Foo;', \"Definition method\" }",
+            "rowObservation": "unknown"
+          },
+          {
+            "index": 9,
+            "input": "{ '@Inject(method = ', \"incomplete method\" }",
+            "rowObservation": "unknown"
+          },
+          {
+            "index": 10,
+            "input": "{ '@Inject(/* comment */ method = \"ti', \"comment before method\" }",
+            "rowObservation": "unknown"
+          }
+        ],
+        "observedLoopIterations": null,
+        "inferredLoopIterations": 10,
+        "expectedLoopIterations": 10,
+        "allRowsObserved": null,
+        "allRowsInferred": true,
+        "runtimeAssertionCounts": {
+          "308": 10
+        },
+        "aggregateAssertionCalls": 10,
+        "runtimeIterationLowerBound": 10,
+        "rowAttribution": "unknown",
+        "observer": "Per-site counters are aggregate over the loop body. No row-specific pass count is claimed.",
+        "inferenceBasis": "Static table has 10 rows and the aggregate body assertion count is 10; this is an inference, not row-level observation."
+      },
+      {
+        "line": 312,
+        "tableEndLine": 315,
+        "bodyEndLine": 322,
+        "inputRows": [
+          {
+            "index": 1,
+            "input": "'// @Inject(method = \"fake'",
+            "rowObservation": "unknown"
+          },
+          {
+            "index": 2,
+            "input": "'String value = \"@Inject(method = \\\\\"fake\";'",
+            "rowObservation": "unknown"
+          }
+        ],
+        "observedLoopIterations": null,
+        "inferredLoopIterations": 2,
+        "expectedLoopIterations": 2,
+        "allRowsObserved": null,
+        "allRowsInferred": true,
+        "runtimeAssertionCounts": {
+          "320": 2
+        },
+        "aggregateAssertionCalls": 2,
+        "runtimeIterationLowerBound": 2,
+        "rowAttribution": "unknown",
+        "observer": "Per-site counters are aggregate over the loop body. No row-specific pass count is claimed.",
+        "inferenceBasis": "Static table has 2 rows and the aggregate body assertion count is 2; this is an inference, not row-level observation."
+      },
+      {
+        "line": 336,
+        "tableEndLine": 336,
+        "bodyEndLine": 348,
+        "inputRows": [
+          {
+            "index": 1,
+            "input": "\"\"",
+            "rowObservation": "unknown"
+          },
+          {
+            "index": 2,
+            "input": "\"Mix\"",
+            "rowObservation": "unknown"
+          },
+          {
+            "index": 3,
+            "input": "\"In\"",
+            "rowObservation": "unknown"
+          },
+          {
+            "index": 4,
+            "input": "\"At\"",
+            "rowObservation": "unknown"
+          },
+          {
+            "index": 5,
+            "input": "\"Wrap\"",
+            "rowObservation": "unknown"
+          },
+          {
+            "index": 6,
+            "input": "\"Expr\"",
+            "rowObservation": "unknown"
+          },
+          {
+            "index": 7,
+            "input": "\"Definition\"",
+            "rowObservation": "unknown"
+          },
+          {
+            "index": 8,
+            "input": "\"Local\"",
+            "rowObservation": "unknown"
+          },
+          {
+            "index": 9,
+            "input": "\"Cancellable\"",
+            "rowObservation": "unknown"
+          }
+        ],
+        "observedLoopIterations": null,
+        "inferredLoopIterations": 9,
+        "expectedLoopIterations": 9,
+        "allRowsObserved": null,
+        "allRowsInferred": true,
+        "runtimeAssertionCounts": {
+          "345": 9,
+          "346": 9
+        },
+        "aggregateAssertionCalls": 18,
+        "runtimeIterationLowerBound": 9,
+        "rowAttribution": "unknown",
+        "observer": "Per-site counters are aggregate over the loop body. No row-specific pass count is claimed.",
+        "inferenceBasis": "Static table has 9 rows and the aggregate body assertion count is 18; this is an inference, not row-level observation."
+      },
+      {
+        "line": 360,
+        "tableEndLine": 371,
+        "bodyEndLine": 385,
+        "inputRows": [
+          {
+            "index": 1,
+            "input": "{ '@Hook(method = [\"ti', \"Inject\", \"method\" }",
+            "rowObservation": "unknown"
+          },
+          {
+            "index": 2,
+            "input": "{ '@Hook(method = [\"tick\", ', \"Inject\", \"method\" }",
+            "rowObservation": "unknown"
+          },
+          {
+            "index": 3,
+            "input": "{ '@Hook(method = [\"tick\", /* comma, */ ', \"Inject\", \"method\" }",
+            "rowObservation": "unknown"
+          },
+          {
+            "index": 4,
+            "input": "{ '@Hook(at = [Point(\"HE', \"At\" }",
+            "rowObservation": "unknown"
+          },
+          {
+            "index": 5,
+            "input": "{ '@Hook(at = [Point(value = \"INVOKE\", target = \"Lfoo/', \"At\", \"target\" }",
+            "rowObservation": "unknown"
+          },
+          {
+            "index": 6,
+            "input": "{ '@Hook(at = [Point(\"HEAD\"), Point(\"RE', \"At\" }",
+            "rowObservation": "unknown"
+          },
+          {
+            "index": 7,
+            "input": "{ '@MappingName(\"secret', \"MappingName\" }",
+            "rowObservation": "unknown"
+          },
+          {
+            "index": 8,
+            "input": "{ '@MappingName(name = \"secret', \"MappingName\", \"name\" }",
+            "rowObservation": "unknown"
+          },
+          {
+            "index": 9,
+            "input": "{ '@Hook(method = [\"\"\"tick', \"Inject\", \"method\" }",
+            "rowObservation": "unknown"
+          },
+          {
+            "index": 10,
+            "input": "{ '@org.spongepowered.asm.mixin.injection.Inject(method = [\"ti', \"Inject\", \"method\" }",
+            "rowObservation": "unknown"
+          }
+        ],
+        "observedLoopIterations": null,
+        "inferredLoopIterations": 10,
+        "expectedLoopIterations": 10,
+        "allRowsObserved": null,
+        "allRowsInferred": true,
+        "runtimeAssertionCounts": {
+          "376": 10,
+          "377": 10,
+          "378": 10,
+          "380": 10,
+          "381": 10,
+          "382": 10
+        },
+        "aggregateAssertionCalls": 60,
+        "runtimeIterationLowerBound": 10,
+        "rowAttribution": "unknown",
+        "observer": "Per-site counters are aggregate over the loop body. No row-specific pass count is claimed.",
+        "inferenceBasis": "Static table has 10 rows and the aggregate body assertion count is 60; this is an inference, not row-level observation."
+      },
+      {
+        "line": 387,
+        "tableEndLine": 395,
+        "bodyEndLine": 405,
+        "inputRows": [
+          {
+            "index": 1,
+            "input": "\"@KMixin(Target::cla\"",
+            "rowObservation": "unknown"
+          },
+          {
+            "index": 2,
+            "input": "\"@KMixin(target = Target::cla\"",
+            "rowObservation": "unknown"
+          },
+          {
+            "index": 3,
+            "input": "\"@KShadow(PRIVA\"",
+            "rowObservation": "unknown"
+          },
+          {
+            "index": 4,
+            "input": "\"@Hook(method = [TARGET_METHOD\"",
+            "rowObservation": "unknown"
+          },
+          {
+            "index": 5,
+            "input": "'@Hook(method = [\"prefix\" + TARGET_METHOD'",
+            "rowObservation": "unknown"
+          },
+          {
+            "index": 6,
+            "input": "\"@Hook(at = [Point\"",
+            "rowObservation": "unknown"
+          },
+          {
+            "index": 7,
+            "input": "'@Hook(at = [Point(\"HEAD\"), Poi'",
+            "rowObservation": "unknown"
+          }
+        ],
+        "observedLoopIterations": null,
+        "inferredLoopIterations": 7,
+        "expectedLoopIterations": 7,
+        "allRowsObserved": null,
+        "allRowsInferred": true,
+        "runtimeAssertionCounts": {
+          "401": 7,
+          "402": 7
+        },
+        "aggregateAssertionCalls": 14,
+        "runtimeIterationLowerBound": 7,
+        "rowAttribution": "unknown",
+        "observer": "Per-site counters are aggregate over the loop body. No row-specific pass count is claimed.",
+        "inferenceBasis": "Static table has 7 rows and the aggregate body assertion count is 14; this is an inference, not row-level observation."
+      },
+      {
+        "line": 407,
+        "tableEndLine": 418,
+        "bodyEndLine": 426,
+        "inputRows": [
+          {
+            "index": 1,
+            "input": "{ \"import unrelated.Inject\", '@Inject(method = [\"not mixin' }",
+            "rowObservation": "unknown"
+          },
+          {
+            "index": 2,
+            "input": "{ \"import unrelated.Inject as Hook\", '@Hook(method = [\"not mixin' }",
+            "rowObservation": "unknown"
+          },
+          {
+            "index": 3,
+            "input": "{ \"import unrelated.KMixin\", \"@KMixin(Target::class)\" }",
+            "rowObservation": "unknown"
+          },
+          {
+            "index": 4,
+            "input": "{ \"import unrelated.*\", '@Inject(method = [\"not mixin' }",
+            "rowObservation": "unknown"
+          },
+          {
+            "index": 5,
+            "input": "{ '@unrelated.Inject(method = [\"not mixin' }",
+            "rowObservation": "unknown"
+          },
+          {
+            "index": 6,
+            "input": "{ \"/*\", \"import org.spongepowered.asm.mixin.injection.Inject\", \"*/\", '@Inject(method = [\"not mixin' }",
+            "rowObservation": "unknown"
+          },
+          {
+            "index": 7,
+            "input": "{ 'val text = \"\"\"', \"import org.spongepowered.asm.mixin.injection.Inject\", '\"\"\"', '@Inject(method = [\"not mixin' }",
+            "rowObservation": "unknown"
+          },
+          {
+            "index": 8,
+            "input": "{ 'val text = \"\"\"@org.spongepowered.asm.mixin.injection.Inject(method = [\"fake' }",
+            "rowObservation": "unknown"
+          },
+          {
+            "index": 9,
+            "input": "{ \"/* outer /* nested */ @org.spongepowered.asm.mixin.injection.Inject(method = [\\\"fake\" }",
+            "rowObservation": "unknown"
+          },
+          {
+            "index": 10,
+            "input": "{ \"fun ordinary() = listOf(1, 2).ma\" }",
+            "rowObservation": "unknown"
+          }
+        ],
+        "observedLoopIterations": null,
+        "inferredLoopIterations": 10,
+        "expectedLoopIterations": 10,
+        "allRowsObserved": null,
+        "allRowsInferred": true,
+        "runtimeAssertionCounts": {
+          "422": 10,
+          "423": 10
+        },
+        "aggregateAssertionCalls": 20,
+        "runtimeIterationLowerBound": 10,
+        "rowAttribution": "unknown",
+        "observer": "Per-site counters are aggregate over the loop body. No row-specific pass count is claimed.",
+        "inferenceBasis": "Static table has 10 rows and the aggregate body assertion count is 20; this is an inference, not row-level observation."
+      },
+      {
+        "line": 428,
+        "tableEndLine": 428,
+        "bodyEndLine": 436,
+        "inputRows": [
+          {
+            "index": 1,
+            "input": "\"@KShadow abstract fun sec\"",
+            "rowObservation": "unknown"
+          },
+          {
+            "index": 2,
+            "input": "\"@Overwrite fun rep\"",
+            "rowObservation": "unknown"
+          },
+          {
+            "index": 3,
+            "input": "\"fun ordinary() = target.me\"",
+            "rowObservation": "unknown"
+          }
+        ],
+        "observedLoopIterations": null,
+        "inferredLoopIterations": 3,
+        "expectedLoopIterations": 3,
+        "allRowsObserved": null,
+        "allRowsInferred": true,
+        "runtimeAssertionCounts": {
+          "433": 3
+        },
+        "aggregateAssertionCalls": 3,
+        "runtimeIterationLowerBound": 3,
+        "rowAttribution": "unknown",
+        "observer": "Per-site counters are aggregate over the loop body. No row-specific pass count is claimed.",
+        "inferenceBasis": "Static table has 3 rows and the aggregate body assertion count is 3; this is an inference, not row-level observation."
+      }
+    ],
+    "mcdev-nvim/tests/e2e/cem_project_e2e.lua": [
+      {
+        "line": 181,
+        "tableEndLine": 187,
+        "bodyEndLine": 190,
+        "inputRows": [
+          {
+            "index": 1,
+            "input": "'completionContextKind'",
+            "rowObservation": "unknown"
+          },
+          {
+            "index": 2,
+            "input": "'owner'",
+            "rowObservation": "unknown"
+          },
+          {
+            "index": 3,
+            "input": "'partialValue'",
+            "rowObservation": "unknown"
+          },
+          {
+            "index": 4,
+            "input": "'kind'",
+            "rowObservation": "unknown"
+          },
+          {
+            "index": 5,
+            "input": "'methodName'",
+            "rowObservation": "unknown"
+          },
+          {
+            "index": 6,
+            "input": "'methodDescriptor'",
+            "rowObservation": "unknown"
+          },
+          {
+            "index": 7,
+            "input": "'candidateCountBeforeFilter'",
+            "rowObservation": "unknown"
+          },
+          {
+            "index": 8,
+            "input": "'candidateCountAfterFilter'",
+            "rowObservation": "unknown"
+          },
+          {
+            "index": 9,
+            "input": "'zeroItemReason'",
+            "rowObservation": "unknown"
+          },
+          {
+            "index": 10,
+            "input": "'semanticContextFound'",
+            "rowObservation": "unknown"
+          },
+          {
+            "index": 11,
+            "input": "'semanticTargetCount'",
+            "rowObservation": "unknown"
+          },
+          {
+            "index": 12,
+            "input": "'semanticMemberCount'",
+            "rowObservation": "unknown"
+          },
+          {
+            "index": 13,
+            "input": "'fallbackAnnotationContextUsed'",
+            "rowObservation": "unknown"
+          },
+          {
+            "index": 14,
+            "input": "'fallbackAnnotationContextReason'",
+            "rowObservation": "unknown"
+          },
+          {
+            "index": 15,
+            "input": "'parseSource'",
+            "rowObservation": "unknown"
+          },
+          {
+            "index": 16,
+            "input": "'parseConfidence'",
+            "rowObservation": "unknown"
+          }
+        ],
+        "observedLoopIterations": null,
+        "inferredLoopIterations": null,
+        "expectedLoopIterations": 16,
+        "allRowsObserved": null,
+        "allRowsInferred": null,
+        "runtimeAssertionCounts": {},
+        "aggregateAssertionCalls": 0,
+        "runtimeIterationLowerBound": null,
+        "rowAttribution": "unknown",
+        "observer": "Per-site counters are aggregate over the loop body. No row-specific pass count is claimed.",
+        "inferenceBasis": "No row-level loop counter or input identity was logged."
+      },
+      {
+        "line": 249,
+        "tableEndLine": 249,
+        "bodyEndLine": 251,
+        "inputRows": [
+          {
+            "index": 1,
+            "input": "'isEnchantable'",
+            "rowObservation": "unknown"
+          },
+          {
+            "index": 2,
+            "input": "'getEnchantmentValue'",
+            "rowObservation": "unknown"
+          },
+          {
+            "index": 3,
+            "input": "'getDefaultInstance'",
+            "rowObservation": "unknown"
+          },
+          {
+            "index": 4,
+            "input": "'use'",
+            "rowObservation": "unknown"
+          },
+          {
+            "index": 5,
+            "input": "'<init>'",
+            "rowObservation": "unknown"
+          }
+        ],
+        "observedLoopIterations": null,
+        "inferredLoopIterations": null,
+        "expectedLoopIterations": 5,
+        "allRowsObserved": null,
+        "allRowsInferred": null,
+        "runtimeAssertionCounts": {},
+        "aggregateAssertionCalls": 0,
+        "runtimeIterationLowerBound": null,
+        "rowAttribution": "unknown",
+        "observer": "Per-site counters are aggregate over the loop body. No row-specific pass count is claimed.",
+        "inferenceBasis": "No row-level loop counter or input identity was logged."
+      },
+      {
+        "line": 258,
+        "tableEndLine": 258,
+        "bodyEndLine": 260,
+        "inputRows": [
+          {
+            "index": 1,
+            "input": "'getBlock'",
+            "rowObservation": "unknown"
+          },
+          {
+            "index": 2,
+            "input": "'getPlacementState'",
+            "rowObservation": "unknown"
+          },
+          {
+            "index": 3,
+            "input": "'canPlace'",
+            "rowObservation": "unknown"
+          },
+          {
+            "index": 4,
+            "input": "'<init>'",
+            "rowObservation": "unknown"
+          }
+        ],
+        "observedLoopIterations": null,
+        "inferredLoopIterations": null,
+        "expectedLoopIterations": 4,
+        "allRowsObserved": null,
+        "allRowsInferred": null,
+        "runtimeAssertionCounts": {},
+        "aggregateAssertionCalls": 0,
+        "runtimeIterationLowerBound": null,
+        "rowAttribution": "unknown",
+        "observer": "Per-site counters are aggregate over the loop body. No row-specific pass count is claimed.",
+        "inferenceBasis": "No row-level loop counter or input identity was logged."
+      },
+      {
+        "line": 749,
+        "tableEndLine": 755,
+        "bodyEndLine": 758,
+        "inputRows": [
+          {
+            "index": 1,
+            "input": "'package io.github.cotrin8672.cem.mixin;'",
+            "rowObservation": "unknown"
+          },
+          {
+            "index": 2,
+            "input": "'import java.util.List;'",
+            "rowObservation": "unknown"
+          },
+          {
+            "index": 3,
+            "input": "'import net.minecraft.world.item.Item;'",
+            "rowObservation": "unknown"
+          },
+          {
+            "index": 4,
+            "input": "'@Mixin(Item.class)'",
+            "rowObservation": "unknown"
+          },
+          {
+            "index": 5,
+            "input": "'public class ItemMixin {'",
+            "rowObservation": "unknown"
+          }
+        ],
+        "observedLoopIterations": null,
+        "inferredLoopIterations": null,
+        "expectedLoopIterations": 5,
+        "allRowsObserved": null,
+        "allRowsInferred": null,
+        "runtimeAssertionCounts": {},
+        "aggregateAssertionCalls": 0,
+        "runtimeIterationLowerBound": null,
+        "rowAttribution": "unknown",
+        "observer": "Per-site counters are aggregate over the loop body. No row-specific pass count is claimed.",
+        "inferenceBasis": "No row-level loop counter or input identity was logged."
+      }
+    ],
+    "mcdev-nvim/tests/e2e/create_drill_definition_diagnostics_e2e.lua": [
+      {
+        "line": 169,
+        "tableEndLine": 169,
+        "bodyEndLine": 172,
+        "inputRows": [
+          {
+            "index": 1,
+            "input": "\"missingOne\"",
+            "rowObservation": "unknown"
+          },
+          {
+            "index": 2,
+            "input": "\"missingTwo\"",
+            "rowObservation": "unknown"
+          },
+          {
+            "index": 3,
+            "input": "\"missingThree\"",
+            "rowObservation": "unknown"
+          },
+          {
+            "index": 4,
+            "input": "\"useItemOn\"",
+            "rowObservation": "unknown"
+          }
+        ],
+        "observedLoopIterations": null,
+        "inferredLoopIterations": null,
+        "expectedLoopIterations": 4,
+        "allRowsObserved": null,
+        "allRowsInferred": null,
+        "runtimeAssertionCounts": {},
+        "aggregateAssertionCalls": 0,
+        "runtimeIterationLowerBound": null,
+        "rowAttribution": "unknown",
+        "observer": "Per-site counters are aggregate over the loop body. No row-specific pass count is claimed.",
+        "inferenceBasis": "No row-level loop counter or input identity was logged."
+      }
+    ],
+    "mcdev-nvim/tests/e2e/expression_e2e.lua": [
+      {
+        "line": 183,
+        "tableEndLine": 190,
+        "bodyEndLine": 238,
+        "inputRows": [
+          {
+            "index": 1,
+            "input": "{ name = \"WrapWithCondition v1\", annotation = \"com.llamalad7.mixinextras.injector.WrapWithCondition\", signature = \"private boolean guard(SimpleTarget instance) { return true; }\" }",
+            "rowObservation": "unknown"
+          },
+          {
+            "index": 2,
+            "input": "{ name = \"WrapWithCondition v2\", annotation = \"com.llamalad7.mixinextras.injector.v2.WrapWithCondition\", signature = \"private boolean guard(SimpleTarget instance) { return true; }\" }",
+            "rowObservation": "unknown"
+          },
+          {
+            "index": 3,
+            "input": "{ name = \"Inject\", annotation = \"org.spongepowered.asm.mixin.injection.Inject\", signature = \"private void guard(org.spongepowered.asm.mixin.injection.callback.CallbackInfo ci) {}\" }",
+            "rowObservation": "unknown"
+          }
+        ],
+        "observedLoopIterations": null,
+        "inferredLoopIterations": null,
+        "expectedLoopIterations": 3,
+        "allRowsObserved": null,
+        "allRowsInferred": null,
+        "runtimeAssertionCounts": {},
+        "aggregateAssertionCalls": 0,
+        "runtimeIterationLowerBound": null,
+        "rowAttribution": "unknown",
+        "observer": "Per-site counters are aggregate over the loop body. No row-specific pass count is claimed.",
+        "inferenceBasis": "No row-level loop counter or input identity was logged."
+      }
+    ],
+    "mcdev-nvim/tests/e2e/real_project_e2e.lua": [
+      {
+        "line": 17,
+        "tableEndLine": 17,
+        "bodyEndLine": 33,
+        "inputRows": [
+          {
+            "index": 1,
+            "input": "\"startup\"",
+            "rowObservation": "unknown"
+          },
+          {
+            "index": 2,
+            "input": "\"warm\"",
+            "rowObservation": "unknown"
+          }
+        ],
+        "observedLoopIterations": null,
+        "inferredLoopIterations": null,
+        "expectedLoopIterations": 2,
+        "allRowsObserved": null,
+        "allRowsInferred": null,
+        "runtimeAssertionCounts": {},
+        "aggregateAssertionCalls": 0,
+        "runtimeIterationLowerBound": null,
+        "rowAttribution": "unknown",
+        "observer": "Per-site counters are aggregate over the loop body. No row-specific pass count is claimed.",
+        "inferenceBasis": "No row-level loop counter or input identity was logged."
+      }
+    ],
+    "mcdev-nvim/tests/lsp_regressions.lua": [
+      {
+        "line": 65,
+        "tableEndLine": 65,
+        "bodyEndLine": 71,
+        "inputRows": [
+          {
+            "index": 1,
+            "input": "\"definition\"",
+            "rowObservation": "unknown"
+          },
+          {
+            "index": 2,
+            "input": "\"references\"",
+            "rowObservation": "unknown"
+          },
+          {
+            "index": 3,
+            "input": "\"hover\"",
+            "rowObservation": "unknown"
+          }
+        ],
+        "observedLoopIterations": null,
+        "inferredLoopIterations": 3,
+        "expectedLoopIterations": 3,
+        "allRowsObserved": null,
+        "allRowsInferred": true,
+        "runtimeAssertionCounts": {
+          "69": 9,
+          "70": 9
+        },
+        "aggregateAssertionCalls": 18,
+        "runtimeIterationLowerBound": 9,
+        "rowAttribution": "unknown",
+        "observer": "Per-site counters are aggregate over the loop body. No row-specific pass count is claimed.",
+        "inferenceBasis": "Static table has 3 rows and the aggregate body assertion count is 18; this is an inference, not row-level observation."
+      },
+      {
+        "line": 68,
+        "tableEndLine": 68,
+        "bodyEndLine": 71,
+        "inputRows": [
+          {
+            "index": 1,
+            "input": "10",
+            "rowObservation": "unknown"
+          },
+          {
+            "index": 2,
+            "input": "4",
+            "rowObservation": "unknown"
+          },
+          {
+            "index": 3,
+            "input": "3",
+            "rowObservation": "unknown"
+          }
+        ],
+        "observedLoopIterations": null,
+        "inferredLoopIterations": 3,
+        "expectedLoopIterations": 3,
+        "allRowsObserved": null,
+        "allRowsInferred": true,
+        "runtimeAssertionCounts": {
+          "69": 9,
+          "70": 9
+        },
+        "aggregateAssertionCalls": 18,
+        "runtimeIterationLowerBound": 9,
+        "rowAttribution": "unknown",
+        "observer": "Per-site counters are aggregate over the loop body. No row-specific pass count is claimed.",
+        "inferenceBasis": "Static table has 3 rows and the aggregate body assertion count is 18; this is an inference, not row-level observation."
+      },
+      {
+        "line": 77,
+        "tableEndLine": 77,
+        "bodyEndLine": 89,
+        "inputRows": [
+          {
+            "index": 1,
+            "input": "\"definition\"",
+            "rowObservation": "unknown"
+          },
+          {
+            "index": 2,
+            "input": "\"references\"",
+            "rowObservation": "unknown"
+          },
+          {
+            "index": 3,
+            "input": "\"hover\"",
+            "rowObservation": "unknown"
+          }
+        ],
+        "observedLoopIterations": null,
+        "inferredLoopIterations": null,
+        "expectedLoopIterations": 3,
+        "allRowsObserved": null,
+        "allRowsInferred": null,
+        "runtimeAssertionCounts": {},
+        "aggregateAssertionCalls": 0,
+        "runtimeIterationLowerBound": null,
+        "rowAttribution": "unknown",
+        "observer": "Per-site counters are aggregate over the loop body. No row-specific pass count is claimed.",
+        "inferenceBasis": "No row-level loop counter or input identity was logged."
+      },
+      {
+        "line": 81,
+        "tableEndLine": 82,
+        "bodyEndLine": 89,
+        "inputRows": [
+          {
+            "index": 1,
+            "input": "{ \"hit\", \"empty\" }",
+            "rowObservation": "unknown"
+          },
+          {
+            "index": 2,
+            "input": "{ \"empty\", \"hit\" }",
+            "rowObservation": "unknown"
+          },
+          {
+            "index": 3,
+            "input": "{ \"hit\", \"hit\" }",
+            "rowObservation": "unknown"
+          },
+          {
+            "index": 4,
+            "input": "{ \"error\", \"hit\" }",
+            "rowObservation": "unknown"
+          },
+          {
+            "index": 5,
+            "input": "{ \"empty\", \"error\" }",
+            "rowObservation": "unknown"
+          },
+          {
+            "index": 6,
+            "input": "{ \"null\", \"empty\" }",
+            "rowObservation": "unknown"
+          }
+        ],
+        "observedLoopIterations": null,
+        "inferredLoopIterations": null,
+        "expectedLoopIterations": 6,
+        "allRowsObserved": null,
+        "allRowsInferred": null,
+        "runtimeAssertionCounts": {},
+        "aggregateAssertionCalls": 0,
+        "runtimeIterationLowerBound": null,
+        "rowAttribution": "unknown",
+        "observer": "Per-site counters are aggregate over the loop body. No row-specific pass count is claimed.",
+        "inferenceBasis": "No row-level loop counter or input identity was logged."
+      },
+      {
+        "line": 123,
+        "tableEndLine": 123,
+        "bodyEndLine": 137,
+        "inputRows": [
+          {
+            "index": 1,
+            "input": "\"utf-8\"",
+            "rowObservation": "unknown"
+          },
+          {
+            "index": 2,
+            "input": "\"utf-16\"",
+            "rowObservation": "unknown"
+          },
+          {
+            "index": 3,
+            "input": "\"utf-32\"",
+            "rowObservation": "unknown"
+          }
+        ],
+        "observedLoopIterations": null,
+        "inferredLoopIterations": 3,
+        "expectedLoopIterations": 3,
+        "allRowsObserved": null,
+        "allRowsInferred": true,
+        "runtimeAssertionCounts": {
+          "136": 12
+        },
+        "aggregateAssertionCalls": 12,
+        "runtimeIterationLowerBound": 12,
+        "rowAttribution": "unknown",
+        "observer": "Per-site counters are aggregate over the loop body. No row-specific pass count is claimed.",
+        "inferenceBasis": "Static table has 3 rows and the aggregate body assertion count is 12; this is an inference, not row-level observation."
+      },
+      {
+        "line": 125,
+        "tableEndLine": 125,
+        "bodyEndLine": 137,
+        "inputRows": [
+          {
+            "index": 1,
+            "input": "\"gd\"",
+            "rowObservation": "unknown"
+          },
+          {
+            "index": 2,
+            "input": "\"gr\"",
+            "rowObservation": "unknown"
+          }
+        ],
+        "observedLoopIterations": null,
+        "inferredLoopIterations": 2,
+        "expectedLoopIterations": 2,
+        "allRowsObserved": null,
+        "allRowsInferred": true,
+        "runtimeAssertionCounts": {
+          "136": 12
+        },
+        "aggregateAssertionCalls": 12,
+        "runtimeIterationLowerBound": 12,
+        "rowAttribution": "unknown",
+        "observer": "Per-site counters are aggregate over the loop body. No row-specific pass count is claimed.",
+        "inferenceBasis": "Static table has 2 rows and the aggregate body assertion count is 12; this is an inference, not row-level observation."
+      },
+      {
+        "line": 126,
+        "tableEndLine": 126,
+        "bodyEndLine": 137,
+        "inputRows": [
+          {
+            "index": 1,
+            "input": "1",
+            "rowObservation": "unknown"
+          },
+          {
+            "index": 2,
+            "input": "2",
+            "rowObservation": "unknown"
+          }
+        ],
+        "observedLoopIterations": null,
+        "inferredLoopIterations": 2,
+        "expectedLoopIterations": 2,
+        "allRowsObserved": null,
+        "allRowsInferred": true,
+        "runtimeAssertionCounts": {
+          "136": 12
+        },
+        "aggregateAssertionCalls": 12,
+        "runtimeIterationLowerBound": 12,
+        "rowAttribution": "unknown",
+        "observer": "Per-site counters are aggregate over the loop body. No row-specific pass count is claimed.",
+        "inferenceBasis": "Static table has 2 rows and the aggregate body assertion count is 12; this is an inference, not row-level observation."
+      },
+      {
+        "line": 172,
+        "tableEndLine": 172,
+        "bodyEndLine": 181,
+        "inputRows": [
+          {
+            "index": 1,
+            "input": "10",
+            "rowObservation": "unknown"
+          },
+          {
+            "index": 2,
+            "input": "4",
+            "rowObservation": "unknown"
+          },
+          {
+            "index": 3,
+            "input": "3",
+            "rowObservation": "unknown"
+          }
+        ],
+        "observedLoopIterations": null,
+        "inferredLoopIterations": 3,
+        "expectedLoopIterations": 3,
+        "allRowsObserved": null,
+        "allRowsInferred": true,
+        "runtimeAssertionCounts": {
+          "173": 3,
+          "174": 3,
+          "175": 3,
+          "177": 3,
+          "178": 3,
+          "179": 3,
+          "180": 3
+        },
+        "aggregateAssertionCalls": 21,
+        "runtimeIterationLowerBound": 3,
+        "rowAttribution": "unknown",
+        "observer": "Per-site counters are aggregate over the loop body. No row-specific pass count is claimed.",
+        "inferenceBasis": "Static table has 3 rows and the aggregate body assertion count is 21; this is an inference, not row-level observation."
+      },
+      {
+        "line": 190,
+        "tableEndLine": 190,
+        "bodyEndLine": 197,
+        "inputRows": [
+          {
+            "index": 1,
+            "input": "3",
+            "rowObservation": "unknown"
+          },
+          {
+            "index": 2,
+            "input": "2147483647",
+            "rowObservation": "unknown"
+          }
+        ],
+        "observedLoopIterations": null,
+        "inferredLoopIterations": 2,
+        "expectedLoopIterations": 2,
+        "allRowsObserved": null,
+        "allRowsInferred": true,
+        "runtimeAssertionCounts": {
+          "194": 2,
+          "195": 2,
+          "196": 2
+        },
+        "aggregateAssertionCalls": 6,
+        "runtimeIterationLowerBound": 2,
+        "rowAttribution": "unknown",
+        "observer": "Per-site counters are aggregate over the loop body. No row-specific pass count is claimed.",
+        "inferenceBasis": "Static table has 2 rows and the aggregate body assertion count is 6; this is an inference, not row-level observation."
+      },
+      {
+        "line": 305,
+        "tableEndLine": 305,
+        "bodyEndLine": 312,
+        "inputRows": [
+          {
+            "index": 1,
+            "input": "10",
+            "rowObservation": "unknown"
+          },
+          {
+            "index": 2,
+            "input": "4",
+            "rowObservation": "unknown"
+          },
+          {
+            "index": 3,
+            "input": "3",
+            "rowObservation": "unknown"
+          }
+        ],
+        "observedLoopIterations": null,
+        "inferredLoopIterations": 3,
+        "expectedLoopIterations": 3,
+        "allRowsObserved": null,
+        "allRowsInferred": true,
+        "runtimeAssertionCounts": {
+          "307": 3,
+          "308": 3,
+          "309": 3,
+          "310": 3,
+          "311": 3
+        },
+        "aggregateAssertionCalls": 15,
+        "runtimeIterationLowerBound": 3,
+        "rowAttribution": "unknown",
+        "observer": "Per-site counters are aggregate over the loop body. No row-specific pass count is claimed.",
+        "inferenceBasis": "Static table has 3 rows and the aggregate body assertion count is 15; this is an inference, not row-level observation."
+      }
+    ],
+    "mcdev-nvim/tests/protocol_positions.lua": [
+      {
+        "line": 10,
+        "tableEndLine": 14,
+        "bodyEndLine": 19,
+        "inputRows": [
+          {
+            "index": 1,
+            "input": "{ line = \"abc\", character = 3 }",
+            "rowObservation": "unknown"
+          },
+          {
+            "index": 2,
+            "input": "{ line = \"日@At\", character = 4 }",
+            "rowObservation": "unknown"
+          },
+          {
+            "index": 3,
+            "input": "{ line = \"😀a\", character = 3 }",
+            "rowObservation": "unknown"
+          }
+        ],
+        "observedLoopIterations": null,
+        "inferredLoopIterations": 3,
+        "expectedLoopIterations": 3,
+        "allRowsObserved": null,
+        "allRowsInferred": true,
+        "runtimeAssertionCounts": {
+          "17": 3,
+          "18": 3
+        },
+        "aggregateAssertionCalls": 6,
+        "runtimeIterationLowerBound": 3,
+        "rowAttribution": "unknown",
+        "observer": "Per-site counters are aggregate over the loop body. No row-specific pass count is claimed.",
+        "inferenceBasis": "Static table has 3 rows and the aggregate body assertion count is 6; this is an inference, not row-level observation."
+      }
+    ],
+    "mcdev-nvim/tests/run.lua": [
+      {
+        "line": 991,
+        "tableEndLine": 991,
+        "bodyEndLine": 1007,
+        "inputRows": [
+          {
+            "index": 1,
+            "input": "\"endpoint\"",
+            "rowObservation": "unknown"
+          },
+          {
+            "index": 2,
+            "input": "\"classpath\"",
+            "rowObservation": "unknown"
+          }
+        ],
+        "observedLoopIterations": null,
+        "inferredLoopIterations": null,
+        "expectedLoopIterations": 2,
+        "allRowsObserved": null,
+        "allRowsInferred": null,
+        "runtimeAssertionCounts": {},
+        "aggregateAssertionCalls": 0,
+        "runtimeIterationLowerBound": null,
+        "rowAttribution": "unknown",
+        "observer": "Per-site counters are aggregate over the loop body. No row-specific pass count is claimed.",
+        "inferenceBasis": "No row-level loop counter or input identity was logged."
+      }
+    ]
+  },
+  "finiteResults": {
+    "fixture-build": {
+      "Name": "native-client-final-fixture-build",
+      "ExitCode": 0,
+      "TimedOut": false,
+      "Pid": 94644,
+      "Seconds": 4.1,
+      "evidence": "build/nvim-test-logs/native-client-final-fixture-build"
+    },
+    "syntax": {
+      "Name": "native-client-final-syntax",
+      "ExitCode": 0,
+      "TimedOut": false,
+      "Pid": 88988,
+      "Seconds": 1.8,
+      "evidence": "build/nvim-test-logs/native-client-final-syntax"
+    },
+    "adapters": {
+      "Name": "native-client-final-adapters",
+      "ExitCode": 0,
+      "TimedOut": false,
+      "Pid": 3036,
+      "Seconds": 24.5,
+      "evidence": "build/nvim-test-logs/native-client-final-adapters"
+    },
+    "helper": {
+      "Name": "native-client-final-helper",
+      "ExitCode": 0,
+      "TimedOut": false,
+      "Pid": 165368,
+      "Seconds": 1.9,
+      "evidence": "build/nvim-test-logs/native-client-final-helper"
+    },
+    "teardown-unit": {
+      "Name": "native-client-final-teardown-unit",
+      "ExitCode": 0,
+      "TimedOut": false,
+      "Pid": 72036,
+      "Seconds": 8.5,
+      "evidence": "build/nvim-test-logs/native-client-final-teardown-unit"
+    },
+    "teardown-process": {
+      "Name": "native-client-final-teardown-process",
+      "ExitCode": 0,
+      "TimedOut": false,
+      "Pid": 63780,
+      "Seconds": 44.5,
+      "evidence": "build/nvim-test-logs/native-client-final-teardown-process"
+    }
+  },
+  "independentNativeSuite": "passed",
+  "realIndexedEditorE2E": "pending host MC command bridge and Java extract-local",
+  "knownHostGaps": "docs/neovim-host-contract.md",
+  "caseCountNote": "The old Lua suite has named checks, table loops and script assertions, not a single test-case abstraction. Assertion sites and actual executions are separate counts.",
+  "nativeKotlinRoutingInputExecution": {
+    "source": "mcdev-nvim/tests/blink_routing.lua",
+    "loops": [
+      {
+        "line": 360,
+        "tableEndLine": 371,
+        "bodyEndLine": 385,
+        "inputRows": [
+          {
+            "index": 1,
+            "input": "{ '@Hook(method = [\"ti', \"Inject\", \"method\" }",
+            "rowObservation": "unknown"
+          },
+          {
+            "index": 2,
+            "input": "{ '@Hook(method = [\"tick\", ', \"Inject\", \"method\" }",
+            "rowObservation": "unknown"
+          },
+          {
+            "index": 3,
+            "input": "{ '@Hook(method = [\"tick\", /* comma, */ ', \"Inject\", \"method\" }",
+            "rowObservation": "unknown"
+          },
+          {
+            "index": 4,
+            "input": "{ '@Hook(at = [Point(\"HE', \"At\" }",
+            "rowObservation": "unknown"
+          },
+          {
+            "index": 5,
+            "input": "{ '@Hook(at = [Point(value = \"INVOKE\", target = \"Lfoo/', \"At\", \"target\" }",
+            "rowObservation": "unknown"
+          },
+          {
+            "index": 6,
+            "input": "{ '@Hook(at = [Point(\"HEAD\"), Point(\"RE', \"At\" }",
+            "rowObservation": "unknown"
+          },
+          {
+            "index": 7,
+            "input": "{ '@MappingName(\"secret', \"MappingName\" }",
+            "rowObservation": "unknown"
+          },
+          {
+            "index": 8,
+            "input": "{ '@MappingName(name = \"secret', \"MappingName\", \"name\" }",
+            "rowObservation": "unknown"
+          },
+          {
+            "index": 9,
+            "input": "{ '@Hook(method = [\"\"\"tick', \"Inject\", \"method\" }",
+            "rowObservation": "unknown"
+          },
+          {
+            "index": 10,
+            "input": "{ '@org.spongepowered.asm.mixin.injection.Inject(method = [\"ti', \"Inject\", \"method\" }",
+            "rowObservation": "unknown"
+          }
+        ],
+        "observedLoopIterations": null,
+        "inferredLoopIterations": 10,
+        "expectedLoopIterations": 10,
+        "allRowsObserved": null,
+        "allRowsInferred": true,
+        "runtimeAssertionCounts": {
+          "376": 10,
+          "377": 10,
+          "378": 10,
+          "380": 10,
+          "381": 10,
+          "382": 10
+        },
+        "aggregateAssertionCalls": 60,
+        "runtimeIterationLowerBound": 10,
+        "rowAttribution": "unknown",
+        "observer": "Per-site counters are aggregate over the loop body. No row-specific pass count is claimed.",
+        "inferenceBasis": "Static table has 10 rows and the aggregate body assertion count is 60; this is an inference, not row-level observation."
+      },
+      {
+        "line": 387,
+        "tableEndLine": 395,
+        "bodyEndLine": 405,
+        "inputRows": [
+          {
+            "index": 1,
+            "input": "\"@KMixin(Target::cla\"",
+            "rowObservation": "unknown"
+          },
+          {
+            "index": 2,
+            "input": "\"@KMixin(target = Target::cla\"",
+            "rowObservation": "unknown"
+          },
+          {
+            "index": 3,
+            "input": "\"@KShadow(PRIVA\"",
+            "rowObservation": "unknown"
+          },
+          {
+            "index": 4,
+            "input": "\"@Hook(method = [TARGET_METHOD\"",
+            "rowObservation": "unknown"
+          },
+          {
+            "index": 5,
+            "input": "'@Hook(method = [\"prefix\" + TARGET_METHOD'",
+            "rowObservation": "unknown"
+          },
+          {
+            "index": 6,
+            "input": "\"@Hook(at = [Point\"",
+            "rowObservation": "unknown"
+          },
+          {
+            "index": 7,
+            "input": "'@Hook(at = [Point(\"HEAD\"), Poi'",
+            "rowObservation": "unknown"
+          }
+        ],
+        "observedLoopIterations": null,
+        "inferredLoopIterations": 7,
+        "expectedLoopIterations": 7,
+        "allRowsObserved": null,
+        "allRowsInferred": true,
+        "runtimeAssertionCounts": {
+          "401": 7,
+          "402": 7
+        },
+        "aggregateAssertionCalls": 14,
+        "runtimeIterationLowerBound": 7,
+        "rowAttribution": "unknown",
+        "observer": "Per-site counters are aggregate over the loop body. No row-specific pass count is claimed.",
+        "inferenceBasis": "Static table has 7 rows and the aggregate body assertion count is 14; this is an inference, not row-level observation."
+      },
+      {
+        "line": 407,
+        "tableEndLine": 418,
+        "bodyEndLine": 426,
+        "inputRows": [
+          {
+            "index": 1,
+            "input": "{ \"import unrelated.Inject\", '@Inject(method = [\"not mixin' }",
+            "rowObservation": "unknown"
+          },
+          {
+            "index": 2,
+            "input": "{ \"import unrelated.Inject as Hook\", '@Hook(method = [\"not mixin' }",
+            "rowObservation": "unknown"
+          },
+          {
+            "index": 3,
+            "input": "{ \"import unrelated.KMixin\", \"@KMixin(Target::class)\" }",
+            "rowObservation": "unknown"
+          },
+          {
+            "index": 4,
+            "input": "{ \"import unrelated.*\", '@Inject(method = [\"not mixin' }",
+            "rowObservation": "unknown"
+          },
+          {
+            "index": 5,
+            "input": "{ '@unrelated.Inject(method = [\"not mixin' }",
+            "rowObservation": "unknown"
+          },
+          {
+            "index": 6,
+            "input": "{ \"/*\", \"import org.spongepowered.asm.mixin.injection.Inject\", \"*/\", '@Inject(method = [\"not mixin' }",
+            "rowObservation": "unknown"
+          },
+          {
+            "index": 7,
+            "input": "{ 'val text = \"\"\"', \"import org.spongepowered.asm.mixin.injection.Inject\", '\"\"\"', '@Inject(method = [\"not mixin' }",
+            "rowObservation": "unknown"
+          },
+          {
+            "index": 8,
+            "input": "{ 'val text = \"\"\"@org.spongepowered.asm.mixin.injection.Inject(method = [\"fake' }",
+            "rowObservation": "unknown"
+          },
+          {
+            "index": 9,
+            "input": "{ \"/* outer /* nested */ @org.spongepowered.asm.mixin.injection.Inject(method = [\\\"fake\" }",
+            "rowObservation": "unknown"
+          },
+          {
+            "index": 10,
+            "input": "{ \"fun ordinary() = listOf(1, 2).ma\" }",
+            "rowObservation": "unknown"
+          }
+        ],
+        "observedLoopIterations": null,
+        "inferredLoopIterations": 10,
+        "expectedLoopIterations": 10,
+        "allRowsObserved": null,
+        "allRowsInferred": true,
+        "runtimeAssertionCounts": {
+          "422": 10,
+          "423": 10
+        },
+        "aggregateAssertionCalls": 20,
+        "runtimeIterationLowerBound": 10,
+        "rowAttribution": "unknown",
+        "observer": "Per-site counters are aggregate over the loop body. No row-specific pass count is claimed.",
+        "inferenceBasis": "Static table has 10 rows and the aggregate body assertion count is 20; this is an inference, not row-level observation."
+      },
+      {
+        "line": 428,
+        "tableEndLine": 428,
+        "bodyEndLine": 436,
+        "inputRows": [
+          {
+            "index": 1,
+            "input": "\"@KShadow abstract fun sec\"",
+            "rowObservation": "unknown"
+          },
+          {
+            "index": 2,
+            "input": "\"@Overwrite fun rep\"",
+            "rowObservation": "unknown"
+          },
+          {
+            "index": 3,
+            "input": "\"fun ordinary() = target.me\"",
+            "rowObservation": "unknown"
+          }
+        ],
+        "observedLoopIterations": null,
+        "inferredLoopIterations": 3,
+        "expectedLoopIterations": 3,
+        "allRowsObserved": null,
+        "allRowsInferred": true,
+        "runtimeAssertionCounts": {
+          "433": 3
+        },
+        "aggregateAssertionCalls": 3,
+        "runtimeIterationLowerBound": 3,
+        "rowAttribution": "unknown",
+        "observer": "Per-site counters are aggregate over the loop body. No row-specific pass count is claimed.",
+        "inferenceBasis": "Static table has 3 rows and the aggregate body assertion count is 3; this is an inference, not row-level observation."
+      }
+    ],
+    "directCases": [
+      {
+        "line": 438,
+        "input": "with_buffer({ \"import io.github.diskria.lapis.annotations.KMixin as Patch\", \"@Pat \" }, function(bufnr)",
+        "runtimeAssertionCounts": {
+          "441": 1
+        },
+        "aggregateAssertionCalls": 1,
+        "rowAttribution": "single direct case body; no additional input counter"
+      },
+      {
+        "line": 445,
+        "input": "with_buffer({ \"import org.spongepowered.asm.mixin.injection.*\", '@Inject(at = [At(\"INVOKE\", target = \"Lfoo/' }, function(bufnr)",
+        "runtimeAssertionCounts": {
+          "448": 1
+        },
+        "aggregateAssertionCalls": 1,
+        "rowAttribution": "single direct case body; no additional input counter"
+      }
+    ],
+    "inputRowCount": 30,
+    "inferredInputRowCount": 30,
+    "directCaseCount": 2,
+    "strictSource": "build/migration-baseline/current-20261023/mcdev-nvim/tests/blink_routing.lua",
+    "note": "Runtime assertion counts are per-site aggregates. Input rows retain static fidelity, while row-level pass attribution is unknown; inferred loop counts are explicitly marked as inference."
+  },
+  "standardHostMaterializedAction": {
+    "Name": "native-materialized-f595",
+    "ExitCode": 0,
+    "TimedOut": false,
+    "Pid": 207236,
+    "Seconds": 25.9,
+    "test": "mcdev-nvim/tests/e2e/native_materialized_action.lua",
+    "evidence": "build/nvim-test-logs/native-materialized-f595",
+    "wholeProof": "build/nvim-test-logs/materialized-f595/proof.json",
+    "scope": "Actual standard host action, unique merged materialized effect, complete applied buffer and stale rejection; not MC wire or extract-local proof."
+  }
+}

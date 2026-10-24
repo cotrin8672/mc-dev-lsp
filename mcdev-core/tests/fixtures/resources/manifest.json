@@ -1,0 +1,322 @@
+[
+  {
+    "resource": "fixtures/broken-diagnostics/build.gradle",
+    "rustPath": "tests/fixtures/resources/primary/broken-diagnostics/build.gradle",
+    "sha256": "b1c6bc9147c0e590a8996e3bc368b5b1404d3f945612fd39525805f34847e0f8",
+    "bytes": 298,
+    "required": true,
+    "baselineSource": "mcdev-test-fixtures/src/main/resources/fixtures/broken-diagnostics/build.gradle"
+  },
+  {
+    "resource": "fixtures/broken-diagnostics/fabric.mod.json",
+    "rustPath": "tests/fixtures/resources/primary/broken-diagnostics/fabric.mod.json",
+    "sha256": "3ff00af1846088c4d359d96c1f5b408de02cddc8dc547882f78d63da342a14a8",
+    "bytes": 338,
+    "required": true,
+    "baselineSource": "mcdev-test-fixtures/src/main/resources/fixtures/broken-diagnostics/fabric.mod.json"
+  },
+  {
+    "resource": "fixtures/broken-diagnostics/mixins.json",
+    "rustPath": "tests/fixtures/resources/primary/broken-diagnostics/mixins.json",
+    "sha256": "bf77daae75dee6a67068c875d6491e042dcdd9b95f07ea7d3ec5c0d7af459915",
+    "bytes": 177,
+    "required": true,
+    "baselineSource": "mcdev-test-fixtures/src/main/resources/fixtures/broken-diagnostics/mixins.json"
+  },
+  {
+    "resource": "fixtures/broken-diagnostics/src/main/java/com/example/mixin/BrokenMixin.java",
+    "rustPath": "tests/fixtures/resources/primary/broken-diagnostics/src/main/java/com/example/mixin/BrokenMixin.java",
+    "sha256": "cd58ac47778f73f7caf71b61599767139f2de3fdee693d4fdd660dc2fddc9a82",
+    "bytes": 722,
+    "required": true,
+    "baselineSource": "mcdev-test-fixtures/src/main/resources/fixtures/broken-diagnostics/src/main/java/com/example/mixin/BrokenMixin.java"
+  },
+  {
+    "resource": "fixtures/fabric-aw-at/build.gradle",
+    "rustPath": "tests/fixtures/resources/primary/fabric-aw-at/build.gradle",
+    "sha256": "9ddb2916011e1f9b41509224f4f9322d14419fe9ae7b411c113902f0106f4ef6",
+    "bytes": 316,
+    "required": true,
+    "baselineSource": "mcdev-test-fixtures/src/main/resources/fixtures/fabric-aw-at/build.gradle"
+  },
+  {
+    "resource": "fixtures/fabric-aw-at/fabric.mod.json",
+    "rustPath": "tests/fixtures/resources/primary/fabric-aw-at/fabric.mod.json",
+    "sha256": "28d0b050def14418766ebdf5cbbb54e6143cedc582358ba29066efb65d69be6b",
+    "bytes": 340,
+    "required": true,
+    "baselineSource": "mcdev-test-fixtures/src/main/resources/fixtures/fabric-aw-at/fabric.mod.json"
+  },
+  {
+    "resource": "fixtures/fabric-aw-at/mappings.tiny",
+    "rustPath": "tests/fixtures/fabric-basic-mappings.tiny",
+    "sha256": "e9f92f59f8d581dbf34766efa4f78920129402a5debb4fa2a139db0cfc95d9f2",
+    "bytes": 180,
+    "required": true,
+    "baselineSource": "mcdev-test-fixtures/src/main/resources/fixtures/fabric-aw-at/mappings.tiny"
+  },
+  {
+    "resource": "fixtures/fabric-aw-at/src/main/resources/mod.accesswidener",
+    "rustPath": "tests/fixtures/resources/primary/fabric-aw-at/src/main/resources/mod.accesswidener",
+    "sha256": "0e1a865e57f61887a1b6a0aa6fb6829bf086f2f541a3d9b4e0d47e6aee02e6c2",
+    "bytes": 207,
+    "required": true,
+    "baselineSource": "mcdev-test-fixtures/src/main/resources/fixtures/fabric-aw-at/src/main/resources/mod.accesswidener"
+  },
+  {
+    "resource": "fixtures/fabric-aw-at/src/main/resources/mod_at.cfg",
+    "rustPath": "tests/fixtures/resources/primary/fabric-aw-at/src/main/resources/mod_at.cfg",
+    "sha256": "1a804901e4484cc674ea1b685f72aec46970c97cd050b7ca5b97db9541359e18",
+    "bytes": 156,
+    "required": true,
+    "baselineSource": "mcdev-test-fixtures/src/main/resources/fixtures/fabric-aw-at/src/main/resources/mod_at.cfg"
+  },
+  {
+    "resource": "fixtures/fabric-basic/build.gradle",
+    "rustPath": "tests/fixtures/mixin_completion/project_files/fabric-basic/build.gradle",
+    "sha256": "6662cdf3b78d54b97e836d259ead280ae1763568a9fcc8c548418fffa141a9a9",
+    "bytes": 346,
+    "required": true,
+    "baselineSource": "mcdev-test-fixtures/src/main/resources/fixtures/fabric-basic/build.gradle"
+  },
+  {
+    "resource": "fixtures/fabric-basic/fabric.mod.json",
+    "rustPath": "tests/fixtures/mixin_completion/project_files/fabric-basic/fabric.mod.json",
+    "sha256": "bec39fee07cb67a6f331dada2ca15d5856b3fc54e0dc9a3bbebf185b85d732a0",
+    "bytes": 321,
+    "required": true,
+    "baselineSource": "mcdev-test-fixtures/src/main/resources/fixtures/fabric-basic/fabric.mod.json"
+  },
+  {
+    "resource": "fixtures/fabric-basic/mappings.tiny",
+    "rustPath": "tests/fixtures/mixin_completion/project_files/fabric-basic/mappings.tiny",
+    "sha256": "e9f92f59f8d581dbf34766efa4f78920129402a5debb4fa2a139db0cfc95d9f2",
+    "bytes": 180,
+    "required": true,
+    "baselineSource": "mcdev-test-fixtures/src/main/resources/fixtures/fabric-basic/mappings.tiny"
+  },
+  {
+    "resource": "fixtures/fabric-basic/mixins.json",
+    "rustPath": "tests/fixtures/mixin_completion/project_files/fabric-basic/mixins.json",
+    "sha256": "2f25840b8f154ee5228006aaac531c7e318e4a83d697c9e55d3d4a7aa05ce8d8",
+    "bytes": 199,
+    "required": true,
+    "baselineSource": "mcdev-test-fixtures/src/main/resources/fixtures/fabric-basic/mixins.json"
+  },
+  {
+    "resource": "fixtures/fabric-basic/src/main/java/com/example/mixin/ExampleMixin.java",
+    "rustPath": "tests/fixtures/mixin_completion/project_files/fabric-basic/src/main/java/com/example/mixin/ExampleMixin.java",
+    "sha256": "0cdd1e8e9374feb89f3ecc2b307b76d2d77105d94da23d929ac217c8c83a7439",
+    "bytes": 503,
+    "required": true,
+    "baselineSource": "mcdev-test-fixtures/src/main/resources/fixtures/fabric-basic/src/main/java/com/example/mixin/ExampleMixin.java"
+  },
+  {
+    "resource": "fixtures/fabric-basic/src/main/java/com/example/target/SimpleTarget.java",
+    "rustPath": "tests/fixtures/mixin_completion/project_files/fabric-basic/src/main/java/com/example/target/SimpleTarget.java",
+    "sha256": "2e006db63d9571deac4e8f2702be382d93ac19af4ab14a53bd610b54de7ab305",
+    "bytes": 364,
+    "required": false,
+    "baselineSource": "mcdev-test-fixtures/src/main/resources/fixtures/fabric-basic/src/main/java/com/example/target/SimpleTarget.java"
+  },
+  {
+    "resource": "fixtures/fabric-loom-e2e/.classpath",
+    "rustPath": "tests/fixtures/mixin_completion/project_files/fabric-loom-e2e/.classpath",
+    "sha256": "9cc4406c58d223da4418bffaf939b5b734c25107a9057a92f3566a547627b086",
+    "bytes": 433,
+    "required": true,
+    "baselineSource": "mcdev-test-fixtures/src/main/resources/fixtures/fabric-loom-e2e/.classpath"
+  },
+  {
+    "resource": "fixtures/fabric-loom-e2e/.project",
+    "rustPath": "tests/fixtures/mixin_completion/project_files/fabric-loom-e2e/.project",
+    "sha256": "b28c85a7361debadf3b31441a0aed43bab350e46702e14189b9a27a8987b6418",
+    "bytes": 374,
+    "required": true,
+    "baselineSource": "mcdev-test-fixtures/src/main/resources/fixtures/fabric-loom-e2e/.project"
+  },
+  {
+    "resource": "fixtures/fabric-loom-e2e/build.gradle",
+    "rustPath": "tests/fixtures/mixin_completion/project_files/fabric-loom-e2e/build.gradle",
+    "sha256": "0b1221c977051b8d96330e7886c7c82f288e08286fa595c885647d193aeab3aa",
+    "bytes": 372,
+    "required": true,
+    "baselineSource": "mcdev-test-fixtures/src/main/resources/fixtures/fabric-loom-e2e/build.gradle"
+  },
+  {
+    "resource": "fixtures/fabric-loom-e2e/fabric.mod.json",
+    "rustPath": "tests/fixtures/mixin_completion/project_files/fabric-loom-e2e/fabric.mod.json",
+    "sha256": "09772a1c648bca85f07a515252e24c3a93c7c467a699448014f4f4624b1ba480",
+    "bytes": 341,
+    "required": true,
+    "baselineSource": "mcdev-test-fixtures/src/main/resources/fixtures/fabric-loom-e2e/fabric.mod.json"
+  },
+  {
+    "resource": "fixtures/fabric-loom-e2e/mapped-sources/com/example/target/SimpleTarget.java",
+    "rustPath": "tests/fixtures/mixin_completion/project_files/fabric-loom-e2e/mapped-sources/com/example/target/SimpleTarget.java",
+    "sha256": "9588f833c13207e4ebfbc8e2e8b44dfd285eb97e94faf5f34167ba05dc93e481",
+    "bytes": 336,
+    "required": true,
+    "baselineSource": "mcdev-test-fixtures/src/main/resources/fixtures/fabric-loom-e2e/mapped-sources/com/example/target/SimpleTarget.java"
+  },
+  {
+    "resource": "fixtures/fabric-loom-e2e/mappings.tiny",
+    "rustPath": "tests/fixtures/mixin_completion/project_files/fabric-loom-e2e/mappings.tiny",
+    "sha256": "1e0963de9baf8cb8fb1214932608b7ba524afacb62f60c30ea580d58211fe753",
+    "bytes": 135,
+    "required": true,
+    "baselineSource": "mcdev-test-fixtures/src/main/resources/fixtures/fabric-loom-e2e/mappings.tiny"
+  },
+  {
+    "resource": "fixtures/fabric-loom-e2e/mixins.json",
+    "rustPath": "tests/fixtures/mixin_completion/project_files/fabric-loom-e2e/mixins.json",
+    "sha256": "f0e81dab5411e17feea42764f77b391f8dbb0e5ee6689fb7272971cdc1a3ab5b",
+    "bytes": 130,
+    "required": true,
+    "baselineSource": "mcdev-test-fixtures/src/main/resources/fixtures/fabric-loom-e2e/mixins.json"
+  },
+  {
+    "resource": "fixtures/fabric-loom-e2e/src/main/java/com/example/mixin/ExampleMixin.java",
+    "rustPath": "tests/fixtures/mixin_completion/project_files/fabric-loom-e2e/src/main/java/com/example/mixin/ExampleMixin.java",
+    "sha256": "0cdd1e8e9374feb89f3ecc2b307b76d2d77105d94da23d929ac217c8c83a7439",
+    "bytes": 503,
+    "required": true,
+    "baselineSource": "mcdev-test-fixtures/src/main/resources/fixtures/fabric-loom-e2e/src/main/java/com/example/mixin/ExampleMixin.java"
+  },
+  {
+    "resource": "fixtures/fabric-mixinextras/build.gradle",
+    "rustPath": "tests/fixtures/resources/primary/fabric-mixinextras/build.gradle",
+    "sha256": "e90c39ec484501e83a17f933a00a63c24e6ab811670329a45e5f1ff714a92b40",
+    "bytes": 500,
+    "required": true,
+    "baselineSource": "mcdev-test-fixtures/src/main/resources/fixtures/fabric-mixinextras/build.gradle"
+  },
+  {
+    "resource": "fixtures/fabric-mixinextras/fabric.mod.json",
+    "rustPath": "tests/fixtures/resources/primary/fabric-mixinextras/fabric.mod.json",
+    "sha256": "e5111afa49ca1b7893779e34a274c1e7f76780bd55347aa42ee4120d7d053ffd",
+    "bytes": 350,
+    "required": true,
+    "baselineSource": "mcdev-test-fixtures/src/main/resources/fixtures/fabric-mixinextras/fabric.mod.json"
+  },
+  {
+    "resource": "fixtures/fabric-mixinextras/mixins.json",
+    "rustPath": "tests/fixtures/resources/primary/fabric-mixinextras/mixins.json",
+    "sha256": "94980166663cfdaf1080fd61dcd8b263688cea81978cae9da26783d398319278",
+    "bytes": 205,
+    "required": true,
+    "baselineSource": "mcdev-test-fixtures/src/main/resources/fixtures/fabric-mixinextras/mixins.json"
+  },
+  {
+    "resource": "fixtures/fabric-mixinextras/src/main/java/com/example/mixin/MixinExtrasExample.java",
+    "rustPath": "tests/fixtures/resources/primary/fabric-mixinextras/src/main/java/com/example/mixin/MixinExtrasExample.java",
+    "sha256": "4bea6123fdae54c7268a0ee640875d4a10856313a1a60de5b0b6579c68b40a0a",
+    "bytes": 1097,
+    "required": true,
+    "baselineSource": "mcdev-test-fixtures/src/main/resources/fixtures/fabric-mixinextras/src/main/java/com/example/mixin/MixinExtrasExample.java"
+  },
+  {
+    "resource": "fixtures/forge-basic/build.gradle",
+    "rustPath": "tests/fixtures/resources/primary/forge-basic/build.gradle",
+    "sha256": "08a7eb6f48e2c4b110d70dbc49c3a6f2620c2ac9270929fa2bb815b9b6cd3acd",
+    "bytes": 216,
+    "required": true,
+    "baselineSource": "mcdev-test-fixtures/src/main/resources/fixtures/forge-basic/build.gradle"
+  },
+  {
+    "resource": "fixtures/forge-basic/mixins.json",
+    "rustPath": "tests/fixtures/resources/primary/forge-basic/mixins.json",
+    "sha256": "420b0404b8d0d7d949b57e9831915a58c686056f19a76d326560da02d12d49ef",
+    "bytes": 204,
+    "required": true,
+    "baselineSource": "mcdev-test-fixtures/src/main/resources/fixtures/forge-basic/mixins.json"
+  },
+  {
+    "resource": "fixtures/forge-basic/src/main/java/com/example/mixin/ForgeExampleMixin.java",
+    "rustPath": "tests/fixtures/resources/primary/forge-basic/src/main/java/com/example/mixin/ForgeExampleMixin.java",
+    "sha256": "4108319ba5bc35eb6f7becaccb937b9c527eab3f51936a3db0673e73fe3218c9",
+    "bytes": 508,
+    "required": true,
+    "baselineSource": "mcdev-test-fixtures/src/main/resources/fixtures/forge-basic/src/main/java/com/example/mixin/ForgeExampleMixin.java"
+  },
+  {
+    "resource": "fixtures/multi-source-set/build.gradle",
+    "rustPath": "tests/fixtures/mixin_completion/project_files/multi-source-set/build.gradle",
+    "sha256": "0b1221c977051b8d96330e7886c7c82f288e08286fa595c885647d193aeab3aa",
+    "bytes": 372,
+    "required": true,
+    "baselineSource": "mcdev-test-fixtures/src/main/resources/fixtures/multi-source-set/build.gradle"
+  },
+  {
+    "resource": "fixtures/multi-source-set/fabric.mod.json",
+    "rustPath": "tests/fixtures/mixin_completion/project_files/multi-source-set/fabric.mod.json",
+    "sha256": "144e3ceec65816e5b202de100b409a4fbcedef75682f1c0c9cf072c9234be17e",
+    "bytes": 329,
+    "required": true,
+    "baselineSource": "mcdev-test-fixtures/src/main/resources/fixtures/multi-source-set/fabric.mod.json"
+  },
+  {
+    "resource": "fixtures/multi-source-set/mixins.json",
+    "rustPath": "tests/fixtures/mixin_completion/project_files/multi-source-set/mixins.json",
+    "sha256": "dd095e1415a534b523ce2703de4b0ed6be5a7226e03e08586c74b1bdd53c21be",
+    "bytes": 233,
+    "required": true,
+    "baselineSource": "mcdev-test-fixtures/src/main/resources/fixtures/multi-source-set/mixins.json"
+  },
+  {
+    "resource": "fixtures/multi-source-set/src/client/java/com/example/mixin/ClientMixin.java",
+    "rustPath": "tests/fixtures/mixin_completion/project_files/multi-source-set/src/client/java/com/example/mixin/ClientMixin.java",
+    "sha256": "5db6029d2e5e14cd3ab988da46ecaa733d02fc75d2942e01c0a1d49bd75dfcf1",
+    "bytes": 176,
+    "required": true,
+    "baselineSource": "mcdev-test-fixtures/src/main/resources/fixtures/multi-source-set/src/client/java/com/example/mixin/ClientMixin.java"
+  },
+  {
+    "resource": "fixtures/multi-source-set/src/main/java/com/example/mixin/MainMixin.java",
+    "rustPath": "tests/fixtures/mixin_completion/project_files/multi-source-set/src/main/java/com/example/mixin/MainMixin.java",
+    "sha256": "af2eae927b72901b82ddea9f9e6971984f3754c10698c03c55c2cb60f2f711a6",
+    "bytes": 174,
+    "required": true,
+    "baselineSource": "mcdev-test-fixtures/src/main/resources/fixtures/multi-source-set/src/main/java/com/example/mixin/MainMixin.java"
+  },
+  {
+    "resource": "fixtures/multi-source-set/src/main/resources/mod.accesswidener",
+    "rustPath": "tests/fixtures/mixin_completion/project_files/multi-source-set/src/main/resources/mod.accesswidener",
+    "sha256": "843c7c79b2a92e8583c35f2b4ae3c16f2af59cc4616102086e79093881d29302",
+    "bytes": 151,
+    "required": true,
+    "baselineSource": "mcdev-test-fixtures/src/main/resources/fixtures/multi-source-set/src/main/resources/mod.accesswidener"
+  },
+  {
+    "resource": "fixtures/neoforge-basic/build.gradle",
+    "rustPath": "tests/fixtures/resources/primary/neoforge-basic/build.gradle",
+    "sha256": "322ad38f067d25eb6916d8813e58f23f1055b3335dbd572d3c097bc4db3d7289",
+    "bytes": 207,
+    "required": true,
+    "baselineSource": "mcdev-test-fixtures/src/main/resources/fixtures/neoforge-basic/build.gradle"
+  },
+  {
+    "resource": "fixtures/neoforge-basic/mixins.json",
+    "rustPath": "tests/fixtures/resources/primary/neoforge-basic/mixins.json",
+    "sha256": "c2fe6d63cf7969644647a0a1a2eab82d8463377a12f2f3bdba214ffc4f6479ff",
+    "bytes": 207,
+    "required": true,
+    "baselineSource": "mcdev-test-fixtures/src/main/resources/fixtures/neoforge-basic/mixins.json"
+  },
+  {
+    "resource": "fixtures/neoforge-basic/src/main/java/com/example/mixin/NeoForgeExampleMixin.java",
+    "rustPath": "tests/fixtures/resources/primary/neoforge-basic/src/main/java/com/example/mixin/NeoForgeExampleMixin.java",
+    "sha256": "742d56aaf03947522ae4363914936f1b018f4f33f7a116a89af81d1c41221fd0",
+    "bytes": 511,
+    "required": true,
+    "baselineSource": "mcdev-test-fixtures/src/main/resources/fixtures/neoforge-basic/src/main/java/com/example/mixin/NeoForgeExampleMixin.java"
+  },
+  {
+    "resource": "fixtures/shared/classes/com/example/target/SimpleTarget.class",
+    "rustPath": "tests/fixtures/mixin_completion/project_files/SimpleTarget.class.bin",
+    "sha256": "4e3b9137c518f0449e9360875173d9dd516e48c58d0005a3a57c9ed5818a47f7",
+    "bytes": 837,
+    "required": true,
+    "baselineSource": "mcdev-test-fixtures/build/generated/fixture-classes/com/example/target/SimpleTarget.class"
+  }
+]

@@ -1,0 +1,1972 @@
+[
+  {
+    "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixinextras/ConstantAtArgsParserTest.kt::acceptsFloatAndDoubleFormsSupportedByRawKotlinParsing",
+    "status": "passed",
+    "calls": 6
+  },
+  {
+    "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixinextras/ConstantAtArgsParserTest.kt::allowsNullValueFalseWhenAnotherDiscriminatorIsValid",
+    "status": "passed",
+    "calls": 1
+  },
+  {
+    "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixinextras/ConstantAtArgsParserTest.kt::allowsRepeatedSameDiscriminator",
+    "status": "passed",
+    "calls": 1
+  },
+  {
+    "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixinextras/ConstantAtArgsParserTest.kt::duplicateKeysKeepLastValue",
+    "status": "passed",
+    "calls": 3
+  },
+  {
+    "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixinextras/ConstantAtArgsParserTest.kt::ignoresBareUnknownKeysWithoutEquals",
+    "status": "passed",
+    "calls": 2
+  },
+  {
+    "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixinextras/ConstantAtArgsParserTest.kt::ignoresUnknownNonDiscriminatorKeys",
+    "status": "passed",
+    "calls": 1
+  },
+  {
+    "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixinextras/ConstantAtArgsParserTest.kt::parsesClassValueDiscriminator",
+    "status": "passed",
+    "calls": 1
+  },
+  {
+    "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixinextras/ConstantAtArgsParserTest.kt::parsesClassValueVoidDiscriminator",
+    "status": "passed",
+    "calls": 1
+  },
+  {
+    "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixinextras/ConstantAtArgsParserTest.kt::parsesDoubleValueDiscriminator",
+    "status": "passed",
+    "calls": 4
+  },
+  {
+    "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixinextras/ConstantAtArgsParserTest.kt::parsesExplicitNullValueDiscriminator",
+    "status": "passed",
+    "calls": 2
+  },
+  {
+    "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixinextras/ConstantAtArgsParserTest.kt::parsesFloatValueDiscriminator",
+    "status": "passed",
+    "calls": 4
+  },
+  {
+    "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixinextras/ConstantAtArgsParserTest.kt::parsesIntValueDiscriminator",
+    "status": "passed",
+    "calls": 2
+  },
+  {
+    "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixinextras/ConstantAtArgsParserTest.kt::parsesLongValueDiscriminator",
+    "status": "passed",
+    "calls": 2
+  },
+  {
+    "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixinextras/ConstantAtArgsParserTest.kt::parsesStringValueDiscriminatorIncludingEmpty",
+    "status": "passed",
+    "calls": 2
+  },
+  {
+    "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixinextras/ConstantAtArgsParserTest.kt::rejectsBlankClassValue",
+    "status": "passed",
+    "calls": 2
+  },
+  {
+    "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixinextras/ConstantAtArgsParserTest.kt::rejectsConflictingDistinctDiscriminators",
+    "status": "passed",
+    "calls": 2
+  },
+  {
+    "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixinextras/ConstantAtArgsParserTest.kt::rejectsEntryWithoutEqualsWhenNoValidDiscriminatorRemains",
+    "status": "passed",
+    "calls": 1
+  },
+  {
+    "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixinextras/ConstantAtArgsParserTest.kt::rejectsIntAndLongWhitespaceAndSuffixForms",
+    "status": "passed",
+    "calls": 8
+  },
+  {
+    "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixinextras/ConstantAtArgsParserTest.kt::rejectsMalformedNumericValues",
+    "status": "passed",
+    "calls": 4
+  },
+  {
+    "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixinextras/ConstantAtArgsParserTest.kt::rejectsMissingDiscriminator",
+    "status": "passed",
+    "calls": 2
+  },
+  {
+    "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixinextras/ConstantAtArgsParserTest.kt::rejectsNullValueFalseWithoutAnotherDiscriminator",
+    "status": "passed",
+    "calls": 1
+  },
+  {
+    "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixinextras/ConstantAtArgsParserTest.kt::treatsInvalidNullValueLiteralAsFalseWithoutDiscriminator",
+    "status": "passed",
+    "calls": 1
+  },
+  {
+    "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixinextras/InjectionPointOccurrenceResolverTest.kt::afterShiftMovesOccurrenceIndexForward",
+    "status": "passed",
+    "calls": 1
+  },
+  {
+    "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixinextras/InjectionPointOccurrenceResolverTest.kt::atOrdinalSelectsBeforeAtSpecifier",
+    "status": "passed",
+    "calls": 7
+  },
+  {
+    "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixinextras/InjectionPointOccurrenceResolverTest.kt::atSpecifierOneRequiresExactlyOneBaseMatchAndMalformedFailsClosed",
+    "status": "passed",
+    "calls": 6
+  },
+  {
+    "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixinextras/InjectionPointOccurrenceResolverTest.kt::broadSelectorFailsClosed",
+    "status": "passed",
+    "calls": 1
+  },
+  {
+    "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixinextras/InjectionPointOccurrenceResolverTest.kt::byShiftAppliesOffset",
+    "status": "passed",
+    "calls": 1
+  },
+  {
+    "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixinextras/InjectionPointOccurrenceResolverTest.kt::constantMatchesExactValueOnly",
+    "status": "passed",
+    "calls": 6
+  },
+  {
+    "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixinextras/InjectionPointOccurrenceResolverTest.kt::constantOrdinalSelectsAfterHandlerTypeFilter",
+    "status": "passed",
+    "calls": 1
+  },
+  {
+    "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixinextras/InjectionPointOccurrenceResolverTest.kt::deduplicatesAndSortsThroughSetSemantics",
+    "status": "passed",
+    "calls": 1
+  },
+  {
+    "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixinextras/InjectionPointOccurrenceResolverTest.kt::emptyConstantArgsFilterByHandlerReturnType",
+    "status": "passed",
+    "calls": 3
+  },
+  {
+    "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixinextras/InjectionPointOccurrenceResolverTest.kt::emptyConstantArgsFilterNullByObjectHandlerReturnTypeOnly",
+    "status": "passed",
+    "calls": 3
+  },
+  {
+    "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixinextras/InjectionPointOccurrenceResolverTest.kt::expandZeroConditionsFilterLiteralAndConditionCandidates",
+    "status": "passed",
+    "calls": 12
+  },
+  {
+    "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixinextras/InjectionPointOccurrenceResolverTest.kt::explicitVoidClassSelectorMatchesNoConstants",
+    "status": "passed",
+    "calls": 1
+  },
+  {
+    "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixinextras/InjectionPointOccurrenceResolverTest.kt::expressionUsesSuppliedIndices",
+    "status": "passed",
+    "calls": 2
+  },
+  {
+    "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixinextras/InjectionPointOccurrenceResolverTest.kt::headResolvesToFirstInstructionIndex",
+    "status": "passed",
+    "calls": 1
+  },
+  {
+    "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixinextras/InjectionPointOccurrenceResolverTest.kt::invokeResolvesExactTargetOnly",
+    "status": "passed",
+    "calls": 3
+  },
+  {
+    "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixinextras/InjectionPointOccurrenceResolverTest.kt::malformedConstantArgsFailClosed",
+    "status": "passed",
+    "calls": 4
+  },
+  {
+    "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixinextras/InjectionPointOccurrenceResolverTest.kt::negativeShiftedIndexFailsClosed",
+    "status": "passed",
+    "calls": 2
+  },
+  {
+    "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixinextras/InjectionPointOccurrenceResolverTest.kt::ordinalSelectsAfterExactTargetFilter",
+    "status": "passed",
+    "calls": 3
+  },
+  {
+    "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixinextras/InjectionPointOccurrenceResolverTest.kt::ordinalWithNegativeInstructionOccurrenceIndexFailsClosed",
+    "status": "passed",
+    "calls": 1
+  },
+  {
+    "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixinextras/InjectionPointOccurrenceResolverTest.kt::returnResolvesReturnOccurrenceIndices",
+    "status": "passed",
+    "calls": 1
+  },
+  {
+    "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixinextras/InjectionPointOccurrenceResolverTest.kt::shiftedHeadAppliesShift",
+    "status": "passed",
+    "calls": 2
+  },
+  {
+    "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixinextras/InjectionPointOccurrenceResolverTest.kt::tailSelectsFinalReturnFromMultipleReturns",
+    "status": "passed",
+    "calls": 2
+  },
+  {
+    "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixinextras/InjectionPointOccurrenceResolverTest.kt::tailWithMissingOrInvalidReturnDataFailsClosed",
+    "status": "passed",
+    "calls": 2
+  },
+  {
+    "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixinextras/InjectionPointOccurrenceResolverTest.kt::unresolvedShiftFailsClosed",
+    "status": "passed",
+    "calls": 1
+  },
+  {
+    "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixinextras/InjectionPointOccurrenceResolverTest.kt::unsupportedAtValueReturnsNull",
+    "status": "passed",
+    "calls": 1
+  },
+  {
+    "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixinextras/OperationCallValidatorTest.kt::acceptsComparisonOperandsSplitByTopLevelCommaWhenArityIsTwo",
+    "status": "passed",
+    "calls": 16
+  },
+  {
+    "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixinextras/OperationCallValidatorTest.kt::acceptsCorrectArgumentOrderAtSameArity",
+    "status": "passed",
+    "calls": 16
+  },
+  {
+    "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixinextras/OperationCallValidatorTest.kt::acceptsPrimitiveAndCorrespondingBoxedWrapperAtSameArity",
+    "status": "passed",
+    "calls": 17
+  },
+  {
+    "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixinextras/OperationCallValidatorTest.kt::acceptsValidWrapMethodCallArity",
+    "status": "passed",
+    "calls": 12
+  },
+  {
+    "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixinextras/OperationCallValidatorTest.kt::acceptsValidWrapOperationCallArity",
+    "status": "passed",
+    "calls": 14
+  },
+  {
+    "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixinextras/OperationCallValidatorTest.kt::acceptsWrapMethodCallWithReceiverExtraHandlerParameter",
+    "status": "passed",
+    "calls": 13
+  },
+  {
+    "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixinextras/OperationCallValidatorTest.kt::countsBalancedComparisonChainAsSingleArgument",
+    "status": "passed",
+    "calls": 16
+  },
+  {
+    "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixinextras/OperationCallValidatorTest.kt::countsChainedComparisonWithoutSpacesAsSingleArgument",
+    "status": "passed",
+    "calls": 16
+  },
+  {
+    "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixinextras/OperationCallValidatorTest.kt::countsComparisonGreaterThanAsSingleArgument",
+    "status": "passed",
+    "calls": 16
+  },
+  {
+    "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixinextras/OperationCallValidatorTest.kt::countsComparisonLessThanAsSingleArgument",
+    "status": "passed",
+    "calls": 16
+  },
+  {
+    "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixinextras/OperationCallValidatorTest.kt::crlfDiagnosticRangeMatchesActualSourceIndex",
+    "status": "passed",
+    "calls": 14
+  },
+  {
+    "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixinextras/OperationCallValidatorTest.kt::crlfTwoHandlersDoNotCrossCapture",
+    "status": "passed",
+    "calls": 27
+  },
+  {
+    "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixinextras/OperationCallValidatorTest.kt::excludesTrailingCaptureAndLocalFromExpectedCallArgs",
+    "status": "passed",
+    "calls": 32
+  },
+  {
+    "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixinextras/OperationCallValidatorTest.kt::expectedCallArgNamesUseHandlerParameterNamesNotSpecPlaceholders",
+    "status": "passed",
+    "calls": 25
+  },
+  {
+    "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixinextras/OperationCallValidatorTest.kt::handlesNestedCommasInsideCallArguments",
+    "status": "passed",
+    "calls": 32
+  },
+  {
+    "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixinextras/OperationCallValidatorTest.kt::ignoresCallsWhenAbstractHandlerHasNoBody",
+    "status": "passed",
+    "calls": 14
+  },
+  {
+    "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixinextras/OperationCallValidatorTest.kt::ignoresCommasInsideBlockCommentsWhenCountingCallArguments",
+    "status": "passed",
+    "calls": 14
+  },
+  {
+    "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixinextras/OperationCallValidatorTest.kt::ignoresCommasInsideLineCommentsWhenCountingCallArguments",
+    "status": "passed",
+    "calls": 14
+  },
+  {
+    "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixinextras/OperationCallValidatorTest.kt::ignoresOperationCallsInsideCommentsAndStrings",
+    "status": "passed",
+    "calls": 14
+  },
+  {
+    "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixinextras/OperationCallValidatorTest.kt::ignoresQualifiedOperationCallReceivers",
+    "status": "passed",
+    "calls": 14
+  },
+  {
+    "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixinextras/OperationCallValidatorTest.kt::ignoresSameArityCallWhenHandlerParameterDescriptorIsNull",
+    "status": "passed",
+    "calls": 16
+  },
+  {
+    "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixinextras/OperationCallValidatorTest.kt::ignoresUnknownCallArgumentExpressionsAtSameArity",
+    "status": "passed",
+    "calls": 16
+  },
+  {
+    "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixinextras/OperationCallValidatorTest.kt::preservesExplicitGenericMethodInvocationCommas",
+    "status": "passed",
+    "calls": 14
+  },
+  {
+    "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixinextras/OperationCallValidatorTest.kt::preservesGenericCastCommas",
+    "status": "passed",
+    "calls": 14
+  },
+  {
+    "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixinextras/OperationCallValidatorTest.kt::preservesGenericTypeCommasInNewExpressionArguments",
+    "status": "passed",
+    "calls": 16
+  },
+  {
+    "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixinextras/OperationCallValidatorTest.kt::preservesNestedGenericTypeCommas",
+    "status": "passed",
+    "calls": 16
+  },
+  {
+    "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixinextras/OperationCallValidatorTest.kt::reportsEachWrongCallIndependently",
+    "status": "passed",
+    "calls": 14
+  },
+  {
+    "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixinextras/OperationCallValidatorTest.kt::reportsIncompatiblePrimitiveFamiliesAtSameArity",
+    "status": "passed",
+    "calls": 17
+  },
+  {
+    "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixinextras/OperationCallValidatorTest.kt::reportsWrongArgumentTypesAtSameArityWhenHandlerParametersAreSwapped",
+    "status": "passed",
+    "calls": 16
+  },
+  {
+    "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixinextras/OperationCallValidatorTest.kt::reportsWrongArityWhenComparisonChainHidesTopLevelComma",
+    "status": "passed",
+    "calls": 14
+  },
+  {
+    "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixinextras/OperationCallValidatorTest.kt::reportsWrongArityWhenComparisonCommaIsHiddenByGenericHeuristic",
+    "status": "passed",
+    "calls": 14
+  },
+  {
+    "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixinextras/OperationCallValidatorTest.kt::reportsWrongWrapOperationCallArity",
+    "status": "passed",
+    "calls": 14
+  },
+  {
+    "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixinextras/OperationCallValidatorTest.kt::returnsEmptyForNonWrapAnnotation",
+    "status": "passed",
+    "calls": 15
+  },
+  {
+    "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixinextras/OperationCallValidatorTest.kt::returnsEmptyWhenCallArgParameterNameIsBlank",
+    "status": "passed",
+    "calls": 14
+  },
+  {
+    "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixinextras/OperationCallValidatorTest.kt::returnsEmptyWhenCallArgParameterNameIsInvalid",
+    "status": "passed",
+    "calls": 14
+  },
+  {
+    "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixinextras/OperationCallValidatorTest.kt::returnsEmptyWhenExpectedSignatureIsUnavailable",
+    "status": "passed",
+    "calls": 8
+  },
+  {
+    "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixinextras/OperationCallValidatorTest.kt::returnsEmptyWhenHandlerHasExtraRequiredParameterBeforeOperation",
+    "status": "passed",
+    "calls": 15
+  },
+  {
+    "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixinextras/OperationCallValidatorTest.kt::returnsEmptyWhenHandlerHasMultipleOperationParameters",
+    "status": "passed",
+    "calls": 14
+  },
+  {
+    "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixinextras/OperationCallValidatorTest.kt::returnsEmptyWhenHandlerHasNoOperationParameter",
+    "status": "passed",
+    "calls": 11
+  },
+  {
+    "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixinextras/OperationCallValidatorTest.kt::returnsEmptyWhenLayoutIsUnresolved",
+    "status": "passed",
+    "calls": 14
+  },
+  {
+    "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixinextras/OperationCallValidatorTest.kt::returnsEmptyWhenSugarInterleavesRequiredParametersForWrapMethod",
+    "status": "passed",
+    "calls": 17
+  },
+  {
+    "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixinextras/OperationCallValidatorTest.kt::returnsEmptyWhenSugarInterleavesRequiredParametersForWrapOperation",
+    "status": "passed",
+    "calls": 23
+  },
+  {
+    "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixinextras/OperationCallValidatorTest.kt::treatsCommentLikeTextInsideStringAndCharLiteralsAsLiteral",
+    "status": "passed",
+    "calls": 28
+  },
+  {
+    "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixinextras/OperationCallValidatorTest.kt::validatesDespiteWrongReturnTypeWhenLayoutIsUnambiguous",
+    "status": "passed",
+    "calls": 14
+  },
+  {
+    "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixinextras/HandlerSignatureServiceTest.kt::ambiguousFieldOperationKindsReturnNull",
+    "status": "passed",
+    "calls": 3
+  },
+  {
+    "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixinextras/HandlerSignatureServiceTest.kt::ambiguousTargetMethodWithoutDescriptorReportsExplicitDescriptorRequired",
+    "status": "passed",
+    "calls": 7
+  },
+  {
+    "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixinextras/HandlerSignatureServiceTest.kt::ambiguousTargetMethodWithoutDescriptorReturnsNullSpecAndStub",
+    "status": "passed",
+    "calls": 5
+  },
+  {
+    "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixinextras/HandlerSignatureServiceTest.kt::cancellableParameterOnNonVoidTargetWithCallbackInfoReturnableProducesNoDiagnostic",
+    "status": "passed",
+    "calls": 15
+  },
+  {
+    "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixinextras/HandlerSignatureServiceTest.kt::cancellableParameterOnNonVoidTargetWithWrongTypeProducesHandlerSignatureMismatchOnAnnotation",
+    "status": "passed",
+    "calls": 14
+  },
+  {
+    "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixinextras/HandlerSignatureServiceTest.kt::cancellableParameterOnVoidTargetWithCallbackInfoProducesNoDiagnostic",
+    "status": "passed",
+    "calls": 20
+  },
+  {
+    "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixinextras/HandlerSignatureServiceTest.kt::cancellableParameterOnVoidTargetWithWrongTypeProducesHandlerSignatureMismatchOnAnnotation",
+    "status": "passed",
+    "calls": 19
+  },
+  {
+    "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixinextras/HandlerSignatureServiceTest.kt::detectsMissingOperationParameter",
+    "status": "passed",
+    "calls": 16
+  },
+  {
+    "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixinextras/HandlerSignatureServiceTest.kt::detectsOperationNotLastParameter",
+    "status": "passed",
+    "calls": 17
+  },
+  {
+    "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixinextras/HandlerSignatureServiceTest.kt::detectsWrongOriginalValueTypeForModifyExpressionValue",
+    "status": "passed",
+    "calls": 18
+  },
+  {
+    "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixinextras/HandlerSignatureServiceTest.kt::detectsWrongOriginalValueTypeForModifyExpressionValueInvoke",
+    "status": "passed",
+    "calls": 17
+  },
+  {
+    "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixinextras/HandlerSignatureServiceTest.kt::detectsWrongReturnType",
+    "status": "passed",
+    "calls": 17
+  },
+  {
+    "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixinextras/HandlerSignatureServiceTest.kt::duplicateFieldOperationKindWithDistinctOrdinalsIsAccepted",
+    "status": "passed",
+    "calls": 10
+  },
+  {
+    "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixinextras/HandlerSignatureServiceTest.kt::explicitDescriptorResolvesEachExactOverload",
+    "status": "passed",
+    "calls": 4
+  },
+  {
+    "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixinextras/HandlerSignatureServiceTest.kt::explicitFieldOrdinalWithUnknownOperationKindForAnyMixinOwnerReturnsNullSignatureAndStub",
+    "status": "passed",
+    "calls": 5
+  },
+  {
+    "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixinextras/HandlerSignatureServiceTest.kt::fieldCandidateMissingOperationKindReturnsNull",
+    "status": "passed",
+    "calls": 3
+  },
+  {
+    "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixinextras/HandlerSignatureServiceTest.kt::fieldTargetsWithoutBytecodeIndexReturnNull",
+    "status": "passed",
+    "calls": 3
+  },
+  {
+    "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixinextras/HandlerSignatureServiceTest.kt::findAnnotationSitesDefaultsAtShiftToBefore",
+    "status": "passed",
+    "calls": 2
+  },
+  {
+    "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixinextras/HandlerSignatureServiceTest.kt::findAnnotationSitesExpandsAtArrayInSourceOrder",
+    "status": "passed",
+    "calls": 2
+  },
+  {
+    "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixinextras/HandlerSignatureServiceTest.kt::findAnnotationSitesExtractsConstantAtArgsFromArrayInLexicalOrder",
+    "status": "passed",
+    "calls": 2
+  },
+  {
+    "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixinextras/HandlerSignatureServiceTest.kt::findAnnotationSitesExtractsConstantAtArgsFromSingleString",
+    "status": "passed",
+    "calls": 2
+  },
+  {
+    "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixinextras/HandlerSignatureServiceTest.kt::findAnnotationSitesExtractsConstantShorthandWithArgsArrayAndId",
+    "status": "passed",
+    "calls": 2
+  },
+  {
+    "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixinextras/HandlerSignatureServiceTest.kt::findAnnotationSitesExtractsConstantShorthandWithSingleArgs",
+    "status": "passed",
+    "calls": 2
+  },
+  {
+    "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixinextras/HandlerSignatureServiceTest.kt::findAnnotationSitesExtractsInvokeShorthandWithTargetAfterShorthandValue",
+    "status": "passed",
+    "calls": 2
+  },
+  {
+    "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixinextras/HandlerSignatureServiceTest.kt::findAnnotationSitesExtractsPlainShorthandAtValueWithoutExtraAttributes",
+    "status": "passed",
+    "calls": 2
+  },
+  {
+    "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixinextras/HandlerSignatureServiceTest.kt::findAnnotationSitesIgnoresByOnBeforeAndAfter",
+    "status": "passed",
+    "calls": 4
+  },
+  {
+    "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixinextras/HandlerSignatureServiceTest.kt::findAnnotationSitesIgnoresInjectorAnnotationsInCommentsStringsAndChars",
+    "status": "passed",
+    "calls": 2
+  },
+  {
+    "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixinextras/HandlerSignatureServiceTest.kt::findAnnotationSitesIgnoresMalformedAtOrdinalWithoutCorruptingLaterAttributes",
+    "status": "passed",
+    "calls": 10
+  },
+  {
+    "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixinextras/HandlerSignatureServiceTest.kt::findAnnotationSitesIgnoresNonCodeAtTextInsideAtArray",
+    "status": "passed",
+    "calls": 2
+  },
+  {
+    "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixinextras/HandlerSignatureServiceTest.kt::findAnnotationSitesIgnoresStringAndCommentFakeAtBeforeRealAt",
+    "status": "passed",
+    "calls": 2
+  },
+  {
+    "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixinextras/HandlerSignatureServiceTest.kt::findAnnotationSitesIgnoresUnrelatedNestedStringsWhenExtractingAtArgs",
+    "status": "passed",
+    "calls": 2
+  },
+  {
+    "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixinextras/HandlerSignatureServiceTest.kt::findAnnotationSitesKeepsAtTargetReservedForTargetOnly",
+    "status": "passed",
+    "calls": 2
+  },
+  {
+    "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixinextras/HandlerSignatureServiceTest.kt::findAnnotationSitesKeepsOrdinalLikeArgsTextInAtArgsOnly",
+    "status": "passed",
+    "calls": 2
+  },
+  {
+    "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixinextras/HandlerSignatureServiceTest.kt::findAnnotationSitesMarksMalformedAtByWhenShiftIsByAsUnresolved",
+    "status": "passed",
+    "calls": 2
+  },
+  {
+    "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixinextras/HandlerSignatureServiceTest.kt::findAnnotationSitesMarksMalformedAtShiftAsUnresolved",
+    "status": "passed",
+    "calls": 2
+  },
+  {
+    "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixinextras/HandlerSignatureServiceTest.kt::findAnnotationSitesParsesAtIdFromExpressionSelector",
+    "status": "passed",
+    "calls": 2
+  },
+  {
+    "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixinextras/HandlerSignatureServiceTest.kt::findAnnotationSitesParsesAtOrdinalZeroAndPositive",
+    "status": "passed",
+    "calls": 4
+  },
+  {
+    "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixinextras/HandlerSignatureServiceTest.kt::findAnnotationSitesParsesAtShiftAfter",
+    "status": "passed",
+    "calls": 2
+  },
+  {
+    "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixinextras/HandlerSignatureServiceTest.kt::findAnnotationSitesParsesAtShiftByDefaultZeroWhenByOmitted",
+    "status": "passed",
+    "calls": 2
+  },
+  {
+    "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixinextras/HandlerSignatureServiceTest.kt::findAnnotationSitesParsesAtShiftByWithPositiveAndNegativeOffset",
+    "status": "passed",
+    "calls": 4
+  },
+  {
+    "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixinextras/HandlerSignatureServiceTest.kt::findAnnotationSitesParsesAtShiftWithReorderedAttributesAndWhitespace",
+    "status": "passed",
+    "calls": 2
+  },
+  {
+    "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixinextras/HandlerSignatureServiceTest.kt::findAnnotationSitesParsesMultipleAnnotations",
+    "status": "passed",
+    "calls": 3
+  },
+  {
+    "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixinextras/HandlerSignatureServiceTest.kt::findAnnotationSitesResolvesInjectorAnnotationsByExactIdentity",
+    "status": "passed",
+    "calls": 8
+  },
+  {
+    "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixinextras/HandlerSignatureServiceTest.kt::findAnnotationSitesResolvesNestedAtByExactIdentity",
+    "status": "passed",
+    "calls": 10
+  },
+  {
+    "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixinextras/HandlerSignatureServiceTest.kt::findAnnotationSitesReturnsNullAtIdWhenAtSelectorHasNoId",
+    "status": "passed",
+    "calls": 2
+  },
+  {
+    "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixinextras/HandlerSignatureServiceTest.kt::findAnnotationSitesSkipsCommentsAndNormalMethodModifiersBeforeHandler",
+    "status": "passed",
+    "calls": 2
+  },
+  {
+    "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixinextras/HandlerSignatureServiceTest.kt::findAnnotationSitesTreatsMissingAndNegativeOneAtOrdinalAsNull",
+    "status": "passed",
+    "calls": 4
+  },
+  {
+    "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixinextras/HandlerSignatureServiceTest.kt::findAnnotationSitesUsesTopLevelAtWhenSlicePrecedesIt",
+    "status": "passed",
+    "calls": 2
+  },
+  {
+    "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixinextras/HandlerSignatureServiceTest.kt::findSugarHandlerAnnotationSitesEmitsBothMethodSelectorsInLexicalOrderForInjectMethodArray",
+    "status": "passed",
+    "calls": 2
+  },
+  {
+    "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixinextras/HandlerSignatureServiceTest.kt::findSugarHandlerAnnotationSitesIncludesStandardInjectors",
+    "status": "passed",
+    "calls": 5
+  },
+  {
+    "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixinextras/HandlerSignatureServiceTest.kt::findSugarHandlerAnnotationSitesParsesInjectHandlerLocalParameter",
+    "status": "passed",
+    "calls": 2
+  },
+  {
+    "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixinextras/HandlerSignatureServiceTest.kt::findSugarHandlerAnnotationSitesParsesModifyConstantConstantSelectors",
+    "status": "passed",
+    "calls": 84
+  },
+  {
+    "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixinextras/HandlerSignatureServiceTest.kt::generatesModifyExpressionValueFieldGetHandlerStub",
+    "status": "passed",
+    "calls": 10
+  },
+  {
+    "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixinextras/HandlerSignatureServiceTest.kt::generatesModifyExpressionValueHandlerStub",
+    "status": "passed",
+    "calls": 11
+  },
+  {
+    "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixinextras/HandlerSignatureServiceTest.kt::generatesModifyExpressionValueHandlerStubStaysMinimalWithTargetParameters",
+    "status": "passed",
+    "calls": 11
+  },
+  {
+    "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixinextras/HandlerSignatureServiceTest.kt::generatesModifyExpressionValueInvokeHandlerStub",
+    "status": "passed",
+    "calls": 10
+  },
+  {
+    "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixinextras/HandlerSignatureServiceTest.kt::generatesModifyExpressionValueNewHandlerStub",
+    "status": "passed",
+    "calls": 10
+  },
+  {
+    "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixinextras/HandlerSignatureServiceTest.kt::generatesModifyReceiverGetFieldHandlerStubStaysMinimalWithTargetParameters",
+    "status": "passed",
+    "calls": 9
+  },
+  {
+    "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixinextras/HandlerSignatureServiceTest.kt::generatesModifyReceiverInvokeHandlerStubStaysMinimalWithTargetParameters",
+    "status": "passed",
+    "calls": 9
+  },
+  {
+    "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixinextras/HandlerSignatureServiceTest.kt::generatesModifyReceiverPutFieldHandlerStubStaysMinimalWithTargetParameters",
+    "status": "passed",
+    "calls": 10
+  },
+  {
+    "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixinextras/HandlerSignatureServiceTest.kt::generatesModifyReturnValueHandlerStub",
+    "status": "passed",
+    "calls": 6
+  },
+  {
+    "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixinextras/HandlerSignatureServiceTest.kt::generatesModifyReturnValueHandlerStubStaysMinimalWithTargetParameters",
+    "status": "passed",
+    "calls": 10
+  },
+  {
+    "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixinextras/HandlerSignatureServiceTest.kt::generatesWrapMethodHandlerStub",
+    "status": "passed",
+    "calls": 6
+  },
+  {
+    "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixinextras/HandlerSignatureServiceTest.kt::generatesWrapOperationConstantSelectorHandlerStubStaysMinimal",
+    "status": "passed",
+    "calls": 10
+  },
+  {
+    "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixinextras/HandlerSignatureServiceTest.kt::generatesWrapOperationHandlerStub",
+    "status": "passed",
+    "calls": 10
+  },
+  {
+    "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixinextras/HandlerSignatureServiceTest.kt::generatesWrapOperationHandlerStubStaysMinimalWithTargetParameters",
+    "status": "passed",
+    "calls": 10
+  },
+  {
+    "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixinextras/HandlerSignatureServiceTest.kt::generatesWrapOperationNewHandlerStub",
+    "status": "passed",
+    "calls": 7
+  },
+  {
+    "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixinextras/HandlerSignatureServiceTest.kt::generatesWrapWithConditionHandlerStub",
+    "status": "passed",
+    "calls": 9
+  },
+  {
+    "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixinextras/HandlerSignatureServiceTest.kt::generatesWrapWithConditionPutFieldHandlerStubStaysMinimalWithTargetParameters",
+    "status": "passed",
+    "calls": 10
+  },
+  {
+    "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixinextras/HandlerSignatureServiceTest.kt::identicalDescriptorAcrossMultipleMixinTargetsIsAcceptedWithoutExplicitDescriptor",
+    "status": "passed",
+    "calls": 6
+  },
+  {
+    "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixinextras/HandlerSignatureServiceTest.kt::mixinExtrasAnnotationMapsFromSimpleName",
+    "status": "passed",
+    "calls": 0
+  },
+  {
+    "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixinextras/HandlerSignatureServiceTest.kt::modifyConstantExpandZeroConditionsParsesAndInfersInt",
+    "status": "passed",
+    "calls": 26
+  },
+  {
+    "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixinextras/HandlerSignatureServiceTest.kt::modifyExpressionValueAcceptsOneConsistentIntLikeHandlerType",
+    "status": "passed",
+    "calls": 19
+  },
+  {
+    "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixinextras/HandlerSignatureServiceTest.kt::modifyExpressionValueConstantInfersHandlerTypeFromAtArgs",
+    "status": "passed",
+    "calls": 171
+  },
+  {
+    "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixinextras/HandlerSignatureServiceTest.kt::modifyExpressionValueConstantRejectsUnresolvedAtArgsForSignatureAndStub",
+    "status": "passed",
+    "calls": 54
+  },
+  {
+    "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixinextras/HandlerSignatureServiceTest.kt::modifyExpressionValueConstantValidatesHandlerForEachDiscriminator",
+    "status": "passed",
+    "calls": 95
+  },
+  {
+    "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixinextras/HandlerSignatureServiceTest.kt::modifyExpressionValueExpectsOriginalFloatParameter",
+    "status": "passed",
+    "calls": 10
+  },
+  {
+    "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixinextras/HandlerSignatureServiceTest.kt::modifyExpressionValueExposesOptionalCapturedTargetParameters",
+    "status": "passed",
+    "calls": 10
+  },
+  {
+    "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixinextras/HandlerSignatureServiceTest.kt::modifyExpressionValueExpressionSelectorFailsClosedOnOfficialConflict",
+    "status": "passed",
+    "calls": 5
+  },
+  {
+    "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixinextras/HandlerSignatureServiceTest.kt::modifyExpressionValueExpressionSelectorFailsClosedOnOfficialNoMatch",
+    "status": "passed",
+    "calls": 5
+  },
+  {
+    "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixinextras/HandlerSignatureServiceTest.kt::modifyExpressionValueExpressionSelectorFailsClosedOnUnsupportedHandwrittenWithResolvedContext",
+    "status": "passed",
+    "calls": 5
+  },
+  {
+    "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixinextras/HandlerSignatureServiceTest.kt::modifyExpressionValueExpressionSelectorFailsClosedWithoutBytecodeIndex",
+    "status": "passed",
+    "calls": 5
+  },
+  {
+    "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixinextras/HandlerSignatureServiceTest.kt::modifyExpressionValueExpressionSelectorUsesSupportedHandwrittenIntFallback",
+    "status": "passed",
+    "calls": 15
+  },
+  {
+    "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixinextras/HandlerSignatureServiceTest.kt::modifyExpressionValueFieldTargetRejectsPutBlankMalformedMissingBytecodeUnmatchedAndAmbiguous",
+    "status": "passed",
+    "calls": 49
+  },
+  {
+    "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixinextras/HandlerSignatureServiceTest.kt::modifyExpressionValueGetFieldInfersExactFieldDescriptor",
+    "status": "passed",
+    "calls": 9
+  },
+  {
+    "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixinextras/HandlerSignatureServiceTest.kt::modifyExpressionValueGetStaticFieldInfersExactFieldDescriptor",
+    "status": "passed",
+    "calls": 9
+  },
+  {
+    "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixinextras/HandlerSignatureServiceTest.kt::modifyExpressionValueInvokeTargetInfersReturnTypeFromExactMethodTarget",
+    "status": "passed",
+    "calls": 27
+  },
+  {
+    "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixinextras/HandlerSignatureServiceTest.kt::modifyExpressionValueInvokeTargetRejectsVoidMalformedMissingAndFieldTargets",
+    "status": "passed",
+    "calls": 28
+  },
+  {
+    "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixinextras/HandlerSignatureServiceTest.kt::modifyExpressionValueKeepsExactIntArithmeticStrict",
+    "status": "passed",
+    "calls": 20
+  },
+  {
+    "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixinextras/HandlerSignatureServiceTest.kt::modifyExpressionValueNewInfersUniqueOwnerWhenTargetOmitted",
+    "status": "passed",
+    "calls": 9
+  },
+  {
+    "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixinextras/HandlerSignatureServiceTest.kt::modifyExpressionValueNewSameOwnerDuplicatesRemainUnambiguous",
+    "status": "passed",
+    "calls": 9
+  },
+  {
+    "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixinextras/HandlerSignatureServiceTest.kt::modifyExpressionValueNewTargetInfersAllocatedTypeFromExplicitClassAndConstructor",
+    "status": "passed",
+    "calls": 27
+  },
+  {
+    "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixinextras/HandlerSignatureServiceTest.kt::modifyExpressionValueNewTargetRejectsInvalidOwnersWildcardsAndEmptyBytecodeOwner",
+    "status": "passed",
+    "calls": 46
+  },
+  {
+    "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixinextras/HandlerSignatureServiceTest.kt::modifyExpressionValueNewTargetRejectsMalformedFieldInvokeConstructorNonVoidArrayMissingIndexAndAmbiguous",
+    "status": "passed",
+    "calls": 56
+  },
+  {
+    "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixinextras/HandlerSignatureServiceTest.kt::modifyExpressionValueRejectsMixedIntLikeHandlerTypes",
+    "status": "passed",
+    "calls": 14
+  },
+  {
+    "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixinextras/HandlerSignatureServiceTest.kt::modifyExpressionValueRejectsUnsupportedAtValuesWithoutFakeSignatures",
+    "status": "passed",
+    "calls": 105
+  },
+  {
+    "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixinextras/HandlerSignatureServiceTest.kt::modifyReceiverExpectsInstanceParameterWithoutOperation",
+    "status": "passed",
+    "calls": 15
+  },
+  {
+    "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixinextras/HandlerSignatureServiceTest.kt::modifyReceiverExpressionUsesOfficialInvocationLayout",
+    "status": "passed",
+    "calls": 25
+  },
+  {
+    "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixinextras/HandlerSignatureServiceTest.kt::modifyReceiverGetFieldExpectsReceiverReturn",
+    "status": "passed",
+    "calls": 8
+  },
+  {
+    "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixinextras/HandlerSignatureServiceTest.kt::modifyReceiverInvokeAmbiguousMultiTargetEffectiveReceiverReturnsNull",
+    "status": "passed",
+    "calls": 5
+  },
+  {
+    "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixinextras/HandlerSignatureServiceTest.kt::modifyReceiverInvokeExposesOptionalCapturedTargetParameters",
+    "status": "passed",
+    "calls": 8
+  },
+  {
+    "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixinextras/HandlerSignatureServiceTest.kt::modifyReceiverInvokeMissingOperationKindReturnsNull",
+    "status": "passed",
+    "calls": 3
+  },
+  {
+    "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixinextras/HandlerSignatureServiceTest.kt::modifyReceiverInvokeSpecialUsesMixinTargetReceiverNotCalleeOwner",
+    "status": "passed",
+    "calls": 8
+  },
+  {
+    "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixinextras/HandlerSignatureServiceTest.kt::modifyReceiverInvokeStaticTargetReturnsNull",
+    "status": "passed",
+    "calls": 3
+  },
+  {
+    "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixinextras/HandlerSignatureServiceTest.kt::modifyReceiverInvokeVirtualRetainsCalleeOwner",
+    "status": "passed",
+    "calls": 8
+  },
+  {
+    "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixinextras/HandlerSignatureServiceTest.kt::modifyReceiverInvokeWithoutBytecodeIndexReturnsNull",
+    "status": "passed",
+    "calls": 3
+  },
+  {
+    "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixinextras/HandlerSignatureServiceTest.kt::modifyReceiverPutFieldExpectsReceiverValueReturn",
+    "status": "passed",
+    "calls": 9
+  },
+  {
+    "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixinextras/HandlerSignatureServiceTest.kt::modifyReceiverStaticFieldTargetsReturnNull",
+    "status": "passed",
+    "calls": 6
+  },
+  {
+    "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixinextras/HandlerSignatureServiceTest.kt::modifyReceiverUsesBytecodeTargetWhenCalleeIsAbsentFromClassIndex",
+    "status": "passed",
+    "calls": 8
+  },
+  {
+    "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixinextras/HandlerSignatureServiceTest.kt::modifyReturnValueExposesOptionalCapturedTargetParameters",
+    "status": "passed",
+    "calls": 9
+  },
+  {
+    "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixinextras/HandlerSignatureServiceTest.kt::modifyReturnValueReturnAtValueStillInfersMethodReturnType",
+    "status": "passed",
+    "calls": 5
+  },
+  {
+    "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixinextras/HandlerSignatureServiceTest.kt::modifyReturnValueVoidTargetIsInvalid",
+    "status": "passed",
+    "calls": 10
+  },
+  {
+    "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixinextras/HandlerSignatureServiceTest.kt::operationSignatureRendererFormatsGeneric",
+    "status": "passed",
+    "calls": 12
+  },
+  {
+    "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixinextras/HandlerSignatureServiceTest.kt::parseHandlerParameterCancellableMarkerSetsSugarSpec",
+    "status": "passed",
+    "calls": 1
+  },
+  {
+    "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixinextras/HandlerSignatureServiceTest.kt::parseHandlerParameterExistingIsSugarRemainsCompatibleForBareLocal",
+    "status": "passed",
+    "calls": 1
+  },
+  {
+    "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixinextras/HandlerSignatureServiceTest.kt::parseHandlerParameterFullyQualifiedLocalAnnotation",
+    "status": "passed",
+    "calls": 1
+  },
+  {
+    "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixinextras/HandlerSignatureServiceTest.kt::parseHandlerParameterLocalSpecMalformedPrintAndTypeFailClosedToDefaults",
+    "status": "passed",
+    "calls": 1
+  },
+  {
+    "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixinextras/HandlerSignatureServiceTest.kt::parseHandlerParameterLocalSpecParsesFullyQualifiedTypeClassLiteral",
+    "status": "passed",
+    "calls": 1
+  },
+  {
+    "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixinextras/HandlerSignatureServiceTest.kt::parseHandlerParameterLocalSpecParsesNamedAttributesInArbitraryOrder",
+    "status": "passed",
+    "calls": 1
+  },
+  {
+    "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixinextras/HandlerSignatureServiceTest.kt::parseHandlerParameterLocalSpecParsesPrimitiveTypeClassLiteral",
+    "status": "passed",
+    "calls": 1
+  },
+  {
+    "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixinextras/HandlerSignatureServiceTest.kt::parseHandlerParameterLocalSpecParsesPrintTrue",
+    "status": "passed",
+    "calls": 1
+  },
+  {
+    "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixinextras/HandlerSignatureServiceTest.kt::parseHandlerParameterLocalSpecParsesSimpleTypeClassLiteral",
+    "status": "passed",
+    "calls": 1
+  },
+  {
+    "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixinextras/HandlerSignatureServiceTest.kt::parseHandlerParameterLocalSpecParsesSingleNameAttribute",
+    "status": "passed",
+    "calls": 1
+  },
+  {
+    "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixinextras/HandlerSignatureServiceTest.kt::parseHandlerParameterLocalSpecTreatsNegativeOneIndexAndOrdinalAsUnset",
+    "status": "passed",
+    "calls": 1
+  },
+  {
+    "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixinextras/HandlerSignatureServiceTest.kt::parseHandlerParameterMalformedLocalArgsFailClosedWithoutCrash",
+    "status": "passed",
+    "calls": 1
+  },
+  {
+    "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixinextras/HandlerSignatureServiceTest.kt::parseHandlerParameterRangesLocalNameArrayArgs",
+    "status": "passed",
+    "calls": 1
+  },
+  {
+    "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixinextras/HandlerSignatureServiceTest.kt::parseHandlerParameterRangesQualifiedLocalAnnotation",
+    "status": "passed",
+    "calls": 1
+  },
+  {
+    "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixinextras/HandlerSignatureServiceTest.kt::parseHandlerParameterRangesTwoLocalParameters",
+    "status": "passed",
+    "calls": 1
+  },
+  {
+    "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixinextras/HandlerSignatureServiceTest.kt::parseHandlerParameterRecognizesOnlyOfficialSugarAnnotations",
+    "status": "passed",
+    "calls": 12
+  },
+  {
+    "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixinextras/HandlerSignatureServiceTest.kt::parseHandlerParameterShareSpecIgnoresUnknownIdAttribute",
+    "status": "passed",
+    "calls": 1
+  },
+  {
+    "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixinextras/HandlerSignatureServiceTest.kt::parseHandlerParameterShareSpecParsesNamedValueAndNamespace",
+    "status": "passed",
+    "calls": 1
+  },
+  {
+    "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixinextras/HandlerSignatureServiceTest.kt::parseHandlerParameterShareSpecParsesShorthandString",
+    "status": "passed",
+    "calls": 1
+  },
+  {
+    "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixinextras/HandlerSignatureServiceTest.kt::parseHandlerParameterWithoutSugarHasNullSugarSpec",
+    "status": "passed",
+    "calls": 1
+  },
+  {
+    "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixinextras/HandlerSignatureServiceTest.kt::parseShareNamespacePresenceAndRefValueDescriptor",
+    "status": "passed",
+    "calls": 5
+  },
+  {
+    "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixinextras/HandlerSignatureServiceTest.kt::providedEmptyResolvedContextSuppressesModifyExpressionValueSignatureInsteadOfObjectFallback",
+    "status": "passed",
+    "calls": 18
+  },
+  {
+    "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixinextras/HandlerSignatureServiceTest.kt::providedResolvedContextControlsModifyExpressionValueSignatureDespiteContradictorySource",
+    "status": "passed",
+    "calls": 32
+  },
+  {
+    "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixinextras/HandlerSignatureServiceTest.kt::rejectsHandlerWithSugarPrecedingRequiredBaseParameter",
+    "status": "passed",
+    "calls": 18
+  },
+  {
+    "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixinextras/HandlerSignatureServiceTest.kt::rejectsModifyExpressionValueHandlerWithSkippedCapturedTargetParameter",
+    "status": "passed",
+    "calls": 20
+  },
+  {
+    "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixinextras/HandlerSignatureServiceTest.kt::rejectsModifyExpressionValueHandlerWithWrongCapturedTargetParameterType",
+    "status": "passed",
+    "calls": 20
+  },
+  {
+    "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixinextras/HandlerSignatureServiceTest.kt::rejectsModifyReceiverGetFieldHandlerWithSkippedCapturedTargetParameter",
+    "status": "passed",
+    "calls": 17
+  },
+  {
+    "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixinextras/HandlerSignatureServiceTest.kt::rejectsModifyReceiverInvokeHandlerWithSkippedCapturedTargetParameter",
+    "status": "passed",
+    "calls": 17
+  },
+  {
+    "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixinextras/HandlerSignatureServiceTest.kt::rejectsModifyReceiverInvokeHandlerWithSugarBeforeCapturedArgs",
+    "status": "passed",
+    "calls": 17
+  },
+  {
+    "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixinextras/HandlerSignatureServiceTest.kt::rejectsModifyReceiverInvokeHandlerWithTooManyCapturedTargetParameters",
+    "status": "passed",
+    "calls": 20
+  },
+  {
+    "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixinextras/HandlerSignatureServiceTest.kt::rejectsModifyReceiverInvokeHandlerWithWrongCapturedTargetParameterType",
+    "status": "passed",
+    "calls": 17
+  },
+  {
+    "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixinextras/HandlerSignatureServiceTest.kt::rejectsModifyReceiverPutFieldHandlerWithWrongCapturedTargetParameterType",
+    "status": "passed",
+    "calls": 20
+  },
+  {
+    "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixinextras/HandlerSignatureServiceTest.kt::rejectsModifyReturnValueHandlerWithSkippedCapturedTargetParameter",
+    "status": "passed",
+    "calls": 19
+  },
+  {
+    "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixinextras/HandlerSignatureServiceTest.kt::rejectsModifyReturnValueHandlerWithTooManyCapturedTargetParameters",
+    "status": "passed",
+    "calls": 23
+  },
+  {
+    "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixinextras/HandlerSignatureServiceTest.kt::rejectsModifyReturnValueHandlerWithWrongCapturedTargetParameterType",
+    "status": "passed",
+    "calls": 19
+  },
+  {
+    "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixinextras/HandlerSignatureServiceTest.kt::rejectsWrapMethodHandlerWithInstanceReceiver",
+    "status": "passed",
+    "calls": 16
+  },
+  {
+    "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixinextras/HandlerSignatureServiceTest.kt::rejectsWrapOperationHandlerWithCapturedTargetParameterBeforeOperation",
+    "status": "passed",
+    "calls": 18
+  },
+  {
+    "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixinextras/HandlerSignatureServiceTest.kt::rejectsWrapOperationHandlerWithSkippedCapturedTargetParameter",
+    "status": "passed",
+    "calls": 21
+  },
+  {
+    "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixinextras/HandlerSignatureServiceTest.kt::rejectsWrapOperationHandlerWithTooManyCapturedTargetParameters",
+    "status": "passed",
+    "calls": 24
+  },
+  {
+    "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixinextras/HandlerSignatureServiceTest.kt::rejectsWrapOperationHandlerWithWrongCapturedTargetParameterType",
+    "status": "passed",
+    "calls": 21
+  },
+  {
+    "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixinextras/HandlerSignatureServiceTest.kt::rejectsWrapWithConditionHandlerWithOperationParameter",
+    "status": "passed",
+    "calls": 15
+  },
+  {
+    "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixinextras/HandlerSignatureServiceTest.kt::rejectsWrapWithConditionInvokeHandlerWithSkippedCapturedTargetParameter",
+    "status": "passed",
+    "calls": 17
+  },
+  {
+    "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixinextras/HandlerSignatureServiceTest.kt::rejectsWrapWithConditionInvokeHandlerWithSugarBeforeCapturedArgs",
+    "status": "passed",
+    "calls": 17
+  },
+  {
+    "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixinextras/HandlerSignatureServiceTest.kt::rejectsWrapWithConditionInvokeHandlerWithTooManyCapturedTargetParameters",
+    "status": "passed",
+    "calls": 20
+  },
+  {
+    "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixinextras/HandlerSignatureServiceTest.kt::rejectsWrapWithConditionInvokeHandlerWithWrongCapturedTargetParameterType",
+    "status": "passed",
+    "calls": 17
+  },
+  {
+    "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixinextras/HandlerSignatureServiceTest.kt::rejectsWrapWithConditionPutFieldHandlerWithSkippedCapturedTargetParameter",
+    "status": "passed",
+    "calls": 20
+  },
+  {
+    "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixinextras/HandlerSignatureServiceTest.kt::rejectsWrapWithConditionPutFieldHandlerWithSugarBeforeCapturedArgs",
+    "status": "passed",
+    "calls": 19
+  },
+  {
+    "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixinextras/HandlerSignatureServiceTest.kt::rejectsWrapWithConditionPutFieldHandlerWithTooManyCapturedTargetParameters",
+    "status": "passed",
+    "calls": 23
+  },
+  {
+    "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixinextras/HandlerSignatureServiceTest.kt::rejectsWrapWithConditionPutFieldHandlerWithWrongCapturedTargetParameterType",
+    "status": "passed",
+    "calls": 20
+  },
+  {
+    "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixinextras/HandlerSignatureServiceTest.kt::resolveFieldOperationKindQueriesEveryMixinTargetOwner",
+    "status": "passed",
+    "calls": 11
+  },
+  {
+    "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixinextras/HandlerSignatureServiceTest.kt::resolveTargetMethodReturnsNullForMissingMethod",
+    "status": "passed",
+    "calls": 1
+  },
+  {
+    "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixinextras/HandlerSignatureServiceTest.kt::resolveTargetMethodUsesDescriptorSuffix",
+    "status": "passed",
+    "calls": 1
+  },
+  {
+    "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixinextras/HandlerSignatureServiceTest.kt::shareParameterWithFullyQualifiedShareAnnotationAcceptsLocalRef",
+    "status": "passed",
+    "calls": 21
+  },
+  {
+    "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixinextras/HandlerSignatureServiceTest.kt::shareParameterWithLocalRefTypeProducesNoDiagnostic",
+    "status": "passed",
+    "calls": 21
+  },
+  {
+    "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixinextras/HandlerSignatureServiceTest.kt::shareParameterWithLookalikeLocalRefTypeProducesInvalidShareParameterTypeDiagnostic",
+    "status": "passed",
+    "calls": 20
+  },
+  {
+    "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixinextras/HandlerSignatureServiceTest.kt::shareParameterWithNestedLocalRefTypeProducesInvalidShareParameterTypeDiagnostic",
+    "status": "passed",
+    "calls": 20
+  },
+  {
+    "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixinextras/HandlerSignatureServiceTest.kt::shareParameterWithOrdinaryTypeProducesInvalidShareParameterTypeDiagnostic",
+    "status": "passed",
+    "calls": 20
+  },
+  {
+    "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixinextras/HandlerSignatureServiceTest.kt::shareParameterWithUnresolvedTypeProducesNoDiagnostic",
+    "status": "passed",
+    "calls": 20
+  },
+  {
+    "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixinextras/HandlerSignatureServiceTest.kt::specializesIntLikeSignatureFromExistingBooleanHandler",
+    "status": "passed",
+    "calls": 8
+  },
+  {
+    "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixinextras/HandlerSignatureServiceTest.kt::textRendererWrapOperationIncludesAllInvokeArgs",
+    "status": "passed",
+    "calls": 10
+  },
+  {
+    "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixinextras/HandlerSignatureServiceTest.kt::unmatchedFieldCandidateReturnsNull",
+    "status": "passed",
+    "calls": 3
+  },
+  {
+    "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixinextras/HandlerSignatureServiceTest.kt::unresolvedMixinTargetDoesNotSearchGlobalClasses",
+    "status": "passed",
+    "calls": 3
+  },
+  {
+    "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixinextras/HandlerSignatureServiceTest.kt::validatesCorrectWrapMethodHandler",
+    "status": "passed",
+    "calls": 20
+  },
+  {
+    "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixinextras/HandlerSignatureServiceTest.kt::validatesCorrectWrapOperationFieldGetHandler",
+    "status": "passed",
+    "calls": 21
+  },
+  {
+    "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixinextras/HandlerSignatureServiceTest.kt::validatesCorrectWrapOperationHandler",
+    "status": "passed",
+    "calls": 20
+  },
+  {
+    "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixinextras/HandlerSignatureServiceTest.kt::validatesCorrectWrapWithConditionHandler",
+    "status": "passed",
+    "calls": 16
+  },
+  {
+    "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixinextras/HandlerSignatureServiceTest.kt::validatesModifyExpressionValueFieldGetHandlerSignature",
+    "status": "passed",
+    "calls": 18
+  },
+  {
+    "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixinextras/HandlerSignatureServiceTest.kt::validatesModifyExpressionValueHandlerWithPartialCapturedTargetParameterPrefix",
+    "status": "passed",
+    "calls": 21
+  },
+  {
+    "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixinextras/HandlerSignatureServiceTest.kt::validatesModifyExpressionValueHandlerWithTrailingShareParameter",
+    "status": "passed",
+    "calls": 20
+  },
+  {
+    "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixinextras/HandlerSignatureServiceTest.kt::validatesModifyExpressionValueHandlerWithTrailingShareWithArgument",
+    "status": "passed",
+    "calls": 20
+  },
+  {
+    "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixinextras/HandlerSignatureServiceTest.kt::validatesModifyExpressionValueInvokeHandlerSignature",
+    "status": "passed",
+    "calls": 18
+  },
+  {
+    "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixinextras/HandlerSignatureServiceTest.kt::validatesModifyExpressionValueNewHandlerSignature",
+    "status": "passed",
+    "calls": 18
+  },
+  {
+    "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixinextras/HandlerSignatureServiceTest.kt::validatesModifyReceiverGetFieldHandlerWithFullCapturedTargetParameterPrefix",
+    "status": "passed",
+    "calls": 19
+  },
+  {
+    "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixinextras/HandlerSignatureServiceTest.kt::validatesModifyReceiverGetFieldHandlerWithPartialCapturedTargetParameterPrefix",
+    "status": "passed",
+    "calls": 17
+  },
+  {
+    "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixinextras/HandlerSignatureServiceTest.kt::validatesModifyReceiverInvokeHandlerWithFullCapturedTargetParameterPrefix",
+    "status": "passed",
+    "calls": 19
+  },
+  {
+    "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixinextras/HandlerSignatureServiceTest.kt::validatesModifyReceiverInvokeHandlerWithPartialCapturedTargetParameterPrefix",
+    "status": "passed",
+    "calls": 18
+  },
+  {
+    "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixinextras/HandlerSignatureServiceTest.kt::validatesModifyReceiverInvokeHandlerWithTrailingSugarParameter",
+    "status": "passed",
+    "calls": 18
+  },
+  {
+    "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixinextras/HandlerSignatureServiceTest.kt::validatesModifyReceiverInvokeHandlerWithZeroCapturedTargetParameters",
+    "status": "passed",
+    "calls": 16
+  },
+  {
+    "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixinextras/HandlerSignatureServiceTest.kt::validatesModifyReceiverPutFieldHandlerWithFullCapturedTargetParameterPrefix",
+    "status": "passed",
+    "calls": 22
+  },
+  {
+    "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixinextras/HandlerSignatureServiceTest.kt::validatesModifyReceiverPutFieldHandlerWithPartialCapturedTargetParameterPrefix",
+    "status": "passed",
+    "calls": 20
+  },
+  {
+    "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixinextras/HandlerSignatureServiceTest.kt::validatesModifyReturnValueHandlerWithFirstCapturedTargetParameter",
+    "status": "passed",
+    "calls": 19
+  },
+  {
+    "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixinextras/HandlerSignatureServiceTest.kt::validatesModifyReturnValueHandlerWithFullCapturedTargetParameterPrefix",
+    "status": "passed",
+    "calls": 22
+  },
+  {
+    "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixinextras/HandlerSignatureServiceTest.kt::validatesModifyReturnValueHandlerWithPartialCapturedTargetParameterPrefix",
+    "status": "passed",
+    "calls": 20
+  },
+  {
+    "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixinextras/HandlerSignatureServiceTest.kt::validatesModifyReturnValueHandlerWithTrailingSugarParameter",
+    "status": "passed",
+    "calls": 20
+  },
+  {
+    "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixinextras/HandlerSignatureServiceTest.kt::validatesModifyReturnValueHandlerWithZeroCapturedTargetParameters",
+    "status": "passed",
+    "calls": 18
+  },
+  {
+    "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixinextras/HandlerSignatureServiceTest.kt::validatesWrapOperationConstantSelectorHandler",
+    "status": "passed",
+    "calls": 21
+  },
+  {
+    "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixinextras/HandlerSignatureServiceTest.kt::validatesWrapOperationHandlerWithFirstCapturedTargetParameterAfterOperation",
+    "status": "passed",
+    "calls": 21
+  },
+  {
+    "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixinextras/HandlerSignatureServiceTest.kt::validatesWrapOperationHandlerWithFullCapturedTargetParameterPrefixAfterOperation",
+    "status": "passed",
+    "calls": 23
+  },
+  {
+    "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixinextras/HandlerSignatureServiceTest.kt::validatesWrapOperationHandlerWithTrailingLocalParameter",
+    "status": "passed",
+    "calls": 21
+  },
+  {
+    "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixinextras/HandlerSignatureServiceTest.kt::validatesWrapOperationHandlerWithTrailingLocalWithArguments",
+    "status": "passed",
+    "calls": 21
+  },
+  {
+    "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixinextras/HandlerSignatureServiceTest.kt::validatesWrapOperationNewHandlerSignature",
+    "status": "passed",
+    "calls": 15
+  },
+  {
+    "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixinextras/HandlerSignatureServiceTest.kt::validatesWrapWithConditionInvokeHandlerWithFullCapturedTargetParameterPrefix",
+    "status": "passed",
+    "calls": 19
+  },
+  {
+    "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixinextras/HandlerSignatureServiceTest.kt::validatesWrapWithConditionInvokeHandlerWithPartialCapturedTargetParameterPrefix",
+    "status": "passed",
+    "calls": 18
+  },
+  {
+    "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixinextras/HandlerSignatureServiceTest.kt::validatesWrapWithConditionInvokeHandlerWithTrailingSugarParameter",
+    "status": "passed",
+    "calls": 18
+  },
+  {
+    "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixinextras/HandlerSignatureServiceTest.kt::validatesWrapWithConditionPutFieldHandlerWithFullCapturedTargetParameterPrefix",
+    "status": "passed",
+    "calls": 22
+  },
+  {
+    "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixinextras/HandlerSignatureServiceTest.kt::validatesWrapWithConditionPutFieldHandlerWithPartialCapturedTargetParameterPrefix",
+    "status": "passed",
+    "calls": 21
+  },
+  {
+    "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixinextras/HandlerSignatureServiceTest.kt::validatesWrapWithConditionPutFieldHandlerWithTrailingSugarParameter",
+    "status": "passed",
+    "calls": 21
+  },
+  {
+    "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixinextras/HandlerSignatureServiceTest.kt::wrapMethodGenerationIsUnavailableWhenMatchingTargetsDisagreeOnStaticness",
+    "status": "passed",
+    "calls": 4
+  },
+  {
+    "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixinextras/HandlerSignatureServiceTest.kt::wrapMethodHandlerStaticnessMustMatchTarget",
+    "status": "passed",
+    "calls": 51
+  },
+  {
+    "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixinextras/HandlerSignatureServiceTest.kt::wrapMethodIncludesTargetParametersAndOperation",
+    "status": "passed",
+    "calls": 5
+  },
+  {
+    "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixinextras/HandlerSignatureServiceTest.kt::wrapMethodInstanceTargetOmitsReceiver",
+    "status": "passed",
+    "calls": 5
+  },
+  {
+    "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixinextras/HandlerSignatureServiceTest.kt::wrapMethodRejectsInitializersAndMalformedTargetDescriptors",
+    "status": "passed",
+    "calls": 25
+  },
+  {
+    "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixinextras/HandlerSignatureServiceTest.kt::wrapMethodStaticTargetOmitsReceiver",
+    "status": "passed",
+    "calls": 9
+  },
+  {
+    "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixinextras/HandlerSignatureServiceTest.kt::wrapMethodStillRequiresOperationAsLastNonSugarParameter",
+    "status": "passed",
+    "calls": 15
+  },
+  {
+    "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixinextras/HandlerSignatureServiceTest.kt::wrapMethodValidatesSupportedSugarParameters",
+    "status": "passed",
+    "calls": 61
+  },
+  {
+    "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixinextras/HandlerSignatureServiceTest.kt::wrapOperationConstantSelectorExpectsInstanceofHandlerSignature",
+    "status": "passed",
+    "calls": 9
+  },
+  {
+    "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixinextras/HandlerSignatureServiceTest.kt::wrapOperationConstantSelectorIgnoresConstantNestedInAtArgs",
+    "status": "passed",
+    "calls": 2
+  },
+  {
+    "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixinextras/HandlerSignatureServiceTest.kt::wrapOperationConstantSelectorIsParsedFromTopLevelConstantAttribute",
+    "status": "passed",
+    "calls": 2
+  },
+  {
+    "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixinextras/HandlerSignatureServiceTest.kt::wrapOperationExpectsIntReturnType",
+    "status": "passed",
+    "calls": 9
+  },
+  {
+    "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixinextras/HandlerSignatureServiceTest.kt::wrapOperationExpectsReceiverOperationLast",
+    "status": "passed",
+    "calls": 9
+  },
+  {
+    "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixinextras/HandlerSignatureServiceTest.kt::wrapOperationExposesOptionalCapturedTargetParameters",
+    "status": "passed",
+    "calls": 9
+  },
+  {
+    "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixinextras/HandlerSignatureServiceTest.kt::wrapOperationExpressionFailsClosedWithoutBytecodeIndex",
+    "status": "passed",
+    "calls": 5
+  },
+  {
+    "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixinextras/HandlerSignatureServiceTest.kt::wrapOperationExpressionUsesOfficialSimpleOperationLayout",
+    "status": "passed",
+    "calls": 37
+  },
+  {
+    "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixinextras/HandlerSignatureServiceTest.kt::wrapOperationFieldOrdinalSelectsRequestedOperationAndRejectsOutOfRange",
+    "status": "passed",
+    "calls": 15
+  },
+  {
+    "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixinextras/HandlerSignatureServiceTest.kt::wrapOperationGetFieldExpectsReceiverOperationAndFieldReturn",
+    "status": "passed",
+    "calls": 10
+  },
+  {
+    "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixinextras/HandlerSignatureServiceTest.kt::wrapOperationGetStaticExpectsOperationOnlyAndFieldReturn",
+    "status": "passed",
+    "calls": 8
+  },
+  {
+    "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixinextras/HandlerSignatureServiceTest.kt::wrapOperationInvokeOutOfRangeOrdinalReturnsNullSignatureAndStub",
+    "status": "passed",
+    "calls": 5
+  },
+  {
+    "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixinextras/HandlerSignatureServiceTest.kt::wrapOperationInvokeSpecialOrdinalUsesSelectedInvocationReceiver",
+    "status": "passed",
+    "calls": 9
+  },
+  {
+    "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixinextras/HandlerSignatureServiceTest.kt::wrapOperationInvokeSpecialUsesMixinTargetReceiver",
+    "status": "passed",
+    "calls": 9
+  },
+  {
+    "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixinextras/HandlerSignatureServiceTest.kt::wrapOperationNewBeforeConstructorInitializationIsSuppressed",
+    "status": "passed",
+    "calls": 3
+  },
+  {
+    "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixinextras/HandlerSignatureServiceTest.kt::wrapOperationNewExpectsConstructorArgsThenOperationWithoutReceiver",
+    "status": "passed",
+    "calls": 6
+  },
+  {
+    "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixinextras/HandlerSignatureServiceTest.kt::wrapOperationNewIgnoresOrdinalLikeArgsTextForFiltering",
+    "status": "passed",
+    "calls": 3
+  },
+  {
+    "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixinextras/HandlerSignatureServiceTest.kt::wrapOperationNewNestedSameOwnerPairsConstructorsInJvmOrder",
+    "status": "passed",
+    "calls": 23
+  },
+  {
+    "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixinextras/HandlerSignatureServiceTest.kt::wrapOperationNewOrdinalSelectsMatchingConstructorSite",
+    "status": "passed",
+    "calls": 13
+  },
+  {
+    "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixinextras/HandlerSignatureServiceTest.kt::wrapOperationNewParameterOrderPlacesConstructorArgsBeforeOperation",
+    "status": "passed",
+    "calls": 7
+  },
+  {
+    "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixinextras/HandlerSignatureServiceTest.kt::wrapOperationNewRejectsAmbiguousMalformedMissingBytesUnpairedAndMixedConstructors",
+    "status": "passed",
+    "calls": 49
+  },
+  {
+    "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixinextras/HandlerSignatureServiceTest.kt::wrapOperationNewResolvesAfterInitialSuperConstructorCall",
+    "status": "passed",
+    "calls": 11
+  },
+  {
+    "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixinextras/HandlerSignatureServiceTest.kt::wrapOperationPutFieldExpectsReceiverValueAndVoidOperation",
+    "status": "passed",
+    "calls": 10
+  },
+  {
+    "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixinextras/HandlerSignatureServiceTest.kt::wrapOperationPutStaticExpectsValueAndVoidOperation",
+    "status": "passed",
+    "calls": 9
+  },
+  {
+    "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixinextras/HandlerSignatureServiceTest.kt::wrapOperationRejectsUnsupportedAtValuesAndConstructorInvokes",
+    "status": "passed",
+    "calls": 15
+  },
+  {
+    "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixinextras/HandlerSignatureServiceTest.kt::wrapOperationWithBothAtAndConstantSelectorsReturnsNull",
+    "status": "passed",
+    "calls": 5
+  },
+  {
+    "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixinextras/HandlerSignatureServiceTest.kt::wrapOperationWithNeitherSelectorReturnsNull",
+    "status": "passed",
+    "calls": 3
+  },
+  {
+    "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixinextras/HandlerSignatureServiceTest.kt::wrapWithConditionExpectsBooleanReturnWithoutOperation",
+    "status": "passed",
+    "calls": 8
+  },
+  {
+    "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixinextras/HandlerSignatureServiceTest.kt::wrapWithConditionExpressionRecognizesPoppedNonVoidInvocation",
+    "status": "passed",
+    "calls": 6
+  },
+  {
+    "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixinextras/HandlerSignatureServiceTest.kt::wrapWithConditionExpressionRejectsOfficialFieldRead",
+    "status": "passed",
+    "calls": 6
+  },
+  {
+    "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixinextras/HandlerSignatureServiceTest.kt::wrapWithConditionExpressionUsesOfficialFieldWriteLayout",
+    "status": "passed",
+    "calls": 28
+  },
+  {
+    "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixinextras/HandlerSignatureServiceTest.kt::wrapWithConditionExpressionUsesOfficialVoidInvocationLayout",
+    "status": "passed",
+    "calls": 6
+  },
+  {
+    "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixinextras/HandlerSignatureServiceTest.kt::wrapWithConditionFieldAtValueRejectsExactMethodTarget",
+    "status": "passed",
+    "calls": 3
+  },
+  {
+    "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixinextras/HandlerSignatureServiceTest.kt::wrapWithConditionFieldReadTargetsReturnNull",
+    "status": "passed",
+    "calls": 6
+  },
+  {
+    "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixinextras/HandlerSignatureServiceTest.kt::wrapWithConditionInvokeAtValueRejectsExactFieldTarget",
+    "status": "passed",
+    "calls": 3
+  },
+  {
+    "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixinextras/HandlerSignatureServiceTest.kt::wrapWithConditionInvokeCategoryOnePoppedResultIsValid",
+    "status": "passed",
+    "calls": 8
+  },
+  {
+    "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixinextras/HandlerSignatureServiceTest.kt::wrapWithConditionInvokeCategoryTwoPoppedResultIsValid",
+    "status": "passed",
+    "calls": 8
+  },
+  {
+    "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixinextras/HandlerSignatureServiceTest.kt::wrapWithConditionInvokeConstructorTargetIsInvalid",
+    "status": "passed",
+    "calls": 3
+  },
+  {
+    "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixinextras/HandlerSignatureServiceTest.kt::wrapWithConditionInvokeExposesOptionalCapturedTargetParameters",
+    "status": "passed",
+    "calls": 8
+  },
+  {
+    "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixinextras/HandlerSignatureServiceTest.kt::wrapWithConditionInvokeMissingCandidatesOrIndexIsInvalid",
+    "status": "passed",
+    "calls": 4
+  },
+  {
+    "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixinextras/HandlerSignatureServiceTest.kt::wrapWithConditionInvokeMultipleMixinTargetsFailWhenAnyTargetIsInvalid",
+    "status": "passed",
+    "calls": 3
+  },
+  {
+    "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixinextras/HandlerSignatureServiceTest.kt::wrapWithConditionInvokeOrdinalRejectsLegacyNegativeInstructionOccurrenceIndex",
+    "status": "passed",
+    "calls": 3
+  },
+  {
+    "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixinextras/HandlerSignatureServiceTest.kt::wrapWithConditionInvokeOrdinalSelectsSelectorRelativeOccurrence",
+    "status": "passed",
+    "calls": 14
+  },
+  {
+    "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixinextras/HandlerSignatureServiceTest.kt::wrapWithConditionInvokeRequiresBytecodeIndexAndInvokeAtValue",
+    "status": "passed",
+    "calls": 6
+  },
+  {
+    "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixinextras/HandlerSignatureServiceTest.kt::wrapWithConditionInvokeRetainedResultIsInvalid",
+    "status": "passed",
+    "calls": 3
+  },
+  {
+    "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixinextras/HandlerSignatureServiceTest.kt::wrapWithConditionInvokeVoidInstanceMethodIsValid",
+    "status": "passed",
+    "calls": 8
+  },
+  {
+    "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixinextras/HandlerSignatureServiceTest.kt::wrapWithConditionInvokeVoidStaticMethodIsValid",
+    "status": "passed",
+    "calls": 7
+  },
+  {
+    "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixinextras/HandlerSignatureServiceTest.kt::wrapWithConditionInvokeWrongPopClassificationIsInvalid",
+    "status": "passed",
+    "calls": 3
+  },
+  {
+    "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixinextras/HandlerSignatureServiceTest.kt::wrapWithConditionPutFieldExpectsReceiverValueAndBooleanReturn",
+    "status": "passed",
+    "calls": 9
+  },
+  {
+    "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixinextras/HandlerSignatureServiceTest.kt::wrapWithConditionPutStaticExpectsValueAndBooleanReturn",
+    "status": "passed",
+    "calls": 8
+  },
+  {
+    "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixinextras/HandlerSignatureServiceTest.kt::wrapWithConditionTargetStatusFieldGetIsInvalidInstruction",
+    "status": "passed",
+    "calls": 4
+  },
+  {
+    "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixinextras/HandlerSignatureServiceTest.kt::wrapWithConditionTargetStatusFieldMissingOccurrenceIndexWithOrdinalIsUnresolved",
+    "status": "passed",
+    "calls": 4
+  },
+  {
+    "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixinextras/HandlerSignatureServiceTest.kt::wrapWithConditionTargetStatusFieldMixedGetPutWithoutOrdinalIsInvalidInstruction",
+    "status": "passed",
+    "calls": 4
+  },
+  {
+    "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixinextras/HandlerSignatureServiceTest.kt::wrapWithConditionTargetStatusFieldOrdinalSelectsGetIsInvalidInstruction",
+    "status": "passed",
+    "calls": 4
+  },
+  {
+    "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixinextras/HandlerSignatureServiceTest.kt::wrapWithConditionTargetStatusFieldOrdinalSelectsPutIsValidVoid",
+    "status": "passed",
+    "calls": 10
+  },
+  {
+    "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixinextras/HandlerSignatureServiceTest.kt::wrapWithConditionTargetStatusFieldPutIsValidVoid",
+    "status": "passed",
+    "calls": 10
+  },
+  {
+    "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixinextras/HandlerSignatureServiceTest.kt::wrapWithConditionTargetStatusMissingBytecodeIsUnresolved",
+    "status": "passed",
+    "calls": 4
+  },
+  {
+    "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixinextras/HandlerSignatureServiceTest.kt::wrapWithConditionTargetStatusMixedOccurrencesIsInvalidRetainedNonVoid",
+    "status": "passed",
+    "calls": 4
+  },
+  {
+    "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixinextras/HandlerSignatureServiceTest.kt::wrapWithConditionTargetStatusPoppedInvokeIsValidPoppedNonVoid",
+    "status": "passed",
+    "calls": 9
+  },
+  {
+    "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixinextras/HandlerSignatureServiceTest.kt::wrapWithConditionTargetStatusRetainedInvokeIsInvalidRetainedNonVoid",
+    "status": "passed",
+    "calls": 4
+  },
+  {
+    "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixinextras/HandlerSignatureServiceTest.kt::wrapWithConditionTargetStatusUnsupportedAtValueIsInvalidInstruction",
+    "status": "passed",
+    "calls": 4
+  },
+  {
+    "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixinextras/HandlerSignatureServiceTest.kt::wrapWithConditionTargetStatusVoidInvokeIsValidVoid",
+    "status": "passed",
+    "calls": 9
+  },
+  {
+    "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixinextras/CoreHandlerSignatureCompletionTest.kt::completionUsesEmptyNameTabstopAndBodyTabstop",
+    "status": "passed",
+    "calls": 12
+  },
+  {
+    "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixinextras/CoreHandlerSignatureCompletionTest.kt::constructorHandlersOnlyGenerateAtReturn",
+    "status": "passed",
+    "calls": 6
+  },
+  {
+    "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixinextras/CoreHandlerSignatureCompletionTest.kt::facadeNormalizesDeclarationSnippetIndentationAtBothInsertionBoundaries",
+    "status": "passed",
+    "calls": 0
+  },
+  {
+    "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixinextras/CoreHandlerSignatureCompletionTest.kt::facadeRoutesAccessorInvokerAndOverwriteToDeclarationSnippets",
+    "status": "passed",
+    "calls": 0
+  },
+  {
+    "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixinextras/CoreHandlerSignatureCompletionTest.kt::facadeRoutesImmediatelyAfterAnnotationToHandlerSnippet",
+    "status": "passed",
+    "calls": 4
+  },
+  {
+    "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixinextras/CoreHandlerSignatureCompletionTest.kt::generatedCoreStubsUseCompilablePlaceholderBodies",
+    "status": "passed",
+    "calls": 22
+  },
+  {
+    "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixinextras/CoreHandlerSignatureCompletionTest.kt::injectUsesTargetParametersAndGenericReturnableCallback",
+    "status": "passed",
+    "calls": 4
+  },
+  {
+    "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixinextras/CoreHandlerSignatureCompletionTest.kt::injectWithCapturedLocalsFailsClosed",
+    "status": "passed",
+    "calls": 3
+  },
+  {
+    "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixinextras/CoreHandlerSignatureCompletionTest.kt::modifyArgAndModifyArgsUseTheirCoreContracts",
+    "status": "passed",
+    "calls": 8
+  },
+  {
+    "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixinextras/CoreHandlerSignatureCompletionTest.kt::modifyVariableUsesUniqueLoadSlotFromBytecode",
+    "status": "passed",
+    "calls": 5
+  },
+  {
+    "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixinextras/CoreHandlerSignatureCompletionTest.kt::multiTargetResolutionRequiresTheSameMethodOnEveryOwner",
+    "status": "passed",
+    "calls": 4
+  },
+  {
+    "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixinextras/CoreHandlerSignatureCompletionTest.kt::redirectArraySelectorsDoNotFallBackToOrdinaryFieldSignatures",
+    "status": "passed",
+    "calls": 9
+  },
+  {
+    "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixinextras/CoreHandlerSignatureCompletionTest.kt::redirectInvokeUsesReceiverAndInvocationArguments",
+    "status": "passed",
+    "calls": 5
+  },
+  {
+    "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixinextras/KotlinHandlerSignatureTest.kt::companionHandlerRetainsLocalShareAndCancellableSugar",
+    "status": "passed",
+    "calls": 5
+  },
+  {
+    "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixinextras/KotlinHandlerSignatureTest.kt::companionStaticDetectionStopsAtNestedClassesAndObjects",
+    "status": "passed",
+    "calls": 18
+  },
+  {
+    "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixinextras/KotlinHandlerSignatureTest.kt::extensionHandlerKeepsOnlyJvmArgumentsAndNullableTypes",
+    "status": "passed",
+    "calls": 4
+  },
+  {
+    "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixinextras/KotlinHandlerSignatureTest.kt::inferredExpressionReturnIsUnresolvedInsteadOfReportedAsVoid",
+    "status": "passed",
+    "calls": 3
+  },
+  {
+    "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixinextras/KotlinHandlerSignatureTest.kt::inferredReturnDoesNotInventAnErrorButExplicitWrongReturnAndInvalidParametersStillDo",
+    "status": "passed",
+    "calls": 35
+  },
+  {
+    "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixinextras/KotlinHandlerSignatureTest.kt::kotlinConstantArraysAndExpandedConditionsKeepOfficialIdentities",
+    "status": "passed",
+    "calls": 33
+  },
+  {
+    "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixinextras/KotlinHandlerSignatureTest.kt::operationGenericUsesJvmTypesForAliasesQualifiedNamesAndNullableBoxes",
+    "status": "passed",
+    "calls": 99
+  },
+  {
+    "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixinextras/KotlinHandlerSignatureTest.kt::operationReferenceGenericAliasesAndWildcardsResolveAgainstTheClasspath",
+    "status": "passed",
+    "calls": 5
+  },
+  {
+    "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixinextras/KotlinHandlerSignatureTest.kt::unrelatedParameterAnnotationsKeepArgumentsAndOriginalUtf16Ranges",
+    "status": "passed",
+    "calls": 2
+  },
+  {
+    "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixinextras/KotlinHandlerSignatureTest.kt::wrapOperationAliasAndAtArrayKeepSignatureAndInstruction",
+    "status": "passed",
+    "calls": 7
+  }
+]

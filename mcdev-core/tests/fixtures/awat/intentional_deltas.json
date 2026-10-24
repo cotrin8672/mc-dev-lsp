@@ -1,0 +1,837 @@
+[
+  {
+    "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/at/AtContextExtractorTest.kt::detectsOwnerSlotAfterModifierOnTrailingCursor",
+    "api": "AtContextExtractor.extractAtOffset",
+    "args": {
+      "source": "public ",
+      "offset": 7
+    },
+    "changes": [
+      {
+        "field": "/valueStartOffset",
+        "old": 0,
+        "new": 7
+      }
+    ],
+    "reason": "Missing token replacement starts at the caret, preserving preceding modifier/owner/comment.",
+    "regression": {
+      "kind": "contextRange",
+      "source": "public ",
+      "start": 7,
+      "end": 7,
+      "selectedText": ""
+    }
+  },
+  {
+    "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/at/AtContextExtractorTest.kt::detectsOwnerSlotAfterModifierOnTrailingCursor",
+    "api": "AtContextExtractor.extract",
+    "args": {
+      "source": "public ",
+      "line": 0,
+      "character": 7
+    },
+    "changes": [
+      {
+        "field": "/valueStartOffset",
+        "old": 0,
+        "new": 7
+      }
+    ],
+    "reason": "Missing token replacement starts at the caret, preserving preceding modifier/owner/comment.",
+    "regression": {
+      "kind": "contextRange",
+      "source": "public ",
+      "start": 7,
+      "end": 7,
+      "selectedText": ""
+    }
+  },
+  {
+    "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/at/AtContextExtractorTest.kt::detectsMemberSlotAfterOwnerOnTrailingCursor",
+    "api": "AtContextExtractor.extractAtOffset",
+    "args": {
+      "source": "public net.minecraft.client.MinecraftClient ",
+      "offset": 44
+    },
+    "changes": [
+      {
+        "field": "/valueStartOffset",
+        "old": 0,
+        "new": 44
+      }
+    ],
+    "reason": "Missing token replacement starts at the caret, preserving preceding modifier/owner/comment.",
+    "regression": {
+      "kind": "contextRange",
+      "source": "public net.minecraft.client.MinecraftClient ",
+      "start": 44,
+      "end": 44,
+      "selectedText": ""
+    }
+  },
+  {
+    "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/at/AtContextExtractorTest.kt::detectsMemberSlotAfterOwnerOnTrailingCursor",
+    "api": "AtContextExtractor.extract",
+    "args": {
+      "source": "public net.minecraft.client.MinecraftClient ",
+      "line": 0,
+      "character": 44
+    },
+    "changes": [
+      {
+        "field": "/valueStartOffset",
+        "old": 0,
+        "new": 44
+      }
+    ],
+    "reason": "Missing token replacement starts at the caret, preserving preceding modifier/owner/comment.",
+    "regression": {
+      "kind": "contextRange",
+      "source": "public net.minecraft.client.MinecraftClient ",
+      "start": 44,
+      "end": 44,
+      "selectedText": ""
+    }
+  },
+  {
+    "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/at/AtContextExtractorTest.kt::ignoresCommentSuffix",
+    "api": "AtContextExtractor.extractAtOffset",
+    "args": {
+      "source": "public net.minecraft.client.MinecraftClient # comment",
+      "offset": 53
+    },
+    "changes": [
+      {
+        "field": "/valueStartOffset",
+        "old": 0,
+        "new": 53
+      }
+    ],
+    "reason": "Missing token replacement starts at the caret, preserving preceding modifier/owner/comment.",
+    "regression": {
+      "kind": "contextRange",
+      "source": "public net.minecraft.client.MinecraftClient # comment",
+      "start": 53,
+      "end": 53,
+      "selectedText": ""
+    }
+  },
+  {
+    "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/at/AtContextExtractorTest.kt::ignoresCommentSuffix",
+    "api": "AtContextExtractor.extract",
+    "args": {
+      "source": "public net.minecraft.client.MinecraftClient # comment",
+      "line": 0,
+      "character": 53
+    },
+    "changes": [
+      {
+        "field": "/valueStartOffset",
+        "old": 0,
+        "new": 53
+      }
+    ],
+    "reason": "Missing token replacement starts at the caret, preserving preceding modifier/owner/comment.",
+    "regression": {
+      "kind": "contextRange",
+      "source": "public net.minecraft.client.MinecraftClient # comment",
+      "start": 53,
+      "end": 53,
+      "selectedText": ""
+    }
+  },
+  {
+    "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/at/AccessTransformerCompletionServiceTest.kt::returnsEmptyWhenOwnerMissingForMemberCompletion",
+    "api": "AtContextExtractor.extractAtOffset",
+    "args": {
+      "source": "public ",
+      "offset": 7
+    },
+    "changes": [
+      {
+        "field": "/valueStartOffset",
+        "old": 0,
+        "new": 7
+      }
+    ],
+    "reason": "Missing token replacement starts at the caret, preserving preceding modifier/owner/comment.",
+    "regression": {
+      "kind": "contextRange",
+      "source": "public ",
+      "start": 7,
+      "end": 7,
+      "selectedText": ""
+    }
+  },
+  {
+    "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/at/AccessTransformerCompletionServiceTest.kt::returnsEmptyWhenOwnerMissingForMemberCompletion",
+    "api": "AtContextExtractor.extract",
+    "args": {
+      "source": "public ",
+      "line": 0,
+      "character": 7
+    },
+    "changes": [
+      {
+        "field": "/valueStartOffset",
+        "old": 0,
+        "new": 7
+      }
+    ],
+    "reason": "Missing token replacement starts at the caret, preserving preceding modifier/owner/comment.",
+    "regression": {
+      "kind": "contextRange",
+      "source": "public ",
+      "start": 7,
+      "end": 7,
+      "selectedText": ""
+    }
+  },
+  {
+    "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/at/AccessTransformerCompletionServiceTest.kt::separatesDisplayLabelFromInsertText",
+    "api": "AtContextExtractor.extractAtOffset",
+    "args": {
+      "source": "public net.minecraft.client.MinecraftClient ",
+      "offset": 44
+    },
+    "changes": [
+      {
+        "field": "/valueStartOffset",
+        "old": 0,
+        "new": 44
+      }
+    ],
+    "reason": "Missing token replacement starts at the caret, preserving preceding modifier/owner/comment.",
+    "regression": {
+      "kind": "contextRange",
+      "source": "public net.minecraft.client.MinecraftClient ",
+      "start": 44,
+      "end": 44,
+      "selectedText": ""
+    }
+  },
+  {
+    "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/at/AccessTransformerCompletionServiceTest.kt::separatesDisplayLabelFromInsertText",
+    "api": "AtContextExtractor.extract",
+    "args": {
+      "source": "public net.minecraft.client.MinecraftClient ",
+      "line": 0,
+      "character": 44
+    },
+    "changes": [
+      {
+        "field": "/valueStartOffset",
+        "old": 0,
+        "new": 44
+      }
+    ],
+    "reason": "Missing token replacement starts at the caret, preserving preceding modifier/owner/comment.",
+    "regression": {
+      "kind": "contextRange",
+      "source": "public net.minecraft.client.MinecraftClient ",
+      "start": 44,
+      "end": 44,
+      "selectedText": ""
+    }
+  },
+  {
+    "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/at/AtContextExtractorTest.kt::detectsMemberDescriptorSlot",
+    "api": "AtContextExtractor.extractAtOffset",
+    "args": {
+      "source": "public net.minecraft.client.MinecraftClient setScreen(",
+      "offset": 54
+    },
+    "changes": [
+      {
+        "field": "/partialValue",
+        "old": "s",
+        "new": "("
+      }
+    ],
+    "reason": "Descriptor partial uses the descriptor token offset instead of indexing from the member name.",
+    "regression": {
+      "kind": "contextRange",
+      "source": "public net.minecraft.client.MinecraftClient setScreen(",
+      "start": 53,
+      "end": 54,
+      "selectedText": "("
+    }
+  },
+  {
+    "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/at/AtContextExtractorTest.kt::detectsMemberDescriptorSlot",
+    "api": "AtContextExtractor.extract",
+    "args": {
+      "source": "public net.minecraft.client.MinecraftClient setScreen(",
+      "line": 0,
+      "character": 54
+    },
+    "changes": [
+      {
+        "field": "/partialValue",
+        "old": "s",
+        "new": "("
+      }
+    ],
+    "reason": "Descriptor partial uses the descriptor token offset instead of indexing from the member name.",
+    "regression": {
+      "kind": "contextRange",
+      "source": "public net.minecraft.client.MinecraftClient setScreen(",
+      "start": 53,
+      "end": 54,
+      "selectedText": "("
+    }
+  },
+  {
+    "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/at/AccessTransformerCompletionServiceTest.kt::returnsEmptyForDescriptorSlot",
+    "api": "AtContextExtractor.extractAtOffset",
+    "args": {
+      "source": "public net.minecraft.client.MinecraftClient setScreen(",
+      "offset": 54
+    },
+    "changes": [
+      {
+        "field": "/partialValue",
+        "old": "s",
+        "new": "("
+      }
+    ],
+    "reason": "Descriptor partial uses the descriptor token offset instead of indexing from the member name.",
+    "regression": {
+      "kind": "contextRange",
+      "source": "public net.minecraft.client.MinecraftClient setScreen(",
+      "start": 53,
+      "end": 54,
+      "selectedText": "("
+    }
+  },
+  {
+    "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/at/AccessTransformerCompletionServiceTest.kt::returnsEmptyForDescriptorSlot",
+    "api": "AtContextExtractor.extract",
+    "args": {
+      "source": "public net.minecraft.client.MinecraftClient setScreen(",
+      "line": 0,
+      "character": 55
+    },
+    "changes": [
+      {
+        "field": "/partialValue",
+        "old": "s",
+        "new": "("
+      }
+    ],
+    "reason": "Descriptor partial uses the descriptor token offset instead of indexing from the member name.",
+    "regression": {
+      "kind": "contextRange",
+      "source": "public net.minecraft.client.MinecraftClient setScreen(",
+      "start": 53,
+      "end": 54,
+      "selectedText": "("
+    }
+  },
+  {
+    "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/aw/AccessWidenerDiagnosticsServiceTest.kt::detectsDescriptorMismatch",
+    "api": "AccessWidenerDiagnosticsService.analyze",
+    "args": {
+      "request": {
+        "source": "accessWidener v2 named\naccessible method net/minecraft/client/MinecraftClient setScreen ()V",
+        "documentUri": "file:///mod.accesswidener",
+        "mappingContext": null
+      }
+    },
+    "changes": [
+      {
+        "field": "/0/range/end/character",
+        "old": 67,
+        "new": 68
+      }
+    ],
+    "reason": "Descriptor highlight includes its final character; source token is the full ()V.",
+    "regression": {
+      "kind": "diagnosticRange",
+      "source": "accessWidener v2 named\naccessible method net/minecraft/client/MinecraftClient setScreen ()V",
+      "selectedText": "()V"
+    }
+  },
+  {
+    "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/aw/AccessWidenerCodeActionServiceTest.kt::offersFixDescriptorForMismatch",
+    "api": "AccessWidenerDiagnosticsService.analyze",
+    "args": {
+      "request": {
+        "source": "accessWidener v2 named\naccessible method net/minecraft/client/MinecraftClient setScreen ()V",
+        "documentUri": "file:///mod.accesswidener",
+        "mappingContext": null
+      }
+    },
+    "changes": [
+      {
+        "field": "/0/range/end/character",
+        "old": 67,
+        "new": 68
+      }
+    ],
+    "reason": "Descriptor highlight includes its final character; source token is the full ()V.",
+    "regression": {
+      "kind": "diagnosticRange",
+      "source": "accessWidener v2 named\naccessible method net/minecraft/client/MinecraftClient setScreen ()V",
+      "selectedText": "()V"
+    }
+  },
+  {
+    "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/aw/AccessWidenerCodeActionServiceTest.kt::applyDescriptorFixReplacesWrongMethodDescriptor",
+    "api": "AccessWidenerDiagnosticsService.analyze",
+    "args": {
+      "request": {
+        "source": "accessWidener v2 named\naccessible method net/minecraft/client/MinecraftClient setScreen ()V",
+        "documentUri": "file:///mod.accesswidener",
+        "mappingContext": null
+      }
+    },
+    "changes": [
+      {
+        "field": "/0/range/end/character",
+        "old": 67,
+        "new": 68
+      }
+    ],
+    "reason": "Descriptor highlight includes its final character; source token is the full ()V.",
+    "regression": {
+      "kind": "diagnosticRange",
+      "source": "accessWidener v2 named\naccessible method net/minecraft/client/MinecraftClient setScreen ()V",
+      "selectedText": "()V"
+    }
+  },
+  {
+    "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/at/AccessTransformerCodeActionServiceTest.kt::appliesAddDescriptorFix",
+    "api": "AccessTransformerCodeActionService.applyMethodDescriptorFix",
+    "args": {
+      "fix": {
+        "_type": "AddAtMethodDescriptorFix",
+        "_value": {
+          "title": "Add method descriptor",
+          "documentUri": "file:///at.cfg",
+          "line": 1,
+          "memberName": "setScreen",
+          "descriptor": "(Lnet/minecraft/client/gui/screen/Screen;)V",
+          "kind": "quickfix.at.addDescriptor"
+        }
+      },
+      "currentContent": "public net.minecraft.client.MinecraftClient setScreen",
+      "_mappingContext": null
+    },
+    "changes": [
+      {
+        "field": "/edits",
+        "old": [
+          {
+            "startOffset": 0,
+            "endOffset": 53,
+            "newText": "public net.minecraft.client.MinecraftClient setScreen(Lnet/minecraft/client/gui/screen/Screen;)V"
+          }
+        ],
+        "new": [
+          {
+            "startOffset": 44,
+            "endOffset": 53,
+            "newText": "setScreen(Lnet/minecraft/client/gui/screen/Screen;)V"
+          }
+        ]
+      }
+    ],
+    "reason": "Replace only the member token; preserve all other text. Original and revised edits produce exactly the same document.",
+    "regression": {
+      "kind": "equivalentEdits",
+      "source": "public net.minecraft.client.MinecraftClient setScreen",
+      "document": "public net.minecraft.client.MinecraftClient setScreen(Lnet/minecraft/client/gui/screen/Screen;)V"
+    }
+  },
+  {
+    "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/at/AccessTransformerCodeActionServiceTest.kt::appliesRemapFixToSrgNames",
+    "api": "AccessTransformerCodeActionService.applyRemapFix",
+    "args": {
+      "fix": {
+        "_type": "RemapAccessTransformerEntryFix",
+        "_value": {
+          "title": "Remap AT entry namespace",
+          "documentUri": "file:///at.cfg",
+          "line": 1,
+          "kind": "quickfix.at.remapNamespace"
+        }
+      },
+      "currentContent": "public net.minecraft.client.MinecraftClient setScreen(Lnet/minecraft/client/gui/screen/Screen;)V",
+      "classIndex": {
+        "hasIndex": true
+      },
+      "mappingContext": {
+        "sourceNamespace": "NAMED",
+        "runtimeNamespace": "SRG",
+        "awNamespace": "NAMED",
+        "atNamespace": "SRG",
+        "availableNamespaces": [
+          "NAMED",
+          "SRG"
+        ]
+      },
+      "_mappingContext": {
+        "sourceNamespace": "NAMED",
+        "runtimeNamespace": "SRG",
+        "awNamespace": "NAMED",
+        "atNamespace": "SRG",
+        "availableNamespaces": [
+          "NAMED",
+          "SRG"
+        ]
+      }
+    },
+    "changes": [
+      {
+        "field": "/edits",
+        "old": [
+          {
+            "startOffset": 0,
+            "endOffset": 96,
+            "newText": "public net.minecraft.client.MinecraftClient m_91152_(Lnet/minecraft/client/gui/screen/Screen;)V"
+          }
+        ],
+        "new": [
+          {
+            "startOffset": 44,
+            "endOffset": 96,
+            "newText": "m_91152_(Lnet/minecraft/client/gui/screen/Screen;)V"
+          }
+        ]
+      }
+    ],
+    "reason": "Replace only the member token; preserve all other text. Original and revised edits produce exactly the same document.",
+    "regression": {
+      "kind": "equivalentEdits",
+      "source": "public net.minecraft.client.MinecraftClient setScreen(Lnet/minecraft/client/gui/screen/Screen;)V",
+      "document": "public net.minecraft.client.MinecraftClient m_91152_(Lnet/minecraft/client/gui/screen/Screen;)V"
+    }
+  },
+  {
+    "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/at/AccessTransformerCodeActionServiceTest.kt::remapActionUsesExactDescriptorWhenDescriptorIsPresent",
+    "api": "AccessTransformerCodeActionService.applyRemapFix",
+    "args": {
+      "fix": {
+        "_type": "RemapAccessTransformerEntryFix",
+        "_value": {
+          "title": "Remap AT entry namespace",
+          "documentUri": "file:///at.cfg",
+          "line": 1,
+          "kind": "quickfix.at.remapNamespace"
+        }
+      },
+      "currentContent": "public com.example.target.OverloadedTarget setValue(Ljava/lang/String;)V",
+      "classIndex": {
+        "hasIndex": true
+      },
+      "mappingContext": {
+        "sourceNamespace": "NAMED",
+        "runtimeNamespace": "SRG",
+        "awNamespace": "NAMED",
+        "atNamespace": "SRG",
+        "availableNamespaces": [
+          "NAMED",
+          "SRG"
+        ]
+      },
+      "_mappingContext": {
+        "sourceNamespace": "NAMED",
+        "runtimeNamespace": "SRG",
+        "awNamespace": "NAMED",
+        "atNamespace": "SRG",
+        "availableNamespaces": [
+          "NAMED",
+          "SRG"
+        ]
+      }
+    },
+    "changes": [
+      {
+        "field": "/edits",
+        "old": [
+          {
+            "startOffset": 0,
+            "endOffset": 72,
+            "newText": "public com.example.target.OverloadedTarget m_string_(Ljava/lang/String;)V"
+          }
+        ],
+        "new": [
+          {
+            "startOffset": 43,
+            "endOffset": 72,
+            "newText": "m_string_(Ljava/lang/String;)V"
+          }
+        ]
+      }
+    ],
+    "reason": "Replace only the member token; preserve all other text. Original and revised edits produce exactly the same document.",
+    "regression": {
+      "kind": "equivalentEdits",
+      "source": "public com.example.target.OverloadedTarget setValue(Ljava/lang/String;)V",
+      "document": "public com.example.target.OverloadedTarget m_string_(Ljava/lang/String;)V"
+    }
+  },
+  {
+    "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/at/AccessTransformerCodeActionServiceTest.kt::remapActionUsesSingleCandidateOnlyWhenDescriptorIsOmitted",
+    "api": "AccessTransformerCodeActionService.applyRemapFix",
+    "args": {
+      "fix": {
+        "_type": "RemapAccessTransformerEntryFix",
+        "_value": {
+          "title": "Remap AT entry namespace",
+          "documentUri": "file:///at.cfg",
+          "line": 1,
+          "kind": "quickfix.at.remapNamespace"
+        }
+      },
+      "currentContent": "public com.example.target.SingleTarget tick",
+      "classIndex": {
+        "hasIndex": true
+      },
+      "mappingContext": {
+        "sourceNamespace": "NAMED",
+        "runtimeNamespace": "SRG",
+        "awNamespace": "NAMED",
+        "atNamespace": "SRG",
+        "availableNamespaces": [
+          "NAMED",
+          "SRG"
+        ]
+      },
+      "_mappingContext": {
+        "sourceNamespace": "NAMED",
+        "runtimeNamespace": "SRG",
+        "awNamespace": "NAMED",
+        "atNamespace": "SRG",
+        "availableNamespaces": [
+          "NAMED",
+          "SRG"
+        ]
+      }
+    },
+    "changes": [
+      {
+        "field": "/edits",
+        "old": [
+          {
+            "startOffset": 0,
+            "endOffset": 43,
+            "newText": "public com.example.target.SingleTarget m_tick_()V"
+          }
+        ],
+        "new": [
+          {
+            "startOffset": 39,
+            "endOffset": 43,
+            "newText": "m_tick_()V"
+          }
+        ]
+      }
+    ],
+    "reason": "Replace only the member token; preserve all other text. Original and revised edits produce exactly the same document.",
+    "regression": {
+      "kind": "equivalentEdits",
+      "source": "public com.example.target.SingleTarget tick",
+      "document": "public com.example.target.SingleTarget m_tick_()V"
+    }
+  },
+  {
+    "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/aw/AccessWidenerCodeActionServiceTest.kt::applyRemoveDuplicateFixRemovesLine",
+    "api": "AccessWidenerEditor.removeLine",
+    "args": {
+      "content": "accessWidener v2 named\naccessible class net/minecraft/client/MinecraftClient\naccessible class net/minecraft/client/MinecraftClient",
+      "lineNumber": 3
+    },
+    "changes": [
+      {
+        "field": "",
+        "old": "accessWidener v2 named\naccessible class net/minecraft/client/MinecraftClient",
+        "new": "accessWidener v2 named\naccessible class net/minecraft/client/MinecraftClient\n"
+      }
+    ],
+    "reason": "Deleting the final duplicate preserves the preceding line terminator.",
+    "regression": {
+      "kind": "document",
+      "document": "accessWidener v2 named\naccessible class net/minecraft/client/MinecraftClient\n"
+    }
+  },
+  {
+    "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/aw/AccessWidenerCodeActionServiceTest.kt::applyRemoveDuplicateFixRemovesLine",
+    "api": "AccessWidenerCodeActionService.applyRemoveDuplicateFix",
+    "args": {
+      "fix": {
+        "_type": "RemoveDuplicateAccessWidenerEntryFix",
+        "_value": {
+          "title": "Remove duplicate",
+          "documentUri": "file:///mod.accesswidener",
+          "lineNumber": 3,
+          "kind": "quickfix.aw.removeDuplicate"
+        }
+      },
+      "currentContent": "accessWidener v2 named\naccessible class net/minecraft/client/MinecraftClient\naccessible class net/minecraft/client/MinecraftClient"
+    },
+    "changes": [
+      {
+        "field": "/edits",
+        "old": [
+          {
+            "startOffset": 0,
+            "endOffset": 130,
+            "newText": "accessWidener v2 named\naccessible class net/minecraft/client/MinecraftClient"
+          }
+        ],
+        "new": [
+          {
+            "startOffset": 77,
+            "endOffset": 130,
+            "newText": ""
+          }
+        ]
+      }
+    ],
+    "reason": "Delete the duplicate range while preserving the preceding line terminator. Bug-corrected adaptation: count entries in the applied document instead of replacement newText.",
+    "regression": {
+      "kind": "changedEdits",
+      "source": "accessWidener v2 named\naccessible class net/minecraft/client/MinecraftClient\naccessible class net/minecraft/client/MinecraftClient",
+      "oldDocument": "accessWidener v2 named\naccessible class net/minecraft/client/MinecraftClient",
+      "document": "accessWidener v2 named\naccessible class net/minecraft/client/MinecraftClient\n",
+      "assertion": "applied document contains exactly one accessible class/public owner entry"
+    }
+  },
+  {
+    "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/at/AccessTransformerCodeActionServiceTest.kt::appliesRemoveDuplicateFix",
+    "api": "AccessTransformerEditor.removeLine",
+    "args": {
+      "content": "public net.minecraft.client.MinecraftClient\npublic net.minecraft.client.MinecraftClient",
+      "lineNumber": 2
+    },
+    "changes": [
+      {
+        "field": "/content",
+        "old": "public net.minecraft.client.MinecraftClient",
+        "new": "public net.minecraft.client.MinecraftClient\n"
+      }
+    ],
+    "reason": "Deleting the final duplicate preserves the preceding line terminator.",
+    "regression": {
+      "kind": "document",
+      "document": "public net.minecraft.client.MinecraftClient\n"
+    }
+  },
+  {
+    "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/at/AccessTransformerCodeActionServiceTest.kt::appliesRemoveDuplicateFix",
+    "api": "AccessTransformerCodeActionService.applyRemoveDuplicateFix",
+    "args": {
+      "fix": {
+        "_type": "RemoveDuplicateAtEntryFix",
+        "_value": {
+          "title": "Remove duplicate entry",
+          "documentUri": "file:///at.cfg",
+          "line": 2,
+          "kind": "quickfix.at.removeDuplicate"
+        }
+      },
+      "currentContent": "public net.minecraft.client.MinecraftClient\npublic net.minecraft.client.MinecraftClient",
+      "_mappingContext": null
+    },
+    "changes": [
+      {
+        "field": "/edits",
+        "old": [
+          {
+            "startOffset": 0,
+            "endOffset": 87,
+            "newText": "public net.minecraft.client.MinecraftClient"
+          }
+        ],
+        "new": [
+          {
+            "startOffset": 44,
+            "endOffset": 87,
+            "newText": ""
+          }
+        ]
+      }
+    ],
+    "reason": "Delete the duplicate range while preserving the preceding line terminator. Bug-corrected adaptation: count entries in the applied document instead of replacement newText.",
+    "regression": {
+      "kind": "changedEdits",
+      "source": "public net.minecraft.client.MinecraftClient\npublic net.minecraft.client.MinecraftClient",
+      "oldDocument": "public net.minecraft.client.MinecraftClient",
+      "document": "public net.minecraft.client.MinecraftClient\n",
+      "assertion": "applied document contains exactly one accessible class/public owner entry"
+    }
+  },
+  {
+    "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/aw/AccessWidenerCodeActionServiceTest.kt::applyGenerateEntryFixInsertsLine",
+    "api": "AccessWidenerCodeActionService.applyGenerateEntryFix",
+    "args": {
+      "fix": {
+        "_type": "GenerateAccessWidenerEntryFix",
+        "_value": {
+          "title": "Generate entry",
+          "documentUri": "file:///mod.accesswidener",
+          "insertLine": 1,
+          "entry": "accessible class net/minecraft/client/MinecraftClient",
+          "kind": "quickfix.aw.generateEntry"
+        }
+      },
+      "currentContent": "accessWidener v2 named\n"
+    },
+    "changes": [
+      {
+        "field": "/edits",
+        "old": [
+          {
+            "startOffset": 0,
+            "endOffset": 23,
+            "newText": "accessible class net/minecraft/client/MinecraftClient\naccessWidener v2 named\n\n"
+          }
+        ],
+        "new": [
+          {
+            "startOffset": 0,
+            "endOffset": 0,
+            "newText": "accessible class net/minecraft/client/MinecraftClient\n"
+          }
+        ]
+      }
+    ],
+    "reason": "Insertion preserves existing terminators instead of reconstructing the document and adding a blank line.",
+    "regression": {
+      "kind": "changedEdits",
+      "source": "accessWidener v2 named\n",
+      "oldDocument": "accessible class net/minecraft/client/MinecraftClient\naccessWidener v2 named\n\n",
+      "document": "accessible class net/minecraft/client/MinecraftClient\naccessWidener v2 named\n"
+    }
+  },
+  {
+    "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/aw/AccessWidenerEditorTest.kt::insertEntryAppendsFormattedLine",
+    "api": "AccessWidenerEditor.insertEntry",
+    "args": {
+      "content": "accessWidener v2 named\n",
+      "entry": {
+        "directive": "ACCESSIBLE",
+        "kind": "CLASS",
+        "owner": "net/minecraft/client/MinecraftClient",
+        "name": null,
+        "descriptor": null,
+        "line": 2
+      },
+      "afterLine": null
+    },
+    "changes": [
+      {
+        "field": "",
+        "old": "accessWidener v2 named\n\naccessible class net/minecraft/client/MinecraftClient\n",
+        "new": "accessWidener v2 named\naccessible class net/minecraft/client/MinecraftClient\n"
+      }
+    ],
+    "reason": "Appending to an already terminated document adds the entry without inventing a blank line.",
+    "regression": {
+      "kind": "document",
+      "document": "accessWidener v2 named\naccessible class net/minecraft/client/MinecraftClient\n"
+    }
+  }
+]

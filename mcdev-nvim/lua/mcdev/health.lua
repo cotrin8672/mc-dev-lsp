@@ -48,16 +48,6 @@ local function current_commit()
   return "unknown"
 end
 
-local function extension_jar()
-  local ok, jar = pcall(function()
-    return require("mcdev.jdtls").resolve_extension_jar()
-  end)
-  if ok then
-    return jar
-  end
-  return nil
-end
-
 local function first_items(items, limit)
   local result = {}
   for index = 1, math.min(#items, limit) do
@@ -90,8 +80,13 @@ end
 
 local function base_lines(bufnr)
   bufnr = bufnr or vim.api.nvim_get_current_buf()
-  local client = protocol.active_jdtls_client(bufnr)
-  local jar = extension_jar()
+  local client = protocol.active_ktlsp_client(bufnr)
+  local command = require("mcdev.ktlsp").companion_command()
+  local init = client and client.config and client.config.init_options or {}
+  local provider = init.analysisProviders and init.analysisProviders["mcdev.mixin"]
+  if provider and provider.command then
+    command = require("mcdev.ktlsp").companion_command({ companion = { cmd = provider.command } })
+  end
   local blink_loaded = package.loaded["blink.cmp"] ~= nil
   local cmp_loaded = package.loaded["cmp"] ~= nil
   return {
@@ -99,15 +94,16 @@ local function base_lines(bufnr)
     "mcdev-nvim module path: " .. module_path("mcdev"),
     "mcdev.blink module path: " .. module_path("mcdev.blink"),
     "mcdev.completion module path: " .. module_path("mcdev.completion"),
-    "jdtls client found: " .. bool_text(client ~= nil),
-    "selected jdtls client id: " .. client_id(client),
-    "selected jdtls root_dir: " .. tostring(client_root(client)),
+    "ktlsp client found: " .. bool_text(client ~= nil),
+    "selected ktlsp client id: " .. client_id(client),
+    "selected ktlsp root_dir: " .. tostring(client_root(client)),
     "workspace root: " .. protocol.context(bufnr).workspaceRoot,
     "current buffer uri: " .. vim.uri_from_bufnr(bufnr),
     "current filetype: " .. vim.bo[bufnr].filetype,
     "current language id: " .. require("mcdev.buffer").effective_language_id(bufnr),
-    "resolved extension jar: " .. tostring(jar),
-    "extension jar readable: " .. bool_text(jar ~= nil and vim.fn.filereadable(jar) == 1),
+    "companion argv: " .. vim.inspect(command),
+    "companion executable available: " .. bool_text(command ~= nil and vim.fn.executable(command[1]) == 1),
+    "indexed completion advertised: " .. bool_text(protocol.command_supported(client, protocol.commands.completion)),
     "blink.cmp detected: " .. bool_text(blink_loaded),
     "blink provider module: mcdev.blink",
     "nvim-cmp detected: " .. bool_text(cmp_loaded),
@@ -174,10 +170,10 @@ function M.health(bufnr)
     local lines = base_lines(bufnr)
     vim.list_extend(lines, {
       "repo current commit: " .. repo_commit,
-      "jar build commit: " .. tostring(info.buildCommit or "unknown"),
-      "extension build commit: " .. tostring(info.buildCommit or "unknown"),
-      "extension build time: " .. tostring(info.buildTime or "unknown"),
-      "extension jar location: " .. tostring(info.jarLocation or "unknown"),
+      "companion build commit: " .. tostring(info.buildCommit or "unknown"),
+      "backend build commit: " .. tostring(info.buildCommit or "unknown"),
+      "backend build time: " .. tostring(info.buildTime or "unknown"),
+      "backend executable: " .. tostring(info.executableLocation or info.jarLocation or "unknown"),
       "registered commands: " .. vim.inspect(info.registeredCommands or {}),
       "mcdev.info ping: " .. (results.info.ok and "OK" or "FAILED"),
       "mcdev.info error: " .. tostring(results.info.err),
@@ -209,7 +205,7 @@ function M.health(bufnr)
       "  warnings: " .. vim.inspect(debug.warnings or {}),
     })
     if info.buildCommit and repo_commit ~= "unknown" and info.buildCommit ~= repo_commit then
-      lines[#lines + 1] = "WARNING: JDTLS is using an old mcdev extension jar. Rebuild/reinstall the jar and restart JDTLS."
+      lines[#lines + 1] = "WARNING: the mcdev companion build differs from this checkout. Rebuild/reinstall the executable and restart ktlsp."
     end
     ui.show_report("mcdev health", lines)
   end
@@ -238,7 +234,7 @@ function M.debug_completion(bufnr)
     end
     ui.show_report("mcdev completion debug", {
       "request params: " .. vim.inspect(payload),
-      "selected jdtls client: " .. client_id(protocol.active_jdtls_client(bufnr)),
+      "selected ktlsp client: " .. client_id(protocol.active_ktlsp_client(bufnr)),
       "raw response: " .. vim.inspect(envelope),
       "item count: " .. tostring(#items),
       "zero item reason: " .. tostring(debug.zeroItemReason),

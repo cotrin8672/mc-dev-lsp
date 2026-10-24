@@ -1,0 +1,243 @@
+[
+  {
+    "case": "identical",
+    "destinations": [
+      "B",
+      "B"
+    ],
+    "className": "B",
+    "fieldName": "field_B",
+    "methodName": "method_B",
+    "classResult": {
+      "kind": "Found",
+      "value": {
+        "internalName": "B",
+        "namespace": "INTERMEDIARY"
+      }
+    },
+    "fieldResult": {
+      "kind": "Found",
+      "value": {
+        "owner": "B",
+        "name": "field_B",
+        "descriptor": "LB;",
+        "namespace": "INTERMEDIARY"
+      }
+    },
+    "methodResult": {
+      "kind": "Found",
+      "value": {
+        "owner": "B",
+        "name": "method_B",
+        "descriptor": "([LB;)LB;",
+        "namespace": "INTERMEDIARY"
+      }
+    },
+    "descriptorResult": {
+      "kind": "Found",
+      "value": "([LB;)LB;"
+    }
+  },
+  {
+    "case": "conflicting",
+    "destinations": [
+      "B",
+      "C"
+    ],
+    "className": "B",
+    "fieldName": "field_B",
+    "methodName": "method_B",
+    "classResult": {
+      "kind": "Found",
+      "value": {
+        "internalName": "B",
+        "namespace": "INTERMEDIARY"
+      }
+    },
+    "fieldResult": {
+      "kind": "Found",
+      "value": {
+        "owner": "B",
+        "name": "field_B",
+        "descriptor": "LB;",
+        "namespace": "INTERMEDIARY"
+      }
+    },
+    "methodResult": {
+      "kind": "Found",
+      "value": {
+        "owner": "B",
+        "name": "method_B",
+        "descriptor": "([LB;)LB;",
+        "namespace": "INTERMEDIARY"
+      }
+    },
+    "descriptorResult": {
+      "kind": "Found",
+      "value": "([LB;)LB;"
+    }
+  },
+  {
+    "case": "reversed",
+    "destinations": [
+      "C",
+      "B"
+    ],
+    "className": "C",
+    "fieldName": "field_C",
+    "methodName": "method_C",
+    "classResult": {
+      "kind": "Found",
+      "value": {
+        "internalName": "C",
+        "namespace": "INTERMEDIARY"
+      }
+    },
+    "fieldResult": {
+      "kind": "Found",
+      "value": {
+        "owner": "C",
+        "name": "field_C",
+        "descriptor": "LC;",
+        "namespace": "INTERMEDIARY"
+      }
+    },
+    "methodResult": {
+      "kind": "Found",
+      "value": {
+        "owner": "C",
+        "name": "method_C",
+        "descriptor": "([LC;)LC;",
+        "namespace": "INTERMEDIARY"
+      }
+    },
+    "descriptorResult": {
+      "kind": "Found",
+      "value": "([LC;)LC;"
+    }
+  },
+  {
+    "case": "firstMissing",
+    "destinations": [
+      null,
+      "C"
+    ],
+    "className": null,
+    "fieldName": null,
+    "methodName": null,
+    "classResult": {
+      "kind": "Missing",
+      "subject": "CLASS",
+      "owner": "A",
+      "name": null,
+      "descriptor": null,
+      "from": "NAMED",
+      "to": "INTERMEDIARY"
+    },
+    "fieldResult": {
+      "kind": "Missing",
+      "subject": "CLASS",
+      "owner": "A",
+      "name": null,
+      "descriptor": null,
+      "from": "NAMED",
+      "to": "INTERMEDIARY"
+    },
+    "methodResult": {
+      "kind": "Missing",
+      "subject": "CLASS",
+      "owner": "A",
+      "name": null,
+      "descriptor": null,
+      "from": "NAMED",
+      "to": "INTERMEDIARY"
+    },
+    "descriptorResult": {
+      "kind": "Missing",
+      "subject": "CLASS",
+      "owner": "A",
+      "name": null,
+      "descriptor": null,
+      "from": "NAMED",
+      "to": "INTERMEDIARY"
+    }
+  },
+  {
+    "case": "laterMissing",
+    "destinations": [
+      "B",
+      null
+    ],
+    "className": "B",
+    "fieldName": "field_B",
+    "methodName": "method_B",
+    "classResult": {
+      "kind": "Found",
+      "value": {
+        "internalName": "B",
+        "namespace": "INTERMEDIARY"
+      }
+    },
+    "fieldResult": {
+      "kind": "Found",
+      "value": {
+        "owner": "B",
+        "name": "field_B",
+        "descriptor": "LB;",
+        "namespace": "INTERMEDIARY"
+      }
+    },
+    "methodResult": {
+      "kind": "Found",
+      "value": {
+        "owner": "B",
+        "name": "method_B",
+        "descriptor": "([LB;)LB;",
+        "namespace": "INTERMEDIARY"
+      }
+    },
+    "descriptorResult": {
+      "kind": "Found",
+      "value": "([LB;)LB;"
+    }
+  },
+  {
+    "case": "emptyFirst",
+    "destinations": [
+      "",
+      "C"
+    ],
+    "className": "",
+    "fieldName": "field_",
+    "methodName": "method_",
+    "classResult": {
+      "kind": "Found",
+      "value": {
+        "internalName": "",
+        "namespace": "INTERMEDIARY"
+      }
+    },
+    "fieldResult": {
+      "kind": "Found",
+      "value": {
+        "owner": "",
+        "name": "field_",
+        "descriptor": "L;",
+        "namespace": "INTERMEDIARY"
+      }
+    },
+    "methodResult": {
+      "kind": "Found",
+      "value": {
+        "owner": "",
+        "name": "method_",
+        "descriptor": "([L;)L;",
+        "namespace": "INTERMEDIARY"
+      }
+    },
+    "descriptorResult": {
+      "kind": "Found",
+      "value": "([L;)L;"
+    }
+  }
+]

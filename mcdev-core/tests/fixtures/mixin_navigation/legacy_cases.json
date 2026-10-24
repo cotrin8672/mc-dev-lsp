@@ -1,0 +1,416 @@
+[
+  {
+    "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixin/MixinDefinitionServiceTest.kt::atTargetParserParsesFieldDescriptor",
+    "legacyClass": "io.github.mcdev.core.mixin.MixinDefinitionServiceTest",
+    "status": "passed",
+    "calls": 1
+  },
+  {
+    "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixin/MixinDefinitionServiceTest.kt::atTargetParserParsesMethodDescriptor",
+    "legacyClass": "io.github.mcdev.core.mixin.MixinDefinitionServiceTest",
+    "status": "passed",
+    "calls": 1
+  },
+  {
+    "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixin/MixinDefinitionServiceTest.kt::definitionCursorOutsideValueReturnsEmpty",
+    "legacyClass": "io.github.mcdev.core.mixin.MixinDefinitionServiceTest",
+    "status": "passed",
+    "calls": 43
+  },
+  {
+    "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixin/MixinDefinitionServiceTest.kt::definitionDoesNotMatchCommentString",
+    "legacyClass": "io.github.mcdev.core.mixin.MixinDefinitionServiceTest",
+    "status": "passed",
+    "calls": 43
+  },
+  {
+    "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixin/MixinDefinitionServiceTest.kt::definitionDoesNotMatchUnrelatedHandlerMethodString",
+    "legacyClass": "io.github.mcdev.core.mixin.MixinDefinitionServiceTest",
+    "status": "passed",
+    "calls": 54
+  },
+  {
+    "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixin/MixinDefinitionServiceTest.kt::definitionExactMethodDoesNotSetDirectSourceDocumentUri",
+    "legacyClass": "io.github.mcdev.core.mixin.MixinDefinitionServiceTest",
+    "status": "passed",
+    "calls": 13
+  },
+  {
+    "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixin/MixinDefinitionServiceTest.kt::definitionLocalTypeAmbiguousWildcardClassLiteralReturnsEmpty",
+    "legacyClass": "io.github.mcdev.core.mixin.MixinDefinitionServiceTest",
+    "status": "passed",
+    "calls": 50
+  },
+  {
+    "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixin/MixinDefinitionServiceTest.kt::definitionLocalTypeUnknownClassLiteralReturnsEmpty",
+    "legacyClass": "io.github.mcdev.core.mixin.MixinDefinitionServiceTest",
+    "status": "passed",
+    "calls": 50
+  },
+  {
+    "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixin/MixinDefinitionServiceTest.kt::definitionMalformedSelectorReturnsEmpty",
+    "legacyClass": "io.github.mcdev.core.mixin.MixinDefinitionServiceTest",
+    "status": "passed",
+    "calls": 45
+  },
+  {
+    "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixin/MixinDefinitionServiceTest.kt::definitionOmittedDescriptorReturnsEmpty",
+    "legacyClass": "io.github.mcdev.core.mixin.MixinDefinitionServiceTest",
+    "status": "passed",
+    "calls": 45
+  },
+  {
+    "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixin/MixinDefinitionServiceTest.kt::definitionWildcardSelectorReturnsEmpty",
+    "legacyClass": "io.github.mcdev.core.mixin.MixinDefinitionServiceTest",
+    "status": "passed",
+    "calls": 45
+  },
+  {
+    "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixin/MixinDefinitionServiceTest.kt::expressionDefinitionIdSetsDirectSourceDocumentUriWhenProvided",
+    "legacyClass": "io.github.mcdev.core.mixin.MixinDefinitionServiceTest",
+    "status": "passed",
+    "calls": 40
+  },
+  {
+    "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixin/MixinDefinitionServiceTest.kt::invokerDefinitionDoesNotFallbackToWrongOverload",
+    "legacyClass": "io.github.mcdev.core.mixin.MixinDefinitionServiceTest",
+    "status": "passed",
+    "calls": 75
+  },
+  {
+    "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixin/MixinDefinitionServiceTest.kt::invokerDefinitionDoesNotResolveWhenDescriptorContainsUnknownType",
+    "legacyClass": "io.github.mcdev.core.mixin.MixinDefinitionServiceTest",
+    "status": "passed",
+    "calls": 93
+  },
+  {
+    "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixin/MixinDefinitionServiceTest.kt::isolatesExpressionDefinitionIdByHandler",
+    "legacyClass": "io.github.mcdev.core.mixin.MixinDefinitionServiceTest",
+    "status": "passed",
+    "calls": 38
+  },
+  {
+    "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixin/MixinDefinitionServiceTest.kt::preservesDefinitionExactMethodNavigation",
+    "legacyClass": "io.github.mcdev.core.mixin.MixinDefinitionServiceTest",
+    "status": "passed",
+    "calls": 13
+  },
+  {
+    "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixin/MixinDefinitionServiceTest.kt::preservesRawExpressionTokenOffsetsForOctalEscapedIdentifier",
+    "legacyClass": "io.github.mcdev.core.mixin.MixinDefinitionServiceTest",
+    "status": "passed",
+    "calls": 19
+  },
+  {
+    "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixin/MixinDefinitionServiceTest.kt::rejectsAmbiguousInjectorMethodAndNonMethodAttribute",
+    "legacyClass": "io.github.mcdev.core.mixin.MixinDefinitionServiceTest",
+    "status": "passed",
+    "calls": 116
+  },
+  {
+    "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixin/MixinDefinitionServiceTest.kt::rejectsExpressionIdAttributeSelection",
+    "legacyClass": "io.github.mcdev.core.mixin.MixinDefinitionServiceTest",
+    "status": "passed",
+    "calls": 45
+  },
+  {
+    "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixin/MixinDefinitionServiceTest.kt::rejectsExpressionIdentifierAfterDotMemberName",
+    "legacyClass": "io.github.mcdev.core.mixin.MixinDefinitionServiceTest",
+    "status": "passed",
+    "calls": 72
+  },
+  {
+    "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixin/MixinDefinitionServiceTest.kt::rejectsExpressionIdentifierInCommentStringFake",
+    "legacyClass": "io.github.mcdev.core.mixin.MixinDefinitionServiceTest",
+    "status": "passed",
+    "calls": 53
+  },
+  {
+    "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixin/MixinDefinitionServiceTest.kt::rejectsExpressionIdentifierWithLeadingBackslashAfterJavaDecode",
+    "legacyClass": "io.github.mcdev.core.mixin.MixinDefinitionServiceTest",
+    "status": "passed",
+    "calls": 54
+  },
+  {
+    "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixin/MixinDefinitionServiceTest.kt::rejectsExpressionKeywordIdentifier",
+    "legacyClass": "io.github.mcdev.core.mixin.MixinDefinitionServiceTest",
+    "status": "passed",
+    "calls": 53
+  },
+  {
+    "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixin/MixinDefinitionServiceTest.kt::rejectsMissingExpressionDefinitionId",
+    "legacyClass": "io.github.mcdev.core.mixin.MixinDefinitionServiceTest",
+    "status": "passed",
+    "calls": 72
+  },
+  {
+    "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixin/MixinDefinitionServiceTest.kt::rejectsPartialExpressionDefinitionIdentifier",
+    "legacyClass": "io.github.mcdev.core.mixin.MixinDefinitionServiceTest",
+    "status": "passed",
+    "calls": 72
+  },
+  {
+    "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixin/MixinDefinitionServiceTest.kt::resolvesAccessorField",
+    "legacyClass": "io.github.mcdev.core.mixin.MixinDefinitionServiceTest",
+    "status": "passed",
+    "calls": 37
+  },
+  {
+    "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixin/MixinDefinitionServiceTest.kt::resolvesAtTargetInvokeMember",
+    "legacyClass": "io.github.mcdev.core.mixin.MixinDefinitionServiceTest",
+    "status": "passed",
+    "calls": 27
+  },
+  {
+    "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixin/MixinDefinitionServiceTest.kt::resolvesCompleteMixinTargetBeforeAmbiguousPartialPrefix",
+    "legacyClass": "io.github.mcdev.core.mixin.MixinDefinitionServiceTest",
+    "status": "passed",
+    "calls": 77
+  },
+  {
+    "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixin/MixinDefinitionServiceTest.kt::resolvesDefinitionExactField",
+    "legacyClass": "io.github.mcdev.core.mixin.MixinDefinitionServiceTest",
+    "status": "passed",
+    "calls": 13
+  },
+  {
+    "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixin/MixinDefinitionServiceTest.kt::resolvesDefinitionExactMethod",
+    "legacyClass": "io.github.mcdev.core.mixin.MixinDefinitionServiceTest",
+    "status": "passed",
+    "calls": 13
+  },
+  {
+    "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixin/MixinDefinitionServiceTest.kt::resolvesDefinitionLocalTypeClassLiteral",
+    "legacyClass": "io.github.mcdev.core.mixin.MixinDefinitionServiceTest",
+    "status": "passed",
+    "calls": 18
+  },
+  {
+    "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixin/MixinDefinitionServiceTest.kt::resolvesDefinitionLocalTypeImplicitJavaLangClassLiteral",
+    "legacyClass": "io.github.mcdev.core.mixin.MixinDefinitionServiceTest",
+    "status": "passed",
+    "calls": 18
+  },
+  {
+    "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixin/MixinDefinitionServiceTest.kt::resolvesDefinitionLocalTypeNestedClassThroughImport",
+    "legacyClass": "io.github.mcdev.core.mixin.MixinDefinitionServiceTest",
+    "status": "passed",
+    "calls": 18
+  },
+  {
+    "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixin/MixinDefinitionServiceTest.kt::resolvesDefinitionLocalTypeThroughExplicitImport",
+    "legacyClass": "io.github.mcdev.core.mixin.MixinDefinitionServiceTest",
+    "status": "passed",
+    "calls": 18
+  },
+  {
+    "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixin/MixinDefinitionServiceTest.kt::resolvesDefinitionTypeClassLiteral",
+    "legacyClass": "io.github.mcdev.core.mixin.MixinDefinitionServiceTest",
+    "status": "passed",
+    "calls": 45
+  },
+  {
+    "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixin/MixinDefinitionServiceTest.kt::resolvesEachLocalTypeInsideDefinitionArray",
+    "legacyClass": "io.github.mcdev.core.mixin.MixinDefinitionServiceTest",
+    "status": "passed",
+    "calls": 36
+  },
+  {
+    "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixin/MixinDefinitionServiceTest.kt::resolvesExpressionIdentifierFromNestedDefinitions",
+    "legacyClass": "io.github.mcdev.core.mixin.MixinDefinitionServiceTest",
+    "status": "passed",
+    "calls": 42
+  },
+  {
+    "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixin/MixinDefinitionServiceTest.kt::resolvesExpressionIdentifierToUniqueDefinitionId",
+    "legacyClass": "io.github.mcdev.core.mixin.MixinDefinitionServiceTest",
+    "status": "passed",
+    "calls": 41
+  },
+  {
+    "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixin/MixinDefinitionServiceTest.kt::resolvesExpressionIdentifierWithDefinitionsAfterInjector",
+    "legacyClass": "io.github.mcdev.core.mixin.MixinDefinitionServiceTest",
+    "status": "passed",
+    "calls": 30
+  },
+  {
+    "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixin/MixinDefinitionServiceTest.kt::resolvesExpressionIdentifierWithFqnAnnotations",
+    "legacyClass": "io.github.mcdev.core.mixin.MixinDefinitionServiceTest",
+    "status": "passed",
+    "calls": 30
+  },
+  {
+    "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixin/MixinDefinitionServiceTest.kt::resolvesExpressionMemberAndMethodReferenceDefinitionIds",
+    "legacyClass": "io.github.mcdev.core.mixin.MixinDefinitionServiceTest",
+    "status": "passed",
+    "calls": 123
+  },
+  {
+    "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixin/MixinDefinitionServiceTest.kt::resolvesExpressionsContainerIdentifierToDefinitionId",
+    "legacyClass": "io.github.mcdev.core.mixin.MixinDefinitionServiceTest",
+    "status": "passed",
+    "calls": 30
+  },
+  {
+    "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixin/MixinDefinitionServiceTest.kt::resolvesFullyQualifiedDefinitionExactMethod",
+    "legacyClass": "io.github.mcdev.core.mixin.MixinDefinitionServiceTest",
+    "status": "passed",
+    "calls": 13
+  },
+  {
+    "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixin/MixinDefinitionServiceTest.kt::resolvesInjectorMethodForInjectAndMixinExtras",
+    "legacyClass": "io.github.mcdev.core.mixin.MixinDefinitionServiceTest",
+    "status": "passed",
+    "calls": 54
+  },
+  {
+    "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixin/MixinDefinitionServiceTest.kt::resolvesInvokerMethod",
+    "legacyClass": "io.github.mcdev.core.mixin.MixinDefinitionServiceTest",
+    "status": "passed",
+    "calls": 43
+  },
+  {
+    "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixin/MixinDefinitionServiceTest.kt::resolvesKotlinDefinitionAndLocalClassLiteralsWithOriginalRanges",
+    "legacyClass": "io.github.mcdev.core.mixin.MixinDefinitionServiceTest",
+    "status": "passed",
+    "calls": 247
+  },
+  {
+    "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixin/MixinDefinitionServiceTest.kt::resolvesMixinClassTarget",
+    "legacyClass": "io.github.mcdev.core.mixin.MixinDefinitionServiceTest",
+    "status": "passed",
+    "calls": 14
+  },
+  {
+    "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixin/MixinDefinitionServiceTest.kt::resolvesMixinTargetsString",
+    "legacyClass": "io.github.mcdev.core.mixin.MixinDefinitionServiceTest",
+    "status": "passed",
+    "calls": 17
+  },
+  {
+    "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixin/MixinDefinitionServiceTest.kt::resolvesNestedDefinitionFieldInDefinitionsArray",
+    "legacyClass": "io.github.mcdev.core.mixin.MixinDefinitionServiceTest",
+    "status": "passed",
+    "calls": 13
+  },
+  {
+    "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixin/MixinDefinitionServiceTest.kt::resolvesOctalEscapedExpressionTokenToPlainDefinitionId",
+    "legacyClass": "io.github.mcdev.core.mixin.MixinDefinitionServiceTest",
+    "status": "passed",
+    "calls": 41
+  },
+  {
+    "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixin/MixinDefinitionServiceTest.kt::resolvesPlainExpressionTokenToOctalEscapedDefinitionId",
+    "legacyClass": "io.github.mcdev.core.mixin.MixinDefinitionServiceTest",
+    "status": "passed",
+    "calls": 42
+  },
+  {
+    "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixin/MixinDefinitionServiceTest.kt::resolvesShadowField",
+    "legacyClass": "io.github.mcdev.core.mixin.MixinDefinitionServiceTest",
+    "status": "passed",
+    "calls": 49
+  },
+  {
+    "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixin/MixinDefinitionServiceTest.kt::resolvesShadowMembersWhenTheCaretIsAtTheNameEnd",
+    "legacyClass": "io.github.mcdev.core.mixin.MixinDefinitionServiceTest",
+    "status": "passed",
+    "calls": 122
+  },
+  {
+    "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixin/MixinDefinitionServiceTest.kt::resolvesShadowMethod",
+    "legacyClass": "io.github.mcdev.core.mixin.MixinDefinitionServiceTest",
+    "status": "passed",
+    "calls": 58
+  },
+  {
+    "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixin/MixinDefinitionServiceTest.kt::resolvesSimpleTargetMixinClassFromBytecodeIndex",
+    "legacyClass": "io.github.mcdev.core.mixin.MixinDefinitionServiceTest",
+    "status": "passed",
+    "calls": 14
+  },
+  {
+    "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixin/MixinDefinitionServiceTest.kt::returnsEmptyOutsideMixinContext",
+    "legacyClass": "io.github.mcdev.core.mixin.MixinDefinitionServiceTest",
+    "status": "passed",
+    "calls": 43
+  },
+  {
+    "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixin/MixinDefinitionServiceTest.kt::returnsEquivalentPlainAndEscapedDefinitionIds",
+    "legacyClass": "io.github.mcdev.core.mixin.MixinDefinitionServiceTest",
+    "status": "passed",
+    "calls": 45
+  },
+  {
+    "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixin/MixinDefinitionServiceTest.kt::returnsEveryDefinitionOfRepeatedIdentifier",
+    "legacyClass": "io.github.mcdev.core.mixin.MixinDefinitionServiceTest",
+    "status": "passed",
+    "calls": 43
+  },
+  {
+    "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixin/MixinDefinitionServiceTest.kt::semanticMemberDefinitionsOnlyResolveTheExactNameToken",
+    "legacyClass": "io.github.mcdev.core.mixin.MixinDefinitionServiceTest",
+    "status": "passed",
+    "calls": 457
+  },
+  {
+    "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixin/MixinReferenceServiceTest.kt::doesNotMatchInjectMethodNameByPrefix",
+    "legacyClass": "io.github.mcdev.core.mixin.MixinReferenceServiceTest",
+    "status": "passed",
+    "calls": 17
+  },
+  {
+    "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixin/MixinReferenceServiceTest.kt::findsAccessTransformerFieldReferences",
+    "legacyClass": "io.github.mcdev.core.mixin.MixinReferenceServiceTest",
+    "status": "passed",
+    "calls": 9
+  },
+  {
+    "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixin/MixinReferenceServiceTest.kt::findsAccessWidenerMethodReferences",
+    "legacyClass": "io.github.mcdev.core.mixin.MixinReferenceServiceTest",
+    "status": "passed",
+    "calls": 17
+  },
+  {
+    "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixin/MixinReferenceServiceTest.kt::findsAccessorFieldReferences",
+    "legacyClass": "io.github.mcdev.core.mixin.MixinReferenceServiceTest",
+    "status": "passed",
+    "calls": 9
+  },
+  {
+    "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixin/MixinReferenceServiceTest.kt::findsInvokerReferences",
+    "legacyClass": "io.github.mcdev.core.mixin.MixinReferenceServiceTest",
+    "status": "passed",
+    "calls": 17
+  },
+  {
+    "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixin/MixinReferenceServiceTest.kt::findsMixinClassReferences",
+    "legacyClass": "io.github.mcdev.core.mixin.MixinReferenceServiceTest",
+    "status": "passed",
+    "calls": 1
+  },
+  {
+    "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixin/MixinReferenceServiceTest.kt::findsReferencesAcrossMultipleSources",
+    "legacyClass": "io.github.mcdev.core.mixin.MixinReferenceServiceTest",
+    "status": "passed",
+    "calls": 1
+  },
+  {
+    "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixin/MixinReferenceServiceTest.kt::findsShadowFieldReferences",
+    "legacyClass": "io.github.mcdev.core.mixin.MixinReferenceServiceTest",
+    "status": "passed",
+    "calls": 11
+  },
+  {
+    "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixin/MixinReferenceServiceTest.kt::matchesInjectMethodDescriptorExactly",
+    "legacyClass": "io.github.mcdev.core.mixin.MixinReferenceServiceTest",
+    "status": "passed",
+    "calls": 17
+  },
+  {
+    "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixin/MixinReferenceServiceTest.kt::returnsEmptyWhenNoMatches",
+    "legacyClass": "io.github.mcdev.core.mixin.MixinReferenceServiceTest",
+    "status": "passed",
+    "calls": 1
+  }
+]

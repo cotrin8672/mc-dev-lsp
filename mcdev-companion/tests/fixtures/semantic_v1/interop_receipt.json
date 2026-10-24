@@ -1,0 +1,184 @@
+{
+  "stockHost": {
+    "revision": "f5953350928eb8af1ab34bb39db23ba7370d14af",
+    "sha256": "7e71f6f44c12c3a80a0ff60363d1a6ee996dfb2e4b3e010cf3fc12d81c68fcd8"
+  },
+  "oldConsumerSha256": "3e0fc4b9814ac0cf3699a5c3a62eddecb921f493ee32f7944307ed798e09f9c7",
+  "newConsumerSha256": "403033f32d71900d9ebe2022a2b8a6f3a4d61a64cddf8756ba586491a7cdc9ff",
+  "consumerReceipt": "build/companion-artifacts/semantic-v1-config-20261024-1626/receipt.json",
+  "failureCapture": "build/rust-test-logs/companion-editor-proxy-20261024-160942567/wire/202412",
+  "immutableReplay": {
+    "sameOutputBytes": true,
+    "exitCode": 0,
+    "stderrBytes": 0
+  },
+  "rootCause": "wire::Evaluation::validate rejected host opaque configuration [] as non-object; no policy consumes configuration",
+  "realShapeFixtureSha256": "7f36b23104d183e8d631cc9627f27a7e54ecb83825f7f060d37e154c7dc9eb09",
+  "native": {
+    "tests": 165,
+    "exitCode": 0,
+    "log": "build/rust-test-logs/companion-real-config-native-final/affected.*",
+    "seconds": 32.4
+  },
+  "observer": {
+    "exitCode": 0,
+    "seconds": 2.0,
+    "log": "build/rust-test-logs/companion-accepted-scope-final/trace.*"
+  },
+  "editor": {
+    "checks": 112,
+    "requests": 29,
+    "methods": {
+      "textDocument/definition": 19,
+      "textDocument/diagnostic": 4,
+      "textDocument/references": 3,
+      "textDocument/rename": 1,
+      "textDocument/completion": 2
+    },
+    "accepted": 19,
+    "instances": {
+      "3": 7,
+      "12": 12
+    },
+    "singleAttempt": true,
+    "inputHashesStable": true,
+    "shutdown": {
+      "clean": true,
+      "exited": true,
+      "exit_code": 0,
+      "signal": 0
+    },
+    "seconds": 25.7,
+    "deadlineSeconds": 120,
+    "timedOut": false,
+    "log": "build/rust-test-logs/companion-editor-fixed-20261024-163224097",
+    "mutations": [
+      "appliedRename",
+      "unsavedLongOverload"
+    ],
+    "completionWholeBufferMatches": [
+      true,
+      true
+    ]
+  },
+  "scope": "reduced semantic-v1 source Shadow/method slice only; not full MC/command/resource E2E",
+  "followupHosts": [
+    {
+      "stockHost": {
+        "revision": "f76a43fbeddf4fbdc69768fd0f7544e5a4a3610f",
+        "sha256": "93a216e0b39847fe33403c23542b4767dac84df5d8cfef84edb7f53fa49d5981"
+      },
+      "consumerSha256": "403033f32d71900d9ebe2022a2b8a6f3a4d61a64cddf8756ba586491a7cdc9ff",
+      "editor": {
+        "checks": 112,
+        "requests": 29,
+        "methods": {
+          "textDocument/definition": 19,
+          "textDocument/diagnostic": 4,
+          "textDocument/references": 3,
+          "textDocument/rename": 1,
+          "textDocument/completion": 2
+        },
+        "accepted": 20,
+        "instances": {
+          "3": 7,
+          "12": 13
+        },
+        "singleAttempt": true,
+        "inputHashesStable": true,
+        "shutdown": {
+          "clean": true,
+          "exited": true,
+          "signal": 0,
+          "exit_code": 0
+        },
+        "seconds": 22.0,
+        "deadlineSeconds": 120,
+        "timedOut": false,
+        "log": "build/rust-test-logs/companion-editor-f76-20261024-171152693",
+        "completionWholeBufferMatches": [
+          true,
+          true
+        ],
+        "completionApplication": "Identity edits at fully typed Shadow names; exact item fields, suffix ranges, prefixes/backticks and whole buffers are checked."
+      },
+      "scope": "Same semantic-v1 source Shadow/method slice on stock host 36; projectContext/typeJvm and full MC commands/resources are not implemented or advertised."
+    },
+    {
+      "stockHost": {
+        "revision": "f76a43fbeddf4fbdc69768fd0f7544e5a4a3610f",
+        "sha256": "93a216e0b39847fe33403c23542b4767dac84df5d8cfef84edb7f53fa49d5981"
+      },
+      "consumerSha256": "c8f433e45ff6782849f31114016c5f7b2f11974441a6b5db4e6931f3cda47e07",
+      "consumerReceipt": "build/companion-artifacts/native-all-cases-c8f433e45ff6/receipt.json",
+      "editor": {
+        "checks": 112,
+        "requests": 29,
+        "methods": {
+          "textDocument/definition": 19,
+          "textDocument/diagnostic": 4,
+          "textDocument/references": 3,
+          "textDocument/rename": 1,
+          "textDocument/completion": 2
+        },
+        "accepted": 20,
+        "singleAttempt": true,
+        "inputHashesStable": true,
+        "shutdown": {
+          "signal": 0,
+          "clean": true,
+          "exit_code": 0,
+          "exited": true
+        },
+        "seconds": 16.7,
+        "deadlineSeconds": 120,
+        "timedOut": false,
+        "log": "build/rust-test-logs/companion-editor-native-20261024-184213162",
+        "completionWholeBufferMatches": [
+          true,
+          true
+        ],
+        "completionApplication": "Identity edits at fully typed Shadow names; suffix ranges, complete item fields and whole buffers are strict."
+      },
+      "scope": "Latest native-workspace-verified companion on stock host; semantic-v1 source slice only. Full MC command/resource/class-byte/SDK capabilities remain pending."
+    },
+    {
+      "stockHost": {
+        "revision": "f76a43fbeddf4fbdc69768fd0f7544e5a4a3610f",
+        "sha256": "93a216e0b39847fe33403c23542b4767dac84df5d8cfef84edb7f53fa49d5981"
+      },
+      "consumerSha256": "059b22c68ed00a40d7df9c1796fb6ba8e3e5acc97c5a9bc5a30421947810a20e",
+      "consumerReceipt": "build/companion-artifacts/release-059b22c68ed0/receipt.json",
+      "editor": {
+        "checks": 112,
+        "requests": 29,
+        "methods": {
+          "textDocument/definition": 19,
+          "textDocument/diagnostic": 4,
+          "textDocument/references": 3,
+          "textDocument/rename": 1,
+          "textDocument/completion": 2
+        },
+        "accepted": 21,
+        "singleAttempt": true,
+        "inputHashesStable": true,
+        "shutdown": {
+          "clean": true,
+          "exited": true,
+          "signal": 0,
+          "exit_code": 0
+        },
+        "seconds": 16.2,
+        "deadlineSeconds": 120,
+        "timedOut": false,
+        "log": "build/rust-test-logs/companion-editor-release-20261024-192116142",
+        "completionWholeBufferMatches": [
+          true,
+          true
+        ],
+        "completionApplication": "Identity edits at fully typed Shadow names; partial-name and snippet insertion remain unverified."
+      },
+      "scope": "Optimized binary extracted from the verified native Windows archive. Semantic-v1 source slice only; full MC command/resource/class-byte/SDK capabilities remain pending."
+    }
+  ]
+}

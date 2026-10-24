@@ -1,22 +1,26 @@
 local function assert_eq(actual, expected, message)
+  if _G.mcdev_record_assertion then mcdev_record_assertion("assert_eq", debug.getinfo(2, "Sl")) end
   if actual ~= expected then
     error((message or "assertion failed") .. ": expected " .. vim.inspect(expected) .. ", got " .. vim.inspect(actual))
   end
 end
 
 local function assert_true(value, message)
+  if _G.mcdev_record_assertion then mcdev_record_assertion("assert_true", debug.getinfo(2, "Sl")) end
   if not value then
     error(message or "expected true")
   end
 end
 
 local function assert_not_nil(value, message)
+  if _G.mcdev_record_assertion then mcdev_record_assertion("assert_not_nil", debug.getinfo(2, "Sl")) end
   if value == nil then
     error(message or "expected non-nil value")
   end
 end
 
 local function assert_nil(value, message)
+  if _G.mcdev_record_assertion then mcdev_record_assertion("assert_nil", debug.getinfo(2, "Sl")) end
   if value ~= nil then
     error((message or "expected nil") .. ": got " .. vim.inspect(value))
   end

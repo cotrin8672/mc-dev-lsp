@@ -1,0 +1,32 @@
+[
+  {
+    "source": "mcdev-jdtls-extension/src/test/kotlin/io/github/mcdev/jdtls/project/BytecodeIndexAdapterTest.kt",
+    "sha256": "131d75abc5720a4318171aa7f562f537563a0663ca023392477f004cc9ecad24",
+    "javaSourceBlocks": [
+      "package test;\n\npublic class ConcurrentSamples {\n    public void alpha() {\n        System.out.println(\"alpha\");\n    }\n\n    public void beta() {\n        System.out.println(\"beta\");\n    }\n}\n",
+      "package test;\n\npublic class FieldAccessSamples {\n    static int STATIC_FIELD = 1;\n    int instanceField = 2;\n\n    void accessFields() {\n        int a = STATIC_FIELD;\n        STATIC_FIELD = 3;\n        int b = instanceField;\n        instanceField = 4;\n    }\n}\n",
+      "package test;\n\npublic class ConstantSamples {\n    void smallInts() {\n        int a = 5;\n        int b = -1;\n    }\n}\n",
+      "package test;\n\npublic class InvokeClassificationSamples {\n    void mixedAbsCalls() {\n        Math.abs(1);\n        int retained = Math.abs(2);\n    }\n}\n",
+      "package test;\n\npublic class OverloadInvokeSamples {\n    public void run() {\n        System.out.println(\"void-overload\");\n    }\n\n    public void run(int value) {\n        Math.abs(value);\n    }\n}\n",
+      "package test;\n\npublic class ClassBytesSamples {\n}\n",
+      "package hierarchy;\n\npublic class Base {\n}\n",
+      "package hierarchy;\n\npublic class ChildOne extends Base {\n}\n",
+      "package hierarchy;\n\npublic class ChildTwo extends Base {\n}\n",
+      "package hierarchy;\n\npublic class Peer {\n}\n"
+    ]
+  },
+  {
+    "source": "mcdev-jdtls-extension/src/test/kotlin/io/github/mcdev/jdtls/project/LazyClasspathClassIndexTest.kt",
+    "sha256": "be51fadf9ab1d17bf6aa20068976ed633497c6400b222a083f4f33ab7428702c",
+    "javaSourceBlocks": [
+      "package demo;\n\npublic class $simpleName {\n    $members\n}\n"
+    ]
+  },
+  {
+    "source": "mcdev-jdtls-extension/src/test/kotlin/io/github/mcdev/jdtls/project/McdevProjectSessionTest.kt",
+    "sha256": "1a7406473cd7d7ac1ec493b497ba8d288c58b89874978d79374cd5b86dcbdd97",
+    "javaSourceBlocks": [
+      "package demo;\n\npublic class $simpleName {\n    $members\n}\n"
+    ]
+  }
+]

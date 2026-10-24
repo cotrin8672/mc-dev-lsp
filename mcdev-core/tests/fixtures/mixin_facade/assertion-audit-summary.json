@@ -1,0 +1,47 @@
+{
+  "cases": 189,
+  "explicitBodyAssertionExpressions": 437,
+  "originalAssertionFunctions": {
+    "assertTrue": 193,
+    "assertEquals": 184,
+    "assertNotNull": 26,
+    "assertNotEquals": 3,
+    "assertFalse": 16,
+    "assertIs": 2,
+    "assertNull": 7,
+    "assertProviderObservedSessionEnvironmentSince": 2,
+    "assertSingleSessionEnvironment": 2,
+    "assertClasspathUntouched": 2
+  },
+  "resultProducingProductMethodsChecked": [
+    "analyzeDiagnostics",
+    "applyMethodDescriptorFix",
+    "applyMixinConfigFix",
+    "codeActions",
+    "collectSourceEntries",
+    "complete",
+    "completeFields",
+    "completeWithDebug",
+    "definitions",
+    "definitionsAtOffset",
+    "diagnose",
+    "fixesForDiagnostics",
+    "selectedMixinConfig",
+    "semanticModel",
+    "tryCompleteBufferOnly"
+  ],
+  "missingNativeProductMethodWitnesses": [],
+  "missingOriginalAssertionsFoundByReview": [
+    "generateAccessorFixContainsFieldName",
+    "producesGenerateInvokerFix",
+    "producesGenerateAccessorFix",
+    "routesShadowMemberCompletion",
+    "kotlinSourcesUseSemicolonlessPackagesForConfigAndRegisteredShareLookup"
+  ],
+  "additionalComputedEditTails": [
+    "codeActionFixesWrapOperationBadReturnThroughFacade",
+    "facadeNormalizesDeclarationSnippetIndentationAtBothInsertionBoundaries"
+  ],
+  "originalCaseCountUnchanged": 189,
+  "methodology": "Every frozen original body and explicit assertion expression is retained with a body hash; service/caller calls are audited against whole captured APIs or exact independent native functions. Callback/helper assertions are preserved by strict argument/order/count traces and native same-instance state/authority/live-file tests. Counts are static body expressions, not loop-expanded executions; original JVM assertions still execute unchanged."
+}

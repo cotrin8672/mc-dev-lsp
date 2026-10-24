@@ -1,0 +1,361 @@
+{
+  "scope": "host-owned project/classpath/reflection adapters",
+  "legacyCount": 42,
+  "portedNative": 42,
+  "runtimeConnection": "pending_ktlsp_host_capability",
+  "cases": [
+    {
+      "legacyCase": "mcdev-jdtls-extension/src/test/kotlin/io/github/mcdev/jdtls/java/JdtClasspathBridgeTest.kt::discoversLoomRemappedJars",
+      "nativeTest": "host_project::discoversLoomRemappedJars",
+      "status": "ported_native",
+      "originalAssertions": "original_assertions.json",
+      "sourceSha256": "a81526106f2ecdbc5f39b56507a126b58ea42872b73a17e057cb93614f05de85",
+      "boundaryAdaptation": "JDT and filesystem handles replaced by owned host-selected catalog, bytes, normalized signature and location facts; same original expected assertions execute in Rust"
+    },
+    {
+      "legacyCase": "mcdev-jdtls-extension/src/test/kotlin/io/github/mcdev/jdtls/java/JdtClasspathBridgeTest.kt::mergeClasspathAddsMinecraftJarsFromLoomNames",
+      "nativeTest": "host_project::mergeClasspathAddsMinecraftJarsFromLoomNames",
+      "status": "ported_native",
+      "originalAssertions": "original_assertions.json",
+      "sourceSha256": "a81526106f2ecdbc5f39b56507a126b58ea42872b73a17e057cb93614f05de85",
+      "boundaryAdaptation": "JDT and filesystem handles replaced by owned host-selected catalog, bytes, normalized signature and location facts; same original expected assertions execute in Rust"
+    },
+    {
+      "legacyCase": "mcdev-jdtls-extension/src/test/kotlin/io/github/mcdev/jdtls/java/JdtClasspathBridgeTest.kt::mergeWithJdtClasspathReturnsBaseWhenJdtUnavailable",
+      "nativeTest": "host_project::mergeWithJdtClasspathReturnsBaseWhenJdtUnavailable",
+      "status": "ported_native",
+      "originalAssertions": "original_assertions.json",
+      "sourceSha256": "a81526106f2ecdbc5f39b56507a126b58ea42872b73a17e057cb93614f05de85",
+      "boundaryAdaptation": "JDT and filesystem handles replaced by owned host-selected catalog, bytes, normalized signature and location facts; same original expected assertions execute in Rust"
+    },
+    {
+      "legacyCase": "mcdev-jdtls-extension/src/test/kotlin/io/github/mcdev/jdtls/java/JdtReflectionBridgeTest.kt::absentDescriptorReturnsFirstSameNameOverload",
+      "nativeTest": "host_project::absentDescriptorReturnsFirstSameNameOverload",
+      "status": "ported_native",
+      "originalAssertions": "original_assertions.json",
+      "sourceSha256": "2de4ec2cce593dff5cb9878aede6cd104704288390aef72f702c67e694084645",
+      "boundaryAdaptation": "JDT and filesystem handles replaced by owned host-selected catalog, bytes, normalized signature and location facts; same original expected assertions execute in Rust"
+    },
+    {
+      "legacyCase": "mcdev-jdtls-extension/src/test/kotlin/io/github/mcdev/jdtls/java/JdtReflectionBridgeTest.kt::blankDescriptorReturnsFirstSameNameOverload",
+      "nativeTest": "host_project::blankDescriptorReturnsFirstSameNameOverload",
+      "status": "ported_native",
+      "originalAssertions": "original_assertions.json",
+      "sourceSha256": "2de4ec2cce593dff5cb9878aede6cd104704288390aef72f702c67e694084645",
+      "boundaryAdaptation": "JDT and filesystem handles replaced by owned host-selected catalog, bytes, normalized signature and location facts; same original expected assertions execute in Rust"
+    },
+    {
+      "legacyCase": "mcdev-jdtls-extension/src/test/kotlin/io/github/mcdev/jdtls/java/JdtReflectionBridgeTest.kt::explicitDescriptorExactMatchSelectsMatchingOverload",
+      "nativeTest": "host_project::explicitDescriptorExactMatchSelectsMatchingOverload",
+      "status": "ported_native",
+      "originalAssertions": "original_assertions.json",
+      "sourceSha256": "2de4ec2cce593dff5cb9878aede6cd104704288390aef72f702c67e694084645",
+      "boundaryAdaptation": "JDT and filesystem handles replaced by owned host-selected catalog, bytes, normalized signature and location facts; same original expected assertions execute in Rust"
+    },
+    {
+      "legacyCase": "mcdev-jdtls-extension/src/test/kotlin/io/github/mcdev/jdtls/java/JdtReflectionBridgeTest.kt::explicitDescriptorMatchesPrimitiveArrayAndErasedGenericOverloads",
+      "nativeTest": "host_project::explicitDescriptorMatchesPrimitiveArrayAndErasedGenericOverloads",
+      "status": "ported_native",
+      "originalAssertions": "original_assertions.json",
+      "sourceSha256": "2de4ec2cce593dff5cb9878aede6cd104704288390aef72f702c67e694084645",
+      "boundaryAdaptation": "JDT and filesystem handles replaced by owned host-selected catalog, bytes, normalized signature and location facts; same original expected assertions execute in Rust"
+    },
+    {
+      "legacyCase": "mcdev-jdtls-extension/src/test/kotlin/io/github/mcdev/jdtls/java/JdtReflectionBridgeTest.kt::explicitDescriptorWithAmbiguousNormalizedMatchesReturnsNull",
+      "nativeTest": "host_project::explicitDescriptorWithAmbiguousNormalizedMatchesReturnsNull",
+      "status": "ported_native",
+      "originalAssertions": "original_assertions.json",
+      "sourceSha256": "2de4ec2cce593dff5cb9878aede6cd104704288390aef72f702c67e694084645",
+      "boundaryAdaptation": "JDT and filesystem handles replaced by owned host-selected catalog, bytes, normalized signature and location facts; same original expected assertions execute in Rust"
+    },
+    {
+      "legacyCase": "mcdev-jdtls-extension/src/test/kotlin/io/github/mcdev/jdtls/java/JdtReflectionBridgeTest.kt::onlyQualifiedUnresolvedTypesAreNormalized",
+      "nativeTest": "host_project::onlyQualifiedUnresolvedTypesAreNormalized",
+      "status": "ported_native",
+      "originalAssertions": "original_assertions.json",
+      "sourceSha256": "2de4ec2cce593dff5cb9878aede6cd104704288390aef72f702c67e694084645",
+      "boundaryAdaptation": "JDT and filesystem handles replaced by owned host-selected catalog, bytes, normalized signature and location facts; same original expected assertions execute in Rust"
+    },
+    {
+      "legacyCase": "mcdev-jdtls-extension/src/test/kotlin/io/github/mcdev/jdtls/java/JdtReflectionBridgeTest.kt::explicitDescriptorMismatchReturnsNull",
+      "nativeTest": "host_project::explicitDescriptorMismatchReturnsNull",
+      "status": "ported_native",
+      "originalAssertions": "original_assertions.json",
+      "sourceSha256": "2de4ec2cce593dff5cb9878aede6cd104704288390aef72f702c67e694084645",
+      "boundaryAdaptation": "JDT and filesystem handles replaced by owned host-selected catalog, bytes, normalized signature and location facts; same original expected assertions execute in Rust"
+    },
+    {
+      "legacyCase": "mcdev-jdtls-extension/src/test/kotlin/io/github/mcdev/jdtls/java/JdtReflectionBridgeTest.kt::explicitDescriptorWhenParameterExtractionFailsReturnsNull",
+      "nativeTest": "host_project::explicitDescriptorWhenParameterExtractionFailsReturnsNull",
+      "status": "ported_native",
+      "originalAssertions": "original_assertions.json",
+      "sourceSha256": "2de4ec2cce593dff5cb9878aede6cd104704288390aef72f702c67e694084645",
+      "boundaryAdaptation": "JDT and filesystem handles replaced by owned host-selected catalog, bytes, normalized signature and location facts; same original expected assertions execute in Rust"
+    },
+    {
+      "legacyCase": "mcdev-jdtls-extension/src/test/kotlin/io/github/mcdev/jdtls/java/JdtReflectionBridgeTest.kt::explicitDescriptorWhenSignatureUnavailableReturnsNull",
+      "nativeTest": "host_project::explicitDescriptorWhenSignatureUnavailableReturnsNull",
+      "status": "ported_native",
+      "originalAssertions": "original_assertions.json",
+      "sourceSha256": "2de4ec2cce593dff5cb9878aede6cd104704288390aef72f702c67e694084645",
+      "boundaryAdaptation": "JDT and filesystem handles replaced by owned host-selected catalog, bytes, normalized signature and location facts; same original expected assertions execute in Rust"
+    },
+    {
+      "legacyCase": "mcdev-jdtls-extension/src/test/kotlin/io/github/mcdev/jdtls/java/JdtReflectionBridgeTest.kt::explicitDescriptorWhenMethodParameterExtractionFailsReturnsNull",
+      "nativeTest": "host_project::explicitDescriptorWhenMethodParameterExtractionFailsReturnsNull",
+      "status": "ported_native",
+      "originalAssertions": "original_assertions.json",
+      "sourceSha256": "2de4ec2cce593dff5cb9878aede6cd104704288390aef72f702c67e694084645",
+      "boundaryAdaptation": "JDT and filesystem handles replaced by owned host-selected catalog, bytes, normalized signature and location facts; same original expected assertions execute in Rust"
+    },
+    {
+      "legacyCase": "mcdev-jdtls-extension/src/test/kotlin/io/github/mcdev/jdtls/project/BytecodeIndexAdapterTest.kt::getClassBytesReturnsExactProviderBytesForExistingClass",
+      "nativeTest": "host_project::getClassBytesReturnsExactProviderBytesForExistingClass",
+      "status": "ported_native",
+      "originalAssertions": "original_assertions.json",
+      "sourceSha256": "131d75abc5720a4318171aa7f562f537563a0663ca023392477f004cc9ecad24",
+      "boundaryAdaptation": "JDT and filesystem handles replaced by owned host-selected catalog, bytes, normalized signature and location facts; same original expected assertions execute in Rust"
+    },
+    {
+      "legacyCase": "mcdev-jdtls-extension/src/test/kotlin/io/github/mcdev/jdtls/project/BytecodeIndexAdapterTest.kt::getClassBytesReturnsNullForMissingClass",
+      "nativeTest": "host_project::getClassBytesReturnsNullForMissingClass",
+      "status": "ported_native",
+      "originalAssertions": "original_assertions.json",
+      "sourceSha256": "131d75abc5720a4318171aa7f562f537563a0663ca023392477f004cc9ecad24",
+      "boundaryAdaptation": "JDT and filesystem handles replaced by owned host-selected catalog, bytes, normalized signature and location facts; same original expected assertions execute in Rust"
+    },
+    {
+      "legacyCase": "mcdev-jdtls-extension/src/test/kotlin/io/github/mcdev/jdtls/project/BytecodeIndexAdapterTest.kt::getClassBytesDoesNotPopulateAdapterCachesOrEnumerateClasspath",
+      "nativeTest": "host_project::getClassBytesDoesNotPopulateAdapterCachesOrEnumerateClasspath",
+      "status": "ported_native",
+      "originalAssertions": "original_assertions.json",
+      "sourceSha256": "131d75abc5720a4318171aa7f562f537563a0663ca023392477f004cc9ecad24",
+      "boundaryAdaptation": "JDT and filesystem handles replaced by owned host-selected catalog, bytes, normalized signature and location facts; same original expected assertions execute in Rust"
+    },
+    {
+      "legacyCase": "mcdev-jdtls-extension/src/test/kotlin/io/github/mcdev/jdtls/project/BytecodeIndexAdapterTest.kt::resolveCommonSuperClassResolvesSiblingSuperclassAndArrayCases",
+      "nativeTest": "host_project::resolveCommonSuperClassResolvesSiblingSuperclassAndArrayCases",
+      "status": "ported_native",
+      "originalAssertions": "original_assertions.json",
+      "sourceSha256": "131d75abc5720a4318171aa7f562f537563a0663ca023392477f004cc9ecad24",
+      "boundaryAdaptation": "JDT and filesystem handles replaced by owned host-selected catalog, bytes, normalized signature and location facts; same original expected assertions execute in Rust"
+    },
+    {
+      "legacyCase": "mcdev-jdtls-extension/src/test/kotlin/io/github/mcdev/jdtls/project/BytecodeIndexAdapterTest.kt::resolveCommonSuperClassReverseOrderReusesByteReads",
+      "nativeTest": "host_project::resolveCommonSuperClassReverseOrderReusesByteReads",
+      "status": "ported_native",
+      "originalAssertions": "original_assertions.json",
+      "sourceSha256": "131d75abc5720a4318171aa7f562f537563a0663ca023392477f004cc9ecad24",
+      "boundaryAdaptation": "JDT and filesystem handles replaced by owned host-selected catalog, bytes, normalized signature and location facts; same original expected assertions execute in Rust"
+    },
+    {
+      "legacyCase": "mcdev-jdtls-extension/src/test/kotlin/io/github/mcdev/jdtls/project/BytecodeIndexAdapterTest.kt::resolveCommonSuperClassMissingOrCorruptReturnsNull",
+      "nativeTest": "host_project::resolveCommonSuperClassMissingOrCorruptReturnsNull",
+      "status": "ported_native",
+      "originalAssertions": "original_assertions.json",
+      "sourceSha256": "131d75abc5720a4318171aa7f562f537563a0663ca023392477f004cc9ecad24",
+      "boundaryAdaptation": "JDT and filesystem handles replaced by owned host-selected catalog, bytes, normalized signature and location facts; same original expected assertions execute in Rust"
+    },
+    {
+      "legacyCase": "mcdev-jdtls-extension/src/test/kotlin/io/github/mcdev/jdtls/project/BytecodeIndexAdapterTest.kt::resolveCommonSuperClassDoesNotPopulateAdapterCachesOrEnumerateClasspath",
+      "nativeTest": "host_project::resolveCommonSuperClassDoesNotPopulateAdapterCachesOrEnumerateClasspath",
+      "status": "ported_native",
+      "originalAssertions": "original_assertions.json",
+      "sourceSha256": "131d75abc5720a4318171aa7f562f537563a0663ca023392477f004cc9ecad24",
+      "boundaryAdaptation": "JDT and filesystem handles replaced by owned host-selected catalog, bytes, normalized signature and location facts; same original expected assertions execute in Rust"
+    },
+    {
+      "legacyCase": "mcdev-jdtls-extension/src/test/kotlin/io/github/mcdev/jdtls/project/BytecodeIndexAdapterTest.kt::overloadedMethodWithoutDescriptorUnionsDistinctInvokeCandidates",
+      "nativeTest": "host_project::overloadedMethodWithoutDescriptorUnionsDistinctInvokeCandidates",
+      "status": "ported_native",
+      "originalAssertions": "original_assertions.json",
+      "sourceSha256": "131d75abc5720a4318171aa7f562f537563a0663ca023392477f004cc9ecad24",
+      "boundaryAdaptation": "JDT and filesystem handles replaced by owned host-selected catalog, bytes, normalized signature and location facts; same original expected assertions execute in Rust"
+    },
+    {
+      "legacyCase": "mcdev-jdtls-extension/src/test/kotlin/io/github/mcdev/jdtls/project/BytecodeIndexAdapterTest.kt::returnCountCacheIsBoundedAcrossDistinctKeys",
+      "nativeTest": "host_project::returnCountCacheIsBoundedAcrossDistinctKeys",
+      "status": "ported_native",
+      "originalAssertions": "original_assertions.json",
+      "sourceSha256": "131d75abc5720a4318171aa7f562f537563a0663ca023392477f004cc9ecad24",
+      "boundaryAdaptation": "JDT and filesystem handles replaced by owned host-selected catalog, bytes, normalized signature and location facts; same original expected assertions execute in Rust"
+    },
+    {
+      "legacyCase": "mcdev-jdtls-extension/src/test/kotlin/io/github/mcdev/jdtls/project/BytecodeIndexAdapterTest.kt::atTargetCandidateCacheIsBoundedAcrossDistinctKeys",
+      "nativeTest": "host_project::atTargetCandidateCacheIsBoundedAcrossDistinctKeys",
+      "status": "ported_native",
+      "originalAssertions": "original_assertions.json",
+      "sourceSha256": "131d75abc5720a4318171aa7f562f537563a0663ca023392477f004cc9ecad24",
+      "boundaryAdaptation": "JDT and filesystem handles replaced by owned host-selected catalog, bytes, normalized signature and location facts; same original expected assertions execute in Rust"
+    },
+    {
+      "legacyCase": "mcdev-jdtls-extension/src/test/kotlin/io/github/mcdev/jdtls/project/BytecodeIndexAdapterTest.kt::distinctCandidateCacheKeysComputeConcurrentlyOutsideGlobalCacheLock",
+      "nativeTest": "host_project::distinctCandidateCacheKeysComputeConcurrentlyOutsideGlobalCacheLock",
+      "status": "ported_native",
+      "originalAssertions": "original_assertions.json",
+      "sourceSha256": "131d75abc5720a4318171aa7f562f537563a0663ca023392477f004cc9ecad24",
+      "boundaryAdaptation": "JDT and filesystem handles replaced by owned host-selected catalog, bytes, normalized signature and location facts; same original expected assertions execute in Rust"
+    },
+    {
+      "legacyCase": "mcdev-jdtls-extension/src/test/kotlin/io/github/mcdev/jdtls/project/BytecodeIndexAdapterTest.kt::fieldGetAndPutAtSameOwnerNameDescriptorRemainDistinct",
+      "nativeTest": "host_project::fieldGetAndPutAtSameOwnerNameDescriptorRemainDistinct",
+      "status": "ported_native",
+      "originalAssertions": "original_assertions.json",
+      "sourceSha256": "131d75abc5720a4318171aa7f562f537563a0663ca023392477f004cc9ecad24",
+      "boundaryAdaptation": "JDT and filesystem handles replaced by owned host-selected catalog, bytes, normalized signature and location facts; same original expected assertions execute in Rust"
+    },
+    {
+      "legacyCase": "mcdev-jdtls-extension/src/test/kotlin/io/github/mcdev/jdtls/project/BytecodeIndexAdapterTest.kt::operationKindMapsBytecodeKindsCorrectly",
+      "nativeTest": "host_project::operationKindMapsBytecodeKindsCorrectly",
+      "status": "ported_native",
+      "originalAssertions": "original_assertions.json",
+      "sourceSha256": "131d75abc5720a4318171aa7f562f537563a0663ca023392477f004cc9ecad24",
+      "boundaryAdaptation": "JDT and filesystem handles replaced by owned host-selected catalog, bytes, normalized signature and location facts; same original expected assertions execute in Rust"
+    },
+    {
+      "legacyCase": "mcdev-jdtls-extension/src/test/kotlin/io/github/mcdev/jdtls/project/BytecodeIndexAdapterTest.kt::distinctConstantValuesAtSameOrdinalAreBothRetained",
+      "nativeTest": "host_project::distinctConstantValuesAtSameOrdinalAreBothRetained",
+      "status": "ported_native",
+      "originalAssertions": "original_assertions.json",
+      "sourceSha256": "131d75abc5720a4318171aa7f562f537563a0663ca023392477f004cc9ecad24",
+      "boundaryAdaptation": "JDT and filesystem handles replaced by owned host-selected catalog, bytes, normalized signature and location facts; same original expected assertions execute in Rust"
+    },
+    {
+      "legacyCase": "mcdev-jdtls-extension/src/test/kotlin/io/github/mcdev/jdtls/project/BytecodeIndexAdapterTest.kt::invokeOccurrenceClassificationAndIndexPropagateWithoutCollapsing",
+      "nativeTest": "host_project::invokeOccurrenceClassificationAndIndexPropagateWithoutCollapsing",
+      "status": "ported_native",
+      "originalAssertions": "original_assertions.json",
+      "sourceSha256": "131d75abc5720a4318171aa7f562f537563a0663ca023392477f004cc9ecad24",
+      "boundaryAdaptation": "JDT and filesystem handles replaced by owned host-selected catalog, bytes, normalized signature and location facts; same original expected assertions execute in Rust"
+    },
+    {
+      "legacyCase": "mcdev-jdtls-extension/src/test/kotlin/io/github/mcdev/jdtls/project/BytecodeIndexAdapterTest.kt::unknownMethodWithoutDescriptorReturnsNoCandidates",
+      "nativeTest": "host_project::unknownMethodWithoutDescriptorReturnsNoCandidates",
+      "status": "ported_native",
+      "originalAssertions": "original_assertions.json",
+      "sourceSha256": "131d75abc5720a4318171aa7f562f537563a0663ca023392477f004cc9ecad24",
+      "boundaryAdaptation": "JDT and filesystem handles replaced by owned host-selected catalog, bytes, normalized signature and location facts; same original expected assertions execute in Rust"
+    },
+    {
+      "legacyCase": "mcdev-jdtls-extension/src/test/kotlin/io/github/mcdev/jdtls/project/ClasspathClassBytesProviderTest.kt::classCountDiscoversNamesWithoutReadingClassContents",
+      "nativeTest": "host_project::classCountDiscoversNamesWithoutReadingClassContents",
+      "status": "ported_native",
+      "originalAssertions": "original_assertions.json",
+      "sourceSha256": "9aab7e6d8021309a849d1b11251ec9aeadf21c4ddd0079b0b749e31db8e6b12d",
+      "boundaryAdaptation": "JDT and filesystem handles replaced by owned host-selected catalog, bytes, normalized signature and location facts; same original expected assertions execute in Rust"
+    },
+    {
+      "legacyCase": "mcdev-jdtls-extension/src/test/kotlin/io/github/mcdev/jdtls/project/ClasspathClassBytesProviderTest.kt::getClassBytesReadsLazilyAndCachesPerOwner",
+      "nativeTest": "host_project::getClassBytesReadsLazilyAndCachesPerOwner",
+      "status": "ported_native",
+      "originalAssertions": "original_assertions.json",
+      "sourceSha256": "9aab7e6d8021309a849d1b11251ec9aeadf21c4ddd0079b0b749e31db8e6b12d",
+      "boundaryAdaptation": "JDT and filesystem handles replaced by owned host-selected catalog, bytes, normalized signature and location facts; same original expected assertions execute in Rust"
+    },
+    {
+      "legacyCase": "mcdev-jdtls-extension/src/test/kotlin/io/github/mcdev/jdtls/project/ClasspathClassBytesProviderTest.kt::metadataQueriesDoNotReadClassBytes",
+      "nativeTest": "host_project::metadataQueriesDoNotReadClassBytes",
+      "status": "ported_native",
+      "originalAssertions": "original_assertions.json",
+      "sourceSha256": "9aab7e6d8021309a849d1b11251ec9aeadf21c4ddd0079b0b749e31db8e6b12d",
+      "boundaryAdaptation": "JDT and filesystem handles replaced by owned host-selected catalog, bytes, normalized signature and location facts; same original expected assertions execute in Rust"
+    },
+    {
+      "legacyCase": "mcdev-jdtls-extension/src/test/kotlin/io/github/mcdev/jdtls/project/ClasspathClassBytesProviderTest.kt::getClassBytesAppliesDuplicateNameSemanticsAcrossEntries",
+      "nativeTest": "host_project::getClassBytesAppliesDuplicateNameSemanticsAcrossEntries",
+      "status": "ported_native",
+      "originalAssertions": "original_assertions.json",
+      "sourceSha256": "9aab7e6d8021309a849d1b11251ec9aeadf21c4ddd0079b0b749e31db8e6b12d",
+      "boundaryAdaptation": "JDT and filesystem handles replaced by owned host-selected catalog, bytes, normalized signature and location facts; same original expected assertions execute in Rust"
+    },
+    {
+      "legacyCase": "mcdev-jdtls-extension/src/test/kotlin/io/github/mcdev/jdtls/project/ClasspathClassBytesProviderTest.kt::findInternalNamesAppliesDuplicateNameSemanticsAcrossEntries",
+      "nativeTest": "host_project::findInternalNamesAppliesDuplicateNameSemanticsAcrossEntries",
+      "status": "ported_native",
+      "originalAssertions": "original_assertions.json",
+      "sourceSha256": "9aab7e6d8021309a849d1b11251ec9aeadf21c4ddd0079b0b749e31db8e6b12d",
+      "boundaryAdaptation": "JDT and filesystem handles replaced by owned host-selected catalog, bytes, normalized signature and location facts; same original expected assertions execute in Rust"
+    },
+    {
+      "legacyCase": "mcdev-jdtls-extension/src/test/kotlin/io/github/mcdev/jdtls/project/ClasspathClassBytesProviderTest.kt::concurrentGetClassBytesForSameOwnerReadsClassBytesOnce",
+      "nativeTest": "host_project::concurrentGetClassBytesForSameOwnerReadsClassBytesOnce",
+      "status": "ported_native",
+      "originalAssertions": "original_assertions.json",
+      "sourceSha256": "9aab7e6d8021309a849d1b11251ec9aeadf21c4ddd0079b0b749e31db8e6b12d",
+      "boundaryAdaptation": "JDT and filesystem handles replaced by owned host-selected catalog, bytes, normalized signature and location facts; same original expected assertions execute in Rust"
+    },
+    {
+      "legacyCase": "mcdev-jdtls-extension/src/test/kotlin/io/github/mcdev/jdtls/project/ClasspathClassBytesProviderTest.kt::acceptsInjectedBytesReadCounter",
+      "nativeTest": "host_project::acceptsInjectedBytesReadCounter",
+      "status": "ported_native",
+      "originalAssertions": "original_assertions.json",
+      "sourceSha256": "9aab7e6d8021309a849d1b11251ec9aeadf21c4ddd0079b0b749e31db8e6b12d",
+      "boundaryAdaptation": "JDT and filesystem handles replaced by owned host-selected catalog, bytes, normalized signature and location facts; same original expected assertions execute in Rust"
+    },
+    {
+      "legacyCase": "mcdev-jdtls-extension/src/test/kotlin/io/github/mcdev/jdtls/project/LazyClasspathClassIndexTest.kt::classSearchReadsNoBytesAndMemberQueriesIndexLazilyPerOwner",
+      "nativeTest": "host_project::classSearchReadsNoBytesAndMemberQueriesIndexLazilyPerOwner",
+      "status": "ported_native",
+      "originalAssertions": "original_assertions.json",
+      "sourceSha256": "be51fadf9ab1d17bf6aa20068976ed633497c6400b222a083f4f33ab7428702c",
+      "boundaryAdaptation": "JDT and filesystem handles replaced by owned host-selected catalog, bytes, normalized signature and location facts; same original expected assertions execute in Rust"
+    },
+    {
+      "legacyCase": "mcdev-jdtls-extension/src/test/kotlin/io/github/mcdev/jdtls/project/LazyClasspathClassIndexTest.kt::exactOwnerMemberLookupBypassesProviderCatalog",
+      "nativeTest": "host_project::exactOwnerMemberLookupBypassesProviderCatalog",
+      "status": "ported_native",
+      "originalAssertions": "original_assertions.json",
+      "sourceSha256": "be51fadf9ab1d17bf6aa20068976ed633497c6400b222a083f4f33ab7428702c",
+      "boundaryAdaptation": "JDT and filesystem handles replaced by owned host-selected catalog, bytes, normalized signature and location facts; same original expected assertions execute in Rust"
+    },
+    {
+      "legacyCase": "mcdev-jdtls-extension/src/test/kotlin/io/github/mcdev/jdtls/project/LazyClasspathClassIndexTest.kt::ownerIndexCacheStaysBounded",
+      "nativeTest": "host_project::ownerIndexCacheStaysBounded",
+      "status": "ported_native",
+      "originalAssertions": "original_assertions.json",
+      "sourceSha256": "be51fadf9ab1d17bf6aa20068976ed633497c6400b222a083f4f33ab7428702c",
+      "boundaryAdaptation": "JDT and filesystem handles replaced by owned host-selected catalog, bytes, normalized signature and location facts; same original expected assertions execute in Rust"
+    },
+    {
+      "legacyCase": "mcdev-jdtls-extension/src/test/kotlin/io/github/mcdev/jdtls/project/McdevProjectSessionTest.kt::createAndReindexStayLazyUntilMemberQuery",
+      "nativeTest": "host_project::createAndReindexStayLazyUntilMemberQuery",
+      "status": "ported_native",
+      "originalAssertions": "original_assertions.json",
+      "sourceSha256": "1a7406473cd7d7ac1ec493b497ba8d288c58b89874978d79374cd5b86dcbdd97",
+      "boundaryAdaptation": "JDT and filesystem handles replaced by owned host-selected catalog, bytes, normalized signature and location facts; same original expected assertions execute in Rust"
+    },
+    {
+      "legacyCase": "mcdev-jdtls-extension/src/test/kotlin/io/github/mcdev/jdtls/project/McdevProjectSessionTest.kt::createAndReindexWithEmptyClasspathStayNotReadyWithoutCatalogScan",
+      "nativeTest": "host_project::createAndReindexWithEmptyClasspathStayNotReadyWithoutCatalogScan",
+      "status": "ported_native",
+      "originalAssertions": "original_assertions.json",
+      "sourceSha256": "1a7406473cd7d7ac1ec493b497ba8d288c58b89874978d79374cd5b86dcbdd97",
+      "boundaryAdaptation": "JDT and filesystem handles replaced by owned host-selected catalog, bytes, normalized signature and location facts; same original expected assertions execute in Rust"
+    },
+    {
+      "legacyCase": "mcdev-jdtls-extension/src/test/kotlin/io/github/mcdev/jdtls/project/FileBasedProjectContextServiceTest.kt::sessionIndexesClasspathClasses",
+      "nativeTest": "host_project::sessionIndexesClasspathClasses",
+      "status": "ported_native",
+      "originalAssertions": "original_assertions.json",
+      "sourceSha256": "5a1d62704565ac41a7ff281396f5515d2f01937efaad80730b07cc8de19ba2ce",
+      "boundaryAdaptation": "JDT and filesystem handles replaced by owned host-selected catalog, bytes, normalized signature and location facts; same original expected assertions execute in Rust"
+    }
+  ],
+  "verification": {
+    "runner": "build/rust-test-logs/host-project-zero-capacity-final/affected.*",
+    "exitCode": 0,
+    "seconds": 23.7,
+    "nativeHostTests": 60,
+    "legacyExactCases": 42,
+    "additionalStateAndSnapshotTests": 18,
+    "completionVerification": {
+      "runner": "build/rust-test-logs/host-project-closed-final/affected.*",
+      "exitCode": 0,
+      "seconds": 65.9,
+      "hostTests": 59,
+      "completionTests": 195
+    },
+    "originalRunner": "build/source-oracle/host-project-original.*",
+    "candidateSnapshotRunner": "build/source-oracle/host-project-candidates.*"
+  }
+}

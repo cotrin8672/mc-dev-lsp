@@ -24,7 +24,16 @@ local function as_list(value)
   return value
 end
 
+local shell_sequence = 0
 local function powershell(script, stdin, timeout_ms)
+  shell_sequence = shell_sequence + 1
+  local log = vim.fn.getcwd() .. "/build/nvim-test-logs/teardown-" .. vim.fn.getpid() .. "-" .. shell_sequence
+  vim.fn.mkdir(vim.fn.fnamemodify(log, ":h"), "p")
+  vim.fn.writefile(vim.split(script, "\n", { plain = true }), log .. ".ps1")
+  local function save(value)
+    vim.fn.writefile(vim.split(value and value.stdout or "", "\n", { plain = true }), log .. ".stdout.log")
+    vim.fn.writefile(vim.split(value and value.stderr or "timeout", "\n", { plain = true }), log .. ".stderr.log")
+  end
   local options = { text = true }
   if stdin ~= nil then
     options.stdin = stdin
@@ -37,25 +46,27 @@ local function powershell(script, stdin, timeout_ms)
     return { code = -1, stdout = "", stderr = tostring(process) }
   end
   -- SystemObj:wait processes only fast events. LSP shutdown/exit callbacks need
-  -- ordinary scheduled events too, or waiting for Java exit deadlocks the client.
+  -- ordinary scheduled events too, or waiting for server exit deadlocks the client.
   if not vim.wait(timeout_ms, function() return result ~= nil end, 25) then
     process:kill(9)
     vim.wait(2000, function() return result ~= nil end, 25)
+    save(result)
     return nil
   end
+  save(result)
   return result
 end
 
 local function decode_snapshot(result)
   if result == nil then
-    return nil, "JDT process snapshot timed out"
+    return nil, "ktlsp process snapshot timed out"
   end
   if result.code ~= 0 then
-    return nil, "JDT process snapshot failed: " .. tostring(result.stderr or result.code)
+    return nil, "ktlsp process snapshot failed: " .. tostring(result.stderr or result.code)
   end
   local decoded_ok, decoded = pcall(vim.json.decode, result.stdout or "")
   if not decoded_ok or type(decoded) ~= "table" then
-    return nil, "JDT process snapshot returned invalid JSON"
+    return nil, "ktlsp process snapshot returned invalid JSON"
   end
   local snapshot = {
     roots = as_list(decoded.roots),
@@ -63,12 +74,12 @@ local function decode_snapshot(result)
   }
   for _, process in ipairs(snapshot.roots) do
     if type(process) ~= "table" or type(process.pid) ~= "number" or type(process.creationDate) ~= "string" then
-      return nil, "JDT process snapshot returned an invalid root identity"
+      return nil, "ktlsp process snapshot returned an invalid root identity"
     end
   end
   for _, process in ipairs(snapshot.children) do
     if type(process) ~= "table" or type(process.pid) ~= "number" or type(process.creationDate) ~= "string" then
-      return nil, "JDT process snapshot returned an invalid child identity"
+      return nil, "ktlsp process snapshot returned an invalid child identity"
     end
   end
   return snapshot
@@ -145,9 +156,10 @@ function Identity($process, $depth) {
     }
 }
 $servers = @($all | Where-Object {
-    $descendants.Contains([int]$_.ProcessId) -and
-        $_.Name -ieq 'java.exe' -and
-        ([string]$_.CommandLine) -like '*-Declipse.application=org.eclipse.jdt.ls.core.id1*'
+    $descendants.Contains([int]$_.ProcessId) -and (
+        ($_.Name -ieq 'teardown_process.exe' -and ([string]$_.CommandLine) -like '*--mcdev-test-server*') -or
+        ($env:MCDEV_E2E_KTLSP -and ([string]$_.ExecutablePath) -ieq $env:MCDEV_E2E_KTLSP)
+    )
 })
 $roots = [System.Collections.Generic.List[object]]::new()
 $ownedChildren = [System.Collections.Generic.List[object]]::new()
@@ -177,7 +189,7 @@ foreach ($server in $servers) {
 ]=]
 
 require("mcdev.stdio").stop()
-local jdtls_exit = rawget(_G, "mcdev_e2e_jdtls_exit")
+local ktlsp_exit = rawget(_G, "mcdev_e2e_ktlsp_exit")
 local clients = vim.lsp.get_clients()
 local snapshot
 if vim.fn.has("win32") == 1 then
@@ -204,7 +216,7 @@ local function clients_stopped()
 end
 
 local function process_exit_received()
-  return jdtls_exit == nil or jdtls_exit.exited
+  return ktlsp_exit == nil or ktlsp_exit.exited
 end
 
 local function settled()
@@ -250,14 +262,14 @@ while ($true) {
 ]=]
   local result = powershell(wait_script, vim.json.encode(snapshot_value), timeout_ms + 5000)
   if result == nil then
-    return nil, "JDT process-root wait timed out"
+    return nil, "ktlsp process-root wait timed out"
   end
   local decoded_ok, decoded = pcall(vim.json.decode, result.stdout or "")
   if not decoded_ok or type(decoded) ~= "table" then
-    return nil, "JDT process-root wait returned invalid JSON"
+    return nil, "ktlsp process-root wait returned invalid JSON"
   end
   if decoded.rootsExited ~= true then
-    return decoded, "JDT Java process did not exit before the graceful deadline"
+    return decoded, "ktlsp process did not exit before the graceful deadline"
   end
   return decoded
 end
@@ -284,11 +296,8 @@ $children = @($snapshot.children | Sort-Object depth -Descending)
 if (]=] .. force_literal .. [=[) {
     foreach ($root in $roots) {
         $current = CurrentProcess $root
-        if ((IsSameProcess $current $root) -and
-            ([string]$current.CommandLine) -like '*-Declipse.application=org.eclipse.jdt.ls.core.id1*') {
-            $ErrorActionPreference = 'Continue'
-            & taskkill.exe /PID ([int]$root.pid) /T /F *> $null
-            $ErrorActionPreference = 'Stop'
+        if (IsSameProcess $current $root) {
+            try { [System.Diagnostics.Process]::GetProcessById([int]$root.pid).Kill() } catch {}
         }
     }
 }
@@ -302,11 +311,8 @@ for ($attempt = 0; $attempt -lt 40; $attempt++) {
     foreach ($entry in $targets) {
         $current = CurrentProcess $entry
         if (-not (IsSameProcess $current $entry)) { continue }
-        # A validated process may exit before taskkill. Its rechecked identity,
-        # not taskkill stderr, determines whether cleanup succeeded.
-        $ErrorActionPreference = 'Continue'
-        & taskkill.exe /PID ([int]$entry.pid) /F *> $null
-        $ErrorActionPreference = 'Stop'
+        # Kill only the snapshotted identity; taskkill can itself block on WMI.
+        try { [System.Diagnostics.Process]::GetProcessById([int]$entry.pid).Kill() } catch {}
         $current = CurrentProcess $entry
         if (IsSameProcess $current $entry) { $remaining.Add([int]$entry.pid) }
     }
@@ -319,16 +325,19 @@ for ($attempt = 0; $attempt -lt 40; $attempt++) {
 [pscustomobject]@{ cleaned = $false; remaining = @($remaining) } | ConvertTo-Json -Compress
 exit 2
 ]=]
-  local result = powershell(cleanup_script, vim.json.encode(snapshot_value), 5000)
+  -- The native fixture has an inherited conhost child in addition to the
+  -- sleeping Rust child. Keep the ownership/creation checks exact, but allow
+  -- bounded WMI teardown time on a busy Windows host.
+  local result = powershell(cleanup_script, vim.json.encode(snapshot_value), 15000)
   if result == nil then
-    return nil, "JDT owned-process cleanup timed out"
+    return nil, "ktlsp owned-process cleanup timed out"
   end
   local decoded_ok, decoded = pcall(vim.json.decode, result.stdout or "")
   if not decoded_ok or type(decoded) ~= "table" then
-    return nil, "JDT owned-process cleanup returned invalid JSON: " .. tostring(result.stderr or result.stdout)
+    return nil, "ktlsp owned-process cleanup returned invalid JSON: " .. tostring(result.stderr or result.stdout)
   end
   if decoded.cleaned ~= true or result.code ~= 0 then
-    return decoded, "JDT owned-process cleanup left validated processes running"
+    return decoded, "ktlsp owned-process cleanup left validated processes running"
   end
   return decoded
 end
@@ -343,13 +352,13 @@ if snapshot then
     if cleanup_error then
       append_error(cleanup_error)
     end
-    local settled_after_cleanup = wait(2000, settled, 50)
+    local settled_after_cleanup = wait(5000, settled, 50)
     stopped = cleanup_error == nil and settled_after_cleanup
     if not stopped and not cleanup_error then
-      process_wait_error = "JDT process exited but its LSP transport did not settle after owned children were cleaned"
+      process_wait_error = "ktlsp process exited but its LSP transport did not settle after owned children were cleaned"
     end
   else
-    process_wait_error = wait_error or "JDT Java process did not exit before the graceful deadline"
+    process_wait_error = wait_error or "ktlsp process did not exit before the graceful deadline"
   end
 else
   stopped = wait(15000, settled, 50)
@@ -372,21 +381,21 @@ if not stopped then
     client:stop(true)
   end
   if force_cleanup_succeeded then
-    append_error("JDT graceful shutdown exceeded 15 seconds; stopped its owned process tree")
+    append_error("ktlsp graceful shutdown exceeded 15 seconds; stopped its owned process tree")
   else
-    append_error("JDT graceful shutdown exceeded 15 seconds; could not verify its owned process tree was stopped")
+    append_error("ktlsp graceful shutdown exceeded 15 seconds; could not verify its owned process tree was stopped")
   end
 end
 
-if jdtls_exit and jdtls_exit.exited
-    and (jdtls_exit.code ~= 0 or jdtls_exit.signal ~= 0) then
+if ktlsp_exit and ktlsp_exit.exited
+    and (ktlsp_exit.code ~= 0 or ktlsp_exit.signal ~= 0) then
   append_error(string.format(
-    "JDT process exited abnormally (code=%s, signal=%s)",
-    tostring(jdtls_exit.code),
-    tostring(jdtls_exit.signal)
+    "ktlsp process exited abnormally (code=%s, signal=%s)",
+    tostring(ktlsp_exit.code),
+    tostring(ktlsp_exit.signal)
   ))
 end
-rawset(_G, "mcdev_e2e_jdtls_exit", nil)
+rawset(_G, "mcdev_e2e_ktlsp_exit", nil)
 
 if not ok then
   io.stderr:write(err .. "\n")

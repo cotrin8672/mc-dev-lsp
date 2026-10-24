@@ -1,0 +1,14 @@
+{
+  "schemaVersion": 1,
+  "id": "mcdev-fixture-fabric-basic",
+  "version": "1.0.0",
+  "name": "MCDev Fabric Basic Fixture",
+  "description": "Minimal Fabric mod fixture for mcdev semantic tests",
+  "authors": ["mcdev"],
+  "license": "MIT",
+  "environment": "*",
+  "entrypoints": {},
+  "mixins": [
+    "mixins.json"
+  ]
+}

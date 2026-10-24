@@ -1,0 +1,2896 @@
+[
+  {
+    "group": "project",
+    "legacyTestPath": "mcdev-core/src/test/kotlin/io/github/mcdev/core/project/AwAtDiscoveryServiceTest.kt",
+    "legacyClass": "AwAtDiscoveryServiceTest",
+    "legacyCase": "identifiesAccessWidenerExtensions",
+    "baselineSha256": "4c738d87c5538d7b89ae58cfc72821e30b63b42cd1e209b8330e8fe5f0c167c8",
+    "rustTest": "mcdev-core/tests/project_legacy.rs::aw_at_discovery_service_test_identifies_access_widener_extensions",
+    "status": "ported",
+    "evidenceLog": "build/rust-test-logs/project-completion-final/affected.stdout.log"
+  },
+  {
+    "group": "project",
+    "legacyTestPath": "mcdev-core/src/test/kotlin/io/github/mcdev/core/project/AwAtDiscoveryServiceTest.kt",
+    "legacyClass": "AwAtDiscoveryServiceTest",
+    "legacyCase": "identifiesAccessTransformerFiles",
+    "baselineSha256": "4c738d87c5538d7b89ae58cfc72821e30b63b42cd1e209b8330e8fe5f0c167c8",
+    "rustTest": "mcdev-core/tests/project_legacy.rs::aw_at_discovery_service_test_identifies_access_transformer_files",
+    "status": "ported",
+    "evidenceLog": "build/rust-test-logs/project-completion-final/affected.stdout.log"
+  },
+  {
+    "group": "project",
+    "legacyTestPath": "mcdev-core/src/test/kotlin/io/github/mcdev/core/project/AwAtDiscoveryServiceTest.kt",
+    "legacyClass": "AwAtDiscoveryServiceTest",
+    "legacyCase": "parsesValidAccessWidener",
+    "baselineSha256": "4c738d87c5538d7b89ae58cfc72821e30b63b42cd1e209b8330e8fe5f0c167c8",
+    "rustTest": "mcdev-core/tests/project_legacy.rs::aw_at_discovery_service_test_parses_valid_access_widener",
+    "status": "ported",
+    "evidenceLog": "build/rust-test-logs/project-completion-final/affected.stdout.log"
+  },
+  {
+    "group": "project",
+    "legacyTestPath": "mcdev-core/src/test/kotlin/io/github/mcdev/core/project/AwAtDiscoveryServiceTest.kt",
+    "legacyClass": "AwAtDiscoveryServiceTest",
+    "legacyCase": "parsesInvalidAccessWidenerWithoutParsedModel",
+    "baselineSha256": "4c738d87c5538d7b89ae58cfc72821e30b63b42cd1e209b8330e8fe5f0c167c8",
+    "rustTest": "mcdev-core/tests/project_legacy.rs::aw_at_discovery_service_test_parses_invalid_access_widener_without_parsed_model",
+    "status": "ported",
+    "evidenceLog": "build/rust-test-logs/project-completion-final/affected.stdout.log"
+  },
+  {
+    "group": "project",
+    "legacyTestPath": "mcdev-core/src/test/kotlin/io/github/mcdev/core/project/AwAtDiscoveryServiceTest.kt",
+    "legacyClass": "AwAtDiscoveryServiceTest",
+    "legacyCase": "parsesValidAccessTransformer",
+    "baselineSha256": "4c738d87c5538d7b89ae58cfc72821e30b63b42cd1e209b8330e8fe5f0c167c8",
+    "rustTest": "mcdev-core/tests/project_legacy.rs::aw_at_discovery_service_test_parses_valid_access_transformer",
+    "status": "ported",
+    "evidenceLog": "build/rust-test-logs/project-completion-final/affected.stdout.log"
+  },
+  {
+    "group": "project",
+    "legacyTestPath": "mcdev-core/src/test/kotlin/io/github/mcdev/core/project/AwAtDiscoveryServiceTest.kt",
+    "legacyClass": "AwAtDiscoveryServiceTest",
+    "legacyCase": "parsesInvalidAccessTransformerWithoutParsedModel",
+    "baselineSha256": "4c738d87c5538d7b89ae58cfc72821e30b63b42cd1e209b8330e8fe5f0c167c8",
+    "rustTest": "mcdev-core/tests/project_legacy.rs::aw_at_discovery_service_test_parses_invalid_access_transformer_without_parsed_model",
+    "status": "ported",
+    "evidenceLog": "build/rust-test-logs/project-completion-final/affected.stdout.log"
+  },
+  {
+    "group": "project",
+    "legacyTestPath": "mcdev-core/src/test/kotlin/io/github/mcdev/core/project/AwAtDiscoveryServiceTest.kt",
+    "legacyClass": "AwAtDiscoveryServiceTest",
+    "legacyCase": "discoversAccessWidenerFilesInTree",
+    "baselineSha256": "4c738d87c5538d7b89ae58cfc72821e30b63b42cd1e209b8330e8fe5f0c167c8",
+    "rustTest": "mcdev-core/tests/project_legacy.rs::aw_at_discovery_service_test_discovers_access_widener_files_in_tree",
+    "status": "ported",
+    "evidenceLog": "build/rust-test-logs/project-completion-final/affected.stdout.log"
+  },
+  {
+    "group": "project",
+    "legacyTestPath": "mcdev-core/src/test/kotlin/io/github/mcdev/core/project/AwAtDiscoveryServiceTest.kt",
+    "legacyClass": "AwAtDiscoveryServiceTest",
+    "legacyCase": "discoversAccessTransformerFilesInTree",
+    "baselineSha256": "4c738d87c5538d7b89ae58cfc72821e30b63b42cd1e209b8330e8fe5f0c167c8",
+    "rustTest": "mcdev-core/tests/project_legacy.rs::aw_at_discovery_service_test_discovers_access_transformer_files_in_tree",
+    "status": "ported",
+    "evidenceLog": "build/rust-test-logs/project-completion-final/affected.stdout.log"
+  },
+  {
+    "group": "project",
+    "legacyTestPath": "mcdev-core/src/test/kotlin/io/github/mcdev/core/project/AwAtDiscoveryServiceTest.kt",
+    "legacyClass": "AwAtDiscoveryServiceTest",
+    "legacyCase": "excludesBuildDirectoryAwAtFiles",
+    "baselineSha256": "4c738d87c5538d7b89ae58cfc72821e30b63b42cd1e209b8330e8fe5f0c167c8",
+    "rustTest": "mcdev-core/tests/project_legacy.rs::aw_at_discovery_service_test_excludes_build_directory_aw_at_files",
+    "status": "ported",
+    "evidenceLog": "build/rust-test-logs/project-completion-final/affected.stdout.log"
+  },
+  {
+    "group": "project",
+    "legacyTestPath": "mcdev-core/src/test/kotlin/io/github/mcdev/core/project/AwAtDiscoveryServiceTest.kt",
+    "legacyClass": "AwAtDiscoveryServiceTest",
+    "legacyCase": "excludesGradleDirectoryAwAtFiles",
+    "baselineSha256": "4c738d87c5538d7b89ae58cfc72821e30b63b42cd1e209b8330e8fe5f0c167c8",
+    "rustTest": "mcdev-core/tests/project_legacy.rs::aw_at_discovery_service_test_excludes_gradle_directory_aw_at_files",
+    "status": "ported",
+    "evidenceLog": "build/rust-test-logs/project-completion-final/affected.stdout.log"
+  },
+  {
+    "group": "project",
+    "legacyTestPath": "mcdev-core/src/test/kotlin/io/github/mcdev/core/project/AwAtDiscoveryServiceTest.kt",
+    "legacyClass": "AwAtDiscoveryServiceTest",
+    "legacyCase": "excludesNodeModulesDirectoryAwAtFiles",
+    "baselineSha256": "4c738d87c5538d7b89ae58cfc72821e30b63b42cd1e209b8330e8fe5f0c167c8",
+    "rustTest": "mcdev-core/tests/project_legacy.rs::aw_at_discovery_service_test_excludes_node_modules_directory_aw_at_files",
+    "status": "ported",
+    "evidenceLog": "build/rust-test-logs/project-completion-final/affected.stdout.log"
+  },
+  {
+    "group": "project",
+    "legacyTestPath": "mcdev-core/src/test/kotlin/io/github/mcdev/core/project/InfoServiceTest.kt",
+    "legacyClass": "InfoServiceTest",
+    "legacyCase": "formatsCompleteFabricProjectInfo",
+    "baselineSha256": "0ff7434d0ab0a12823c94460deaf61f92e6ebad58eb0b68a181300a233fd7457",
+    "rustTest": "mcdev-core/tests/project_legacy.rs::info_service_test_formats_complete_fabric_project_info",
+    "status": "ported",
+    "evidenceLog": "build/rust-test-logs/project-completion-final/affected.stdout.log"
+  },
+  {
+    "group": "project",
+    "legacyTestPath": "mcdev-core/src/test/kotlin/io/github/mcdev/core/project/InfoServiceTest.kt",
+    "legacyClass": "InfoServiceTest",
+    "legacyCase": "formatsPartialContextWithNoMappings",
+    "baselineSha256": "0ff7434d0ab0a12823c94460deaf61f92e6ebad58eb0b68a181300a233fd7457",
+    "rustTest": "mcdev-core/tests/project_legacy.rs::info_service_test_formats_partial_context_with_no_mappings",
+    "status": "ported",
+    "evidenceLog": "build/rust-test-logs/project-completion-final/affected.stdout.log"
+  },
+  {
+    "group": "project",
+    "legacyTestPath": "mcdev-core/src/test/kotlin/io/github/mcdev/core/project/InfoServiceTest.kt",
+    "legacyClass": "InfoServiceTest",
+    "legacyCase": "formatsUnknownPlatform",
+    "baselineSha256": "0ff7434d0ab0a12823c94460deaf61f92e6ebad58eb0b68a181300a233fd7457",
+    "rustTest": "mcdev-core/tests/project_legacy.rs::info_service_test_formats_unknown_platform",
+    "status": "ported",
+    "evidenceLog": "build/rust-test-logs/project-completion-final/affected.stdout.log"
+  },
+  {
+    "group": "project",
+    "legacyTestPath": "mcdev-core/src/test/kotlin/io/github/mcdev/core/project/InfoServiceTest.kt",
+    "legacyClass": "InfoServiceTest",
+    "legacyCase": "formatsPartialMappingsAsPartialStatus",
+    "baselineSha256": "0ff7434d0ab0a12823c94460deaf61f92e6ebad58eb0b68a181300a233fd7457",
+    "rustTest": "mcdev-core/tests/project_legacy.rs::info_service_test_formats_partial_mappings_as_partial_status",
+    "status": "ported",
+    "evidenceLog": "build/rust-test-logs/project-completion-final/affected.stdout.log"
+  },
+  {
+    "group": "project",
+    "legacyTestPath": "mcdev-core/src/test/kotlin/io/github/mcdev/core/project/InfoServiceTest.kt",
+    "legacyClass": "InfoServiceTest",
+    "legacyCase": "formatJoinsLinesWithNewlines",
+    "baselineSha256": "0ff7434d0ab0a12823c94460deaf61f92e6ebad58eb0b68a181300a233fd7457",
+    "rustTest": "mcdev-core/tests/project_legacy.rs::info_service_test_format_joins_lines_with_newlines",
+    "status": "ported",
+    "evidenceLog": "build/rust-test-logs/project-completion-final/affected.stdout.log"
+  },
+  {
+    "group": "project",
+    "legacyTestPath": "mcdev-core/src/test/kotlin/io/github/mcdev/core/project/InfoServiceTest.kt",
+    "legacyClass": "InfoServiceTest",
+    "legacyCase": "formatsIndexStates",
+    "baselineSha256": "0ff7434d0ab0a12823c94460deaf61f92e6ebad58eb0b68a181300a233fd7457",
+    "rustTest": "mcdev-core/tests/project_legacy.rs::info_service_test_formats_index_states",
+    "status": "ported",
+    "evidenceLog": "build/rust-test-logs/project-completion-final/affected.stdout.log"
+  },
+  {
+    "group": "project",
+    "legacyTestPath": "mcdev-core/src/test/kotlin/io/github/mcdev/core/project/InfoServiceTest.kt",
+    "legacyClass": "InfoServiceTest",
+    "legacyCase": "usesClasspathMinecraftJarsWhenContextListEmpty",
+    "baselineSha256": "0ff7434d0ab0a12823c94460deaf61f92e6ebad58eb0b68a181300a233fd7457",
+    "rustTest": "mcdev-core/tests/project_legacy.rs::info_service_test_uses_classpath_minecraft_jars_when_context_list_empty",
+    "status": "ported",
+    "evidenceLog": "build/rust-test-logs/project-completion-final/affected.stdout.log"
+  },
+  {
+    "group": "project",
+    "legacyTestPath": "mcdev-core/src/test/kotlin/io/github/mcdev/core/project/InfoServiceTest.kt",
+    "legacyClass": "InfoServiceTest",
+    "legacyCase": "formatsDiscoveredMappingSourceAndSourceSetCount",
+    "baselineSha256": "0ff7434d0ab0a12823c94460deaf61f92e6ebad58eb0b68a181300a233fd7457",
+    "rustTest": "mcdev-core/tests/project_legacy.rs::info_service_test_formats_discovered_mapping_source_and_source_set_count",
+    "status": "ported",
+    "evidenceLog": "build/rust-test-logs/project-completion-final/affected.stdout.log"
+  },
+  {
+    "group": "project",
+    "legacyTestPath": "mcdev-core/src/test/kotlin/io/github/mcdev/core/project/MappingDiscoveryServiceTest.kt",
+    "legacyClass": "MappingDiscoveryServiceTest",
+    "legacyCase": "discoversTinyMappingFiles",
+    "baselineSha256": "76586bc34bdfc824fd4a4351b78a140196a1b731d914c16455cf47a535a4cecb",
+    "rustTest": "mcdev-core/tests/project_legacy.rs::mapping_discovery_service_test_discovers_tiny_mapping_files",
+    "status": "ported",
+    "evidenceLog": "build/rust-test-logs/project-completion-final/affected.stdout.log"
+  },
+  {
+    "group": "project",
+    "legacyTestPath": "mcdev-core/src/test/kotlin/io/github/mcdev/core/project/MappingDiscoveryServiceTest.kt",
+    "legacyClass": "MappingDiscoveryServiceTest",
+    "legacyCase": "discoversSrgMappingFiles",
+    "baselineSha256": "76586bc34bdfc824fd4a4351b78a140196a1b731d914c16455cf47a535a4cecb",
+    "rustTest": "mcdev-core/tests/project_legacy.rs::mapping_discovery_service_test_discovers_srg_mapping_files",
+    "status": "ported",
+    "evidenceLog": "build/rust-test-logs/project-completion-final/affected.stdout.log"
+  },
+  {
+    "group": "project",
+    "legacyTestPath": "mcdev-core/src/test/kotlin/io/github/mcdev/core/project/MappingDiscoveryServiceTest.kt",
+    "legacyClass": "MappingDiscoveryServiceTest",
+    "legacyCase": "excludesBuildDirectoryMappings",
+    "baselineSha256": "76586bc34bdfc824fd4a4351b78a140196a1b731d914c16455cf47a535a4cecb",
+    "rustTest": "mcdev-core/tests/project_legacy.rs::mapping_discovery_service_test_excludes_build_directory_mappings",
+    "status": "ported",
+    "evidenceLog": "build/rust-test-logs/project-completion-final/affected.stdout.log"
+  },
+  {
+    "group": "project",
+    "legacyTestPath": "mcdev-core/src/test/kotlin/io/github/mcdev/core/project/MappingDiscoveryServiceTest.kt",
+    "legacyClass": "MappingDiscoveryServiceTest",
+    "legacyCase": "includesGradleLoomCacheMappings",
+    "baselineSha256": "76586bc34bdfc824fd4a4351b78a140196a1b731d914c16455cf47a535a4cecb",
+    "rustTest": "mcdev-core/tests/project_legacy.rs::mapping_discovery_service_test_includes_gradle_loom_cache_mappings",
+    "status": "ported",
+    "evidenceLog": "build/rust-test-logs/project-completion-final/affected.stdout.log"
+  },
+  {
+    "group": "project",
+    "legacyTestPath": "mcdev-core/src/test/kotlin/io/github/mcdev/core/project/MappingDiscoveryServiceTest.kt",
+    "legacyClass": "MappingDiscoveryServiceTest",
+    "legacyCase": "includesGradleFabricLoomCacheMappings",
+    "baselineSha256": "76586bc34bdfc824fd4a4351b78a140196a1b731d914c16455cf47a535a4cecb",
+    "rustTest": "mcdev-core/tests/project_legacy.rs::mapping_discovery_service_test_includes_gradle_fabric_loom_cache_mappings",
+    "status": "ported",
+    "evidenceLog": "build/rust-test-logs/project-completion-final/affected.stdout.log"
+  },
+  {
+    "group": "project",
+    "legacyTestPath": "mcdev-core/src/test/kotlin/io/github/mcdev/core/project/MappingDiscoveryServiceTest.kt",
+    "legacyClass": "MappingDiscoveryServiceTest",
+    "legacyCase": "includesGradleModuleCacheMappings",
+    "baselineSha256": "76586bc34bdfc824fd4a4351b78a140196a1b731d914c16455cf47a535a4cecb",
+    "rustTest": "mcdev-core/tests/project_legacy.rs::mapping_discovery_service_test_includes_gradle_module_cache_mappings",
+    "status": "ported",
+    "evidenceLog": "build/rust-test-logs/project-completion-final/affected.stdout.log"
+  },
+  {
+    "group": "project",
+    "legacyTestPath": "mcdev-core/src/test/kotlin/io/github/mcdev/core/project/MappingDiscoveryServiceTest.kt",
+    "legacyClass": "MappingDiscoveryServiceTest",
+    "legacyCase": "includesBuildLoomCacheAndForgeTmpMappings",
+    "baselineSha256": "76586bc34bdfc824fd4a4351b78a140196a1b731d914c16455cf47a535a4cecb",
+    "rustTest": "mcdev-core/tests/project_legacy.rs::mapping_discovery_service_test_includes_build_loom_cache_and_forge_tmp_mappings",
+    "status": "ported",
+    "evidenceLog": "build/rust-test-logs/project-completion-final/affected.stdout.log"
+  },
+  {
+    "group": "project",
+    "legacyTestPath": "mcdev-core/src/test/kotlin/io/github/mcdev/core/project/MappingDiscoveryServiceTest.kt",
+    "legacyClass": "MappingDiscoveryServiceTest",
+    "legacyCase": "excludesUnrelatedGradleBuildAndNodeModulesMappings",
+    "baselineSha256": "76586bc34bdfc824fd4a4351b78a140196a1b731d914c16455cf47a535a4cecb",
+    "rustTest": "mcdev-core/tests/project_legacy.rs::mapping_discovery_service_test_excludes_unrelated_gradle_build_and_node_modules_mappings",
+    "status": "ported",
+    "evidenceLog": "build/rust-test-logs/project-completion-final/affected.stdout.log"
+  },
+  {
+    "group": "project",
+    "legacyTestPath": "mcdev-core/src/test/kotlin/io/github/mcdev/core/project/MappingDiscoveryServiceTest.kt",
+    "legacyClass": "MappingDiscoveryServiceTest",
+    "legacyCase": "includesNestedWhitelistMappingPaths",
+    "baselineSha256": "76586bc34bdfc824fd4a4351b78a140196a1b731d914c16455cf47a535a4cecb",
+    "rustTest": "mcdev-core/tests/project_legacy.rs::mapping_discovery_service_test_includes_nested_whitelist_mapping_paths",
+    "status": "ported",
+    "evidenceLog": "build/rust-test-logs/project-completion-final/affected.stdout.log"
+  },
+  {
+    "group": "project",
+    "legacyTestPath": "mcdev-core/src/test/kotlin/io/github/mcdev/core/project/MappingDiscoveryServiceTest.kt",
+    "legacyClass": "MappingDiscoveryServiceTest",
+    "legacyCase": "parsesTinyMappingFile",
+    "baselineSha256": "76586bc34bdfc824fd4a4351b78a140196a1b731d914c16455cf47a535a4cecb",
+    "rustTest": "mcdev-core/tests/project_legacy.rs::mapping_discovery_service_test_parses_tiny_mapping_file",
+    "status": "ported",
+    "evidenceLog": "build/rust-test-logs/project-completion-final/affected.stdout.log"
+  },
+  {
+    "group": "project",
+    "legacyTestPath": "mcdev-core/src/test/kotlin/io/github/mcdev/core/project/MappingDiscoveryServiceTest.kt",
+    "legacyClass": "MappingDiscoveryServiceTest",
+    "legacyCase": "parsesSrgMappingFile",
+    "baselineSha256": "76586bc34bdfc824fd4a4351b78a140196a1b731d914c16455cf47a535a4cecb",
+    "rustTest": "mcdev-core/tests/project_legacy.rs::mapping_discovery_service_test_parses_srg_mapping_file",
+    "status": "ported",
+    "evidenceLog": "build/rust-test-logs/project-completion-final/affected.stdout.log"
+  },
+  {
+    "group": "project",
+    "legacyTestPath": "mcdev-core/src/test/kotlin/io/github/mcdev/core/project/MappingDiscoveryServiceTest.kt",
+    "legacyClass": "MappingDiscoveryServiceTest",
+    "legacyCase": "buildsFabricMappingContextFromTinyFile",
+    "baselineSha256": "76586bc34bdfc824fd4a4351b78a140196a1b731d914c16455cf47a535a4cecb",
+    "rustTest": "mcdev-core/tests/project_legacy.rs::mapping_discovery_service_test_builds_fabric_mapping_context_from_tiny_file",
+    "status": "ported",
+    "evidenceLog": "build/rust-test-logs/project-completion-final/affected.stdout.log"
+  },
+  {
+    "group": "project",
+    "legacyTestPath": "mcdev-core/src/test/kotlin/io/github/mcdev/core/project/MappingDiscoveryServiceTest.kt",
+    "legacyClass": "MappingDiscoveryServiceTest",
+    "legacyCase": "buildsForgeMappingContextFromSrgFile",
+    "baselineSha256": "76586bc34bdfc824fd4a4351b78a140196a1b731d914c16455cf47a535a4cecb",
+    "rustTest": "mcdev-core/tests/project_legacy.rs::mapping_discovery_service_test_builds_forge_mapping_context_from_srg_file",
+    "status": "ported",
+    "evidenceLog": "build/rust-test-logs/project-completion-final/affected.stdout.log"
+  },
+  {
+    "group": "project",
+    "legacyTestPath": "mcdev-core/src/test/kotlin/io/github/mcdev/core/project/MappingDiscoveryServiceTest.kt",
+    "legacyClass": "MappingDiscoveryServiceTest",
+    "legacyCase": "emptyMappingContextWhenNoFilesFound",
+    "baselineSha256": "76586bc34bdfc824fd4a4351b78a140196a1b731d914c16455cf47a535a4cecb",
+    "rustTest": "mcdev-core/tests/project_legacy.rs::mapping_discovery_service_test_empty_mapping_context_when_no_files_found",
+    "status": "ported",
+    "evidenceLog": "build/rust-test-logs/project-completion-final/affected.stdout.log"
+  },
+  {
+    "group": "project",
+    "legacyTestPath": "mcdev-core/src/test/kotlin/io/github/mcdev/core/project/MappingDiscoveryServiceTest.kt",
+    "legacyClass": "MappingDiscoveryServiceTest",
+    "legacyCase": "buildMappingContextFromExplicitFileList",
+    "baselineSha256": "76586bc34bdfc824fd4a4351b78a140196a1b731d914c16455cf47a535a4cecb",
+    "rustTest": "mcdev-core/tests/project_legacy.rs::mapping_discovery_service_test_build_mapping_context_from_explicit_file_list",
+    "status": "ported",
+    "evidenceLog": "build/rust-test-logs/project-completion-final/affected.stdout.log"
+  },
+  {
+    "group": "project",
+    "legacyTestPath": "mcdev-core/src/test/kotlin/io/github/mcdev/core/project/MappingDiscoveryServiceTest.kt",
+    "legacyClass": "MappingDiscoveryServiceTest",
+    "legacyCase": "mergesMultipleTinyMappingFilesForLookup",
+    "baselineSha256": "76586bc34bdfc824fd4a4351b78a140196a1b731d914c16455cf47a535a4cecb",
+    "rustTest": "mcdev-core/tests/project_legacy.rs::mapping_discovery_service_test_merges_multiple_tiny_mapping_files_for_lookup",
+    "status": "ported",
+    "evidenceLog": "build/rust-test-logs/project-completion-final/affected.stdout.log"
+  },
+  {
+    "group": "project",
+    "legacyTestPath": "mcdev-core/src/test/kotlin/io/github/mcdev/core/project/MappingDiscoveryServiceTest.kt",
+    "legacyClass": "MappingDiscoveryServiceTest",
+    "legacyCase": "mergesTinyAndSrgMappingFilesForLookup",
+    "baselineSha256": "76586bc34bdfc824fd4a4351b78a140196a1b731d914c16455cf47a535a4cecb",
+    "rustTest": "mcdev-core/tests/project_legacy.rs::mapping_discovery_service_test_merges_tiny_and_srg_mapping_files_for_lookup",
+    "status": "ported",
+    "evidenceLog": "build/rust-test-logs/project-completion-final/affected.stdout.log"
+  },
+  {
+    "group": "project",
+    "legacyTestPath": "mcdev-core/src/test/kotlin/io/github/mcdev/core/project/MappingDiscoveryServiceTest.kt",
+    "legacyClass": "MappingDiscoveryServiceTest",
+    "legacyCase": "returnsEmptyListForNonexistentRoot",
+    "baselineSha256": "76586bc34bdfc824fd4a4351b78a140196a1b731d914c16455cf47a535a4cecb",
+    "rustTest": "mcdev-core/tests/project_legacy.rs::mapping_discovery_service_test_returns_empty_list_for_nonexistent_root",
+    "status": "ported",
+    "evidenceLog": "build/rust-test-logs/project-completion-final/affected.stdout.log"
+  },
+  {
+    "group": "project",
+    "legacyTestPath": "mcdev-core/src/test/kotlin/io/github/mcdev/core/project/MixinConfigDiscoveryServiceTest.kt",
+    "legacyClass": "MixinConfigDiscoveryServiceTest",
+    "legacyCase": "identifiesMixinsJsonFile",
+    "baselineSha256": "fca89f76c3a021df6acfba75df3439e8cd8b47e3c5a980a91a5aac9b7d9cf3bb",
+    "rustTest": "mcdev-core/tests/project_legacy.rs::mixin_config_discovery_service_test_identifies_mixins_json_file",
+    "status": "ported",
+    "evidenceLog": "build/rust-test-logs/project-completion-final/affected.stdout.log"
+  },
+  {
+    "group": "project",
+    "legacyTestPath": "mcdev-core/src/test/kotlin/io/github/mcdev/core/project/MixinConfigDiscoveryServiceTest.kt",
+    "legacyClass": "MixinConfigDiscoveryServiceTest",
+    "legacyCase": "identifiesModMixinsJsonFile",
+    "baselineSha256": "fca89f76c3a021df6acfba75df3439e8cd8b47e3c5a980a91a5aac9b7d9cf3bb",
+    "rustTest": "mcdev-core/tests/project_legacy.rs::mixin_config_discovery_service_test_identifies_mod_mixins_json_file",
+    "status": "ported",
+    "evidenceLog": "build/rust-test-logs/project-completion-final/affected.stdout.log"
+  },
+  {
+    "group": "project",
+    "legacyTestPath": "mcdev-core/src/test/kotlin/io/github/mcdev/core/project/MixinConfigDiscoveryServiceTest.kt",
+    "legacyClass": "MixinConfigDiscoveryServiceTest",
+    "legacyCase": "identifiesMixinNamedJsonFile",
+    "baselineSha256": "fca89f76c3a021df6acfba75df3439e8cd8b47e3c5a980a91a5aac9b7d9cf3bb",
+    "rustTest": "mcdev-core/tests/project_legacy.rs::mixin_config_discovery_service_test_identifies_mixin_named_json_file",
+    "status": "ported",
+    "evidenceLog": "build/rust-test-logs/project-completion-final/affected.stdout.log"
+  },
+  {
+    "group": "project",
+    "legacyTestPath": "mcdev-core/src/test/kotlin/io/github/mcdev/core/project/MixinConfigDiscoveryServiceTest.kt",
+    "legacyClass": "MixinConfigDiscoveryServiceTest",
+    "legacyCase": "rejectsNonMixinJsonFile",
+    "baselineSha256": "fca89f76c3a021df6acfba75df3439e8cd8b47e3c5a980a91a5aac9b7d9cf3bb",
+    "rustTest": "mcdev-core/tests/project_legacy.rs::mixin_config_discovery_service_test_rejects_non_mixin_json_file",
+    "status": "ported",
+    "evidenceLog": "build/rust-test-logs/project-completion-final/affected.stdout.log"
+  },
+  {
+    "group": "project",
+    "legacyTestPath": "mcdev-core/src/test/kotlin/io/github/mcdev/core/project/MixinConfigDiscoveryServiceTest.kt",
+    "legacyClass": "MixinConfigDiscoveryServiceTest",
+    "legacyCase": "parsesMixinConfigContent",
+    "baselineSha256": "fca89f76c3a021df6acfba75df3439e8cd8b47e3c5a980a91a5aac9b7d9cf3bb",
+    "rustTest": "mcdev-core/tests/project_legacy.rs::mixin_config_discovery_service_test_parses_mixin_config_content",
+    "status": "ported",
+    "evidenceLog": "build/rust-test-logs/project-completion-final/affected.stdout.log"
+  },
+  {
+    "group": "project",
+    "legacyTestPath": "mcdev-core/src/test/kotlin/io/github/mcdev/core/project/MixinConfigDiscoveryServiceTest.kt",
+    "legacyClass": "MixinConfigDiscoveryServiceTest",
+    "legacyCase": "parsesMixinConfigWithMissingOptionalFields",
+    "baselineSha256": "fca89f76c3a021df6acfba75df3439e8cd8b47e3c5a980a91a5aac9b7d9cf3bb",
+    "rustTest": "mcdev-core/tests/project_legacy.rs::mixin_config_discovery_service_test_parses_mixin_config_with_missing_optional_fields",
+    "status": "ported",
+    "evidenceLog": "build/rust-test-logs/project-completion-final/affected.stdout.log"
+  },
+  {
+    "group": "project",
+    "legacyTestPath": "mcdev-core/src/test/kotlin/io/github/mcdev/core/project/MixinConfigDiscoveryServiceTest.kt",
+    "legacyClass": "MixinConfigDiscoveryServiceTest",
+    "legacyCase": "returnsNullForInvalidJson",
+    "baselineSha256": "fca89f76c3a021df6acfba75df3439e8cd8b47e3c5a980a91a5aac9b7d9cf3bb",
+    "rustTest": "mcdev-core/tests/project_legacy.rs::mixin_config_discovery_service_test_returns_null_for_invalid_json",
+    "status": "ported",
+    "evidenceLog": "build/rust-test-logs/project-completion-final/affected.stdout.log"
+  },
+  {
+    "group": "project",
+    "legacyTestPath": "mcdev-core/src/test/kotlin/io/github/mcdev/core/project/MixinConfigDiscoveryServiceTest.kt",
+    "legacyClass": "MixinConfigDiscoveryServiceTest",
+    "legacyCase": "returnsNullForJsonArrayRoot",
+    "baselineSha256": "fca89f76c3a021df6acfba75df3439e8cd8b47e3c5a980a91a5aac9b7d9cf3bb",
+    "rustTest": "mcdev-core/tests/project_legacy.rs::mixin_config_discovery_service_test_returns_null_for_json_array_root",
+    "status": "ported",
+    "evidenceLog": "build/rust-test-logs/project-completion-final/affected.stdout.log"
+  },
+  {
+    "group": "project",
+    "legacyTestPath": "mcdev-core/src/test/kotlin/io/github/mcdev/core/project/MixinConfigDiscoveryServiceTest.kt",
+    "legacyClass": "MixinConfigDiscoveryServiceTest",
+    "legacyCase": "discoversMixinConfigsInProjectTree",
+    "baselineSha256": "fca89f76c3a021df6acfba75df3439e8cd8b47e3c5a980a91a5aac9b7d9cf3bb",
+    "rustTest": "mcdev-core/tests/project_legacy.rs::mixin_config_discovery_service_test_discovers_mixin_configs_in_project_tree",
+    "status": "ported",
+    "evidenceLog": "build/rust-test-logs/project-completion-final/affected.stdout.log"
+  },
+  {
+    "group": "project",
+    "legacyTestPath": "mcdev-core/src/test/kotlin/io/github/mcdev/core/project/MixinConfigDiscoveryServiceTest.kt",
+    "legacyClass": "MixinConfigDiscoveryServiceTest",
+    "legacyCase": "identifiesMixinsJson5File",
+    "baselineSha256": "fca89f76c3a021df6acfba75df3439e8cd8b47e3c5a980a91a5aac9b7d9cf3bb",
+    "rustTest": "mcdev-core/tests/project_legacy.rs::mixin_config_discovery_service_test_identifies_mixins_json5_file",
+    "status": "ported",
+    "evidenceLog": "build/rust-test-logs/project-completion-final/affected.stdout.log"
+  },
+  {
+    "group": "project",
+    "legacyTestPath": "mcdev-core/src/test/kotlin/io/github/mcdev/core/project/MixinConfigDiscoveryServiceTest.kt",
+    "legacyClass": "MixinConfigDiscoveryServiceTest",
+    "legacyCase": "identifiesMixinNamedJson5File",
+    "baselineSha256": "fca89f76c3a021df6acfba75df3439e8cd8b47e3c5a980a91a5aac9b7d9cf3bb",
+    "rustTest": "mcdev-core/tests/project_legacy.rs::mixin_config_discovery_service_test_identifies_mixin_named_json5_file",
+    "status": "ported",
+    "evidenceLog": "build/rust-test-logs/project-completion-final/affected.stdout.log"
+  },
+  {
+    "group": "project",
+    "legacyTestPath": "mcdev-core/src/test/kotlin/io/github/mcdev/core/project/MixinConfigDiscoveryServiceTest.kt",
+    "legacyClass": "MixinConfigDiscoveryServiceTest",
+    "legacyCase": "parsesJson5ConfigWithCommentsAndTrailingCommas",
+    "baselineSha256": "fca89f76c3a021df6acfba75df3439e8cd8b47e3c5a980a91a5aac9b7d9cf3bb",
+    "rustTest": "mcdev-core/tests/project_legacy.rs::mixin_config_discovery_service_test_parses_json5_config_with_comments_and_trailing_commas",
+    "status": "ported",
+    "evidenceLog": "build/rust-test-logs/project-completion-final/affected.stdout.log"
+  },
+  {
+    "group": "project",
+    "legacyTestPath": "mcdev-core/src/test/kotlin/io/github/mcdev/core/project/MixinConfigDiscoveryServiceTest.kt",
+    "legacyClass": "MixinConfigDiscoveryServiceTest",
+    "legacyCase": "selectsConfigListingMixinClassOverEarlierConfig",
+    "baselineSha256": "fca89f76c3a021df6acfba75df3439e8cd8b47e3c5a980a91a5aac9b7d9cf3bb",
+    "rustTest": "mcdev-core/tests/project_legacy.rs::mixin_config_discovery_service_test_selects_config_listing_mixin_class_over_earlier_config",
+    "status": "ported",
+    "evidenceLog": "build/rust-test-logs/project-completion-final/affected.stdout.log"
+  },
+  {
+    "group": "project",
+    "legacyTestPath": "mcdev-core/src/test/kotlin/io/github/mcdev/core/project/MixinConfigDiscoveryServiceTest.kt",
+    "legacyClass": "MixinConfigDiscoveryServiceTest",
+    "legacyCase": "selectsPackageMatchingConfigWhenClassIsNotListed",
+    "baselineSha256": "fca89f76c3a021df6acfba75df3439e8cd8b47e3c5a980a91a5aac9b7d9cf3bb",
+    "rustTest": "mcdev-core/tests/project_legacy.rs::mixin_config_discovery_service_test_selects_package_matching_config_when_class_is_not_listed",
+    "status": "ported",
+    "evidenceLog": "build/rust-test-logs/project-completion-final/affected.stdout.log"
+  },
+  {
+    "group": "project",
+    "legacyTestPath": "mcdev-core/src/test/kotlin/io/github/mcdev/core/project/MixinConfigDiscoveryServiceTest.kt",
+    "legacyClass": "MixinConfigDiscoveryServiceTest",
+    "legacyCase": "returnsNullWhenNoSelectionEvidence",
+    "baselineSha256": "fca89f76c3a021df6acfba75df3439e8cd8b47e3c5a980a91a5aac9b7d9cf3bb",
+    "rustTest": "mcdev-core/tests/project_legacy.rs::mixin_config_discovery_service_test_returns_null_when_no_selection_evidence",
+    "status": "ported",
+    "evidenceLog": "build/rust-test-logs/project-completion-final/affected.stdout.log"
+  },
+  {
+    "group": "project",
+    "legacyTestPath": "mcdev-core/src/test/kotlin/io/github/mcdev/core/project/MixinConfigDiscoveryServiceTest.kt",
+    "legacyClass": "MixinConfigDiscoveryServiceTest",
+    "legacyCase": "returnsNullWhenMultipleConfigsListMixinClass",
+    "baselineSha256": "fca89f76c3a021df6acfba75df3439e8cd8b47e3c5a980a91a5aac9b7d9cf3bb",
+    "rustTest": "mcdev-core/tests/project_legacy.rs::mixin_config_discovery_service_test_returns_null_when_multiple_configs_list_mixin_class",
+    "status": "ported",
+    "evidenceLog": "build/rust-test-logs/project-completion-final/affected.stdout.log"
+  },
+  {
+    "group": "project",
+    "legacyTestPath": "mcdev-core/src/test/kotlin/io/github/mcdev/core/project/MixinConfigDiscoveryServiceTest.kt",
+    "legacyClass": "MixinConfigDiscoveryServiceTest",
+    "legacyCase": "returnsNullWhenMultipleConfigsMatchPackage",
+    "baselineSha256": "fca89f76c3a021df6acfba75df3439e8cd8b47e3c5a980a91a5aac9b7d9cf3bb",
+    "rustTest": "mcdev-core/tests/project_legacy.rs::mixin_config_discovery_service_test_returns_null_when_multiple_configs_match_package",
+    "status": "ported",
+    "evidenceLog": "build/rust-test-logs/project-completion-final/affected.stdout.log"
+  },
+  {
+    "group": "project",
+    "legacyTestPath": "mcdev-core/src/test/kotlin/io/github/mcdev/core/project/MixinConfigDiscoveryServiceTest.kt",
+    "legacyClass": "MixinConfigDiscoveryServiceTest",
+    "legacyCase": "selectsParentConfigPackageForSubpackageMixin",
+    "baselineSha256": "fca89f76c3a021df6acfba75df3439e8cd8b47e3c5a980a91a5aac9b7d9cf3bb",
+    "rustTest": "mcdev-core/tests/project_legacy.rs::mixin_config_discovery_service_test_selects_parent_config_package_for_subpackage_mixin",
+    "status": "ported",
+    "evidenceLog": "build/rust-test-logs/project-completion-final/affected.stdout.log"
+  },
+  {
+    "group": "project",
+    "legacyTestPath": "mcdev-core/src/test/kotlin/io/github/mcdev/core/project/MixinConfigDiscoveryServiceTest.kt",
+    "legacyClass": "MixinConfigDiscoveryServiceTest",
+    "legacyCase": "selectsMoreSpecificPackagePrefixOverBroaderOne",
+    "baselineSha256": "fca89f76c3a021df6acfba75df3439e8cd8b47e3c5a980a91a5aac9b7d9cf3bb",
+    "rustTest": "mcdev-core/tests/project_legacy.rs::mixin_config_discovery_service_test_selects_more_specific_package_prefix_over_broader_one",
+    "status": "ported",
+    "evidenceLog": "build/rust-test-logs/project-completion-final/affected.stdout.log"
+  },
+  {
+    "group": "project",
+    "legacyTestPath": "mcdev-core/src/test/kotlin/io/github/mcdev/core/project/MixinConfigDiscoveryServiceTest.kt",
+    "legacyClass": "MixinConfigDiscoveryServiceTest",
+    "legacyCase": "selectsConfigListingRelativeSubpackageEntry",
+    "baselineSha256": "fca89f76c3a021df6acfba75df3439e8cd8b47e3c5a980a91a5aac9b7d9cf3bb",
+    "rustTest": "mcdev-core/tests/project_legacy.rs::mixin_config_discovery_service_test_selects_config_listing_relative_subpackage_entry",
+    "status": "ported",
+    "evidenceLog": "build/rust-test-logs/project-completion-final/affected.stdout.log"
+  },
+  {
+    "group": "project",
+    "legacyTestPath": "mcdev-core/src/test/kotlin/io/github/mcdev/core/project/MixinConfigDiscoveryServiceTest.kt",
+    "legacyClass": "MixinConfigDiscoveryServiceTest",
+    "legacyCase": "returnsNullWhenEqualLongestPackagePrefixIsAmbiguous",
+    "baselineSha256": "fca89f76c3a021df6acfba75df3439e8cd8b47e3c5a980a91a5aac9b7d9cf3bb",
+    "rustTest": "mcdev-core/tests/project_legacy.rs::mixin_config_discovery_service_test_returns_null_when_equal_longest_package_prefix_is_ambiguous",
+    "status": "ported",
+    "evidenceLog": "build/rust-test-logs/project-completion-final/affected.stdout.log"
+  },
+  {
+    "group": "project",
+    "legacyTestPath": "mcdev-core/src/test/kotlin/io/github/mcdev/core/project/MixinConfigDiscoveryServiceTest.kt",
+    "legacyClass": "MixinConfigDiscoveryServiceTest",
+    "legacyCase": "excludesBuildDirectoryMixinConfigs",
+    "baselineSha256": "fca89f76c3a021df6acfba75df3439e8cd8b47e3c5a980a91a5aac9b7d9cf3bb",
+    "rustTest": "mcdev-core/tests/project_legacy.rs::mixin_config_discovery_service_test_excludes_build_directory_mixin_configs",
+    "status": "ported",
+    "evidenceLog": "build/rust-test-logs/project-completion-final/affected.stdout.log"
+  },
+  {
+    "group": "project",
+    "legacyTestPath": "mcdev-core/src/test/kotlin/io/github/mcdev/core/project/MixinConfigDiscoveryServiceTest.kt",
+    "legacyClass": "MixinConfigDiscoveryServiceTest",
+    "legacyCase": "excludesGradleDirectoryMixinConfigs",
+    "baselineSha256": "fca89f76c3a021df6acfba75df3439e8cd8b47e3c5a980a91a5aac9b7d9cf3bb",
+    "rustTest": "mcdev-core/tests/project_legacy.rs::mixin_config_discovery_service_test_excludes_gradle_directory_mixin_configs",
+    "status": "ported",
+    "evidenceLog": "build/rust-test-logs/project-completion-final/affected.stdout.log"
+  },
+  {
+    "group": "project",
+    "legacyTestPath": "mcdev-core/src/test/kotlin/io/github/mcdev/core/project/MixinConfigDiscoveryServiceTest.kt",
+    "legacyClass": "MixinConfigDiscoveryServiceTest",
+    "legacyCase": "excludesNodeModulesDirectoryMixinConfigs",
+    "baselineSha256": "fca89f76c3a021df6acfba75df3439e8cd8b47e3c5a980a91a5aac9b7d9cf3bb",
+    "rustTest": "mcdev-core/tests/project_legacy.rs::mixin_config_discovery_service_test_excludes_node_modules_directory_mixin_configs",
+    "status": "ported",
+    "evidenceLog": "build/rust-test-logs/project-completion-final/affected.stdout.log"
+  },
+  {
+    "group": "project",
+    "legacyTestPath": "mcdev-core/src/test/kotlin/io/github/mcdev/core/project/MixinConfigDiscoveryServiceTest.kt",
+    "legacyClass": "MixinConfigDiscoveryServiceTest",
+    "legacyCase": "configsForSourceSetReturnsSelectedFabricOrForgeResources",
+    "baselineSha256": "fca89f76c3a021df6acfba75df3439e8cd8b47e3c5a980a91a5aac9b7d9cf3bb",
+    "rustTest": "mcdev-core/tests/project_legacy.rs::mixin_config_discovery_service_test_configs_for_source_set_returns_selected_fabric_or_forge_resources",
+    "status": "ported",
+    "evidenceLog": "build/rust-test-logs/project-completion-final/affected.stdout.log"
+  },
+  {
+    "group": "project",
+    "legacyTestPath": "mcdev-core/src/test/kotlin/io/github/mcdev/core/project/MixinConfigDiscoveryServiceTest.kt",
+    "legacyClass": "MixinConfigDiscoveryServiceTest",
+    "legacyCase": "configsForSourceSetPrefersLocalResourcesOverRootShared",
+    "baselineSha256": "fca89f76c3a021df6acfba75df3439e8cd8b47e3c5a980a91a5aac9b7d9cf3bb",
+    "rustTest": "mcdev-core/tests/project_legacy.rs::mixin_config_discovery_service_test_configs_for_source_set_prefers_local_resources_over_root_shared",
+    "status": "ported",
+    "evidenceLog": "build/rust-test-logs/project-completion-final/affected.stdout.log"
+  },
+  {
+    "group": "project",
+    "legacyTestPath": "mcdev-core/src/test/kotlin/io/github/mcdev/core/project/MixinConfigDiscoveryServiceTest.kt",
+    "legacyClass": "MixinConfigDiscoveryServiceTest",
+    "legacyCase": "configsForSourceSetFallsBackToRootSharedWhenSelectedSourceSetHasNoConfig",
+    "baselineSha256": "fca89f76c3a021df6acfba75df3439e8cd8b47e3c5a980a91a5aac9b7d9cf3bb",
+    "rustTest": "mcdev-core/tests/project_legacy.rs::mixin_config_discovery_service_test_configs_for_source_set_falls_back_to_root_shared_when_selected_source_set_has_no_config",
+    "status": "ported",
+    "evidenceLog": "build/rust-test-logs/project-completion-final/affected.stdout.log"
+  },
+  {
+    "group": "project",
+    "legacyTestPath": "mcdev-core/src/test/kotlin/io/github/mcdev/core/project/MixinConfigDiscoveryServiceTest.kt",
+    "legacyClass": "MixinConfigDiscoveryServiceTest",
+    "legacyCase": "configsForSourceSetReturnsEmptyWhenOnlySiblingSourceSetHasConfigs",
+    "baselineSha256": "fca89f76c3a021df6acfba75df3439e8cd8b47e3c5a980a91a5aac9b7d9cf3bb",
+    "rustTest": "mcdev-core/tests/project_legacy.rs::mixin_config_discovery_service_test_configs_for_source_set_returns_empty_when_only_sibling_source_set_has_configs",
+    "status": "ported",
+    "evidenceLog": "build/rust-test-logs/project-completion-final/affected.stdout.log"
+  },
+  {
+    "group": "project",
+    "legacyTestPath": "mcdev-core/src/test/kotlin/io/github/mcdev/core/project/MixinConfigDiscoveryServiceTest.kt",
+    "legacyClass": "MixinConfigDiscoveryServiceTest",
+    "legacyCase": "sharedConfigsReturnsRootUnownedConfigsOnly",
+    "baselineSha256": "fca89f76c3a021df6acfba75df3439e8cd8b47e3c5a980a91a5aac9b7d9cf3bb",
+    "rustTest": "mcdev-core/tests/project_legacy.rs::mixin_config_discovery_service_test_shared_configs_returns_root_unowned_configs_only",
+    "status": "ported",
+    "evidenceLog": "build/rust-test-logs/project-completion-final/affected.stdout.log"
+  },
+  {
+    "group": "project",
+    "legacyTestPath": "mcdev-core/src/test/kotlin/io/github/mcdev/core/project/MixinConfigDiscoveryServiceTest.kt",
+    "legacyClass": "MixinConfigDiscoveryServiceTest",
+    "legacyCase": "configsForSourceSetExcludesPathsOutsideProjectRoot",
+    "baselineSha256": "fca89f76c3a021df6acfba75df3439e8cd8b47e3c5a980a91a5aac9b7d9cf3bb",
+    "rustTest": "mcdev-core/tests/project_legacy.rs::mixin_config_discovery_service_test_configs_for_source_set_excludes_paths_outside_project_root",
+    "status": "ported",
+    "evidenceLog": "build/rust-test-logs/project-completion-final/affected.stdout.log"
+  },
+  {
+    "group": "project",
+    "legacyTestPath": "mcdev-core/src/test/kotlin/io/github/mcdev/core/project/PlatformDetectorTest.kt",
+    "legacyClass": "PlatformDetectorTest",
+    "legacyCase": "detectsFabricFromFabricLoomPlugin",
+    "baselineSha256": "66774dca8b10583a8d15f580591cd1abcf37d076b19c68aa8135dadd1175f0dd",
+    "rustTest": "mcdev-core/tests/project_legacy.rs::platform_detector_test_detects_fabric_from_fabric_loom_plugin",
+    "status": "ported",
+    "evidenceLog": "build/rust-test-logs/project-completion-final/affected.stdout.log"
+  },
+  {
+    "group": "project",
+    "legacyTestPath": "mcdev-core/src/test/kotlin/io/github/mcdev/core/project/PlatformDetectorTest.kt",
+    "legacyClass": "PlatformDetectorTest",
+    "legacyCase": "detectsFabricFromFabricLoomCoordinate",
+    "baselineSha256": "66774dca8b10583a8d15f580591cd1abcf37d076b19c68aa8135dadd1175f0dd",
+    "rustTest": "mcdev-core/tests/project_legacy.rs::platform_detector_test_detects_fabric_from_fabric_loom_coordinate",
+    "status": "ported",
+    "evidenceLog": "build/rust-test-logs/project-completion-final/affected.stdout.log"
+  },
+  {
+    "group": "project",
+    "legacyTestPath": "mcdev-core/src/test/kotlin/io/github/mcdev/core/project/PlatformDetectorTest.kt",
+    "legacyClass": "PlatformDetectorTest",
+    "legacyCase": "detectsNeoForgeFromModdevGradle",
+    "baselineSha256": "66774dca8b10583a8d15f580591cd1abcf37d076b19c68aa8135dadd1175f0dd",
+    "rustTest": "mcdev-core/tests/project_legacy.rs::platform_detector_test_detects_neo_forge_from_moddev_gradle",
+    "status": "ported",
+    "evidenceLog": "build/rust-test-logs/project-completion-final/affected.stdout.log"
+  },
+  {
+    "group": "project",
+    "legacyTestPath": "mcdev-core/src/test/kotlin/io/github/mcdev/core/project/PlatformDetectorTest.kt",
+    "legacyClass": "PlatformDetectorTest",
+    "legacyCase": "detectsNeoForgeFromNeoforgedGradleCoordinate",
+    "baselineSha256": "66774dca8b10583a8d15f580591cd1abcf37d076b19c68aa8135dadd1175f0dd",
+    "rustTest": "mcdev-core/tests/project_legacy.rs::platform_detector_test_detects_neo_forge_from_neoforged_gradle_coordinate",
+    "status": "ported",
+    "evidenceLog": "build/rust-test-logs/project-completion-final/affected.stdout.log"
+  },
+  {
+    "group": "project",
+    "legacyTestPath": "mcdev-core/src/test/kotlin/io/github/mcdev/core/project/PlatformDetectorTest.kt",
+    "legacyClass": "PlatformDetectorTest",
+    "legacyCase": "detectsForgeFromForgeGradle",
+    "baselineSha256": "66774dca8b10583a8d15f580591cd1abcf37d076b19c68aa8135dadd1175f0dd",
+    "rustTest": "mcdev-core/tests/project_legacy.rs::platform_detector_test_detects_forge_from_forge_gradle",
+    "status": "ported",
+    "evidenceLog": "build/rust-test-logs/project-completion-final/affected.stdout.log"
+  },
+  {
+    "group": "project",
+    "legacyTestPath": "mcdev-core/src/test/kotlin/io/github/mcdev/core/project/PlatformDetectorTest.kt",
+    "legacyClass": "PlatformDetectorTest",
+    "legacyCase": "detectsForgeFromForgeGradleLegacyMarker",
+    "baselineSha256": "66774dca8b10583a8d15f580591cd1abcf37d076b19c68aa8135dadd1175f0dd",
+    "rustTest": "mcdev-core/tests/project_legacy.rs::platform_detector_test_detects_forge_from_forge_gradle_legacy_marker",
+    "status": "ported",
+    "evidenceLog": "build/rust-test-logs/project-completion-final/affected.stdout.log"
+  },
+  {
+    "group": "project",
+    "legacyTestPath": "mcdev-core/src/test/kotlin/io/github/mcdev/core/project/PlatformDetectorTest.kt",
+    "legacyClass": "PlatformDetectorTest",
+    "legacyCase": "returnsUnknownForPlainJavaProject",
+    "baselineSha256": "66774dca8b10583a8d15f580591cd1abcf37d076b19c68aa8135dadd1175f0dd",
+    "rustTest": "mcdev-core/tests/project_legacy.rs::platform_detector_test_returns_unknown_for_plain_java_project",
+    "status": "ported",
+    "evidenceLog": "build/rust-test-logs/project-completion-final/affected.stdout.log"
+  },
+  {
+    "group": "project",
+    "legacyTestPath": "mcdev-core/src/test/kotlin/io/github/mcdev/core/project/PlatformDetectorTest.kt",
+    "legacyClass": "PlatformDetectorTest",
+    "legacyCase": "returnsUnknownForEmptyGradleContents",
+    "baselineSha256": "66774dca8b10583a8d15f580591cd1abcf37d076b19c68aa8135dadd1175f0dd",
+    "rustTest": "mcdev-core/tests/project_legacy.rs::platform_detector_test_returns_unknown_for_empty_gradle_contents",
+    "status": "ported",
+    "evidenceLog": "build/rust-test-logs/project-completion-final/affected.stdout.log"
+  },
+  {
+    "group": "project",
+    "legacyTestPath": "mcdev-core/src/test/kotlin/io/github/mcdev/core/project/PlatformDetectorTest.kt",
+    "legacyClass": "PlatformDetectorTest",
+    "legacyCase": "neoforgeTakesPriorityOverForgeWhenBothPresent",
+    "baselineSha256": "66774dca8b10583a8d15f580591cd1abcf37d076b19c68aa8135dadd1175f0dd",
+    "rustTest": "mcdev-core/tests/project_legacy.rs::platform_detector_test_neoforge_takes_priority_over_forge_when_both_present",
+    "status": "ported",
+    "evidenceLog": "build/rust-test-logs/project-completion-final/affected.stdout.log"
+  },
+  {
+    "group": "project",
+    "legacyTestPath": "mcdev-core/src/test/kotlin/io/github/mcdev/core/project/PlatformDetectorTest.kt",
+    "legacyClass": "PlatformDetectorTest",
+    "legacyCase": "detectsFromRootGradleFiles",
+    "baselineSha256": "66774dca8b10583a8d15f580591cd1abcf37d076b19c68aa8135dadd1175f0dd",
+    "rustTest": "mcdev-core/tests/project_legacy.rs::platform_detector_test_detects_from_root_gradle_files",
+    "status": "ported",
+    "evidenceLog": "build/rust-test-logs/project-completion-final/affected.stdout.log"
+  },
+  {
+    "group": "project",
+    "legacyTestPath": "mcdev-core/src/test/kotlin/io/github/mcdev/core/project/PlatformDetectorTest.kt",
+    "legacyClass": "PlatformDetectorTest",
+    "legacyCase": "combinesMultipleGradleFilesForDetection",
+    "baselineSha256": "66774dca8b10583a8d15f580591cd1abcf37d076b19c68aa8135dadd1175f0dd",
+    "rustTest": "mcdev-core/tests/project_legacy.rs::platform_detector_test_combines_multiple_gradle_files_for_detection",
+    "status": "ported",
+    "evidenceLog": "build/rust-test-logs/project-completion-final/affected.stdout.log"
+  },
+  {
+    "group": "project",
+    "legacyTestPath": "mcdev-core/src/test/kotlin/io/github/mcdev/core/project/ProjectContextBuilderTest.kt",
+    "legacyClass": "ProjectContextBuilderTest",
+    "legacyCase": "buildsEmptyContextWithExplicitUnknownPlatform",
+    "baselineSha256": "5fb583d5a7ec8945b0148919afc79aea5aff77c8a9897ab9b9f261e3281cce20",
+    "rustTest": "mcdev-core/tests/project_legacy.rs::project_context_builder_test_builds_empty_context_with_explicit_unknown_platform",
+    "status": "ported",
+    "evidenceLog": "build/rust-test-logs/project-completion-final/affected.stdout.log"
+  },
+  {
+    "group": "project",
+    "legacyTestPath": "mcdev-core/src/test/kotlin/io/github/mcdev/core/project/ProjectContextBuilderTest.kt",
+    "legacyClass": "ProjectContextBuilderTest",
+    "legacyCase": "buildsFabricContextFromGradleAndDiscoveredFiles",
+    "baselineSha256": "5fb583d5a7ec8945b0148919afc79aea5aff77c8a9897ab9b9f261e3281cce20",
+    "rustTest": "mcdev-core/tests/project_legacy.rs::project_context_builder_test_builds_fabric_context_from_gradle_and_discovered_files",
+    "status": "ported",
+    "evidenceLog": "build/rust-test-logs/project-completion-final/affected.stdout.log"
+  },
+  {
+    "group": "project",
+    "legacyTestPath": "mcdev-core/src/test/kotlin/io/github/mcdev/core/project/ProjectContextBuilderTest.kt",
+    "legacyClass": "ProjectContextBuilderTest",
+    "legacyCase": "usesExplicitPlatformOverGradleDetection",
+    "baselineSha256": "5fb583d5a7ec8945b0148919afc79aea5aff77c8a9897ab9b9f261e3281cce20",
+    "rustTest": "mcdev-core/tests/project_legacy.rs::project_context_builder_test_uses_explicit_platform_over_gradle_detection",
+    "status": "ported",
+    "evidenceLog": "build/rust-test-logs/project-completion-final/affected.stdout.log"
+  },
+  {
+    "group": "project",
+    "legacyTestPath": "mcdev-core/src/test/kotlin/io/github/mcdev/core/project/ProjectContextBuilderTest.kt",
+    "legacyClass": "ProjectContextBuilderTest",
+    "legacyCase": "usesProvidedMappingsWithoutRediscovery",
+    "baselineSha256": "5fb583d5a7ec8945b0148919afc79aea5aff77c8a9897ab9b9f261e3281cce20",
+    "rustTest": "mcdev-core/tests/project_legacy.rs::project_context_builder_test_uses_provided_mappings_without_rediscovery",
+    "status": "ported",
+    "evidenceLog": "build/rust-test-logs/project-completion-final/affected.stdout.log"
+  },
+  {
+    "group": "project",
+    "legacyTestPath": "mcdev-core/src/test/kotlin/io/github/mcdev/core/project/ProjectContextBuilderTest.kt",
+    "legacyClass": "ProjectContextBuilderTest",
+    "legacyCase": "detectsPlatformFromGradleContentsWhenRootFilesMissing",
+    "baselineSha256": "5fb583d5a7ec8945b0148919afc79aea5aff77c8a9897ab9b9f261e3281cce20",
+    "rustTest": "mcdev-core/tests/project_legacy.rs::project_context_builder_test_detects_platform_from_gradle_contents_when_root_files_missing",
+    "status": "ported",
+    "evidenceLog": "build/rust-test-logs/project-completion-final/affected.stdout.log"
+  },
+  {
+    "group": "project",
+    "legacyTestPath": "mcdev-core/src/test/kotlin/io/github/mcdev/core/project/ProjectContextBuilderTest.kt",
+    "legacyClass": "ProjectContextBuilderTest",
+    "legacyCase": "preservesClasspathSnapshotInBuiltContext",
+    "baselineSha256": "5fb583d5a7ec8945b0148919afc79aea5aff77c8a9897ab9b9f261e3281cce20",
+    "rustTest": "mcdev-core/tests/project_legacy.rs::project_context_builder_test_preserves_classpath_snapshot_in_built_context",
+    "status": "ported",
+    "evidenceLog": "build/rust-test-logs/project-completion-final/affected.stdout.log"
+  },
+  {
+    "group": "project",
+    "legacyTestPath": "mcdev-core/src/test/kotlin/io/github/mcdev/core/project/ProjectModelTest.kt",
+    "legacyClass": "ProjectModelTest",
+    "legacyCase": "classpathSnapshotAggregatesAllEntryTypes",
+    "baselineSha256": "970d5d9af6645cdb4cab5bc97dc1827ab2984c5bdb324c263ec52150cf64c16d",
+    "rustTest": "mcdev-core/tests/project_legacy_stateful.rs::project_model_test_classpath_snapshot_aggregates_all_entry_types",
+    "status": "ported",
+    "evidenceLog": "build/rust-test-logs/project-completion-final/affected.stdout.log"
+  },
+  {
+    "group": "project",
+    "legacyTestPath": "mcdev-core/src/test/kotlin/io/github/mcdev/core/project/ProjectModelTest.kt",
+    "legacyClass": "ProjectModelTest",
+    "legacyCase": "classpathSnapshotEmptyDefaults",
+    "baselineSha256": "970d5d9af6645cdb4cab5bc97dc1827ab2984c5bdb324c263ec52150cf64c16d",
+    "rustTest": "mcdev-core/tests/project_legacy_stateful.rs::project_model_test_classpath_snapshot_empty_defaults",
+    "status": "ported",
+    "evidenceLog": "build/rust-test-logs/project-completion-final/affected.stdout.log"
+  },
+  {
+    "group": "project",
+    "legacyTestPath": "mcdev-core/src/test/kotlin/io/github/mcdev/core/project/ProjectModelTest.kt",
+    "legacyClass": "ProjectModelTest",
+    "legacyCase": "sourceSetContextStoresDirectories",
+    "baselineSha256": "970d5d9af6645cdb4cab5bc97dc1827ab2984c5bdb324c263ec52150cf64c16d",
+    "rustTest": "mcdev-core/tests/project_legacy_stateful.rs::project_model_test_source_set_context_stores_directories",
+    "status": "ported",
+    "evidenceLog": "build/rust-test-logs/project-completion-final/affected.stdout.log"
+  },
+  {
+    "group": "project",
+    "legacyTestPath": "mcdev-core/src/test/kotlin/io/github/mcdev/core/project/ProjectModelTest.kt",
+    "legacyClass": "ProjectModelTest",
+    "legacyCase": "mixinConfigRefDefaultsToEmptyLists",
+    "baselineSha256": "970d5d9af6645cdb4cab5bc97dc1827ab2984c5bdb324c263ec52150cf64c16d",
+    "rustTest": "mcdev-core/tests/project_legacy_stateful.rs::project_model_test_mixin_config_ref_defaults_to_empty_lists",
+    "status": "ported",
+    "evidenceLog": "build/rust-test-logs/project-completion-final/affected.stdout.log"
+  },
+  {
+    "group": "project",
+    "legacyTestPath": "mcdev-core/src/test/kotlin/io/github/mcdev/core/project/ProjectModelTest.kt",
+    "legacyClass": "ProjectModelTest",
+    "legacyCase": "projectIndexStateHasAllLifecycleValues",
+    "baselineSha256": "970d5d9af6645cdb4cab5bc97dc1827ab2984c5bdb324c263ec52150cf64c16d",
+    "rustTest": "mcdev-core/tests/project_legacy_stateful.rs::project_model_test_project_index_state_has_all_lifecycle_values",
+    "status": "ported",
+    "evidenceLog": "build/rust-test-logs/project-completion-final/affected.stdout.log"
+  },
+  {
+    "group": "project",
+    "legacyTestPath": "mcdev-core/src/test/kotlin/io/github/mcdev/core/project/ProjectModelTest.kt",
+    "legacyClass": "ProjectModelTest",
+    "legacyCase": "modPlatformHasSupportedValues",
+    "baselineSha256": "970d5d9af6645cdb4cab5bc97dc1827ab2984c5bdb324c263ec52150cf64c16d",
+    "rustTest": "mcdev-core/tests/project_legacy_stateful.rs::project_model_test_mod_platform_has_supported_values",
+    "status": "ported",
+    "evidenceLog": "build/rust-test-logs/project-completion-final/affected.stdout.log"
+  },
+  {
+    "group": "project",
+    "legacyTestPath": "mcdev-core/src/test/kotlin/io/github/mcdev/core/project/ProjectTreeWalkerTest.kt",
+    "legacyClass": "ProjectTreeWalkerTest",
+    "legacyCase": "returnsEmptyForMissingRoot",
+    "baselineSha256": "de1b7b5e7eb4c0ca6e29cb716785266b9ffc515b5adf1f5b152b1b2ae1fe085a",
+    "rustTest": "mcdev-core/tests/project_legacy.rs::project_tree_walker_test_returns_empty_for_missing_root",
+    "status": "ported",
+    "evidenceLog": "build/rust-test-logs/project-completion-final/affected.stdout.log"
+  },
+  {
+    "group": "project",
+    "legacyTestPath": "mcdev-core/src/test/kotlin/io/github/mcdev/core/project/ProjectTreeWalkerTest.kt",
+    "legacyClass": "ProjectTreeWalkerTest",
+    "legacyCase": "skipsExcludedSubtreesWithoutVisitingThem",
+    "baselineSha256": "de1b7b5e7eb4c0ca6e29cb716785266b9ffc515b5adf1f5b152b1b2ae1fe085a",
+    "rustTest": "mcdev-core/tests/project_legacy.rs::project_tree_walker_test_skips_excluded_subtrees_without_visiting_them",
+    "status": "ported",
+    "evidenceLog": "build/rust-test-logs/project-completion-final/affected.stdout.log"
+  },
+  {
+    "group": "project",
+    "legacyTestPath": "mcdev-core/src/test/kotlin/io/github/mcdev/core/project/ProjectTreeWalkerTest.kt",
+    "legacyClass": "ProjectTreeWalkerTest",
+    "legacyCase": "skipsNestedExcludedDirectorySegments",
+    "baselineSha256": "de1b7b5e7eb4c0ca6e29cb716785266b9ffc515b5adf1f5b152b1b2ae1fe085a",
+    "rustTest": "mcdev-core/tests/project_legacy.rs::project_tree_walker_test_skips_nested_excluded_directory_segments",
+    "status": "ported",
+    "evidenceLog": "build/rust-test-logs/project-completion-final/affected.stdout.log"
+  },
+  {
+    "group": "project",
+    "legacyTestPath": "mcdev-core/src/test/kotlin/io/github/mcdev/core/project/ProjectTreeWalkerTest.kt",
+    "legacyClass": "ProjectTreeWalkerTest",
+    "legacyCase": "includesSimilarlyNamedDirectories",
+    "baselineSha256": "de1b7b5e7eb4c0ca6e29cb716785266b9ffc515b5adf1f5b152b1b2ae1fe085a",
+    "rustTest": "mcdev-core/tests/project_legacy.rs::project_tree_walker_test_includes_similarly_named_directories",
+    "status": "ported",
+    "evidenceLog": "build/rust-test-logs/project-completion-final/affected.stdout.log"
+  },
+  {
+    "group": "project",
+    "legacyTestPath": "mcdev-core/src/test/kotlin/io/github/mcdev/core/project/ProjectTreeWalkerTest.kt",
+    "legacyClass": "ProjectTreeWalkerTest",
+    "legacyCase": "returnsDeterministicSortedOrder",
+    "baselineSha256": "de1b7b5e7eb4c0ca6e29cb716785266b9ffc515b5adf1f5b152b1b2ae1fe085a",
+    "rustTest": "mcdev-core/tests/project_legacy.rs::project_tree_walker_test_returns_deterministic_sorted_order",
+    "status": "ported",
+    "evidenceLog": "build/rust-test-logs/project-completion-final/affected.stdout.log"
+  },
+  {
+    "group": "project",
+    "legacyTestPath": "mcdev-core/src/test/kotlin/io/github/mcdev/core/project/ProjectTreeWalkerTest.kt",
+    "legacyClass": "ProjectTreeWalkerTest",
+    "legacyCase": "mappingWalkReturnsEmptyForMissingRoot",
+    "baselineSha256": "de1b7b5e7eb4c0ca6e29cb716785266b9ffc515b5adf1f5b152b1b2ae1fe085a",
+    "rustTest": "mcdev-core/tests/project_legacy.rs::project_tree_walker_test_mapping_walk_returns_empty_for_missing_root",
+    "status": "ported",
+    "evidenceLog": "build/rust-test-logs/project-completion-final/affected.stdout.log"
+  },
+  {
+    "group": "project",
+    "legacyTestPath": "mcdev-core/src/test/kotlin/io/github/mcdev/core/project/ProjectTreeWalkerTest.kt",
+    "legacyClass": "ProjectTreeWalkerTest",
+    "legacyCase": "mappingWalkPrunesIrrelevantBuildAndGradleSubtrees",
+    "baselineSha256": "de1b7b5e7eb4c0ca6e29cb716785266b9ffc515b5adf1f5b152b1b2ae1fe085a",
+    "rustTest": "mcdev-core/tests/project_legacy.rs::project_tree_walker_test_mapping_walk_prunes_irrelevant_build_and_gradle_subtrees",
+    "status": "ported",
+    "evidenceLog": "build/rust-test-logs/project-completion-final/affected.stdout.log"
+  },
+  {
+    "group": "project",
+    "legacyTestPath": "mcdev-core/src/test/kotlin/io/github/mcdev/core/project/ProjectTreeWalkerTest.kt",
+    "legacyClass": "ProjectTreeWalkerTest",
+    "legacyCase": "mappingWalkDescendsThroughNestedWhitelistPaths",
+    "baselineSha256": "de1b7b5e7eb4c0ca6e29cb716785266b9ffc515b5adf1f5b152b1b2ae1fe085a",
+    "rustTest": "mcdev-core/tests/project_legacy.rs::project_tree_walker_test_mapping_walk_descends_through_nested_whitelist_paths",
+    "status": "ported",
+    "evidenceLog": "build/rust-test-logs/project-completion-final/affected.stdout.log"
+  },
+  {
+    "group": "project",
+    "legacyTestPath": "mcdev-core/src/test/kotlin/io/github/mcdev/core/project/ProjectTreeWalkerTest.kt",
+    "legacyClass": "ProjectTreeWalkerTest",
+    "legacyCase": "mappingWalkCoversAllMappingWhitelistPrefixes",
+    "baselineSha256": "de1b7b5e7eb4c0ca6e29cb716785266b9ffc515b5adf1f5b152b1b2ae1fe085a",
+    "rustTest": "mcdev-core/tests/project_legacy.rs::project_tree_walker_test_mapping_walk_covers_all_mapping_whitelist_prefixes",
+    "status": "ported",
+    "evidenceLog": "build/rust-test-logs/project-completion-final/affected.stdout.log"
+  },
+  {
+    "group": "project",
+    "legacyTestPath": "mcdev-core/src/test/kotlin/io/github/mcdev/core/project/ProjectTreeWalkerTest.kt",
+    "legacyClass": "ProjectTreeWalkerTest",
+    "legacyCase": "mappingWalkReturnsDeterministicSortedOrder",
+    "baselineSha256": "de1b7b5e7eb4c0ca6e29cb716785266b9ffc515b5adf1f5b152b1b2ae1fe085a",
+    "rustTest": "mcdev-core/tests/project_legacy.rs::project_tree_walker_test_mapping_walk_returns_deterministic_sorted_order",
+    "status": "ported",
+    "evidenceLog": "build/rust-test-logs/project-completion-final/affected.stdout.log"
+  },
+  {
+    "group": "project",
+    "legacyTestPath": "mcdev-core/src/test/kotlin/io/github/mcdev/core/project/ProjectTreeWalkerTest.kt",
+    "legacyClass": "ProjectTreeWalkerTest",
+    "legacyCase": "shouldPruneMappingDiscoveryDirectoryMatchesWhitelistSemantics",
+    "baselineSha256": "de1b7b5e7eb4c0ca6e29cb716785266b9ffc515b5adf1f5b152b1b2ae1fe085a",
+    "rustTest": "mcdev-core/tests/project_legacy.rs::project_tree_walker_test_should_prune_mapping_discovery_directory_matches_whitelist_semantics",
+    "status": "ported",
+    "evidenceLog": "build/rust-test-logs/project-completion-final/affected.stdout.log"
+  },
+  {
+    "group": "project",
+    "legacyTestPath": "mcdev-core/src/test/kotlin/io/github/mcdev/core/project/SourceSetResolverTest.kt",
+    "legacyClass": "SourceSetResolverTest",
+    "legacyCase": "resolvesMainAndClientSourceSets",
+    "baselineSha256": "83139edff50116365801f66977a8c05434e6cdd8beaf4b1a6066ac8b4a3346e6",
+    "rustTest": "mcdev-core/tests/project_legacy.rs::source_set_resolver_test_resolves_main_and_client_source_sets",
+    "status": "ported",
+    "evidenceLog": "build/rust-test-logs/project-completion-final/affected.stdout.log"
+  },
+  {
+    "group": "project",
+    "legacyTestPath": "mcdev-core/src/test/kotlin/io/github/mcdev/core/project/SourceSetResolverTest.kt",
+    "legacyClass": "SourceSetResolverTest",
+    "legacyCase": "prefersNestedMostSpecificSourceRoot",
+    "baselineSha256": "83139edff50116365801f66977a8c05434e6cdd8beaf4b1a6066ac8b4a3346e6",
+    "rustTest": "mcdev-core/tests/project_legacy.rs::source_set_resolver_test_prefers_nested_most_specific_source_root",
+    "status": "ported",
+    "evidenceLog": "build/rust-test-logs/project-completion-final/affected.stdout.log"
+  },
+  {
+    "group": "project",
+    "legacyTestPath": "mcdev-core/src/test/kotlin/io/github/mcdev/core/project/SourceSetResolverTest.kt",
+    "legacyClass": "SourceSetResolverTest",
+    "legacyCase": "returnsNullWhenEqualSpecificityTie",
+    "baselineSha256": "83139edff50116365801f66977a8c05434e6cdd8beaf4b1a6066ac8b4a3346e6",
+    "rustTest": "mcdev-core/tests/project_legacy.rs::source_set_resolver_test_returns_null_when_equal_specificity_tie",
+    "status": "ported",
+    "evidenceLog": "build/rust-test-logs/project-completion-final/affected.stdout.log"
+  },
+  {
+    "group": "project",
+    "legacyTestPath": "mcdev-core/src/test/kotlin/io/github/mcdev/core/project/SourceSetResolverTest.kt",
+    "legacyClass": "SourceSetResolverTest",
+    "legacyCase": "returnsNullForUnknownDocumentPath",
+    "baselineSha256": "83139edff50116365801f66977a8c05434e6cdd8beaf4b1a6066ac8b4a3346e6",
+    "rustTest": "mcdev-core/tests/project_legacy.rs::source_set_resolver_test_returns_null_for_unknown_document_path",
+    "status": "ported",
+    "evidenceLog": "build/rust-test-logs/project-completion-final/affected.stdout.log"
+  },
+  {
+    "group": "project",
+    "legacyTestPath": "mcdev-core/src/test/kotlin/io/github/mcdev/core/project/SourceSetResolverTest.kt",
+    "legacyClass": "SourceSetResolverTest",
+    "legacyCase": "resolvesMappedSourcesToMainSourceSet",
+    "baselineSha256": "83139edff50116365801f66977a8c05434e6cdd8beaf4b1a6066ac8b4a3346e6",
+    "rustTest": "mcdev-core/tests/project_legacy.rs::source_set_resolver_test_resolves_mapped_sources_to_main_source_set",
+    "status": "ported",
+    "evidenceLog": "build/rust-test-logs/project-completion-final/affected.stdout.log"
+  },
+  {
+    "group": "mixin_completion",
+    "legacyTestPath": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixin/AtCompletionServiceTest.kt",
+    "legacyClass": "AtCompletionServiceTest",
+    "legacyCase": "completesAtValueHead",
+    "baselineSha256": "9b416bc5a8f0340b7e03d7a7a507fcf6f921a6e01b52c600b1a8f41250201386",
+    "rustTest": "mcdev-core/tests/mixin_completion_legacy.rs::at_completion_service_test_completes_at_value_head",
+    "status": "ported",
+    "evidenceLog": "build/rust-test-logs/project-completion-final/affected.stdout.log"
+  },
+  {
+    "group": "mixin_completion",
+    "legacyTestPath": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixin/AtCompletionServiceTest.kt",
+    "legacyClass": "AtCompletionServiceTest",
+    "legacyCase": "completesModifyReturnValueTail",
+    "baselineSha256": "9b416bc5a8f0340b7e03d7a7a507fcf6f921a6e01b52c600b1a8f41250201386",
+    "rustTest": "mcdev-core/tests/mixin_completion_legacy.rs::at_completion_service_test_completes_modify_return_value_tail",
+    "status": "ported",
+    "evidenceLog": "build/rust-test-logs/project-completion-final/affected.stdout.log"
+  },
+  {
+    "group": "mixin_completion",
+    "legacyTestPath": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixin/AtCompletionServiceTest.kt",
+    "legacyClass": "AtCompletionServiceTest",
+    "legacyCase": "completesAllAtValues",
+    "baselineSha256": "9b416bc5a8f0340b7e03d7a7a507fcf6f921a6e01b52c600b1a8f41250201386",
+    "rustTest": "mcdev-core/tests/mixin_completion_legacy.rs::at_completion_service_test_completes_all_at_values",
+    "status": "ported",
+    "evidenceLog": "build/rust-test-logs/project-completion-final/affected.stdout.log"
+  },
+  {
+    "group": "mixin_completion",
+    "legacyTestPath": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixin/AtCompletionServiceTest.kt",
+    "legacyClass": "AtCompletionServiceTest",
+    "legacyCase": "wrapOperationAtValueCompletionUsesAllValuesInsideSlice",
+    "baselineSha256": "9b416bc5a8f0340b7e03d7a7a507fcf6f921a6e01b52c600b1a8f41250201386",
+    "rustTest": "mcdev-core/tests/mixin_completion_legacy.rs::at_completion_service_test_wrap_operation_at_value_completion_uses_all_values_inside_slice",
+    "status": "ported",
+    "evidenceLog": "build/rust-test-logs/project-completion-final/affected.stdout.log"
+  },
+  {
+    "group": "mixin_completion",
+    "legacyTestPath": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixin/AtCompletionServiceTest.kt",
+    "legacyClass": "AtCompletionServiceTest",
+    "legacyCase": "atValueCompletionFiltersByPrefix",
+    "baselineSha256": "9b416bc5a8f0340b7e03d7a7a507fcf6f921a6e01b52c600b1a8f41250201386",
+    "rustTest": "mcdev-core/tests/mixin_completion_legacy.rs::at_completion_service_test_at_value_completion_filters_by_prefix",
+    "status": "ported",
+    "evidenceLog": "build/rust-test-logs/project-completion-final/affected.stdout.log"
+  },
+  {
+    "group": "mixin_completion",
+    "legacyTestPath": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixin/AtCompletionServiceTest.kt",
+    "legacyClass": "AtCompletionServiceTest",
+    "legacyCase": "completesAtInvokeTarget",
+    "baselineSha256": "9b416bc5a8f0340b7e03d7a7a507fcf6f921a6e01b52c600b1a8f41250201386",
+    "rustTest": "mcdev-core/tests/mixin_completion_legacy.rs::at_completion_service_test_completes_at_invoke_target",
+    "status": "ported",
+    "evidenceLog": "build/rust-test-logs/project-completion-final/affected.stdout.log"
+  },
+  {
+    "group": "mixin_completion",
+    "legacyTestPath": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixin/AtCompletionServiceTest.kt",
+    "legacyClass": "AtCompletionServiceTest",
+    "legacyCase": "atTargetLabelDiffersFromInsertText",
+    "baselineSha256": "9b416bc5a8f0340b7e03d7a7a507fcf6f921a6e01b52c600b1a8f41250201386",
+    "rustTest": "mcdev-core/tests/mixin_completion_legacy.rs::at_completion_service_test_at_target_label_differs_from_insert_text",
+    "status": "ported",
+    "evidenceLog": "build/rust-test-logs/project-completion-final/affected.stdout.log"
+  },
+  {
+    "group": "mixin_completion",
+    "legacyTestPath": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixin/AtCompletionServiceTest.kt",
+    "legacyClass": "AtCompletionServiceTest",
+    "legacyCase": "completesAtFieldTarget",
+    "baselineSha256": "9b416bc5a8f0340b7e03d7a7a507fcf6f921a6e01b52c600b1a8f41250201386",
+    "rustTest": "mcdev-core/tests/mixin_completion_legacy.rs::at_completion_service_test_completes_at_field_target",
+    "status": "ported",
+    "evidenceLog": "build/rust-test-logs/project-completion-final/affected.stdout.log"
+  },
+  {
+    "group": "mixin_completion",
+    "legacyTestPath": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixin/AtCompletionServiceTest.kt",
+    "legacyClass": "AtCompletionServiceTest",
+    "legacyCase": "formatTargetForNewClassOnly",
+    "baselineSha256": "9b416bc5a8f0340b7e03d7a7a507fcf6f921a6e01b52c600b1a8f41250201386",
+    "rustTest": "mcdev-core/tests/mixin_completion_legacy.rs::at_completion_service_test_format_target_for_new_class_only",
+    "status": "ported",
+    "evidenceLog": "build/rust-test-logs/project-completion-final/affected.stdout.log"
+  },
+  {
+    "group": "mixin_completion",
+    "legacyTestPath": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixin/AtCompletionServiceTest.kt",
+    "legacyClass": "AtCompletionServiceTest",
+    "legacyCase": "formatTargetForConstructor",
+    "baselineSha256": "9b416bc5a8f0340b7e03d7a7a507fcf6f921a6e01b52c600b1a8f41250201386",
+    "rustTest": "mcdev-core/tests/mixin_completion_legacy.rs::at_completion_service_test_format_target_for_constructor",
+    "status": "ported",
+    "evidenceLog": "build/rust-test-logs/project-completion-final/affected.stdout.log"
+  },
+  {
+    "group": "mixin_completion",
+    "legacyTestPath": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixin/AtCompletionServiceTest.kt",
+    "legacyClass": "AtCompletionServiceTest",
+    "legacyCase": "atTargetFiltersByPartial",
+    "baselineSha256": "9b416bc5a8f0340b7e03d7a7a507fcf6f921a6e01b52c600b1a8f41250201386",
+    "rustTest": "mcdev-core/tests/mixin_completion_legacy.rs::at_completion_service_test_at_target_filters_by_partial",
+    "status": "ported",
+    "evidenceLog": "build/rust-test-logs/project-completion-final/affected.stdout.log"
+  },
+  {
+    "group": "mixin_completion",
+    "legacyTestPath": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixin/AtCompletionServiceTest.kt",
+    "legacyClass": "AtCompletionServiceTest",
+    "legacyCase": "atTargetDeduplicatesRepeatedIdenticalInvokeOccurrences",
+    "baselineSha256": "9b416bc5a8f0340b7e03d7a7a507fcf6f921a6e01b52c600b1a8f41250201386",
+    "rustTest": "mcdev-core/tests/mixin_completion_legacy.rs::at_completion_service_test_at_target_deduplicates_repeated_identical_invoke_occurrences",
+    "status": "ported",
+    "evidenceLog": "build/rust-test-logs/project-completion-final/affected.stdout.log"
+  },
+  {
+    "group": "mixin_completion",
+    "legacyTestPath": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixin/AtCompletionServiceTest.kt",
+    "legacyClass": "AtCompletionServiceTest",
+    "legacyCase": "atTargetKeepsDistinctInvokeOverloads",
+    "baselineSha256": "9b416bc5a8f0340b7e03d7a7a507fcf6f921a6e01b52c600b1a8f41250201386",
+    "rustTest": "mcdev-core/tests/mixin_completion_legacy.rs::at_completion_service_test_at_target_keeps_distinct_invoke_overloads",
+    "status": "ported",
+    "evidenceLog": "build/rust-test-logs/project-completion-final/affected.stdout.log"
+  },
+  {
+    "group": "mixin_completion",
+    "legacyTestPath": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixin/AtCompletionServiceTest.kt",
+    "legacyClass": "AtCompletionServiceTest",
+    "legacyCase": "atTargetDeduplicatesFieldGetAndPutWithSameSelector",
+    "baselineSha256": "9b416bc5a8f0340b7e03d7a7a507fcf6f921a6e01b52c600b1a8f41250201386",
+    "rustTest": "mcdev-core/tests/mixin_completion_legacy.rs::at_completion_service_test_at_target_deduplicates_field_get_and_put_with_same_selector",
+    "status": "ported",
+    "evidenceLog": "build/rust-test-logs/project-completion-final/affected.stdout.log"
+  },
+  {
+    "group": "mixin_completion",
+    "legacyTestPath": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixin/AtCompletionServiceTest.kt",
+    "legacyClass": "AtCompletionServiceTest",
+    "legacyCase": "atTargetPrefixFilteringUnchangedAfterDeduplication",
+    "baselineSha256": "9b416bc5a8f0340b7e03d7a7a507fcf6f921a6e01b52c600b1a8f41250201386",
+    "rustTest": "mcdev-core/tests/mixin_completion_legacy.rs::at_completion_service_test_at_target_prefix_filtering_unchanged_after_deduplication",
+    "status": "ported",
+    "evidenceLog": "build/rust-test-logs/project-completion-final/affected.stdout.log"
+  },
+  {
+    "group": "mixin_completion",
+    "legacyTestPath": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixin/AtCompletionServiceTest.kt",
+    "legacyClass": "AtCompletionServiceTest",
+    "legacyCase": "atTargetKeepsDistinctConstantValues",
+    "baselineSha256": "9b416bc5a8f0340b7e03d7a7a507fcf6f921a6e01b52c600b1a8f41250201386",
+    "rustTest": "mcdev-core/tests/mixin_completion_legacy.rs::at_completion_service_test_at_target_keeps_distinct_constant_values",
+    "status": "ported",
+    "evidenceLog": "build/rust-test-logs/project-completion-final/affected.stdout.log"
+  },
+  {
+    "group": "mixin_completion",
+    "legacyTestPath": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixin/AtCompletionServiceTest.kt",
+    "legacyClass": "AtCompletionServiceTest",
+    "legacyCase": "atTargetItemMetadataUnchangedForFirstDuplicate",
+    "baselineSha256": "9b416bc5a8f0340b7e03d7a7a507fcf6f921a6e01b52c600b1a8f41250201386",
+    "rustTest": "mcdev-core/tests/mixin_completion_legacy.rs::at_completion_service_test_at_target_item_metadata_unchanged_for_first_duplicate",
+    "status": "ported",
+    "evidenceLog": "build/rust-test-logs/project-completion-final/affected.stdout.log"
+  },
+  {
+    "group": "mixin_completion",
+    "legacyTestPath": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixin/AtCompletionServiceTest.kt",
+    "legacyClass": "AtCompletionServiceTest",
+    "legacyCase": "completesAtSpecifiersInsideSliceWithEmptySuffix",
+    "baselineSha256": "9b416bc5a8f0340b7e03d7a7a507fcf6f921a6e01b52c600b1a8f41250201386",
+    "rustTest": "mcdev-core/tests/mixin_completion_legacy.rs::at_completion_service_test_completes_at_specifiers_inside_slice_with_empty_suffix",
+    "status": "ported",
+    "evidenceLog": "build/rust-test-logs/project-completion-final/affected.stdout.log"
+  },
+  {
+    "group": "mixin_completion",
+    "legacyTestPath": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixin/AtCompletionServiceTest.kt",
+    "legacyClass": "AtCompletionServiceTest",
+    "legacyCase": "atSpecifierCompletionFiltersBySuffixPrefix",
+    "baselineSha256": "9b416bc5a8f0340b7e03d7a7a507fcf6f921a6e01b52c600b1a8f41250201386",
+    "rustTest": "mcdev-core/tests/mixin_completion_legacy.rs::at_completion_service_test_at_specifier_completion_filters_by_suffix_prefix",
+    "status": "ported",
+    "evidenceLog": "build/rust-test-logs/project-completion-final/affected.stdout.log"
+  },
+  {
+    "group": "mixin_completion",
+    "legacyTestPath": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixin/AtCompletionServiceTest.kt",
+    "legacyClass": "AtCompletionServiceTest",
+    "legacyCase": "atSpecifierCompletionUsesAtInsideSlice",
+    "baselineSha256": "9b416bc5a8f0340b7e03d7a7a507fcf6f921a6e01b52c600b1a8f41250201386",
+    "rustTest": "mcdev-core/tests/mixin_completion_legacy.rs::at_completion_service_test_at_specifier_completion_uses_at_inside_slice",
+    "status": "ported",
+    "evidenceLog": "build/rust-test-logs/project-completion-final/affected.stdout.log"
+  },
+  {
+    "group": "mixin_completion",
+    "legacyTestPath": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixin/AtCompletionServiceTest.kt",
+    "legacyClass": "AtCompletionServiceTest",
+    "legacyCase": "atSpecifierCompletionUsesInjectionPointSpecifierProbe",
+    "baselineSha256": "9b416bc5a8f0340b7e03d7a7a507fcf6f921a6e01b52c600b1a8f41250201386",
+    "rustTest": "mcdev-core/tests/mixin_completion_legacy.rs::at_completion_service_test_at_specifier_completion_uses_injection_point_specifier_probe",
+    "status": "ported",
+    "evidenceLog": "build/rust-test-logs/project-completion-final/affected.stdout.log"
+  },
+  {
+    "group": "mixin_completion",
+    "legacyTestPath": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixin/AtCompletionServiceTest.kt",
+    "legacyClass": "AtCompletionServiceTest",
+    "legacyCase": "atSpecifierProbeSkippedForOrdinaryPartials",
+    "baselineSha256": "9b416bc5a8f0340b7e03d7a7a507fcf6f921a6e01b52c600b1a8f41250201386",
+    "rustTest": "mcdev-core/tests/mixin_completion_legacy.rs::at_completion_service_test_at_specifier_probe_skipped_for_ordinary_partials",
+    "status": "ported",
+    "evidenceLog": "build/rust-test-logs/project-completion-final/affected.stdout.log"
+  },
+  {
+    "group": "mixin_completion",
+    "legacyTestPath": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixin/AtCompletionServiceTest.kt",
+    "legacyClass": "AtCompletionServiceTest",
+    "legacyCase": "atSpecifierProbeSkippedForUnknownCode",
+    "baselineSha256": "9b416bc5a8f0340b7e03d7a7a507fcf6f921a6e01b52c600b1a8f41250201386",
+    "rustTest": "mcdev-core/tests/mixin_completion_legacy.rs::at_completion_service_test_at_specifier_probe_skipped_for_unknown_code",
+    "status": "ported",
+    "evidenceLog": "build/rust-test-logs/project-completion-final/affected.stdout.log"
+  },
+  {
+    "group": "mixin_completion",
+    "legacyTestPath": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixin/AtCompletionServiceTest.kt",
+    "legacyClass": "AtCompletionServiceTest",
+    "legacyCase": "atSpecifierProbeSkippedForInvalidInjectorCode",
+    "baselineSha256": "9b416bc5a8f0340b7e03d7a7a507fcf6f921a6e01b52c600b1a8f41250201386",
+    "rustTest": "mcdev-core/tests/mixin_completion_legacy.rs::at_completion_service_test_at_specifier_probe_skipped_for_invalid_injector_code",
+    "status": "ported",
+    "evidenceLog": "build/rust-test-logs/project-completion-final/affected.stdout.log"
+  },
+  {
+    "group": "mixin_completion",
+    "legacyTestPath": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixin/AtCompletionServiceTest.kt",
+    "legacyClass": "AtCompletionServiceTest",
+    "legacyCase": "atSpecifierProbeSkippedInsideSlice",
+    "baselineSha256": "9b416bc5a8f0340b7e03d7a7a507fcf6f921a6e01b52c600b1a8f41250201386",
+    "rustTest": "mcdev-core/tests/mixin_completion_legacy.rs::at_completion_service_test_at_specifier_probe_skipped_inside_slice",
+    "status": "ported",
+    "evidenceLog": "build/rust-test-logs/project-completion-final/affected.stdout.log"
+  },
+  {
+    "group": "mixin_completion",
+    "legacyTestPath": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixin/AtCompletionServiceTest.kt",
+    "legacyClass": "AtCompletionServiceTest",
+    "legacyCase": "atSpecifierProbeCalledOnceOutsideSlice",
+    "baselineSha256": "9b416bc5a8f0340b7e03d7a7a507fcf6f921a6e01b52c600b1a8f41250201386",
+    "rustTest": "mcdev-core/tests/mixin_completion_legacy.rs::at_completion_service_test_at_specifier_probe_called_once_outside_slice",
+    "status": "ported",
+    "evidenceLog": "build/rust-test-logs/project-completion-final/affected.stdout.log"
+  },
+  {
+    "group": "mixin_completion",
+    "legacyTestPath": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixin/AtCompletionServiceTest.kt",
+    "legacyClass": "AtCompletionServiceTest",
+    "legacyCase": "atSpecifierCompletionUsesFullSliceValuesWithParentInjector",
+    "baselineSha256": "9b416bc5a8f0340b7e03d7a7a507fcf6f921a6e01b52c600b1a8f41250201386",
+    "rustTest": "mcdev-core/tests/mixin_completion_legacy.rs::at_completion_service_test_at_specifier_completion_uses_full_slice_values_with_parent_injector",
+    "status": "ported",
+    "evidenceLog": "build/rust-test-logs/project-completion-final/affected.stdout.log"
+  },
+  {
+    "group": "mixin_completion",
+    "legacyTestPath": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixin/AtCompletionServiceTest.kt",
+    "legacyClass": "AtCompletionServiceTest",
+    "legacyCase": "atSpecifierCompletionRejectsUnknownCode",
+    "baselineSha256": "9b416bc5a8f0340b7e03d7a7a507fcf6f921a6e01b52c600b1a8f41250201386",
+    "rustTest": "mcdev-core/tests/mixin_completion_legacy.rs::at_completion_service_test_at_specifier_completion_rejects_unknown_code",
+    "status": "ported",
+    "evidenceLog": "build/rust-test-logs/project-completion-final/affected.stdout.log"
+  },
+  {
+    "group": "mixin_completion",
+    "legacyTestPath": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixin/AtCompletionServiceTest.kt",
+    "legacyClass": "AtCompletionServiceTest",
+    "legacyCase": "completesAtSpecifiersForNamespacedCode",
+    "baselineSha256": "9b416bc5a8f0340b7e03d7a7a507fcf6f921a6e01b52c600b1a8f41250201386",
+    "rustTest": "mcdev-core/tests/mixin_completion_legacy.rs::at_completion_service_test_completes_at_specifiers_for_namespaced_code",
+    "status": "ported",
+    "evidenceLog": "build/rust-test-logs/project-completion-final/affected.stdout.log"
+  },
+  {
+    "group": "mixin_completion",
+    "legacyTestPath": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixin/AtCompletionServiceTest.kt",
+    "legacyClass": "AtCompletionServiceTest",
+    "legacyCase": "returnsEmptyForNonAtAnnotation",
+    "baselineSha256": "9b416bc5a8f0340b7e03d7a7a507fcf6f921a6e01b52c600b1a8f41250201386",
+    "rustTest": "mcdev-core/tests/mixin_completion_legacy.rs::at_completion_service_test_returns_empty_for_non_at_annotation",
+    "status": "ported",
+    "evidenceLog": "build/rust-test-logs/project-completion-final/affected.stdout.log"
+  },
+  {
+    "group": "mixin_completion",
+    "legacyTestPath": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixin/AtCompletionServiceTest.kt",
+    "legacyClass": "AtCompletionServiceTest",
+    "legacyCase": "additionalAtValuesCompletesCustomNamespacedPrefix",
+    "baselineSha256": "9b416bc5a8f0340b7e03d7a7a507fcf6f921a6e01b52c600b1a8f41250201386",
+    "rustTest": "mcdev-core/tests/mixin_completion_legacy.rs::at_completion_service_test_additional_at_values_completes_custom_namespaced_prefix",
+    "status": "ported",
+    "evidenceLog": "build/rust-test-logs/project-completion-final/affected.stdout.log"
+  },
+  {
+    "group": "mixin_completion",
+    "legacyTestPath": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixin/AtCompletionServiceTest.kt",
+    "legacyClass": "AtCompletionServiceTest",
+    "legacyCase": "additionalAtValuesCompletesFqnPrefix",
+    "baselineSha256": "9b416bc5a8f0340b7e03d7a7a507fcf6f921a6e01b52c600b1a8f41250201386",
+    "rustTest": "mcdev-core/tests/mixin_completion_legacy.rs::at_completion_service_test_additional_at_values_completes_fqn_prefix",
+    "status": "ported",
+    "evidenceLog": "build/rust-test-logs/project-completion-final/affected.stdout.log"
+  },
+  {
+    "group": "mixin_completion",
+    "legacyTestPath": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixin/AtCompletionServiceTest.kt",
+    "legacyClass": "AtCompletionServiceTest",
+    "legacyCase": "additionalAtValuesDeduplicatesCaseInsensitively",
+    "baselineSha256": "9b416bc5a8f0340b7e03d7a7a507fcf6f921a6e01b52c600b1a8f41250201386",
+    "rustTest": "mcdev-core/tests/mixin_completion_legacy.rs::at_completion_service_test_additional_at_values_deduplicates_case_insensitively",
+    "status": "ported",
+    "evidenceLog": "build/rust-test-logs/project-completion-final/affected.stdout.log"
+  },
+  {
+    "group": "mixin_completion",
+    "legacyTestPath": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixin/AtCompletionServiceTest.kt",
+    "legacyClass": "AtCompletionServiceTest",
+    "legacyCase": "additionalAtValuesDoesNotReintroduceDisallowedBuiltIn",
+    "baselineSha256": "9b416bc5a8f0340b7e03d7a7a507fcf6f921a6e01b52c600b1a8f41250201386",
+    "rustTest": "mcdev-core/tests/mixin_completion_legacy.rs::at_completion_service_test_additional_at_values_does_not_reintroduce_disallowed_built_in",
+    "status": "ported",
+    "evidenceLog": "build/rust-test-logs/project-completion-final/affected.stdout.log"
+  },
+  {
+    "group": "mixin_completion",
+    "legacyTestPath": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixin/AtCompletionServiceTest.kt",
+    "legacyClass": "AtCompletionServiceTest",
+    "legacyCase": "additionalAtValuesSpecifierCompletionForCustomCode",
+    "baselineSha256": "9b416bc5a8f0340b7e03d7a7a507fcf6f921a6e01b52c600b1a8f41250201386",
+    "rustTest": "mcdev-core/tests/mixin_completion_legacy.rs::at_completion_service_test_additional_at_values_specifier_completion_for_custom_code",
+    "status": "ported",
+    "evidenceLog": "build/rust-test-logs/project-completion-final/affected.stdout.log"
+  },
+  {
+    "group": "mixin_completion",
+    "legacyTestPath": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixin/InjectMethodCompletionServiceTest.kt",
+    "legacyClass": "InjectMethodCompletionServiceTest",
+    "legacyCase": "completesInjectMethodWithoutDescriptorForSingleOverload",
+    "baselineSha256": "b53d944c4ec11b053b9cb336989c963b33d011bf6ab5feedbee07ea308f3141f",
+    "rustTest": "mcdev-core/tests/mixin_completion_legacy.rs::inject_method_completion_service_test_completes_inject_method_without_descriptor_for_single_overload",
+    "status": "ported",
+    "evidenceLog": "build/rust-test-logs/project-completion-final/affected.stdout.log"
+  },
+  {
+    "group": "mixin_completion",
+    "legacyTestPath": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixin/InjectMethodCompletionServiceTest.kt",
+    "legacyClass": "InjectMethodCompletionServiceTest",
+    "legacyCase": "completesInjectMethodWithDescriptorForOverloadsInAutoMode",
+    "baselineSha256": "b53d944c4ec11b053b9cb336989c963b33d011bf6ab5feedbee07ea308f3141f",
+    "rustTest": "mcdev-core/tests/mixin_completion_legacy.rs::inject_method_completion_service_test_completes_inject_method_with_descriptor_for_overloads_in_auto_mode",
+    "status": "ported",
+    "evidenceLog": "build/rust-test-logs/project-completion-final/affected.stdout.log"
+  },
+  {
+    "group": "mixin_completion",
+    "legacyTestPath": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixin/InjectMethodCompletionServiceTest.kt",
+    "legacyClass": "InjectMethodCompletionServiceTest",
+    "legacyCase": "alwaysModeInsertsDescriptorEvenForSingleOverload",
+    "baselineSha256": "b53d944c4ec11b053b9cb336989c963b33d011bf6ab5feedbee07ea308f3141f",
+    "rustTest": "mcdev-core/tests/mixin_completion_legacy.rs::inject_method_completion_service_test_always_mode_inserts_descriptor_even_for_single_overload",
+    "status": "ported",
+    "evidenceLog": "build/rust-test-logs/project-completion-final/affected.stdout.log"
+  },
+  {
+    "group": "mixin_completion",
+    "legacyTestPath": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixin/InjectMethodCompletionServiceTest.kt",
+    "legacyClass": "InjectMethodCompletionServiceTest",
+    "legacyCase": "neverModeInsertsNameOnlyEvenForOverloads",
+    "baselineSha256": "b53d944c4ec11b053b9cb336989c963b33d011bf6ab5feedbee07ea308f3141f",
+    "rustTest": "mcdev-core/tests/mixin_completion_legacy.rs::inject_method_completion_service_test_never_mode_inserts_name_only_even_for_overloads",
+    "status": "ported",
+    "evidenceLog": "build/rust-test-logs/project-completion-final/affected.stdout.log"
+  },
+  {
+    "group": "mixin_completion",
+    "legacyTestPath": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixin/InjectMethodCompletionServiceTest.kt",
+    "legacyClass": "InjectMethodCompletionServiceTest",
+    "legacyCase": "completionLabelShowsReadableSignature",
+    "baselineSha256": "b53d944c4ec11b053b9cb336989c963b33d011bf6ab5feedbee07ea308f3141f",
+    "rustTest": "mcdev-core/tests/mixin_completion_legacy.rs::inject_method_completion_service_test_completion_label_shows_readable_signature",
+    "status": "ported",
+    "evidenceLog": "build/rust-test-logs/project-completion-final/affected.stdout.log"
+  },
+  {
+    "group": "mixin_completion",
+    "legacyTestPath": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixin/InjectMethodCompletionServiceTest.kt",
+    "legacyClass": "InjectMethodCompletionServiceTest",
+    "legacyCase": "returnsEmptyWithoutMixinTargets",
+    "baselineSha256": "b53d944c4ec11b053b9cb336989c963b33d011bf6ab5feedbee07ea308f3141f",
+    "rustTest": "mcdev-core/tests/mixin_completion_legacy.rs::inject_method_completion_service_test_returns_empty_without_mixin_targets",
+    "status": "ported",
+    "evidenceLog": "build/rust-test-logs/project-completion-final/affected.stdout.log"
+  },
+  {
+    "group": "mixin_completion",
+    "legacyTestPath": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixin/InjectMethodCompletionServiceTest.kt",
+    "legacyClass": "InjectMethodCompletionServiceTest",
+    "legacyCase": "filtersByMethodPrefix",
+    "baselineSha256": "b53d944c4ec11b053b9cb336989c963b33d011bf6ab5feedbee07ea308f3141f",
+    "rustTest": "mcdev-core/tests/mixin_completion_legacy.rs::inject_method_completion_service_test_filters_by_method_prefix",
+    "status": "ported",
+    "evidenceLog": "build/rust-test-logs/project-completion-final/affected.stdout.log"
+  },
+  {
+    "group": "mixin_completion",
+    "legacyTestPath": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixin/InjectMethodCompletionServiceTest.kt",
+    "legacyClass": "InjectMethodCompletionServiceTest",
+    "legacyCase": "metadataContainsDescriptor",
+    "baselineSha256": "b53d944c4ec11b053b9cb336989c963b33d011bf6ab5feedbee07ea308f3141f",
+    "rustTest": "mcdev-core/tests/mixin_completion_legacy.rs::inject_method_completion_service_test_metadata_contains_descriptor",
+    "status": "ported",
+    "evidenceLog": "build/rust-test-logs/project-completion-final/affected.stdout.log"
+  },
+  {
+    "group": "mixin_completion",
+    "legacyTestPath": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixin/InjectMethodCompletionServiceTest.kt",
+    "legacyClass": "InjectMethodCompletionServiceTest",
+    "legacyCase": "returnsEmptyForNonMethodSlot",
+    "baselineSha256": "b53d944c4ec11b053b9cb336989c963b33d011bf6ab5feedbee07ea308f3141f",
+    "rustTest": "mcdev-core/tests/mixin_completion_legacy.rs::inject_method_completion_service_test_returns_empty_for_non_method_slot",
+    "status": "ported",
+    "evidenceLog": "build/rust-test-logs/project-completion-final/affected.stdout.log"
+  },
+  {
+    "group": "mixin_completion",
+    "legacyTestPath": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixin/InjectMethodCompletionServiceTest.kt",
+    "legacyClass": "InjectMethodCompletionServiceTest",
+    "legacyCase": "completesFromMultipleMixinTargets",
+    "baselineSha256": "b53d944c4ec11b053b9cb336989c963b33d011bf6ab5feedbee07ea308f3141f",
+    "rustTest": "mcdev-core/tests/mixin_completion_legacy.rs::inject_method_completion_service_test_completes_from_multiple_mixin_targets",
+    "status": "ported",
+    "evidenceLog": "build/rust-test-logs/project-completion-final/affected.stdout.log"
+  },
+  {
+    "group": "mixin_completion",
+    "legacyTestPath": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixin/KotlinCompletionEditingTest.kt",
+    "legacyClass": "KotlinCompletionEditingTest",
+    "legacyCase": "kotlinInjectorAttributesUseArraysAndAnnotationConstructors",
+    "baselineSha256": "a4378b57daafd9899ca72d1e7fc98af1bfef8e6bb77a207b8a3ccb5e71baef66",
+    "rustTest": "mcdev-core/tests/mixin_completion_legacy.rs::kotlin_completion_editing_test_kotlin_injector_attributes_use_arrays_and_annotation_constructors",
+    "status": "ported",
+    "evidenceLog": "build/rust-test-logs/project-completion-final/affected.stdout.log"
+  },
+  {
+    "group": "mixin_completion",
+    "legacyTestPath": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixin/KotlinCompletionEditingTest.kt",
+    "legacyClass": "KotlinCompletionEditingTest",
+    "legacyCase": "lapisAttributesMatchPublishedApiRatherThanJavaMixin",
+    "baselineSha256": "a4378b57daafd9899ca72d1e7fc98af1bfef8e6bb77a207b8a3ccb5e71baef66",
+    "rustTest": "mcdev-core/tests/mixin_completion_legacy.rs::kotlin_completion_editing_test_lapis_attributes_match_published_api_rather_than_java_mixin",
+    "status": "ported",
+    "evidenceLog": "build/rust-test-logs/project-completion-final/affected.stdout.log"
+  },
+  {
+    "group": "mixin_completion",
+    "legacyTestPath": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixin/KotlinCompletionEditingTest.kt",
+    "legacyClass": "KotlinCompletionEditingTest",
+    "legacyCase": "unimportedKotlinSnippetTypesUseFullyQualifiedNames",
+    "baselineSha256": "a4378b57daafd9899ca72d1e7fc98af1bfef8e6bb77a207b8a3ccb5e71baef66",
+    "rustTest": "mcdev-core/tests/mixin_completion_legacy.rs::kotlin_completion_editing_test_unimported_kotlin_snippet_types_use_fully_qualified_names",
+    "status": "ported",
+    "evidenceLog": "build/rust-test-logs/project-completion-final/affected.stdout.log"
+  },
+  {
+    "group": "mixin_completion",
+    "legacyTestPath": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixin/KotlinCompletionEditingTest.kt",
+    "legacyClass": "KotlinCompletionEditingTest",
+    "legacyCase": "kotlinSnippetTypesReuseExistingImportAliases",
+    "baselineSha256": "a4378b57daafd9899ca72d1e7fc98af1bfef8e6bb77a207b8a3ccb5e71baef66",
+    "rustTest": "mcdev-core/tests/mixin_completion_legacy.rs::kotlin_completion_editing_test_kotlin_snippet_types_reuse_existing_import_aliases",
+    "status": "ported",
+    "evidenceLog": "build/rust-test-logs/project-completion-final/affected.stdout.log"
+  },
+  {
+    "group": "mixin_completion",
+    "legacyTestPath": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixin/KotlinCompletionEditingTest.kt",
+    "legacyClass": "KotlinCompletionEditingTest",
+    "legacyCase": "kotlinImportEditPreservesCrLfAndExistingAliases",
+    "baselineSha256": "a4378b57daafd9899ca72d1e7fc98af1bfef8e6bb77a207b8a3ccb5e71baef66",
+    "rustTest": "mcdev-core/tests/mixin_completion_legacy.rs::kotlin_completion_editing_test_kotlin_import_edit_preserves_cr_lf_and_existing_aliases",
+    "status": "ported",
+    "evidenceLog": "build/rust-test-logs/project-completion-final/affected.stdout.log"
+  },
+  {
+    "group": "mixin_completion",
+    "legacyTestPath": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixin/KotlinCompletionEditingTest.kt",
+    "legacyClass": "KotlinCompletionEditingTest",
+    "legacyCase": "kotlinImportsFollowFileAnnotationsAndDoNotShadowBoundNames",
+    "baselineSha256": "a4378b57daafd9899ca72d1e7fc98af1bfef8e6bb77a207b8a3ccb5e71baef66",
+    "rustTest": "mcdev-core/tests/mixin_completion_legacy.rs::kotlin_completion_editing_test_kotlin_imports_follow_file_annotations_and_do_not_shadow_bound_names",
+    "status": "ported",
+    "evidenceLog": "build/rust-test-logs/project-completion-final/affected.stdout.log"
+  },
+  {
+    "group": "mixin_completion",
+    "legacyTestPath": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixin/KotlinCompletionEditingTest.kt",
+    "legacyClass": "KotlinCompletionEditingTest",
+    "legacyCase": "kotlinImportsFollowTheWholeFileAnnotationWithoutPackageOrImports",
+    "baselineSha256": "a4378b57daafd9899ca72d1e7fc98af1bfef8e6bb77a207b8a3ccb5e71baef66",
+    "rustTest": "mcdev-core/tests/mixin_completion_legacy.rs::kotlin_completion_editing_test_kotlin_imports_follow_the_whole_file_annotation_without_package_or_imports",
+    "status": "ported",
+    "evidenceLog": "build/rust-test-logs/project-completion-final/affected.stdout.log"
+  },
+  {
+    "group": "mixin_completion",
+    "legacyTestPath": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixin/KotlinCompletionEditingTest.kt",
+    "legacyClass": "KotlinCompletionEditingTest",
+    "legacyCase": "kotlinClassCompletionMatchesAliasPrefixesAndKeepsJavaSearchUnchanged",
+    "baselineSha256": "a4378b57daafd9899ca72d1e7fc98af1bfef8e6bb77a207b8a3ccb5e71baef66",
+    "rustTest": "mcdev-core/tests/mixin_completion_legacy.rs::kotlin_completion_editing_test_kotlin_class_completion_matches_alias_prefixes_and_keeps_java_search_unchanged",
+    "status": "ported",
+    "evidenceLog": "build/rust-test-logs/project-completion-final/affected.stdout.log"
+  },
+  {
+    "group": "mixin_completion",
+    "legacyTestPath": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixin/KotlinCompletionEditingTest.kt",
+    "legacyClass": "KotlinCompletionEditingTest",
+    "legacyCase": "kotlinClassCompletionUsesClassReferenceAndExistingAlias",
+    "baselineSha256": "a4378b57daafd9899ca72d1e7fc98af1bfef8e6bb77a207b8a3ccb5e71baef66",
+    "rustTest": "mcdev-core/tests/mixin_completion_legacy.rs::kotlin_completion_editing_test_kotlin_class_completion_uses_class_reference_and_existing_alias",
+    "status": "ported",
+    "evidenceLog": "build/rust-test-logs/project-completion-final/affected.stdout.log"
+  },
+  {
+    "group": "mixin_completion",
+    "legacyTestPath": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixin/MixinAttributeCompletionServiceTest.kt",
+    "legacyClass": "MixinAttributeCompletionServiceTest",
+    "legacyCase": "methodAttributeInsertsQuotedSnippetWithCursorInside",
+    "baselineSha256": "883af59817cd6c92c39185a0aee3933573b1106577c2bb35305deeefc65fd2c0",
+    "rustTest": "mcdev-core/tests/mixin_completion_legacy.rs::mixin_attribute_completion_service_test_method_attribute_inserts_quoted_snippet_with_cursor_inside",
+    "status": "ported",
+    "evidenceLog": "build/rust-test-logs/project-completion-final/affected.stdout.log"
+  },
+  {
+    "group": "mixin_completion",
+    "legacyTestPath": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixin/MixinAttributeCompletionServiceTest.kt",
+    "legacyClass": "MixinAttributeCompletionServiceTest",
+    "legacyCase": "atAttributeBuildsNestedAtSnippet",
+    "baselineSha256": "883af59817cd6c92c39185a0aee3933573b1106577c2bb35305deeefc65fd2c0",
+    "rustTest": "mcdev-core/tests/mixin_completion_legacy.rs::mixin_attribute_completion_service_test_at_attribute_builds_nested_at_snippet",
+    "status": "ported",
+    "evidenceLog": "build/rust-test-logs/project-completion-final/affected.stdout.log"
+  },
+  {
+    "group": "mixin_completion",
+    "legacyTestPath": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixin/MixinAttributeCompletionServiceTest.kt",
+    "legacyClass": "MixinAttributeCompletionServiceTest",
+    "legacyCase": "excludesOnlyAttributesAlreadyPresentOnTheSameAnnotation",
+    "baselineSha256": "883af59817cd6c92c39185a0aee3933573b1106577c2bb35305deeefc65fd2c0",
+    "rustTest": "mcdev-core/tests/mixin_completion_legacy.rs::mixin_attribute_completion_service_test_excludes_only_attributes_already_present_on_the_same_annotation",
+    "status": "ported",
+    "evidenceLog": "build/rust-test-logs/project-completion-final/affected.stdout.log"
+  },
+  {
+    "group": "mixin_completion",
+    "legacyTestPath": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixin/MixinAttributeCompletionServiceTest.kt",
+    "legacyClass": "MixinAttributeCompletionServiceTest",
+    "legacyCase": "vanillaInjectStillSuggestsConstraintsAttribute",
+    "baselineSha256": "883af59817cd6c92c39185a0aee3933573b1106577c2bb35305deeefc65fd2c0",
+    "rustTest": "mcdev-core/tests/mixin_completion_legacy.rs::mixin_attribute_completion_service_test_vanilla_inject_still_suggests_constraints_attribute",
+    "status": "ported",
+    "evidenceLog": "build/rust-test-logs/project-completion-final/affected.stdout.log"
+  },
+  {
+    "group": "mixin_completion",
+    "legacyTestPath": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixin/MixinAttributeCompletionServiceTest.kt",
+    "legacyClass": "MixinAttributeCompletionServiceTest",
+    "legacyCase": "mixinExtrasInjectorDoesNotSuggestConstraintsAttribute",
+    "baselineSha256": "883af59817cd6c92c39185a0aee3933573b1106577c2bb35305deeefc65fd2c0",
+    "rustTest": "mcdev-core/tests/mixin_completion_legacy.rs::mixin_attribute_completion_service_test_mixin_extras_injector_does_not_suggest_constraints_attribute",
+    "status": "ported",
+    "evidenceLog": "build/rust-test-logs/project-completion-final/affected.stdout.log"
+  },
+  {
+    "group": "mixin_completion",
+    "legacyTestPath": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixin/MixinAttributeCompletionServiceTest.kt",
+    "legacyClass": "MixinAttributeCompletionServiceTest",
+    "legacyCase": "wrapWithConditionOrderDependsOnResolvedOfficialFqn",
+    "baselineSha256": "883af59817cd6c92c39185a0aee3933573b1106577c2bb35305deeefc65fd2c0",
+    "rustTest": "mcdev-core/tests/mixin_completion_legacy.rs::mixin_attribute_completion_service_test_wrap_with_condition_order_depends_on_resolved_official_fqn",
+    "status": "ported",
+    "evidenceLog": "build/rust-test-logs/project-completion-final/affected.stdout.log"
+  },
+  {
+    "group": "mixin_completion",
+    "legacyTestPath": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixin/MixinAttributeCompletionServiceTest.kt",
+    "legacyClass": "MixinAttributeCompletionServiceTest",
+    "legacyCase": "wrapOperationDoesNotSuggestConstraintsAndKeepsAtConstantExclusivity",
+    "baselineSha256": "883af59817cd6c92c39185a0aee3933573b1106577c2bb35305deeefc65fd2c0",
+    "rustTest": "mcdev-core/tests/mixin_completion_legacy.rs::mixin_attribute_completion_service_test_wrap_operation_does_not_suggest_constraints_and_keeps_at_constant_exclusivity",
+    "status": "ported",
+    "evidenceLog": "build/rust-test-logs/project-completion-final/affected.stdout.log"
+  },
+  {
+    "group": "mixin_completion",
+    "legacyTestPath": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixin/MixinAttributeCompletionServiceTest.kt",
+    "legacyClass": "MixinAttributeCompletionServiceTest",
+    "legacyCase": "wrapMethodDoesNotSuggestConstraintsAttribute",
+    "baselineSha256": "883af59817cd6c92c39185a0aee3933573b1106577c2bb35305deeefc65fd2c0",
+    "rustTest": "mcdev-core/tests/mixin_completion_legacy.rs::mixin_attribute_completion_service_test_wrap_method_does_not_suggest_constraints_attribute",
+    "status": "ported",
+    "evidenceLog": "build/rust-test-logs/project-completion-final/affected.stdout.log"
+  },
+  {
+    "group": "mixin_completion",
+    "legacyTestPath": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixin/MixinAttributeCompletionServiceTest.kt",
+    "legacyClass": "MixinAttributeCompletionServiceTest",
+    "legacyCase": "localSuggestsOnlyValidMixinExtrasAttributes",
+    "baselineSha256": "883af59817cd6c92c39185a0aee3933573b1106577c2bb35305deeefc65fd2c0",
+    "rustTest": "mcdev-core/tests/mixin_completion_legacy.rs::mixin_attribute_completion_service_test_local_suggests_only_valid_mixin_extras_attributes",
+    "status": "ported",
+    "evidenceLog": "build/rust-test-logs/project-completion-final/affected.stdout.log"
+  },
+  {
+    "group": "mixin_completion",
+    "legacyTestPath": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixin/MixinAttributeCompletionServiceTest.kt",
+    "legacyClass": "MixinAttributeCompletionServiceTest",
+    "legacyCase": "localAttributePrefixFiltersCandidates",
+    "baselineSha256": "883af59817cd6c92c39185a0aee3933573b1106577c2bb35305deeefc65fd2c0",
+    "rustTest": "mcdev-core/tests/mixin_completion_legacy.rs::mixin_attribute_completion_service_test_local_attribute_prefix_filters_candidates",
+    "status": "ported",
+    "evidenceLog": "build/rust-test-logs/project-completion-final/affected.stdout.log"
+  },
+  {
+    "group": "mixin_completion",
+    "legacyTestPath": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixin/MixinAttributeCompletionServiceTest.kt",
+    "legacyClass": "MixinAttributeCompletionServiceTest",
+    "legacyCase": "localExcludesExistingAttributes",
+    "baselineSha256": "883af59817cd6c92c39185a0aee3933573b1106577c2bb35305deeefc65fd2c0",
+    "rustTest": "mcdev-core/tests/mixin_completion_legacy.rs::mixin_attribute_completion_service_test_local_excludes_existing_attributes",
+    "status": "ported",
+    "evidenceLog": "build/rust-test-logs/project-completion-final/affected.stdout.log"
+  },
+  {
+    "group": "mixin_completion",
+    "legacyTestPath": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixin/MixinAttributeCompletionServiceTest.kt",
+    "legacyClass": "MixinAttributeCompletionServiceTest",
+    "legacyCase": "localUsesExpectedSnippetKinds",
+    "baselineSha256": "883af59817cd6c92c39185a0aee3933573b1106577c2bb35305deeefc65fd2c0",
+    "rustTest": "mcdev-core/tests/mixin_completion_legacy.rs::mixin_attribute_completion_service_test_local_uses_expected_snippet_kinds",
+    "status": "ported",
+    "evidenceLog": "build/rust-test-logs/project-completion-final/affected.stdout.log"
+  },
+  {
+    "group": "mixin_completion",
+    "legacyTestPath": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixin/MixinAttributeCompletionServiceTest.kt",
+    "legacyClass": "MixinAttributeCompletionServiceTest",
+    "legacyCase": "shareSuggestsOnlyValueAndNamespace",
+    "baselineSha256": "883af59817cd6c92c39185a0aee3933573b1106577c2bb35305deeefc65fd2c0",
+    "rustTest": "mcdev-core/tests/mixin_completion_legacy.rs::mixin_attribute_completion_service_test_share_suggests_only_value_and_namespace",
+    "status": "ported",
+    "evidenceLog": "build/rust-test-logs/project-completion-final/affected.stdout.log"
+  },
+  {
+    "group": "mixin_completion",
+    "legacyTestPath": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixin/MixinAttributeCompletionServiceTest.kt",
+    "legacyClass": "MixinAttributeCompletionServiceTest",
+    "legacyCase": "shareAttributePrefixFiltersCandidates",
+    "baselineSha256": "883af59817cd6c92c39185a0aee3933573b1106577c2bb35305deeefc65fd2c0",
+    "rustTest": "mcdev-core/tests/mixin_completion_legacy.rs::mixin_attribute_completion_service_test_share_attribute_prefix_filters_candidates",
+    "status": "ported",
+    "evidenceLog": "build/rust-test-logs/project-completion-final/affected.stdout.log"
+  },
+  {
+    "group": "mixin_completion",
+    "legacyTestPath": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixin/MixinAttributeCompletionServiceTest.kt",
+    "legacyClass": "MixinAttributeCompletionServiceTest",
+    "legacyCase": "shareExcludesExistingAttributes",
+    "baselineSha256": "883af59817cd6c92c39185a0aee3933573b1106577c2bb35305deeefc65fd2c0",
+    "rustTest": "mcdev-core/tests/mixin_completion_legacy.rs::mixin_attribute_completion_service_test_share_excludes_existing_attributes",
+    "status": "ported",
+    "evidenceLog": "build/rust-test-logs/project-completion-final/affected.stdout.log"
+  },
+  {
+    "group": "mixin_completion",
+    "legacyTestPath": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixin/MixinAttributeCompletionServiceTest.kt",
+    "legacyClass": "MixinAttributeCompletionServiceTest",
+    "legacyCase": "definitionSuggestsOnlyValidMixinExtrasAttributes",
+    "baselineSha256": "883af59817cd6c92c39185a0aee3933573b1106577c2bb35305deeefc65fd2c0",
+    "rustTest": "mcdev-core/tests/mixin_completion_legacy.rs::mixin_attribute_completion_service_test_definition_suggests_only_valid_mixin_extras_attributes",
+    "status": "ported",
+    "evidenceLog": "build/rust-test-logs/project-completion-final/affected.stdout.log"
+  },
+  {
+    "group": "mixin_completion",
+    "legacyTestPath": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixin/MixinAttributeCompletionServiceTest.kt",
+    "legacyClass": "MixinAttributeCompletionServiceTest",
+    "legacyCase": "definitionAttributePrefixFiltersCandidates",
+    "baselineSha256": "883af59817cd6c92c39185a0aee3933573b1106577c2bb35305deeefc65fd2c0",
+    "rustTest": "mcdev-core/tests/mixin_completion_legacy.rs::mixin_attribute_completion_service_test_definition_attribute_prefix_filters_candidates",
+    "status": "ported",
+    "evidenceLog": "build/rust-test-logs/project-completion-final/affected.stdout.log"
+  },
+  {
+    "group": "mixin_completion",
+    "legacyTestPath": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixin/MixinAttributeCompletionServiceTest.kt",
+    "legacyClass": "MixinAttributeCompletionServiceTest",
+    "legacyCase": "definitionExcludesExistingAttributes",
+    "baselineSha256": "883af59817cd6c92c39185a0aee3933573b1106577c2bb35305deeefc65fd2c0",
+    "rustTest": "mcdev-core/tests/mixin_completion_legacy.rs::mixin_attribute_completion_service_test_definition_excludes_existing_attributes",
+    "status": "ported",
+    "evidenceLog": "build/rust-test-logs/project-completion-final/affected.stdout.log"
+  },
+  {
+    "group": "mixin_completion",
+    "legacyTestPath": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixin/MixinAttributeCompletionServiceTest.kt",
+    "legacyClass": "MixinAttributeCompletionServiceTest",
+    "legacyCase": "expressionSuggestsOnlyValueAndId",
+    "baselineSha256": "883af59817cd6c92c39185a0aee3933573b1106577c2bb35305deeefc65fd2c0",
+    "rustTest": "mcdev-core/tests/mixin_completion_legacy.rs::mixin_attribute_completion_service_test_expression_suggests_only_value_and_id",
+    "status": "ported",
+    "evidenceLog": "build/rust-test-logs/project-completion-final/affected.stdout.log"
+  },
+  {
+    "group": "mixin_completion",
+    "legacyTestPath": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixin/MixinAttributeCompletionServiceTest.kt",
+    "legacyClass": "MixinAttributeCompletionServiceTest",
+    "legacyCase": "expressionAttributePrefixFiltersCandidates",
+    "baselineSha256": "883af59817cd6c92c39185a0aee3933573b1106577c2bb35305deeefc65fd2c0",
+    "rustTest": "mcdev-core/tests/mixin_completion_legacy.rs::mixin_attribute_completion_service_test_expression_attribute_prefix_filters_candidates",
+    "status": "ported",
+    "evidenceLog": "build/rust-test-logs/project-completion-final/affected.stdout.log"
+  },
+  {
+    "group": "mixin_completion",
+    "legacyTestPath": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixin/MixinAttributeCompletionServiceTest.kt",
+    "legacyClass": "MixinAttributeCompletionServiceTest",
+    "legacyCase": "expressionExcludesExistingAttributes",
+    "baselineSha256": "883af59817cd6c92c39185a0aee3933573b1106577c2bb35305deeefc65fd2c0",
+    "rustTest": "mcdev-core/tests/mixin_completion_legacy.rs::mixin_attribute_completion_service_test_expression_excludes_existing_attributes",
+    "status": "ported",
+    "evidenceLog": "build/rust-test-logs/project-completion-final/affected.stdout.log"
+  },
+  {
+    "group": "mixin_completion",
+    "legacyTestPath": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixin/MixinAttributeCompletionServiceTest.kt",
+    "legacyClass": "MixinAttributeCompletionServiceTest",
+    "legacyCase": "definitionsSuggestsOnlyValueAttribute",
+    "baselineSha256": "883af59817cd6c92c39185a0aee3933573b1106577c2bb35305deeefc65fd2c0",
+    "rustTest": "mcdev-core/tests/mixin_completion_legacy.rs::mixin_attribute_completion_service_test_definitions_suggests_only_value_attribute",
+    "status": "ported",
+    "evidenceLog": "build/rust-test-logs/project-completion-final/affected.stdout.log"
+  },
+  {
+    "group": "mixin_completion",
+    "legacyTestPath": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixin/MixinAttributeCompletionServiceTest.kt",
+    "legacyClass": "MixinAttributeCompletionServiceTest",
+    "legacyCase": "expressionsSuggestsOnlyValueAttribute",
+    "baselineSha256": "883af59817cd6c92c39185a0aee3933573b1106577c2bb35305deeefc65fd2c0",
+    "rustTest": "mcdev-core/tests/mixin_completion_legacy.rs::mixin_attribute_completion_service_test_expressions_suggests_only_value_attribute",
+    "status": "ported",
+    "evidenceLog": "build/rust-test-logs/project-completion-final/affected.stdout.log"
+  },
+  {
+    "group": "mixin_completion",
+    "legacyTestPath": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixin/MixinAttributeCompletionServiceTest.kt",
+    "legacyClass": "MixinAttributeCompletionServiceTest",
+    "legacyCase": "definitionUsesExpectedSnippetKinds",
+    "baselineSha256": "883af59817cd6c92c39185a0aee3933573b1106577c2bb35305deeefc65fd2c0",
+    "rustTest": "mcdev-core/tests/mixin_completion_legacy.rs::mixin_attribute_completion_service_test_definition_uses_expected_snippet_kinds",
+    "status": "ported",
+    "evidenceLog": "build/rust-test-logs/project-completion-final/affected.stdout.log"
+  },
+  {
+    "group": "mixin_completion",
+    "legacyTestPath": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixin/MixinAttributeCompletionServiceTest.kt",
+    "legacyClass": "MixinAttributeCompletionServiceTest",
+    "legacyCase": "definitionsAndExpressionsUseNestedAnnotationSnippets",
+    "baselineSha256": "883af59817cd6c92c39185a0aee3933573b1106577c2bb35305deeefc65fd2c0",
+    "rustTest": "mcdev-core/tests/mixin_completion_legacy.rs::mixin_attribute_completion_service_test_definitions_and_expressions_use_nested_annotation_snippets",
+    "status": "ported",
+    "evidenceLog": "build/rust-test-logs/project-completion-final/affected.stdout.log"
+  },
+  {
+    "group": "mixin_completion",
+    "legacyTestPath": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixin/MixinAttributeCompletionServiceTest.kt",
+    "legacyClass": "MixinAttributeCompletionServiceTest",
+    "legacyCase": "constantSuggestsExactAttributeNamesWithPrefixAndExistingFiltering",
+    "baselineSha256": "883af59817cd6c92c39185a0aee3933573b1106577c2bb35305deeefc65fd2c0",
+    "rustTest": "mcdev-core/tests/mixin_completion_legacy.rs::mixin_attribute_completion_service_test_constant_suggests_exact_attribute_names_with_prefix_and_existing_filtering",
+    "status": "ported",
+    "evidenceLog": "build/rust-test-logs/project-completion-final/affected.stdout.log"
+  },
+  {
+    "group": "mixin_completion",
+    "legacyTestPath": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixin/MixinAttributeCompletionServiceTest.kt",
+    "legacyClass": "MixinAttributeCompletionServiceTest",
+    "legacyCase": "sliceSuggestsExactAttributeNamesWithPrefixAndExistingFiltering",
+    "baselineSha256": "883af59817cd6c92c39185a0aee3933573b1106577c2bb35305deeefc65fd2c0",
+    "rustTest": "mcdev-core/tests/mixin_completion_legacy.rs::mixin_attribute_completion_service_test_slice_suggests_exact_attribute_names_with_prefix_and_existing_filtering",
+    "status": "ported",
+    "evidenceLog": "build/rust-test-logs/project-completion-final/affected.stdout.log"
+  },
+  {
+    "group": "mixin_completion",
+    "legacyTestPath": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixin/MixinConfigEditorTest.kt",
+    "legacyClass": "MixinConfigEditorTest",
+    "legacyCase": "parsesMixinConfigObject",
+    "baselineSha256": "04675b53529a4b2c6a5c7cbf84b85b52f738bcf110c32caabc62d305f970cce8",
+    "rustTest": "mcdev-core/tests/mixin_completion_legacy.rs::mixin_config_editor_test_parses_mixin_config_object",
+    "status": "ported",
+    "evidenceLog": "build/rust-test-logs/project-completion-final/affected.stdout.log"
+  },
+  {
+    "group": "mixin_completion",
+    "legacyTestPath": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixin/MixinConfigEditorTest.kt",
+    "legacyClass": "MixinConfigEditorTest",
+    "legacyCase": "parsesRootArrayConfig",
+    "baselineSha256": "04675b53529a4b2c6a5c7cbf84b85b52f738bcf110c32caabc62d305f970cce8",
+    "rustTest": "mcdev-core/tests/mixin_completion_legacy.rs::mixin_config_editor_test_parses_root_array_config",
+    "status": "ported",
+    "evidenceLog": "build/rust-test-logs/project-completion-final/affected.stdout.log"
+  },
+  {
+    "group": "mixin_completion",
+    "legacyTestPath": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixin/MixinConfigEditorTest.kt",
+    "legacyClass": "MixinConfigEditorTest",
+    "legacyCase": "addEntryPreservesExistingOrder",
+    "baselineSha256": "04675b53529a4b2c6a5c7cbf84b85b52f738bcf110c32caabc62d305f970cce8",
+    "rustTest": "mcdev-core/tests/mixin_completion_legacy.rs::mixin_config_editor_test_add_entry_preserves_existing_order",
+    "status": "ported",
+    "evidenceLog": "build/rust-test-logs/project-completion-final/affected.stdout.log"
+  },
+  {
+    "group": "mixin_completion",
+    "legacyTestPath": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixin/MixinConfigEditorTest.kt",
+    "legacyClass": "MixinConfigEditorTest",
+    "legacyCase": "addEntryDoesNotDuplicate",
+    "baselineSha256": "04675b53529a4b2c6a5c7cbf84b85b52f738bcf110c32caabc62d305f970cce8",
+    "rustTest": "mcdev-core/tests/mixin_completion_legacy.rs::mixin_config_editor_test_add_entry_does_not_duplicate",
+    "status": "ported",
+    "evidenceLog": "build/rust-test-logs/project-completion-final/affected.stdout.log"
+  },
+  {
+    "group": "mixin_completion",
+    "legacyTestPath": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixin/MixinConfigEditorTest.kt",
+    "legacyClass": "MixinConfigEditorTest",
+    "legacyCase": "containsEntryChecksAllArrays",
+    "baselineSha256": "04675b53529a4b2c6a5c7cbf84b85b52f738bcf110c32caabc62d305f970cce8",
+    "rustTest": "mcdev-core/tests/mixin_completion_legacy.rs::mixin_config_editor_test_contains_entry_checks_all_arrays",
+    "status": "ported",
+    "evidenceLog": "build/rust-test-logs/project-completion-final/affected.stdout.log"
+  },
+  {
+    "group": "mixin_completion",
+    "legacyTestPath": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixin/MixinConfigEditorTest.kt",
+    "legacyClass": "MixinConfigEditorTest",
+    "legacyCase": "listMixinClassesReturnsSortedDistinctEntries",
+    "baselineSha256": "04675b53529a4b2c6a5c7cbf84b85b52f738bcf110c32caabc62d305f970cce8",
+    "rustTest": "mcdev-core/tests/mixin_completion_legacy.rs::mixin_config_editor_test_list_mixin_classes_returns_sorted_distinct_entries",
+    "status": "ported",
+    "evidenceLog": "build/rust-test-logs/project-completion-final/affected.stdout.log"
+  },
+  {
+    "group": "mixin_completion",
+    "legacyTestPath": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixin/MixinConfigEditorTest.kt",
+    "legacyClass": "MixinConfigEditorTest",
+    "legacyCase": "parsesJson5CommentsAndTrailingCommas",
+    "baselineSha256": "04675b53529a4b2c6a5c7cbf84b85b52f738bcf110c32caabc62d305f970cce8",
+    "rustTest": "mcdev-core/tests/mixin_completion_legacy.rs::mixin_config_editor_test_parses_json5_comments_and_trailing_commas",
+    "status": "ported",
+    "evidenceLog": "build/rust-test-logs/project-completion-final/affected.stdout.log"
+  },
+  {
+    "group": "mixin_completion",
+    "legacyTestPath": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixin/MixinConfigEditorTest.kt",
+    "legacyClass": "MixinConfigEditorTest",
+    "legacyCase": "addEntryLosslessIgnoresCommentText",
+    "baselineSha256": "04675b53529a4b2c6a5c7cbf84b85b52f738bcf110c32caabc62d305f970cce8",
+    "rustTest": "mcdev-core/tests/mixin_completion_legacy.rs::mixin_config_editor_test_add_entry_lossless_ignores_comment_text",
+    "status": "ported",
+    "evidenceLog": "build/rust-test-logs/project-completion-final/affected.stdout.log"
+  },
+  {
+    "group": "mixin_completion",
+    "legacyTestPath": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixin/MixinConfigEditorTest.kt",
+    "legacyClass": "MixinConfigEditorTest",
+    "legacyCase": "addEntryLosslessIgnoresNestedArrayKey",
+    "baselineSha256": "04675b53529a4b2c6a5c7cbf84b85b52f738bcf110c32caabc62d305f970cce8",
+    "rustTest": "mcdev-core/tests/mixin_completion_legacy.rs::mixin_config_editor_test_add_entry_lossless_ignores_nested_array_key",
+    "status": "ported",
+    "evidenceLog": "build/rust-test-logs/project-completion-final/affected.stdout.log"
+  },
+  {
+    "group": "mixin_completion",
+    "legacyTestPath": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixin/MixinConfigEditorTest.kt",
+    "legacyClass": "MixinConfigEditorTest",
+    "legacyCase": "addEntryLosslessIgnoresStringLiteralKeyText",
+    "baselineSha256": "04675b53529a4b2c6a5c7cbf84b85b52f738bcf110c32caabc62d305f970cce8",
+    "rustTest": "mcdev-core/tests/mixin_completion_legacy.rs::mixin_config_editor_test_add_entry_lossless_ignores_string_literal_key_text",
+    "status": "ported",
+    "evidenceLog": "build/rust-test-logs/project-completion-final/affected.stdout.log"
+  },
+  {
+    "group": "mixin_completion",
+    "legacyTestPath": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixin/MixinConfigEditorTest.kt",
+    "legacyClass": "MixinConfigEditorTest",
+    "legacyCase": "addEntryLosslessAppendsToEmptyArray",
+    "baselineSha256": "04675b53529a4b2c6a5c7cbf84b85b52f738bcf110c32caabc62d305f970cce8",
+    "rustTest": "mcdev-core/tests/mixin_completion_legacy.rs::mixin_config_editor_test_add_entry_lossless_appends_to_empty_array",
+    "status": "ported",
+    "evidenceLog": "build/rust-test-logs/project-completion-final/affected.stdout.log"
+  },
+  {
+    "group": "mixin_completion",
+    "legacyTestPath": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixin/MixinConfigEditorTest.kt",
+    "legacyClass": "MixinConfigEditorTest",
+    "legacyCase": "addEntryLosslessPreservesTrailingComma",
+    "baselineSha256": "04675b53529a4b2c6a5c7cbf84b85b52f738bcf110c32caabc62d305f970cce8",
+    "rustTest": "mcdev-core/tests/mixin_completion_legacy.rs::mixin_config_editor_test_add_entry_lossless_preserves_trailing_comma",
+    "status": "ported",
+    "evidenceLog": "build/rust-test-logs/project-completion-final/affected.stdout.log"
+  },
+  {
+    "group": "mixin_completion",
+    "legacyTestPath": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixin/MixinConfigEditorTest.kt",
+    "legacyClass": "MixinConfigEditorTest",
+    "legacyCase": "addEntryLosslessPreservesCrlf",
+    "baselineSha256": "04675b53529a4b2c6a5c7cbf84b85b52f738bcf110c32caabc62d305f970cce8",
+    "rustTest": "mcdev-core/tests/mixin_completion_legacy.rs::mixin_config_editor_test_add_entry_lossless_preserves_crlf",
+    "status": "ported",
+    "evidenceLog": "build/rust-test-logs/project-completion-final/affected.stdout.log"
+  },
+  {
+    "group": "mixin_completion",
+    "legacyTestPath": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixin/MixinConfigEditorTest.kt",
+    "legacyClass": "MixinConfigEditorTest",
+    "legacyCase": "addEntryLosslessAppendsToClientArray",
+    "baselineSha256": "04675b53529a4b2c6a5c7cbf84b85b52f738bcf110c32caabc62d305f970cce8",
+    "rustTest": "mcdev-core/tests/mixin_completion_legacy.rs::mixin_config_editor_test_add_entry_lossless_appends_to_client_array",
+    "status": "ported",
+    "evidenceLog": "build/rust-test-logs/project-completion-final/affected.stdout.log"
+  },
+  {
+    "group": "mixin_completion",
+    "legacyTestPath": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixin/MixinConfigEditorTest.kt",
+    "legacyClass": "MixinConfigEditorTest",
+    "legacyCase": "addEntryLosslessAppendsToServerArray",
+    "baselineSha256": "04675b53529a4b2c6a5c7cbf84b85b52f738bcf110c32caabc62d305f970cce8",
+    "rustTest": "mcdev-core/tests/mixin_completion_legacy.rs::mixin_config_editor_test_add_entry_lossless_appends_to_server_array",
+    "status": "ported",
+    "evidenceLog": "build/rust-test-logs/project-completion-final/affected.stdout.log"
+  },
+  {
+    "group": "mixin_completion",
+    "legacyTestPath": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixin/MixinConfigEditorTest.kt",
+    "legacyClass": "MixinConfigEditorTest",
+    "legacyCase": "addEntryLosslessEscapesSpecialCharacters",
+    "baselineSha256": "04675b53529a4b2c6a5c7cbf84b85b52f738bcf110c32caabc62d305f970cce8",
+    "rustTest": "mcdev-core/tests/mixin_completion_legacy.rs::mixin_config_editor_test_add_entry_lossless_escapes_special_characters",
+    "status": "ported",
+    "evidenceLog": "build/rust-test-logs/project-completion-final/affected.stdout.log"
+  },
+  {
+    "group": "mixin_completion",
+    "legacyTestPath": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixin/MixinConfigEditorTest.kt",
+    "legacyClass": "MixinConfigEditorTest",
+    "legacyCase": "addEntryLosslessDuplicateIsIdempotentWithEscapedEntry",
+    "baselineSha256": "04675b53529a4b2c6a5c7cbf84b85b52f738bcf110c32caabc62d305f970cce8",
+    "rustTest": "mcdev-core/tests/mixin_completion_legacy.rs::mixin_config_editor_test_add_entry_lossless_duplicate_is_idempotent_with_escaped_entry",
+    "status": "ported",
+    "evidenceLog": "build/rust-test-logs/project-completion-final/affected.stdout.log"
+  },
+  {
+    "group": "mixin_completion",
+    "legacyTestPath": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixin/MixinConfigEditorTest.kt",
+    "legacyClass": "MixinConfigEditorTest",
+    "legacyCase": "addEntryLosslessAppendsToCommentOnlyEmptyArray",
+    "baselineSha256": "04675b53529a4b2c6a5c7cbf84b85b52f738bcf110c32caabc62d305f970cce8",
+    "rustTest": "mcdev-core/tests/mixin_completion_legacy.rs::mixin_config_editor_test_add_entry_lossless_appends_to_comment_only_empty_array",
+    "status": "ported",
+    "evidenceLog": "build/rust-test-logs/project-completion-final/affected.stdout.log"
+  },
+  {
+    "group": "mixin_completion",
+    "legacyTestPath": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixin/MixinConfigEditorTest.kt",
+    "legacyClass": "MixinConfigEditorTest",
+    "legacyCase": "addEntryLosslessTrailingCommaBeforeCommentsDoesNotDoubleComma",
+    "baselineSha256": "04675b53529a4b2c6a5c7cbf84b85b52f738bcf110c32caabc62d305f970cce8",
+    "rustTest": "mcdev-core/tests/mixin_completion_legacy.rs::mixin_config_editor_test_add_entry_lossless_trailing_comma_before_comments_does_not_double_comma",
+    "status": "ported",
+    "evidenceLog": "build/rust-test-logs/project-completion-final/affected.stdout.log"
+  },
+  {
+    "group": "mixin_completion",
+    "legacyTestPath": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixin/MixinConfigEditorTest.kt",
+    "legacyClass": "MixinConfigEditorTest",
+    "legacyCase": "addEntryLosslessInsertsMixinsArrayWhenMissing",
+    "baselineSha256": "04675b53529a4b2c6a5c7cbf84b85b52f738bcf110c32caabc62d305f970cce8",
+    "rustTest": "mcdev-core/tests/mixin_completion_legacy.rs::mixin_config_editor_test_add_entry_lossless_inserts_mixins_array_when_missing",
+    "status": "ported",
+    "evidenceLog": "build/rust-test-logs/project-completion-final/affected.stdout.log"
+  },
+  {
+    "group": "mixin_completion",
+    "legacyTestPath": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixin/MixinConfigEditorTest.kt",
+    "legacyClass": "MixinConfigEditorTest",
+    "legacyCase": "addEntryLosslessEditDelta",
+    "baselineSha256": "04675b53529a4b2c6a5c7cbf84b85b52f738bcf110c32caabc62d305f970cce8",
+    "rustTest": "mcdev-core/tests/mixin_completion_legacy.rs::mixin_config_editor_test_add_entry_lossless_edit_delta",
+    "status": "ported",
+    "evidenceLog": "build/rust-test-logs/project-completion-final/affected.stdout.log"
+  },
+  {
+    "group": "mixin_completion",
+    "legacyTestPath": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixin/MixinConfigEditorTest.kt",
+    "legacyClass": "MixinConfigEditorTest",
+    "legacyCase": "addEntryLosslessInsertsMixinsArrayWithLfLineEndingBeforeClosingBrace",
+    "baselineSha256": "04675b53529a4b2c6a5c7cbf84b85b52f738bcf110c32caabc62d305f970cce8",
+    "rustTest": "mcdev-core/tests/mixin_completion_legacy.rs::mixin_config_editor_test_add_entry_lossless_inserts_mixins_array_with_lf_line_ending_before_closing_brace",
+    "status": "ported",
+    "evidenceLog": "build/rust-test-logs/project-completion-final/affected.stdout.log"
+  },
+  {
+    "group": "mixin_completion",
+    "legacyTestPath": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixin/MixinConfigEditorTest.kt",
+    "legacyClass": "MixinConfigEditorTest",
+    "legacyCase": "addEntryLosslessAbortsWhenClosingBracketMissing",
+    "baselineSha256": "04675b53529a4b2c6a5c7cbf84b85b52f738bcf110c32caabc62d305f970cce8",
+    "rustTest": "mcdev-core/tests/mixin_completion_legacy.rs::mixin_config_editor_test_add_entry_lossless_aborts_when_closing_bracket_missing",
+    "status": "ported",
+    "evidenceLog": "build/rust-test-logs/project-completion-final/affected.stdout.log"
+  },
+  {
+    "group": "mixin_completion",
+    "legacyTestPath": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixin/MixinConfigEditorTest.kt",
+    "legacyClass": "MixinConfigEditorTest",
+    "legacyCase": "addEntryLosslessAbortsOnIncompleteUnicodeEscape",
+    "baselineSha256": "04675b53529a4b2c6a5c7cbf84b85b52f738bcf110c32caabc62d305f970cce8",
+    "rustTest": "mcdev-core/tests/mixin_completion_legacy.rs::mixin_config_editor_test_add_entry_lossless_aborts_on_incomplete_unicode_escape",
+    "status": "ported",
+    "evidenceLog": "build/rust-test-logs/project-completion-final/affected.stdout.log"
+  },
+  {
+    "group": "mixin_completion",
+    "legacyTestPath": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixin/MixinConfigEditorTest.kt",
+    "legacyClass": "MixinConfigEditorTest",
+    "legacyCase": "addEntryLosslessAbortsOnInvalidUnicodeEscape",
+    "baselineSha256": "04675b53529a4b2c6a5c7cbf84b85b52f738bcf110c32caabc62d305f970cce8",
+    "rustTest": "mcdev-core/tests/mixin_completion_legacy.rs::mixin_config_editor_test_add_entry_lossless_aborts_on_invalid_unicode_escape",
+    "status": "ported",
+    "evidenceLog": "build/rust-test-logs/project-completion-final/affected.stdout.log"
+  },
+  {
+    "group": "mixin_completion",
+    "legacyTestPath": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixin/MixinDeclarationSnippetServiceTest.kt",
+    "legacyClass": "MixinDeclarationSnippetServiceTest",
+    "legacyCase": "explicitAccessorOffersGetterAndSetterWithWholeEmptyNamePlaceholder",
+    "baselineSha256": "d2b20e8e53ccd81e4ef6287157ad3150b7e1e2e4bfa344beda1ac9b67f0cf6c5",
+    "rustTest": "mcdev-core/tests/mixin_completion_legacy.rs::mixin_declaration_snippet_service_test_explicit_accessor_offers_getter_and_setter_with_whole_empty_name_placeholder",
+    "status": "ported",
+    "evidenceLog": "build/rust-test-logs/project-completion-final/affected.stdout.log"
+  },
+  {
+    "group": "mixin_completion",
+    "legacyTestPath": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixin/MixinDeclarationSnippetServiceTest.kt",
+    "legacyClass": "MixinDeclarationSnippetServiceTest",
+    "legacyCase": "staticAccessorUsesStaticBodyInsteadOfInvalidAbstractMethod",
+    "baselineSha256": "d2b20e8e53ccd81e4ef6287157ad3150b7e1e2e4bfa344beda1ac9b67f0cf6c5",
+    "rustTest": "mcdev-core/tests/mixin_completion_legacy.rs::mixin_declaration_snippet_service_test_static_accessor_uses_static_body_instead_of_invalid_abstract_method",
+    "status": "ported",
+    "evidenceLog": "build/rust-test-logs/project-completion-final/affected.stdout.log"
+  },
+  {
+    "group": "mixin_completion",
+    "legacyTestPath": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixin/MixinDeclarationSnippetServiceTest.kt",
+    "legacyClass": "MixinDeclarationSnippetServiceTest",
+    "legacyCase": "instanceAccessorMakesConcreteMixinAbstract",
+    "baselineSha256": "d2b20e8e53ccd81e4ef6287157ad3150b7e1e2e4bfa344beda1ac9b67f0cf6c5",
+    "rustTest": "mcdev-core/tests/mixin_completion_legacy.rs::mixin_declaration_snippet_service_test_instance_accessor_makes_concrete_mixin_abstract",
+    "status": "ported",
+    "evidenceLog": "build/rust-test-logs/project-completion-final/affected.stdout.log"
+  },
+  {
+    "group": "mixin_completion",
+    "legacyTestPath": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixin/MixinDeclarationSnippetServiceTest.kt",
+    "legacyClass": "MixinDeclarationSnippetServiceTest",
+    "legacyCase": "instanceDeclarationsInInterfaceNeedNoClassEdit",
+    "baselineSha256": "d2b20e8e53ccd81e4ef6287157ad3150b7e1e2e4bfa344beda1ac9b67f0cf6c5",
+    "rustTest": "mcdev-core/tests/mixin_completion_legacy.rs::mixin_declaration_snippet_service_test_instance_declarations_in_interface_need_no_class_edit",
+    "status": "ported",
+    "evidenceLog": "build/rust-test-logs/project-completion-final/affected.stdout.log"
+  },
+  {
+    "group": "mixin_completion",
+    "legacyTestPath": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixin/MixinDeclarationSnippetServiceTest.kt",
+    "legacyClass": "MixinDeclarationSnippetServiceTest",
+    "legacyCase": "overloadedInvokerReturnsOneDeclarationPerResolvedDescriptor",
+    "baselineSha256": "d2b20e8e53ccd81e4ef6287157ad3150b7e1e2e4bfa344beda1ac9b67f0cf6c5",
+    "rustTest": "mcdev-core/tests/mixin_completion_legacy.rs::mixin_declaration_snippet_service_test_overloaded_invoker_returns_one_declaration_per_resolved_descriptor",
+    "status": "ported",
+    "evidenceLog": "build/rust-test-logs/project-completion-final/affected.stdout.log"
+  },
+  {
+    "group": "mixin_completion",
+    "legacyTestPath": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixin/MixinDeclarationSnippetServiceTest.kt",
+    "legacyClass": "MixinDeclarationSnippetServiceTest",
+    "legacyCase": "staticInvokerUsesStaticBody",
+    "baselineSha256": "d2b20e8e53ccd81e4ef6287157ad3150b7e1e2e4bfa344beda1ac9b67f0cf6c5",
+    "rustTest": "mcdev-core/tests/mixin_completion_legacy.rs::mixin_declaration_snippet_service_test_static_invoker_uses_static_body",
+    "status": "ported",
+    "evidenceLog": "build/rust-test-logs/project-completion-final/affected.stdout.log"
+  },
+  {
+    "group": "mixin_completion",
+    "legacyTestPath": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixin/MixinDeclarationSnippetServiceTest.kt",
+    "legacyClass": "MixinDeclarationSnippetServiceTest",
+    "legacyCase": "constructorInvokerIsStaticFactoryReturningTargetType",
+    "baselineSha256": "d2b20e8e53ccd81e4ef6287157ad3150b7e1e2e4bfa344beda1ac9b67f0cf6c5",
+    "rustTest": "mcdev-core/tests/mixin_completion_legacy.rs::mixin_declaration_snippet_service_test_constructor_invoker_is_static_factory_returning_target_type",
+    "status": "ported",
+    "evidenceLog": "build/rust-test-logs/project-completion-final/affected.stdout.log"
+  },
+  {
+    "group": "mixin_completion",
+    "legacyTestPath": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixin/MixinDeclarationSnippetServiceTest.kt",
+    "legacyClass": "MixinDeclarationSnippetServiceTest",
+    "legacyCase": "invokerAcceptsJvmDescriptorSelector",
+    "baselineSha256": "d2b20e8e53ccd81e4ef6287157ad3150b7e1e2e4bfa344beda1ac9b67f0cf6c5",
+    "rustTest": "mcdev-core/tests/mixin_completion_legacy.rs::mixin_declaration_snippet_service_test_invoker_accepts_jvm_descriptor_selector",
+    "status": "ported",
+    "evidenceLog": "build/rust-test-logs/project-completion-final/affected.stdout.log"
+  },
+  {
+    "group": "mixin_completion",
+    "legacyTestPath": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixin/MixinDeclarationSnippetServiceTest.kt",
+    "legacyClass": "MixinDeclarationSnippetServiceTest",
+    "legacyCase": "constructorInvokerAcceptsTargetSimpleNameAlias",
+    "baselineSha256": "d2b20e8e53ccd81e4ef6287157ad3150b7e1e2e4bfa344beda1ac9b67f0cf6c5",
+    "rustTest": "mcdev-core/tests/mixin_completion_legacy.rs::mixin_declaration_snippet_service_test_constructor_invoker_accepts_target_simple_name_alias",
+    "status": "ported",
+    "evidenceLog": "build/rust-test-logs/project-completion-final/affected.stdout.log"
+  },
+  {
+    "group": "mixin_completion",
+    "legacyTestPath": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixin/MixinDeclarationSnippetServiceTest.kt",
+    "legacyClass": "MixinDeclarationSnippetServiceTest",
+    "legacyCase": "overwriteWithoutTargetOffersExplicitSignatureChoices",
+    "baselineSha256": "d2b20e8e53ccd81e4ef6287157ad3150b7e1e2e4bfa344beda1ac9b67f0cf6c5",
+    "rustTest": "mcdev-core/tests/mixin_completion_legacy.rs::mixin_declaration_snippet_service_test_overwrite_without_target_offers_explicit_signature_choices",
+    "status": "ported",
+    "evidenceLog": "build/rust-test-logs/project-completion-final/affected.stdout.log"
+  },
+  {
+    "group": "mixin_completion",
+    "legacyTestPath": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixin/MixinDeclarationSnippetServiceTest.kt",
+    "legacyClass": "MixinDeclarationSnippetServiceTest",
+    "legacyCase": "overwriteNonVoidUsesThrowingBodyStubWithEditableStopBeforeThrow",
+    "baselineSha256": "d2b20e8e53ccd81e4ef6287157ad3150b7e1e2e4bfa344beda1ac9b67f0cf6c5",
+    "rustTest": "mcdev-core/tests/mixin_completion_legacy.rs::mixin_declaration_snippet_service_test_overwrite_non_void_uses_throwing_body_stub_with_editable_stop_before_throw",
+    "status": "ported",
+    "evidenceLog": "build/rust-test-logs/project-completion-final/affected.stdout.log"
+  },
+  {
+    "group": "mixin_completion",
+    "legacyTestPath": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixin/MixinDeclarationSnippetServiceTest.kt",
+    "legacyClass": "MixinDeclarationSnippetServiceTest",
+    "legacyCase": "mismatchedMultiTargetFieldDoesNotOfferAOneTargetDeclaration",
+    "baselineSha256": "d2b20e8e53ccd81e4ef6287157ad3150b7e1e2e4bfa344beda1ac9b67f0cf6c5",
+    "rustTest": "mcdev-core/tests/mixin_completion_legacy.rs::mixin_declaration_snippet_service_test_mismatched_multi_target_field_does_not_offer_a_one_target_declaration",
+    "status": "ported",
+    "evidenceLog": "build/rust-test-logs/project-completion-final/affected.stdout.log"
+  },
+  {
+    "group": "mixin_completion",
+    "legacyTestPath": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixin/MixinDeclarationSnippetServiceTest.kt",
+    "legacyClass": "MixinDeclarationSnippetServiceTest",
+    "legacyCase": "overwriteRequiresExactlyOneMixinTarget",
+    "baselineSha256": "d2b20e8e53ccd81e4ef6287157ad3150b7e1e2e4bfa344beda1ac9b67f0cf6c5",
+    "rustTest": "mcdev-core/tests/mixin_completion_legacy.rs::mixin_declaration_snippet_service_test_overwrite_requires_exactly_one_mixin_target",
+    "status": "ported",
+    "evidenceLog": "build/rust-test-logs/project-completion-final/affected.stdout.log"
+  },
+  {
+    "group": "mixin_completion",
+    "legacyTestPath": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixin/MixinDeclarationSnippetServiceTest.kt",
+    "legacyClass": "MixinDeclarationSnippetServiceTest",
+    "legacyCase": "existingMemberAfterAnnotationDoesNotProduceDuplicateDeclaration",
+    "baselineSha256": "d2b20e8e53ccd81e4ef6287157ad3150b7e1e2e4bfa344beda1ac9b67f0cf6c5",
+    "rustTest": "mcdev-core/tests/mixin_completion_legacy.rs::mixin_declaration_snippet_service_test_existing_member_after_annotation_does_not_produce_duplicate_declaration",
+    "status": "ported",
+    "evidenceLog": "build/rust-test-logs/project-completion-final/affected.stdout.log"
+  },
+  {
+    "group": "mixin_completion",
+    "legacyTestPath": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixin/MixinDeclarationSnippetServiceTest.kt",
+    "legacyClass": "MixinDeclarationSnippetServiceTest",
+    "legacyCase": "typeLikeTextInCommentCannotReceiveAbstractClassEdit",
+    "baselineSha256": "d2b20e8e53ccd81e4ef6287157ad3150b7e1e2e4bfa344beda1ac9b67f0cf6c5",
+    "rustTest": "mcdev-core/tests/mixin_completion_legacy.rs::mixin_declaration_snippet_service_test_type_like_text_in_comment_cannot_receive_abstract_class_edit",
+    "status": "ported",
+    "evidenceLog": "build/rust-test-logs/project-completion-final/affected.stdout.log"
+  },
+  {
+    "group": "mixin_completion",
+    "legacyTestPath": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixin/MixinDeclarationSnippetServiceTest.kt",
+    "legacyClass": "MixinDeclarationSnippetServiceTest",
+    "legacyCase": "unresolvedTargetsDoNotFabricateDeclarations",
+    "baselineSha256": "d2b20e8e53ccd81e4ef6287157ad3150b7e1e2e4bfa344beda1ac9b67f0cf6c5",
+    "rustTest": "mcdev-core/tests/mixin_completion_legacy.rs::mixin_declaration_snippet_service_test_unresolved_targets_do_not_fabricate_declarations",
+    "status": "ported",
+    "evidenceLog": "build/rust-test-logs/project-completion-final/affected.stdout.log"
+  },
+  {
+    "group": "mixin_completion",
+    "legacyTestPath": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixin/MixinEdgeCasesTest.kt",
+    "legacyClass": "MixinImportEditBuilderTest",
+    "legacyCase": "generatesImportEditAfterPackageDeclaration",
+    "baselineSha256": "43cc4e447f26c39e4ba54660d6e482e27ec4ba356befdabe8a315fd545f00507",
+    "rustTest": "mcdev-core/tests/mixin_completion_legacy.rs::mixin_import_edit_builder_test_generates_import_edit_after_package_declaration",
+    "status": "ported",
+    "evidenceLog": "build/rust-test-logs/project-completion-final/affected.stdout.log"
+  },
+  {
+    "group": "mixin_completion",
+    "legacyTestPath": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixin/MixinEdgeCasesTest.kt",
+    "legacyClass": "MixinImportEditBuilderTest",
+    "legacyCase": "generatesImportEditAfterExistingImports",
+    "baselineSha256": "43cc4e447f26c39e4ba54660d6e482e27ec4ba356befdabe8a315fd545f00507",
+    "rustTest": "mcdev-core/tests/mixin_completion_legacy.rs::mixin_import_edit_builder_test_generates_import_edit_after_existing_imports",
+    "status": "ported",
+    "evidenceLog": "build/rust-test-logs/project-completion-final/affected.stdout.log"
+  },
+  {
+    "group": "mixin_completion",
+    "legacyTestPath": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixin/MixinEdgeCasesTest.kt",
+    "legacyClass": "MixinImportEditBuilderTest",
+    "legacyCase": "skipsImportWhenAlreadyPresent",
+    "baselineSha256": "43cc4e447f26c39e4ba54660d6e482e27ec4ba356befdabe8a315fd545f00507",
+    "rustTest": "mcdev-core/tests/mixin_completion_legacy.rs::mixin_import_edit_builder_test_skips_import_when_already_present",
+    "status": "ported",
+    "evidenceLog": "build/rust-test-logs/project-completion-final/affected.stdout.log"
+  },
+  {
+    "group": "mixin_completion",
+    "legacyTestPath": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixin/MixinEdgeCasesTest.kt",
+    "legacyClass": "MixinImportEditBuilderTest",
+    "legacyCase": "skipsImportForSamePackageTarget",
+    "baselineSha256": "43cc4e447f26c39e4ba54660d6e482e27ec4ba356befdabe8a315fd545f00507",
+    "rustTest": "mcdev-core/tests/mixin_completion_legacy.rs::mixin_import_edit_builder_test_skips_import_for_same_package_target",
+    "status": "ported",
+    "evidenceLog": "build/rust-test-logs/project-completion-final/affected.stdout.log"
+  },
+  {
+    "group": "mixin_completion",
+    "legacyTestPath": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixin/MixinEdgeCasesTest.kt",
+    "legacyClass": "MixinImportEditBuilderTest",
+    "legacyCase": "ignoresImportMentionedInCommentWhenChoosingTypeReference",
+    "baselineSha256": "43cc4e447f26c39e4ba54660d6e482e27ec4ba356befdabe8a315fd545f00507",
+    "rustTest": "mcdev-core/tests/mixin_completion_legacy.rs::mixin_import_edit_builder_test_ignores_import_mentioned_in_comment_when_choosing_type_reference",
+    "status": "ported",
+    "evidenceLog": "build/rust-test-logs/project-completion-final/affected.stdout.log"
+  },
+  {
+    "group": "mixin_completion",
+    "legacyTestPath": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixin/MixinEdgeCasesTest.kt",
+    "legacyClass": "MixinImportEditBuilderTest",
+    "legacyCase": "importEditPairsWithImportModeCompletionInsertText",
+    "baselineSha256": "43cc4e447f26c39e4ba54660d6e482e27ec4ba356befdabe8a315fd545f00507",
+    "rustTest": "mcdev-core/tests/mixin_completion_legacy.rs::mixin_import_edit_builder_test_import_edit_pairs_with_import_mode_completion_insert_text",
+    "status": "ported",
+    "evidenceLog": "build/rust-test-logs/project-completion-final/affected.stdout.log"
+  },
+  {
+    "group": "mixin_completion",
+    "legacyTestPath": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixin/MixinEdgeCasesTest.kt",
+    "legacyClass": "MixinEdgeCasesTest",
+    "legacyCase": "completesClassInsideMixinArrayFormUsingManualContext",
+    "baselineSha256": "43cc4e447f26c39e4ba54660d6e482e27ec4ba356befdabe8a315fd545f00507",
+    "rustTest": "mcdev-core/tests/mixin_completion_legacy.rs::mixin_edge_cases_test_completes_class_inside_mixin_array_form_using_manual_context",
+    "status": "ported",
+    "evidenceLog": "build/rust-test-logs/project-completion-final/affected.stdout.log"
+  },
+  {
+    "group": "mixin_completion",
+    "legacyTestPath": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixin/MixinEdgeCasesTest.kt",
+    "legacyClass": "MixinEdgeCasesTest",
+    "legacyCase": "constantAtCompletionIncludesStringValueHint",
+    "baselineSha256": "43cc4e447f26c39e4ba54660d6e482e27ec4ba356befdabe8a315fd545f00507",
+    "rustTest": "mcdev-core/tests/mixin_completion_legacy.rs::mixin_edge_cases_test_constant_at_completion_includes_string_value_hint",
+    "status": "ported",
+    "evidenceLog": "build/rust-test-logs/project-completion-final/affected.stdout.log"
+  },
+  {
+    "group": "mixin_completion",
+    "legacyTestPath": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixin/MixinEdgeCasesTest.kt",
+    "legacyClass": "MixinEdgeCasesTest",
+    "legacyCase": "constantAtCompletionIncludesIntValueHint",
+    "baselineSha256": "43cc4e447f26c39e4ba54660d6e482e27ec4ba356befdabe8a315fd545f00507",
+    "rustTest": "mcdev-core/tests/mixin_completion_legacy.rs::mixin_edge_cases_test_constant_at_completion_includes_int_value_hint",
+    "status": "ported",
+    "evidenceLog": "build/rust-test-logs/project-completion-final/affected.stdout.log"
+  },
+  {
+    "group": "mixin_completion",
+    "legacyTestPath": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixin/MixinEdgeCasesTest.kt",
+    "legacyClass": "AtTargetMappingTest",
+    "legacyCase": "preservesNamedDescriptorWithoutResolver",
+    "baselineSha256": "43cc4e447f26c39e4ba54660d6e482e27ec4ba356befdabe8a315fd545f00507",
+    "rustTest": "mcdev-core/tests/mixin_completion_legacy.rs::at_target_mapping_test_preserves_named_descriptor_without_resolver",
+    "status": "ported",
+    "evidenceLog": "build/rust-test-logs/project-completion-final/affected.stdout.log"
+  },
+  {
+    "group": "mixin_completion",
+    "legacyTestPath": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixin/MixinEdgeCasesTest.kt",
+    "legacyClass": "AtTargetMappingTest",
+    "legacyCase": "remapsNamedMethodTargetToIntermediaryUsingFixtureMappings",
+    "baselineSha256": "43cc4e447f26c39e4ba54660d6e482e27ec4ba356befdabe8a315fd545f00507",
+    "rustTest": "mcdev-core/tests/mixin_completion_legacy.rs::at_target_mapping_test_remaps_named_method_target_to_intermediary_using_fixture_mappings",
+    "status": "ported",
+    "evidenceLog": "build/rust-test-logs/project-completion-final/affected.stdout.log"
+  },
+  {
+    "group": "mixin_completion",
+    "legacyTestPath": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixin/MixinEdgeCasesTest.kt",
+    "legacyClass": "AtTargetMappingTest",
+    "legacyCase": "leavesReturnTargetsUnchangedWhenRemapping",
+    "baselineSha256": "43cc4e447f26c39e4ba54660d6e482e27ec4ba356befdabe8a315fd545f00507",
+    "rustTest": "mcdev-core/tests/mixin_completion_legacy.rs::at_target_mapping_test_leaves_return_targets_unchanged_when_remapping",
+    "status": "ported",
+    "evidenceLog": "build/rust-test-logs/project-completion-final/affected.stdout.log"
+  },
+  {
+    "group": "mixin_completion",
+    "legacyTestPath": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixin/MixinSideResolverTest.kt",
+    "legacyClass": "MixinSideResolverTest",
+    "legacyCase": "fabricEnvironmentClient",
+    "baselineSha256": "0fe54d6c4c2c6624a3f784941d90f144b1438a83499a1035ac4e6f2600091c45",
+    "rustTest": "mcdev-core/tests/mixin_completion_legacy.rs::mixin_side_resolver_test_fabric_environment_client",
+    "status": "ported",
+    "evidenceLog": "build/rust-test-logs/project-completion-final/affected.stdout.log"
+  },
+  {
+    "group": "mixin_completion",
+    "legacyTestPath": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixin/MixinSideResolverTest.kt",
+    "legacyClass": "MixinSideResolverTest",
+    "legacyCase": "fabricEnvironmentServer",
+    "baselineSha256": "0fe54d6c4c2c6624a3f784941d90f144b1438a83499a1035ac4e6f2600091c45",
+    "rustTest": "mcdev-core/tests/mixin_completion_legacy.rs::mixin_side_resolver_test_fabric_environment_server",
+    "status": "ported",
+    "evidenceLog": "build/rust-test-logs/project-completion-final/affected.stdout.log"
+  },
+  {
+    "group": "mixin_completion",
+    "legacyTestPath": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixin/MixinSideResolverTest.kt",
+    "legacyClass": "MixinSideResolverTest",
+    "legacyCase": "forgeOnlyInClient",
+    "baselineSha256": "0fe54d6c4c2c6624a3f784941d90f144b1438a83499a1035ac4e6f2600091c45",
+    "rustTest": "mcdev-core/tests/mixin_completion_legacy.rs::mixin_side_resolver_test_forge_only_in_client",
+    "status": "ported",
+    "evidenceLog": "build/rust-test-logs/project-completion-final/affected.stdout.log"
+  },
+  {
+    "group": "mixin_completion",
+    "legacyTestPath": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixin/MixinSideResolverTest.kt",
+    "legacyClass": "MixinSideResolverTest",
+    "legacyCase": "forgeOnlyInDedicatedServer",
+    "baselineSha256": "0fe54d6c4c2c6624a3f784941d90f144b1438a83499a1035ac4e6f2600091c45",
+    "rustTest": "mcdev-core/tests/mixin_completion_legacy.rs::mixin_side_resolver_test_forge_only_in_dedicated_server",
+    "status": "ported",
+    "evidenceLog": "build/rust-test-logs/project-completion-final/affected.stdout.log"
+  },
+  {
+    "group": "mixin_completion",
+    "legacyTestPath": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixin/MixinSideResolverTest.kt",
+    "legacyClass": "MixinSideResolverTest",
+    "legacyCase": "legacySideOnlyClient",
+    "baselineSha256": "0fe54d6c4c2c6624a3f784941d90f144b1438a83499a1035ac4e6f2600091c45",
+    "rustTest": "mcdev-core/tests/mixin_completion_legacy.rs::mixin_side_resolver_test_legacy_side_only_client",
+    "status": "ported",
+    "evidenceLog": "build/rust-test-logs/project-completion-final/affected.stdout.log"
+  },
+  {
+    "group": "mixin_completion",
+    "legacyTestPath": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixin/MixinSideResolverTest.kt",
+    "legacyClass": "MixinSideResolverTest",
+    "legacyCase": "legacySideOnlyServer",
+    "baselineSha256": "0fe54d6c4c2c6624a3f784941d90f144b1438a83499a1035ac4e6f2600091c45",
+    "rustTest": "mcdev-core/tests/mixin_completion_legacy.rs::mixin_side_resolver_test_legacy_side_only_server",
+    "status": "ported",
+    "evidenceLog": "build/rust-test-logs/project-completion-final/affected.stdout.log"
+  },
+  {
+    "group": "mixin_completion",
+    "legacyTestPath": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixin/MixinSideResolverTest.kt",
+    "legacyClass": "MixinSideResolverTest",
+    "legacyCase": "fullyQualifiedAnnotationAndEnumValues",
+    "baselineSha256": "0fe54d6c4c2c6624a3f784941d90f144b1438a83499a1035ac4e6f2600091c45",
+    "rustTest": "mcdev-core/tests/mixin_completion_legacy.rs::mixin_side_resolver_test_fully_qualified_annotation_and_enum_values",
+    "status": "ported",
+    "evidenceLog": "build/rust-test-logs/project-completion-final/affected.stdout.log"
+  },
+  {
+    "group": "mixin_completion",
+    "legacyTestPath": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixin/MixinSideResolverTest.kt",
+    "legacyClass": "MixinSideResolverTest",
+    "legacyCase": "neoForgeFullyQualifiedOnlyIn",
+    "baselineSha256": "0fe54d6c4c2c6624a3f784941d90f144b1438a83499a1035ac4e6f2600091c45",
+    "rustTest": "mcdev-core/tests/mixin_completion_legacy.rs::mixin_side_resolver_test_neo_forge_fully_qualified_only_in",
+    "status": "ported",
+    "evidenceLog": "build/rust-test-logs/project-completion-final/affected.stdout.log"
+  },
+  {
+    "group": "mixin_completion",
+    "legacyTestPath": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixin/MixinSideResolverTest.kt",
+    "legacyClass": "MixinSideResolverTest",
+    "legacyCase": "netMinecraftForgeFmlFullyQualifiedSideOnly",
+    "baselineSha256": "0fe54d6c4c2c6624a3f784941d90f144b1438a83499a1035ac4e6f2600091c45",
+    "rustTest": "mcdev-core/tests/mixin_completion_legacy.rs::mixin_side_resolver_test_net_minecraft_forge_fml_fully_qualified_side_only",
+    "status": "ported",
+    "evidenceLog": "build/rust-test-logs/project-completion-final/affected.stdout.log"
+  },
+  {
+    "group": "mixin_completion",
+    "legacyTestPath": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixin/MixinSideResolverTest.kt",
+    "legacyClass": "MixinSideResolverTest",
+    "legacyCase": "allowsWhitespaceBeforeAnnotationParen",
+    "baselineSha256": "0fe54d6c4c2c6624a3f784941d90f144b1438a83499a1035ac4e6f2600091c45",
+    "rustTest": "mcdev-core/tests/mixin_completion_legacy.rs::mixin_side_resolver_test_allows_whitespace_before_annotation_paren",
+    "status": "ported",
+    "evidenceLog": "build/rust-test-logs/project-completion-final/affected.stdout.log"
+  },
+  {
+    "group": "mixin_completion",
+    "legacyTestPath": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixin/MixinSideResolverTest.kt",
+    "legacyClass": "MixinSideResolverTest",
+    "legacyCase": "ignoresSideAnnotationExamplesInComments",
+    "baselineSha256": "0fe54d6c4c2c6624a3f784941d90f144b1438a83499a1035ac4e6f2600091c45",
+    "rustTest": "mcdev-core/tests/mixin_completion_legacy.rs::mixin_side_resolver_test_ignores_side_annotation_examples_in_comments",
+    "status": "ported",
+    "evidenceLog": "build/rust-test-logs/project-completion-final/affected.stdout.log"
+  },
+  {
+    "group": "mixin_completion",
+    "legacyTestPath": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixin/MixinSideResolverTest.kt",
+    "legacyClass": "MixinSideResolverTest",
+    "legacyCase": "ignoresMethodAnnotationAfterClassDeclaration",
+    "baselineSha256": "0fe54d6c4c2c6624a3f784941d90f144b1438a83499a1035ac4e6f2600091c45",
+    "rustTest": "mcdev-core/tests/mixin_completion_legacy.rs::mixin_side_resolver_test_ignores_method_annotation_after_class_declaration",
+    "status": "ported",
+    "evidenceLog": "build/rust-test-logs/project-completion-final/affected.stdout.log"
+  },
+  {
+    "group": "mixin_completion",
+    "legacyTestPath": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixin/MixinSideResolverTest.kt",
+    "legacyClass": "MixinSideResolverTest",
+    "legacyCase": "returnsNullWhenNoSideAnnotationPresent",
+    "baselineSha256": "0fe54d6c4c2c6624a3f784941d90f144b1438a83499a1035ac4e6f2600091c45",
+    "rustTest": "mcdev-core/tests/mixin_completion_legacy.rs::mixin_side_resolver_test_returns_null_when_no_side_annotation_present",
+    "status": "ported",
+    "evidenceLog": "build/rust-test-logs/project-completion-final/affected.stdout.log"
+  },
+  {
+    "group": "mixin_completion",
+    "legacyTestPath": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixin/MixinSideResolverTest.kt",
+    "legacyClass": "MixinSideResolverTest",
+    "legacyCase": "returnsNullForConflictingClientAndServerAnnotations",
+    "baselineSha256": "0fe54d6c4c2c6624a3f784941d90f144b1438a83499a1035ac4e6f2600091c45",
+    "rustTest": "mcdev-core/tests/mixin_completion_legacy.rs::mixin_side_resolver_test_returns_null_for_conflicting_client_and_server_annotations",
+    "status": "ported",
+    "evidenceLog": "build/rust-test-logs/project-completion-final/affected.stdout.log"
+  },
+  {
+    "group": "mixin_completion",
+    "legacyTestPath": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixin/MixinSideResolverTest.kt",
+    "legacyClass": "MixinSideResolverTest",
+    "legacyCase": "returnsNullForUnqualifiedAmbiguousEnumValue",
+    "baselineSha256": "0fe54d6c4c2c6624a3f784941d90f144b1438a83499a1035ac4e6f2600091c45",
+    "rustTest": "mcdev-core/tests/mixin_completion_legacy.rs::mixin_side_resolver_test_returns_null_for_unqualified_ambiguous_enum_value",
+    "status": "ported",
+    "evidenceLog": "build/rust-test-logs/project-completion-final/affected.stdout.log"
+  },
+  {
+    "group": "mixin_completion",
+    "legacyTestPath": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixin/MixinSideResolverTest.kt",
+    "legacyClass": "MixinSideResolverTest",
+    "legacyCase": "ignoresUnqualifiedSideAnnotationAndFindsLaterValidOne",
+    "baselineSha256": "0fe54d6c4c2c6624a3f784941d90f144b1438a83499a1035ac4e6f2600091c45",
+    "rustTest": "mcdev-core/tests/mixin_completion_legacy.rs::mixin_side_resolver_test_ignores_unqualified_side_annotation_and_finds_later_valid_one",
+    "status": "ported",
+    "evidenceLog": "build/rust-test-logs/project-completion-final/affected.stdout.log"
+  },
+  {
+    "group": "mixin_completion",
+    "legacyTestPath": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixin/MixinSideResolverTest.kt",
+    "legacyClass": "MixinSideResolverTest",
+    "legacyCase": "returnsNullForMalformedSideAnnotation",
+    "baselineSha256": "0fe54d6c4c2c6624a3f784941d90f144b1438a83499a1035ac4e6f2600091c45",
+    "rustTest": "mcdev-core/tests/mixin_completion_legacy.rs::mixin_side_resolver_test_returns_null_for_malformed_side_annotation",
+    "status": "ported",
+    "evidenceLog": "build/rust-test-logs/project-completion-final/affected.stdout.log"
+  },
+  {
+    "group": "mixin_completion",
+    "legacyTestPath": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixin/MixinTargetCompletionServiceTest.kt",
+    "legacyClass": "MixinTargetCompletionServiceTest",
+    "legacyCase": "completesMixinClassWithImportMode",
+    "baselineSha256": "c659a921518656f5aefd5ffc2934705f003fba05015177af167d2e7d1b895642",
+    "rustTest": "mcdev-core/tests/mixin_completion_legacy.rs::mixin_target_completion_service_test_completes_mixin_class_with_import_mode",
+    "status": "ported",
+    "evidenceLog": "build/rust-test-logs/project-completion-final/affected.stdout.log"
+  },
+  {
+    "group": "mixin_completion",
+    "legacyTestPath": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixin/MixinTargetCompletionServiceTest.kt",
+    "legacyClass": "MixinTargetCompletionServiceTest",
+    "legacyCase": "completesMixinClassWithFqnMode",
+    "baselineSha256": "c659a921518656f5aefd5ffc2934705f003fba05015177af167d2e7d1b895642",
+    "rustTest": "mcdev-core/tests/mixin_completion_legacy.rs::mixin_target_completion_service_test_completes_mixin_class_with_fqn_mode",
+    "status": "ported",
+    "evidenceLog": "build/rust-test-logs/project-completion-final/affected.stdout.log"
+  },
+  {
+    "group": "mixin_completion",
+    "legacyTestPath": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixin/MixinTargetCompletionServiceTest.kt",
+    "legacyClass": "MixinTargetCompletionServiceTest",
+    "legacyCase": "classCompletionPreservesLabelAndDetail",
+    "baselineSha256": "c659a921518656f5aefd5ffc2934705f003fba05015177af167d2e7d1b895642",
+    "rustTest": "mcdev-core/tests/mixin_completion_legacy.rs::mixin_target_completion_service_test_class_completion_preserves_label_and_detail",
+    "status": "ported",
+    "evidenceLog": "build/rust-test-logs/project-completion-final/affected.stdout.log"
+  },
+  {
+    "group": "mixin_completion",
+    "legacyTestPath": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixin/MixinTargetCompletionServiceTest.kt",
+    "legacyClass": "MixinTargetCompletionServiceTest",
+    "legacyCase": "classCompletionMetadataContainsOwner",
+    "baselineSha256": "c659a921518656f5aefd5ffc2934705f003fba05015177af167d2e7d1b895642",
+    "rustTest": "mcdev-core/tests/mixin_completion_legacy.rs::mixin_target_completion_service_test_class_completion_metadata_contains_owner",
+    "status": "ported",
+    "evidenceLog": "build/rust-test-logs/project-completion-final/affected.stdout.log"
+  },
+  {
+    "group": "mixin_completion",
+    "legacyTestPath": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixin/MixinTargetCompletionServiceTest.kt",
+    "legacyClass": "MixinTargetCompletionServiceTest",
+    "legacyCase": "completesTargetsStringWithFqn",
+    "baselineSha256": "c659a921518656f5aefd5ffc2934705f003fba05015177af167d2e7d1b895642",
+    "rustTest": "mcdev-core/tests/mixin_completion_legacy.rs::mixin_target_completion_service_test_completes_targets_string_with_fqn",
+    "status": "ported",
+    "evidenceLog": "build/rust-test-logs/project-completion-final/affected.stdout.log"
+  },
+  {
+    "group": "mixin_completion",
+    "legacyTestPath": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixin/MixinTargetCompletionServiceTest.kt",
+    "legacyClass": "MixinTargetCompletionServiceTest",
+    "legacyCase": "targetsCompletionLabelIsSimpleName",
+    "baselineSha256": "c659a921518656f5aefd5ffc2934705f003fba05015177af167d2e7d1b895642",
+    "rustTest": "mcdev-core/tests/mixin_completion_legacy.rs::mixin_target_completion_service_test_targets_completion_label_is_simple_name",
+    "status": "ported",
+    "evidenceLog": "build/rust-test-logs/project-completion-final/affected.stdout.log"
+  },
+  {
+    "group": "mixin_completion",
+    "legacyTestPath": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixin/MixinTargetCompletionServiceTest.kt",
+    "legacyClass": "MixinTargetCompletionServiceTest",
+    "legacyCase": "returnsEmptyForNonMixinAnnotation",
+    "baselineSha256": "c659a921518656f5aefd5ffc2934705f003fba05015177af167d2e7d1b895642",
+    "rustTest": "mcdev-core/tests/mixin_completion_legacy.rs::mixin_target_completion_service_test_returns_empty_for_non_mixin_annotation",
+    "status": "ported",
+    "evidenceLog": "build/rust-test-logs/project-completion-final/affected.stdout.log"
+  },
+  {
+    "group": "mixin_completion",
+    "legacyTestPath": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixin/MixinTargetCompletionServiceTest.kt",
+    "legacyClass": "MixinTargetCompletionServiceTest",
+    "legacyCase": "returnsEmptyForWrongSlot",
+    "baselineSha256": "c659a921518656f5aefd5ffc2934705f003fba05015177af167d2e7d1b895642",
+    "rustTest": "mcdev-core/tests/mixin_completion_legacy.rs::mixin_target_completion_service_test_returns_empty_for_wrong_slot",
+    "status": "ported",
+    "evidenceLog": "build/rust-test-logs/project-completion-final/affected.stdout.log"
+  },
+  {
+    "group": "mixin_completion",
+    "legacyTestPath": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixin/MixinTargetCompletionServiceTest.kt",
+    "legacyClass": "MixinTargetCompletionServiceTest",
+    "legacyCase": "filtersClassesByPrefix",
+    "baselineSha256": "c659a921518656f5aefd5ffc2934705f003fba05015177af167d2e7d1b895642",
+    "rustTest": "mcdev-core/tests/mixin_completion_legacy.rs::mixin_target_completion_service_test_filters_classes_by_prefix",
+    "status": "ported",
+    "evidenceLog": "build/rust-test-logs/project-completion-final/affected.stdout.log"
+  },
+  {
+    "group": "mixin_completion",
+    "legacyTestPath": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixin/MixinTargetCompletionServiceTest.kt",
+    "legacyClass": "MixinTargetCompletionServiceTest",
+    "legacyCase": "narrowerPrefixFindsClassBeyondBroadCompletionLimit",
+    "baselineSha256": "c659a921518656f5aefd5ffc2934705f003fba05015177af167d2e7d1b895642",
+    "rustTest": "mcdev-core/tests/mixin_completion_legacy.rs::mixin_target_completion_service_test_narrower_prefix_finds_class_beyond_broad_completion_limit",
+    "status": "ported",
+    "evidenceLog": "build/rust-test-logs/project-completion-final/affected.stdout.log"
+  },
+  {
+    "group": "mixin_completion",
+    "legacyTestPath": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixin/MixinTargetCompletionServiceTest.kt",
+    "legacyClass": "MixinTargetCompletionServiceTest",
+    "legacyCase": "sortKeyIsStable",
+    "baselineSha256": "c659a921518656f5aefd5ffc2934705f003fba05015177af167d2e7d1b895642",
+    "rustTest": "mcdev-core/tests/mixin_completion_legacy.rs::mixin_target_completion_service_test_sort_key_is_stable",
+    "status": "ported",
+    "evidenceLog": "build/rust-test-logs/project-completion-final/affected.stdout.log"
+  },
+  {
+    "group": "project",
+    "legacyTestPath": "mcdev-jdtls-extension/src/test/kotlin/io/github/mcdev/jdtls/project/FileBasedProjectContextServiceTest.kt",
+    "legacyClass": "FileBasedProjectContextServiceTest",
+    "legacyCase": "discoversFabricPlatformFromFixtureGradle",
+    "baselineSha256": "5a1d62704565ac41a7ff281396f5515d2f01937efaad80730b07cc8de19ba2ce",
+    "rustTest": "mcdev-core/tests/project_legacy_stateful.rs::file_based_project_context_service_test_discovers_fabric_platform_from_fixture_gradle",
+    "status": "ported",
+    "evidenceLog": "build/rust-test-logs/project-completion-final/affected.stdout.log"
+  },
+  {
+    "group": "project",
+    "legacyTestPath": "mcdev-jdtls-extension/src/test/kotlin/io/github/mcdev/jdtls/project/FileBasedProjectContextServiceTest.kt",
+    "legacyClass": "FileBasedProjectContextServiceTest",
+    "legacyCase": "discoversMixinConfigFromFixture",
+    "baselineSha256": "5a1d62704565ac41a7ff281396f5515d2f01937efaad80730b07cc8de19ba2ce",
+    "rustTest": "mcdev-core/tests/project_legacy_stateful.rs::file_based_project_context_service_test_discovers_mixin_config_from_fixture",
+    "status": "ported",
+    "evidenceLog": "build/rust-test-logs/project-completion-final/affected.stdout.log"
+  },
+  {
+    "group": "project",
+    "legacyTestPath": "mcdev-jdtls-extension/src/test/kotlin/io/github/mcdev/jdtls/project/FileBasedProjectContextServiceTest.kt",
+    "legacyClass": "FileBasedProjectContextServiceTest",
+    "legacyCase": "discoversMappingsFromFixture",
+    "baselineSha256": "5a1d62704565ac41a7ff281396f5515d2f01937efaad80730b07cc8de19ba2ce",
+    "rustTest": "mcdev-core/tests/project_legacy_stateful.rs::file_based_project_context_service_test_discovers_mappings_from_fixture",
+    "status": "ported",
+    "evidenceLog": "build/rust-test-logs/project-completion-final/affected.stdout.log"
+  },
+  {
+    "group": "project",
+    "legacyTestPath": "mcdev-jdtls-extension/src/test/kotlin/io/github/mcdev/jdtls/project/FileBasedProjectContextServiceTest.kt",
+    "legacyClass": "FileBasedProjectContextServiceTest",
+    "legacyCase": "discoversClasspathDirectory",
+    "baselineSha256": "5a1d62704565ac41a7ff281396f5515d2f01937efaad80730b07cc8de19ba2ce",
+    "rustTest": "mcdev-core/tests/project_legacy_stateful.rs::file_based_project_context_service_test_discovers_classpath_directory",
+    "status": "ported",
+    "evidenceLog": "build/rust-test-logs/project-completion-final/affected.stdout.log"
+  },
+  {
+    "group": "project",
+    "legacyTestPath": "mcdev-jdtls-extension/src/test/kotlin/io/github/mcdev/jdtls/project/FileBasedProjectContextServiceTest.kt",
+    "legacyClass": "FileBasedProjectContextServiceTest",
+    "legacyCase": "discoversKotlinOnlySourceSetsAndOutputsWithoutJdt",
+    "baselineSha256": "5a1d62704565ac41a7ff281396f5515d2f01937efaad80730b07cc8de19ba2ce",
+    "rustTest": "mcdev-core/tests/project_legacy_stateful.rs::file_based_project_context_service_test_discovers_kotlin_only_source_sets_and_outputs_without_jdt",
+    "status": "ported",
+    "evidenceLog": "build/rust-test-logs/project-completion-final/affected.stdout.log"
+  },
+  {
+    "group": "project",
+    "legacyTestPath": "mcdev-jdtls-extension/src/test/kotlin/io/github/mcdev/jdtls/project/FileBasedProjectContextServiceTest.kt",
+    "legacyClass": "FileBasedProjectContextServiceTest",
+    "legacyCase": "mixedSourceSetRetainsBothJavaAndKotlinClasspathOutputs",
+    "baselineSha256": "5a1d62704565ac41a7ff281396f5515d2f01937efaad80730b07cc8de19ba2ce",
+    "rustTest": "mcdev-core/tests/project_legacy_stateful.rs::file_based_project_context_service_test_mixed_source_set_retains_both_java_and_kotlin_classpath_outputs",
+    "status": "ported",
+    "evidenceLog": "build/rust-test-logs/project-completion-final/affected.stdout.log"
+  },
+  {
+    "group": "project",
+    "legacyTestPath": "mcdev-jdtls-extension/src/test/kotlin/io/github/mcdev/jdtls/project/FileBasedProjectContextServiceTest.kt",
+    "legacyClass": "FileBasedProjectContextServiceTest",
+    "legacyCase": "sessionIndexesClasspathClasses",
+    "baselineSha256": "5a1d62704565ac41a7ff281396f5515d2f01937efaad80730b07cc8de19ba2ce",
+    "rustTest": "host_project::sessionIndexesClasspathClasses",
+    "status": "ported_native",
+    "evidenceLog": "build/rust-test-logs/host-project-zero-capacity-final/affected.stdout.log",
+    "remainingAssertions": [],
+    "fixture": "project_files/SimpleTarget.class.bin and fabric-basic",
+    "hostWireConnection": "pending_ktlsp_capability",
+    "boundaryEvidence": "The same HostProjectSession from original fabric-basic FileBasedProjectContextService cached context exposes READY and its selected SimpleTarget.class bytes/provider.class_count >= 1"
+  },
+  {
+    "group": "project",
+    "legacyTestPath": "mcdev-jdtls-extension/src/test/kotlin/io/github/mcdev/jdtls/project/FileBasedProjectContextServiceTest.kt",
+    "legacyClass": "FileBasedProjectContextServiceTest",
+    "legacyCase": "reindexRefreshesSession",
+    "baselineSha256": "5a1d62704565ac41a7ff281396f5515d2f01937efaad80730b07cc8de19ba2ce",
+    "rustTest": "mcdev-core/tests/project_legacy_stateful.rs::file_based_project_context_service_test_reindex_refreshes_session",
+    "status": "ported",
+    "evidenceLog": "build/rust-test-logs/project-completion-final/affected.stdout.log"
+  },
+  {
+    "group": "project",
+    "legacyTestPath": "mcdev-jdtls-extension/src/test/kotlin/io/github/mcdev/jdtls/project/FileBasedProjectContextServiceTest.kt",
+    "legacyClass": "FileBasedProjectContextServiceTest",
+    "legacyCase": "concurrentLoadCachedSessionReturnsSingleSessionIdentityAndVersion",
+    "baselineSha256": "5a1d62704565ac41a7ff281396f5515d2f01937efaad80730b07cc8de19ba2ce",
+    "rustTest": "mcdev-core/tests/project.rs::concurrent_cold_load_builds_once",
+    "status": "ported",
+    "evidenceLog": "build/rust-test-logs/project-completion-final/affected.stdout.log"
+  },
+  {
+    "group": "project",
+    "legacyTestPath": "mcdev-jdtls-extension/src/test/kotlin/io/github/mcdev/jdtls/project/FileBasedProjectContextServiceTest.kt",
+    "legacyClass": "FileBasedProjectContextServiceTest",
+    "legacyCase": "warmCacheHitForOneWorkspaceDoesNotWaitOnColdBuildForAnother",
+    "baselineSha256": "5a1d62704565ac41a7ff281396f5515d2f01937efaad80730b07cc8de19ba2ce",
+    "rustTest": "mcdev-core/tests/project.rs::warm_workspace_does_not_wait_for_other_workspaces_cold_build",
+    "status": "ported",
+    "evidenceLog": "build/rust-test-logs/project-completion-final/affected.stdout.log"
+  },
+  {
+    "group": "project",
+    "legacyTestPath": "mcdev-jdtls-extension/src/test/kotlin/io/github/mcdev/jdtls/project/FileBasedProjectContextServiceTest.kt",
+    "legacyClass": "FileBasedProjectContextServiceTest",
+    "legacyCase": "concurrentColdLoadAndReindexAlwaysReindexesAndBumpsVersion",
+    "baselineSha256": "5a1d62704565ac41a7ff281396f5515d2f01937efaad80730b07cc8de19ba2ce",
+    "rustTest": "mcdev-core/tests/project.rs::reindex_waits_for_cold_load_then_builds_new_version",
+    "status": "ported",
+    "evidenceLog": "build/rust-test-logs/project-completion-final/affected.stdout.log"
+  },
+  {
+    "group": "project",
+    "legacyTestPath": "mcdev-jdtls-extension/src/test/kotlin/io/github/mcdev/jdtls/project/FileBasedProjectContextServiceTest.kt",
+    "legacyClass": "FileBasedProjectContextServiceTest",
+    "legacyCase": "failedColdLoadPropagatesBuildFailureWithoutSecondarySessionMissing",
+    "baselineSha256": "5a1d62704565ac41a7ff281396f5515d2f01937efaad80730b07cc8de19ba2ce",
+    "rustTest": "mcdev-core/tests/project.rs::cold_failure_is_returned_once_and_next_load_recovers",
+    "status": "ported",
+    "evidenceLog": "build/rust-test-logs/project-completion-final/affected.stdout.log"
+  },
+  {
+    "group": "project",
+    "legacyTestPath": "mcdev-jdtls-extension/src/test/kotlin/io/github/mcdev/jdtls/project/FileBasedProjectContextServiceTest.kt",
+    "legacyClass": "FileBasedProjectContextServiceTest",
+    "legacyCase": "cachedSessionReportsHitAndReindexBumpsVersion",
+    "baselineSha256": "5a1d62704565ac41a7ff281396f5515d2f01937efaad80730b07cc8de19ba2ce",
+    "rustTest": "mcdev-core/tests/project_legacy_stateful.rs::file_based_project_context_service_test_cached_session_reports_hit_and_reindex_bumps_version",
+    "status": "ported",
+    "evidenceLog": "build/rust-test-logs/project-completion-final/affected.stdout.log"
+  },
+  {
+    "group": "project",
+    "legacyTestPath": "mcdev-jdtls-extension/src/test/kotlin/io/github/mcdev/jdtls/project/FileBasedProjectContextServiceTest.kt",
+    "legacyClass": "FileBasedProjectContextServiceTest",
+    "legacyCase": "emptyWorkspaceHasNoClasspathEntries",
+    "baselineSha256": "5a1d62704565ac41a7ff281396f5515d2f01937efaad80730b07cc8de19ba2ce",
+    "rustTest": "mcdev-core/tests/project_legacy_stateful.rs::file_based_project_context_service_test_empty_workspace_has_no_classpath_entries",
+    "status": "ported",
+    "evidenceLog": "build/rust-test-logs/project-completion-final/affected.stdout.log"
+  },
+  {
+    "group": "project",
+    "legacyTestPath": "mcdev-jdtls-extension/src/test/kotlin/io/github/mcdev/jdtls/project/FileBasedProjectContextServiceTest.kt",
+    "legacyClass": "FileBasedProjectContextServiceTest",
+    "legacyCase": "discoverClasspathIncludesMinecraftJarsFromJarRoots",
+    "baselineSha256": "5a1d62704565ac41a7ff281396f5515d2f01937efaad80730b07cc8de19ba2ce",
+    "rustTest": "mcdev-core/tests/project_legacy_stateful.rs::file_based_project_context_service_test_discover_classpath_includes_minecraft_jars_from_jar_roots",
+    "status": "ported",
+    "evidenceLog": "build/rust-test-logs/project-completion-final/affected.stdout.log"
+  },
+  {
+    "group": "project",
+    "legacyTestPath": "mcdev-jdtls-extension/src/test/kotlin/io/github/mcdev/jdtls/project/FileBasedProjectContextServiceTest.kt",
+    "legacyClass": "FileBasedProjectContextServiceTest",
+    "legacyCase": "discoversLoomRemappedJarsInEnhancedClasspath",
+    "baselineSha256": "5a1d62704565ac41a7ff281396f5515d2f01937efaad80730b07cc8de19ba2ce",
+    "rustTest": "mcdev-core/tests/project_legacy_stateful.rs::file_based_project_context_service_test_discovers_loom_remapped_jars_in_enhanced_classpath",
+    "status": "ported",
+    "evidenceLog": "build/rust-test-logs/project-completion-final/affected.stdout.log"
+  },
+  {
+    "group": "project",
+    "legacyTestPath": "mcdev-jdtls-extension/src/test/kotlin/io/github/mcdev/jdtls/project/FileBasedProjectContextServiceTest.kt",
+    "legacyClass": "FileBasedProjectContextServiceTest",
+    "legacyCase": "discoversMappedSourcesForLoomFixture",
+    "baselineSha256": "5a1d62704565ac41a7ff281396f5515d2f01937efaad80730b07cc8de19ba2ce",
+    "rustTest": "mcdev-core/tests/project_legacy_stateful.rs::file_based_project_context_service_test_discovers_mapped_sources_for_loom_fixture",
+    "status": "ported",
+    "evidenceLog": "build/rust-test-logs/project-completion-final/affected.stdout.log"
+  },
+  {
+    "group": "project",
+    "legacyTestPath": "mcdev-jdtls-extension/src/test/kotlin/io/github/mcdev/jdtls/project/FileBasedProjectContextServiceTest.kt",
+    "legacyClass": "FileBasedProjectContextServiceTest",
+    "legacyCase": "discoversMainAndClientSourceSetsFromFixture",
+    "baselineSha256": "5a1d62704565ac41a7ff281396f5515d2f01937efaad80730b07cc8de19ba2ce",
+    "rustTest": "mcdev-core/tests/project_legacy_stateful.rs::file_based_project_context_service_test_discovers_main_and_client_source_sets_from_fixture",
+    "status": "ported",
+    "evidenceLog": "build/rust-test-logs/project-completion-final/affected.stdout.log"
+  },
+  {
+    "group": "project",
+    "legacyTestPath": "mcdev-jdtls-extension/src/test/kotlin/io/github/mcdev/jdtls/project/FileBasedProjectContextServiceTest.kt",
+    "legacyClass": "FileBasedProjectContextServiceTest",
+    "legacyCase": "discoversArchitecturyStyleSourceSetsInSortedOrder",
+    "baselineSha256": "5a1d62704565ac41a7ff281396f5515d2f01937efaad80730b07cc8de19ba2ce",
+    "rustTest": "mcdev-core/tests/project_legacy_stateful.rs::file_based_project_context_service_test_discovers_architectury_style_source_sets_in_sorted_order",
+    "status": "ported",
+    "evidenceLog": "build/rust-test-logs/project-completion-final/affected.stdout.log"
+  },
+  {
+    "group": "project",
+    "legacyTestPath": "mcdev-jdtls-extension/src/test/kotlin/io/github/mcdev/jdtls/project/FileBasedProjectContextServiceTest.kt",
+    "legacyClass": "FileBasedProjectContextServiceTest",
+    "legacyCase": "preservesMappedSourcesOnMainSourceSetOnly",
+    "baselineSha256": "5a1d62704565ac41a7ff281396f5515d2f01937efaad80730b07cc8de19ba2ce",
+    "rustTest": "mcdev-core/tests/project_legacy_stateful.rs::file_based_project_context_service_test_preserves_mapped_sources_on_main_source_set_only",
+    "status": "ported",
+    "evidenceLog": "build/rust-test-logs/project-completion-final/affected.stdout.log"
+  },
+  {
+    "group": "project",
+    "legacyTestPath": "mcdev-jdtls-extension/src/test/kotlin/io/github/mcdev/jdtls/project/FileBasedProjectContextServiceTest.kt",
+    "legacyClass": "FileBasedProjectContextServiceTest",
+    "legacyCase": "discoversGeneratedOutputsAndSourceSetProjectOutputs",
+    "baselineSha256": "5a1d62704565ac41a7ff281396f5515d2f01937efaad80730b07cc8de19ba2ce",
+    "rustTest": "mcdev-core/tests/project_legacy_stateful.rs::file_based_project_context_service_test_discovers_generated_outputs_and_source_set_project_outputs",
+    "status": "ported",
+    "evidenceLog": "build/rust-test-logs/project-completion-final/affected.stdout.log"
+  }
+]

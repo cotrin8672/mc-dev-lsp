@@ -1,0 +1,209 @@
+[
+  {
+    "legacyTestPath": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixin/e2e/MixinServiceFacadeRoutingTest.kt",
+    "legacyClass": "MixinServiceFacadeRoutingTest",
+    "legacyCase": "routesModifyConstantLocalOrdinalValueCompletionFromConstantSamples",
+    "baselineSha256": "e39667cbd7b2fa4f413957c6770e5f0976c54a6a12e21e1d7f56617124fd8e04",
+    "status": "pending_caller_integration",
+    "requiredProof": "Run the native Facade's final completion/diagnostic/cancellation/provider behavior with every original assertion; a Local/Share callee capture does not establish caller parity.",
+    "calleeEvidence": null
+  },
+  {
+    "legacyTestPath": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixin/e2e/MixinServiceFacadeRoutingTest.kt",
+    "legacyClass": "MixinServiceFacadeRoutingTest",
+    "legacyCase": "routesLocalOrdinalValueCompletionFromFixtureSnapshots",
+    "baselineSha256": "e39667cbd7b2fa4f413957c6770e5f0976c54a6a12e21e1d7f56617124fd8e04",
+    "status": "pending_caller_integration",
+    "requiredProof": "Run the native Facade's final completion/diagnostic/cancellation/provider behavior with every original assertion; a Local/Share callee capture does not establish caller parity.",
+    "calleeEvidence": null
+  },
+  {
+    "legacyTestPath": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixin/e2e/MixinServiceFacadeRoutingTest.kt",
+    "legacyClass": "MixinServiceFacadeRoutingTest",
+    "legacyCase": "routesLocalIndexValueCompletionFromFixtureSnapshots",
+    "baselineSha256": "e39667cbd7b2fa4f413957c6770e5f0976c54a6a12e21e1d7f56617124fd8e04",
+    "status": "pending_caller_integration",
+    "requiredProof": "Run the native Facade's final completion/diagnostic/cancellation/provider behavior with every original assertion; a Local/Share callee capture does not establish caller parity.",
+    "calleeEvidence": null
+  },
+  {
+    "legacyTestPath": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixin/e2e/MixinServiceFacadeRoutingTest.kt",
+    "legacyClass": "MixinServiceFacadeRoutingTest",
+    "legacyCase": "handlerParameterLocalAttributeCompletionOmitsType",
+    "baselineSha256": "e39667cbd7b2fa4f413957c6770e5f0976c54a6a12e21e1d7f56617124fd8e04",
+    "status": "pending_caller_integration",
+    "requiredProof": "Run the native Facade's final completion/diagnostic/cancellation/provider behavior with every original assertion; a Local/Share callee capture does not establish caller parity.",
+    "calleeEvidence": null
+  },
+  {
+    "legacyTestPath": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixin/e2e/MixinServiceFacadeRoutingTest.kt",
+    "legacyClass": "MixinServiceFacadeRoutingTest",
+    "legacyCase": "wrapMethodLocalCompletionFailsClosed",
+    "baselineSha256": "e39667cbd7b2fa4f413957c6770e5f0976c54a6a12e21e1d7f56617124fd8e04",
+    "status": "pending_caller_integration",
+    "requiredProof": "Run the native Facade's final completion/diagnostic/cancellation/provider behavior with every original assertion; a Local/Share callee capture does not establish caller parity.",
+    "calleeEvidence": null
+  },
+  {
+    "legacyTestPath": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixin/e2e/MixinServiceFacadeRoutingTest.kt",
+    "legacyClass": "MixinServiceFacadeRoutingTest",
+    "legacyCase": "definitionNestedLocalAttributeCompletionIncludesType",
+    "baselineSha256": "e39667cbd7b2fa4f413957c6770e5f0976c54a6a12e21e1d7f56617124fd8e04",
+    "status": "pending_caller_integration",
+    "requiredProof": "Run the native Facade's final completion/diagnostic/cancellation/provider behavior with every original assertion; a Local/Share callee capture does not establish caller parity.",
+    "calleeEvidence": null
+  },
+  {
+    "legacyTestPath": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixin/e2e/MixinServiceFacadeRoutingTest.kt",
+    "legacyClass": "MixinServiceFacadeRoutingTest",
+    "legacyCase": "localValueCompletionFailsClosedWithoutBytecode",
+    "baselineSha256": "e39667cbd7b2fa4f413957c6770e5f0976c54a6a12e21e1d7f56617124fd8e04",
+    "status": "pending_caller_integration",
+    "requiredProof": "Run the native Facade's final completion/diagnostic/cancellation/provider behavior with every original assertion; a Local/Share callee capture does not establish caller parity.",
+    "calleeEvidence": null
+  },
+  {
+    "legacyTestPath": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixin/e2e/MixinServiceFacadeRoutingTest.kt",
+    "legacyClass": "MixinServiceFacadeRoutingTest",
+    "legacyCase": "cancelledLocalCaptureCompletionPropagatesAndNextRequestRecovers",
+    "baselineSha256": "e39667cbd7b2fa4f413957c6770e5f0976c54a6a12e21e1d7f56617124fd8e04",
+    "status": "pending_caller_integration",
+    "requiredProof": "Run the native Facade's final completion/diagnostic/cancellation/provider behavior with every original assertion; a Local/Share callee capture does not establish caller parity.",
+    "calleeEvidence": null
+  },
+  {
+    "legacyTestPath": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixin/e2e/MixinServiceFacadeRoutingTest.kt",
+    "legacyClass": "MixinServiceFacadeRoutingTest",
+    "legacyCase": "diagnoseLocalCaptureIndex99ReportsNotFound",
+    "baselineSha256": "e39667cbd7b2fa4f413957c6770e5f0976c54a6a12e21e1d7f56617124fd8e04",
+    "status": "pending_caller_integration",
+    "requiredProof": "Run the native Facade's final completion/diagnostic/cancellation/provider behavior with every original assertion; a Local/Share callee capture does not establish caller parity.",
+    "calleeEvidence": null
+  },
+  {
+    "legacyTestPath": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixin/e2e/MixinServiceFacadeRoutingTest.kt",
+    "legacyClass": "MixinServiceFacadeRoutingTest",
+    "legacyCase": "diagnoseImplicitLocalCaptureReportsAmbiguous",
+    "baselineSha256": "e39667cbd7b2fa4f413957c6770e5f0976c54a6a12e21e1d7f56617124fd8e04",
+    "status": "pending_caller_integration",
+    "requiredProof": "Run the native Facade's final completion/diagnostic/cancellation/provider behavior with every original assertion; a Local/Share callee capture does not establish caller parity.",
+    "calleeEvidence": null
+  },
+  {
+    "legacyTestPath": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixin/e2e/MixinServiceFacadeRoutingTest.kt",
+    "legacyClass": "MixinServiceFacadeRoutingTest",
+    "legacyCase": "diagnoseLocalCaptureIndex3ProducesNoLocalCaptureDiagnostics",
+    "baselineSha256": "e39667cbd7b2fa4f413957c6770e5f0976c54a6a12e21e1d7f56617124fd8e04",
+    "status": "pending_caller_integration",
+    "requiredProof": "Run the native Facade's final completion/diagnostic/cancellation/provider behavior with every original assertion; a Local/Share callee capture does not establish caller parity.",
+    "calleeEvidence": null
+  },
+  {
+    "legacyTestPath": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixin/e2e/MixinServiceFacadeRoutingTest.kt",
+    "legacyClass": "MixinServiceFacadeRoutingTest",
+    "legacyCase": "diagnoseLocalCaptureFailsClosedWithoutBytecode",
+    "baselineSha256": "e39667cbd7b2fa4f413957c6770e5f0976c54a6a12e21e1d7f56617124fd8e04",
+    "status": "pending_caller_integration",
+    "requiredProof": "Run the native Facade's final completion/diagnostic/cancellation/provider behavior with every original assertion; a Local/Share callee capture does not establish caller parity.",
+    "calleeEvidence": null
+  },
+  {
+    "legacyTestPath": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixin/e2e/MixinServiceFacadeRoutingTest.kt",
+    "legacyClass": "MixinServiceFacadeRoutingTest",
+    "legacyCase": "routesInjectLocalOrdinalValueCompletionFromFixtureSnapshots",
+    "baselineSha256": "e39667cbd7b2fa4f413957c6770e5f0976c54a6a12e21e1d7f56617124fd8e04",
+    "status": "pending_caller_integration",
+    "requiredProof": "Run the native Facade's final completion/diagnostic/cancellation/provider behavior with every original assertion; a Local/Share callee capture does not establish caller parity.",
+    "calleeEvidence": null
+  },
+  {
+    "legacyTestPath": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixin/e2e/MixinServiceFacadeRoutingTest.kt",
+    "legacyClass": "MixinServiceFacadeRoutingTest",
+    "legacyCase": "routesInjectLocalOrdinalValueCompletionWhenEarlierMethodSelectorIsUnresolved",
+    "baselineSha256": "e39667cbd7b2fa4f413957c6770e5f0976c54a6a12e21e1d7f56617124fd8e04",
+    "status": "pending_caller_integration",
+    "requiredProof": "Run the native Facade's final completion/diagnostic/cancellation/provider behavior with every original assertion; a Local/Share callee capture does not establish caller parity.",
+    "calleeEvidence": null
+  },
+  {
+    "legacyTestPath": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixin/e2e/MixinServiceFacadeRoutingTest.kt",
+    "legacyClass": "MixinServiceFacadeRoutingTest",
+    "legacyCase": "diagnoseInjectLocalCaptureIndex99ReportsNotFound",
+    "baselineSha256": "e39667cbd7b2fa4f413957c6770e5f0976c54a6a12e21e1d7f56617124fd8e04",
+    "status": "pending_caller_integration",
+    "requiredProof": "Run the native Facade's final completion/diagnostic/cancellation/provider behavior with every original assertion; a Local/Share callee capture does not establish caller parity.",
+    "calleeEvidence": null
+  },
+  {
+    "legacyTestPath": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixin/e2e/MixinServiceFacadeRoutingTest.kt",
+    "legacyClass": "MixinServiceFacadeRoutingTest",
+    "legacyCase": "diagnoseLocalCaptureAtArrayDeduplicatesIdenticalDiagnostics",
+    "baselineSha256": "e39667cbd7b2fa4f413957c6770e5f0976c54a6a12e21e1d7f56617124fd8e04",
+    "status": "pending_caller_integration",
+    "requiredProof": "Run the native Facade's final completion/diagnostic/cancellation/provider behavior with every original assertion; a Local/Share callee capture does not establish caller parity.",
+    "calleeEvidence": null
+  },
+  {
+    "legacyTestPath": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixin/e2e/MixinServiceFacadeRoutingTest.kt",
+    "legacyClass": "MixinServiceFacadeRoutingTest",
+    "legacyCase": "diagnoseStandardInjectNonTrailingLocalReportsPlacementError",
+    "baselineSha256": "e39667cbd7b2fa4f413957c6770e5f0976c54a6a12e21e1d7f56617124fd8e04",
+    "status": "pending_caller_integration",
+    "requiredProof": "Run the native Facade's final completion/diagnostic/cancellation/provider behavior with every original assertion; a Local/Share callee capture does not establish caller parity.",
+    "calleeEvidence": null
+  },
+  {
+    "legacyTestPath": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixin/e2e/MixinServiceFacadeRoutingTest.kt",
+    "legacyClass": "MixinServiceFacadeRoutingTest",
+    "legacyCase": "diagnoseStandardInjectInvalidShareAndCancellableTypesReportExpectedCodes",
+    "baselineSha256": "e39667cbd7b2fa4f413957c6770e5f0976c54a6a12e21e1d7f56617124fd8e04",
+    "status": "pending_caller_integration",
+    "requiredProof": "Run the native Facade's final completion/diagnostic/cancellation/provider behavior with every original assertion; a Local/Share callee capture does not establish caller parity.",
+    "calleeEvidence": null
+  },
+  {
+    "legacyTestPath": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixin/e2e/MixinServiceFacadeRoutingTest.kt",
+    "legacyClass": "MixinServiceFacadeRoutingTest",
+    "legacyCase": "diagnoseStandardInjectCancellableAcceptsCapturedLocalsAfterCallback",
+    "baselineSha256": "e39667cbd7b2fa4f413957c6770e5f0976c54a6a12e21e1d7f56617124fd8e04",
+    "status": "pending_caller_integration",
+    "requiredProof": "Run the native Facade's final completion/diagnostic/cancellation/provider behavior with every original assertion; a Local/Share callee capture does not establish caller parity.",
+    "calleeEvidence": null
+  },
+  {
+    "legacyTestPath": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixin/e2e/MixinServiceFacadeRoutingTest.kt",
+    "legacyClass": "MixinServiceFacadeRoutingTest",
+    "legacyCase": "routesShareIdCompletionAcrossMatchingHandlersAndExplicitNamespaces",
+    "baselineSha256": "e39667cbd7b2fa4f413957c6770e5f0976c54a6a12e21e1d7f56617124fd8e04",
+    "status": "pending_caller_integration",
+    "requiredProof": "Run the native Facade's final completion/diagnostic/cancellation/provider behavior with every original assertion; a Local/Share callee capture does not establish caller parity.",
+    "calleeEvidence": "legacy_calls.jsonl ShareCompletionService.complete"
+  },
+  {
+    "legacyTestPath": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixin/e2e/MixinServiceFacadeRoutingTest.kt",
+    "legacyClass": "MixinServiceFacadeRoutingTest",
+    "legacyCase": "shareIdCompletionIncludesMatchingIdsFromAdditionalSources",
+    "baselineSha256": "e39667cbd7b2fa4f413957c6770e5f0976c54a6a12e21e1d7f56617124fd8e04",
+    "status": "pending_caller_integration",
+    "requiredProof": "Run the native Facade's final completion/diagnostic/cancellation/provider behavior with every original assertion; a Local/Share callee capture does not establish caller parity.",
+    "calleeEvidence": "legacy_calls.jsonl ShareCompletionService.complete"
+  },
+  {
+    "legacyTestPath": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixin/e2e/MixinServiceFacadeRoutingTest.kt",
+    "legacyClass": "MixinServiceFacadeRoutingTest",
+    "legacyCase": "routesShareIdCompletionWithJavaEscapedValues",
+    "baselineSha256": "e39667cbd7b2fa4f413957c6770e5f0976c54a6a12e21e1d7f56617124fd8e04",
+    "status": "pending_caller_integration",
+    "requiredProof": "Run the native Facade's final completion/diagnostic/cancellation/provider behavior with every original assertion; a Local/Share callee capture does not establish caller parity.",
+    "calleeEvidence": "legacy_calls.jsonl ShareCompletionService.complete"
+  },
+  {
+    "legacyTestPath": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixin/e2e/MixinServiceFacadeRoutingTest.kt",
+    "legacyClass": "MixinServiceFacadeRoutingTest",
+    "legacyCase": "shareSourceProviderIsNotCalledForNonShareCompletion",
+    "baselineSha256": "e39667cbd7b2fa4f413957c6770e5f0976c54a6a12e21e1d7f56617124fd8e04",
+    "status": "pending_caller_integration",
+    "requiredProof": "Run the native Facade's final completion/diagnostic/cancellation/provider behavior with every original assertion; a Local/Share callee capture does not establish caller parity.",
+    "calleeEvidence": null
+  }
+]

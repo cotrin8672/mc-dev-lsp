@@ -790,6 +790,28 @@ dependencies = [
 ]
 
 [[package]]
+name = "mcdev-companion"
+version = "0.1.0"
+dependencies = [
+ "getrandom 0.3.4",
+ "mcdev-core",
+ "mcdev-protocol",
+ "serde",
+ "serde_json",
+]
+
+[[package]]
+name = "mcdev-core"
+version = "0.1.0"
+dependencies = [
+ "noak",
+ "regex",
+ "serde",
+ "serde_json",
+ "sha2",
+]
+
+[[package]]
 name = "mcdev-ktlsp"
 version = "0.1.0"
 dependencies = [
@@ -798,6 +820,15 @@ dependencies = [
  "tokio",
  "tower-lsp-server",
  "tracing-subscriber",
+]
+
+[[package]]
+name = "mcdev-protocol"
+version = "0.1.0"
+dependencies = [
+ "mcdev-core",
+ "serde",
+ "serde_json",
 ]
 
 [[package]]

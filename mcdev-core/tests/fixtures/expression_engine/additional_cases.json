@@ -1,0 +1,32 @@
+[
+  {
+    "legacyCase": "mcdev-core/tests/fixtures/expression_engine/EngineAdditionalOracle.kt::grammarEdges",
+    "status": "passed",
+    "calls": 49
+  },
+  {
+    "legacyCase": "mcdev-core/tests/fixtures/expression_engine/EngineAdditionalOracle.kt::isolatedUtf16Literals",
+    "status": "passed",
+    "calls": 25
+  },
+  {
+    "legacyCase": "mcdev-core/tests/fixtures/expression_engine/EngineAdditionalOracle.kt::javacFlowCases",
+    "status": "passed",
+    "calls": 4764
+  },
+  {
+    "legacyCase": "mcdev-core/tests/fixtures/expression_engine/EngineAdditionalOracle.kt::malformedFramesAndStacks",
+    "status": "passed",
+    "calls": 26
+  },
+  {
+    "legacyCase": "mcdev-core/tests/fixtures/expression_engine/EngineAdditionalOracle.kt::receiverValidationEdges",
+    "status": "passed",
+    "calls": 40
+  },
+  {
+    "legacyCase": "mcdev-core/tests/fixtures/expression_engine/EngineAdditionalOracle.kt::stackWideAndConstantKinds",
+    "status": "passed",
+    "calls": 360
+  }
+]

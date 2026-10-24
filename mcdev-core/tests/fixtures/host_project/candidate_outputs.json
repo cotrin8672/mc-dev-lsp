@@ -1,0 +1,296 @@
+[
+  {
+    "owner": "test/OverloadInvokeSamples",
+    "method": "run",
+    "descriptor": null,
+    "atValue": "INVOKE",
+    "output": [
+      {
+        "owner": "java/io/PrintStream",
+        "name": "println",
+        "descriptor": "(Ljava/lang/String;)V",
+        "displayLabel": "println(String): void",
+        "detail": "java.io",
+        "kind": "INVOKE",
+        "ordinal": 0,
+        "namespace": "NAMED",
+        "operationKind": "INVOKE_VIRTUAL",
+        "instructionOccurrenceIndex": 2,
+        "occurrenceResultClassification": "VOID",
+        "conditionOpcode": null,
+        "constantValue": null
+      },
+      {
+        "owner": "java/lang/Math",
+        "name": "abs",
+        "descriptor": "(I)I",
+        "displayLabel": "abs(int): int",
+        "detail": "java.lang",
+        "kind": "INVOKE",
+        "ordinal": 0,
+        "namespace": "NAMED",
+        "operationKind": "INVOKE_STATIC",
+        "instructionOccurrenceIndex": 1,
+        "occurrenceResultClassification": "IMMEDIATELY_POPPED",
+        "conditionOpcode": null,
+        "constantValue": null
+      }
+    ]
+  },
+  {
+    "owner": "test/OverloadInvokeSamples",
+    "method": "run",
+    "descriptor": "()V",
+    "atValue": "INVOKE_ASSIGN",
+    "output": [
+      {
+        "owner": "java/io/PrintStream",
+        "name": "println",
+        "descriptor": "(Ljava/lang/String;)V",
+        "displayLabel": "println(String): void",
+        "detail": "java.io",
+        "kind": "INVOKE",
+        "ordinal": 0,
+        "namespace": "NAMED",
+        "operationKind": "INVOKE_VIRTUAL",
+        "instructionOccurrenceIndex": 2,
+        "occurrenceResultClassification": "VOID",
+        "conditionOpcode": null,
+        "constantValue": null
+      }
+    ]
+  },
+  {
+    "owner": "test/OverloadInvokeSamples",
+    "method": "run",
+    "descriptor": "(I)V",
+    "atValue": "INVOKE",
+    "output": [
+      {
+        "owner": "java/lang/Math",
+        "name": "abs",
+        "descriptor": "(I)I",
+        "displayLabel": "abs(int): int",
+        "detail": "java.lang",
+        "kind": "INVOKE",
+        "ordinal": 0,
+        "namespace": "NAMED",
+        "operationKind": "INVOKE_STATIC",
+        "instructionOccurrenceIndex": 1,
+        "occurrenceResultClassification": "IMMEDIATELY_POPPED",
+        "conditionOpcode": null,
+        "constantValue": null
+      }
+    ]
+  },
+  {
+    "owner": "test/FieldAccessSamples",
+    "method": "accessFields",
+    "descriptor": "()V",
+    "atValue": "FIELD",
+    "output": [
+      {
+        "owner": "test/FieldAccessSamples",
+        "name": "STATIC_FIELD",
+        "descriptor": "I",
+        "displayLabel": "STATIC_FIELD: int",
+        "detail": "test",
+        "kind": "FIELD",
+        "ordinal": 0,
+        "namespace": "NAMED",
+        "operationKind": "FIELD_GET_STATIC",
+        "instructionOccurrenceIndex": 0,
+        "occurrenceResultClassification": "RETAINED",
+        "conditionOpcode": null,
+        "constantValue": null
+      },
+      {
+        "owner": "test/FieldAccessSamples",
+        "name": "STATIC_FIELD",
+        "descriptor": "I",
+        "displayLabel": "STATIC_FIELD: int",
+        "detail": "test",
+        "kind": "FIELD",
+        "ordinal": 0,
+        "namespace": "NAMED",
+        "operationKind": "FIELD_PUT_STATIC",
+        "instructionOccurrenceIndex": 3,
+        "occurrenceResultClassification": "VOID",
+        "conditionOpcode": null,
+        "constantValue": null
+      },
+      {
+        "owner": "test/FieldAccessSamples",
+        "name": "instanceField",
+        "descriptor": "I",
+        "displayLabel": "instanceField: int",
+        "detail": "test",
+        "kind": "FIELD",
+        "ordinal": 0,
+        "namespace": "NAMED",
+        "operationKind": "FIELD_GET_INSTANCE",
+        "instructionOccurrenceIndex": 5,
+        "occurrenceResultClassification": "RETAINED",
+        "conditionOpcode": null,
+        "constantValue": null
+      },
+      {
+        "owner": "test/FieldAccessSamples",
+        "name": "instanceField",
+        "descriptor": "I",
+        "displayLabel": "instanceField: int",
+        "detail": "test",
+        "kind": "FIELD",
+        "ordinal": 0,
+        "namespace": "NAMED",
+        "operationKind": "FIELD_PUT_INSTANCE",
+        "instructionOccurrenceIndex": 9,
+        "occurrenceResultClassification": "VOID",
+        "conditionOpcode": null,
+        "constantValue": null
+      }
+    ]
+  },
+  {
+    "owner": "test/ConstantSamples",
+    "method": "smallInts",
+    "descriptor": "()V",
+    "atValue": "CONSTANT",
+    "output": [
+      {
+        "owner": "",
+        "name": "",
+        "descriptor": "",
+        "displayLabel": "",
+        "detail": "",
+        "kind": "CONSTANT",
+        "ordinal": 0,
+        "namespace": "NAMED",
+        "operationKind": null,
+        "instructionOccurrenceIndex": 0,
+        "occurrenceResultClassification": "NOT_APPLICABLE",
+        "conditionOpcode": null,
+        "constantValue": {
+          "kind": "IntValue",
+          "value": 5
+        }
+      },
+      {
+        "owner": "",
+        "name": "",
+        "descriptor": "",
+        "displayLabel": "",
+        "detail": "",
+        "kind": "CONSTANT",
+        "ordinal": 0,
+        "namespace": "NAMED",
+        "operationKind": null,
+        "instructionOccurrenceIndex": 2,
+        "occurrenceResultClassification": "NOT_APPLICABLE",
+        "conditionOpcode": null,
+        "constantValue": {
+          "kind": "IntValue",
+          "value": -1
+        }
+      }
+    ]
+  },
+  {
+    "owner": "test/InvokeClassificationSamples",
+    "method": "mixedAbsCalls",
+    "descriptor": "()V",
+    "atValue": "INVOKE",
+    "output": [
+      {
+        "owner": "java/lang/Math",
+        "name": "abs",
+        "descriptor": "(I)I",
+        "displayLabel": "abs(int): int",
+        "detail": "java.lang",
+        "kind": "INVOKE",
+        "ordinal": 0,
+        "namespace": "NAMED",
+        "operationKind": "INVOKE_STATIC",
+        "instructionOccurrenceIndex": 1,
+        "occurrenceResultClassification": "IMMEDIATELY_POPPED",
+        "conditionOpcode": null,
+        "constantValue": null
+      },
+      {
+        "owner": "java/lang/Math",
+        "name": "abs",
+        "descriptor": "(I)I",
+        "displayLabel": "abs(int): int",
+        "detail": "java.lang",
+        "kind": "INVOKE",
+        "ordinal": 1,
+        "namespace": "NAMED",
+        "operationKind": "INVOKE_STATIC",
+        "instructionOccurrenceIndex": 4,
+        "occurrenceResultClassification": "RETAINED",
+        "conditionOpcode": null,
+        "constantValue": null
+      }
+    ]
+  },
+  {
+    "owner": "test/ClassBytesSamples",
+    "method": "\u003cinit\u003e",
+    "descriptor": "()V",
+    "atValue": "INVOKE",
+    "output": [
+      {
+        "owner": "java/lang/Object",
+        "name": "\u003cinit\u003e",
+        "descriptor": "()V",
+        "displayLabel": "new \u003cinit\u003e(): void",
+        "detail": "java.lang",
+        "kind": "INVOKE",
+        "ordinal": 0,
+        "namespace": "NAMED",
+        "operationKind": "INVOKE_SPECIAL",
+        "instructionOccurrenceIndex": 1,
+        "occurrenceResultClassification": "VOID",
+        "conditionOpcode": null,
+        "constantValue": null
+      }
+    ]
+  },
+  {
+    "owner": "test/ClassBytesSamples",
+    "method": "\u003cinit\u003e",
+    "descriptor": "()V",
+    "atValue": "RETURN",
+    "output": [
+      {
+        "owner": "",
+        "name": "RETURN",
+        "descriptor": "",
+        "displayLabel": "RETURN",
+        "detail": "",
+        "kind": "RETURN",
+        "ordinal": 0,
+        "namespace": "NAMED",
+        "operationKind": null,
+        "instructionOccurrenceIndex": 2,
+        "occurrenceResultClassification": "NOT_APPLICABLE",
+        "conditionOpcode": null,
+        "constantValue": null
+      }
+    ]
+  },
+  {
+    "owner": "test/ClassBytesSamples",
+    "method": "\u003cinit\u003e",
+    "descriptor": "()V",
+    "atValue": "NEW",
+    "output": []
+  },
+  {
+    "owner": "test/ConstantSamples",
+    "method": "smallInts",
+    "descriptor": "()V",
+    "atValue": "unknown",
+    "output": []
+  }
+]

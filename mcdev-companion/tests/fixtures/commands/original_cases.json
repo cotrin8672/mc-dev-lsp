@@ -1,0 +1,764 @@
+[
+  {
+    "legacyCase": "mcdev-jdtls-extension/src/test/kotlin/io/github/mcdev/jdtls/command/McdevCommandDispatcherTest.kt::infoReturnsStructuredLines",
+    "legacyClass": "io.github.mcdev.jdtls.command.McdevCommandDispatcherTest",
+    "sourceSha256": "d7e6d94830c4c31b4b9591e2a7b6bedf80c2e83f0f0e5f5bf29654882916c393",
+    "status": "pending"
+  },
+  {
+    "legacyCase": "mcdev-jdtls-extension/src/test/kotlin/io/github/mcdev/jdtls/command/McdevCommandDispatcherTest.kt::completionReturnsNonEmptyMixinItems",
+    "legacyClass": "io.github.mcdev.jdtls.command.McdevCommandDispatcherTest",
+    "sourceSha256": "d7e6d94830c4c31b4b9591e2a7b6bedf80c2e83f0f0e5f5bf29654882916c393",
+    "status": "pending"
+  },
+  {
+    "legacyCase": "mcdev-jdtls-extension/src/test/kotlin/io/github/mcdev/jdtls/command/McdevCommandDispatcherTest.kt::diagnosticsReturnsDiagnosticsEnvelope",
+    "legacyClass": "io.github.mcdev.jdtls.command.McdevCommandDispatcherTest",
+    "sourceSha256": "d7e6d94830c4c31b4b9591e2a7b6bedf80c2e83f0f0e5f5bf29654882916c393",
+    "status": "pending"
+  },
+  {
+    "legacyCase": "mcdev-jdtls-extension/src/test/kotlin/io/github/mcdev/jdtls/command/McdevCommandDispatcherTest.kt::contextAliasReturnsDiagnosticsEnvelope",
+    "legacyClass": "io.github.mcdev.jdtls.command.McdevCommandDispatcherTest",
+    "sourceSha256": "d7e6d94830c4c31b4b9591e2a7b6bedf80c2e83f0f0e5f5bf29654882916c393",
+    "status": "pending"
+  },
+  {
+    "legacyCase": "mcdev-jdtls-extension/src/test/kotlin/io/github/mcdev/jdtls/command/McdevCommandDispatcherTest.kt::reindexReturnsStructuredStatus",
+    "legacyClass": "io.github.mcdev.jdtls.command.McdevCommandDispatcherTest",
+    "sourceSha256": "d7e6d94830c4c31b4b9591e2a7b6bedf80c2e83f0f0e5f5bf29654882916c393",
+    "status": "pending"
+  },
+  {
+    "legacyCase": "mcdev-jdtls-extension/src/test/kotlin/io/github/mcdev/jdtls/command/McdevCommandDispatcherTest.kt::productionDispatcherReindexInvalidatesTheSharedProjectContext",
+    "legacyClass": "io.github.mcdev.jdtls.command.McdevCommandDispatcherTest",
+    "sourceSha256": "d7e6d94830c4c31b4b9591e2a7b6bedf80c2e83f0f0e5f5bf29654882916c393",
+    "status": "pending"
+  },
+  {
+    "legacyCase": "mcdev-jdtls-extension/src/test/kotlin/io/github/mcdev/jdtls/command/McdevCommandDispatcherTest.kt::reloadProjectContextReturnsStructuredStatus",
+    "legacyClass": "io.github.mcdev.jdtls.command.McdevCommandDispatcherTest",
+    "sourceSha256": "d7e6d94830c4c31b4b9591e2a7b6bedf80c2e83f0f0e5f5bf29654882916c393",
+    "status": "pending"
+  },
+  {
+    "legacyCase": "mcdev-jdtls-extension/src/test/kotlin/io/github/mcdev/jdtls/command/McdevCommandDispatcherTest.kt::dumpContextReturnsStructuredProjectDetails",
+    "legacyClass": "io.github.mcdev.jdtls.command.McdevCommandDispatcherTest",
+    "sourceSha256": "d7e6d94830c4c31b4b9591e2a7b6bedf80c2e83f0f0e5f5bf29654882916c393",
+    "status": "pending"
+  },
+  {
+    "legacyCase": "mcdev-jdtls-extension/src/test/kotlin/io/github/mcdev/jdtls/command/McdevCommandDispatcherTest.kt::unknownCommandReturnsStructuredError",
+    "legacyClass": "io.github.mcdev.jdtls.command.McdevCommandDispatcherTest",
+    "sourceSha256": "d7e6d94830c4c31b4b9591e2a7b6bedf80c2e83f0f0e5f5bf29654882916c393",
+    "status": "pending"
+  },
+  {
+    "legacyCase": "mcdev-jdtls-extension/src/test/kotlin/io/github/mcdev/jdtls/command/McdevCommandDispatcherTest.kt::definitionReturnsMixinClassTarget",
+    "legacyClass": "io.github.mcdev.jdtls.command.McdevCommandDispatcherTest",
+    "sourceSha256": "d7e6d94830c4c31b4b9591e2a7b6bedf80c2e83f0f0e5f5bf29654882916c393",
+    "status": "pending"
+  },
+  {
+    "legacyCase": "mcdev-jdtls-extension/src/test/kotlin/io/github/mcdev/jdtls/command/McdevCommandDispatcherTest.kt::codeActionReturnsMixinConfigFix",
+    "legacyClass": "io.github.mcdev.jdtls.command.McdevCommandDispatcherTest",
+    "sourceSha256": "d7e6d94830c4c31b4b9591e2a7b6bedf80c2e83f0f0e5f5bf29654882916c393",
+    "status": "pending"
+  },
+  {
+    "legacyCase": "mcdev-jdtls-extension/src/test/kotlin/io/github/mcdev/jdtls/command/McdevCommandDispatcherTest.kt::referencesReturnsMixinUsages",
+    "legacyClass": "io.github.mcdev.jdtls.command.McdevCommandDispatcherTest",
+    "sourceSha256": "d7e6d94830c4c31b4b9591e2a7b6bedf80c2e83f0f0e5f5bf29654882916c393",
+    "status": "pending"
+  },
+  {
+    "legacyCase": "mcdev-jdtls-extension/src/test/kotlin/io/github/mcdev/jdtls/command/McdevCommandDispatcherTest.kt::hoverReturnsMixinClassDetails",
+    "legacyClass": "io.github.mcdev.jdtls.command.McdevCommandDispatcherTest",
+    "sourceSha256": "d7e6d94830c4c31b4b9591e2a7b6bedf80c2e83f0f0e5f5bf29654882916c393",
+    "status": "pending"
+  },
+  {
+    "legacyCase": "mcdev-jdtls-extension/src/test/kotlin/io/github/mcdev/jdtls/command/McdevCommandDispatcherTest.kt::registryListsImplementedCommands",
+    "legacyClass": "io.github.mcdev.jdtls.command.McdevCommandDispatcherTest",
+    "sourceSha256": "d7e6d94830c4c31b4b9591e2a7b6bedf80c2e83f0f0e5f5bf29654882916c393",
+    "status": "pending"
+  },
+  {
+    "legacyCase": "mcdev-jdtls-extension/src/test/kotlin/io/github/mcdev/jdtls/command/McdevCommandDispatcherTest.kt::completionWithMissingWorkspaceReturnsError",
+    "legacyClass": "io.github.mcdev.jdtls.command.McdevCommandDispatcherTest",
+    "sourceSha256": "d7e6d94830c4c31b4b9591e2a7b6bedf80c2e83f0f0e5f5bf29654882916c393",
+    "status": "pending"
+  },
+  {
+    "legacyCase": "mcdev-jdtls-extension/src/test/kotlin/io/github/mcdev/jdtls/command/McdevCommandDispatcherTest.kt::endToEndDecodeAndExecuteRoundtrip",
+    "legacyClass": "io.github.mcdev.jdtls.command.McdevCommandDispatcherTest",
+    "sourceSha256": "d7e6d94830c4c31b4b9591e2a7b6bedf80c2e83f0f0e5f5bf29654882916c393",
+    "status": "pending"
+  },
+  {
+    "legacyCase": "mcdev-jdtls-extension/src/test/kotlin/io/github/mcdev/jdtls/McdevDelegateCommandHandlerTest.kt::executeCommandReturnsEncodedEnvelope",
+    "legacyClass": "io.github.mcdev.jdtls.McdevDelegateCommandHandlerTest",
+    "sourceSha256": "d55017598bf26de57597143fc98866807d3a48e4bfd819f2f72ac9052b361f1c",
+    "status": "pending"
+  },
+  {
+    "legacyCase": "mcdev-jdtls-extension/src/test/kotlin/io/github/mcdev/jdtls/McdevDelegateCommandHandlerTest.kt::unknownCommandThrowsUnsupportedOperationException",
+    "legacyClass": "io.github.mcdev.jdtls.McdevDelegateCommandHandlerTest",
+    "sourceSha256": "d55017598bf26de57597143fc98866807d3a48e4bfd819f2f72ac9052b361f1c",
+    "status": "pending"
+  },
+  {
+    "legacyCase": "mcdev-jdtls-extension/src/test/kotlin/io/github/mcdev/jdtls/McdevDelegateCommandHandlerTest.kt::expressionCancellationPropagatesAndNextRequestSucceeds",
+    "legacyClass": "io.github.mcdev.jdtls.McdevDelegateCommandHandlerTest",
+    "sourceSha256": "d55017598bf26de57597143fc98866807d3a48e4bfd819f2f72ac9052b361f1c",
+    "status": "pending"
+  },
+  {
+    "legacyCase": "mcdev-jdtls-extension/src/test/kotlin/io/github/mcdev/jdtls/handler/KotlinMixinRequestHandlerTest.kt::kotlinRequestsUseWorkspaceClasspathAndUnsavedSourceWithoutCompilationUnit",
+    "legacyClass": "io.github.mcdev.jdtls.handler.KotlinMixinRequestHandlerTest",
+    "sourceSha256": "ea670a3de88c772d94ec822923f703e7db92c5a1bbb1dd2f35e5547935338159",
+    "status": "pending"
+  },
+  {
+    "legacyCase": "mcdev-jdtls-extension/src/test/kotlin/io/github/mcdev/jdtls/handler/KotlinMixinRequestHandlerTest.kt::kotlinProjectReadinessUsesWorkspaceAndDoesNotCacheAnImportingSession",
+    "legacyClass": "io.github.mcdev.jdtls.handler.KotlinMixinRequestHandlerTest",
+    "sourceSha256": "ea670a3de88c772d94ec822923f703e7db92c5a1bbb1dd2f35e5547935338159",
+    "status": "pending"
+  },
+  {
+    "legacyCase": "mcdev-jdtls-extension/src/test/kotlin/io/github/mcdev/jdtls/handler/KotlinMixinRequestHandlerTest.kt::javaInfoKeepsLoadingSessionWithoutKotlinReadinessChecks",
+    "legacyClass": "io.github.mcdev.jdtls.handler.KotlinMixinRequestHandlerTest",
+    "sourceSha256": "ea670a3de88c772d94ec822923f703e7db92c5a1bbb1dd2f35e5547935338159",
+    "status": "pending"
+  },
+  {
+    "legacyCase": "mcdev-jdtls-extension/src/test/kotlin/io/github/mcdev/jdtls/handler/McdevAwAtCodeActionHandlerTest.kt::returnsRemoveDuplicateFixForAccessWidenerBuffer",
+    "legacyClass": "io.github.mcdev.jdtls.handler.McdevAwAtCodeActionHandlerTest",
+    "sourceSha256": "78511b5e0a803019291c6775386f32735ba2830028c1d0dfd5980eba8ad01296",
+    "status": "pending"
+  },
+  {
+    "legacyCase": "mcdev-jdtls-extension/src/test/kotlin/io/github/mcdev/jdtls/handler/McdevAwAtCodeActionHandlerTest.kt::returnsAddDescriptorFixForAccessTransformerBuffer",
+    "legacyClass": "io.github.mcdev.jdtls.handler.McdevAwAtCodeActionHandlerTest",
+    "sourceSha256": "78511b5e0a803019291c6775386f32735ba2830028c1d0dfd5980eba8ad01296",
+    "status": "pending"
+  },
+  {
+    "legacyCase": "mcdev-jdtls-extension/src/test/kotlin/io/github/mcdev/jdtls/handler/McdevAwAtCompletionHandlerTest.kt::returnsAccessWidenerDirectiveCompletionsForLanguageId",
+    "legacyClass": "io.github.mcdev.jdtls.handler.McdevAwAtCompletionHandlerTest",
+    "sourceSha256": "7a3bc915e357a28d2bfe7bd7122d697acc2f9bd55c55efaaa8971ab9876f68e8",
+    "status": "pending"
+  },
+  {
+    "legacyCase": "mcdev-jdtls-extension/src/test/kotlin/io/github/mcdev/jdtls/handler/McdevAwAtCompletionHandlerTest.kt::returnsAccessWidenerClassCompletionsByFileExtension",
+    "legacyClass": "io.github.mcdev.jdtls.handler.McdevAwAtCompletionHandlerTest",
+    "sourceSha256": "7a3bc915e357a28d2bfe7bd7122d697acc2f9bd55c55efaaa8971ab9876f68e8",
+    "status": "pending"
+  },
+  {
+    "legacyCase": "mcdev-jdtls-extension/src/test/kotlin/io/github/mcdev/jdtls/handler/McdevAwAtCompletionHandlerTest.kt::returnsAccessTransformerModifierCompletionsForAtCfgBuffer",
+    "legacyClass": "io.github.mcdev.jdtls.handler.McdevAwAtCompletionHandlerTest",
+    "sourceSha256": "7a3bc915e357a28d2bfe7bd7122d697acc2f9bd55c55efaaa8971ab9876f68e8",
+    "status": "pending"
+  },
+  {
+    "legacyCase": "mcdev-jdtls-extension/src/test/kotlin/io/github/mcdev/jdtls/handler/McdevAwAtCompletionHandlerTest.kt::returnsAccessWidenerDescriptorCompletionsAtDescriptorSlot",
+    "legacyClass": "io.github.mcdev.jdtls.handler.McdevAwAtCompletionHandlerTest",
+    "sourceSha256": "7a3bc915e357a28d2bfe7bd7122d697acc2f9bd55c55efaaa8971ab9876f68e8",
+    "status": "pending"
+  },
+  {
+    "legacyCase": "mcdev-jdtls-extension/src/test/kotlin/io/github/mcdev/jdtls/handler/McdevAwAtCompletionHandlerTest.kt::returnsAccessTransformerFieldCompletionsWithIntermediaryInsertText",
+    "legacyClass": "io.github.mcdev.jdtls.handler.McdevAwAtCompletionHandlerTest",
+    "sourceSha256": "7a3bc915e357a28d2bfe7bd7122d697acc2f9bd55c55efaaa8971ab9876f68e8",
+    "status": "pending"
+  },
+  {
+    "legacyCase": "mcdev-jdtls-extension/src/test/kotlin/io/github/mcdev/jdtls/handler/McdevAwAtCompletionHandlerTest.kt::returnsAccessTransformerMemberCompletionsWithMappedInsertText",
+    "legacyClass": "io.github.mcdev.jdtls.handler.McdevAwAtCompletionHandlerTest",
+    "sourceSha256": "7a3bc915e357a28d2bfe7bd7122d697acc2f9bd55c55efaaa8971ab9876f68e8",
+    "status": "pending"
+  },
+  {
+    "legacyCase": "mcdev-jdtls-extension/src/test/kotlin/io/github/mcdev/jdtls/handler/McdevAwAtDiagnosticsHandlerTest.kt::reportsUnresolvedAccessWidenerClassForBrokenBuffer",
+    "legacyClass": "io.github.mcdev.jdtls.handler.McdevAwAtDiagnosticsHandlerTest",
+    "sourceSha256": "2db08217a8d3feeab8569691087a85d7c01afc30493948a3b6a643b8522e4c83",
+    "status": "pending"
+  },
+  {
+    "legacyCase": "mcdev-jdtls-extension/src/test/kotlin/io/github/mcdev/jdtls/handler/McdevAwAtDiagnosticsHandlerTest.kt::cleanAccessWidenerFixtureProducesNoUnresolvedTargets",
+    "legacyClass": "io.github.mcdev.jdtls.handler.McdevAwAtDiagnosticsHandlerTest",
+    "sourceSha256": "2db08217a8d3feeab8569691087a85d7c01afc30493948a3b6a643b8522e4c83",
+    "status": "pending"
+  },
+  {
+    "legacyCase": "mcdev-jdtls-extension/src/test/kotlin/io/github/mcdev/jdtls/handler/McdevAwAtDiagnosticsHandlerTest.kt::cleanAccessTransformerFixtureProducesNoUnresolvedTargets",
+    "legacyClass": "io.github.mcdev.jdtls.handler.McdevAwAtDiagnosticsHandlerTest",
+    "sourceSha256": "2db08217a8d3feeab8569691087a85d7c01afc30493948a3b6a643b8522e4c83",
+    "status": "pending"
+  },
+  {
+    "legacyCase": "mcdev-jdtls-extension/src/test/kotlin/io/github/mcdev/jdtls/handler/McdevAwAtDiagnosticsHandlerTest.kt::reportsNamespaceMismatchForIntermediaryOwnerInNamedAw",
+    "legacyClass": "io.github.mcdev.jdtls.handler.McdevAwAtDiagnosticsHandlerTest",
+    "sourceSha256": "2db08217a8d3feeab8569691087a85d7c01afc30493948a3b6a643b8522e4c83",
+    "status": "pending"
+  },
+  {
+    "legacyCase": "mcdev-jdtls-extension/src/test/kotlin/io/github/mcdev/jdtls/handler/McdevAwAtDiagnosticsHandlerTest.kt::reportsMissingMethodDescriptorForAccessTransformerBuffer",
+    "legacyClass": "io.github.mcdev.jdtls.handler.McdevAwAtDiagnosticsHandlerTest",
+    "sourceSha256": "2db08217a8d3feeab8569691087a85d7c01afc30493948a3b6a643b8522e4c83",
+    "status": "pending"
+  },
+  {
+    "legacyCase": "mcdev-jdtls-extension/src/test/kotlin/io/github/mcdev/jdtls/handler/McdevAwAtDiagnosticsHandlerTest.kt::detectsAccessTransformerBufferByFileExtension",
+    "legacyClass": "io.github.mcdev.jdtls.handler.McdevAwAtDiagnosticsHandlerTest",
+    "sourceSha256": "2db08217a8d3feeab8569691087a85d7c01afc30493948a3b6a643b8522e4c83",
+    "status": "pending"
+  },
+  {
+    "legacyCase": "mcdev-jdtls-extension/src/test/kotlin/io/github/mcdev/jdtls/handler/McdevCodeActionHandlerTest.kt::returnsMixinConfigAddFix",
+    "legacyClass": "io.github.mcdev.jdtls.handler.McdevCodeActionHandlerTest",
+    "sourceSha256": "bda5a0cc4bff136aa7a501fcfba1ce0ab3aec5de4e5cd63b8ece11a8c2b2a127",
+    "status": "pending"
+  },
+  {
+    "legacyCase": "mcdev-jdtls-extension/src/test/kotlin/io/github/mcdev/jdtls/handler/McdevCodeActionHandlerTest.kt::missingWorkspaceRootReturnsIncompleteContextError",
+    "legacyClass": "io.github.mcdev.jdtls.handler.McdevCodeActionHandlerTest",
+    "sourceSha256": "bda5a0cc4bff136aa7a501fcfba1ce0ab3aec5de4e5cd63b8ece11a8c2b2a127",
+    "status": "pending"
+  },
+  {
+    "legacyCase": "mcdev-jdtls-extension/src/test/kotlin/io/github/mcdev/jdtls/handler/McdevCodeActionHandlerTest.kt::protocolMismatchReturnsStructuredError",
+    "legacyClass": "io.github.mcdev.jdtls.handler.McdevCodeActionHandlerTest",
+    "sourceSha256": "bda5a0cc4bff136aa7a501fcfba1ce0ab3aec5de4e5cd63b8ece11a8c2b2a127",
+    "status": "pending"
+  },
+  {
+    "legacyCase": "mcdev-jdtls-extension/src/test/kotlin/io/github/mcdev/jdtls/handler/McdevCodeActionHandlerTest.kt::returnsAmbiguousInjectMethodDescriptorFix",
+    "legacyClass": "io.github.mcdev.jdtls.handler.McdevCodeActionHandlerTest",
+    "sourceSha256": "bda5a0cc4bff136aa7a501fcfba1ce0ab3aec5de4e5cd63b8ece11a8c2b2a127",
+    "status": "pending"
+  },
+  {
+    "legacyCase": "mcdev-jdtls-extension/src/test/kotlin/io/github/mcdev/jdtls/handler/McdevCodeActionHandlerTest.kt::returnsMixinExtrasFixHandlerSignatureThroughHandler",
+    "legacyClass": "io.github.mcdev.jdtls.handler.McdevCodeActionHandlerTest",
+    "sourceSha256": "bda5a0cc4bff136aa7a501fcfba1ce0ab3aec5de4e5cd63b8ece11a8c2b2a127",
+    "status": "pending"
+  },
+  {
+    "legacyCase": "mcdev-jdtls-extension/src/test/kotlin/io/github/mcdev/jdtls/handler/McdevCodeActionHandlerTest.kt::keepsDistinctMixinExtrasSignatureFixesWithTheSameTitle",
+    "legacyClass": "io.github.mcdev.jdtls.handler.McdevCodeActionHandlerTest",
+    "sourceSha256": "bda5a0cc4bff136aa7a501fcfba1ce0ab3aec5de4e5cd63b8ece11a8c2b2a127",
+    "status": "pending"
+  },
+  {
+    "legacyCase": "mcdev-jdtls-extension/src/test/kotlin/io/github/mcdev/jdtls/handler/McdevCodeActionHandlerTest.kt::keepsGenerationAtCursorWhenDiagnosticFilterIsPresent",
+    "legacyClass": "io.github.mcdev.jdtls.handler.McdevCodeActionHandlerTest",
+    "sourceSha256": "bda5a0cc4bff136aa7a501fcfba1ce0ab3aec5de4e5cd63b8ece11a8c2b2a127",
+    "status": "pending"
+  },
+  {
+    "legacyCase": "mcdev-jdtls-extension/src/test/kotlin/io/github/mcdev/jdtls/handler/McdevCodeActionHandlerTest.kt::codeActionEditsIncludeWorkspaceDocumentUri",
+    "legacyClass": "io.github.mcdev.jdtls.handler.McdevCodeActionHandlerTest",
+    "sourceSha256": "bda5a0cc4bff136aa7a501fcfba1ce0ab3aec5de4e5cd63b8ece11a8c2b2a127",
+    "status": "pending"
+  },
+  {
+    "legacyCase": "mcdev-jdtls-extension/src/test/kotlin/io/github/mcdev/jdtls/handler/McdevCodeActionHandlerTest.kt::codeActionMixinConfigEditDocumentUriIsFileUri",
+    "legacyClass": "io.github.mcdev.jdtls.handler.McdevCodeActionHandlerTest",
+    "sourceSha256": "bda5a0cc4bff136aa7a501fcfba1ce0ab3aec5de4e5cd63b8ece11a8c2b2a127",
+    "status": "pending"
+  },
+  {
+    "legacyCase": "mcdev-jdtls-extension/src/test/kotlin/io/github/mcdev/jdtls/handler/McdevCodeActionHandlerTest.kt::codeActionTargetsSelectedMixinConfigWhenEarlierConfigIsWrong",
+    "legacyClass": "io.github.mcdev.jdtls.handler.McdevCodeActionHandlerTest",
+    "sourceSha256": "bda5a0cc4bff136aa7a501fcfba1ce0ab3aec5de4e5cd63b8ece11a8c2b2a127",
+    "status": "pending"
+  },
+  {
+    "legacyCase": "mcdev-jdtls-extension/src/test/kotlin/io/github/mcdev/jdtls/handler/McdevCodeActionHandlerTest.kt::codeActionPreservesJson5CommentAndTrailingCommaInSelectedMixinConfig",
+    "legacyClass": "io.github.mcdev.jdtls.handler.McdevCodeActionHandlerTest",
+    "sourceSha256": "bda5a0cc4bff136aa7a501fcfba1ce0ab3aec5de4e5cd63b8ece11a8c2b2a127",
+    "status": "pending"
+  },
+  {
+    "legacyCase": "mcdev-jdtls-extension/src/test/kotlin/io/github/mcdev/jdtls/handler/McdevCodeActionHandlerTest.kt::codeActionScopesMixinConfigToFabricSourceSetWhenEditingFabricJava",
+    "legacyClass": "io.github.mcdev.jdtls.handler.McdevCodeActionHandlerTest",
+    "sourceSha256": "bda5a0cc4bff136aa7a501fcfba1ce0ab3aec5de4e5cd63b8ece11a8c2b2a127",
+    "status": "pending"
+  },
+  {
+    "legacyCase": "mcdev-jdtls-extension/src/test/kotlin/io/github/mcdev/jdtls/handler/McdevCodeActionHandlerTest.kt::codeActionUsesConfigThatListsMixinClass",
+    "legacyClass": "io.github.mcdev.jdtls.handler.McdevCodeActionHandlerTest",
+    "sourceSha256": "bda5a0cc4bff136aa7a501fcfba1ce0ab3aec5de4e5cd63b8ece11a8c2b2a127",
+    "status": "pending"
+  },
+  {
+    "legacyCase": "mcdev-jdtls-extension/src/test/kotlin/io/github/mcdev/jdtls/handler/McdevCompletionHandlerTest.kt::returnsMixinClassCompletionsForFixture",
+    "legacyClass": "io.github.mcdev.jdtls.handler.McdevCompletionHandlerTest",
+    "sourceSha256": "5f9f5f9f1cb4841e5504214b4e5993d884cf10f4ae97c762acaf2c86c8f6f4e8",
+    "status": "pending"
+  },
+  {
+    "legacyCase": "mcdev-jdtls-extension/src/test/kotlin/io/github/mcdev/jdtls/handler/McdevCompletionHandlerTest.kt::mixinClassCompletionNeverInvokesSourceClassScannerOnProductionPath",
+    "legacyClass": "io.github.mcdev.jdtls.handler.McdevCompletionHandlerTest",
+    "sourceSha256": "5f9f5f9f1cb4841e5504214b4e5993d884cf10f4ae97c762acaf2c86c8f6f4e8",
+    "status": "pending"
+  },
+  {
+    "legacyCase": "mcdev-jdtls-extension/src/test/kotlin/io/github/mcdev/jdtls/handler/McdevCompletionHandlerTest.kt::mixinClassCompletionReturnsBufferDeclaredClassWhenJdtUnavailable",
+    "legacyClass": "io.github.mcdev.jdtls.handler.McdevCompletionHandlerTest",
+    "sourceSha256": "5f9f5f9f1cb4841e5504214b4e5993d884cf10f4ae97c762acaf2c86c8f6f4e8",
+    "status": "pending"
+  },
+  {
+    "legacyCase": "mcdev-jdtls-extension/src/test/kotlin/io/github/mcdev/jdtls/handler/McdevCompletionHandlerTest.kt::returnsEmptyItemsWhenCursorIsOutsideAnnotation",
+    "legacyClass": "io.github.mcdev.jdtls.handler.McdevCompletionHandlerTest",
+    "sourceSha256": "5f9f5f9f1cb4841e5504214b4e5993d884cf10f4ae97c762acaf2c86c8f6f4e8",
+    "status": "pending"
+  },
+  {
+    "legacyCase": "mcdev-jdtls-extension/src/test/kotlin/io/github/mcdev/jdtls/handler/McdevCompletionHandlerTest.kt::reusesSemanticModelForSameDocumentVersion",
+    "legacyClass": "io.github.mcdev.jdtls.handler.McdevCompletionHandlerTest",
+    "sourceSha256": "5f9f5f9f1cb4841e5504214b4e5993d884cf10f4ae97c762acaf2c86c8f6f4e8",
+    "status": "pending"
+  },
+  {
+    "legacyCase": "mcdev-jdtls-extension/src/test/kotlin/io/github/mcdev/jdtls/handler/McdevCompletionHandlerTest.kt::reusesNegativeCompletionForSameZeroItemRequest",
+    "legacyClass": "io.github.mcdev.jdtls.handler.McdevCompletionHandlerTest",
+    "sourceSha256": "5f9f5f9f1cb4841e5504214b4e5993d884cf10f4ae97c762acaf2c86c8f6f4e8",
+    "status": "pending"
+  },
+  {
+    "legacyCase": "mcdev-jdtls-extension/src/test/kotlin/io/github/mcdev/jdtls/handler/McdevCompletionHandlerTest.kt::reusesNegativeCompletionBeforeTtlExpires",
+    "legacyClass": "io.github.mcdev.jdtls.handler.McdevCompletionHandlerTest",
+    "sourceSha256": "5f9f5f9f1cb4841e5504214b4e5993d884cf10f4ae97c762acaf2c86c8f6f4e8",
+    "status": "pending"
+  },
+  {
+    "legacyCase": "mcdev-jdtls-extension/src/test/kotlin/io/github/mcdev/jdtls/handler/McdevCompletionHandlerTest.kt::expiresNegativeCompletionAfterTtlAndRecomputes",
+    "legacyClass": "io.github.mcdev.jdtls.handler.McdevCompletionHandlerTest",
+    "sourceSha256": "5f9f5f9f1cb4841e5504214b4e5993d884cf10f4ae97c762acaf2c86c8f6f4e8",
+    "status": "pending"
+  },
+  {
+    "legacyCase": "mcdev-jdtls-extension/src/test/kotlin/io/github/mcdev/jdtls/handler/McdevCompletionHandlerTest.kt::capsNegativeCacheAt256DistinctRequests",
+    "legacyClass": "io.github.mcdev.jdtls.handler.McdevCompletionHandlerTest",
+    "sourceSha256": "5f9f5f9f1cb4841e5504214b4e5993d884cf10f4ae97c762acaf2c86c8f6f4e8",
+    "status": "pending"
+  },
+  {
+    "legacyCase": "mcdev-jdtls-extension/src/test/kotlin/io/github/mcdev/jdtls/handler/McdevCompletionHandlerTest.kt::reusesCandidateCacheForSameInjectMethodCompletion",
+    "legacyClass": "io.github.mcdev.jdtls.handler.McdevCompletionHandlerTest",
+    "sourceSha256": "5f9f5f9f1cb4841e5504214b4e5993d884cf10f4ae97c762acaf2c86c8f6f4e8",
+    "status": "pending"
+  },
+  {
+    "legacyCase": "mcdev-jdtls-extension/src/test/kotlin/io/github/mcdev/jdtls/handler/McdevCompletionHandlerTest.kt::missingWorkspaceRootReturnsIncompleteContextError",
+    "legacyClass": "io.github.mcdev.jdtls.handler.McdevCompletionHandlerTest",
+    "sourceSha256": "5f9f5f9f1cb4841e5504214b4e5993d884cf10f4ae97c762acaf2c86c8f6f4e8",
+    "status": "pending"
+  },
+  {
+    "legacyCase": "mcdev-jdtls-extension/src/test/kotlin/io/github/mcdev/jdtls/handler/McdevCompletionHandlerTest.kt::protocolMismatchReturnsStructuredError",
+    "legacyClass": "io.github.mcdev.jdtls.handler.McdevCompletionHandlerTest",
+    "sourceSha256": "5f9f5f9f1cb4841e5504214b4e5993d884cf10f4ae97c762acaf2c86c8f6f4e8",
+    "status": "pending"
+  },
+  {
+    "legacyCase": "mcdev-jdtls-extension/src/test/kotlin/io/github/mcdev/jdtls/handler/McdevCompletionHandlerTest.kt::completionItemsIncludeMetadataAndKind",
+    "legacyClass": "io.github.mcdev.jdtls.handler.McdevCompletionHandlerTest",
+    "sourceSha256": "5f9f5f9f1cb4841e5504214b4e5993d884cf10f4ae97c762acaf2c86c8f6f4e8",
+    "status": "pending"
+  },
+  {
+    "legacyCase": "mcdev-jdtls-extension/src/test/kotlin/io/github/mcdev/jdtls/handler/McdevCompletionHandlerTest.kt::importModeMixinClassCompletionIncludesImportAdditionalEdit",
+    "legacyClass": "io.github.mcdev.jdtls.handler.McdevCompletionHandlerTest",
+    "sourceSha256": "5f9f5f9f1cb4841e5504214b4e5993d884cf10f4ae97c762acaf2c86c8f6f4e8",
+    "status": "pending"
+  },
+  {
+    "legacyCase": "mcdev-jdtls-extension/src/test/kotlin/io/github/mcdev/jdtls/handler/McdevCompletionHandlerTest.kt::atTargetCompletionRemapsInsertTextWithFixtureMappings",
+    "legacyClass": "io.github.mcdev.jdtls.handler.McdevCompletionHandlerTest",
+    "sourceSha256": "5f9f5f9f1cb4841e5504214b4e5993d884cf10f4ae97c762acaf2c86c8f6f4e8",
+    "status": "pending"
+  },
+  {
+    "legacyCase": "mcdev-jdtls-extension/src/test/kotlin/io/github/mcdev/jdtls/handler/McdevCompletionHandlerTest.kt::returnsMixinExtrasMethodCompletionsThroughFacade",
+    "legacyClass": "io.github.mcdev.jdtls.handler.McdevCompletionHandlerTest",
+    "sourceSha256": "5f9f5f9f1cb4841e5504214b4e5993d884cf10f4ae97c762acaf2c86c8f6f4e8",
+    "status": "pending"
+  },
+  {
+    "legacyCase": "mcdev-jdtls-extension/src/test/kotlin/io/github/mcdev/jdtls/handler/McdevCompletionHandlerTest.kt::injectMethodCompletionHonorsAlwaysDescriptorOption",
+    "legacyClass": "io.github.mcdev.jdtls.handler.McdevCompletionHandlerTest",
+    "sourceSha256": "5f9f5f9f1cb4841e5504214b4e5993d884cf10f4ae97c762acaf2c86c8f6f4e8",
+    "status": "pending"
+  },
+  {
+    "legacyCase": "mcdev-jdtls-extension/src/test/kotlin/io/github/mcdev/jdtls/handler/McdevCompletionHandlerTest.kt::returnsInjectMethodCompletionsAtEmptyOpenQuote",
+    "legacyClass": "io.github.mcdev.jdtls.handler.McdevCompletionHandlerTest",
+    "sourceSha256": "5f9f5f9f1cb4841e5504214b4e5993d884cf10f4ae97c762acaf2c86c8f6f4e8",
+    "status": "pending"
+  },
+  {
+    "legacyCase": "mcdev-jdtls-extension/src/test/kotlin/io/github/mcdev/jdtls/handler/McdevCompletionHandlerTest.kt::injectMethodEditPreservesQuotesAndReplacesTheWholeStringValue",
+    "legacyClass": "io.github.mcdev.jdtls.handler.McdevCompletionHandlerTest",
+    "sourceSha256": "5f9f5f9f1cb4841e5504214b4e5993d884cf10f4ae97c762acaf2c86c8f6f4e8",
+    "status": "pending"
+  },
+  {
+    "legacyCase": "mcdev-jdtls-extension/src/test/kotlin/io/github/mcdev/jdtls/handler/McdevCompletionHandlerTest.kt::injectMethodArrayEditOnlyReplacesTheActiveElement",
+    "legacyClass": "io.github.mcdev.jdtls.handler.McdevCompletionHandlerTest",
+    "sourceSha256": "5f9f5f9f1cb4841e5504214b4e5993d884cf10f4ae97c762acaf2c86c8f6f4e8",
+    "status": "pending"
+  },
+  {
+    "legacyCase": "mcdev-jdtls-extension/src/test/kotlin/io/github/mcdev/jdtls/handler/McdevCompletionHandlerTest.kt::incompleteMethodAttributeOffersQuotedSnippet",
+    "legacyClass": "io.github.mcdev.jdtls.handler.McdevCompletionHandlerTest",
+    "sourceSha256": "5f9f5f9f1cb4841e5504214b4e5993d884cf10f4ae97c762acaf2c86c8f6f4e8",
+    "status": "pending"
+  },
+  {
+    "legacyCase": "mcdev-jdtls-extension/src/test/kotlin/io/github/mcdev/jdtls/handler/McdevCompletionHandlerTest.kt::mixinMemberCompletionDoesNotScanSourceOnlySiblingTarget",
+    "legacyClass": "io.github.mcdev.jdtls.handler.McdevCompletionHandlerTest",
+    "sourceSha256": "5f9f5f9f1cb4841e5504214b4e5993d884cf10f4ae97c762acaf2c86c8f6f4e8",
+    "status": "pending"
+  },
+  {
+    "legacyCase": "mcdev-jdtls-extension/src/test/kotlin/io/github/mcdev/jdtls/handler/McdevCompletionHandlerTest.kt::atTargetCompletionEndToEndWithoutFacadeOverride",
+    "legacyClass": "io.github.mcdev.jdtls.handler.McdevCompletionHandlerTest",
+    "sourceSha256": "5f9f5f9f1cb4841e5504214b4e5993d884cf10f4ae97c762acaf2c86c8f6f4e8",
+    "status": "pending"
+  },
+  {
+    "legacyCase": "mcdev-jdtls-extension/src/test/kotlin/io/github/mcdev/jdtls/handler/McdevCompletionHandlerTest.kt::fqnInsertModeReturnsQualifiedClassName",
+    "legacyClass": "io.github.mcdev.jdtls.handler.McdevCompletionHandlerTest",
+    "sourceSha256": "5f9f5f9f1cb4841e5504214b4e5993d884cf10f4ae97c762acaf2c86c8f6f4e8",
+    "status": "pending"
+  },
+  {
+    "legacyCase": "mcdev-jdtls-extension/src/test/kotlin/io/github/mcdev/jdtls/handler/McdevCompletionHandlerTest.kt::bufferOnlyInjectAttributeCompletionSkipsProjectSessionLoad",
+    "legacyClass": "io.github.mcdev.jdtls.handler.McdevCompletionHandlerTest",
+    "sourceSha256": "5f9f5f9f1cb4841e5504214b4e5993d884cf10f4ae97c762acaf2c86c8f6f4e8",
+    "status": "pending"
+  },
+  {
+    "legacyCase": "mcdev-jdtls-extension/src/test/kotlin/io/github/mcdev/jdtls/handler/McdevCompletionHandlerTest.kt::projectAwareCompletionDoesNotCacheSessionBeforeJdtProjectExists",
+    "legacyClass": "io.github.mcdev.jdtls.handler.McdevCompletionHandlerTest",
+    "sourceSha256": "5f9f5f9f1cb4841e5504214b4e5993d884cf10f4ae97c762acaf2c86c8f6f4e8",
+    "status": "pending"
+  },
+  {
+    "legacyCase": "mcdev-jdtls-extension/src/test/kotlin/io/github/mcdev/jdtls/handler/McdevCompletionHandlerTest.kt::projectAwareCompletionBypassesBufferOnlyShortcut",
+    "legacyClass": "io.github.mcdev.jdtls.handler.McdevCompletionHandlerTest",
+    "sourceSha256": "5f9f5f9f1cb4841e5504214b4e5993d884cf10f4ae97c762acaf2c86c8f6f4e8",
+    "status": "pending"
+  },
+  {
+    "legacyCase": "mcdev-jdtls-extension/src/test/kotlin/io/github/mcdev/jdtls/handler/McdevCompletionHandlerTest.kt::bufferOnlyAtHeadValueCompletionSkipsProjectSessionLoad",
+    "legacyClass": "io.github.mcdev.jdtls.handler.McdevCompletionHandlerTest",
+    "sourceSha256": "5f9f5f9f1cb4841e5504214b4e5993d884cf10f4ae97c762acaf2c86c8f6f4e8",
+    "status": "pending"
+  },
+  {
+    "legacyCase": "mcdev-jdtls-extension/src/test/kotlin/io/github/mcdev/jdtls/handler/McdevCompletionHandlerTest.kt::bufferOnlyAtHeadValueCompletionStaysStableAcrossSequentialTyping",
+    "legacyClass": "io.github.mcdev.jdtls.handler.McdevCompletionHandlerTest",
+    "sourceSha256": "5f9f5f9f1cb4841e5504214b4e5993d884cf10f4ae97c762acaf2c86c8f6f4e8",
+    "status": "pending"
+  },
+  {
+    "legacyCase": "mcdev-jdtls-extension/src/test/kotlin/io/github/mcdev/jdtls/handler/McdevCompletionHandlerTest.kt::bufferOnlyDefinitionIdCompletionSkipsProjectSessionLoad",
+    "legacyClass": "io.github.mcdev.jdtls.handler.McdevCompletionHandlerTest",
+    "sourceSha256": "5f9f5f9f1cb4841e5504214b4e5993d884cf10f4ae97c762acaf2c86c8f6f4e8",
+    "status": "pending"
+  },
+  {
+    "legacyCase": "mcdev-jdtls-extension/src/test/kotlin/io/github/mcdev/jdtls/handler/McdevCompletionHandlerTest.kt::bufferOnlyDefinitionIdCompletionDoesNotLeakAdjacentHandlerDefinitions",
+    "legacyClass": "io.github.mcdev.jdtls.handler.McdevCompletionHandlerTest",
+    "sourceSha256": "5f9f5f9f1cb4841e5504214b4e5993d884cf10f4ae97c762acaf2c86c8f6f4e8",
+    "status": "pending"
+  },
+  {
+    "legacyCase": "mcdev-jdtls-extension/src/test/kotlin/io/github/mcdev/jdtls/handler/McdevCompletionHandlerTest.kt::bufferOnlyExpressionReturnKeywordCompletionSkipsProjectSessionLoad",
+    "legacyClass": "io.github.mcdev.jdtls.handler.McdevCompletionHandlerTest",
+    "sourceSha256": "5f9f5f9f1cb4841e5504214b4e5993d884cf10f4ae97c762acaf2c86c8f6f4e8",
+    "status": "pending"
+  },
+  {
+    "legacyCase": "mcdev-jdtls-extension/src/test/kotlin/io/github/mcdev/jdtls/handler/McdevCompletionHandlerTest.kt::atTargetCompletionLoadsProjectSession",
+    "legacyClass": "io.github.mcdev.jdtls.handler.McdevCompletionHandlerTest",
+    "sourceSha256": "5f9f5f9f1cb4841e5504214b4e5993d884cf10f4ae97c762acaf2c86c8f6f4e8",
+    "status": "pending"
+  },
+  {
+    "legacyCase": "mcdev-jdtls-extension/src/test/kotlin/io/github/mcdev/jdtls/handler/McdevCompletionHandlerTest.kt::accessWidenerCompletionLoadsProjectSession",
+    "legacyClass": "io.github.mcdev.jdtls.handler.McdevCompletionHandlerTest",
+    "sourceSha256": "5f9f5f9f1cb4841e5504214b4e5993d884cf10f4ae97c762acaf2c86c8f6f4e8",
+    "status": "pending"
+  },
+  {
+    "legacyCase": "mcdev-jdtls-extension/src/test/kotlin/io/github/mcdev/jdtls/handler/McdevCompletionHandlerTest.kt::accessTransformerCompletionLoadsProjectSession",
+    "legacyClass": "io.github.mcdev.jdtls.handler.McdevCompletionHandlerTest",
+    "sourceSha256": "5f9f5f9f1cb4841e5504214b4e5993d884cf10f4ae97c762acaf2c86c8f6f4e8",
+    "status": "pending"
+  },
+  {
+    "legacyCase": "mcdev-jdtls-extension/src/test/kotlin/io/github/mcdev/jdtls/handler/McdevDefinitionHandlerTest.kt::resolvesMixinClassTarget",
+    "legacyClass": "io.github.mcdev.jdtls.handler.McdevDefinitionHandlerTest",
+    "sourceSha256": "f8e3c29a9e8c4d3053e0d337006eedae729b526817fc9f5ef035085938fb0c25",
+    "status": "pending"
+  },
+  {
+    "legacyCase": "mcdev-jdtls-extension/src/test/kotlin/io/github/mcdev/jdtls/handler/McdevDefinitionHandlerTest.kt::resolvesShadowFieldTarget",
+    "legacyClass": "io.github.mcdev.jdtls.handler.McdevDefinitionHandlerTest",
+    "sourceSha256": "f8e3c29a9e8c4d3053e0d337006eedae729b526817fc9f5ef035085938fb0c25",
+    "status": "pending"
+  },
+  {
+    "legacyCase": "mcdev-jdtls-extension/src/test/kotlin/io/github/mcdev/jdtls/handler/McdevDefinitionHandlerTest.kt::resolvesAccessWidenerOwnerToClassDefinition",
+    "legacyClass": "io.github.mcdev.jdtls.handler.McdevDefinitionHandlerTest",
+    "sourceSha256": "f8e3c29a9e8c4d3053e0d337006eedae729b526817fc9f5ef035085938fb0c25",
+    "status": "pending"
+  },
+  {
+    "legacyCase": "mcdev-jdtls-extension/src/test/kotlin/io/github/mcdev/jdtls/handler/McdevDefinitionHandlerTest.kt::resolvesAccessTransformerMemberToFieldDefinition",
+    "legacyClass": "io.github.mcdev.jdtls.handler.McdevDefinitionHandlerTest",
+    "sourceSha256": "f8e3c29a9e8c4d3053e0d337006eedae729b526817fc9f5ef035085938fb0c25",
+    "status": "pending"
+  },
+  {
+    "legacyCase": "mcdev-jdtls-extension/src/test/kotlin/io/github/mcdev/jdtls/handler/McdevDefinitionHandlerTest.kt::resolvesLoomMixinTargetFromMappedSources",
+    "legacyClass": "io.github.mcdev.jdtls.handler.McdevDefinitionHandlerTest",
+    "sourceSha256": "f8e3c29a9e8c4d3053e0d337006eedae729b526817fc9f5ef035085938fb0c25",
+    "status": "pending"
+  },
+  {
+    "legacyCase": "mcdev-jdtls-extension/src/test/kotlin/io/github/mcdev/jdtls/handler/McdevDefinitionHandlerTest.kt::returnsEmptyLocationsOutsideMixinContext",
+    "legacyClass": "io.github.mcdev.jdtls.handler.McdevDefinitionHandlerTest",
+    "sourceSha256": "f8e3c29a9e8c4d3053e0d337006eedae729b526817fc9f5ef035085938fb0c25",
+    "status": "pending"
+  },
+  {
+    "legacyCase": "mcdev-jdtls-extension/src/test/kotlin/io/github/mcdev/jdtls/handler/McdevDefinitionHandlerTest.kt::missingWorkspaceRootReturnsIncompleteContextError",
+    "legacyClass": "io.github.mcdev.jdtls.handler.McdevDefinitionHandlerTest",
+    "sourceSha256": "f8e3c29a9e8c4d3053e0d337006eedae729b526817fc9f5ef035085938fb0c25",
+    "status": "pending"
+  },
+  {
+    "legacyCase": "mcdev-jdtls-extension/src/test/kotlin/io/github/mcdev/jdtls/handler/McdevDefinitionHandlerTest.kt::definitionResponseIncludesSourceRangeMetadata",
+    "legacyClass": "io.github.mcdev.jdtls.handler.McdevDefinitionHandlerTest",
+    "sourceSha256": "f8e3c29a9e8c4d3053e0d337006eedae729b526817fc9f5ef035085938fb0c25",
+    "status": "pending"
+  },
+  {
+    "legacyCase": "mcdev-jdtls-extension/src/test/kotlin/io/github/mcdev/jdtls/handler/McdevDefinitionHandlerTest.kt::resolvesExpressionDefinitionIdToDirectSourceLocation",
+    "legacyClass": "io.github.mcdev.jdtls.handler.McdevDefinitionHandlerTest",
+    "sourceSha256": "f8e3c29a9e8c4d3053e0d337006eedae729b526817fc9f5ef035085938fb0c25",
+    "status": "pending"
+  },
+  {
+    "legacyCase": "mcdev-jdtls-extension/src/test/kotlin/io/github/mcdev/jdtls/handler/McdevDefinitionHandlerTest.kt::preservesDefinitionExactMethodNavigation",
+    "legacyClass": "io.github.mcdev.jdtls.handler.McdevDefinitionHandlerTest",
+    "sourceSha256": "f8e3c29a9e8c4d3053e0d337006eedae729b526817fc9f5ef035085938fb0c25",
+    "status": "pending"
+  },
+  {
+    "legacyCase": "mcdev-jdtls-extension/src/test/kotlin/io/github/mcdev/jdtls/handler/McdevDiagnosticsHandlerTest.kt::reportsUnresolvedInjectMethodForBrokenFixture",
+    "legacyClass": "io.github.mcdev.jdtls.handler.McdevDiagnosticsHandlerTest",
+    "sourceSha256": "c679fea5e13755741b5d4a537cfc90cddb9cf762ef5c5155ef20065549ecdcfb",
+    "status": "pending"
+  },
+  {
+    "legacyCase": "mcdev-jdtls-extension/src/test/kotlin/io/github/mcdev/jdtls/handler/McdevDiagnosticsHandlerTest.kt::reportsUnresolvedAtTargetForBrokenFixture",
+    "legacyClass": "io.github.mcdev.jdtls.handler.McdevDiagnosticsHandlerTest",
+    "sourceSha256": "c679fea5e13755741b5d4a537cfc90cddb9cf762ef5c5155ef20065549ecdcfb",
+    "status": "pending"
+  },
+  {
+    "legacyCase": "mcdev-jdtls-extension/src/test/kotlin/io/github/mcdev/jdtls/handler/McdevDiagnosticsHandlerTest.kt::cleanFixtureProducesNoUnresolvedMixinTarget",
+    "legacyClass": "io.github.mcdev.jdtls.handler.McdevDiagnosticsHandlerTest",
+    "sourceSha256": "c679fea5e13755741b5d4a537cfc90cddb9cf762ef5c5155ef20065549ecdcfb",
+    "status": "pending"
+  },
+  {
+    "legacyCase": "mcdev-jdtls-extension/src/test/kotlin/io/github/mcdev/jdtls/handler/McdevDiagnosticsHandlerTest.kt::reportsMissingMixinConfigEntryThroughHandler",
+    "legacyClass": "io.github.mcdev.jdtls.handler.McdevDiagnosticsHandlerTest",
+    "sourceSha256": "c679fea5e13755741b5d4a537cfc90cddb9cf762ef5c5155ef20065549ecdcfb",
+    "status": "pending"
+  },
+  {
+    "legacyCase": "mcdev-jdtls-extension/src/test/kotlin/io/github/mcdev/jdtls/handler/McdevDiagnosticsHandlerTest.kt::reportsShadowStaticMismatchThroughHandler",
+    "legacyClass": "io.github.mcdev.jdtls.handler.McdevDiagnosticsHandlerTest",
+    "sourceSha256": "c679fea5e13755741b5d4a537cfc90cddb9cf762ef5c5155ef20065549ecdcfb",
+    "status": "pending"
+  },
+  {
+    "legacyCase": "mcdev-jdtls-extension/src/test/kotlin/io/github/mcdev/jdtls/handler/McdevDiagnosticsHandlerTest.kt::reportsMixinExtrasWrongReturnTypeThroughHandler",
+    "legacyClass": "io.github.mcdev.jdtls.handler.McdevDiagnosticsHandlerTest",
+    "sourceSha256": "c679fea5e13755741b5d4a537cfc90cddb9cf762ef5c5155ef20065549ecdcfb",
+    "status": "pending"
+  },
+  {
+    "legacyCase": "mcdev-jdtls-extension/src/test/kotlin/io/github/mcdev/jdtls/handler/McdevDiagnosticsHandlerTest.kt::reportsAmbiguousInjectMethodThroughHandler",
+    "legacyClass": "io.github.mcdev.jdtls.handler.McdevDiagnosticsHandlerTest",
+    "sourceSha256": "c679fea5e13755741b5d4a537cfc90cddb9cf762ef5c5155ef20065549ecdcfb",
+    "status": "pending"
+  },
+  {
+    "legacyCase": "mcdev-jdtls-extension/src/test/kotlin/io/github/mcdev/jdtls/handler/McdevDiagnosticsHandlerTest.kt::diagnosticsIncludeSeverityAndMessage",
+    "legacyClass": "io.github.mcdev.jdtls.handler.McdevDiagnosticsHandlerTest",
+    "sourceSha256": "c679fea5e13755741b5d4a537cfc90cddb9cf762ef5c5155ef20065549ecdcfb",
+    "status": "pending"
+  },
+  {
+    "legacyCase": "mcdev-jdtls-extension/src/test/kotlin/io/github/mcdev/jdtls/handler/McdevDiagnosticsHandlerTest.kt::missingWorkspaceRootReturnsIncompleteContextError",
+    "legacyClass": "io.github.mcdev.jdtls.handler.McdevDiagnosticsHandlerTest",
+    "sourceSha256": "c679fea5e13755741b5d4a537cfc90cddb9cf762ef5c5155ef20065549ecdcfb",
+    "status": "pending"
+  },
+  {
+    "legacyCase": "mcdev-jdtls-extension/src/test/kotlin/io/github/mcdev/jdtls/handler/McdevInfoHandlerTest.kt::returnsRealFabricProjectState",
+    "legacyClass": "io.github.mcdev.jdtls.handler.McdevInfoHandlerTest",
+    "sourceSha256": "6dbc94484fe56202e014907b163d9ac5abb03c0d357b3c291e4e20d50f899931",
+    "status": "pending"
+  },
+  {
+    "legacyCase": "mcdev-jdtls-extension/src/test/kotlin/io/github/mcdev/jdtls/handler/McdevInfoHandlerTest.kt::includesProtocolAndExtensionVersions",
+    "legacyClass": "io.github.mcdev.jdtls.handler.McdevInfoHandlerTest",
+    "sourceSha256": "6dbc94484fe56202e014907b163d9ac5abb03c0d357b3c291e4e20d50f899931",
+    "status": "pending"
+  },
+  {
+    "legacyCase": "mcdev-jdtls-extension/src/test/kotlin/io/github/mcdev/jdtls/handler/McdevInfoHandlerTest.kt::reportsAccessWidenerDiscoveryForAwAtFixture",
+    "legacyClass": "io.github.mcdev.jdtls.handler.McdevInfoHandlerTest",
+    "sourceSha256": "6dbc94484fe56202e014907b163d9ac5abb03c0d357b3c291e4e20d50f899931",
+    "status": "pending"
+  },
+  {
+    "legacyCase": "mcdev-jdtls-extension/src/test/kotlin/io/github/mcdev/jdtls/handler/McdevInfoHandlerTest.kt::reportsClasspathEntryCount",
+    "legacyClass": "io.github.mcdev.jdtls.handler.McdevInfoHandlerTest",
+    "sourceSha256": "6dbc94484fe56202e014907b163d9ac5abb03c0d357b3c291e4e20d50f899931",
+    "status": "pending"
+  },
+  {
+    "legacyCase": "mcdev-jdtls-extension/src/test/kotlin/io/github/mcdev/jdtls/handler/McdevInfoHandlerTest.kt::missingWorkspaceRootReturnsIncompleteContextError",
+    "legacyClass": "io.github.mcdev.jdtls.handler.McdevInfoHandlerTest",
+    "sourceSha256": "6dbc94484fe56202e014907b163d9ac5abb03c0d357b3c291e4e20d50f899931",
+    "status": "pending"
+  },
+  {
+    "legacyCase": "mcdev-jdtls-extension/src/test/kotlin/io/github/mcdev/jdtls/handler/McdevProjectContextHandlerTest.kt::reloadClearsAndRebuildsCachedProjectContext",
+    "legacyClass": "io.github.mcdev.jdtls.handler.McdevProjectContextHandlerTest",
+    "sourceSha256": "b3a01f7f9d5f64be33593a044fd9c3becdb7ba7f5d05acf2a6188ef96c1722a2",
+    "status": "pending"
+  },
+  {
+    "legacyCase": "mcdev-jdtls-extension/src/test/kotlin/io/github/mcdev/jdtls/handler/McdevProjectContextHandlerTest.kt::dumpReturnsStructuredProjectContextDetails",
+    "legacyClass": "io.github.mcdev.jdtls.handler.McdevProjectContextHandlerTest",
+    "sourceSha256": "b3a01f7f9d5f64be33593a044fd9c3becdb7ba7f5d05acf2a6188ef96c1722a2",
+    "status": "pending"
+  },
+  {
+    "legacyCase": "mcdev-jdtls-extension/src/test/kotlin/io/github/mcdev/jdtls/handler/McdevProjectContextHandlerTest.kt::dumpWithMissingWorkspaceRootReturnsIncompleteContextError",
+    "legacyClass": "io.github.mcdev.jdtls.handler.McdevProjectContextHandlerTest",
+    "sourceSha256": "b3a01f7f9d5f64be33593a044fd9c3becdb7ba7f5d05acf2a6188ef96c1722a2",
+    "status": "pending"
+  },
+  {
+    "legacyCase": "mcdev-jdtls-extension/src/test/kotlin/io/github/mcdev/jdtls/handler/McdevReferencesHandlerTest.kt::findsMixinClassReferencesInWorkspace",
+    "legacyClass": "io.github.mcdev.jdtls.handler.McdevReferencesHandlerTest",
+    "sourceSha256": "035cebb0a2777a84daeeb2d06f7e8a190f974adc53e899d5a8394901622301fe",
+    "status": "pending"
+  },
+  {
+    "legacyCase": "mcdev-jdtls-extension/src/test/kotlin/io/github/mcdev/jdtls/handler/McdevReferencesHandlerTest.kt::findsShadowFieldReferencesInBuffer",
+    "legacyClass": "io.github.mcdev.jdtls.handler.McdevReferencesHandlerTest",
+    "sourceSha256": "035cebb0a2777a84daeeb2d06f7e8a190f974adc53e899d5a8394901622301fe",
+    "status": "pending"
+  },
+  {
+    "legacyCase": "mcdev-jdtls-extension/src/test/kotlin/io/github/mcdev/jdtls/handler/McdevReferencesHandlerTest.kt::findsAccessWidenerReferencesFromJavaField",
+    "legacyClass": "io.github.mcdev.jdtls.handler.McdevReferencesHandlerTest",
+    "sourceSha256": "035cebb0a2777a84daeeb2d06f7e8a190f974adc53e899d5a8394901622301fe",
+    "status": "pending"
+  },
+  {
+    "legacyCase": "mcdev-jdtls-extension/src/test/kotlin/io/github/mcdev/jdtls/handler/McdevReferencesHandlerTest.kt::findsAccessWidenerReferencesFromAccessWidenerBuffer",
+    "legacyClass": "io.github.mcdev.jdtls.handler.McdevReferencesHandlerTest",
+    "sourceSha256": "035cebb0a2777a84daeeb2d06f7e8a190f974adc53e899d5a8394901622301fe",
+    "status": "pending"
+  },
+  {
+    "legacyCase": "mcdev-jdtls-extension/src/test/kotlin/io/github/mcdev/jdtls/handler/McdevReferencesHandlerTest.kt::returnsEmptyWhenDefinitionTargetMissing",
+    "legacyClass": "io.github.mcdev.jdtls.handler.McdevReferencesHandlerTest",
+    "sourceSha256": "035cebb0a2777a84daeeb2d06f7e8a190f974adc53e899d5a8394901622301fe",
+    "status": "pending"
+  },
+  {
+    "legacyCase": "mcdev-jdtls-extension/src/test/kotlin/io/github/mcdev/jdtls/handler/McdevReindexHandlerTest.kt::reindexReturnsReadyState",
+    "legacyClass": "io.github.mcdev.jdtls.handler.McdevReindexHandlerTest",
+    "sourceSha256": "b73a7feafb64ce293a87a39fa770d63c5773d1c1124b7a12340fd6bead0c82fb",
+    "status": "pending"
+  },
+  {
+    "legacyCase": "mcdev-jdtls-extension/src/test/kotlin/io/github/mcdev/jdtls/handler/McdevReindexHandlerTest.kt::reindexUpdatesCachedSession",
+    "legacyClass": "io.github.mcdev.jdtls.handler.McdevReindexHandlerTest",
+    "sourceSha256": "b73a7feafb64ce293a87a39fa770d63c5773d1c1124b7a12340fd6bead0c82fb",
+    "status": "pending"
+  },
+  {
+    "legacyCase": "mcdev-jdtls-extension/src/test/kotlin/io/github/mcdev/jdtls/handler/McdevReindexHandlerTest.kt::missingWorkspaceRootReturnsIncompleteContextError",
+    "legacyClass": "io.github.mcdev.jdtls.handler.McdevReindexHandlerTest",
+    "sourceSha256": "b73a7feafb64ce293a87a39fa770d63c5773d1c1124b7a12340fd6bead0c82fb",
+    "status": "pending"
+  },
+  {
+    "legacyCase": "mcdev-jdtls-extension/src/test/kotlin/io/github/mcdev/jdtls/convert/CompletionTruncationTest.kt::onlyCappedClassSourcesAreIncomplete",
+    "legacyClass": "io.github.mcdev.jdtls.convert.CompletionTruncationTest",
+    "sourceSha256": "e1fac9e170d1c9e112817bc1c6b6afe19a596c0092643a90be3e193cb45238f3",
+    "status": "pending"
+  },
+  {
+    "legacyCase": "mcdev-jdtls-extension/src/test/kotlin/io/github/mcdev/jdtls/convert/CompletionTruncationTest.kt::wireResponseIncludesIsIncomplete",
+    "legacyClass": "io.github.mcdev.jdtls.convert.CompletionTruncationTest",
+    "sourceSha256": "e1fac9e170d1c9e112817bc1c6b6afe19a596c0092643a90be3e193cb45238f3",
+    "status": "pending"
+  },
+  {
+    "legacyCase": "mcdev-jdtls-extension/src/test/kotlin/io/github/mcdev/jdtls/transport/McdevCompletionTransportTest.kt::authenticatedRequestsAreHandledConcurrentlyAndReturnJson",
+    "legacyClass": "io.github.mcdev.jdtls.transport.McdevCompletionTransportTest",
+    "sourceSha256": "cbf0ce8cdde812d471a57091749018d36a034a1db2f82944fb651991e58f3e36",
+    "status": "pending"
+  },
+  {
+    "legacyCase": "mcdev-jdtls-extension/src/test/kotlin/io/github/mcdev/jdtls/transport/McdevCompletionTransportTest.kt::requestDeadlineProducesBoundedError",
+    "legacyClass": "io.github.mcdev.jdtls.transport.McdevCompletionTransportTest",
+    "sourceSha256": "cbf0ce8cdde812d471a57091749018d36a034a1db2f82944fb651991e58f3e36",
+    "status": "pending"
+  },
+  {
+    "legacyCase": "mcdev-jdtls-extension/src/test/kotlin/io/github/mcdev/jdtls/transport/McdevCompletionTransportTest.kt::rejectsUnauthenticatedRequestBeforeDispatch",
+    "legacyClass": "io.github.mcdev.jdtls.transport.McdevCompletionTransportTest",
+    "sourceSha256": "cbf0ce8cdde812d471a57091749018d36a034a1db2f82944fb651991e58f3e36",
+    "status": "pending"
+  },
+  {
+    "legacyCase": "mcdev-jdtls-extension/src/test/kotlin/io/github/mcdev/jdtls/transport/McdevCompletionTransportTest.kt::disconnectCancelsInFlightComputation",
+    "legacyClass": "io.github.mcdev.jdtls.transport.McdevCompletionTransportTest",
+    "sourceSha256": "cbf0ce8cdde812d471a57091749018d36a034a1db2f82944fb651991e58f3e36",
+    "status": "pending"
+  },
+  {
+    "legacyCase": "mcdev-jdtls-extension/src/test/kotlin/io/github/mcdev/jdtls/transport/McdevCompletionTransportTest.kt::completedRequestDoesNotReportServerTeardownAsFailure",
+    "legacyClass": "io.github.mcdev.jdtls.transport.McdevCompletionTransportTest",
+    "sourceSha256": "cbf0ce8cdde812d471a57091749018d36a034a1db2f82944fb651991e58f3e36",
+    "status": "pending"
+  },
+  {
+    "legacyCase": "mcdev-jdtls-extension/src/test/kotlin/io/github/mcdev/jdtls/stdio/McdevStdioMainTest.kt::shadedJarKeepsLineProtocolAliveAcrossProvisionalAndFallbackRequests",
+    "legacyClass": "io.github.mcdev.jdtls.stdio.McdevStdioMainTest",
+    "sourceSha256": "7a053af98b7acb0d8ffd52dc874caa988a5e5d91c58e0b9e862a48b39f9b3973",
+    "status": "pending"
+  }
+]

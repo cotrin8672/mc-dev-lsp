@@ -1,0 +1,8 @@
+{
+  "resource": "fixtures/shared/classes/com/example/target/SimpleTarget.class",
+  "baselineClass": "mcdev-test-fixtures/build/generated/fixture-classes/com/example/target/SimpleTarget.class",
+  "inputSource": "mcdev-test-fixtures/src/fixture-java/com/example/target/SimpleTarget.java",
+  "inputSha256": "2e006db63d9571deac4e8f2702be382d93ac19af4ab14a53bd610b54de7ab305",
+  "classSha256": "4e3b9137c518f0449e9360875173d9dd516e48c58d0005a3a57c9ed5818a47f7",
+  "runtimeRequiresJava": false
+}

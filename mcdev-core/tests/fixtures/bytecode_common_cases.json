@@ -1,0 +1,405 @@
+[
+  {
+    "case": "equalDescriptorsReturnUnchanged",
+    "checks": [
+      {
+        "left": "Lhierarchy/Base;",
+        "right": "Lhierarchy/Base;",
+        "expected": "Lhierarchy/Base;"
+      }
+    ]
+  },
+  {
+    "case": "siblingsShareCommonBase",
+    "checks": [
+      {
+        "left": "Lhierarchy/ChildOne;",
+        "right": "Lhierarchy/ChildTwo;",
+        "expected": "Lhierarchy/Base;"
+      }
+    ]
+  },
+  {
+    "case": "superclassBothArgumentOrders",
+    "checks": [
+      {
+        "left": "Lhierarchy/Child;",
+        "right": "Lhierarchy/Base;",
+        "expected": "Lhierarchy/Base;"
+      },
+      {
+        "left": "Lhierarchy/Base;",
+        "right": "Lhierarchy/Child;",
+        "expected": "Lhierarchy/Base;"
+      }
+    ]
+  },
+  {
+    "case": "interfaceImplementation",
+    "checks": [
+      {
+        "left": "Lhierarchy/Impl;",
+        "right": "Lhierarchy/Contract;",
+        "expected": "Lhierarchy/Contract;"
+      }
+    ]
+  },
+  {
+    "case": "unrelatedReferencesReturnObject",
+    "checks": [
+      {
+        "left": "Lhierarchy/Alpha;",
+        "right": "Lhierarchy/Beta;",
+        "expected": "Ljava/lang/Object;"
+      }
+    ]
+  },
+  {
+    "case": "arraysPreserveCompatibleReferenceComponentAndDimensions",
+    "checks": [
+      {
+        "left": "[Lhierarchy/Child;",
+        "right": "[Lhierarchy/Base;",
+        "expected": "[Lhierarchy/Base;"
+      },
+      {
+        "left": "[Lhierarchy/Base;",
+        "right": "[Lhierarchy/Child;",
+        "expected": "[Lhierarchy/Base;"
+      },
+      {
+        "left": "[[Lhierarchy/Child;",
+        "right": "[[Lhierarchy/Base;",
+        "expected": "[[Lhierarchy/Base;"
+      },
+      {
+        "left": "[[Lhierarchy/Base;",
+        "right": "[[Lhierarchy/Child;",
+        "expected": "[[Lhierarchy/Base;"
+      }
+    ]
+  },
+  {
+    "case": "stringOneDimensionalWithStringTwoDimensionalReturnsObjectOneDimensional",
+    "checks": [
+      {
+        "left": "[Ljava/lang/String;",
+        "right": "[[Ljava/lang/String;",
+        "expected": "[Ljava/lang/Object;"
+      },
+      {
+        "left": "[[Ljava/lang/String;",
+        "right": "[Ljava/lang/String;",
+        "expected": "[Ljava/lang/Object;"
+      }
+    ]
+  },
+  {
+    "case": "stringTwoDimensionalWithObjectOneDimensionalReturnsObjectOneDimensional",
+    "checks": [
+      {
+        "left": "[[Ljava/lang/String;",
+        "right": "[Ljava/lang/Object;",
+        "expected": "[Ljava/lang/Object;"
+      },
+      {
+        "left": "[Ljava/lang/Object;",
+        "right": "[[Ljava/lang/String;",
+        "expected": "[Ljava/lang/Object;"
+      }
+    ]
+  },
+  {
+    "case": "arraysAreAssignableToCloneableAndSerializable",
+    "checks": [
+      {
+        "left": "[I",
+        "right": "Ljava/lang/Cloneable;",
+        "expected": "Ljava/lang/Cloneable;"
+      },
+      {
+        "left": "Ljava/lang/Cloneable;",
+        "right": "[I",
+        "expected": "Ljava/lang/Cloneable;"
+      },
+      {
+        "left": "[I",
+        "right": "Ljava/io/Serializable;",
+        "expected": "Ljava/io/Serializable;"
+      },
+      {
+        "left": "Ljava/io/Serializable;",
+        "right": "[I",
+        "expected": "Ljava/io/Serializable;"
+      }
+    ]
+  },
+  {
+    "case": "equalPrimitiveArraysReturnUnchanged",
+    "checks": [
+      {
+        "left": "[I",
+        "right": "[I",
+        "expected": "[I"
+      }
+    ]
+  },
+  {
+    "case": "incompatiblePrimitiveArraysReturnObject",
+    "checks": [
+      {
+        "left": "[I",
+        "right": "[J",
+        "expected": "Ljava/lang/Object;"
+      },
+      {
+        "left": "[J",
+        "right": "[I",
+        "expected": "Ljava/lang/Object;"
+      }
+    ]
+  },
+  {
+    "case": "incompatiblePrimitiveArraysReturnObjectArrayAtMatchingDimensions",
+    "checks": [
+      {
+        "left": "[[I",
+        "right": "[[J",
+        "expected": "[Ljava/lang/Object;"
+      },
+      {
+        "left": "[[J",
+        "right": "[[I",
+        "expected": "[Ljava/lang/Object;"
+      }
+    ]
+  },
+  {
+    "case": "incompatiblePrimitiveArraysReturnObjectArrayAtThreeMatchingDimensions",
+    "checks": [
+      {
+        "left": "[[[I",
+        "right": "[[[J",
+        "expected": "[[Ljava/lang/Object;"
+      },
+      {
+        "left": "[[[J",
+        "right": "[[[I",
+        "expected": "[[Ljava/lang/Object;"
+      }
+    ]
+  },
+  {
+    "case": "incompatiblePrimitiveArraysAcrossDimensionsReturnObject",
+    "checks": [
+      {
+        "left": "[I",
+        "right": "[[J",
+        "expected": "Ljava/lang/Object;"
+      },
+      {
+        "left": "[[J",
+        "right": "[I",
+        "expected": "Ljava/lang/Object;"
+      }
+    ]
+  },
+  {
+    "case": "mixedPrimitiveAndReferenceArraysReturnObject",
+    "checks": [
+      {
+        "left": "[I",
+        "right": "[Ljava/lang/String;",
+        "expected": "Ljava/lang/Object;"
+      },
+      {
+        "left": "[Ljava/lang/String;",
+        "right": "[I",
+        "expected": "Ljava/lang/Object;"
+      }
+    ]
+  },
+  {
+    "case": "arrayDimensionMismatchWithSharedComponentTypeReturnsObjectArray",
+    "checks": [
+      {
+        "left": "[Lhierarchy/Leaf;",
+        "right": "[[Lhierarchy/Leaf;",
+        "expected": "[Ljava/lang/Object;"
+      },
+      {
+        "left": "[[Lhierarchy/Leaf;",
+        "right": "[Lhierarchy/Leaf;",
+        "expected": "[Ljava/lang/Object;"
+      }
+    ]
+  },
+  {
+    "case": "arrayDimensionMismatchWithRelatedComponentTypesReturnsObjectArray",
+    "checks": [
+      {
+        "left": "[Lhierarchy/Child;",
+        "right": "[[Lhierarchy/Base;",
+        "expected": "[Ljava/lang/Object;"
+      },
+      {
+        "left": "[[Lhierarchy/Base;",
+        "right": "[Lhierarchy/Child;",
+        "expected": "[Ljava/lang/Object;"
+      }
+    ]
+  },
+  {
+    "case": "unequalPrimitiveDescriptorsReturnNull",
+    "checks": [
+      {
+        "left": "I",
+        "right": "J",
+        "expected": null
+      },
+      {
+        "left": "Z",
+        "right": "B",
+        "expected": null
+      }
+    ]
+  },
+  {
+    "case": "invalidDescriptorsReturnNull",
+    "checks": [
+      {
+        "left": "not-a-descriptor",
+        "right": "[I",
+        "expected": null
+      },
+      {
+        "left": "[I",
+        "right": "Ljava/lang/Object",
+        "expected": null
+      },
+      {
+        "left": "()V",
+        "right": "I",
+        "expected": null
+      },
+      {
+        "left": "Ljava/lang/Object;junk",
+        "right": "[I",
+        "expected": null
+      },
+      {
+        "left": "[Ijunk",
+        "right": "I",
+        "expected": null
+      },
+      {
+        "left": "[[",
+        "right": "[I",
+        "expected": null
+      },
+      {
+        "left": "[Ljava/lang/Object",
+        "right": "[I",
+        "expected": null
+      }
+    ]
+  },
+  {
+    "case": "equalInvalidDescriptorsReturnNull",
+    "checks": [
+      {
+        "left": "not-a-descriptor",
+        "right": "not-a-descriptor",
+        "expected": null
+      },
+      {
+        "left": "()V",
+        "right": "()V",
+        "expected": null
+      }
+    ]
+  },
+  {
+    "case": "missingBytesReturnNull",
+    "checks": [
+      {
+        "left": "Lcom/missing/Alpha;",
+        "right": "Lcom/missing/Beta;",
+        "expected": null
+      }
+    ]
+  },
+  {
+    "case": "corruptBytesReturnNull",
+    "checks": [
+      {
+        "left": "Lhierarchy/Corrupt;",
+        "right": "Lhierarchy/Peer;",
+        "expected": null
+      }
+    ]
+  },
+  {
+    "case": "cacheReusesHierarchyAndPairResults",
+    "checks": []
+  },
+  {
+    "case": "everyReferenceIsAssignableToObjectWithoutHierarchyBytes",
+    "checks": [
+      {
+        "left": "Lcom/missing/Type;",
+        "right": "Ljava/lang/Object;",
+        "expected": "Ljava/lang/Object;"
+      }
+    ]
+  },
+  {
+    "case": "arraysAreAssignableToObject",
+    "checks": [
+      {
+        "left": "[I",
+        "right": "Ljava/lang/Object;",
+        "expected": "Ljava/lang/Object;"
+      },
+      {
+        "left": "Ljava/lang/Object;",
+        "right": "[I",
+        "expected": "Ljava/lang/Object;"
+      }
+    ]
+  },
+  {
+    "case": "cyclicHierarchyDoesNotLoop",
+    "checks": [
+      {
+        "left": "Lcycle/A;",
+        "right": "Lcycle/C;",
+        "expected": null
+      },
+      {
+        "left": "Lcycle/C;",
+        "right": "Lcycle/A;",
+        "expected": null
+      }
+    ]
+  },
+  {
+    "case": "missingBytesAreCachedWithoutRepeatedLookup",
+    "checks": [
+      {
+        "left": "Lcom/missing/Alpha;",
+        "right": "Lcom/missing/Beta;",
+        "expected": null
+      },
+      {
+        "left": "Lcom/missing/Beta;",
+        "right": "Lcom/missing/Alpha;",
+        "expected": null
+      }
+    ]
+  },
+  {
+    "case": "nonPositiveCacheSizesAreRejected",
+    "checks": []
+  }
+]

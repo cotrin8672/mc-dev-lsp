@@ -1,0 +1,95 @@
+[
+  {
+    "id": "initialize",
+    "jsonrpc": "2.0",
+    "method": "initialize",
+    "params": {
+      "capabilities": [
+        "semantic-v1"
+      ],
+      "protocol": {
+        "major": 1,
+        "minor": 0
+      },
+      "provider": "mcdev.mixin"
+    }
+  },
+  {
+    "id": "4",
+    "jsonrpc": "2.0",
+    "method": "analysis/evaluate",
+    "params": {
+      "configuration": [],
+      "declarations": [
+        {
+          "annotations": [
+            {
+              "arguments": [
+                {
+                  "name": null,
+                  "range": {
+                    "end": 121,
+                    "start": 109
+                  },
+                  "value": {
+                    "state": "found",
+                    "value": {
+                      "kind": "class",
+                      "typeRef": "4:4"
+                    }
+                  }
+                }
+              ],
+              "range": {
+                "end": 122,
+                "start": 102
+              },
+              "typeRef": "4:3",
+              "useSiteTarget": null
+            }
+          ],
+          "id": "4:0",
+          "name": "JavaMixin",
+          "owner": null,
+          "range": {
+            "end": 147,
+            "start": 138
+          }
+        },
+        {
+          "annotations": [
+            {
+              "arguments": [],
+              "range": {
+                "end": 161,
+                "start": 154
+              },
+              "typeRef": "4:5",
+              "useSiteTarget": null
+            }
+          ],
+          "id": "4:1",
+          "name": "shadow$twice",
+          "owner": "4:0",
+          "range": {
+            "end": 187,
+            "start": 175
+          }
+        },
+        {
+          "annotations": [],
+          "id": "4:2",
+          "name": "invoke",
+          "owner": "4:0",
+          "range": {
+            "end": 210,
+            "start": 204
+          }
+        }
+      ],
+      "evaluation": "4",
+      "owner": "C:/Users/gummy/AppData/Local/Temp/mcdev-editor-dfe66f4e-0eeb-4ac0-b903-bb4b3b16acf4/fixture/JavaMixin.java",
+      "source": "package fixture;\nimport org.spongepowered.asm.mixin.Mixin;\nimport org.spongepowered.asm.mixin.Shadow;\n@Mixin(Target.class)\nabstract class JavaMixin {\n    @Shadow abstract int shadow$twice(int x);\n    int invoke(int x) { return shadow$twice(x); }\n}\n"
+    }
+  }
+]

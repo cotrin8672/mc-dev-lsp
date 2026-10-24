@@ -1,0 +1,500 @@
+[
+  {
+    "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixinextras/LocalCaptureExtractorTest.kt::analysisFailureFailsClosed",
+    "legacyClass": "io.github.mcdev.core.mixinextras.LocalCaptureExtractorTest",
+    "status": "passed",
+    "calls": 1
+  },
+  {
+    "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixinextras/LocalCaptureExtractorTest.kt::bodyLocalIsNotMarkedAsArgument",
+    "legacyClass": "io.github.mcdev.core.mixinextras.LocalCaptureExtractorTest",
+    "status": "passed",
+    "calls": 1
+  },
+  {
+    "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixinextras/LocalCaptureExtractorTest.kt::corruptClassBytesFailClosed",
+    "legacyClass": "io.github.mcdev.core.mixinextras.LocalCaptureExtractorTest",
+    "status": "passed",
+    "calls": 1
+  },
+  {
+    "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixinextras/LocalCaptureExtractorTest.kt::emptyClassBytesFailClosed",
+    "legacyClass": "io.github.mcdev.core.mixinextras.LocalCaptureExtractorTest",
+    "status": "passed",
+    "calls": 1
+  },
+  {
+    "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixinextras/LocalCaptureExtractorTest.kt::instanceMethodExcludesReceiverAndMarksArguments",
+    "legacyClass": "io.github.mcdev.core.mixinextras.LocalCaptureExtractorTest",
+    "status": "passed",
+    "calls": 1
+  },
+  {
+    "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixinextras/LocalCaptureExtractorTest.kt::invalidInstructionIndexFailsClosed",
+    "legacyClass": "io.github.mcdev.core.mixinextras.LocalCaptureExtractorTest",
+    "status": "passed",
+    "calls": 1
+  },
+  {
+    "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixinextras/LocalCaptureExtractorTest.kt::labelLineAndFrameNodesDoNotShiftRequestedOccurrence",
+    "legacyClass": "io.github.mcdev.core.mixinextras.LocalCaptureExtractorTest",
+    "status": "passed",
+    "calls": 2
+  },
+  {
+    "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixinextras/LocalCaptureExtractorTest.kt::localVariableTableNameAttachedWhenLive",
+    "legacyClass": "io.github.mcdev.core.mixinextras.LocalCaptureExtractorTest",
+    "status": "passed",
+    "calls": 1
+  },
+  {
+    "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixinextras/LocalCaptureExtractorTest.kt::localVariableTableNameNullWhenDebugInfoAbsent",
+    "legacyClass": "io.github.mcdev.core.mixinextras.LocalCaptureExtractorTest",
+    "status": "passed",
+    "calls": 1
+  },
+  {
+    "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixinextras/LocalCaptureExtractorTest.kt::missingClassBytesFailClosed",
+    "legacyClass": "io.github.mcdev.core.mixinextras.LocalCaptureExtractorTest",
+    "status": "passed",
+    "calls": 1
+  },
+  {
+    "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixinextras/LocalCaptureExtractorTest.kt::missingMethodFailsClosed",
+    "legacyClass": "io.github.mcdev.core.mixinextras.LocalCaptureExtractorTest",
+    "status": "passed",
+    "calls": 1
+  },
+  {
+    "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixinextras/LocalCaptureExtractorTest.kt::multipleInstructionIndicesShareSingleAnalysis",
+    "legacyClass": "io.github.mcdev.core.mixinextras.LocalCaptureExtractorTest",
+    "status": "passed",
+    "calls": 1
+  },
+  {
+    "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixinextras/LocalCaptureExtractorTest.kt::staticMethodCoversWideArgumentSlots",
+    "legacyClass": "io.github.mcdev.core.mixinextras.LocalCaptureExtractorTest",
+    "status": "passed",
+    "calls": 1
+  },
+  {
+    "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixinextras/LocalCaptureTypeResolverTest.kt::resolveDefinitionResolvesNonVoidTypeClassName",
+    "legacyClass": "io.github.mcdev.core.mixinextras.LocalCaptureTypeResolverTest",
+    "status": "passed",
+    "calls": 20
+  },
+  {
+    "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixinextras/LocalCaptureTypeResolverTest.kt::resolveDefinitionReturnsNullForMissingOrVoidTypeClassName",
+    "legacyClass": "io.github.mcdev.core.mixinextras.LocalCaptureTypeResolverTest",
+    "status": "passed",
+    "calls": 2
+  },
+  {
+    "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixinextras/LocalCaptureTypeResolverTest.kt::resolveDefinitionReturnsNullForUnresolvedTypeClassName",
+    "legacyClass": "io.github.mcdev.core.mixinextras.LocalCaptureTypeResolverTest",
+    "status": "passed",
+    "calls": 5
+  },
+  {
+    "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixinextras/LocalCaptureTypeResolverTest.kt::resolveParameterIgnoresLocalDefinitionOnlyTypeAttribute",
+    "legacyClass": "io.github.mcdev.core.mixinextras.LocalCaptureTypeResolverTest",
+    "status": "passed",
+    "calls": 5
+  },
+  {
+    "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixinextras/LocalCaptureTypeResolverTest.kt::resolveParameterLeavesOtherOfficialSugarRefTypesUnchanged",
+    "legacyClass": "io.github.mcdev.core.mixinextras.LocalCaptureTypeResolverTest",
+    "status": "passed",
+    "calls": 5
+  },
+  {
+    "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixinextras/LocalCaptureTypeResolverTest.kt::resolveParameterLeavesWrongPackagePrimitiveRefDescriptorUnwrapped",
+    "legacyClass": "io.github.mcdev.core.mixinextras.LocalCaptureTypeResolverTest",
+    "status": "passed",
+    "calls": 5
+  },
+  {
+    "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixinextras/LocalCaptureTypeResolverTest.kt::resolveParameterResolvesPlainPrimitiveAndReferenceTypes",
+    "legacyClass": "io.github.mcdev.core.mixinextras.LocalCaptureTypeResolverTest",
+    "status": "passed",
+    "calls": 15
+  },
+  {
+    "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixinextras/LocalCaptureTypeResolverTest.kt::resolveParameterReturnsNullForRawWildcardMultipleOrUnresolvedLocalRefGenerics",
+    "legacyClass": "io.github.mcdev.core.mixinextras.LocalCaptureTypeResolverTest",
+    "status": "passed",
+    "calls": 42
+  },
+  {
+    "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixinextras/LocalCaptureTypeResolverTest.kt::resolveParameterReturnsNullForUnresolvedType",
+    "legacyClass": "io.github.mcdev.core.mixinextras.LocalCaptureTypeResolverTest",
+    "status": "passed",
+    "calls": 5
+  },
+  {
+    "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixinextras/LocalCaptureTypeResolverTest.kt::resolveParameterReturnsNullForWrongPackageLocalRefLookalike",
+    "legacyClass": "io.github.mcdev.core.mixinextras.LocalCaptureTypeResolverTest",
+    "status": "passed",
+    "calls": 5
+  },
+  {
+    "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixinextras/LocalCaptureTypeResolverTest.kt::resolveParameterUnwrapsOfficialLocalRefErasedGenericType",
+    "legacyClass": "io.github.mcdev.core.mixinextras.LocalCaptureTypeResolverTest",
+    "status": "passed",
+    "calls": 9
+  },
+  {
+    "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixinextras/LocalCaptureTypeResolverTest.kt::resolveParameterUnwrapsOfficialLocalRefReferenceArrayGeneric",
+    "legacyClass": "io.github.mcdev.core.mixinextras.LocalCaptureTypeResolverTest",
+    "status": "passed",
+    "calls": 9
+  },
+  {
+    "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixinextras/LocalCaptureTypeResolverTest.kt::resolveParameterUnwrapsOfficialLocalRefWithConcreteGeneric",
+    "legacyClass": "io.github.mcdev.core.mixinextras.LocalCaptureTypeResolverTest",
+    "status": "passed",
+    "calls": 18
+  },
+  {
+    "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixinextras/LocalCaptureTypeResolverTest.kt::resolveParameterUnwrapsOfficialPrimitiveRefTypes",
+    "legacyClass": "io.github.mcdev.core.mixinextras.LocalCaptureTypeResolverTest",
+    "status": "passed",
+    "calls": 40
+  },
+  {
+    "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixinextras/LocalCaptureValidationServiceTest.kt::ambiguousSiteDoesNotDiscardResolvedSite",
+    "legacyClass": "io.github.mcdev.core.mixinextras.LocalCaptureValidationServiceTest",
+    "status": "passed",
+    "calls": 10
+  },
+  {
+    "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixinextras/LocalCaptureValidationServiceTest.kt::missingClassBytesWithEmptyInvokeCandidatesIsUnavailableNotNotFound",
+    "legacyClass": "io.github.mcdev.core.mixinextras.LocalCaptureValidationServiceTest",
+    "status": "passed",
+    "calls": 6
+  },
+  {
+    "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixinextras/LocalCaptureValidationServiceTest.kt::resolvedCaptureRetainsRawSnapshot",
+    "legacyClass": "io.github.mcdev.core.mixinextras.LocalCaptureValidationServiceTest",
+    "status": "passed",
+    "calls": 8
+  },
+  {
+    "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixinextras/LocalCaptureValidationServiceTest.kt::unresolvedTypeOccurrenceAndExtractionAreUnavailableNotNotFound",
+    "legacyClass": "io.github.mcdev.core.mixinextras.LocalCaptureValidationServiceTest",
+    "status": "passed",
+    "calls": 18
+  },
+  {
+    "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixinextras/LocalDiscriminatorResolverTest.kt::argsOnlyFiltersOutNonArgumentLocals",
+    "legacyClass": "io.github.mcdev.core.mixinextras.LocalDiscriminatorResolverTest",
+    "status": "passed",
+    "calls": 1
+  },
+  {
+    "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixinextras/LocalDiscriminatorResolverTest.kt::argsOnlyImplicitAmbiguousUsesOnlyArguments",
+    "legacyClass": "io.github.mcdev.core.mixinextras.LocalDiscriminatorResolverTest",
+    "status": "passed",
+    "calls": 1
+  },
+  {
+    "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixinextras/LocalDiscriminatorResolverTest.kt::emptyNamesFallThroughToImplicit",
+    "legacyClass": "io.github.mcdev.core.mixinextras.LocalDiscriminatorResolverTest",
+    "status": "passed",
+    "calls": 1
+  },
+  {
+    "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixinextras/LocalDiscriminatorResolverTest.kt::implicitAmbiguousWhenMultipleMatchingCandidates",
+    "legacyClass": "io.github.mcdev.core.mixinextras.LocalDiscriminatorResolverTest",
+    "status": "passed",
+    "calls": 1
+  },
+  {
+    "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixinextras/LocalDiscriminatorResolverTest.kt::implicitNotFoundWhenNoDescriptorMatch",
+    "legacyClass": "io.github.mcdev.core.mixinextras.LocalDiscriminatorResolverTest",
+    "status": "passed",
+    "calls": 1
+  },
+  {
+    "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixinextras/LocalDiscriminatorResolverTest.kt::implicitResolvesSingleMatchingCandidate",
+    "legacyClass": "io.github.mcdev.core.mixinextras.LocalDiscriminatorResolverTest",
+    "status": "passed",
+    "calls": 1
+  },
+  {
+    "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixinextras/LocalDiscriminatorResolverTest.kt::indexMatchesExactJvmSlot",
+    "legacyClass": "io.github.mcdev.core.mixinextras.LocalDiscriminatorResolverTest",
+    "status": "passed",
+    "calls": 1
+  },
+  {
+    "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixinextras/LocalDiscriminatorResolverTest.kt::indexNotFoundWhenSlotHasDifferentDescriptor",
+    "legacyClass": "io.github.mcdev.core.mixinextras.LocalDiscriminatorResolverTest",
+    "status": "passed",
+    "calls": 1
+  },
+  {
+    "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixinextras/LocalDiscriminatorResolverTest.kt::indexPrecedenceOverNamesWhenOrdinalUnspecified",
+    "legacyClass": "io.github.mcdev.core.mixinextras.LocalDiscriminatorResolverTest",
+    "status": "passed",
+    "calls": 1
+  },
+  {
+    "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixinextras/LocalDiscriminatorResolverTest.kt::namesNotFoundWhenNoNameMatches",
+    "legacyClass": "io.github.mcdev.core.mixinextras.LocalDiscriminatorResolverTest",
+    "status": "passed",
+    "calls": 1
+  },
+  {
+    "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixinextras/LocalDiscriminatorResolverTest.kt::namesResolveSingleMatch",
+    "legacyClass": "io.github.mcdev.core.mixinextras.LocalDiscriminatorResolverTest",
+    "status": "passed",
+    "calls": 1
+  },
+  {
+    "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixinextras/LocalDiscriminatorResolverTest.kt::namesSelectFirstMatchingSlotWhenMultipleCandidatesMatch",
+    "legacyClass": "io.github.mcdev.core.mixinextras.LocalDiscriminatorResolverTest",
+    "status": "passed",
+    "calls": 2
+  },
+  {
+    "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixinextras/LocalDiscriminatorResolverTest.kt::negativeIndexFallsThroughToImplicit",
+    "legacyClass": "io.github.mcdev.core.mixinextras.LocalDiscriminatorResolverTest",
+    "status": "passed",
+    "calls": 1
+  },
+  {
+    "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixinextras/LocalDiscriminatorResolverTest.kt::negativeOrdinalFallsThroughToImplicit",
+    "legacyClass": "io.github.mcdev.core.mixinextras.LocalDiscriminatorResolverTest",
+    "status": "passed",
+    "calls": 1
+  },
+  {
+    "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixinextras/LocalDiscriminatorResolverTest.kt::ordinalMissReturnsNotFound",
+    "legacyClass": "io.github.mcdev.core.mixinextras.LocalDiscriminatorResolverTest",
+    "status": "passed",
+    "calls": 1
+  },
+  {
+    "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixinextras/LocalDiscriminatorResolverTest.kt::ordinalPrecedenceOverIndexAndNames",
+    "legacyClass": "io.github.mcdev.core.mixinextras.LocalDiscriminatorResolverTest",
+    "status": "passed",
+    "calls": 1
+  },
+  {
+    "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixinextras/LocalDiscriminatorResolverTest.kt::ordinalSelectsZeroBasedCandidateInStableSlotOrder",
+    "legacyClass": "io.github.mcdev.core.mixinextras.LocalDiscriminatorResolverTest",
+    "status": "passed",
+    "calls": 1
+  },
+  {
+    "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixinextras/LocalDiscriminatorResolverTest.kt::ordinalUsesReceiverCountButCannotSelectReceiver",
+    "legacyClass": "io.github.mcdev.core.mixinextras.LocalDiscriminatorResolverTest",
+    "status": "passed",
+    "calls": 2
+  },
+  {
+    "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixinextras/LocalDiscriminatorResolverTest.kt::printDoesNotChangeSelection",
+    "legacyClass": "io.github.mcdev.core.mixinextras.LocalDiscriminatorResolverTest",
+    "status": "passed",
+    "calls": 2
+  },
+  {
+    "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixinextras/LocalDiscriminatorResolverTest.kt::stableOrderingDoesNotDependOnInputCandidateOrder",
+    "legacyClass": "io.github.mcdev.core.mixinextras.LocalDiscriminatorResolverTest",
+    "status": "passed",
+    "calls": 2
+  },
+  {
+    "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixinextras/LocalCompletionServiceTest.kt::argsOnlyFiltersDerivedCandidates",
+    "legacyClass": "io.github.mcdev.core.mixinextras.LocalCompletionServiceTest",
+    "status": "passed",
+    "calls": 7
+  },
+  {
+    "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixinextras/LocalCompletionServiceTest.kt::completesFirstMatchingNameAcrossSnapshots",
+    "legacyClass": "io.github.mcdev.core.mixinextras.LocalCompletionServiceTest",
+    "status": "passed",
+    "calls": 8
+  },
+  {
+    "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixinextras/LocalCompletionServiceTest.kt::completesIndexValuesPresentInEverySnapshot",
+    "legacyClass": "io.github.mcdev.core.mixinextras.LocalCompletionServiceTest",
+    "status": "passed",
+    "calls": 12
+  },
+  {
+    "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixinextras/LocalCompletionServiceTest.kt::completesNamesLexicallySorted",
+    "legacyClass": "io.github.mcdev.core.mixinextras.LocalCompletionServiceTest",
+    "status": "passed",
+    "calls": 12
+  },
+  {
+    "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixinextras/LocalCompletionServiceTest.kt::completesOrdinalValuesStableAcrossSnapshots",
+    "legacyClass": "io.github.mcdev.core.mixinextras.LocalCompletionServiceTest",
+    "status": "passed",
+    "calls": 12
+  },
+  {
+    "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixinextras/LocalCompletionServiceTest.kt::respectsPartialPrefixForNames",
+    "legacyClass": "io.github.mcdev.core.mixinextras.LocalCompletionServiceTest",
+    "status": "passed",
+    "calls": 9
+  },
+  {
+    "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixinextras/LocalCompletionServiceTest.kt::respectsPartialPrefixForNumericValues",
+    "legacyClass": "io.github.mcdev.core.mixinextras.LocalCompletionServiceTest",
+    "status": "passed",
+    "calls": 10
+  },
+  {
+    "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixinextras/LocalCompletionServiceTest.kt::returnsEmptyForUnsupportedAttribute",
+    "legacyClass": "io.github.mcdev.core.mixinextras.LocalCompletionServiceTest",
+    "status": "passed",
+    "calls": 6
+  },
+  {
+    "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixinextras/LocalCompletionServiceTest.kt::returnsEmptyWhenAnyResultUnavailable",
+    "legacyClass": "io.github.mcdev.core.mixinextras.LocalCompletionServiceTest",
+    "status": "passed",
+    "calls": 1
+  },
+  {
+    "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixinextras/LocalCompletionServiceTest.kt::returnsEmptyWhenAnySnapshotsEmpty",
+    "legacyClass": "io.github.mcdev.core.mixinextras.LocalCompletionServiceTest",
+    "status": "passed",
+    "calls": 1
+  },
+  {
+    "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixinextras/LocalCompletionServiceTest.kt::returnsEmptyWhenResultsEmpty",
+    "legacyClass": "io.github.mcdev.core.mixinextras.LocalCompletionServiceTest",
+    "status": "passed",
+    "calls": 1
+  },
+  {
+    "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixinextras/LocalCompletionServiceTest.kt::returnsEmptyWhenTargetDescriptorUnresolved",
+    "legacyClass": "io.github.mcdev.core.mixinextras.LocalCompletionServiceTest",
+    "status": "passed",
+    "calls": 6
+  },
+  {
+    "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixinextras/MixinExtrasCompletionServiceTest.kt::completeAtTargetForWrapOperationUsesBytecodeIndex",
+    "legacyClass": "io.github.mcdev.core.mixinextras.MixinExtrasCompletionServiceTest",
+    "status": "passed",
+    "calls": 4
+  },
+  {
+    "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixinextras/MixinExtrasCompletionServiceTest.kt::completesModifyExpressionValueMethod",
+    "legacyClass": "io.github.mcdev.core.mixinextras.MixinExtrasCompletionServiceTest",
+    "status": "passed",
+    "calls": 4
+  },
+  {
+    "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixinextras/MixinExtrasCompletionServiceTest.kt::completesModifyReceiverMethod",
+    "legacyClass": "io.github.mcdev.core.mixinextras.MixinExtrasCompletionServiceTest",
+    "status": "passed",
+    "calls": 4
+  },
+  {
+    "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixinextras/MixinExtrasCompletionServiceTest.kt::completesModifyReturnValueMethod",
+    "legacyClass": "io.github.mcdev.core.mixinextras.MixinExtrasCompletionServiceTest",
+    "status": "passed",
+    "calls": 4
+  },
+  {
+    "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixinextras/MixinExtrasCompletionServiceTest.kt::completesWrapMethodTargetMethod",
+    "legacyClass": "io.github.mcdev.core.mixinextras.MixinExtrasCompletionServiceTest",
+    "status": "passed",
+    "calls": 4
+  },
+  {
+    "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixinextras/MixinExtrasCompletionServiceTest.kt::completesWrapOperationAtInvokeTarget",
+    "legacyClass": "io.github.mcdev.core.mixinextras.MixinExtrasCompletionServiceTest",
+    "status": "passed",
+    "calls": 4
+  },
+  {
+    "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixinextras/MixinExtrasCompletionServiceTest.kt::completesWrapOperationMethod",
+    "legacyClass": "io.github.mcdev.core.mixinextras.MixinExtrasCompletionServiceTest",
+    "status": "passed",
+    "calls": 4
+  },
+  {
+    "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixinextras/MixinExtrasCompletionServiceTest.kt::completesWrapWithConditionMethod",
+    "legacyClass": "io.github.mcdev.core.mixinextras.MixinExtrasCompletionServiceTest",
+    "status": "passed",
+    "calls": 4
+  },
+  {
+    "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixinextras/MixinExtrasCompletionServiceTest.kt::returnsEmptyAtTargetWithoutInjectMethodName",
+    "legacyClass": "io.github.mcdev.core.mixinextras.MixinExtrasCompletionServiceTest",
+    "status": "passed",
+    "calls": 1
+  },
+  {
+    "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixinextras/MixinExtrasCompletionServiceTest.kt::returnsEmptyForNonMethodSlot",
+    "legacyClass": "io.github.mcdev.core.mixinextras.MixinExtrasCompletionServiceTest",
+    "status": "passed",
+    "calls": 1
+  },
+  {
+    "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixinextras/MixinExtrasCompletionServiceTest.kt::wrapOperationAtTargetFiltersByPartial",
+    "legacyClass": "io.github.mcdev.core.mixinextras.MixinExtrasCompletionServiceTest",
+    "status": "passed",
+    "calls": 4
+  },
+  {
+    "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixinextras/LocalCaptureRuntimeSemanticsTest.kt::analyzerCancellationEscapesAndTheNextRequestStillSucceeds",
+    "legacyClass": "io.github.mcdev.core.mixinextras.LocalCaptureRuntimeSemanticsTest",
+    "status": "passed",
+    "calls": 2
+  },
+  {
+    "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixinextras/LocalCaptureRuntimeSemanticsTest.kt::instanceLocalOrdinalIncludesReceiverButDoesNotSelectIt",
+    "legacyClass": "io.github.mcdev.core.mixinextras.LocalCaptureRuntimeSemanticsTest",
+    "status": "passed",
+    "calls": 10
+  },
+  {
+    "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixinextras/LocalCaptureRuntimeSemanticsTest.kt::preservesBooleanByteCharAndShortDescriptorsForLoadsAndStores",
+    "legacyClass": "io.github.mcdev.core.mixinextras.LocalCaptureRuntimeSemanticsTest",
+    "status": "passed",
+    "calls": 1
+  },
+  {
+    "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixinextras/LocalCaptureRuntimeSemanticsTest.kt::preservesIntLikeDescriptorsFromTheDeclaredMethodSignatureWithoutLvt",
+    "legacyClass": "io.github.mcdev.core.mixinextras.LocalCaptureRuntimeSemanticsTest",
+    "status": "passed",
+    "calls": 1
+  },
+  {
+    "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixinextras/LocalCaptureRuntimeSemanticsTest.kt::typedPrimitiveDefinitionsMatchTheRealStoreAndLoadInstructions",
+    "legacyClass": "io.github.mcdev.core.mixinextras.LocalCaptureRuntimeSemanticsTest",
+    "status": "passed",
+    "calls": 60
+  },
+  {
+    "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixin/e2e/MixinServiceFacadeRoutingTest.kt::routesShareIdCompletionAcrossMatchingHandlersAndExplicitNamespaces",
+    "legacyClass": "io.github.mcdev.core.mixin.e2e.MixinServiceFacadeRoutingTest",
+    "status": "passed",
+    "calls": 679
+  },
+  {
+    "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixin/e2e/MixinServiceFacadeRoutingTest.kt::routesShareIdCompletionWithJavaEscapedValues",
+    "legacyClass": "io.github.mcdev.core.mixin.e2e.MixinServiceFacadeRoutingTest",
+    "status": "passed",
+    "calls": 654
+  },
+  {
+    "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixin/e2e/MixinServiceFacadeRoutingTest.kt::shareIdCompletionIncludesMatchingIdsFromAdditionalSources",
+    "legacyClass": "io.github.mcdev.core.mixin.e2e.MixinServiceFacadeRoutingTest",
+    "status": "passed",
+    "calls": 371
+  },
+  {
+    "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixin/e2e/MixinServiceFacadeRoutingTest.kt::shareSourceProviderIsNotCalledForNonShareCompletion",
+    "legacyClass": "io.github.mcdev.core.mixin.e2e.MixinServiceFacadeRoutingTest",
+    "status": "passed",
+    "calls": 144
+  }
+]

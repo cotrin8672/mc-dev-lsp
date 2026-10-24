@@ -5,6 +5,16 @@ JDT LS extension. The original checkout stays on `main`; its uncommitted work is
 not copied into this branch. This is an initial Mixin slice, not feature parity
 with `mcdev-core`.
 
+## Migration status
+
+The current implementation described below is the linked-provider prototype.
+The active replacement target is a separately distributed Rust extension process
+using ktlsp stdio IPC, with the complete existing mc-dev feature set.
+See [the migration record](rust-migration.md) and
+[the complete behavior inventory](rust-migration-inventory.md).
+A separate-process install is not yet verified; the build and setup instructions
+below apply to the earlier prototype only.
+
 ## Architecture and distribution
 
 `mcdev-ktlsp` exports `McdevMixinProvider` and builds an LSP executable with that

@@ -1,0 +1,2618 @@
+{
+  "originalCases": 316,
+  "originalAssertionsPassed": true,
+  "capturedSuccessfulCalls": 6650,
+  "capturedCancellationEvents": 2,
+  "cases": [
+    {
+      "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixinextras/ClassLiteralTypeNameResolverTest.kt::conflictingExplicitImportsRemainAmbiguousWhileIdenticalImportsAreAllowed",
+      "oracleStatus": "passed",
+      "capturedCalls": 9,
+      "wholeOutputReplay": "mcdev-core/tests/mixinextras_expression_legacy.rs::every_original_expression_case_and_full_output#mcdev-core/src/test/kotlin/io/github/mcdev/core/mixinextras/ClassLiteralTypeNameResolverTest.kt::conflictingExplicitImportsRemainAmbiguousWhileIdenticalImportsAreAllowed",
+      "nativeStateOrHelperAssertions": [
+        "mcdev-core/tests/mixinextras_expression_models.rs::conflicting_explicit_imports_remain_ambiguous_while_identical_imports_are_allowed"
+      ],
+      "status": "ported"
+    },
+    {
+      "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixinextras/ClassLiteralTypeNameResolverTest.kt::doesNotGuessUnindexedImplicitJavaLangType",
+      "oracleStatus": "passed",
+      "capturedCalls": 2,
+      "wholeOutputReplay": "mcdev-core/tests/mixinextras_expression_legacy.rs::every_original_expression_case_and_full_output#mcdev-core/src/test/kotlin/io/github/mcdev/core/mixinextras/ClassLiteralTypeNameResolverTest.kt::doesNotGuessUnindexedImplicitJavaLangType",
+      "nativeStateOrHelperAssertions": [
+        "mcdev-core/tests/mixinextras_expression_models.rs::does_not_guess_unindexed_implicit_java_lang_type"
+      ],
+      "status": "ported"
+    },
+    {
+      "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixinextras/ClassLiteralTypeNameResolverTest.kt::kotlinBuiltinsAndExplicitAliasesResolveToJvmTypesWithoutChangingJavaNames",
+      "oracleStatus": "passed",
+      "capturedCalls": 19,
+      "wholeOutputReplay": "mcdev-core/tests/mixinextras_expression_legacy.rs::every_original_expression_case_and_full_output#mcdev-core/src/test/kotlin/io/github/mcdev/core/mixinextras/ClassLiteralTypeNameResolverTest.kt::kotlinBuiltinsAndExplicitAliasesResolveToJvmTypesWithoutChangingJavaNames",
+      "nativeStateOrHelperAssertions": [
+        "mcdev-core/tests/mixinextras_expression_models.rs::kotlin_builtins_and_explicit_aliases_resolve_to_jvm_types_without_changing_java_names"
+      ],
+      "status": "ported"
+    },
+    {
+      "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixinextras/ClassLiteralTypeNameResolverTest.kt::rejectsAmbiguousWildcardAndImplicitJavaLangType",
+      "oracleStatus": "passed",
+      "capturedCalls": 2,
+      "wholeOutputReplay": "mcdev-core/tests/mixinextras_expression_legacy.rs::every_original_expression_case_and_full_output#mcdev-core/src/test/kotlin/io/github/mcdev/core/mixinextras/ClassLiteralTypeNameResolverTest.kt::rejectsAmbiguousWildcardAndImplicitJavaLangType",
+      "nativeStateOrHelperAssertions": [
+        "mcdev-core/tests/mixinextras_expression_models.rs::rejects_ambiguous_wildcard_and_implicit_java_lang_type"
+      ],
+      "status": "ported"
+    },
+    {
+      "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixinextras/ClassLiteralTypeNameResolverTest.kt::resolvesExplicitImport",
+      "oracleStatus": "passed",
+      "capturedCalls": 2,
+      "wholeOutputReplay": "mcdev-core/tests/mixinextras_expression_legacy.rs::every_original_expression_case_and_full_output#mcdev-core/src/test/kotlin/io/github/mcdev/core/mixinextras/ClassLiteralTypeNameResolverTest.kt::resolvesExplicitImport",
+      "nativeStateOrHelperAssertions": [
+        "mcdev-core/tests/mixinextras_expression_models.rs::resolves_explicit_import"
+      ],
+      "status": "ported"
+    },
+    {
+      "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixinextras/ClassLiteralTypeNameResolverTest.kt::resolvesIndexedImplicitJavaLangType",
+      "oracleStatus": "passed",
+      "capturedCalls": 2,
+      "wholeOutputReplay": "mcdev-core/tests/mixinextras_expression_legacy.rs::every_original_expression_case_and_full_output#mcdev-core/src/test/kotlin/io/github/mcdev/core/mixinextras/ClassLiteralTypeNameResolverTest.kt::resolvesIndexedImplicitJavaLangType",
+      "nativeStateOrHelperAssertions": [
+        "mcdev-core/tests/mixinextras_expression_models.rs::resolves_indexed_implicit_java_lang_type"
+      ],
+      "status": "ported"
+    },
+    {
+      "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixinextras/ClassLiteralTypeNameResolverTest.kt::resolvesNestedTypeThroughImportedOuterType",
+      "oracleStatus": "passed",
+      "capturedCalls": 2,
+      "wholeOutputReplay": "mcdev-core/tests/mixinextras_expression_legacy.rs::every_original_expression_case_and_full_output#mcdev-core/src/test/kotlin/io/github/mcdev/core/mixinextras/ClassLiteralTypeNameResolverTest.kt::resolvesNestedTypeThroughImportedOuterType",
+      "nativeStateOrHelperAssertions": [
+        "mcdev-core/tests/mixinextras_expression_models.rs::resolves_nested_type_through_imported_outer_type"
+      ],
+      "status": "ported"
+    },
+    {
+      "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixinextras/ClassLiteralTypeNameResolverTest.kt::resolvesNestedTypeThroughSamePackage",
+      "oracleStatus": "passed",
+      "capturedCalls": 2,
+      "wholeOutputReplay": "mcdev-core/tests/mixinextras_expression_legacy.rs::every_original_expression_case_and_full_output#mcdev-core/src/test/kotlin/io/github/mcdev/core/mixinextras/ClassLiteralTypeNameResolverTest.kt::resolvesNestedTypeThroughSamePackage",
+      "nativeStateOrHelperAssertions": [
+        "mcdev-core/tests/mixinextras_expression_models.rs::resolves_nested_type_through_same_package"
+      ],
+      "status": "ported"
+    },
+    {
+      "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixinextras/ClassLiteralTypeNameResolverTest.kt::resolvesSamePackageType",
+      "oracleStatus": "passed",
+      "capturedCalls": 2,
+      "wholeOutputReplay": "mcdev-core/tests/mixinextras_expression_legacy.rs::every_original_expression_case_and_full_output#mcdev-core/src/test/kotlin/io/github/mcdev/core/mixinextras/ClassLiteralTypeNameResolverTest.kt::resolvesSamePackageType",
+      "nativeStateOrHelperAssertions": [
+        "mcdev-core/tests/mixinextras_expression_models.rs::resolves_same_package_type"
+      ],
+      "status": "ported"
+    },
+    {
+      "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixinextras/ClassLiteralTypeNameResolverTest.kt::singleLetterJavaClassNamesAreNotPrimitiveDescriptors",
+      "oracleStatus": "passed",
+      "capturedCalls": 2,
+      "wholeOutputReplay": "mcdev-core/tests/mixinextras_expression_legacy.rs::every_original_expression_case_and_full_output#mcdev-core/src/test/kotlin/io/github/mcdev/core/mixinextras/ClassLiteralTypeNameResolverTest.kt::singleLetterJavaClassNamesAreNotPrimitiveDescriptors",
+      "nativeStateOrHelperAssertions": [
+        "mcdev-core/tests/mixinextras_expression_models.rs::single_letter_java_class_names_are_not_primitive_descriptors"
+      ],
+      "status": "ported"
+    },
+    {
+      "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixinextras/DefinitionAnnotationParseIssueTest.kt::malformedIdProducesOneParseIssueInsteadOfDuplicateMissingIdIssues",
+      "oracleStatus": "passed",
+      "capturedCalls": 2,
+      "wholeOutputReplay": "mcdev-core/tests/mixinextras_expression_legacy.rs::every_original_expression_case_and_full_output#mcdev-core/src/test/kotlin/io/github/mcdev/core/mixinextras/DefinitionAnnotationParseIssueTest.kt::malformedIdProducesOneParseIssueInsteadOfDuplicateMissingIdIssues",
+      "nativeStateOrHelperAssertions": [
+        "mcdev-core/tests/mixinextras_expression_models.rs::malformed_id_produces_one_parse_issue_instead_of_duplicate_missing_id_issues"
+      ],
+      "status": "ported"
+    },
+    {
+      "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixinextras/DefinitionAnnotationParseIssueTest.kt::mapsParseIssueToSourceAndKeepsValidIdentifierBinding",
+      "oracleStatus": "passed",
+      "capturedCalls": 4,
+      "wholeOutputReplay": "mcdev-core/tests/mixinextras_expression_legacy.rs::every_original_expression_case_and_full_output#mcdev-core/src/test/kotlin/io/github/mcdev/core/mixinextras/DefinitionAnnotationParseIssueTest.kt::mapsParseIssueToSourceAndKeepsValidIdentifierBinding",
+      "nativeStateOrHelperAssertions": [
+        "mcdev-core/tests/mixinextras_expression_models.rs::maps_parse_issue_to_source_and_keeps_valid_identifier_binding"
+      ],
+      "status": "ported"
+    },
+    {
+      "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixinextras/DefinitionAnnotationParseIssueTest.kt::recoversFromMissingEqualsBeforeValidSiblingAttribute",
+      "oracleStatus": "passed",
+      "capturedCalls": 2,
+      "wholeOutputReplay": "mcdev-core/tests/mixinextras_expression_legacy.rs::every_original_expression_case_and_full_output#mcdev-core/src/test/kotlin/io/github/mcdev/core/mixinextras/DefinitionAnnotationParseIssueTest.kt::recoversFromMissingEqualsBeforeValidSiblingAttribute",
+      "nativeStateOrHelperAssertions": [],
+      "status": "ported"
+    },
+    {
+      "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixinextras/DefinitionAnnotationParseIssueTest.kt::retainsMalformedKnownAttributesAndContinuesParsingValidSiblings",
+      "oracleStatus": "passed",
+      "capturedCalls": 3,
+      "wholeOutputReplay": "mcdev-core/tests/mixinextras_expression_legacy.rs::every_original_expression_case_and_full_output#mcdev-core/src/test/kotlin/io/github/mcdev/core/mixinextras/DefinitionAnnotationParseIssueTest.kt::retainsMalformedKnownAttributesAndContinuesParsingValidSiblings",
+      "nativeStateOrHelperAssertions": [],
+      "status": "ported"
+    },
+    {
+      "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixinextras/DefinitionAnnotationParserTest.kt::classLiteralArrayRejectsEmptyCommaElements",
+      "oracleStatus": "passed",
+      "capturedCalls": 1,
+      "wholeOutputReplay": "mcdev-core/tests/mixinextras_expression_legacy.rs::every_original_expression_case_and_full_output#mcdev-core/src/test/kotlin/io/github/mcdev/core/mixinextras/DefinitionAnnotationParserTest.kt::classLiteralArrayRejectsEmptyCommaElements",
+      "nativeStateOrHelperAssertions": [],
+      "status": "ported"
+    },
+    {
+      "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixinextras/DefinitionAnnotationParserTest.kt::classLiteralArrayRejectsMixedValidAndMalformedElements",
+      "oracleStatus": "passed",
+      "capturedCalls": 3,
+      "wholeOutputReplay": "mcdev-core/tests/mixinextras_expression_legacy.rs::every_original_expression_case_and_full_output#mcdev-core/src/test/kotlin/io/github/mcdev/core/mixinextras/DefinitionAnnotationParserTest.kt::classLiteralArrayRejectsMixedValidAndMalformedElements",
+      "nativeStateOrHelperAssertions": [],
+      "status": "ported"
+    },
+    {
+      "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixinextras/DefinitionAnnotationParserTest.kt::classLiteralArrayRejectsTrailingNontriviaAfterElement",
+      "oracleStatus": "passed",
+      "capturedCalls": 1,
+      "wholeOutputReplay": "mcdev-core/tests/mixinextras_expression_legacy.rs::every_original_expression_case_and_full_output#mcdev-core/src/test/kotlin/io/github/mcdev/core/mixinextras/DefinitionAnnotationParserTest.kt::classLiteralArrayRejectsTrailingNontriviaAfterElement",
+      "nativeStateOrHelperAssertions": [],
+      "status": "ported"
+    },
+    {
+      "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixinextras/DefinitionAnnotationParserTest.kt::decodesOctalAndStandardJavaEscapesInIdValue",
+      "oracleStatus": "passed",
+      "capturedCalls": 6,
+      "wholeOutputReplay": "mcdev-core/tests/mixinextras_expression_legacy.rs::every_original_expression_case_and_full_output#mcdev-core/src/test/kotlin/io/github/mcdev/core/mixinextras/DefinitionAnnotationParserTest.kt::decodesOctalAndStandardJavaEscapesInIdValue",
+      "nativeStateOrHelperAssertions": [],
+      "status": "ported"
+    },
+    {
+      "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixinextras/DefinitionAnnotationParserTest.kt::decodesQuotedBackslashEscapesInIdValue",
+      "oracleStatus": "passed",
+      "capturedCalls": 4,
+      "wholeOutputReplay": "mcdev-core/tests/mixinextras_expression_legacy.rs::every_original_expression_case_and_full_output#mcdev-core/src/test/kotlin/io/github/mcdev/core/mixinextras/DefinitionAnnotationParserTest.kt::decodesQuotedBackslashEscapesInIdValue",
+      "nativeStateOrHelperAssertions": [],
+      "status": "ported"
+    },
+    {
+      "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixinextras/DefinitionAnnotationParserTest.kt::duplicateAttributesAppendListsAndUseLastScalarValues",
+      "oracleStatus": "passed",
+      "capturedCalls": 5,
+      "wholeOutputReplay": "mcdev-core/tests/mixinextras_expression_legacy.rs::every_original_expression_case_and_full_output#mcdev-core/src/test/kotlin/io/github/mcdev/core/mixinextras/DefinitionAnnotationParserTest.kt::duplicateAttributesAppendListsAndUseLastScalarValues",
+      "nativeStateOrHelperAssertions": [],
+      "status": "ported"
+    },
+    {
+      "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixinextras/DefinitionAnnotationParserTest.kt::emptyBodyDefaultsIdToNull",
+      "oracleStatus": "passed",
+      "capturedCalls": 1,
+      "wholeOutputReplay": "mcdev-core/tests/mixinextras_expression_legacy.rs::every_original_expression_case_and_full_output#mcdev-core/src/test/kotlin/io/github/mcdev/core/mixinextras/DefinitionAnnotationParserTest.kt::emptyBodyDefaultsIdToNull",
+      "nativeStateOrHelperAssertions": [],
+      "status": "ported"
+    },
+    {
+      "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixinextras/DefinitionAnnotationParserTest.kt::handlesCommentsWhitespaceAndEscapedStrings",
+      "oracleStatus": "passed",
+      "capturedCalls": 10,
+      "wholeOutputReplay": "mcdev-core/tests/mixinextras_expression_legacy.rs::every_original_expression_case_and_full_output#mcdev-core/src/test/kotlin/io/github/mcdev/core/mixinextras/DefinitionAnnotationParserTest.kt::handlesCommentsWhitespaceAndEscapedStrings",
+      "nativeStateOrHelperAssertions": [],
+      "status": "ported"
+    },
+    {
+      "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixinextras/DefinitionAnnotationParserTest.kt::ignoresNonOfficialFullyQualifiedLocalAnnotation",
+      "oracleStatus": "passed",
+      "capturedCalls": 2,
+      "wholeOutputReplay": "mcdev-core/tests/mixinextras_expression_legacy.rs::every_original_expression_case_and_full_output#mcdev-core/src/test/kotlin/io/github/mcdev/core/mixinextras/DefinitionAnnotationParserTest.kt::ignoresNonOfficialFullyQualifiedLocalAnnotation",
+      "nativeStateOrHelperAssertions": [],
+      "status": "ported"
+    },
+    {
+      "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixinextras/DefinitionAnnotationParserTest.kt::ignoresUnknownAttributes",
+      "oracleStatus": "passed",
+      "capturedCalls": 3,
+      "wholeOutputReplay": "mcdev-core/tests/mixinextras_expression_legacy.rs::every_original_expression_case_and_full_output#mcdev-core/src/test/kotlin/io/github/mcdev/core/mixinextras/DefinitionAnnotationParserTest.kt::ignoresUnknownAttributes",
+      "nativeStateOrHelperAssertions": [],
+      "status": "ported"
+    },
+    {
+      "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixinextras/DefinitionAnnotationParserTest.kt::localArrayRejectsEmptyCommaElements",
+      "oracleStatus": "passed",
+      "capturedCalls": 3,
+      "wholeOutputReplay": "mcdev-core/tests/mixinextras_expression_legacy.rs::every_original_expression_case_and_full_output#mcdev-core/src/test/kotlin/io/github/mcdev/core/mixinextras/DefinitionAnnotationParserTest.kt::localArrayRejectsEmptyCommaElements",
+      "nativeStateOrHelperAssertions": [],
+      "status": "ported"
+    },
+    {
+      "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixinextras/DefinitionAnnotationParserTest.kt::localArrayRejectsMixedValidAndUnresolvedElements",
+      "oracleStatus": "passed",
+      "capturedCalls": 5,
+      "wholeOutputReplay": "mcdev-core/tests/mixinextras_expression_legacy.rs::every_original_expression_case_and_full_output#mcdev-core/src/test/kotlin/io/github/mcdev/core/mixinextras/DefinitionAnnotationParserTest.kt::localArrayRejectsMixedValidAndUnresolvedElements",
+      "nativeStateOrHelperAssertions": [],
+      "status": "ported"
+    },
+    {
+      "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixinextras/DefinitionAnnotationParserTest.kt::localArrayRejectsTrailingNontriviaAfterElement",
+      "oracleStatus": "passed",
+      "capturedCalls": 1,
+      "wholeOutputReplay": "mcdev-core/tests/mixinextras_expression_legacy.rs::every_original_expression_case_and_full_output#mcdev-core/src/test/kotlin/io/github/mcdev/core/mixinextras/DefinitionAnnotationParserTest.kt::localArrayRejectsTrailingNontriviaAfterElement",
+      "nativeStateOrHelperAssertions": [],
+      "status": "ported"
+    },
+    {
+      "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixinextras/DefinitionAnnotationParserTest.kt::localSugarFallbackParsesDecimalIntLiterals",
+      "oracleStatus": "passed",
+      "capturedCalls": 1,
+      "wholeOutputReplay": "mcdev-core/tests/mixinextras_expression_legacy.rs::every_original_expression_case_and_full_output#mcdev-core/src/test/kotlin/io/github/mcdev/core/mixinextras/DefinitionAnnotationParserTest.kt::localSugarFallbackParsesDecimalIntLiterals",
+      "nativeStateOrHelperAssertions": [],
+      "status": "ported"
+    },
+    {
+      "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixinextras/DefinitionAnnotationParserTest.kt::localSugarFallbackRejectsHexAndUnderscoreIntLiterals",
+      "oracleStatus": "passed",
+      "capturedCalls": 1,
+      "wholeOutputReplay": "mcdev-core/tests/mixinextras_expression_legacy.rs::every_original_expression_case_and_full_output#mcdev-core/src/test/kotlin/io/github/mcdev/core/mixinextras/DefinitionAnnotationParserTest.kt::localSugarFallbackRejectsHexAndUnderscoreIntLiterals",
+      "nativeStateOrHelperAssertions": [],
+      "status": "ported"
+    },
+    {
+      "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixinextras/DefinitionAnnotationParserTest.kt::localSugarFallbackRejectsUppercaseBooleanLiterals",
+      "oracleStatus": "passed",
+      "capturedCalls": 1,
+      "wholeOutputReplay": "mcdev-core/tests/mixinextras_expression_legacy.rs::every_original_expression_case_and_full_output#mcdev-core/src/test/kotlin/io/github/mcdev/core/mixinextras/DefinitionAnnotationParserTest.kt::localSugarFallbackRejectsUppercaseBooleanLiterals",
+      "nativeStateOrHelperAssertions": [],
+      "status": "ported"
+    },
+    {
+      "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixinextras/DefinitionAnnotationParserTest.kt::malformedAttributeValuesAreIgnoredWithoutDiscardingValidOnes",
+      "oracleStatus": "passed",
+      "capturedCalls": 4,
+      "wholeOutputReplay": "mcdev-core/tests/mixinextras_expression_legacy.rs::every_original_expression_case_and_full_output#mcdev-core/src/test/kotlin/io/github/mcdev/core/mixinextras/DefinitionAnnotationParserTest.kt::malformedAttributeValuesAreIgnoredWithoutDiscardingValidOnes",
+      "nativeStateOrHelperAssertions": [],
+      "status": "ported"
+    },
+    {
+      "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixinextras/DefinitionAnnotationParserTest.kt::malformedLocalArrayRejectsWholeAttribute",
+      "oracleStatus": "passed",
+      "capturedCalls": 7,
+      "wholeOutputReplay": "mcdev-core/tests/mixinextras_expression_legacy.rs::every_original_expression_case_and_full_output#mcdev-core/src/test/kotlin/io/github/mcdev/core/mixinextras/DefinitionAnnotationParserTest.kt::malformedLocalArrayRejectsWholeAttribute",
+      "nativeStateOrHelperAssertions": [],
+      "status": "ported"
+    },
+    {
+      "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixinextras/DefinitionAnnotationParserTest.kt::normalizesSingleFieldStringToList",
+      "oracleStatus": "passed",
+      "capturedCalls": 2,
+      "wholeOutputReplay": "mcdev-core/tests/mixinextras_expression_legacy.rs::every_original_expression_case_and_full_output#mcdev-core/src/test/kotlin/io/github/mcdev/core/mixinextras/DefinitionAnnotationParserTest.kt::normalizesSingleFieldStringToList",
+      "nativeStateOrHelperAssertions": [],
+      "status": "ported"
+    },
+    {
+      "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixinextras/DefinitionAnnotationParserTest.kt::normalizesSingleMethodStringToList",
+      "oracleStatus": "passed",
+      "capturedCalls": 2,
+      "wholeOutputReplay": "mcdev-core/tests/mixinextras_expression_legacy.rs::every_original_expression_case_and_full_output#mcdev-core/src/test/kotlin/io/github/mcdev/core/mixinextras/DefinitionAnnotationParserTest.kt::normalizesSingleMethodStringToList",
+      "nativeStateOrHelperAssertions": [],
+      "status": "ported"
+    },
+    {
+      "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixinextras/DefinitionAnnotationParserTest.kt::parsesBareLocalMarkerWithoutParentheses",
+      "oracleStatus": "passed",
+      "capturedCalls": 1,
+      "wholeOutputReplay": "mcdev-core/tests/mixinextras_expression_legacy.rs::every_original_expression_case_and_full_output#mcdev-core/src/test/kotlin/io/github/mcdev/core/mixinextras/DefinitionAnnotationParserTest.kt::parsesBareLocalMarkerWithoutParentheses",
+      "nativeStateOrHelperAssertions": [],
+      "status": "ported"
+    },
+    {
+      "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixinextras/DefinitionAnnotationParserTest.kt::parsesClassLiteralsWithCommentsBetweenSegments",
+      "oracleStatus": "passed",
+      "capturedCalls": 1,
+      "wholeOutputReplay": "mcdev-core/tests/mixinextras_expression_legacy.rs::every_original_expression_case_and_full_output#mcdev-core/src/test/kotlin/io/github/mcdev/core/mixinextras/DefinitionAnnotationParserTest.kt::parsesClassLiteralsWithCommentsBetweenSegments",
+      "nativeStateOrHelperAssertions": [],
+      "status": "ported"
+    },
+    {
+      "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixinextras/DefinitionAnnotationParserTest.kt::parsesCombinedUpstreamStyleDefinitionBody",
+      "oracleStatus": "passed",
+      "capturedCalls": 5,
+      "wholeOutputReplay": "mcdev-core/tests/mixinextras_expression_legacy.rs::every_original_expression_case_and_full_output#mcdev-core/src/test/kotlin/io/github/mcdev/core/mixinextras/DefinitionAnnotationParserTest.kt::parsesCombinedUpstreamStyleDefinitionBody",
+      "nativeStateOrHelperAssertions": [],
+      "status": "ported"
+    },
+    {
+      "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixinextras/DefinitionAnnotationParserTest.kt::parsesEmptyStringArrays",
+      "oracleStatus": "passed",
+      "capturedCalls": 2,
+      "wholeOutputReplay": "mcdev-core/tests/mixinextras_expression_legacy.rs::every_original_expression_case_and_full_output#mcdev-core/src/test/kotlin/io/github/mcdev/core/mixinextras/DefinitionAnnotationParserTest.kt::parsesEmptyStringArrays",
+      "nativeStateOrHelperAssertions": [],
+      "status": "ported"
+    },
+    {
+      "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixinextras/DefinitionAnnotationParserTest.kt::parsesExplicitEmptyStringId",
+      "oracleStatus": "passed",
+      "capturedCalls": 2,
+      "wholeOutputReplay": "mcdev-core/tests/mixinextras_expression_legacy.rs::every_original_expression_case_and_full_output#mcdev-core/src/test/kotlin/io/github/mcdev/core/mixinextras/DefinitionAnnotationParserTest.kt::parsesExplicitEmptyStringId",
+      "nativeStateOrHelperAssertions": [],
+      "status": "ported"
+    },
+    {
+      "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixinextras/DefinitionAnnotationParserTest.kt::parsesFieldArrayPreservingOrder",
+      "oracleStatus": "passed",
+      "capturedCalls": 5,
+      "wholeOutputReplay": "mcdev-core/tests/mixinextras_expression_legacy.rs::every_original_expression_case_and_full_output#mcdev-core/src/test/kotlin/io/github/mcdev/core/mixinextras/DefinitionAnnotationParserTest.kt::parsesFieldArrayPreservingOrder",
+      "nativeStateOrHelperAssertions": [],
+      "status": "ported"
+    },
+    {
+      "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixinextras/DefinitionAnnotationParserTest.kt::parsesFullyQualifiedLocalAnnotation",
+      "oracleStatus": "passed",
+      "capturedCalls": 1,
+      "wholeOutputReplay": "mcdev-core/tests/mixinextras_expression_legacy.rs::every_original_expression_case_and_full_output#mcdev-core/src/test/kotlin/io/github/mcdev/core/mixinextras/DefinitionAnnotationParserTest.kt::parsesFullyQualifiedLocalAnnotation",
+      "nativeStateOrHelperAssertions": [],
+      "status": "ported"
+    },
+    {
+      "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixinextras/DefinitionAnnotationParserTest.kt::parsesIdAttribute",
+      "oracleStatus": "passed",
+      "capturedCalls": 2,
+      "wholeOutputReplay": "mcdev-core/tests/mixinextras_expression_legacy.rs::every_original_expression_case_and_full_output#mcdev-core/src/test/kotlin/io/github/mcdev/core/mixinextras/DefinitionAnnotationParserTest.kt::parsesIdAttribute",
+      "nativeStateOrHelperAssertions": [],
+      "status": "ported"
+    },
+    {
+      "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixinextras/DefinitionAnnotationParserTest.kt::parsesLocalArrayPreservingOrder",
+      "oracleStatus": "passed",
+      "capturedCalls": 4,
+      "wholeOutputReplay": "mcdev-core/tests/mixinextras_expression_legacy.rs::every_original_expression_case_and_full_output#mcdev-core/src/test/kotlin/io/github/mcdev/core/mixinextras/DefinitionAnnotationParserTest.kt::parsesLocalArrayPreservingOrder",
+      "nativeStateOrHelperAssertions": [],
+      "status": "ported"
+    },
+    {
+      "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixinextras/DefinitionAnnotationParserTest.kt::parsesLocalMinusOneIndexAndOrdinalAsUnset",
+      "oracleStatus": "passed",
+      "capturedCalls": 1,
+      "wholeOutputReplay": "mcdev-core/tests/mixinextras_expression_legacy.rs::every_original_expression_case_and_full_output#mcdev-core/src/test/kotlin/io/github/mcdev/core/mixinextras/DefinitionAnnotationParserTest.kt::parsesLocalMinusOneIndexAndOrdinalAsUnset",
+      "nativeStateOrHelperAssertions": [],
+      "status": "ported"
+    },
+    {
+      "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixinextras/DefinitionAnnotationParserTest.kt::parsesLocalWithAllAttributes",
+      "oracleStatus": "passed",
+      "capturedCalls": 7,
+      "wholeOutputReplay": "mcdev-core/tests/mixinextras_expression_legacy.rs::every_original_expression_case_and_full_output#mcdev-core/src/test/kotlin/io/github/mcdev/core/mixinextras/DefinitionAnnotationParserTest.kt::parsesLocalWithAllAttributes",
+      "nativeStateOrHelperAssertions": [],
+      "status": "ported"
+    },
+    {
+      "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixinextras/DefinitionAnnotationParserTest.kt::parsesMethodArrayPreservingOrder",
+      "oracleStatus": "passed",
+      "capturedCalls": 5,
+      "wholeOutputReplay": "mcdev-core/tests/mixinextras_expression_legacy.rs::every_original_expression_case_and_full_output#mcdev-core/src/test/kotlin/io/github/mcdev/core/mixinextras/DefinitionAnnotationParserTest.kt::parsesMethodArrayPreservingOrder",
+      "nativeStateOrHelperAssertions": [],
+      "status": "ported"
+    },
+    {
+      "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixinextras/DefinitionAnnotationParserTest.kt::parsesMethodArrayWithBlockCommentImmediatelyBeforeNextString",
+      "oracleStatus": "passed",
+      "capturedCalls": 5,
+      "wholeOutputReplay": "mcdev-core/tests/mixinextras_expression_legacy.rs::every_original_expression_case_and_full_output#mcdev-core/src/test/kotlin/io/github/mcdev/core/mixinextras/DefinitionAnnotationParserTest.kt::parsesMethodArrayWithBlockCommentImmediatelyBeforeNextString",
+      "nativeStateOrHelperAssertions": [],
+      "status": "ported"
+    },
+    {
+      "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixinextras/DefinitionAnnotationParserTest.kt::parsesRemapBoolean",
+      "oracleStatus": "passed",
+      "capturedCalls": 2,
+      "wholeOutputReplay": "mcdev-core/tests/mixinextras_expression_legacy.rs::every_original_expression_case_and_full_output#mcdev-core/src/test/kotlin/io/github/mcdev/core/mixinextras/DefinitionAnnotationParserTest.kt::parsesRemapBoolean",
+      "nativeStateOrHelperAssertions": [],
+      "status": "ported"
+    },
+    {
+      "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixinextras/DefinitionAnnotationParserTest.kt::parsesSingleCharacterIdContentRange",
+      "oracleStatus": "passed",
+      "capturedCalls": 2,
+      "wholeOutputReplay": "mcdev-core/tests/mixinextras_expression_legacy.rs::every_original_expression_case_and_full_output#mcdev-core/src/test/kotlin/io/github/mcdev/core/mixinextras/DefinitionAnnotationParserTest.kt::parsesSingleCharacterIdContentRange",
+      "nativeStateOrHelperAssertions": [],
+      "status": "ported"
+    },
+    {
+      "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixinextras/DefinitionAnnotationParserTest.kt::parsesSingleClassLiteralTypes",
+      "oracleStatus": "passed",
+      "capturedCalls": 8,
+      "wholeOutputReplay": "mcdev-core/tests/mixinextras_expression_legacy.rs::every_original_expression_case_and_full_output#mcdev-core/src/test/kotlin/io/github/mcdev/core/mixinextras/DefinitionAnnotationParserTest.kt::parsesSingleClassLiteralTypes",
+      "nativeStateOrHelperAssertions": [],
+      "status": "ported"
+    },
+    {
+      "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixinextras/DefinitionAnnotationParserTest.kt::parsesSingleLocalAnnotation",
+      "oracleStatus": "passed",
+      "capturedCalls": 1,
+      "wholeOutputReplay": "mcdev-core/tests/mixinextras_expression_legacy.rs::every_original_expression_case_and_full_output#mcdev-core/src/test/kotlin/io/github/mcdev/core/mixinextras/DefinitionAnnotationParserTest.kt::parsesSingleLocalAnnotation",
+      "nativeStateOrHelperAssertions": [],
+      "status": "ported"
+    },
+    {
+      "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixinextras/DefinitionAnnotationParserTest.kt::parsesTypeArrayPreservingOrder",
+      "oracleStatus": "passed",
+      "capturedCalls": 1,
+      "wholeOutputReplay": "mcdev-core/tests/mixinextras_expression_legacy.rs::every_original_expression_case_and_full_output#mcdev-core/src/test/kotlin/io/github/mcdev/core/mixinextras/DefinitionAnnotationParserTest.kt::parsesTypeArrayPreservingOrder",
+      "nativeStateOrHelperAssertions": [],
+      "status": "ported"
+    },
+    {
+      "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixinextras/DefinitionAnnotationParserTest.kt::parsesTypeArrayWithBlockCommentImmediatelyBeforeNextClassLiteral",
+      "oracleStatus": "passed",
+      "capturedCalls": 1,
+      "wholeOutputReplay": "mcdev-core/tests/mixinextras_expression_legacy.rs::every_original_expression_case_and_full_output#mcdev-core/src/test/kotlin/io/github/mcdev/core/mixinextras/DefinitionAnnotationParserTest.kt::parsesTypeArrayWithBlockCommentImmediatelyBeforeNextClassLiteral",
+      "nativeStateOrHelperAssertions": [],
+      "status": "ported"
+    },
+    {
+      "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixinextras/DefinitionAnnotationParserTest.kt::parsesTypeClassLiteralFollowedByAnotherAttribute",
+      "oracleStatus": "passed",
+      "capturedCalls": 1,
+      "wholeOutputReplay": "mcdev-core/tests/mixinextras_expression_legacy.rs::every_original_expression_case_and_full_output#mcdev-core/src/test/kotlin/io/github/mcdev/core/mixinextras/DefinitionAnnotationParserTest.kt::parsesTypeClassLiteralFollowedByAnotherAttribute",
+      "nativeStateOrHelperAssertions": [],
+      "status": "ported"
+    },
+    {
+      "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixinextras/DefinitionAnnotationParserTest.kt::preservesSlashSequencesInsideStringLiterals",
+      "oracleStatus": "passed",
+      "capturedCalls": 7,
+      "wholeOutputReplay": "mcdev-core/tests/mixinextras_expression_legacy.rs::every_original_expression_case_and_full_output#mcdev-core/src/test/kotlin/io/github/mcdev/core/mixinextras/DefinitionAnnotationParserTest.kt::preservesSlashSequencesInsideStringLiterals",
+      "nativeStateOrHelperAssertions": [],
+      "status": "ported"
+    },
+    {
+      "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixinextras/DefinitionAnnotationParserTest.kt::readClassLiteralTypeNameStopsBeforeTerminalClassSuffix",
+      "oracleStatus": "passed",
+      "capturedCalls": 3,
+      "wholeOutputReplay": "mcdev-core/tests/mixinextras_expression_legacy.rs::every_original_expression_case_and_full_output#mcdev-core/src/test/kotlin/io/github/mcdev/core/mixinextras/DefinitionAnnotationParserTest.kt::readClassLiteralTypeNameStopsBeforeTerminalClassSuffix",
+      "nativeStateOrHelperAssertions": [],
+      "status": "ported"
+    },
+    {
+      "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixinextras/DefinitionAnnotationParserTest.kt::stringArrayRejectsEmptyCommaElements",
+      "oracleStatus": "passed",
+      "capturedCalls": 6,
+      "wholeOutputReplay": "mcdev-core/tests/mixinextras_expression_legacy.rs::every_original_expression_case_and_full_output#mcdev-core/src/test/kotlin/io/github/mcdev/core/mixinextras/DefinitionAnnotationParserTest.kt::stringArrayRejectsEmptyCommaElements",
+      "nativeStateOrHelperAssertions": [],
+      "status": "ported"
+    },
+    {
+      "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixinextras/DefinitionAnnotationParserTest.kt::stringArrayRejectsMixedValidAndMalformedElements",
+      "oracleStatus": "passed",
+      "capturedCalls": 9,
+      "wholeOutputReplay": "mcdev-core/tests/mixinextras_expression_legacy.rs::every_original_expression_case_and_full_output#mcdev-core/src/test/kotlin/io/github/mcdev/core/mixinextras/DefinitionAnnotationParserTest.kt::stringArrayRejectsMixedValidAndMalformedElements",
+      "nativeStateOrHelperAssertions": [],
+      "status": "ported"
+    },
+    {
+      "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixinextras/DefinitionAnnotationParserTest.kt::stringArrayRejectsTrailingNontriviaAfterElement",
+      "oracleStatus": "passed",
+      "capturedCalls": 4,
+      "wholeOutputReplay": "mcdev-core/tests/mixinextras_expression_legacy.rs::every_original_expression_case_and_full_output#mcdev-core/src/test/kotlin/io/github/mcdev/core/mixinextras/DefinitionAnnotationParserTest.kt::stringArrayRejectsTrailingNontriviaAfterElement",
+      "nativeStateOrHelperAssertions": [],
+      "status": "ported"
+    },
+    {
+      "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixinextras/DefinitionAnnotationParserTest.kt::withIdSourceRangeFromHandlerRegionAddsBaseExactlyOnce",
+      "oracleStatus": "passed",
+      "capturedCalls": 2,
+      "wholeOutputReplay": "mcdev-core/tests/mixinextras_expression_legacy.rs::every_original_expression_case_and_full_output#mcdev-core/src/test/kotlin/io/github/mcdev/core/mixinextras/DefinitionAnnotationParserTest.kt::withIdSourceRangeFromHandlerRegionAddsBaseExactlyOnce",
+      "nativeStateOrHelperAssertions": [],
+      "status": "ported"
+    },
+    {
+      "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixinextras/DefinitionAnnotationParserTest.kt::withIdSourceRangeMapsBodyContentToAbsoluteHalfOpenSpan",
+      "oracleStatus": "passed",
+      "capturedCalls": 2,
+      "wholeOutputReplay": "mcdev-core/tests/mixinextras_expression_legacy.rs::every_original_expression_case_and_full_output#mcdev-core/src/test/kotlin/io/github/mcdev/core/mixinextras/DefinitionAnnotationParserTest.kt::withIdSourceRangeMapsBodyContentToAbsoluteHalfOpenSpan",
+      "nativeStateOrHelperAssertions": [],
+      "status": "ported"
+    },
+    {
+      "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixinextras/DefinitionAnnotationParserTest.kt::withIdSourceRangePreservesOneCharacterId",
+      "oracleStatus": "passed",
+      "capturedCalls": 2,
+      "wholeOutputReplay": "mcdev-core/tests/mixinextras_expression_legacy.rs::every_original_expression_case_and_full_output#mcdev-core/src/test/kotlin/io/github/mcdev/core/mixinextras/DefinitionAnnotationParserTest.kt::withIdSourceRangePreservesOneCharacterId",
+      "nativeStateOrHelperAssertions": [],
+      "status": "ported"
+    },
+    {
+      "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixinextras/DefinitionAnnotationSingleQuoteRecoveryTest.kt::invalidSingleQuotedValueDoesNotHideFollowingValidAttribute",
+      "oracleStatus": "passed",
+      "capturedCalls": 3,
+      "wholeOutputReplay": "mcdev-core/tests/mixinextras_expression_legacy.rs::every_original_expression_case_and_full_output#mcdev-core/src/test/kotlin/io/github/mcdev/core/mixinextras/DefinitionAnnotationSingleQuoteRecoveryTest.kt::invalidSingleQuotedValueDoesNotHideFollowingValidAttribute",
+      "nativeStateOrHelperAssertions": [],
+      "status": "ported"
+    },
+    {
+      "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixinextras/DefinitionsAnnotationParserTest.kt::assignsAbsoluteIdSourceRangeForSingleDefinition",
+      "oracleStatus": "passed",
+      "capturedCalls": 3,
+      "wholeOutputReplay": "mcdev-core/tests/mixinextras_expression_legacy.rs::every_original_expression_case_and_full_output#mcdev-core/src/test/kotlin/io/github/mcdev/core/mixinextras/DefinitionsAnnotationParserTest.kt::assignsAbsoluteIdSourceRangeForSingleDefinition",
+      "nativeStateOrHelperAssertions": [],
+      "status": "ported"
+    },
+    {
+      "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixinextras/DefinitionsAnnotationParserTest.kt::assignsAbsoluteIdSourceRangesForNestedDefinitionsArray",
+      "oracleStatus": "passed",
+      "capturedCalls": 6,
+      "wholeOutputReplay": "mcdev-core/tests/mixinextras_expression_legacy.rs::every_original_expression_case_and_full_output#mcdev-core/src/test/kotlin/io/github/mcdev/core/mixinextras/DefinitionsAnnotationParserTest.kt::assignsAbsoluteIdSourceRangesForNestedDefinitionsArray",
+      "nativeStateOrHelperAssertions": [],
+      "status": "ported"
+    },
+    {
+      "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixinextras/DefinitionsAnnotationParserTest.kt::bareDefinitionWithoutParenthesesIsExcluded",
+      "oracleStatus": "passed",
+      "capturedCalls": 1,
+      "wholeOutputReplay": "mcdev-core/tests/mixinextras_expression_legacy.rs::every_original_expression_case_and_full_output#mcdev-core/src/test/kotlin/io/github/mcdev/core/mixinextras/DefinitionsAnnotationParserTest.kt::bareDefinitionWithoutParenthesesIsExcluded",
+      "nativeStateOrHelperAssertions": [],
+      "status": "ported"
+    },
+    {
+      "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixinextras/DefinitionsAnnotationParserTest.kt::definitionWithoutIdIsRetainedForDiagnostics",
+      "oracleStatus": "passed",
+      "capturedCalls": 5,
+      "wholeOutputReplay": "mcdev-core/tests/mixinextras_expression_legacy.rs::every_original_expression_case_and_full_output#mcdev-core/src/test/kotlin/io/github/mcdev/core/mixinextras/DefinitionsAnnotationParserTest.kt::definitionWithoutIdIsRetainedForDiagnostics",
+      "nativeStateOrHelperAssertions": [],
+      "status": "ported"
+    },
+    {
+      "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixinextras/DefinitionsAnnotationParserTest.kt::duplicateIdDefinitionsAreBothRetainedInDocumentOrder",
+      "oracleStatus": "passed",
+      "capturedCalls": 7,
+      "wholeOutputReplay": "mcdev-core/tests/mixinextras_expression_legacy.rs::every_original_expression_case_and_full_output#mcdev-core/src/test/kotlin/io/github/mcdev/core/mixinextras/DefinitionsAnnotationParserTest.kt::duplicateIdDefinitionsAreBothRetainedInDocumentOrder",
+      "nativeStateOrHelperAssertions": [],
+      "status": "ported"
+    },
+    {
+      "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixinextras/DefinitionsAnnotationParserTest.kt::emptyBodyReturnsEmptyIndex",
+      "oracleStatus": "passed",
+      "capturedCalls": 1,
+      "wholeOutputReplay": "mcdev-core/tests/mixinextras_expression_legacy.rs::every_original_expression_case_and_full_output#mcdev-core/src/test/kotlin/io/github/mcdev/core/mixinextras/DefinitionsAnnotationParserTest.kt::emptyBodyReturnsEmptyIndex",
+      "nativeStateOrHelperAssertions": [],
+      "status": "ported"
+    },
+    {
+      "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixinextras/DefinitionsAnnotationParserTest.kt::failClosedOnDuplicateValue",
+      "oracleStatus": "passed",
+      "capturedCalls": 6,
+      "wholeOutputReplay": "mcdev-core/tests/mixinextras_expression_legacy.rs::every_original_expression_case_and_full_output#mcdev-core/src/test/kotlin/io/github/mcdev/core/mixinextras/DefinitionsAnnotationParserTest.kt::failClosedOnDuplicateValue",
+      "nativeStateOrHelperAssertions": [],
+      "status": "ported"
+    },
+    {
+      "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixinextras/DefinitionsAnnotationParserTest.kt::failClosedOnNamedArrayTrailingGarbage",
+      "oracleStatus": "passed",
+      "capturedCalls": 5,
+      "wholeOutputReplay": "mcdev-core/tests/mixinextras_expression_legacy.rs::every_original_expression_case_and_full_output#mcdev-core/src/test/kotlin/io/github/mcdev/core/mixinextras/DefinitionsAnnotationParserTest.kt::failClosedOnNamedArrayTrailingGarbage",
+      "nativeStateOrHelperAssertions": [],
+      "status": "ported"
+    },
+    {
+      "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixinextras/DefinitionsAnnotationParserTest.kt::failClosedOnRootArrayTrailingGarbage",
+      "oracleStatus": "passed",
+      "capturedCalls": 5,
+      "wholeOutputReplay": "mcdev-core/tests/mixinextras_expression_legacy.rs::every_original_expression_case_and_full_output#mcdev-core/src/test/kotlin/io/github/mcdev/core/mixinextras/DefinitionsAnnotationParserTest.kt::failClosedOnRootArrayTrailingGarbage",
+      "nativeStateOrHelperAssertions": [],
+      "status": "ported"
+    },
+    {
+      "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixinextras/DefinitionsAnnotationParserTest.kt::failClosedOnUnclosedArrayBrace",
+      "oracleStatus": "passed",
+      "capturedCalls": 2,
+      "wholeOutputReplay": "mcdev-core/tests/mixinextras_expression_legacy.rs::every_original_expression_case_and_full_output#mcdev-core/src/test/kotlin/io/github/mcdev/core/mixinextras/DefinitionsAnnotationParserTest.kt::failClosedOnUnclosedArrayBrace",
+      "nativeStateOrHelperAssertions": [],
+      "status": "ported"
+    },
+    {
+      "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixinextras/DefinitionsAnnotationParserTest.kt::failClosedOnUnclosedDefinitionParenInSingleValue",
+      "oracleStatus": "passed",
+      "capturedCalls": 2,
+      "wholeOutputReplay": "mcdev-core/tests/mixinextras_expression_legacy.rs::every_original_expression_case_and_full_output#mcdev-core/src/test/kotlin/io/github/mcdev/core/mixinextras/DefinitionsAnnotationParserTest.kt::failClosedOnUnclosedDefinitionParenInSingleValue",
+      "nativeStateOrHelperAssertions": [],
+      "status": "ported"
+    },
+    {
+      "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixinextras/DefinitionsAnnotationParserTest.kt::failClosedOnUnknownMember",
+      "oracleStatus": "passed",
+      "capturedCalls": 4,
+      "wholeOutputReplay": "mcdev-core/tests/mixinextras_expression_legacy.rs::every_original_expression_case_and_full_output#mcdev-core/src/test/kotlin/io/github/mcdev/core/mixinextras/DefinitionsAnnotationParserTest.kt::failClosedOnUnknownMember",
+      "nativeStateOrHelperAssertions": [],
+      "status": "ported"
+    },
+    {
+      "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixinextras/DefinitionsAnnotationParserTest.kt::handlesCommentsWhitespaceAndNestedDefinitionAttributes",
+      "oracleStatus": "passed",
+      "capturedCalls": 5,
+      "wholeOutputReplay": "mcdev-core/tests/mixinextras_expression_legacy.rs::every_original_expression_case_and_full_output#mcdev-core/src/test/kotlin/io/github/mcdev/core/mixinextras/DefinitionsAnnotationParserTest.kt::handlesCommentsWhitespaceAndNestedDefinitionAttributes",
+      "nativeStateOrHelperAssertions": [],
+      "status": "ported"
+    },
+    {
+      "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixinextras/DefinitionsAnnotationParserTest.kt::idSourceRangeCoversFullTargetIdentifierCharacters",
+      "oracleStatus": "passed",
+      "capturedCalls": 3,
+      "wholeOutputReplay": "mcdev-core/tests/mixinextras_expression_legacy.rs::every_original_expression_case_and_full_output#mcdev-core/src/test/kotlin/io/github/mcdev/core/mixinextras/DefinitionsAnnotationParserTest.kt::idSourceRangeCoversFullTargetIdentifierCharacters",
+      "nativeStateOrHelperAssertions": [],
+      "status": "ported"
+    },
+    {
+      "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixinextras/DefinitionsAnnotationParserTest.kt::ignoresWrongAnnotationSiblings",
+      "oracleStatus": "passed",
+      "capturedCalls": 5,
+      "wholeOutputReplay": "mcdev-core/tests/mixinextras_expression_legacy.rs::every_original_expression_case_and_full_output#mcdev-core/src/test/kotlin/io/github/mcdev/core/mixinextras/DefinitionsAnnotationParserTest.kt::ignoresWrongAnnotationSiblings",
+      "nativeStateOrHelperAssertions": [],
+      "status": "ported"
+    },
+    {
+      "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixinextras/DefinitionsAnnotationParserTest.kt::malformedDefinitionElementsAreIgnoredWithoutDiscardingValidSiblings",
+      "oracleStatus": "passed",
+      "capturedCalls": 5,
+      "wholeOutputReplay": "mcdev-core/tests/mixinextras_expression_legacy.rs::every_original_expression_case_and_full_output#mcdev-core/src/test/kotlin/io/github/mcdev/core/mixinextras/DefinitionsAnnotationParserTest.kt::malformedDefinitionElementsAreIgnoredWithoutDiscardingValidSiblings",
+      "nativeStateOrHelperAssertions": [],
+      "status": "ported"
+    },
+    {
+      "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixinextras/DefinitionsAnnotationParserTest.kt::malformedIdIsRetainedForDiagnostics",
+      "oracleStatus": "passed",
+      "capturedCalls": 2,
+      "wholeOutputReplay": "mcdev-core/tests/mixinextras_expression_legacy.rs::every_original_expression_case_and_full_output#mcdev-core/src/test/kotlin/io/github/mcdev/core/mixinextras/DefinitionsAnnotationParserTest.kt::malformedIdIsRetainedForDiagnostics",
+      "nativeStateOrHelperAssertions": [],
+      "status": "ported"
+    },
+    {
+      "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixinextras/DefinitionsAnnotationParserTest.kt::nonOfficialDefinitionFqnIsExcluded",
+      "oracleStatus": "passed",
+      "capturedCalls": 1,
+      "wholeOutputReplay": "mcdev-core/tests/mixinextras_expression_legacy.rs::every_original_expression_case_and_full_output#mcdev-core/src/test/kotlin/io/github/mcdev/core/mixinextras/DefinitionsAnnotationParserTest.kt::nonOfficialDefinitionFqnIsExcluded",
+      "nativeStateOrHelperAssertions": [],
+      "status": "ported"
+    },
+    {
+      "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixinextras/DefinitionsAnnotationParserTest.kt::parseDefinitionAtMapsIdSourceRangeWithNonzeroHandlerRegionBase",
+      "oracleStatus": "passed",
+      "capturedCalls": 3,
+      "wholeOutputReplay": "mcdev-core/tests/mixinextras_expression_legacy.rs::every_original_expression_case_and_full_output#mcdev-core/src/test/kotlin/io/github/mcdev/core/mixinextras/DefinitionsAnnotationParserTest.kt::parseDefinitionAtMapsIdSourceRangeWithNonzeroHandlerRegionBase",
+      "nativeStateOrHelperAssertions": [],
+      "status": "ported"
+    },
+    {
+      "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixinextras/DefinitionsAnnotationParserTest.kt::parseWithNonzeroBaseMapsNestedDefinitionsArrayIdSourceRanges",
+      "oracleStatus": "passed",
+      "capturedCalls": 6,
+      "wholeOutputReplay": "mcdev-core/tests/mixinextras_expression_legacy.rs::every_original_expression_case_and_full_output#mcdev-core/src/test/kotlin/io/github/mcdev/core/mixinextras/DefinitionsAnnotationParserTest.kt::parseWithNonzeroBaseMapsNestedDefinitionsArrayIdSourceRanges",
+      "nativeStateOrHelperAssertions": [],
+      "status": "ported"
+    },
+    {
+      "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixinextras/DefinitionsAnnotationParserTest.kt::parsesArrayViaUnnamedShorthand",
+      "oracleStatus": "passed",
+      "capturedCalls": 5,
+      "wholeOutputReplay": "mcdev-core/tests/mixinextras_expression_legacy.rs::every_original_expression_case_and_full_output#mcdev-core/src/test/kotlin/io/github/mcdev/core/mixinextras/DefinitionsAnnotationParserTest.kt::parsesArrayViaUnnamedShorthand",
+      "nativeStateOrHelperAssertions": [],
+      "status": "ported"
+    },
+    {
+      "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixinextras/DefinitionsAnnotationParserTest.kt::parsesDefinitionArrayPreservingOrder",
+      "oracleStatus": "passed",
+      "capturedCalls": 7,
+      "wholeOutputReplay": "mcdev-core/tests/mixinextras_expression_legacy.rs::every_original_expression_case_and_full_output#mcdev-core/src/test/kotlin/io/github/mcdev/core/mixinextras/DefinitionsAnnotationParserTest.kt::parsesDefinitionArrayPreservingOrder",
+      "nativeStateOrHelperAssertions": [],
+      "status": "ported"
+    },
+    {
+      "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixinextras/DefinitionsAnnotationParserTest.kt::parsesEmptyArray",
+      "oracleStatus": "passed",
+      "capturedCalls": 2,
+      "wholeOutputReplay": "mcdev-core/tests/mixinextras_expression_legacy.rs::every_original_expression_case_and_full_output#mcdev-core/src/test/kotlin/io/github/mcdev/core/mixinextras/DefinitionsAnnotationParserTest.kt::parsesEmptyArray",
+      "nativeStateOrHelperAssertions": [],
+      "status": "ported"
+    },
+    {
+      "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixinextras/DefinitionsAnnotationParserTest.kt::parsesFullyQualifiedDefinition",
+      "oracleStatus": "passed",
+      "capturedCalls": 3,
+      "wholeOutputReplay": "mcdev-core/tests/mixinextras_expression_legacy.rs::every_original_expression_case_and_full_output#mcdev-core/src/test/kotlin/io/github/mcdev/core/mixinextras/DefinitionsAnnotationParserTest.kt::parsesFullyQualifiedDefinition",
+      "nativeStateOrHelperAssertions": [],
+      "status": "ported"
+    },
+    {
+      "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixinextras/DefinitionsAnnotationParserTest.kt::parsesSingleDefinitionViaUnnamedShorthand",
+      "oracleStatus": "passed",
+      "capturedCalls": 3,
+      "wholeOutputReplay": "mcdev-core/tests/mixinextras_expression_legacy.rs::every_original_expression_case_and_full_output#mcdev-core/src/test/kotlin/io/github/mcdev/core/mixinextras/DefinitionsAnnotationParserTest.kt::parsesSingleDefinitionViaUnnamedShorthand",
+      "nativeStateOrHelperAssertions": [],
+      "status": "ported"
+    },
+    {
+      "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixinextras/DefinitionsAnnotationParserTest.kt::parsesSingleDefinitionViaValueEquals",
+      "oracleStatus": "passed",
+      "capturedCalls": 3,
+      "wholeOutputReplay": "mcdev-core/tests/mixinextras_expression_legacy.rs::every_original_expression_case_and_full_output#mcdev-core/src/test/kotlin/io/github/mcdev/core/mixinextras/DefinitionsAnnotationParserTest.kt::parsesSingleDefinitionViaValueEquals",
+      "nativeStateOrHelperAssertions": [],
+      "status": "ported"
+    },
+    {
+      "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixinextras/DefinitionsAnnotationParserTest.kt::trailingGarbageIsExcluded",
+      "oracleStatus": "passed",
+      "capturedCalls": 10,
+      "wholeOutputReplay": "mcdev-core/tests/mixinextras_expression_legacy.rs::every_original_expression_case_and_full_output#mcdev-core/src/test/kotlin/io/github/mcdev/core/mixinextras/DefinitionsAnnotationParserTest.kt::trailingGarbageIsExcluded",
+      "nativeStateOrHelperAssertions": [],
+      "status": "ported"
+    },
+    {
+      "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixinextras/DefinitionsAnnotationParserTest.kt::trailingGarbageRecoverySkipsNestedDelimitersAndComments",
+      "oracleStatus": "passed",
+      "capturedCalls": 7,
+      "wholeOutputReplay": "mcdev-core/tests/mixinextras_expression_legacy.rs::every_original_expression_case_and_full_output#mcdev-core/src/test/kotlin/io/github/mcdev/core/mixinextras/DefinitionsAnnotationParserTest.kt::trailingGarbageRecoverySkipsNestedDelimitersAndComments",
+      "nativeStateOrHelperAssertions": [],
+      "status": "ported"
+    },
+    {
+      "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixinextras/ExpressionAnnotationParserTest.kt::decodesUnicodeEscapeInValueShorthand",
+      "oracleStatus": "passed",
+      "capturedCalls": 2,
+      "wholeOutputReplay": "mcdev-core/tests/mixinextras_expression_legacy.rs::every_original_expression_case_and_full_output#mcdev-core/src/test/kotlin/io/github/mcdev/core/mixinextras/ExpressionAnnotationParserTest.kt::decodesUnicodeEscapeInValueShorthand",
+      "nativeStateOrHelperAssertions": [],
+      "status": "ported"
+    },
+    {
+      "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixinextras/ExpressionAnnotationParserTest.kt::decodesValidJavaBasicEscapes",
+      "oracleStatus": "passed",
+      "capturedCalls": 9,
+      "wholeOutputReplay": "mcdev-core/tests/mixinextras_expression_legacy.rs::every_original_expression_case_and_full_output#mcdev-core/src/test/kotlin/io/github/mcdev/core/mixinextras/ExpressionAnnotationParserTest.kt::decodesValidJavaBasicEscapes",
+      "nativeStateOrHelperAssertions": [],
+      "status": "ported"
+    },
+    {
+      "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixinextras/ExpressionAnnotationParserTest.kt::decodesValidJavaOctalEscapes",
+      "oracleStatus": "passed",
+      "capturedCalls": 7,
+      "wholeOutputReplay": "mcdev-core/tests/mixinextras_expression_legacy.rs::every_original_expression_case_and_full_output#mcdev-core/src/test/kotlin/io/github/mcdev/core/mixinextras/ExpressionAnnotationParserTest.kt::decodesValidJavaOctalEscapes",
+      "nativeStateOrHelperAssertions": [],
+      "status": "ported"
+    },
+    {
+      "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixinextras/ExpressionAnnotationParserTest.kt::duplicateValueAttributeFails",
+      "oracleStatus": "passed",
+      "capturedCalls": 1,
+      "wholeOutputReplay": "mcdev-core/tests/mixinextras_expression_legacy.rs::every_original_expression_case_and_full_output#mcdev-core/src/test/kotlin/io/github/mcdev/core/mixinextras/ExpressionAnnotationParserTest.kt::duplicateValueAttributeFails",
+      "nativeStateOrHelperAssertions": [],
+      "status": "ported"
+    },
+    {
+      "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixinextras/ExpressionAnnotationParserTest.kt::emptyBodyFailsWithoutRequiredValue",
+      "oracleStatus": "passed",
+      "capturedCalls": 1,
+      "wholeOutputReplay": "mcdev-core/tests/mixinextras_expression_legacy.rs::every_original_expression_case_and_full_output#mcdev-core/src/test/kotlin/io/github/mcdev/core/mixinextras/ExpressionAnnotationParserTest.kt::emptyBodyFailsWithoutRequiredValue",
+      "nativeStateOrHelperAssertions": [],
+      "status": "ported"
+    },
+    {
+      "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixinextras/ExpressionAnnotationParserTest.kt::emptyValueArrayRemainsEmpty",
+      "oracleStatus": "passed",
+      "capturedCalls": 1,
+      "wholeOutputReplay": "mcdev-core/tests/mixinextras_expression_legacy.rs::every_original_expression_case_and_full_output#mcdev-core/src/test/kotlin/io/github/mcdev/core/mixinextras/ExpressionAnnotationParserTest.kt::emptyValueArrayRemainsEmpty",
+      "nativeStateOrHelperAssertions": [],
+      "status": "ported"
+    },
+    {
+      "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixinextras/ExpressionAnnotationParserTest.kt::handlesCommentsWhitespaceAndTrailingComma",
+      "oracleStatus": "passed",
+      "capturedCalls": 1,
+      "wholeOutputReplay": "mcdev-core/tests/mixinextras_expression_legacy.rs::every_original_expression_case_and_full_output#mcdev-core/src/test/kotlin/io/github/mcdev/core/mixinextras/ExpressionAnnotationParserTest.kt::handlesCommentsWhitespaceAndTrailingComma",
+      "nativeStateOrHelperAssertions": [],
+      "status": "ported"
+    },
+    {
+      "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixinextras/ExpressionAnnotationParserTest.kt::idDefaultsToEmptyWhenOmitted",
+      "oracleStatus": "passed",
+      "capturedCalls": 1,
+      "wholeOutputReplay": "mcdev-core/tests/mixinextras_expression_legacy.rs::every_original_expression_case_and_full_output#mcdev-core/src/test/kotlin/io/github/mcdev/core/mixinextras/ExpressionAnnotationParserTest.kt::idDefaultsToEmptyWhenOmitted",
+      "nativeStateOrHelperAssertions": [],
+      "status": "ported"
+    },
+    {
+      "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixinextras/ExpressionAnnotationParserTest.kt::invalidAndUnicodeEscapesFailClosed",
+      "oracleStatus": "passed",
+      "capturedCalls": 10,
+      "wholeOutputReplay": "mcdev-core/tests/mixinextras_expression_legacy.rs::every_original_expression_case_and_full_output#mcdev-core/src/test/kotlin/io/github/mcdev/core/mixinextras/ExpressionAnnotationParserTest.kt::invalidAndUnicodeEscapesFailClosed",
+      "nativeStateOrHelperAssertions": [],
+      "status": "ported"
+    },
+    {
+      "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixinextras/ExpressionAnnotationParserTest.kt::malformedExplicitIdFailsWholeExpression",
+      "oracleStatus": "passed",
+      "capturedCalls": 2,
+      "wholeOutputReplay": "mcdev-core/tests/mixinextras_expression_legacy.rs::every_original_expression_case_and_full_output#mcdev-core/src/test/kotlin/io/github/mcdev/core/mixinextras/ExpressionAnnotationParserTest.kt::malformedExplicitIdFailsWholeExpression",
+      "nativeStateOrHelperAssertions": [],
+      "status": "ported"
+    },
+    {
+      "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixinextras/ExpressionAnnotationParserTest.kt::malformedInnerStringArrayElementFailsWithoutPartialList",
+      "oracleStatus": "passed",
+      "capturedCalls": 3,
+      "wholeOutputReplay": "mcdev-core/tests/mixinextras_expression_legacy.rs::every_original_expression_case_and_full_output#mcdev-core/src/test/kotlin/io/github/mcdev/core/mixinextras/ExpressionAnnotationParserTest.kt::malformedInnerStringArrayElementFailsWithoutPartialList",
+      "nativeStateOrHelperAssertions": [],
+      "status": "ported"
+    },
+    {
+      "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixinextras/ExpressionAnnotationParserTest.kt::malformedRequiredValueFailsWholeExpression",
+      "oracleStatus": "passed",
+      "capturedCalls": 2,
+      "wholeOutputReplay": "mcdev-core/tests/mixinextras_expression_legacy.rs::every_original_expression_case_and_full_output#mcdev-core/src/test/kotlin/io/github/mcdev/core/mixinextras/ExpressionAnnotationParserTest.kt::malformedRequiredValueFailsWholeExpression",
+      "nativeStateOrHelperAssertions": [],
+      "status": "ported"
+    },
+    {
+      "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixinextras/ExpressionAnnotationParserTest.kt::missingValueAttributeFails",
+      "oracleStatus": "passed",
+      "capturedCalls": 2,
+      "wholeOutputReplay": "mcdev-core/tests/mixinextras_expression_legacy.rs::every_original_expression_case_and_full_output#mcdev-core/src/test/kotlin/io/github/mcdev/core/mixinextras/ExpressionAnnotationParserTest.kt::missingValueAttributeFails",
+      "nativeStateOrHelperAssertions": [],
+      "status": "ported"
+    },
+    {
+      "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixinextras/ExpressionAnnotationParserTest.kt::parsesEscapedQuoteAndBackslashInExpressionValue",
+      "oracleStatus": "passed",
+      "capturedCalls": 1,
+      "wholeOutputReplay": "mcdev-core/tests/mixinextras_expression_legacy.rs::every_original_expression_case_and_full_output#mcdev-core/src/test/kotlin/io/github/mcdev/core/mixinextras/ExpressionAnnotationParserTest.kt::parsesEscapedQuoteAndBackslashInExpressionValue",
+      "nativeStateOrHelperAssertions": [],
+      "status": "ported"
+    },
+    {
+      "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixinextras/ExpressionAnnotationParserTest.kt::parsesExplicitEmptyStringId",
+      "oracleStatus": "passed",
+      "capturedCalls": 1,
+      "wholeOutputReplay": "mcdev-core/tests/mixinextras_expression_legacy.rs::every_original_expression_case_and_full_output#mcdev-core/src/test/kotlin/io/github/mcdev/core/mixinextras/ExpressionAnnotationParserTest.kt::parsesExplicitEmptyStringId",
+      "nativeStateOrHelperAssertions": [],
+      "status": "ported"
+    },
+    {
+      "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixinextras/ExpressionAnnotationParserTest.kt::parsesFullyQualifiedStyleStringsWithSpecialCharacters",
+      "oracleStatus": "passed",
+      "capturedCalls": 1,
+      "wholeOutputReplay": "mcdev-core/tests/mixinextras_expression_legacy.rs::every_original_expression_case_and_full_output#mcdev-core/src/test/kotlin/io/github/mcdev/core/mixinextras/ExpressionAnnotationParserTest.kt::parsesFullyQualifiedStyleStringsWithSpecialCharacters",
+      "nativeStateOrHelperAssertions": [],
+      "status": "ported"
+    },
+    {
+      "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixinextras/ExpressionAnnotationParserTest.kt::parsesIdAndValueInEitherOrder",
+      "oracleStatus": "passed",
+      "capturedCalls": 2,
+      "wholeOutputReplay": "mcdev-core/tests/mixinextras_expression_legacy.rs::every_original_expression_case_and_full_output#mcdev-core/src/test/kotlin/io/github/mcdev/core/mixinextras/ExpressionAnnotationParserTest.kt::parsesIdAndValueInEitherOrder",
+      "nativeStateOrHelperAssertions": [],
+      "status": "ported"
+    },
+    {
+      "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixinextras/ExpressionAnnotationParserTest.kt::parsesNamedValueArray",
+      "oracleStatus": "passed",
+      "capturedCalls": 1,
+      "wholeOutputReplay": "mcdev-core/tests/mixinextras_expression_legacy.rs::every_original_expression_case_and_full_output#mcdev-core/src/test/kotlin/io/github/mcdev/core/mixinextras/ExpressionAnnotationParserTest.kt::parsesNamedValueArray",
+      "nativeStateOrHelperAssertions": [],
+      "status": "ported"
+    },
+    {
+      "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixinextras/ExpressionAnnotationParserTest.kt::parsesNamedValueEquals",
+      "oracleStatus": "passed",
+      "capturedCalls": 1,
+      "wholeOutputReplay": "mcdev-core/tests/mixinextras_expression_legacy.rs::every_original_expression_case_and_full_output#mcdev-core/src/test/kotlin/io/github/mcdev/core/mixinextras/ExpressionAnnotationParserTest.kt::parsesNamedValueEquals",
+      "nativeStateOrHelperAssertions": [],
+      "status": "ported"
+    },
+    {
+      "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixinextras/ExpressionAnnotationParserTest.kt::parsesValueShorthandArrayPreservingOrder",
+      "oracleStatus": "passed",
+      "capturedCalls": 1,
+      "wholeOutputReplay": "mcdev-core/tests/mixinextras_expression_legacy.rs::every_original_expression_case_and_full_output#mcdev-core/src/test/kotlin/io/github/mcdev/core/mixinextras/ExpressionAnnotationParserTest.kt::parsesValueShorthandArrayPreservingOrder",
+      "nativeStateOrHelperAssertions": [],
+      "status": "ported"
+    },
+    {
+      "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixinextras/ExpressionAnnotationParserTest.kt::parsesValueShorthandSingleString",
+      "oracleStatus": "passed",
+      "capturedCalls": 1,
+      "wholeOutputReplay": "mcdev-core/tests/mixinextras_expression_legacy.rs::every_original_expression_case_and_full_output#mcdev-core/src/test/kotlin/io/github/mcdev/core/mixinextras/ExpressionAnnotationParserTest.kt::parsesValueShorthandSingleString",
+      "nativeStateOrHelperAssertions": [],
+      "status": "ported"
+    },
+    {
+      "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixinextras/ExpressionAnnotationParserTest.kt::unclosedValueArrayFails",
+      "oracleStatus": "passed",
+      "capturedCalls": 2,
+      "wholeOutputReplay": "mcdev-core/tests/mixinextras_expression_legacy.rs::every_original_expression_case_and_full_output#mcdev-core/src/test/kotlin/io/github/mcdev/core/mixinextras/ExpressionAnnotationParserTest.kt::unclosedValueArrayFails",
+      "nativeStateOrHelperAssertions": [],
+      "status": "ported"
+    },
+    {
+      "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixinextras/ExpressionAnnotationParserTest.kt::unknownNamedAttributeFailsWholeExpression",
+      "oracleStatus": "passed",
+      "capturedCalls": 4,
+      "wholeOutputReplay": "mcdev-core/tests/mixinextras_expression_legacy.rs::every_original_expression_case_and_full_output#mcdev-core/src/test/kotlin/io/github/mcdev/core/mixinextras/ExpressionAnnotationParserTest.kt::unknownNamedAttributeFailsWholeExpression",
+      "nativeStateOrHelperAssertions": [],
+      "status": "ported"
+    },
+    {
+      "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixinextras/ExpressionAnnotationParserTest.kt::valueShorthandWithTrailingGarbageFails",
+      "oracleStatus": "passed",
+      "capturedCalls": 1,
+      "wholeOutputReplay": "mcdev-core/tests/mixinextras_expression_legacy.rs::every_original_expression_case_and_full_output#mcdev-core/src/test/kotlin/io/github/mcdev/core/mixinextras/ExpressionAnnotationParserTest.kt::valueShorthandWithTrailingGarbageFails",
+      "nativeStateOrHelperAssertions": [],
+      "status": "ported"
+    },
+    {
+      "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixinextras/ExpressionCompletionLexerTest.kt::aPlusThRetainsValueStartPosition",
+      "oracleStatus": "passed",
+      "capturedCalls": 1,
+      "wholeOutputReplay": "mcdev-core/tests/mixinextras_expression_legacy.rs::every_original_expression_case_and_full_output#mcdev-core/src/test/kotlin/io/github/mcdev/core/mixinextras/ExpressionCompletionLexerTest.kt::aPlusThRetainsValueStartPosition",
+      "nativeStateOrHelperAssertions": [],
+      "status": "ported"
+    },
+    {
+      "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixinextras/ExpressionCompletionLexerTest.kt::afterCompleteIdentifierIsNone",
+      "oracleStatus": "passed",
+      "capturedCalls": 1,
+      "wholeOutputReplay": "mcdev-core/tests/mixinextras_expression_legacy.rs::every_original_expression_case_and_full_output#mcdev-core/src/test/kotlin/io/github/mcdev/core/mixinextras/ExpressionCompletionLexerTest.kt::afterCompleteIdentifierIsNone",
+      "nativeStateOrHelperAssertions": [],
+      "status": "ported"
+    },
+    {
+      "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixinextras/ExpressionCompletionLexerTest.kt::afterPlusIsValueStart",
+      "oracleStatus": "passed",
+      "capturedCalls": 1,
+      "wholeOutputReplay": "mcdev-core/tests/mixinextras_expression_legacy.rs::every_original_expression_case_and_full_output#mcdev-core/src/test/kotlin/io/github/mcdev/core/mixinextras/ExpressionCompletionLexerTest.kt::afterPlusIsValueStart",
+      "nativeStateOrHelperAssertions": [],
+      "status": "ported"
+    },
+    {
+      "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixinextras/ExpressionCompletionLexerTest.kt::blockAfterSemicolonIsStatementStart",
+      "oracleStatus": "passed",
+      "capturedCalls": 1,
+      "wholeOutputReplay": "mcdev-core/tests/mixinextras_expression_legacy.rs::every_original_expression_case_and_full_output#mcdev-core/src/test/kotlin/io/github/mcdev/core/mixinextras/ExpressionCompletionLexerTest.kt::blockAfterSemicolonIsStatementStart",
+      "nativeStateOrHelperAssertions": [],
+      "status": "ported"
+    },
+    {
+      "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixinextras/ExpressionCompletionLexerTest.kt::blockBodyIdentifierPrefixRetainsStatementStart",
+      "oracleStatus": "passed",
+      "capturedCalls": 1,
+      "wholeOutputReplay": "mcdev-core/tests/mixinextras_expression_legacy.rs::every_original_expression_case_and_full_output#mcdev-core/src/test/kotlin/io/github/mcdev/core/mixinextras/ExpressionCompletionLexerTest.kt::blockBodyIdentifierPrefixRetainsStatementStart",
+      "nativeStateOrHelperAssertions": [],
+      "status": "ported"
+    },
+    {
+      "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixinextras/ExpressionCompletionLexerTest.kt::blockStartIsStatementStart",
+      "oracleStatus": "passed",
+      "capturedCalls": 1,
+      "wholeOutputReplay": "mcdev-core/tests/mixinextras_expression_legacy.rs::every_original_expression_case_and_full_output#mcdev-core/src/test/kotlin/io/github/mcdev/core/mixinextras/ExpressionCompletionLexerTest.kt::blockStartIsStatementStart",
+      "nativeStateOrHelperAssertions": [],
+      "status": "ported"
+    },
+    {
+      "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixinextras/ExpressionCompletionLexerTest.kt::cursorInMiddleOfIdentifierUsesFullTokenBoundsAndValueStart",
+      "oracleStatus": "passed",
+      "capturedCalls": 1,
+      "wholeOutputReplay": "mcdev-core/tests/mixinextras_expression_legacy.rs::every_original_expression_case_and_full_output#mcdev-core/src/test/kotlin/io/github/mcdev/core/mixinextras/ExpressionCompletionLexerTest.kt::cursorInMiddleOfIdentifierUsesFullTokenBoundsAndValueStart",
+      "nativeStateOrHelperAssertions": [],
+      "status": "ported"
+    },
+    {
+      "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixinextras/ExpressionCompletionLexerTest.kt::emptyExpressionStartIsValueStart",
+      "oracleStatus": "passed",
+      "capturedCalls": 1,
+      "wholeOutputReplay": "mcdev-core/tests/mixinextras_expression_legacy.rs::every_original_expression_case_and_full_output#mcdev-core/src/test/kotlin/io/github/mcdev/core/mixinextras/ExpressionCompletionLexerTest.kt::emptyExpressionStartIsValueStart",
+      "nativeStateOrHelperAssertions": [],
+      "status": "ported"
+    },
+    {
+      "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixinextras/ExpressionCompletionLexerTest.kt::fooMethodReferenceEmptyIsAfterMethodReference",
+      "oracleStatus": "passed",
+      "capturedCalls": 1,
+      "wholeOutputReplay": "mcdev-core/tests/mixinextras_expression_legacy.rs::every_original_expression_case_and_full_output#mcdev-core/src/test/kotlin/io/github/mcdev/core/mixinextras/ExpressionCompletionLexerTest.kt::fooMethodReferenceEmptyIsAfterMethodReference",
+      "nativeStateOrHelperAssertions": [],
+      "status": "ported"
+    },
+    {
+      "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixinextras/ExpressionCompletionLexerTest.kt::identifierAfterDotAtTokenStartUsesEmptyToken",
+      "oracleStatus": "passed",
+      "capturedCalls": 1,
+      "wholeOutputReplay": "mcdev-core/tests/mixinextras_expression_legacy.rs::every_original_expression_case_and_full_output#mcdev-core/src/test/kotlin/io/github/mcdev/core/mixinextras/ExpressionCompletionLexerTest.kt::identifierAfterDotAtTokenStartUsesEmptyToken",
+      "nativeStateOrHelperAssertions": [],
+      "status": "ported"
+    },
+    {
+      "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixinextras/ExpressionCompletionLexerTest.kt::identifierAfterDotRetainsAfterDotPosition",
+      "oracleStatus": "passed",
+      "capturedCalls": 1,
+      "wholeOutputReplay": "mcdev-core/tests/mixinextras_expression_legacy.rs::every_original_expression_case_and_full_output#mcdev-core/src/test/kotlin/io/github/mcdev/core/mixinextras/ExpressionCompletionLexerTest.kt::identifierAfterDotRetainsAfterDotPosition",
+      "nativeStateOrHelperAssertions": [],
+      "status": "ported"
+    },
+    {
+      "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixinextras/ExpressionCompletionLexerTest.kt::identifierAfterMethodReferenceRetainsAfterMethodReferencePosition",
+      "oracleStatus": "passed",
+      "capturedCalls": 1,
+      "wholeOutputReplay": "mcdev-core/tests/mixinextras_expression_legacy.rs::every_original_expression_case_and_full_output#mcdev-core/src/test/kotlin/io/github/mcdev/core/mixinextras/ExpressionCompletionLexerTest.kt::identifierAfterMethodReferenceRetainsAfterMethodReferencePosition",
+      "nativeStateOrHelperAssertions": [],
+      "status": "ported"
+    },
+    {
+      "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixinextras/ExpressionCompletionLexerTest.kt::incompleteBinaryPrefixIsValueStart",
+      "oracleStatus": "passed",
+      "capturedCalls": 1,
+      "wholeOutputReplay": "mcdev-core/tests/mixinextras_expression_legacy.rs::every_original_expression_case_and_full_output#mcdev-core/src/test/kotlin/io/github/mcdev/core/mixinextras/ExpressionCompletionLexerTest.kt::incompleteBinaryPrefixIsValueStart",
+      "nativeStateOrHelperAssertions": [],
+      "status": "ported"
+    },
+    {
+      "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixinextras/ExpressionCompletionLexerTest.kt::insideSingleQuotedLiteralIsNone",
+      "oracleStatus": "passed",
+      "capturedCalls": 1,
+      "wholeOutputReplay": "mcdev-core/tests/mixinextras_expression_legacy.rs::every_original_expression_case_and_full_output#mcdev-core/src/test/kotlin/io/github/mcdev/core/mixinextras/ExpressionCompletionLexerTest.kt::insideSingleQuotedLiteralIsNone",
+      "nativeStateOrHelperAssertions": [],
+      "status": "ported"
+    },
+    {
+      "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixinextras/ExpressionCompletionLexerTest.kt::thTokenAtStartRetainsValueStartPosition",
+      "oracleStatus": "passed",
+      "capturedCalls": 1,
+      "wholeOutputReplay": "mcdev-core/tests/mixinextras_expression_legacy.rs::every_original_expression_case_and_full_output#mcdev-core/src/test/kotlin/io/github/mcdev/core/mixinextras/ExpressionCompletionLexerTest.kt::thTokenAtStartRetainsValueStartPosition",
+      "nativeStateOrHelperAssertions": [],
+      "status": "ported"
+    },
+    {
+      "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixinextras/ExpressionCompletionLexerTest.kt::thisDotEmptyIsAfterDot",
+      "oracleStatus": "passed",
+      "capturedCalls": 1,
+      "wholeOutputReplay": "mcdev-core/tests/mixinextras_expression_legacy.rs::every_original_expression_case_and_full_output#mcdev-core/src/test/kotlin/io/github/mcdev/core/mixinextras/ExpressionCompletionLexerTest.kt::thisDotEmptyIsAfterDot",
+      "nativeStateOrHelperAssertions": [],
+      "status": "ported"
+    },
+    {
+      "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixinextras/ExpressionContextResolverTest.kt::acceptsOfficialFullyQualifiedExpressionAnnotation",
+      "oracleStatus": "passed",
+      "capturedCalls": 17,
+      "wholeOutputReplay": "mcdev-core/tests/mixinextras_expression_legacy.rs::every_original_expression_case_and_full_output#mcdev-core/src/test/kotlin/io/github/mcdev/core/mixinextras/ExpressionContextResolverTest.kt::acceptsOfficialFullyQualifiedExpressionAnnotation",
+      "nativeStateOrHelperAssertions": [],
+      "status": "ported"
+    },
+    {
+      "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixinextras/ExpressionContextResolverTest.kt::collectsDefinitionsInLexicalOrder",
+      "oracleStatus": "passed",
+      "capturedCalls": 31,
+      "wholeOutputReplay": "mcdev-core/tests/mixinextras_expression_legacy.rs::every_original_expression_case_and_full_output#mcdev-core/src/test/kotlin/io/github/mcdev/core/mixinextras/ExpressionContextResolverTest.kt::collectsDefinitionsInLexicalOrder",
+      "nativeStateOrHelperAssertions": [],
+      "status": "ported"
+    },
+    {
+      "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixinextras/ExpressionContextResolverTest.kt::defaultAtIdMatchesEmptyExpressionId",
+      "oracleStatus": "passed",
+      "capturedCalls": 17,
+      "wholeOutputReplay": "mcdev-core/tests/mixinextras_expression_legacy.rs::every_original_expression_case_and_full_output#mcdev-core/src/test/kotlin/io/github/mcdev/core/mixinextras/ExpressionContextResolverTest.kt::defaultAtIdMatchesEmptyExpressionId",
+      "nativeStateOrHelperAssertions": [],
+      "status": "ported"
+    },
+    {
+      "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixinextras/ExpressionContextResolverTest.kt::excludesStandaloneDefinitionsWithoutValidId",
+      "oracleStatus": "passed",
+      "capturedCalls": 39,
+      "wholeOutputReplay": "mcdev-core/tests/mixinextras_expression_legacy.rs::every_original_expression_case_and_full_output#mcdev-core/src/test/kotlin/io/github/mcdev/core/mixinextras/ExpressionContextResolverTest.kt::excludesStandaloneDefinitionsWithoutValidId",
+      "nativeStateOrHelperAssertions": [],
+      "status": "ported"
+    },
+    {
+      "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixinextras/ExpressionContextResolverTest.kt::findEnclosingSiteDoesNotLeakAcrossAdjacentHandlers",
+      "oracleStatus": "passed",
+      "capturedCalls": 50,
+      "wholeOutputReplay": "mcdev-core/tests/mixinextras_expression_legacy.rs::every_original_expression_case_and_full_output#mcdev-core/src/test/kotlin/io/github/mcdev/core/mixinextras/ExpressionContextResolverTest.kt::findEnclosingSiteDoesNotLeakAcrossAdjacentHandlers",
+      "nativeStateOrHelperAssertions": [],
+      "status": "ported"
+    },
+    {
+      "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixinextras/ExpressionContextResolverTest.kt::findEnclosingSiteResolvesStandardInjectHandlerWithExpression",
+      "oracleStatus": "passed",
+      "capturedCalls": 30,
+      "wholeOutputReplay": "mcdev-core/tests/mixinextras_expression_legacy.rs::every_original_expression_case_and_full_output#mcdev-core/src/test/kotlin/io/github/mcdev/core/mixinextras/ExpressionContextResolverTest.kt::findEnclosingSiteResolvesStandardInjectHandlerWithExpression",
+      "nativeStateOrHelperAssertions": [],
+      "status": "ported"
+    },
+    {
+      "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixinextras/ExpressionContextResolverTest.kt::findEnclosingSiteReturnsNullOutsideHandlerPrefixBlock",
+      "oracleStatus": "passed",
+      "capturedCalls": 16,
+      "wholeOutputReplay": "mcdev-core/tests/mixinextras_expression_legacy.rs::every_original_expression_case_and_full_output#mcdev-core/src/test/kotlin/io/github/mcdev/core/mixinextras/ExpressionContextResolverTest.kt::findEnclosingSiteReturnsNullOutsideHandlerPrefixBlock",
+      "nativeStateOrHelperAssertions": [],
+      "status": "ported"
+    },
+    {
+      "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixinextras/ExpressionContextResolverTest.kt::findEnclosingSiteReturnsSiteForOffsetInsideDefinitionPrefix",
+      "oracleStatus": "passed",
+      "capturedCalls": 23,
+      "wholeOutputReplay": "mcdev-core/tests/mixinextras_expression_legacy.rs::every_original_expression_case_and_full_output#mcdev-core/src/test/kotlin/io/github/mcdev/core/mixinextras/ExpressionContextResolverTest.kt::findEnclosingSiteReturnsSiteForOffsetInsideDefinitionPrefix",
+      "nativeStateOrHelperAssertions": [],
+      "status": "ported"
+    },
+    {
+      "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixinextras/ExpressionContextResolverTest.kt::flattensExpressionArrayValuesInDocumentOrder",
+      "oracleStatus": "passed",
+      "capturedCalls": 17,
+      "wholeOutputReplay": "mcdev-core/tests/mixinextras_expression_legacy.rs::every_original_expression_case_and_full_output#mcdev-core/src/test/kotlin/io/github/mcdev/core/mixinextras/ExpressionContextResolverTest.kt::flattensExpressionArrayValuesInDocumentOrder",
+      "nativeStateOrHelperAssertions": [],
+      "status": "ported"
+    },
+    {
+      "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixinextras/ExpressionContextResolverTest.kt::fullyQualifiedReceiverDisambiguatesSameNamedInvokes",
+      "oracleStatus": "passed",
+      "capturedCalls": 1,
+      "wholeOutputReplay": "mcdev-core/tests/mixinextras_expression_legacy.rs::every_original_expression_case_and_full_output#mcdev-core/src/test/kotlin/io/github/mcdev/core/mixinextras/ExpressionContextResolverTest.kt::fullyQualifiedReceiverDisambiguatesSameNamedInvokes",
+      "nativeStateOrHelperAssertions": [],
+      "status": "ported"
+    },
+    {
+      "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixinextras/ExpressionContextResolverTest.kt::handlerRegionPreservesFullBlockUpToHandlerStart",
+      "oracleStatus": "passed",
+      "capturedCalls": 13,
+      "wholeOutputReplay": "mcdev-core/tests/mixinextras_expression_legacy.rs::every_original_expression_case_and_full_output#mcdev-core/src/test/kotlin/io/github/mcdev/core/mixinextras/ExpressionContextResolverTest.kt::handlerRegionPreservesFullBlockUpToHandlerStart",
+      "nativeStateOrHelperAssertions": [],
+      "status": "ported"
+    },
+    {
+      "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixinextras/ExpressionContextResolverTest.kt::ignoresExpressionLikeTextInsideComments",
+      "oracleStatus": "passed",
+      "capturedCalls": 17,
+      "wholeOutputReplay": "mcdev-core/tests/mixinextras_expression_legacy.rs::every_original_expression_case_and_full_output#mcdev-core/src/test/kotlin/io/github/mcdev/core/mixinextras/ExpressionContextResolverTest.kt::ignoresExpressionLikeTextInsideComments",
+      "nativeStateOrHelperAssertions": [],
+      "status": "ported"
+    },
+    {
+      "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixinextras/ExpressionContextResolverTest.kt::ignoresMismatchedExpressionSibling",
+      "oracleStatus": "passed",
+      "capturedCalls": 17,
+      "wholeOutputReplay": "mcdev-core/tests/mixinextras_expression_legacy.rs::every_original_expression_case_and_full_output#mcdev-core/src/test/kotlin/io/github/mcdev/core/mixinextras/ExpressionContextResolverTest.kt::ignoresMismatchedExpressionSibling",
+      "nativeStateOrHelperAssertions": [],
+      "status": "ported"
+    },
+    {
+      "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixinextras/ExpressionContextResolverTest.kt::infersInvokeTypeFromFullyQualifiedReceiver",
+      "oracleStatus": "passed",
+      "capturedCalls": 1,
+      "wholeOutputReplay": "mcdev-core/tests/mixinextras_expression_legacy.rs::every_original_expression_case_and_full_output#mcdev-core/src/test/kotlin/io/github/mcdev/core/mixinextras/ExpressionContextResolverTest.kt::infersInvokeTypeFromFullyQualifiedReceiver",
+      "nativeStateOrHelperAssertions": [],
+      "status": "ported"
+    },
+    {
+      "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixinextras/ExpressionContextResolverTest.kt::infersTypeWhenAllMatchedExpressionsResolveToSameDescriptor",
+      "oracleStatus": "passed",
+      "capturedCalls": 25,
+      "wholeOutputReplay": "mcdev-core/tests/mixinextras_expression_legacy.rs::every_original_expression_case_and_full_output#mcdev-core/src/test/kotlin/io/github/mcdev/core/mixinextras/ExpressionContextResolverTest.kt::infersTypeWhenAllMatchedExpressionsResolveToSameDescriptor",
+      "nativeStateOrHelperAssertions": [],
+      "status": "ported"
+    },
+    {
+      "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixinextras/ExpressionContextResolverTest.kt::invalidPoolSiblingDoesNotPreventValidUsedDefinitionFromMatching",
+      "oracleStatus": "passed",
+      "capturedCalls": 31,
+      "wholeOutputReplay": "mcdev-core/tests/mixinextras_expression_legacy.rs::every_original_expression_case_and_full_output#mcdev-core/src/test/kotlin/io/github/mcdev/core/mixinextras/ExpressionContextResolverTest.kt::invalidPoolSiblingDoesNotPreventValidUsedDefinitionFromMatching",
+      "nativeStateOrHelperAssertions": [],
+      "status": "ported"
+    },
+    {
+      "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixinextras/ExpressionContextResolverTest.kt::missingBytesFallsBackToRegexHeuristicWithoutResolvedContext",
+      "oracleStatus": "passed",
+      "capturedCalls": 22,
+      "wholeOutputReplay": "mcdev-core/tests/mixinextras_expression_legacy.rs::every_original_expression_case_and_full_output#mcdev-core/src/test/kotlin/io/github/mcdev/core/mixinextras/ExpressionContextResolverTest.kt::missingBytesFallsBackToRegexHeuristicWithoutResolvedContext",
+      "nativeStateOrHelperAssertions": [],
+      "status": "ported"
+    },
+    {
+      "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixinextras/ExpressionContextResolverTest.kt::missingBytesWithResolvedContextDoesNotFallBackToRegexHeuristic",
+      "oracleStatus": "passed",
+      "capturedCalls": 13,
+      "wholeOutputReplay": "mcdev-core/tests/mixinextras_expression_legacy.rs::every_original_expression_case_and_full_output#mcdev-core/src/test/kotlin/io/github/mcdev/core/mixinextras/ExpressionContextResolverTest.kt::missingBytesWithResolvedContextDoesNotFallBackToRegexHeuristic",
+      "nativeStateOrHelperAssertions": [],
+      "status": "ported"
+    },
+    {
+      "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixinextras/ExpressionContextResolverTest.kt::officialMatcherCollapsesMultipleExpressionsToSameDescriptor",
+      "oracleStatus": "passed",
+      "capturedCalls": 23,
+      "wholeOutputReplay": "mcdev-core/tests/mixinextras_expression_legacy.rs::every_original_expression_case_and_full_output#mcdev-core/src/test/kotlin/io/github/mcdev/core/mixinextras/ExpressionContextResolverTest.kt::officialMatcherCollapsesMultipleExpressionsToSameDescriptor",
+      "nativeStateOrHelperAssertions": [],
+      "status": "ported"
+    },
+    {
+      "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixinextras/ExpressionContextResolverTest.kt::officialMatcherInvokesCommonSuperClassResolverForBranchMergeFixture",
+      "oracleStatus": "passed",
+      "capturedCalls": 21,
+      "wholeOutputReplay": "mcdev-core/tests/mixinextras_expression_legacy.rs::every_original_expression_case_and_full_output#mcdev-core/src/test/kotlin/io/github/mcdev/core/mixinextras/ExpressionContextResolverTest.kt::officialMatcherInvokesCommonSuperClassResolverForBranchMergeFixture",
+      "nativeStateOrHelperAssertions": [
+        "mcdev-core/tests/mixinextras_expression_legacy.rs::official_matcher_invokes_common_super_class_resolver_for_branch_merge_fixture"
+      ],
+      "status": "ported"
+    },
+    {
+      "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixinextras/ExpressionContextResolverTest.kt::officialMatcherResolvesStringFromDefinitionAndExpressionCapture",
+      "oracleStatus": "passed",
+      "capturedCalls": 26,
+      "wholeOutputReplay": "mcdev-core/tests/mixinextras_expression_legacy.rs::every_original_expression_case_and_full_output#mcdev-core/src/test/kotlin/io/github/mcdev/core/mixinextras/ExpressionContextResolverTest.kt::officialMatcherResolvesStringFromDefinitionAndExpressionCapture",
+      "nativeStateOrHelperAssertions": [],
+      "status": "ported"
+    },
+    {
+      "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixinextras/ExpressionContextResolverTest.kt::officialMatcherReturnsNullWhenExpressionDoesNotMatch",
+      "oracleStatus": "passed",
+      "capturedCalls": 21,
+      "wholeOutputReplay": "mcdev-core/tests/mixinextras_expression_legacy.rs::every_original_expression_case_and_full_output#mcdev-core/src/test/kotlin/io/github/mcdev/core/mixinextras/ExpressionContextResolverTest.kt::officialMatcherReturnsNullWhenExpressionDoesNotMatch",
+      "nativeStateOrHelperAssertions": [],
+      "status": "ported"
+    },
+    {
+      "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixinextras/ExpressionContextResolverTest.kt::officialMatcherReturnsNullWhenMatchedExpressionsHaveConflictingTypes",
+      "oracleStatus": "passed",
+      "capturedCalls": 21,
+      "wholeOutputReplay": "mcdev-core/tests/mixinextras_expression_legacy.rs::every_original_expression_case_and_full_output#mcdev-core/src/test/kotlin/io/github/mcdev/core/mixinextras/ExpressionContextResolverTest.kt::officialMatcherReturnsNullWhenMatchedExpressionsHaveConflictingTypes",
+      "nativeStateOrHelperAssertions": [],
+      "status": "ported"
+    },
+    {
+      "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixinextras/ExpressionContextResolverTest.kt::pairsExpressionBeforeInjectorAnnotation",
+      "oracleStatus": "passed",
+      "capturedCalls": 17,
+      "wholeOutputReplay": "mcdev-core/tests/mixinextras_expression_legacy.rs::every_original_expression_case_and_full_output#mcdev-core/src/test/kotlin/io/github/mcdev/core/mixinextras/ExpressionContextResolverTest.kt::pairsExpressionBeforeInjectorAnnotation",
+      "nativeStateOrHelperAssertions": [],
+      "status": "ported"
+    },
+    {
+      "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixinextras/ExpressionContextResolverTest.kt::pairsExpressionBeforeInjectorWithBareMarkerAnnotation",
+      "oracleStatus": "passed",
+      "capturedCalls": 18,
+      "wholeOutputReplay": "mcdev-core/tests/mixinextras_expression_legacy.rs::every_original_expression_case_and_full_output#mcdev-core/src/test/kotlin/io/github/mcdev/core/mixinextras/ExpressionContextResolverTest.kt::pairsExpressionBeforeInjectorWithBareMarkerAnnotation",
+      "nativeStateOrHelperAssertions": [],
+      "status": "ported"
+    },
+    {
+      "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixinextras/ExpressionContextResolverTest.kt::pairsNamedExpressionByMatchingAtId",
+      "oracleStatus": "passed",
+      "capturedCalls": 17,
+      "wholeOutputReplay": "mcdev-core/tests/mixinextras_expression_legacy.rs::every_original_expression_case_and_full_output#mcdev-core/src/test/kotlin/io/github/mcdev/core/mixinextras/ExpressionContextResolverTest.kt::pairsNamedExpressionByMatchingAtId",
+      "nativeStateOrHelperAssertions": [],
+      "status": "ported"
+    },
+    {
+      "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixinextras/ExpressionContextResolverTest.kt::preservesInterleavedStandaloneAndContainerOrder",
+      "oracleStatus": "passed",
+      "capturedCalls": 23,
+      "wholeOutputReplay": "mcdev-core/tests/mixinextras_expression_legacy.rs::every_original_expression_case_and_full_output#mcdev-core/src/test/kotlin/io/github/mcdev/core/mixinextras/ExpressionContextResolverTest.kt::preservesInterleavedStandaloneAndContainerOrder",
+      "nativeStateOrHelperAssertions": [],
+      "status": "ported"
+    },
+    {
+      "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixinextras/ExpressionContextResolverTest.kt::preservesShorthandExpressionAfterInjector",
+      "oracleStatus": "passed",
+      "capturedCalls": 17,
+      "wholeOutputReplay": "mcdev-core/tests/mixinextras_expression_legacy.rs::every_original_expression_case_and_full_output#mcdev-core/src/test/kotlin/io/github/mcdev/core/mixinextras/ExpressionContextResolverTest.kt::preservesShorthandExpressionAfterInjector",
+      "nativeStateOrHelperAssertions": [],
+      "status": "ported"
+    },
+    {
+      "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixinextras/ExpressionContextResolverTest.kt::providedEmptyResolvedContextDoesNotFallBackToSourceExpression",
+      "oracleStatus": "passed",
+      "capturedCalls": 11,
+      "wholeOutputReplay": "mcdev-core/tests/mixinextras_expression_legacy.rs::every_original_expression_case_and_full_output#mcdev-core/src/test/kotlin/io/github/mcdev/core/mixinextras/ExpressionContextResolverTest.kt::providedEmptyResolvedContextDoesNotFallBackToSourceExpression",
+      "nativeStateOrHelperAssertions": [],
+      "status": "ported"
+    },
+    {
+      "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixinextras/ExpressionContextResolverTest.kt::providedResolvedContextOverridesContradictorySourceValues",
+      "oracleStatus": "passed",
+      "capturedCalls": 13,
+      "wholeOutputReplay": "mcdev-core/tests/mixinextras_expression_legacy.rs::every_original_expression_case_and_full_output#mcdev-core/src/test/kotlin/io/github/mcdev/core/mixinextras/ExpressionContextResolverTest.kt::providedResolvedContextOverridesContradictorySourceValues",
+      "nativeStateOrHelperAssertions": [],
+      "status": "ported"
+    },
+    {
+      "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixinextras/ExpressionContextResolverTest.kt::recognizesExpressionAfterLiteralsContainingCommentMarkers",
+      "oracleStatus": "passed",
+      "capturedCalls": 18,
+      "wholeOutputReplay": "mcdev-core/tests/mixinextras_expression_legacy.rs::every_original_expression_case_and_full_output#mcdev-core/src/test/kotlin/io/github/mcdev/core/mixinextras/ExpressionContextResolverTest.kt::recognizesExpressionAfterLiteralsContainingCommentMarkers",
+      "nativeStateOrHelperAssertions": [],
+      "status": "ported"
+    },
+    {
+      "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixinextras/ExpressionContextResolverTest.kt::rejectsNonOfficialQualifiedExpressionAnnotationNames",
+      "oracleStatus": "passed",
+      "capturedCalls": 18,
+      "wholeOutputReplay": "mcdev-core/tests/mixinextras_expression_legacy.rs::every_original_expression_case_and_full_output#mcdev-core/src/test/kotlin/io/github/mcdev/core/mixinextras/ExpressionContextResolverTest.kt::rejectsNonOfficialQualifiedExpressionAnnotationNames",
+      "nativeStateOrHelperAssertions": [],
+      "status": "ported"
+    },
+    {
+      "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixinextras/ExpressionContextResolverTest.kt::resolveExpressionContextForSiteFallsBackToLexicalParsingWhenResolvedContextsEmpty",
+      "oracleStatus": "passed",
+      "capturedCalls": 26,
+      "wholeOutputReplay": "mcdev-core/tests/mixinextras_expression_legacy.rs::every_original_expression_case_and_full_output#mcdev-core/src/test/kotlin/io/github/mcdev/core/mixinextras/ExpressionContextResolverTest.kt::resolveExpressionContextForSiteFallsBackToLexicalParsingWhenResolvedContextsEmpty",
+      "nativeStateOrHelperAssertions": [],
+      "status": "ported"
+    },
+    {
+      "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixinextras/ExpressionContextResolverTest.kt::resolveExpressionContextForSiteReturnsNullWhenAuthoritativeSelectionIsAmbiguous",
+      "oracleStatus": "passed",
+      "capturedCalls": 10,
+      "wholeOutputReplay": "mcdev-core/tests/mixinextras_expression_legacy.rs::every_original_expression_case_and_full_output#mcdev-core/src/test/kotlin/io/github/mcdev/core/mixinextras/ExpressionContextResolverTest.kt::resolveExpressionContextForSiteReturnsNullWhenAuthoritativeSelectionIsAmbiguous",
+      "nativeStateOrHelperAssertions": [],
+      "status": "ported"
+    },
+    {
+      "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixinextras/ExpressionContextResolverTest.kt::resolveExpressionContextForSiteUsesAuthoritativeEmptyContextInsteadOfLexicalFallback",
+      "oracleStatus": "passed",
+      "capturedCalls": 10,
+      "wholeOutputReplay": "mcdev-core/tests/mixinextras_expression_legacy.rs::every_original_expression_case_and_full_output#mcdev-core/src/test/kotlin/io/github/mcdev/core/mixinextras/ExpressionContextResolverTest.kt::resolveExpressionContextForSiteUsesAuthoritativeEmptyContextInsteadOfLexicalFallback",
+      "nativeStateOrHelperAssertions": [],
+      "status": "ported"
+    },
+    {
+      "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixinextras/ExpressionContextResolverTest.kt::resolvesExpressionAdjacentToHandlerModifierWithoutTruncatingClosingParen",
+      "oracleStatus": "passed",
+      "capturedCalls": 17,
+      "wholeOutputReplay": "mcdev-core/tests/mixinextras_expression_legacy.rs::every_original_expression_case_and_full_output#mcdev-core/src/test/kotlin/io/github/mcdev/core/mixinextras/ExpressionContextResolverTest.kt::resolvesExpressionAdjacentToHandlerModifierWithoutTruncatingClosingParen",
+      "nativeStateOrHelperAssertions": [],
+      "status": "ported"
+    },
+    {
+      "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixinextras/ExpressionContextResolverTest.kt::retainsAllMatchingExpressionValuesWhenMultipleShareId",
+      "oracleStatus": "passed",
+      "capturedCalls": 19,
+      "wholeOutputReplay": "mcdev-core/tests/mixinextras_expression_legacy.rs::every_original_expression_case_and_full_output#mcdev-core/src/test/kotlin/io/github/mcdev/core/mixinextras/ExpressionContextResolverTest.kt::retainsAllMatchingExpressionValuesWhenMultipleShareId",
+      "nativeStateOrHelperAssertions": [],
+      "status": "ported"
+    },
+    {
+      "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixinextras/ExpressionContextResolverTest.kt::returnsNullWhenMatchedExpressionsResolveToConflictingDescriptors",
+      "oracleStatus": "passed",
+      "capturedCalls": 25,
+      "wholeOutputReplay": "mcdev-core/tests/mixinextras_expression_legacy.rs::every_original_expression_case_and_full_output#mcdev-core/src/test/kotlin/io/github/mcdev/core/mixinextras/ExpressionContextResolverTest.kt::returnsNullWhenMatchedExpressionsResolveToConflictingDescriptors",
+      "nativeStateOrHelperAssertions": [],
+      "status": "ported"
+    },
+    {
+      "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixinextras/ExpressionContextResolverTest.kt::undeclaredUsedDefinitionIdentifierYieldsNullWithoutRegexFallback",
+      "oracleStatus": "passed",
+      "capturedCalls": 22,
+      "wholeOutputReplay": "mcdev-core/tests/mixinextras_expression_legacy.rs::every_original_expression_case_and_full_output#mcdev-core/src/test/kotlin/io/github/mcdev/core/mixinextras/ExpressionContextResolverTest.kt::undeclaredUsedDefinitionIdentifierYieldsNullWithoutRegexFallback",
+      "nativeStateOrHelperAssertions": [],
+      "status": "ported"
+    },
+    {
+      "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixinextras/ExpressionContextResolverTest.kt::valuesForAtIdIsCaseSensitive",
+      "oracleStatus": "passed",
+      "capturedCalls": 19,
+      "wholeOutputReplay": "mcdev-core/tests/mixinextras_expression_legacy.rs::every_original_expression_case_and_full_output#mcdev-core/src/test/kotlin/io/github/mcdev/core/mixinextras/ExpressionContextResolverTest.kt::valuesForAtIdIsCaseSensitive",
+      "nativeStateOrHelperAssertions": [],
+      "status": "ported"
+    },
+    {
+      "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixinextras/ExpressionDefinitionEditPlannerTest.kt::appliedMainInsertPlusAdditionalEditsYieldsValidOrdering",
+      "oracleStatus": "passed",
+      "capturedCalls": 42,
+      "wholeOutputReplay": "mcdev-core/tests/mixinextras_expression_legacy.rs::every_original_expression_case_and_full_output#mcdev-core/src/test/kotlin/io/github/mcdev/core/mixinextras/ExpressionDefinitionEditPlannerTest.kt::appliedMainInsertPlusAdditionalEditsYieldsValidOrdering",
+      "nativeStateOrHelperAssertions": [],
+      "status": "ported"
+    },
+    {
+      "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixinextras/ExpressionDefinitionEditPlannerTest.kt::canonicalExactSelectorFormatsFieldAndMethod",
+      "oracleStatus": "passed",
+      "capturedCalls": 2,
+      "wholeOutputReplay": "mcdev-core/tests/mixinextras_expression_legacy.rs::every_original_expression_case_and_full_output#mcdev-core/src/test/kotlin/io/github/mcdev/core/mixinextras/ExpressionDefinitionEditPlannerTest.kt::canonicalExactSelectorFormatsFieldAndMethod",
+      "nativeStateOrHelperAssertions": [],
+      "status": "ported"
+    },
+    {
+      "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixinextras/ExpressionDefinitionEditPlannerTest.kt::conflictingSameIdGetsStableNumericSuffix",
+      "oracleStatus": "passed",
+      "capturedCalls": 48,
+      "wholeOutputReplay": "mcdev-core/tests/mixinextras_expression_legacy.rs::every_original_expression_case_and_full_output#mcdev-core/src/test/kotlin/io/github/mcdev/core/mixinextras/ExpressionDefinitionEditPlannerTest.kt::conflictingSameIdGetsStableNumericSuffix",
+      "nativeStateOrHelperAssertions": [],
+      "status": "ported"
+    },
+    {
+      "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixinextras/ExpressionDefinitionEditPlannerTest.kt::definitionInsertionUsesCrlfIndentation",
+      "oracleStatus": "passed",
+      "capturedCalls": 24,
+      "wholeOutputReplay": "mcdev-core/tests/mixinextras_expression_legacy.rs::every_original_expression_case_and_full_output#mcdev-core/src/test/kotlin/io/github/mcdev/core/mixinextras/ExpressionDefinitionEditPlannerTest.kt::definitionInsertionUsesCrlfIndentation",
+      "nativeStateOrHelperAssertions": [],
+      "status": "ported"
+    },
+    {
+      "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixinextras/ExpressionDefinitionEditPlannerTest.kt::definitionInsertionUsesLfIndentation",
+      "oracleStatus": "passed",
+      "capturedCalls": 24,
+      "wholeOutputReplay": "mcdev-core/tests/mixinextras_expression_legacy.rs::every_original_expression_case_and_full_output#mcdev-core/src/test/kotlin/io/github/mcdev/core/mixinextras/ExpressionDefinitionEditPlannerTest.kt::definitionInsertionUsesLfIndentation",
+      "nativeStateOrHelperAssertions": [],
+      "status": "ported"
+    },
+    {
+      "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixinextras/ExpressionDefinitionEditPlannerTest.kt::duplicateAmbiguousIdIsNotReused",
+      "oracleStatus": "passed",
+      "capturedCalls": 24,
+      "wholeOutputReplay": "mcdev-core/tests/mixinextras_expression_legacy.rs::every_original_expression_case_and_full_output#mcdev-core/src/test/kotlin/io/github/mcdev/core/mixinextras/ExpressionDefinitionEditPlannerTest.kt::duplicateAmbiguousIdIsNotReused",
+      "nativeStateOrHelperAssertions": [],
+      "status": "ported"
+    },
+    {
+      "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixinextras/ExpressionDefinitionEditPlannerTest.kt::failsClosedForInvalidExpressionOffset",
+      "oracleStatus": "passed",
+      "capturedCalls": 19,
+      "wholeOutputReplay": "mcdev-core/tests/mixinextras_expression_legacy.rs::every_original_expression_case_and_full_output#mcdev-core/src/test/kotlin/io/github/mcdev/core/mixinextras/ExpressionDefinitionEditPlannerTest.kt::failsClosedForInvalidExpressionOffset",
+      "nativeStateOrHelperAssertions": [],
+      "status": "ported"
+    },
+    {
+      "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixinextras/ExpressionDefinitionEditPlannerTest.kt::failsClosedWhenAnnotationOffsetDoesNotPointAtAt",
+      "oracleStatus": "passed",
+      "capturedCalls": 19,
+      "wholeOutputReplay": "mcdev-core/tests/mixinextras_expression_legacy.rs::every_original_expression_case_and_full_output#mcdev-core/src/test/kotlin/io/github/mcdev/core/mixinextras/ExpressionDefinitionEditPlannerTest.kt::failsClosedWhenAnnotationOffsetDoesNotPointAtAt",
+      "nativeStateOrHelperAssertions": [],
+      "status": "ported"
+    },
+    {
+      "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixinextras/ExpressionDefinitionEditPlannerTest.kt::failsClosedWhenContextIsNotAfterDot",
+      "oracleStatus": "passed",
+      "capturedCalls": 19,
+      "wholeOutputReplay": "mcdev-core/tests/mixinextras_expression_legacy.rs::every_original_expression_case_and_full_output#mcdev-core/src/test/kotlin/io/github/mcdev/core/mixinextras/ExpressionDefinitionEditPlannerTest.kt::failsClosedWhenContextIsNotAfterDot",
+      "nativeStateOrHelperAssertions": [],
+      "status": "ported"
+    },
+    {
+      "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixinextras/ExpressionDefinitionEditPlannerTest.kt::failsClosedWhenContextIsNotExpression",
+      "oracleStatus": "passed",
+      "capturedCalls": 1,
+      "wholeOutputReplay": "mcdev-core/tests/mixinextras_expression_legacy.rs::every_original_expression_case_and_full_output#mcdev-core/src/test/kotlin/io/github/mcdev/core/mixinextras/ExpressionDefinitionEditPlannerTest.kt::failsClosedWhenContextIsNotExpression",
+      "nativeStateOrHelperAssertions": [],
+      "status": "ported"
+    },
+    {
+      "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixinextras/ExpressionDefinitionEditPlannerTest.kt::failsClosedWhenContextIsNotValueSlot",
+      "oracleStatus": "passed",
+      "capturedCalls": 19,
+      "wholeOutputReplay": "mcdev-core/tests/mixinextras_expression_legacy.rs::every_original_expression_case_and_full_output#mcdev-core/src/test/kotlin/io/github/mcdev/core/mixinextras/ExpressionDefinitionEditPlannerTest.kt::failsClosedWhenContextIsNotValueSlot",
+      "nativeStateOrHelperAssertions": [],
+      "status": "ported"
+    },
+    {
+      "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixinextras/ExpressionDefinitionEditPlannerTest.kt::importAddedOnceWhenMissing",
+      "oracleStatus": "passed",
+      "capturedCalls": 24,
+      "wholeOutputReplay": "mcdev-core/tests/mixinextras_expression_legacy.rs::every_original_expression_case_and_full_output#mcdev-core/src/test/kotlin/io/github/mcdev/core/mixinextras/ExpressionDefinitionEditPlannerTest.kt::importAddedOnceWhenMissing",
+      "nativeStateOrHelperAssertions": [],
+      "status": "ported"
+    },
+    {
+      "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixinextras/ExpressionDefinitionEditPlannerTest.kt::importSkippedWhenAlreadyImported",
+      "oracleStatus": "passed",
+      "capturedCalls": 24,
+      "wholeOutputReplay": "mcdev-core/tests/mixinextras_expression_legacy.rs::every_original_expression_case_and_full_output#mcdev-core/src/test/kotlin/io/github/mcdev/core/mixinextras/ExpressionDefinitionEditPlannerTest.kt::importSkippedWhenAlreadyImported",
+      "nativeStateOrHelperAssertions": [],
+      "status": "ported"
+    },
+    {
+      "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixinextras/ExpressionDefinitionEditPlannerTest.kt::importSkippedWhenTargetSharesPackage",
+      "oracleStatus": "passed",
+      "capturedCalls": 24,
+      "wholeOutputReplay": "mcdev-core/tests/mixinextras_expression_legacy.rs::every_original_expression_case_and_full_output#mcdev-core/src/test/kotlin/io/github/mcdev/core/mixinextras/ExpressionDefinitionEditPlannerTest.kt::importSkippedWhenTargetSharesPackage",
+      "nativeStateOrHelperAssertions": [],
+      "status": "ported"
+    },
+    {
+      "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixinextras/ExpressionDefinitionEditPlannerTest.kt::overloadedMethodDescriptorDoesNotReuseWrongSelector",
+      "oracleStatus": "passed",
+      "capturedCalls": 24,
+      "wholeOutputReplay": "mcdev-core/tests/mixinextras_expression_legacy.rs::every_original_expression_case_and_full_output#mcdev-core/src/test/kotlin/io/github/mcdev/core/mixinextras/ExpressionDefinitionEditPlannerTest.kt::overloadedMethodDescriptorDoesNotReuseWrongSelector",
+      "nativeStateOrHelperAssertions": [],
+      "status": "ported"
+    },
+    {
+      "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixinextras/ExpressionDefinitionEditPlannerTest.kt::reusesExactFieldDefinitionWithoutAdditionalEdits",
+      "oracleStatus": "passed",
+      "capturedCalls": 21,
+      "wholeOutputReplay": "mcdev-core/tests/mixinextras_expression_legacy.rs::every_original_expression_case_and_full_output#mcdev-core/src/test/kotlin/io/github/mcdev/core/mixinextras/ExpressionDefinitionEditPlannerTest.kt::reusesExactFieldDefinitionWithoutAdditionalEdits",
+      "nativeStateOrHelperAssertions": [],
+      "status": "ported"
+    },
+    {
+      "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixinextras/ExpressionDefinitionEditPlannerTest.kt::reusesExactMethodDefinitionWithoutAdditionalEdits",
+      "oracleStatus": "passed",
+      "capturedCalls": 21,
+      "wholeOutputReplay": "mcdev-core/tests/mixinextras_expression_legacy.rs::every_original_expression_case_and_full_output#mcdev-core/src/test/kotlin/io/github/mcdev/core/mixinextras/ExpressionDefinitionEditPlannerTest.kt::reusesExactMethodDefinitionWithoutAdditionalEdits",
+      "nativeStateOrHelperAssertions": [],
+      "status": "ported"
+    },
+    {
+      "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixinextras/ExpressionMemberCompletionServiceTest.kt::cacheMissesWhenClassBytesContentChanges",
+      "oracleStatus": "passed",
+      "capturedCalls": 102,
+      "wholeOutputReplay": "mcdev-core/tests/mixinextras_expression_legacy.rs::every_original_expression_case_and_full_output#mcdev-core/src/test/kotlin/io/github/mcdev/core/mixinextras/ExpressionMemberCompletionServiceTest.kt::cacheMissesWhenClassBytesContentChanges",
+      "nativeStateOrHelperAssertions": [
+        "mcdev-core/tests/mixinextras_expression_legacy.rs::original_cache_transitions_check_native_state_and_callback_counts_after_every_call#cacheMissesWhenClassBytesContentChanges"
+      ],
+      "status": "ported"
+    },
+    {
+      "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixinextras/ExpressionMemberCompletionServiceTest.kt::cacheMissesWhenDefinitionSemanticContentChanges",
+      "oracleStatus": "passed",
+      "capturedCalls": 108,
+      "wholeOutputReplay": "mcdev-core/tests/mixinextras_expression_legacy.rs::every_original_expression_case_and_full_output#mcdev-core/src/test/kotlin/io/github/mcdev/core/mixinextras/ExpressionMemberCompletionServiceTest.kt::cacheMissesWhenDefinitionSemanticContentChanges",
+      "nativeStateOrHelperAssertions": [
+        "mcdev-core/tests/mixinextras_expression_legacy.rs::original_cache_transitions_check_native_state_and_callback_counts_after_every_call#cacheMissesWhenDefinitionSemanticContentChanges"
+      ],
+      "status": "ported"
+    },
+    {
+      "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixinextras/ExpressionMemberCompletionServiceTest.kt::cacheMissesWhenReceiverExpressionChanges",
+      "oracleStatus": "passed",
+      "capturedCalls": 102,
+      "wholeOutputReplay": "mcdev-core/tests/mixinextras_expression_legacy.rs::every_original_expression_case_and_full_output#mcdev-core/src/test/kotlin/io/github/mcdev/core/mixinextras/ExpressionMemberCompletionServiceTest.kt::cacheMissesWhenReceiverExpressionChanges",
+      "nativeStateOrHelperAssertions": [
+        "mcdev-core/tests/mixinextras_expression_legacy.rs::original_cache_transitions_check_native_state_and_callback_counts_after_every_call#cacheMissesWhenReceiverExpressionChanges"
+      ],
+      "status": "ported"
+    },
+    {
+      "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixinextras/ExpressionMemberCompletionServiceTest.kt::cacheMissesWhenTargetMethodOrContextTypeChanges",
+      "oracleStatus": "passed",
+      "capturedCalls": 153,
+      "wholeOutputReplay": "mcdev-core/tests/mixinextras_expression_legacy.rs::every_original_expression_case_and_full_output#mcdev-core/src/test/kotlin/io/github/mcdev/core/mixinextras/ExpressionMemberCompletionServiceTest.kt::cacheMissesWhenTargetMethodOrContextTypeChanges",
+      "nativeStateOrHelperAssertions": [
+        "mcdev-core/tests/mixinextras_expression_legacy.rs::original_cache_transitions_check_native_state_and_callback_counts_after_every_call#cacheMissesWhenTargetMethodOrContextTypeChanges"
+      ],
+      "status": "ported"
+    },
+    {
+      "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixinextras/ExpressionMemberCompletionServiceTest.kt::deduplicatesCandidatesDeterministicallyAcrossOwners",
+      "oracleStatus": "passed",
+      "capturedCalls": 237,
+      "wholeOutputReplay": "mcdev-core/tests/mixinextras_expression_legacy.rs::every_original_expression_case_and_full_output#mcdev-core/src/test/kotlin/io/github/mcdev/core/mixinextras/ExpressionMemberCompletionServiceTest.kt::deduplicatesCandidatesDeterministicallyAcrossOwners",
+      "nativeStateOrHelperAssertions": [],
+      "status": "ported"
+    },
+    {
+      "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixinextras/ExpressionMemberCompletionServiceTest.kt::doesNotCacheUnavailableOrCancelledMatcherResults",
+      "oracleStatus": "passed",
+      "capturedCalls": 165,
+      "wholeOutputReplay": "mcdev-core/tests/mixinextras_expression_legacy.rs::every_original_expression_case_and_full_output#mcdev-core/src/test/kotlin/io/github/mcdev/core/mixinextras/ExpressionMemberCompletionServiceTest.kt::doesNotCacheUnavailableOrCancelledMatcherResults",
+      "nativeStateOrHelperAssertions": [
+        "mcdev-core/tests/mixinextras_expression_legacy.rs::original_cache_transitions_check_native_state_and_callback_counts_after_every_call#doesNotCacheUnavailableOrCancelledMatcherResults"
+      ],
+      "status": "ported"
+    },
+    {
+      "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixinextras/ExpressionMemberCompletionServiceTest.kt::evictsOldestCacheEntryAndReRunsMatcherOnCapacityMiss",
+      "oracleStatus": "passed",
+      "capturedCalls": 204,
+      "wholeOutputReplay": "mcdev-core/tests/mixinextras_expression_legacy.rs::every_original_expression_case_and_full_output#mcdev-core/src/test/kotlin/io/github/mcdev/core/mixinextras/ExpressionMemberCompletionServiceTest.kt::evictsOldestCacheEntryAndReRunsMatcherOnCapacityMiss",
+      "nativeStateOrHelperAssertions": [
+        "mcdev-core/tests/mixinextras_expression_legacy.rs::original_cache_transitions_check_native_state_and_callback_counts_after_every_call#evictsOldestCacheEntryAndReRunsMatcherOnCapacityMiss"
+      ],
+      "status": "ported"
+    },
+    {
+      "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixinextras/ExpressionMemberCompletionServiceTest.kt::excludesUnrelatedClassMembers",
+      "oracleStatus": "passed",
+      "capturedCalls": 51,
+      "wholeOutputReplay": "mcdev-core/tests/mixinextras_expression_legacy.rs::every_original_expression_case_and_full_output#mcdev-core/src/test/kotlin/io/github/mcdev/core/mixinextras/ExpressionMemberCompletionServiceTest.kt::excludesUnrelatedClassMembers",
+      "nativeStateOrHelperAssertions": [],
+      "status": "ported"
+    },
+    {
+      "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixinextras/ExpressionMemberCompletionServiceTest.kt::failsClosedForAmbiguousTargetMethod",
+      "oracleStatus": "passed",
+      "capturedCalls": 37,
+      "wholeOutputReplay": "mcdev-core/tests/mixinextras_expression_legacy.rs::every_original_expression_case_and_full_output#mcdev-core/src/test/kotlin/io/github/mcdev/core/mixinextras/ExpressionMemberCompletionServiceTest.kt::failsClosedForAmbiguousTargetMethod",
+      "nativeStateOrHelperAssertions": [],
+      "status": "ported"
+    },
+    {
+      "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixinextras/ExpressionMemberCompletionServiceTest.kt::failsClosedWhenClassBytesMissing",
+      "oracleStatus": "passed",
+      "capturedCalls": 50,
+      "wholeOutputReplay": "mcdev-core/tests/mixinextras_expression_legacy.rs::every_original_expression_case_and_full_output#mcdev-core/src/test/kotlin/io/github/mcdev/core/mixinextras/ExpressionMemberCompletionServiceTest.kt::failsClosedWhenClassBytesMissing",
+      "nativeStateOrHelperAssertions": [],
+      "status": "ported"
+    },
+    {
+      "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixinextras/ExpressionMemberCompletionServiceTest.kt::filtersCachedCandidatesByMemberPrefixWithoutReRunningMatcher",
+      "oracleStatus": "passed",
+      "capturedCalls": 151,
+      "wholeOutputReplay": "mcdev-core/tests/mixinextras_expression_legacy.rs::every_original_expression_case_and_full_output#mcdev-core/src/test/kotlin/io/github/mcdev/core/mixinextras/ExpressionMemberCompletionServiceTest.kt::filtersCachedCandidatesByMemberPrefixWithoutReRunningMatcher",
+      "nativeStateOrHelperAssertions": [
+        "mcdev-core/tests/mixinextras_expression_legacy.rs::original_cache_transitions_check_native_state_and_callback_counts_after_every_call#filtersCachedCandidatesByMemberPrefixWithoutReRunningMatcher"
+      ],
+      "status": "ported"
+    },
+    {
+      "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixinextras/ExpressionMemberCompletionServiceTest.kt::filtersCandidatesByMemberPrefix",
+      "oracleStatus": "passed",
+      "capturedCalls": 101,
+      "wholeOutputReplay": "mcdev-core/tests/mixinextras_expression_legacy.rs::every_original_expression_case_and_full_output#mcdev-core/src/test/kotlin/io/github/mcdev/core/mixinextras/ExpressionMemberCompletionServiceTest.kt::filtersCandidatesByMemberPrefix",
+      "nativeStateOrHelperAssertions": [],
+      "status": "ported"
+    },
+    {
+      "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixinextras/ExpressionMemberCompletionServiceTest.kt::propagatesCancellation",
+      "oracleStatus": "passed",
+      "capturedCalls": 50,
+      "wholeOutputReplay": "mcdev-core/tests/mixinextras_expression_legacy.rs::every_original_expression_case_and_full_output#mcdev-core/src/test/kotlin/io/github/mcdev/core/mixinextras/ExpressionMemberCompletionServiceTest.kt::propagatesCancellation",
+      "nativeStateOrHelperAssertions": [
+        "mcdev-core/tests/mixinextras_expression_legacy.rs::original_cancellation_marker_propagates_by_identity"
+      ],
+      "status": "ported"
+    },
+    {
+      "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixinextras/ExpressionMemberCompletionServiceTest.kt::returnsEmptyForNonAfterDotPositions",
+      "oracleStatus": "passed",
+      "capturedCalls": 19,
+      "wholeOutputReplay": "mcdev-core/tests/mixinextras_expression_legacy.rs::every_original_expression_case_and_full_output#mcdev-core/src/test/kotlin/io/github/mcdev/core/mixinextras/ExpressionMemberCompletionServiceTest.kt::returnsEmptyForNonAfterDotPositions",
+      "nativeStateOrHelperAssertions": [],
+      "status": "ported"
+    },
+    {
+      "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixinextras/ExpressionMemberCompletionServiceTest.kt::returnsEmptyForNonExpressionAnnotation",
+      "oracleStatus": "passed",
+      "capturedCalls": 1,
+      "wholeOutputReplay": "mcdev-core/tests/mixinextras_expression_legacy.rs::every_original_expression_case_and_full_output#mcdev-core/src/test/kotlin/io/github/mcdev/core/mixinextras/ExpressionMemberCompletionServiceTest.kt::returnsEmptyForNonExpressionAnnotation",
+      "nativeStateOrHelperAssertions": [],
+      "status": "ported"
+    },
+    {
+      "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixinextras/ExpressionMemberCompletionServiceTest.kt::returnsOnlyReachableFieldAndMethodCandidates",
+      "oracleStatus": "passed",
+      "capturedCalls": 102,
+      "wholeOutputReplay": "mcdev-core/tests/mixinextras_expression_legacy.rs::every_original_expression_case_and_full_output#mcdev-core/src/test/kotlin/io/github/mcdev/core/mixinextras/ExpressionMemberCompletionServiceTest.kt::returnsOnlyReachableFieldAndMethodCandidates",
+      "nativeStateOrHelperAssertions": [],
+      "status": "ported"
+    },
+    {
+      "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixinextras/ExpressionMemberCompletionServiceTest.kt::returnsReachableMembersForStandardInjectHandlerWithExpression",
+      "oracleStatus": "passed",
+      "capturedCalls": 102,
+      "wholeOutputReplay": "mcdev-core/tests/mixinextras_expression_legacy.rs::every_original_expression_case_and_full_output#mcdev-core/src/test/kotlin/io/github/mcdev/core/mixinextras/ExpressionMemberCompletionServiceTest.kt::returnsReachableMembersForStandardInjectHandlerWithExpression",
+      "nativeStateOrHelperAssertions": [],
+      "status": "ported"
+    },
+    {
+      "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixinextras/ExpressionMemberCompletionServiceTest.kt::reusesCachedReachableMembersWhenOnlyMemberPrefixChanges",
+      "oracleStatus": "passed",
+      "capturedCalls": 101,
+      "wholeOutputReplay": "mcdev-core/tests/mixinextras_expression_legacy.rs::every_original_expression_case_and_full_output#mcdev-core/src/test/kotlin/io/github/mcdev/core/mixinextras/ExpressionMemberCompletionServiceTest.kt::reusesCachedReachableMembersWhenOnlyMemberPrefixChanges",
+      "nativeStateOrHelperAssertions": [
+        "mcdev-core/tests/mixinextras_expression_legacy.rs::original_cache_transitions_check_native_state_and_callback_counts_after_every_call#reusesCachedReachableMembersWhenOnlyMemberPrefixChanges"
+      ],
+      "status": "ported"
+    },
+    {
+      "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixinextras/ExpressionMemberCompletionServiceTest.kt::sharedCacheReusesMatcherAcrossDistinctServiceInstancesWhenOnlyMemberPrefixChanges",
+      "oracleStatus": "passed",
+      "capturedCalls": 101,
+      "wholeOutputReplay": "mcdev-core/tests/mixinextras_expression_legacy.rs::every_original_expression_case_and_full_output#mcdev-core/src/test/kotlin/io/github/mcdev/core/mixinextras/ExpressionMemberCompletionServiceTest.kt::sharedCacheReusesMatcherAcrossDistinctServiceInstancesWhenOnlyMemberPrefixChanges",
+      "nativeStateOrHelperAssertions": [
+        "mcdev-core/tests/mixinextras_expression_legacy.rs::original_cache_transitions_check_native_state_and_callback_counts_after_every_call#sharedCacheReusesMatcherAcrossDistinctServiceInstancesWhenOnlyMemberPrefixChanges"
+      ],
+      "status": "ported"
+    },
+    {
+      "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixinextras/ExpressionReceiverParserTest.kt::memberPrefixUsesCursorNotFullPrefix",
+      "oracleStatus": "passed",
+      "capturedCalls": 3,
+      "wholeOutputReplay": "mcdev-core/tests/mixinextras_expression_legacy.rs::every_original_expression_case_and_full_output#mcdev-core/src/test/kotlin/io/github/mcdev/core/mixinextras/ExpressionReceiverParserTest.kt::memberPrefixUsesCursorNotFullPrefix",
+      "nativeStateOrHelperAssertions": [],
+      "status": "ported"
+    },
+    {
+      "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixinextras/ExpressionReceiverParserTest.kt::parsesOfficialCompoundReceivers",
+      "oracleStatus": "passed",
+      "capturedCalls": 21,
+      "wholeOutputReplay": "mcdev-core/tests/mixinextras_expression_legacy.rs::every_original_expression_case_and_full_output#mcdev-core/src/test/kotlin/io/github/mcdev/core/mixinextras/ExpressionReceiverParserTest.kt::parsesOfficialCompoundReceivers",
+      "nativeStateOrHelperAssertions": [],
+      "status": "ported"
+    },
+    {
+      "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixinextras/ExpressionReceiverParserTest.kt::parsesReceiverInsideUnclosedOuterCallCaptureAndArrayIndex",
+      "oracleStatus": "passed",
+      "capturedCalls": 15,
+      "wholeOutputReplay": "mcdev-core/tests/mixinextras_expression_legacy.rs::every_original_expression_case_and_full_output#mcdev-core/src/test/kotlin/io/github/mcdev/core/mixinextras/ExpressionReceiverParserTest.kt::parsesReceiverInsideUnclosedOuterCallCaptureAndArrayIndex",
+      "nativeStateOrHelperAssertions": [],
+      "status": "ported"
+    },
+    {
+      "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixinextras/ExpressionReceiverParserTest.kt::qualifiedReceiverWithPartialMemberPrefix",
+      "oracleStatus": "passed",
+      "capturedCalls": 3,
+      "wholeOutputReplay": "mcdev-core/tests/mixinextras_expression_legacy.rs::every_original_expression_case_and_full_output#mcdev-core/src/test/kotlin/io/github/mcdev/core/mixinextras/ExpressionReceiverParserTest.kt::qualifiedReceiverWithPartialMemberPrefix",
+      "nativeStateOrHelperAssertions": [],
+      "status": "ported"
+    },
+    {
+      "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixinextras/ExpressionReceiverParserTest.kt::receiverChainStopsBeforePrecedingExpression",
+      "oracleStatus": "passed",
+      "capturedCalls": 3,
+      "wholeOutputReplay": "mcdev-core/tests/mixinextras_expression_legacy.rs::every_original_expression_case_and_full_output#mcdev-core/src/test/kotlin/io/github/mcdev/core/mixinextras/ExpressionReceiverParserTest.kt::receiverChainStopsBeforePrecedingExpression",
+      "nativeStateOrHelperAssertions": [],
+      "status": "ported"
+    },
+    {
+      "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixinextras/ExpressionReceiverParserTest.kt::rejectsBooleanAndNullLiteralReceivers",
+      "oracleStatus": "passed",
+      "capturedCalls": 9,
+      "wholeOutputReplay": "mcdev-core/tests/mixinextras_expression_legacy.rs::every_original_expression_case_and_full_output#mcdev-core/src/test/kotlin/io/github/mcdev/core/mixinextras/ExpressionReceiverParserTest.kt::rejectsBooleanAndNullLiteralReceivers",
+      "nativeStateOrHelperAssertions": [],
+      "status": "ported"
+    },
+    {
+      "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixinextras/ExpressionReceiverParserTest.kt::rejectsClassLiteralSuffix",
+      "oracleStatus": "passed",
+      "capturedCalls": 2,
+      "wholeOutputReplay": "mcdev-core/tests/mixinextras_expression_legacy.rs::every_original_expression_case_and_full_output#mcdev-core/src/test/kotlin/io/github/mcdev/core/mixinextras/ExpressionReceiverParserTest.kt::rejectsClassLiteralSuffix",
+      "nativeStateOrHelperAssertions": [],
+      "status": "ported"
+    },
+    {
+      "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixinextras/ExpressionReceiverParserTest.kt::rejectsInvalidMemberPrefixTail",
+      "oracleStatus": "passed",
+      "capturedCalls": 6,
+      "wholeOutputReplay": "mcdev-core/tests/mixinextras_expression_legacy.rs::every_original_expression_case_and_full_output#mcdev-core/src/test/kotlin/io/github/mcdev/core/mixinextras/ExpressionReceiverParserTest.kt::rejectsInvalidMemberPrefixTail",
+      "nativeStateOrHelperAssertions": [],
+      "status": "ported"
+    },
+    {
+      "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixinextras/ExpressionReceiverParserTest.kt::rejectsMalformedDelimiters",
+      "oracleStatus": "passed",
+      "capturedCalls": 13,
+      "wholeOutputReplay": "mcdev-core/tests/mixinextras_expression_legacy.rs::every_original_expression_case_and_full_output#mcdev-core/src/test/kotlin/io/github/mcdev/core/mixinextras/ExpressionReceiverParserTest.kt::rejectsMalformedDelimiters",
+      "nativeStateOrHelperAssertions": [],
+      "status": "ported"
+    },
+    {
+      "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixinextras/ExpressionReceiverParserTest.kt::rejectsMethodReference",
+      "oracleStatus": "passed",
+      "capturedCalls": 6,
+      "wholeOutputReplay": "mcdev-core/tests/mixinextras_expression_legacy.rs::every_original_expression_case_and_full_output#mcdev-core/src/test/kotlin/io/github/mcdev/core/mixinextras/ExpressionReceiverParserTest.kt::rejectsMethodReference",
+      "nativeStateOrHelperAssertions": [],
+      "status": "ported"
+    },
+    {
+      "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixinextras/ExpressionReceiverParserTest.kt::rejectsMissingDot",
+      "oracleStatus": "passed",
+      "capturedCalls": 4,
+      "wholeOutputReplay": "mcdev-core/tests/mixinextras_expression_legacy.rs::every_original_expression_case_and_full_output#mcdev-core/src/test/kotlin/io/github/mcdev/core/mixinextras/ExpressionReceiverParserTest.kt::rejectsMissingDot",
+      "nativeStateOrHelperAssertions": [],
+      "status": "ported"
+    },
+    {
+      "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixinextras/ExpressionReceiverParserTest.kt::rejectsNewKeywordReceiver",
+      "oracleStatus": "passed",
+      "capturedCalls": 3,
+      "wholeOutputReplay": "mcdev-core/tests/mixinextras_expression_legacy.rs::every_original_expression_case_and_full_output#mcdev-core/src/test/kotlin/io/github/mcdev/core/mixinextras/ExpressionReceiverParserTest.kt::rejectsNewKeywordReceiver",
+      "nativeStateOrHelperAssertions": [],
+      "status": "ported"
+    },
+    {
+      "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixinextras/ExpressionReceiverParserTest.kt::rejectsNumericLiteralReceiver",
+      "oracleStatus": "passed",
+      "capturedCalls": 3,
+      "wholeOutputReplay": "mcdev-core/tests/mixinextras_expression_legacy.rs::every_original_expression_case_and_full_output#mcdev-core/src/test/kotlin/io/github/mcdev/core/mixinextras/ExpressionReceiverParserTest.kt::rejectsNumericLiteralReceiver",
+      "nativeStateOrHelperAssertions": [],
+      "status": "ported"
+    },
+    {
+      "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixinextras/ExpressionReceiverParserTest.kt::rejectsSingleQuotedLiteralReceiver",
+      "oracleStatus": "passed",
+      "capturedCalls": 3,
+      "wholeOutputReplay": "mcdev-core/tests/mixinextras_expression_legacy.rs::every_original_expression_case_and_full_output#mcdev-core/src/test/kotlin/io/github/mcdev/core/mixinextras/ExpressionReceiverParserTest.kt::rejectsSingleQuotedLiteralReceiver",
+      "nativeStateOrHelperAssertions": [],
+      "status": "ported"
+    },
+    {
+      "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixinextras/ExpressionReceiverParserTest.kt::superDotEmptyMemberPrefix",
+      "oracleStatus": "passed",
+      "capturedCalls": 3,
+      "wholeOutputReplay": "mcdev-core/tests/mixinextras_expression_legacy.rs::every_original_expression_case_and_full_output#mcdev-core/src/test/kotlin/io/github/mcdev/core/mixinextras/ExpressionReceiverParserTest.kt::superDotEmptyMemberPrefix",
+      "nativeStateOrHelperAssertions": [],
+      "status": "ported"
+    },
+    {
+      "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixinextras/ExpressionReceiverParserTest.kt::thisDotEmptyMemberPrefix",
+      "oracleStatus": "passed",
+      "capturedCalls": 3,
+      "wholeOutputReplay": "mcdev-core/tests/mixinextras_expression_legacy.rs::every_original_expression_case_and_full_output#mcdev-core/src/test/kotlin/io/github/mcdev/core/mixinextras/ExpressionReceiverParserTest.kt::thisDotEmptyMemberPrefix",
+      "nativeStateOrHelperAssertions": [],
+      "status": "ported"
+    },
+    {
+      "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixinextras/ExpressionReceiverParserTest.kt::thisDotPartialMemberPrefix",
+      "oracleStatus": "passed",
+      "capturedCalls": 3,
+      "wholeOutputReplay": "mcdev-core/tests/mixinextras_expression_legacy.rs::every_original_expression_case_and_full_output#mcdev-core/src/test/kotlin/io/github/mcdev/core/mixinextras/ExpressionReceiverParserTest.kt::thisDotPartialMemberPrefix",
+      "nativeStateOrHelperAssertions": [],
+      "status": "ported"
+    },
+    {
+      "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixinextras/ExpressionReceiverParserTest.kt::whitespaceAfterDotAllowsEmptyMemberPrefix",
+      "oracleStatus": "passed",
+      "capturedCalls": 3,
+      "wholeOutputReplay": "mcdev-core/tests/mixinextras_expression_legacy.rs::every_original_expression_case_and_full_output#mcdev-core/src/test/kotlin/io/github/mcdev/core/mixinextras/ExpressionReceiverParserTest.kt::whitespaceAfterDotAllowsEmptyMemberPrefix",
+      "nativeStateOrHelperAssertions": [],
+      "status": "ported"
+    },
+    {
+      "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixinextras/ExpressionsAnnotationParserTest.kt::bareExpressionWithoutParenthesesIsExcluded",
+      "oracleStatus": "passed",
+      "capturedCalls": 1,
+      "wholeOutputReplay": "mcdev-core/tests/mixinextras_expression_legacy.rs::every_original_expression_case_and_full_output#mcdev-core/src/test/kotlin/io/github/mcdev/core/mixinextras/ExpressionsAnnotationParserTest.kt::bareExpressionWithoutParenthesesIsExcluded",
+      "nativeStateOrHelperAssertions": [],
+      "status": "ported"
+    },
+    {
+      "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixinextras/ExpressionsAnnotationParserTest.kt::duplicateIdExpressionsAreBothRetainedInDocumentOrder",
+      "oracleStatus": "passed",
+      "capturedCalls": 3,
+      "wholeOutputReplay": "mcdev-core/tests/mixinextras_expression_legacy.rs::every_original_expression_case_and_full_output#mcdev-core/src/test/kotlin/io/github/mcdev/core/mixinextras/ExpressionsAnnotationParserTest.kt::duplicateIdExpressionsAreBothRetainedInDocumentOrder",
+      "nativeStateOrHelperAssertions": [],
+      "status": "ported"
+    },
+    {
+      "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixinextras/ExpressionsAnnotationParserTest.kt::emptyBodyReturnsEmptyIndex",
+      "oracleStatus": "passed",
+      "capturedCalls": 1,
+      "wholeOutputReplay": "mcdev-core/tests/mixinextras_expression_legacy.rs::every_original_expression_case_and_full_output#mcdev-core/src/test/kotlin/io/github/mcdev/core/mixinextras/ExpressionsAnnotationParserTest.kt::emptyBodyReturnsEmptyIndex",
+      "nativeStateOrHelperAssertions": [],
+      "status": "ported"
+    },
+    {
+      "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixinextras/ExpressionsAnnotationParserTest.kt::expressionWithValueShorthandInsideAnnotation",
+      "oracleStatus": "passed",
+      "capturedCalls": 2,
+      "wholeOutputReplay": "mcdev-core/tests/mixinextras_expression_legacy.rs::every_original_expression_case_and_full_output#mcdev-core/src/test/kotlin/io/github/mcdev/core/mixinextras/ExpressionsAnnotationParserTest.kt::expressionWithValueShorthandInsideAnnotation",
+      "nativeStateOrHelperAssertions": [],
+      "status": "ported"
+    },
+    {
+      "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixinextras/ExpressionsAnnotationParserTest.kt::expressionWithoutValueIsExcluded",
+      "oracleStatus": "passed",
+      "capturedCalls": 4,
+      "wholeOutputReplay": "mcdev-core/tests/mixinextras_expression_legacy.rs::every_original_expression_case_and_full_output#mcdev-core/src/test/kotlin/io/github/mcdev/core/mixinextras/ExpressionsAnnotationParserTest.kt::expressionWithoutValueIsExcluded",
+      "nativeStateOrHelperAssertions": [],
+      "status": "ported"
+    },
+    {
+      "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixinextras/ExpressionsAnnotationParserTest.kt::failClosedOnDuplicateValue",
+      "oracleStatus": "passed",
+      "capturedCalls": 4,
+      "wholeOutputReplay": "mcdev-core/tests/mixinextras_expression_legacy.rs::every_original_expression_case_and_full_output#mcdev-core/src/test/kotlin/io/github/mcdev/core/mixinextras/ExpressionsAnnotationParserTest.kt::failClosedOnDuplicateValue",
+      "nativeStateOrHelperAssertions": [],
+      "status": "ported"
+    },
+    {
+      "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixinextras/ExpressionsAnnotationParserTest.kt::failClosedOnNamedArrayTrailingGarbage",
+      "oracleStatus": "passed",
+      "capturedCalls": 3,
+      "wholeOutputReplay": "mcdev-core/tests/mixinextras_expression_legacy.rs::every_original_expression_case_and_full_output#mcdev-core/src/test/kotlin/io/github/mcdev/core/mixinextras/ExpressionsAnnotationParserTest.kt::failClosedOnNamedArrayTrailingGarbage",
+      "nativeStateOrHelperAssertions": [],
+      "status": "ported"
+    },
+    {
+      "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixinextras/ExpressionsAnnotationParserTest.kt::failClosedOnRootArrayTrailingGarbage",
+      "oracleStatus": "passed",
+      "capturedCalls": 3,
+      "wholeOutputReplay": "mcdev-core/tests/mixinextras_expression_legacy.rs::every_original_expression_case_and_full_output#mcdev-core/src/test/kotlin/io/github/mcdev/core/mixinextras/ExpressionsAnnotationParserTest.kt::failClosedOnRootArrayTrailingGarbage",
+      "nativeStateOrHelperAssertions": [],
+      "status": "ported"
+    },
+    {
+      "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixinextras/ExpressionsAnnotationParserTest.kt::failClosedOnUnclosedArrayBrace",
+      "oracleStatus": "passed",
+      "capturedCalls": 2,
+      "wholeOutputReplay": "mcdev-core/tests/mixinextras_expression_legacy.rs::every_original_expression_case_and_full_output#mcdev-core/src/test/kotlin/io/github/mcdev/core/mixinextras/ExpressionsAnnotationParserTest.kt::failClosedOnUnclosedArrayBrace",
+      "nativeStateOrHelperAssertions": [],
+      "status": "ported"
+    },
+    {
+      "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixinextras/ExpressionsAnnotationParserTest.kt::failClosedOnUnclosedExpressionParenInSingleValue",
+      "oracleStatus": "passed",
+      "capturedCalls": 2,
+      "wholeOutputReplay": "mcdev-core/tests/mixinextras_expression_legacy.rs::every_original_expression_case_and_full_output#mcdev-core/src/test/kotlin/io/github/mcdev/core/mixinextras/ExpressionsAnnotationParserTest.kt::failClosedOnUnclosedExpressionParenInSingleValue",
+      "nativeStateOrHelperAssertions": [],
+      "status": "ported"
+    },
+    {
+      "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixinextras/ExpressionsAnnotationParserTest.kt::failClosedOnUnknownMember",
+      "oracleStatus": "passed",
+      "capturedCalls": 3,
+      "wholeOutputReplay": "mcdev-core/tests/mixinextras_expression_legacy.rs::every_original_expression_case_and_full_output#mcdev-core/src/test/kotlin/io/github/mcdev/core/mixinextras/ExpressionsAnnotationParserTest.kt::failClosedOnUnknownMember",
+      "nativeStateOrHelperAssertions": [],
+      "status": "ported"
+    },
+    {
+      "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixinextras/ExpressionsAnnotationParserTest.kt::handlesCommentsWhitespaceAndNestedExpressionAttributes",
+      "oracleStatus": "passed",
+      "capturedCalls": 2,
+      "wholeOutputReplay": "mcdev-core/tests/mixinextras_expression_legacy.rs::every_original_expression_case_and_full_output#mcdev-core/src/test/kotlin/io/github/mcdev/core/mixinextras/ExpressionsAnnotationParserTest.kt::handlesCommentsWhitespaceAndNestedExpressionAttributes",
+      "nativeStateOrHelperAssertions": [],
+      "status": "ported"
+    },
+    {
+      "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixinextras/ExpressionsAnnotationParserTest.kt::ignoresWrongAnnotationSiblings",
+      "oracleStatus": "passed",
+      "capturedCalls": 3,
+      "wholeOutputReplay": "mcdev-core/tests/mixinextras_expression_legacy.rs::every_original_expression_case_and_full_output#mcdev-core/src/test/kotlin/io/github/mcdev/core/mixinextras/ExpressionsAnnotationParserTest.kt::ignoresWrongAnnotationSiblings",
+      "nativeStateOrHelperAssertions": [],
+      "status": "ported"
+    },
+    {
+      "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixinextras/ExpressionsAnnotationParserTest.kt::malformedExpressionElementsAreIgnoredWithoutDiscardingValidSiblings",
+      "oracleStatus": "passed",
+      "capturedCalls": 4,
+      "wholeOutputReplay": "mcdev-core/tests/mixinextras_expression_legacy.rs::every_original_expression_case_and_full_output#mcdev-core/src/test/kotlin/io/github/mcdev/core/mixinextras/ExpressionsAnnotationParserTest.kt::malformedExpressionElementsAreIgnoredWithoutDiscardingValidSiblings",
+      "nativeStateOrHelperAssertions": [],
+      "status": "ported"
+    },
+    {
+      "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixinextras/ExpressionsAnnotationParserTest.kt::malformedIdInsideExpressionIsExcluded",
+      "oracleStatus": "passed",
+      "capturedCalls": 2,
+      "wholeOutputReplay": "mcdev-core/tests/mixinextras_expression_legacy.rs::every_original_expression_case_and_full_output#mcdev-core/src/test/kotlin/io/github/mcdev/core/mixinextras/ExpressionsAnnotationParserTest.kt::malformedIdInsideExpressionIsExcluded",
+      "nativeStateOrHelperAssertions": [],
+      "status": "ported"
+    },
+    {
+      "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixinextras/ExpressionsAnnotationParserTest.kt::malformedValueInsideExpressionIsExcluded",
+      "oracleStatus": "passed",
+      "capturedCalls": 2,
+      "wholeOutputReplay": "mcdev-core/tests/mixinextras_expression_legacy.rs::every_original_expression_case_and_full_output#mcdev-core/src/test/kotlin/io/github/mcdev/core/mixinextras/ExpressionsAnnotationParserTest.kt::malformedValueInsideExpressionIsExcluded",
+      "nativeStateOrHelperAssertions": [],
+      "status": "ported"
+    },
+    {
+      "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixinextras/ExpressionsAnnotationParserTest.kt::nonOfficialExpressionFqnIsExcluded",
+      "oracleStatus": "passed",
+      "capturedCalls": 1,
+      "wholeOutputReplay": "mcdev-core/tests/mixinextras_expression_legacy.rs::every_original_expression_case_and_full_output#mcdev-core/src/test/kotlin/io/github/mcdev/core/mixinextras/ExpressionsAnnotationParserTest.kt::nonOfficialExpressionFqnIsExcluded",
+      "nativeStateOrHelperAssertions": [],
+      "status": "ported"
+    },
+    {
+      "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixinextras/ExpressionsAnnotationParserTest.kt::parsesArrayViaUnnamedShorthand",
+      "oracleStatus": "passed",
+      "capturedCalls": 3,
+      "wholeOutputReplay": "mcdev-core/tests/mixinextras_expression_legacy.rs::every_original_expression_case_and_full_output#mcdev-core/src/test/kotlin/io/github/mcdev/core/mixinextras/ExpressionsAnnotationParserTest.kt::parsesArrayViaUnnamedShorthand",
+      "nativeStateOrHelperAssertions": [],
+      "status": "ported"
+    },
+    {
+      "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixinextras/ExpressionsAnnotationParserTest.kt::parsesEmptyArray",
+      "oracleStatus": "passed",
+      "capturedCalls": 2,
+      "wholeOutputReplay": "mcdev-core/tests/mixinextras_expression_legacy.rs::every_original_expression_case_and_full_output#mcdev-core/src/test/kotlin/io/github/mcdev/core/mixinextras/ExpressionsAnnotationParserTest.kt::parsesEmptyArray",
+      "nativeStateOrHelperAssertions": [],
+      "status": "ported"
+    },
+    {
+      "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixinextras/ExpressionsAnnotationParserTest.kt::parsesExpressionArrayPreservingOrder",
+      "oracleStatus": "passed",
+      "capturedCalls": 4,
+      "wholeOutputReplay": "mcdev-core/tests/mixinextras_expression_legacy.rs::every_original_expression_case_and_full_output#mcdev-core/src/test/kotlin/io/github/mcdev/core/mixinextras/ExpressionsAnnotationParserTest.kt::parsesExpressionArrayPreservingOrder",
+      "nativeStateOrHelperAssertions": [],
+      "status": "ported"
+    },
+    {
+      "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixinextras/ExpressionsAnnotationParserTest.kt::parsesFullyQualifiedExpression",
+      "oracleStatus": "passed",
+      "capturedCalls": 2,
+      "wholeOutputReplay": "mcdev-core/tests/mixinextras_expression_legacy.rs::every_original_expression_case_and_full_output#mcdev-core/src/test/kotlin/io/github/mcdev/core/mixinextras/ExpressionsAnnotationParserTest.kt::parsesFullyQualifiedExpression",
+      "nativeStateOrHelperAssertions": [],
+      "status": "ported"
+    },
+    {
+      "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixinextras/ExpressionsAnnotationParserTest.kt::parsesSingleExpressionViaUnnamedShorthand",
+      "oracleStatus": "passed",
+      "capturedCalls": 2,
+      "wholeOutputReplay": "mcdev-core/tests/mixinextras_expression_legacy.rs::every_original_expression_case_and_full_output#mcdev-core/src/test/kotlin/io/github/mcdev/core/mixinextras/ExpressionsAnnotationParserTest.kt::parsesSingleExpressionViaUnnamedShorthand",
+      "nativeStateOrHelperAssertions": [],
+      "status": "ported"
+    },
+    {
+      "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixinextras/ExpressionsAnnotationParserTest.kt::parsesSingleExpressionViaValueEquals",
+      "oracleStatus": "passed",
+      "capturedCalls": 2,
+      "wholeOutputReplay": "mcdev-core/tests/mixinextras_expression_legacy.rs::every_original_expression_case_and_full_output#mcdev-core/src/test/kotlin/io/github/mcdev/core/mixinextras/ExpressionsAnnotationParserTest.kt::parsesSingleExpressionViaValueEquals",
+      "nativeStateOrHelperAssertions": [],
+      "status": "ported"
+    },
+    {
+      "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixinextras/ExpressionsAnnotationParserTest.kt::trailingGarbageAtTopLevelFailsClosed",
+      "oracleStatus": "passed",
+      "capturedCalls": 2,
+      "wholeOutputReplay": "mcdev-core/tests/mixinextras_expression_legacy.rs::every_original_expression_case_and_full_output#mcdev-core/src/test/kotlin/io/github/mcdev/core/mixinextras/ExpressionsAnnotationParserTest.kt::trailingGarbageAtTopLevelFailsClosed",
+      "nativeStateOrHelperAssertions": [],
+      "status": "ported"
+    },
+    {
+      "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixinextras/ExpressionSupportTest.kt::annotationSnippetDoesNotDuplicateExistingArgumentListWhenCaretIsInsideName",
+      "oracleStatus": "passed",
+      "capturedCalls": 1,
+      "wholeOutputReplay": "mcdev-core/tests/mixinextras_expression_legacy.rs::every_original_expression_case_and_full_output#mcdev-core/src/test/kotlin/io/github/mcdev/core/mixinextras/ExpressionSupportTest.kt::annotationSnippetDoesNotDuplicateExistingArgumentListWhenCaretIsInsideName",
+      "nativeStateOrHelperAssertions": [],
+      "status": "ported"
+    },
+    {
+      "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixinextras/ExpressionSupportTest.kt::annotationSnippetReplacesWholeNameWhenCaretIsInsideIt",
+      "oracleStatus": "passed",
+      "capturedCalls": 21,
+      "wholeOutputReplay": "mcdev-core/tests/mixinextras_expression_legacy.rs::every_original_expression_case_and_full_output#mcdev-core/src/test/kotlin/io/github/mcdev/core/mixinextras/ExpressionSupportTest.kt::annotationSnippetReplacesWholeNameWhenCaretIsInsideIt",
+      "nativeStateOrHelperAssertions": [],
+      "status": "ported"
+    },
+    {
+      "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixinextras/ExpressionSupportTest.kt::annotationSnippetsApplyOverOnlyTheTypedNameAndAddImports",
+      "oracleStatus": "passed",
+      "capturedCalls": 100,
+      "wholeOutputReplay": "mcdev-core/tests/mixinextras_expression_legacy.rs::every_original_expression_case_and_full_output#mcdev-core/src/test/kotlin/io/github/mcdev/core/mixinextras/ExpressionSupportTest.kt::annotationSnippetsApplyOverOnlyTheTypedNameAndAddImports",
+      "nativeStateOrHelperAssertions": [],
+      "status": "ported"
+    },
+    {
+      "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixinextras/ExpressionSupportTest.kt::argumentBearingCoreAnnotationSnippetsExposeUsefulAttributes",
+      "oracleStatus": "passed",
+      "capturedCalls": 261,
+      "wholeOutputReplay": "mcdev-core/tests/mixinextras_expression_legacy.rs::every_original_expression_case_and_full_output#mcdev-core/src/test/kotlin/io/github/mcdev/core/mixinextras/ExpressionSupportTest.kt::argumentBearingCoreAnnotationSnippetsExposeUsefulAttributes",
+      "nativeStateOrHelperAssertions": [],
+      "status": "ported"
+    },
+    {
+      "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixinextras/ExpressionSupportTest.kt::completeExpressionValueAfterDotAddsDefinitionAndImportEditsForNewMembers",
+      "oracleStatus": "passed",
+      "capturedCalls": 80,
+      "wholeOutputReplay": "mcdev-core/tests/mixinextras_expression_legacy.rs::every_original_expression_case_and_full_output#mcdev-core/src/test/kotlin/io/github/mcdev/core/mixinextras/ExpressionSupportTest.kt::completeExpressionValueAfterDotAddsDefinitionAndImportEditsForNewMembers",
+      "nativeStateOrHelperAssertions": [],
+      "status": "ported"
+    },
+    {
+      "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixinextras/ExpressionSupportTest.kt::completeExpressionValueAfterDotDistinguishesOverloadedMethods",
+      "oracleStatus": "passed",
+      "capturedCalls": 85,
+      "wholeOutputReplay": "mcdev-core/tests/mixinextras_expression_legacy.rs::every_original_expression_case_and_full_output#mcdev-core/src/test/kotlin/io/github/mcdev/core/mixinextras/ExpressionSupportTest.kt::completeExpressionValueAfterDotDistinguishesOverloadedMethods",
+      "nativeStateOrHelperAssertions": [],
+      "status": "ported"
+    },
+    {
+      "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixinextras/ExpressionSupportTest.kt::completeExpressionValueAfterDotOffersFieldAndMethodMemberItems",
+      "oracleStatus": "passed",
+      "capturedCalls": 160,
+      "wholeOutputReplay": "mcdev-core/tests/mixinextras_expression_legacy.rs::every_original_expression_case_and_full_output#mcdev-core/src/test/kotlin/io/github/mcdev/core/mixinextras/ExpressionSupportTest.kt::completeExpressionValueAfterDotOffersFieldAndMethodMemberItems",
+      "nativeStateOrHelperAssertions": [],
+      "status": "ported"
+    },
+    {
+      "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixinextras/ExpressionSupportTest.kt::completeExpressionValueAfterDotOmitsUnreachableCandidates",
+      "oracleStatus": "passed",
+      "capturedCalls": 80,
+      "wholeOutputReplay": "mcdev-core/tests/mixinextras_expression_legacy.rs::every_original_expression_case_and_full_output#mcdev-core/src/test/kotlin/io/github/mcdev/core/mixinextras/ExpressionSupportTest.kt::completeExpressionValueAfterDotOmitsUnreachableCandidates",
+      "nativeStateOrHelperAssertions": [],
+      "status": "ported"
+    },
+    {
+      "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixinextras/ExpressionSupportTest.kt::completeExpressionValueAfterDotReturnsEmpty",
+      "oracleStatus": "passed",
+      "capturedCalls": 1,
+      "wholeOutputReplay": "mcdev-core/tests/mixinextras_expression_legacy.rs::every_original_expression_case_and_full_output#mcdev-core/src/test/kotlin/io/github/mcdev/core/mixinextras/ExpressionSupportTest.kt::completeExpressionValueAfterDotReturnsEmpty",
+      "nativeStateOrHelperAssertions": [],
+      "status": "ported"
+    },
+    {
+      "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixinextras/ExpressionSupportTest.kt::completeExpressionValueAfterDotReturnsEmptyWhenMemberServiceUnavailable",
+      "oracleStatus": "passed",
+      "capturedCalls": 51,
+      "wholeOutputReplay": "mcdev-core/tests/mixinextras_expression_legacy.rs::every_original_expression_case_and_full_output#mcdev-core/src/test/kotlin/io/github/mcdev/core/mixinextras/ExpressionSupportTest.kt::completeExpressionValueAfterDotReturnsEmptyWhenMemberServiceUnavailable",
+      "nativeStateOrHelperAssertions": [],
+      "status": "ported"
+    },
+    {
+      "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixinextras/ExpressionSupportTest.kt::completeExpressionValueAfterDotReusesExactDefinitionWithoutAdditionalEdits",
+      "oracleStatus": "passed",
+      "capturedCalls": 89,
+      "wholeOutputReplay": "mcdev-core/tests/mixinextras_expression_legacy.rs::every_original_expression_case_and_full_output#mcdev-core/src/test/kotlin/io/github/mcdev/core/mixinextras/ExpressionSupportTest.kt::completeExpressionValueAfterDotReusesExactDefinitionWithoutAdditionalEdits",
+      "nativeStateOrHelperAssertions": [],
+      "status": "ported"
+    },
+    {
+      "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixinextras/ExpressionSupportTest.kt::completeExpressionValueAfterMethodReferenceOffersNew",
+      "oracleStatus": "passed",
+      "capturedCalls": 1,
+      "wholeOutputReplay": "mcdev-core/tests/mixinextras_expression_legacy.rs::every_original_expression_case_and_full_output#mcdev-core/src/test/kotlin/io/github/mcdev/core/mixinextras/ExpressionSupportTest.kt::completeExpressionValueAfterMethodReferenceOffersNew",
+      "nativeStateOrHelperAssertions": [],
+      "status": "ported"
+    },
+    {
+      "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixinextras/ExpressionSupportTest.kt::completeExpressionValueAtStatementStartAlsoOffersValueKeywords",
+      "oracleStatus": "passed",
+      "capturedCalls": 1,
+      "wholeOutputReplay": "mcdev-core/tests/mixinextras_expression_legacy.rs::every_original_expression_case_and_full_output#mcdev-core/src/test/kotlin/io/github/mcdev/core/mixinextras/ExpressionSupportTest.kt::completeExpressionValueAtStatementStartAlsoOffersValueKeywords",
+      "nativeStateOrHelperAssertions": [],
+      "status": "ported"
+    },
+    {
+      "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixinextras/ExpressionSupportTest.kt::completeExpressionValueAtStatementStartOffersReturnAndThrow",
+      "oracleStatus": "passed",
+      "capturedCalls": 1,
+      "wholeOutputReplay": "mcdev-core/tests/mixinextras_expression_legacy.rs::every_original_expression_case_and_full_output#mcdev-core/src/test/kotlin/io/github/mcdev/core/mixinextras/ExpressionSupportTest.kt::completeExpressionValueAtStatementStartOffersReturnAndThrow",
+      "nativeStateOrHelperAssertions": [],
+      "status": "ported"
+    },
+    {
+      "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixinextras/ExpressionSupportTest.kt::completeExpressionValueAtValueStartOffersValueKeywordsOnly",
+      "oracleStatus": "passed",
+      "capturedCalls": 1,
+      "wholeOutputReplay": "mcdev-core/tests/mixinextras_expression_legacy.rs::every_original_expression_case_and_full_output#mcdev-core/src/test/kotlin/io/github/mcdev/core/mixinextras/ExpressionSupportTest.kt::completeExpressionValueAtValueStartOffersValueKeywordsOnly",
+      "nativeStateOrHelperAssertions": [],
+      "status": "ported"
+    },
+    {
+      "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixinextras/ExpressionSupportTest.kt::completeExpressionValueAuthoritativeEmptySuppressesLexicalDefinitionIds",
+      "oracleStatus": "passed",
+      "capturedCalls": 61,
+      "wholeOutputReplay": "mcdev-core/tests/mixinextras_expression_legacy.rs::every_original_expression_case_and_full_output#mcdev-core/src/test/kotlin/io/github/mcdev/core/mixinextras/ExpressionSupportTest.kt::completeExpressionValueAuthoritativeEmptySuppressesLexicalDefinitionIds",
+      "nativeStateOrHelperAssertions": [],
+      "status": "ported"
+    },
+    {
+      "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixinextras/ExpressionSupportTest.kt::completeExpressionValueDeduplicatesRepeatedDefinitionIds",
+      "oracleStatus": "passed",
+      "capturedCalls": 56,
+      "wholeOutputReplay": "mcdev-core/tests/mixinextras_expression_legacy.rs::every_original_expression_case_and_full_output#mcdev-core/src/test/kotlin/io/github/mcdev/core/mixinextras/ExpressionSupportTest.kt::completeExpressionValueDeduplicatesRepeatedDefinitionIds",
+      "nativeStateOrHelperAssertions": [],
+      "status": "ported"
+    },
+    {
+      "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixinextras/ExpressionSupportTest.kt::completeExpressionValueDoesNotOfferDefinitionIdsAfterDotEvenWithDefinitions",
+      "oracleStatus": "passed",
+      "capturedCalls": 19,
+      "wholeOutputReplay": "mcdev-core/tests/mixinextras_expression_legacy.rs::every_original_expression_case_and_full_output#mcdev-core/src/test/kotlin/io/github/mcdev/core/mixinextras/ExpressionSupportTest.kt::completeExpressionValueDoesNotOfferDefinitionIdsAfterDotEvenWithDefinitions",
+      "nativeStateOrHelperAssertions": [],
+      "status": "ported"
+    },
+    {
+      "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixinextras/ExpressionSupportTest.kt::completeExpressionValueFiltersByPrefix",
+      "oracleStatus": "passed",
+      "capturedCalls": 1,
+      "wholeOutputReplay": "mcdev-core/tests/mixinextras_expression_legacy.rs::every_original_expression_case_and_full_output#mcdev-core/src/test/kotlin/io/github/mcdev/core/mixinextras/ExpressionSupportTest.kt::completeExpressionValueFiltersByPrefix",
+      "nativeStateOrHelperAssertions": [],
+      "status": "ported"
+    },
+    {
+      "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixinextras/ExpressionSupportTest.kt::completeExpressionValueFiltersDefinitionIdsByPrefix",
+      "oracleStatus": "passed",
+      "capturedCalls": 51,
+      "wholeOutputReplay": "mcdev-core/tests/mixinextras_expression_legacy.rs::every_original_expression_case_and_full_output#mcdev-core/src/test/kotlin/io/github/mcdev/core/mixinextras/ExpressionSupportTest.kt::completeExpressionValueFiltersDefinitionIdsByPrefix",
+      "nativeStateOrHelperAssertions": [],
+      "status": "ported"
+    },
+    {
+      "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixinextras/ExpressionSupportTest.kt::completeExpressionValueIsolatesDefinitionIdsByHandler",
+      "oracleStatus": "passed",
+      "capturedCalls": 53,
+      "wholeOutputReplay": "mcdev-core/tests/mixinextras_expression_legacy.rs::every_original_expression_case_and_full_output#mcdev-core/src/test/kotlin/io/github/mcdev/core/mixinextras/ExpressionSupportTest.kt::completeExpressionValueIsolatesDefinitionIdsByHandler",
+      "nativeStateOrHelperAssertions": [],
+      "status": "ported"
+    },
+    {
+      "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixinextras/ExpressionSupportTest.kt::completeExpressionValueKeywordAndDefinitionIdCompletionDoesNotInvokeMemberService",
+      "oracleStatus": "passed",
+      "capturedCalls": 51,
+      "wholeOutputReplay": "mcdev-core/tests/mixinextras_expression_legacy.rs::every_original_expression_case_and_full_output#mcdev-core/src/test/kotlin/io/github/mcdev/core/mixinextras/ExpressionSupportTest.kt::completeExpressionValueKeywordAndDefinitionIdCompletionDoesNotInvokeMemberService",
+      "nativeStateOrHelperAssertions": [
+        "mcdev-core/tests/mixinextras_expression_legacy.rs::keyword_and_definition_id_completion_does_not_invoke_member_matcher"
+      ],
+      "status": "ported"
+    },
+    {
+      "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixinextras/ExpressionSupportTest.kt::completeExpressionValueNoneReturnsEmpty",
+      "oracleStatus": "passed",
+      "capturedCalls": 1,
+      "wholeOutputReplay": "mcdev-core/tests/mixinextras_expression_legacy.rs::every_original_expression_case_and_full_output#mcdev-core/src/test/kotlin/io/github/mcdev/core/mixinextras/ExpressionSupportTest.kt::completeExpressionValueNoneReturnsEmpty",
+      "nativeStateOrHelperAssertions": [],
+      "status": "ported"
+    },
+    {
+      "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixinextras/ExpressionSupportTest.kt::completeExpressionValueOffersLexicalDefinitionIdsWithKeywords",
+      "oracleStatus": "passed",
+      "capturedCalls": 51,
+      "wholeOutputReplay": "mcdev-core/tests/mixinextras_expression_legacy.rs::every_original_expression_case_and_full_output#mcdev-core/src/test/kotlin/io/github/mcdev/core/mixinextras/ExpressionSupportTest.kt::completeExpressionValueOffersLexicalDefinitionIdsWithKeywords",
+      "nativeStateOrHelperAssertions": [],
+      "status": "ported"
+    },
+    {
+      "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixinextras/ExpressionSupportTest.kt::completeExpressionValuePreservesDefinitionIdDeclarationOrder",
+      "oracleStatus": "passed",
+      "capturedCalls": 56,
+      "wholeOutputReplay": "mcdev-core/tests/mixinextras_expression_legacy.rs::every_original_expression_case_and_full_output#mcdev-core/src/test/kotlin/io/github/mcdev/core/mixinextras/ExpressionSupportTest.kt::completeExpressionValuePreservesDefinitionIdDeclarationOrder",
+      "nativeStateOrHelperAssertions": [],
+      "status": "ported"
+    },
+    {
+      "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixinextras/ExpressionSupportTest.kt::completeExpressionValueRepeatedPrefixMatchesMultipleKeywords",
+      "oracleStatus": "passed",
+      "capturedCalls": 1,
+      "wholeOutputReplay": "mcdev-core/tests/mixinextras_expression_legacy.rs::every_original_expression_case_and_full_output#mcdev-core/src/test/kotlin/io/github/mcdev/core/mixinextras/ExpressionSupportTest.kt::completeExpressionValueRepeatedPrefixMatchesMultipleKeywords",
+      "nativeStateOrHelperAssertions": [],
+      "status": "ported"
+    },
+    {
+      "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixinextras/ExpressionSupportTest.kt::completeExpressionValueRequiresExpressionAnnotation",
+      "oracleStatus": "passed",
+      "capturedCalls": 1,
+      "wholeOutputReplay": "mcdev-core/tests/mixinextras_expression_legacy.rs::every_original_expression_case_and_full_output#mcdev-core/src/test/kotlin/io/github/mcdev/core/mixinextras/ExpressionSupportTest.kt::completeExpressionValueRequiresExpressionAnnotation",
+      "nativeStateOrHelperAssertions": [],
+      "status": "ported"
+    },
+    {
+      "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixinextras/ExpressionSupportTest.kt::completeExpressionValueUsesAuthoritativeDefinitionIdsOverLexical",
+      "oracleStatus": "passed",
+      "capturedCalls": 44,
+      "wholeOutputReplay": "mcdev-core/tests/mixinextras_expression_legacy.rs::every_original_expression_case_and_full_output#mcdev-core/src/test/kotlin/io/github/mcdev/core/mixinextras/ExpressionSupportTest.kt::completeExpressionValueUsesAuthoritativeDefinitionIdsOverLexical",
+      "nativeStateOrHelperAssertions": [],
+      "status": "ported"
+    },
+    {
+      "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixinextras/ExpressionSupportTest.kt::completesAllMixinExtrasFeatureSnippets",
+      "oracleStatus": "passed",
+      "capturedCalls": 131,
+      "wholeOutputReplay": "mcdev-core/tests/mixinextras_expression_legacy.rs::every_original_expression_case_and_full_output#mcdev-core/src/test/kotlin/io/github/mcdev/core/mixinextras/ExpressionSupportTest.kt::completesAllMixinExtrasFeatureSnippets",
+      "nativeStateOrHelperAssertions": [],
+      "status": "ported"
+    },
+    {
+      "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixinextras/ExpressionSupportTest.kt::completesCancellableSnippet",
+      "oracleStatus": "passed",
+      "capturedCalls": 131,
+      "wholeOutputReplay": "mcdev-core/tests/mixinextras_expression_legacy.rs::every_original_expression_case_and_full_output#mcdev-core/src/test/kotlin/io/github/mcdev/core/mixinextras/ExpressionSupportTest.kt::completesCancellableSnippet",
+      "nativeStateOrHelperAssertions": [],
+      "status": "ported"
+    },
+    {
+      "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixinextras/ExpressionSupportTest.kt::completesExpressionAnnotationSnippets",
+      "oracleStatus": "passed",
+      "capturedCalls": 5,
+      "wholeOutputReplay": "mcdev-core/tests/mixinextras_expression_legacy.rs::every_original_expression_case_and_full_output#mcdev-core/src/test/kotlin/io/github/mcdev/core/mixinextras/ExpressionSupportTest.kt::completesExpressionAnnotationSnippets",
+      "nativeStateOrHelperAssertions": [],
+      "status": "ported"
+    },
+    {
+      "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixinextras/ExpressionSupportTest.kt::completesFeatureAnnotationsAtAtSign",
+      "oracleStatus": "passed",
+      "capturedCalls": 10,
+      "wholeOutputReplay": "mcdev-core/tests/mixinextras_expression_legacy.rs::every_original_expression_case_and_full_output#mcdev-core/src/test/kotlin/io/github/mcdev/core/mixinextras/ExpressionSupportTest.kt::completesFeatureAnnotationsAtAtSign",
+      "nativeStateOrHelperAssertions": [],
+      "status": "ported"
+    },
+    {
+      "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixinextras/ExpressionSupportTest.kt::completesLocalSnippet",
+      "oracleStatus": "passed",
+      "capturedCalls": 131,
+      "wholeOutputReplay": "mcdev-core/tests/mixinextras_expression_legacy.rs::every_original_expression_case_and_full_output#mcdev-core/src/test/kotlin/io/github/mcdev/core/mixinextras/ExpressionSupportTest.kt::completesLocalSnippet",
+      "nativeStateOrHelperAssertions": [],
+      "status": "ported"
+    },
+    {
+      "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixinextras/ExpressionSupportTest.kt::completesMixinExtrasExpressionAtValue",
+      "oracleStatus": "passed",
+      "capturedCalls": 1,
+      "wholeOutputReplay": "mcdev-core/tests/mixinextras_expression_legacy.rs::every_original_expression_case_and_full_output#mcdev-core/src/test/kotlin/io/github/mcdev/core/mixinextras/ExpressionSupportTest.kt::completesMixinExtrasExpressionAtValue",
+      "nativeStateOrHelperAssertions": [],
+      "status": "ported"
+    },
+    {
+      "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixinextras/ExpressionSupportTest.kt::completesNoArgMixinMarkerAnnotationsWithImports",
+      "oracleStatus": "passed",
+      "capturedCalls": 261,
+      "wholeOutputReplay": "mcdev-core/tests/mixinextras_expression_legacy.rs::every_original_expression_case_and_full_output#mcdev-core/src/test/kotlin/io/github/mcdev/core/mixinextras/ExpressionSupportTest.kt::completesNoArgMixinMarkerAnnotationsWithImports",
+      "nativeStateOrHelperAssertions": [],
+      "status": "ported"
+    },
+    {
+      "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixinextras/ExpressionSupportTest.kt::completesShareSnippet",
+      "oracleStatus": "passed",
+      "capturedCalls": 131,
+      "wholeOutputReplay": "mcdev-core/tests/mixinextras_expression_legacy.rs::every_original_expression_case_and_full_output#mcdev-core/src/test/kotlin/io/github/mcdev/core/mixinextras/ExpressionSupportTest.kt::completesShareSnippet",
+      "nativeStateOrHelperAssertions": [],
+      "status": "ported"
+    },
+    {
+      "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixinextras/ExpressionSupportTest.kt::conflictingAnnotationImportUsesQualifiedSnippetWithoutConflictingImport",
+      "oracleStatus": "passed",
+      "capturedCalls": 13,
+      "wholeOutputReplay": "mcdev-core/tests/mixinextras_expression_legacy.rs::every_original_expression_case_and_full_output#mcdev-core/src/test/kotlin/io/github/mcdev/core/mixinextras/ExpressionSupportTest.kt::conflictingAnnotationImportUsesQualifiedSnippetWithoutConflictingImport",
+      "nativeStateOrHelperAssertions": [],
+      "status": "ported"
+    },
+    {
+      "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixinextras/ExpressionSupportTest.kt::coreAnnotationSnippetReplacesWholeNameAndPreservesExistingArguments",
+      "oracleStatus": "passed",
+      "capturedCalls": 6,
+      "wholeOutputReplay": "mcdev-core/tests/mixinextras_expression_legacy.rs::every_original_expression_case_and_full_output#mcdev-core/src/test/kotlin/io/github/mcdev/core/mixinextras/ExpressionSupportTest.kt::coreAnnotationSnippetReplacesWholeNameAndPreservesExistingArguments",
+      "nativeStateOrHelperAssertions": [],
+      "status": "ported"
+    },
+    {
+      "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixinextras/ExpressionSupportTest.kt::expressionAtValueCompletionFiltersByPrefix",
+      "oracleStatus": "passed",
+      "capturedCalls": 1,
+      "wholeOutputReplay": "mcdev-core/tests/mixinextras_expression_legacy.rs::every_original_expression_case_and_full_output#mcdev-core/src/test/kotlin/io/github/mcdev/core/mixinextras/ExpressionSupportTest.kt::expressionAtValueCompletionFiltersByPrefix",
+      "nativeStateOrHelperAssertions": [],
+      "status": "ported"
+    },
+    {
+      "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixinextras/ExpressionSupportTest.kt::expressionAtValueReturnsEmptyForNonAtAnnotation",
+      "oracleStatus": "passed",
+      "capturedCalls": 1,
+      "wholeOutputReplay": "mcdev-core/tests/mixinextras_expression_legacy.rs::every_original_expression_case_and_full_output#mcdev-core/src/test/kotlin/io/github/mcdev/core/mixinextras/ExpressionSupportTest.kt::expressionAtValueReturnsEmptyForNonAtAnnotation",
+      "nativeStateOrHelperAssertions": [],
+      "status": "ported"
+    },
+    {
+      "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixinextras/ExpressionSupportTest.kt::featureCompletionIgnoresAtSignsInStringsAndComments",
+      "oracleStatus": "passed",
+      "capturedCalls": 9,
+      "wholeOutputReplay": "mcdev-core/tests/mixinextras_expression_legacy.rs::every_original_expression_case_and_full_output#mcdev-core/src/test/kotlin/io/github/mcdev/core/mixinextras/ExpressionSupportTest.kt::featureCompletionIgnoresAtSignsInStringsAndComments",
+      "nativeStateOrHelperAssertions": [],
+      "status": "ported"
+    },
+    {
+      "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixinextras/ExpressionSupportTest.kt::isExpressionAtValueDetectsValue",
+      "oracleStatus": "passed",
+      "capturedCalls": 2,
+      "wholeOutputReplay": "mcdev-core/tests/mixinextras_expression_legacy.rs::every_original_expression_case_and_full_output#mcdev-core/src/test/kotlin/io/github/mcdev/core/mixinextras/ExpressionSupportTest.kt::isExpressionAtValueDetectsValue",
+      "nativeStateOrHelperAssertions": [],
+      "status": "ported"
+    },
+    {
+      "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixinextras/ExpressionSupportTest.kt::nestedCoreAnnotationSnippetsAddImportsAndRespectSimpleNameConflicts",
+      "oracleStatus": "passed",
+      "capturedCalls": 16,
+      "wholeOutputReplay": "mcdev-core/tests/mixinextras_expression_legacy.rs::every_original_expression_case_and_full_output#mcdev-core/src/test/kotlin/io/github/mcdev/core/mixinextras/ExpressionSupportTest.kt::nestedCoreAnnotationSnippetsAddImportsAndRespectSimpleNameConflicts",
+      "nativeStateOrHelperAssertions": [],
+      "status": "ported"
+    },
+    {
+      "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixinextras/ExpressionSupportTest.kt::wrapWithConditionUsesIndexedVersionAndImport",
+      "oracleStatus": "passed",
+      "capturedCalls": 21,
+      "wholeOutputReplay": "mcdev-core/tests/mixinextras_expression_legacy.rs::every_original_expression_case_and_full_output#mcdev-core/src/test/kotlin/io/github/mcdev/core/mixinextras/ExpressionSupportTest.kt::wrapWithConditionUsesIndexedVersionAndImport",
+      "nativeStateOrHelperAssertions": [],
+      "status": "ported"
+    },
+    {
+      "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixinextras/ExpressionTypeImportCacheTest.kt::changingImportRecomputesBindingsButUnchangedImportReusesCandidates",
+      "oracleStatus": "passed",
+      "capturedCalls": 168,
+      "wholeOutputReplay": "mcdev-core/tests/mixinextras_expression_legacy.rs::every_original_expression_case_and_full_output#mcdev-core/src/test/kotlin/io/github/mcdev/core/mixinextras/ExpressionTypeImportCacheTest.kt::changingImportRecomputesBindingsButUnchangedImportReusesCandidates",
+      "nativeStateOrHelperAssertions": [
+        "mcdev-core/tests/mixinextras_expression_legacy.rs::changing_import_recomputes_bindings_but_unchanged_import_reuses_candidates"
+      ],
+      "status": "ported"
+    },
+    {
+      "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixinextras/KotlinExpressionContextTest.kt::aliasImportsReachHandlerRegionAndKeepDefinitionsAndSourceRanges",
+      "oracleStatus": "passed",
+      "capturedCalls": 43,
+      "wholeOutputReplay": "mcdev-core/tests/mixinextras_expression_legacy.rs::every_original_expression_case_and_full_output#mcdev-core/src/test/kotlin/io/github/mcdev/core/mixinextras/KotlinExpressionContextTest.kt::aliasImportsReachHandlerRegionAndKeepDefinitionsAndSourceRanges",
+      "nativeStateOrHelperAssertions": [
+        "mcdev-core/tests/mixinextras_expression_legacy.rs::kotlin_definition_context_retains_valid_pool_binding_and_slices_original_ids"
+      ],
+      "status": "ported"
+    },
+    {
+      "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixinextras/KotlinExpressionContextTest.kt::equivalentJavaAnnotationsKeepTheSameSemanticResult",
+      "oracleStatus": "passed",
+      "capturedCalls": 91,
+      "wholeOutputReplay": "mcdev-core/tests/mixinextras_expression_legacy.rs::every_original_expression_case_and_full_output#mcdev-core/src/test/kotlin/io/github/mcdev/core/mixinextras/KotlinExpressionContextTest.kt::equivalentJavaAnnotationsKeepTheSameSemanticResult",
+      "nativeStateOrHelperAssertions": [],
+      "status": "ported"
+    },
+    {
+      "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixinextras/KotlinExpressionContextTest.kt::kotlinRawStringsKeepContentAndIdUtf16RangesWithoutJavaUnescaping",
+      "oracleStatus": "passed",
+      "capturedCalls": 40,
+      "wholeOutputReplay": "mcdev-core/tests/mixinextras_expression_legacy.rs::every_original_expression_case_and_full_output#mcdev-core/src/test/kotlin/io/github/mcdev/core/mixinextras/KotlinExpressionContextTest.kt::kotlinRawStringsKeepContentAndIdUtf16RangesWithoutJavaUnescaping",
+      "nativeStateOrHelperAssertions": [],
+      "status": "ported"
+    },
+    {
+      "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixinextras/KotlinExpressionContextTest.kt::kotlinRejectsInteriorEmptyElementsWithoutChangingJavaCommaHandling",
+      "oracleStatus": "passed",
+      "capturedCalls": 18,
+      "wholeOutputReplay": "mcdev-core/tests/mixinextras_expression_legacy.rs::every_original_expression_case_and_full_output#mcdev-core/src/test/kotlin/io/github/mcdev/core/mixinextras/KotlinExpressionContextTest.kt::kotlinRejectsInteriorEmptyElementsWithoutChangingJavaCommaHandling",
+      "nativeStateOrHelperAssertions": [],
+      "status": "ported"
+    },
+    {
+      "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixinextras/KotlinExpressionContextTest.kt::kotlinTrailingCommasKeepScalarContainerAndArrayValues",
+      "oracleStatus": "passed",
+      "capturedCalls": 86,
+      "wholeOutputReplay": "mcdev-core/tests/mixinextras_expression_legacy.rs::every_original_expression_case_and_full_output#mcdev-core/src/test/kotlin/io/github/mcdev/core/mixinextras/KotlinExpressionContextTest.kt::kotlinTrailingCommasKeepScalarContainerAndArrayValues",
+      "nativeStateOrHelperAssertions": [],
+      "status": "ported"
+    },
+    {
+      "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixinextras/KotlinExpressionContextTest.kt::mismatchedDefinitionElementCannotResolveAnOfficialAliasSuffix",
+      "oracleStatus": "passed",
+      "capturedCalls": 86,
+      "wholeOutputReplay": "mcdev-core/tests/mixinextras_expression_legacy.rs::every_original_expression_case_and_full_output#mcdev-core/src/test/kotlin/io/github/mcdev/core/mixinextras/KotlinExpressionContextTest.kt::mismatchedDefinitionElementCannotResolveAnOfficialAliasSuffix",
+      "nativeStateOrHelperAssertions": [],
+      "status": "ported"
+    },
+    {
+      "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixinextras/KotlinExpressionContextTest.kt::unrelatedAliasesAreNotTreatedAsOfficialDefinitionsOrExpressions",
+      "oracleStatus": "passed",
+      "capturedCalls": 68,
+      "wholeOutputReplay": "mcdev-core/tests/mixinextras_expression_legacy.rs::every_original_expression_case_and_full_output#mcdev-core/src/test/kotlin/io/github/mcdev/core/mixinextras/KotlinExpressionContextTest.kt::unrelatedAliasesAreNotTreatedAsOfficialDefinitionsOrExpressions",
+      "nativeStateOrHelperAssertions": [],
+      "status": "ported"
+    },
+    {
+      "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixinextras/MixinExtrasDefinitionIndexTest.kt::definitionsWithIdReturnsAllMatchesInDocumentOrder",
+      "oracleStatus": "passed",
+      "capturedCalls": 0,
+      "wholeOutputReplay": null,
+      "nativeStateOrHelperAssertions": [
+        "mcdev-core/tests/mixinextras_expression_models.rs::definitions_with_id_returns_all_matches_in_document_order"
+      ],
+      "status": "ported"
+    },
+    {
+      "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixinextras/MixinExtrasDefinitionIndexTest.kt::emptyIndexHasNoDefinitions",
+      "oracleStatus": "passed",
+      "capturedCalls": 0,
+      "wholeOutputReplay": null,
+      "nativeStateOrHelperAssertions": [
+        "mcdev-core/tests/mixinextras_expression_models.rs::definition_empty_index_has_no_definitions"
+      ],
+      "status": "ported"
+    },
+    {
+      "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixinextras/MixinExtrasDefinitionIndexTest.kt::preservesDocumentOrder",
+      "oracleStatus": "passed",
+      "capturedCalls": 0,
+      "wholeOutputReplay": null,
+      "nativeStateOrHelperAssertions": [
+        "mcdev-core/tests/mixinextras_expression_models.rs::definition_preserves_document_order"
+      ],
+      "status": "ported"
+    },
+    {
+      "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixinextras/MixinExtrasExpressionIndexTest.kt::emptyIndexHasNoExpressions",
+      "oracleStatus": "passed",
+      "capturedCalls": 0,
+      "wholeOutputReplay": null,
+      "nativeStateOrHelperAssertions": [
+        "mcdev-core/tests/mixinextras_expression_models.rs::expression_empty_index_has_no_expressions"
+      ],
+      "status": "ported"
+    },
+    {
+      "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixinextras/MixinExtrasExpressionIndexTest.kt::integrationWithExpressionsAnnotationParserPreservesSameIdOrder",
+      "oracleStatus": "passed",
+      "capturedCalls": 4,
+      "wholeOutputReplay": "mcdev-core/tests/mixinextras_expression_legacy.rs::every_original_expression_case_and_full_output#mcdev-core/src/test/kotlin/io/github/mcdev/core/mixinextras/MixinExtrasExpressionIndexTest.kt::integrationWithExpressionsAnnotationParserPreservesSameIdOrder",
+      "nativeStateOrHelperAssertions": [
+        "mcdev-core/tests/mixinextras_expression_models.rs::integration_with_expressions_annotation_parser_preserves_same_id_order"
+      ],
+      "status": "ported"
+    },
+    {
+      "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixinextras/MixinExtrasExpressionIndexTest.kt::preservesDocumentOrder",
+      "oracleStatus": "passed",
+      "capturedCalls": 0,
+      "wholeOutputReplay": null,
+      "nativeStateOrHelperAssertions": [
+        "mcdev-core/tests/mixinextras_expression_models.rs::expression_preserves_document_order"
+      ],
+      "status": "ported"
+    },
+    {
+      "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixinextras/MixinExtrasExpressionIndexTest.kt::valuesForIdIsCaseSensitive",
+      "oracleStatus": "passed",
+      "capturedCalls": 0,
+      "wholeOutputReplay": null,
+      "nativeStateOrHelperAssertions": [
+        "mcdev-core/tests/mixinextras_expression_models.rs::values_for_id_is_case_sensitive"
+      ],
+      "status": "ported"
+    },
+    {
+      "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixinextras/MixinExtrasExpressionIndexTest.kt::valuesForIdMatchesEmptyIdExactly",
+      "oracleStatus": "passed",
+      "capturedCalls": 0,
+      "wholeOutputReplay": null,
+      "nativeStateOrHelperAssertions": [
+        "mcdev-core/tests/mixinextras_expression_models.rs::values_for_id_matches_empty_id_exactly"
+      ],
+      "status": "ported"
+    },
+    {
+      "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixinextras/MixinExtrasExpressionIndexTest.kt::valuesForIdReturnsAllMatchesFlatMappedInDocumentOrder",
+      "oracleStatus": "passed",
+      "capturedCalls": 0,
+      "wholeOutputReplay": null,
+      "nativeStateOrHelperAssertions": [
+        "mcdev-core/tests/mixinextras_expression_models.rs::values_for_id_returns_all_matches_flat_mapped_in_document_order"
+      ],
+      "status": "ported"
+    },
+    {
+      "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixinextras/MixinExtrasAnnotationContextTest.kt::extractsAtTargetContextWithParentMixinExtrasMethod",
+      "oracleStatus": "passed",
+      "capturedCalls": 22,
+      "wholeOutputReplay": "mcdev-core/tests/mixinextras_expression_legacy.rs::every_original_expression_case_and_full_output#mcdev-core/src/test/kotlin/io/github/mcdev/core/mixinextras/MixinExtrasAnnotationContextTest.kt::extractsAtTargetContextWithParentMixinExtrasMethod",
+      "nativeStateOrHelperAssertions": [
+        "mcdev-core/tests/mixinextras_expression_models.rs::extracts_at_target_context_with_parent_mixin_extras_method"
+      ],
+      "status": "ported"
+    },
+    {
+      "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixinextras/MixinExtrasAnnotationContextTest.kt::extractsModifyExpressionValueMethodSlot",
+      "oracleStatus": "passed",
+      "capturedCalls": 20,
+      "wholeOutputReplay": "mcdev-core/tests/mixinextras_expression_legacy.rs::every_original_expression_case_and_full_output#mcdev-core/src/test/kotlin/io/github/mcdev/core/mixinextras/MixinExtrasAnnotationContextTest.kt::extractsModifyExpressionValueMethodSlot",
+      "nativeStateOrHelperAssertions": [
+        "mcdev-core/tests/mixinextras_expression_models.rs::extracts_modify_expression_value_method_slot"
+      ],
+      "status": "ported"
+    },
+    {
+      "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixinextras/MixinExtrasAnnotationContextTest.kt::extractsModifyReturnValueMethodSlot",
+      "oracleStatus": "passed",
+      "capturedCalls": 20,
+      "wholeOutputReplay": "mcdev-core/tests/mixinextras_expression_legacy.rs::every_original_expression_case_and_full_output#mcdev-core/src/test/kotlin/io/github/mcdev/core/mixinextras/MixinExtrasAnnotationContextTest.kt::extractsModifyReturnValueMethodSlot",
+      "nativeStateOrHelperAssertions": [
+        "mcdev-core/tests/mixinextras_expression_models.rs::extracts_modify_return_value_method_slot"
+      ],
+      "status": "ported"
+    },
+    {
+      "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixinextras/MixinExtrasAnnotationContextTest.kt::extractsWrapMethodMethodSlot",
+      "oracleStatus": "passed",
+      "capturedCalls": 18,
+      "wholeOutputReplay": "mcdev-core/tests/mixinextras_expression_legacy.rs::every_original_expression_case_and_full_output#mcdev-core/src/test/kotlin/io/github/mcdev/core/mixinextras/MixinExtrasAnnotationContextTest.kt::extractsWrapMethodMethodSlot",
+      "nativeStateOrHelperAssertions": [
+        "mcdev-core/tests/mixinextras_expression_models.rs::extracts_wrap_method_method_slot"
+      ],
+      "status": "ported"
+    },
+    {
+      "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixinextras/MixinExtrasAnnotationContextTest.kt::extractsWrapOperationMethodSlot",
+      "oracleStatus": "passed",
+      "capturedCalls": 20,
+      "wholeOutputReplay": "mcdev-core/tests/mixinextras_expression_legacy.rs::every_original_expression_case_and_full_output#mcdev-core/src/test/kotlin/io/github/mcdev/core/mixinextras/MixinExtrasAnnotationContextTest.kt::extractsWrapOperationMethodSlot",
+      "nativeStateOrHelperAssertions": [
+        "mcdev-core/tests/mixinextras_expression_models.rs::extracts_wrap_operation_method_slot"
+      ],
+      "status": "ported"
+    },
+    {
+      "legacyCase": "mcdev-core/src/test/kotlin/io/github/mcdev/core/mixinextras/MixinExtrasAnnotationContextTest.kt::extractsWrapWithConditionMethodSlot",
+      "oracleStatus": "passed",
+      "capturedCalls": 20,
+      "wholeOutputReplay": "mcdev-core/tests/mixinextras_expression_legacy.rs::every_original_expression_case_and_full_output#mcdev-core/src/test/kotlin/io/github/mcdev/core/mixinextras/MixinExtrasAnnotationContextTest.kt::extractsWrapWithConditionMethodSlot",
+      "nativeStateOrHelperAssertions": [
+        "mcdev-core/tests/mixinextras_expression_models.rs::extracts_wrap_with_condition_method_slot"
+      ],
+      "status": "ported"
+    }
+  ]
+}

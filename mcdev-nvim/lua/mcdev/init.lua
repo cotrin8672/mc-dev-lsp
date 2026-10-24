@@ -9,7 +9,7 @@ local transport = require("mcdev.transport")
 local M = {}
 local stdio_augroup
 
--- Register before JDT LS starts; bundle notifications can arrive during initialization.
+-- Register before ktlsp starts; readiness may arrive during initialization.
 transport.setup()
 
 function M.setup(opts)
@@ -62,9 +62,7 @@ function M.setup(opts)
   end, {})
 end
 
-function M.extension_jar()
-  return require("mcdev.jdtls").resolve_extension_jar()
-end
+M.ktlsp = require("mcdev.ktlsp")
 
 function M.options()
   return config.options

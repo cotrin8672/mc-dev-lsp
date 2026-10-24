@@ -337,7 +337,7 @@ check("plain commands, edits and resolve failures", function()
   actions.apply(plain, bufnr)
   h.assert_eq(#commands, 2, "never reroute actions from a disconnected client")
   clients = { client(2, "utf-8") }
-  clients[1].name = "jdtls"
+  clients[1].name = "ktlsp"
   edit.changes[vim.uri_from_bufnr(bufnr)][1] = { range = range(4), newText = "t" }
   actions.apply({ title = "mcdev", edit = edit }, bufnr)
   h.assert_eq(vim.api.nvim_buf_get_lines(bufnr, 0, 1, false)[1], line, "mcdev edits always use UTF-16")
@@ -409,7 +409,7 @@ end)
 check("JDT code action aliases", function()
   actions.code_actions = function(_, _, _, cb) cb({}, nil) end
   clients = { client(1, "utf-16") }
-  clients[1].name = "jdtls"
+  clients[1].name = "ktlsp"
 
   local function request(response)
     pending = {}
@@ -468,7 +468,7 @@ check("JDT code action aliases", function()
   h.assert_true(merged[3].disabled ~= nil, "disabled command remains distinct")
 
   clients = { client(1, "utf-16"), client(2, "utf-16") }
-  clients[1].name, clients[2].name = "jdtls", "jdtls"
+  clients[1].name, clients[2].name = "ktlsp", "jdtls"
   pending = {}
   merged = nil
   lsp.code_actions(bufnr, range(4), {}, function(items) merged = items end)

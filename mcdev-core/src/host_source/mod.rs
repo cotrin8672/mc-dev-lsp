@@ -1,0 +1,23 @@
+//! Host-authoritative owned source facts. No host handles, reflection or source scanner.
+mod facts;
+pub use facts::*;
+mod query;
+pub use query::*;
+mod types;
+pub use types::*;
+mod cache;
+pub use cache::*;
+mod semantic;
+pub use semantic::*;
+mod project_query;
+pub use project_query::*;
+mod extras;
+pub use extras::*;
+mod injection_points;
+pub use injection_points::*;
+mod projection;
+pub use projection::*;
+mod completion_cache;
+pub use completion_cache::*;
+mod snapshot;
+pub use snapshot::*;

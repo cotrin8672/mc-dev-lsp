@@ -1,0 +1,2592 @@
+{
+  "cause": "official FlowInterpreter.finish uses an IdentityHashMap-backed set; physical-instruction dedup keeps the first virtual component",
+  "nativeOrder": "physical instruction index, then original node before expansion insertion order",
+  "cases": [
+    {
+      "case": "mcdev-core/tests/fixtures/expression_engine/EngineAdditionalOracle.kt::javacFlowCases",
+      "args": {
+        "methodName": "referenceCompare",
+        "methodDescriptor": "(Ljava/lang/Object;Ljava/lang/Object;)Z",
+        "expressions": [
+          "?"
+        ],
+        "contextType": "WRAP_OPERATION",
+        "identifierPool": {
+          "members": {
+            "length": [
+              {
+                "kind": "ArrayLengthDef",
+                "value": {}
+              }
+            ]
+          },
+          "types": {
+            "double": [
+              {
+                "kind": "ExactTypeDef",
+                "value": {
+                  "type": "D"
+                }
+              }
+            ],
+            "byte": [
+              {
+                "kind": "ExactTypeDef",
+                "value": {
+                  "type": "B"
+                }
+              }
+            ],
+            "char": [
+              {
+                "kind": "ExactTypeDef",
+                "value": {
+                  "type": "C"
+                }
+              }
+            ],
+            "short": [
+              {
+                "kind": "ExactTypeDef",
+                "value": {
+                  "type": "S"
+                }
+              }
+            ],
+            "float": [
+              {
+                "kind": "ExactTypeDef",
+                "value": {
+                  "type": "F"
+                }
+              }
+            ],
+            "long": [
+              {
+                "kind": "ExactTypeDef",
+                "value": {
+                  "type": "J"
+                }
+              }
+            ],
+            "int": [
+              {
+                "kind": "ExactTypeDef",
+                "value": {
+                  "type": "I"
+                }
+              }
+            ]
+          },
+          "locals": []
+        },
+        "allowIncompleteListInputs": false,
+        "commonSuperClass": {
+          "commonSuperClass": true
+        },
+        "cancellationChecker": {
+          "cancellationChecker": true
+        },
+        "classBytesKey": "63412b8e00f5175554112b3090bb7dac0764b21eb1bd520a7fc932587dcaa069"
+      },
+      "key": [
+        0,
+        0,
+        4,
+        199
+      ],
+      "legalAlternatives": [
+        {
+          "expressionIndex": 0,
+          "expressionStartOffset": 0,
+          "originalInstructionOpcode": 199,
+          "originalInstructionIndex": 4,
+          "capturedType": {
+            "kind": "Exact",
+            "fields": {
+              "descriptor": "Lnull;"
+            }
+          },
+          "decorations": {
+            "SIMPLE_EXPRESSION_TYPE": {
+              "constraint": {
+                "kind": "Exact",
+                "fields": {
+                  "descriptor": "Ljava/lang/Object;"
+                }
+              }
+            }
+          },
+          "instructionMetadata": null
+        },
+        {
+          "expressionIndex": 0,
+          "expressionStartOffset": 0,
+          "originalInstructionOpcode": 199,
+          "originalInstructionIndex": 4,
+          "capturedType": {
+            "kind": "Exact",
+            "fields": {
+              "descriptor": "V"
+            }
+          },
+          "decorations": {},
+          "instructionMetadata": null
+        }
+      ]
+    },
+    {
+      "case": "mcdev-core/tests/fixtures/expression_engine/EngineAdditionalOracle.kt::javacFlowCases",
+      "args": {
+        "methodName": "increments",
+        "methodDescriptor": "(I)I",
+        "expressions": [
+          "?"
+        ],
+        "contextType": "WRAP_OPERATION",
+        "identifierPool": {
+          "members": {
+            "length": [
+              {
+                "kind": "ArrayLengthDef",
+                "value": {}
+              }
+            ]
+          },
+          "types": {
+            "double": [
+              {
+                "kind": "ExactTypeDef",
+                "value": {
+                  "type": "D"
+                }
+              }
+            ],
+            "byte": [
+              {
+                "kind": "ExactTypeDef",
+                "value": {
+                  "type": "B"
+                }
+              }
+            ],
+            "char": [
+              {
+                "kind": "ExactTypeDef",
+                "value": {
+                  "type": "C"
+                }
+              }
+            ],
+            "short": [
+              {
+                "kind": "ExactTypeDef",
+                "value": {
+                  "type": "S"
+                }
+              }
+            ],
+            "float": [
+              {
+                "kind": "ExactTypeDef",
+                "value": {
+                  "type": "F"
+                }
+              }
+            ],
+            "long": [
+              {
+                "kind": "ExactTypeDef",
+                "value": {
+                  "type": "J"
+                }
+              }
+            ],
+            "int": [
+              {
+                "kind": "ExactTypeDef",
+                "value": {
+                  "type": "I"
+                }
+              }
+            ]
+          },
+          "locals": []
+        },
+        "allowIncompleteListInputs": false,
+        "commonSuperClass": {
+          "commonSuperClass": true
+        },
+        "cancellationChecker": {
+          "cancellationChecker": true
+        },
+        "classBytesKey": "63412b8e00f5175554112b3090bb7dac0764b21eb1bd520a7fc932587dcaa069"
+      },
+      "key": [
+        0,
+        0,
+        1,
+        132
+      ],
+      "legalAlternatives": [
+        {
+          "expressionIndex": 0,
+          "expressionStartOffset": 0,
+          "originalInstructionOpcode": 132,
+          "originalInstructionIndex": 1,
+          "capturedType": {
+            "kind": "Exact",
+            "fields": {
+              "descriptor": "V"
+            }
+          },
+          "decorations": {},
+          "instructionMetadata": null
+        },
+        {
+          "expressionIndex": 0,
+          "expressionStartOffset": 0,
+          "originalInstructionOpcode": 132,
+          "originalInstructionIndex": 1,
+          "capturedType": {
+            "kind": "Exact",
+            "fields": {
+              "descriptor": "I"
+            }
+          },
+          "decorations": {
+            "SIMPLE_EXPRESSION_TYPE": {
+              "constraint": {
+                "kind": "Exact",
+                "fields": {
+                  "descriptor": "I"
+                }
+              }
+            }
+          },
+          "instructionMetadata": null
+        }
+      ]
+    },
+    {
+      "case": "mcdev-core/tests/fixtures/expression_engine/EngineAdditionalOracle.kt::javacFlowCases",
+      "args": {
+        "methodName": "increments",
+        "methodDescriptor": "(I)I",
+        "expressions": [
+          "?"
+        ],
+        "contextType": "WRAP_OPERATION",
+        "identifierPool": {
+          "members": {
+            "length": [
+              {
+                "kind": "ArrayLengthDef",
+                "value": {}
+              }
+            ]
+          },
+          "types": {
+            "double": [
+              {
+                "kind": "ExactTypeDef",
+                "value": {
+                  "type": "D"
+                }
+              }
+            ],
+            "byte": [
+              {
+                "kind": "ExactTypeDef",
+                "value": {
+                  "type": "B"
+                }
+              }
+            ],
+            "char": [
+              {
+                "kind": "ExactTypeDef",
+                "value": {
+                  "type": "C"
+                }
+              }
+            ],
+            "short": [
+              {
+                "kind": "ExactTypeDef",
+                "value": {
+                  "type": "S"
+                }
+              }
+            ],
+            "float": [
+              {
+                "kind": "ExactTypeDef",
+                "value": {
+                  "type": "F"
+                }
+              }
+            ],
+            "long": [
+              {
+                "kind": "ExactTypeDef",
+                "value": {
+                  "type": "J"
+                }
+              }
+            ],
+            "int": [
+              {
+                "kind": "ExactTypeDef",
+                "value": {
+                  "type": "I"
+                }
+              }
+            ]
+          },
+          "locals": []
+        },
+        "allowIncompleteListInputs": false,
+        "commonSuperClass": {
+          "commonSuperClass": true
+        },
+        "cancellationChecker": {
+          "cancellationChecker": true
+        },
+        "classBytesKey": "63412b8e00f5175554112b3090bb7dac0764b21eb1bd520a7fc932587dcaa069"
+      },
+      "key": [
+        0,
+        0,
+        3,
+        132
+      ],
+      "legalAlternatives": [
+        {
+          "expressionIndex": 0,
+          "expressionStartOffset": 0,
+          "originalInstructionOpcode": 132,
+          "originalInstructionIndex": 3,
+          "capturedType": {
+            "kind": "Exact",
+            "fields": {
+              "descriptor": "V"
+            }
+          },
+          "decorations": {},
+          "instructionMetadata": null
+        },
+        {
+          "expressionIndex": 0,
+          "expressionStartOffset": 0,
+          "originalInstructionOpcode": 132,
+          "originalInstructionIndex": 3,
+          "capturedType": {
+            "kind": "Exact",
+            "fields": {
+              "descriptor": "I"
+            }
+          },
+          "decorations": {
+            "SIMPLE_EXPRESSION_TYPE": {
+              "constraint": {
+                "kind": "Exact",
+                "fields": {
+                  "descriptor": "I"
+                }
+              }
+            }
+          },
+          "instructionMetadata": null
+        }
+      ]
+    },
+    {
+      "case": "mcdev-core/tests/fixtures/expression_engine/EngineAdditionalOracle.kt::javacFlowCases",
+      "args": {
+        "methodName": "increments",
+        "methodDescriptor": "(I)I",
+        "expressions": [
+          "?"
+        ],
+        "contextType": "WRAP_OPERATION",
+        "identifierPool": {
+          "members": {
+            "length": [
+              {
+                "kind": "ArrayLengthDef",
+                "value": {}
+              }
+            ]
+          },
+          "types": {
+            "double": [
+              {
+                "kind": "ExactTypeDef",
+                "value": {
+                  "type": "D"
+                }
+              }
+            ],
+            "byte": [
+              {
+                "kind": "ExactTypeDef",
+                "value": {
+                  "type": "B"
+                }
+              }
+            ],
+            "char": [
+              {
+                "kind": "ExactTypeDef",
+                "value": {
+                  "type": "C"
+                }
+              }
+            ],
+            "short": [
+              {
+                "kind": "ExactTypeDef",
+                "value": {
+                  "type": "S"
+                }
+              }
+            ],
+            "float": [
+              {
+                "kind": "ExactTypeDef",
+                "value": {
+                  "type": "F"
+                }
+              }
+            ],
+            "long": [
+              {
+                "kind": "ExactTypeDef",
+                "value": {
+                  "type": "J"
+                }
+              }
+            ],
+            "int": [
+              {
+                "kind": "ExactTypeDef",
+                "value": {
+                  "type": "I"
+                }
+              }
+            ]
+          },
+          "locals": []
+        },
+        "allowIncompleteListInputs": false,
+        "commonSuperClass": {
+          "commonSuperClass": true
+        },
+        "cancellationChecker": {
+          "cancellationChecker": true
+        },
+        "classBytesKey": "63412b8e00f5175554112b3090bb7dac0764b21eb1bd520a7fc932587dcaa069"
+      },
+      "key": [
+        0,
+        0,
+        6,
+        132
+      ],
+      "legalAlternatives": [
+        {
+          "expressionIndex": 0,
+          "expressionStartOffset": 0,
+          "originalInstructionOpcode": 132,
+          "originalInstructionIndex": 6,
+          "capturedType": {
+            "kind": "Exact",
+            "fields": {
+              "descriptor": "I"
+            }
+          },
+          "decorations": {
+            "SIMPLE_EXPRESSION_TYPE": {
+              "constraint": {
+                "kind": "Exact",
+                "fields": {
+                  "descriptor": "I"
+                }
+              }
+            }
+          },
+          "instructionMetadata": null
+        },
+        {
+          "expressionIndex": 0,
+          "expressionStartOffset": 0,
+          "originalInstructionOpcode": 132,
+          "originalInstructionIndex": 6,
+          "capturedType": {
+            "kind": "Exact",
+            "fields": {
+              "descriptor": "V"
+            }
+          },
+          "decorations": {},
+          "instructionMetadata": null
+        }
+      ]
+    },
+    {
+      "case": "mcdev-core/tests/fixtures/expression_engine/EngineAdditionalOracle.kt::javacFlowCases",
+      "args": {
+        "methodName": "loop",
+        "methodDescriptor": "(I)I",
+        "expressions": [
+          "?"
+        ],
+        "contextType": "WRAP_OPERATION",
+        "identifierPool": {
+          "members": {
+            "length": [
+              {
+                "kind": "ArrayLengthDef",
+                "value": {}
+              }
+            ]
+          },
+          "types": {
+            "double": [
+              {
+                "kind": "ExactTypeDef",
+                "value": {
+                  "type": "D"
+                }
+              }
+            ],
+            "byte": [
+              {
+                "kind": "ExactTypeDef",
+                "value": {
+                  "type": "B"
+                }
+              }
+            ],
+            "char": [
+              {
+                "kind": "ExactTypeDef",
+                "value": {
+                  "type": "C"
+                }
+              }
+            ],
+            "short": [
+              {
+                "kind": "ExactTypeDef",
+                "value": {
+                  "type": "S"
+                }
+              }
+            ],
+            "float": [
+              {
+                "kind": "ExactTypeDef",
+                "value": {
+                  "type": "F"
+                }
+              }
+            ],
+            "long": [
+              {
+                "kind": "ExactTypeDef",
+                "value": {
+                  "type": "J"
+                }
+              }
+            ],
+            "int": [
+              {
+                "kind": "ExactTypeDef",
+                "value": {
+                  "type": "I"
+                }
+              }
+            ]
+          },
+          "locals": []
+        },
+        "allowIncompleteListInputs": false,
+        "commonSuperClass": {
+          "commonSuperClass": true
+        },
+        "cancellationChecker": {
+          "cancellationChecker": true
+        },
+        "classBytesKey": "63412b8e00f5175554112b3090bb7dac0764b21eb1bd520a7fc932587dcaa069"
+      },
+      "key": [
+        0,
+        0,
+        11,
+        132
+      ],
+      "legalAlternatives": [
+        {
+          "expressionIndex": 0,
+          "expressionStartOffset": 0,
+          "originalInstructionOpcode": 132,
+          "originalInstructionIndex": 11,
+          "capturedType": {
+            "kind": "Exact",
+            "fields": {
+              "descriptor": "I"
+            }
+          },
+          "decorations": {
+            "SIMPLE_EXPRESSION_TYPE": {
+              "constraint": {
+                "kind": "Exact",
+                "fields": {
+                  "descriptor": "I"
+                }
+              }
+            }
+          },
+          "instructionMetadata": null
+        },
+        {
+          "expressionIndex": 0,
+          "expressionStartOffset": 0,
+          "originalInstructionOpcode": 132,
+          "originalInstructionIndex": 11,
+          "capturedType": {
+            "kind": "Exact",
+            "fields": {
+              "descriptor": "V"
+            }
+          },
+          "decorations": {},
+          "instructionMetadata": null
+        }
+      ]
+    },
+    {
+      "case": "mcdev-core/tests/fixtures/expression_engine/EngineAdditionalOracle.kt::javacFlowCases",
+      "args": {
+        "methodName": "merge",
+        "methodDescriptor": "(Z)Ljava/lang/Object;",
+        "expressions": [
+          "?"
+        ],
+        "contextType": "WRAP_OPERATION",
+        "identifierPool": {
+          "members": {
+            "length": [
+              {
+                "kind": "ArrayLengthDef",
+                "value": {}
+              }
+            ]
+          },
+          "types": {
+            "double": [
+              {
+                "kind": "ExactTypeDef",
+                "value": {
+                  "type": "D"
+                }
+              }
+            ],
+            "byte": [
+              {
+                "kind": "ExactTypeDef",
+                "value": {
+                  "type": "B"
+                }
+              }
+            ],
+            "char": [
+              {
+                "kind": "ExactTypeDef",
+                "value": {
+                  "type": "C"
+                }
+              }
+            ],
+            "short": [
+              {
+                "kind": "ExactTypeDef",
+                "value": {
+                  "type": "S"
+                }
+              }
+            ],
+            "float": [
+              {
+                "kind": "ExactTypeDef",
+                "value": {
+                  "type": "F"
+                }
+              }
+            ],
+            "long": [
+              {
+                "kind": "ExactTypeDef",
+                "value": {
+                  "type": "J"
+                }
+              }
+            ],
+            "int": [
+              {
+                "kind": "ExactTypeDef",
+                "value": {
+                  "type": "I"
+                }
+              }
+            ]
+          },
+          "locals": []
+        },
+        "allowIncompleteListInputs": false,
+        "commonSuperClass": {
+          "commonSuperClass": true
+        },
+        "cancellationChecker": {
+          "cancellationChecker": true
+        },
+        "classBytesKey": "63412b8e00f5175554112b3090bb7dac0764b21eb1bd520a7fc932587dcaa069"
+      },
+      "key": [
+        0,
+        0,
+        1,
+        153
+      ],
+      "legalAlternatives": [
+        {
+          "expressionIndex": 0,
+          "expressionStartOffset": 0,
+          "originalInstructionOpcode": 153,
+          "originalInstructionIndex": 1,
+          "capturedType": {
+            "kind": "Exact",
+            "fields": {
+              "descriptor": "V"
+            }
+          },
+          "decorations": {},
+          "instructionMetadata": null
+        },
+        {
+          "expressionIndex": 0,
+          "expressionStartOffset": 0,
+          "originalInstructionOpcode": 153,
+          "originalInstructionIndex": 1,
+          "capturedType": {
+            "kind": "IntLike",
+            "fields": {}
+          },
+          "decorations": {
+            "SIMPLE_EXPRESSION_TYPE": {
+              "constraint": {
+                "kind": "IntLike",
+                "fields": {}
+              }
+            }
+          },
+          "instructionMetadata": null
+        }
+      ]
+    },
+    {
+      "case": "mcdev-core/tests/fixtures/expression_engine/EngineAdditionalOracle.kt::javacFlowCases",
+      "args": {
+        "methodName": "mergeArrays",
+        "methodDescriptor": "(Z[Ljava/lang/String;[Ljava/lang/Integer;)[Ljava/lang/Object;",
+        "expressions": [
+          "?"
+        ],
+        "contextType": "WRAP_OPERATION",
+        "identifierPool": {
+          "members": {
+            "length": [
+              {
+                "kind": "ArrayLengthDef",
+                "value": {}
+              }
+            ]
+          },
+          "types": {
+            "double": [
+              {
+                "kind": "ExactTypeDef",
+                "value": {
+                  "type": "D"
+                }
+              }
+            ],
+            "byte": [
+              {
+                "kind": "ExactTypeDef",
+                "value": {
+                  "type": "B"
+                }
+              }
+            ],
+            "char": [
+              {
+                "kind": "ExactTypeDef",
+                "value": {
+                  "type": "C"
+                }
+              }
+            ],
+            "short": [
+              {
+                "kind": "ExactTypeDef",
+                "value": {
+                  "type": "S"
+                }
+              }
+            ],
+            "float": [
+              {
+                "kind": "ExactTypeDef",
+                "value": {
+                  "type": "F"
+                }
+              }
+            ],
+            "long": [
+              {
+                "kind": "ExactTypeDef",
+                "value": {
+                  "type": "J"
+                }
+              }
+            ],
+            "int": [
+              {
+                "kind": "ExactTypeDef",
+                "value": {
+                  "type": "I"
+                }
+              }
+            ]
+          },
+          "locals": []
+        },
+        "allowIncompleteListInputs": false,
+        "commonSuperClass": {
+          "commonSuperClass": true
+        },
+        "cancellationChecker": {
+          "cancellationChecker": true
+        },
+        "classBytesKey": "63412b8e00f5175554112b3090bb7dac0764b21eb1bd520a7fc932587dcaa069"
+      },
+      "key": [
+        0,
+        0,
+        1,
+        153
+      ],
+      "legalAlternatives": [
+        {
+          "expressionIndex": 0,
+          "expressionStartOffset": 0,
+          "originalInstructionOpcode": 153,
+          "originalInstructionIndex": 1,
+          "capturedType": {
+            "kind": "Exact",
+            "fields": {
+              "descriptor": "V"
+            }
+          },
+          "decorations": {},
+          "instructionMetadata": null
+        },
+        {
+          "expressionIndex": 0,
+          "expressionStartOffset": 0,
+          "originalInstructionOpcode": 153,
+          "originalInstructionIndex": 1,
+          "capturedType": {
+            "kind": "IntLike",
+            "fields": {}
+          },
+          "decorations": {
+            "SIMPLE_EXPRESSION_TYPE": {
+              "constraint": {
+                "kind": "IntLike",
+                "fields": {}
+              }
+            }
+          },
+          "instructionMetadata": null
+        }
+      ]
+    },
+    {
+      "case": "mcdev-core/tests/fixtures/expression_engine/EngineAdditionalOracle.kt::javacFlowCases",
+      "args": {
+        "methodName": "concat",
+        "methodDescriptor": "(ILjava/lang/String;)Ljava/lang/String;",
+        "expressions": [
+          "?"
+        ],
+        "contextType": "WRAP_OPERATION",
+        "identifierPool": {
+          "members": {
+            "length": [
+              {
+                "kind": "ArrayLengthDef",
+                "value": {}
+              }
+            ]
+          },
+          "types": {
+            "double": [
+              {
+                "kind": "ExactTypeDef",
+                "value": {
+                  "type": "D"
+                }
+              }
+            ],
+            "byte": [
+              {
+                "kind": "ExactTypeDef",
+                "value": {
+                  "type": "B"
+                }
+              }
+            ],
+            "char": [
+              {
+                "kind": "ExactTypeDef",
+                "value": {
+                  "type": "C"
+                }
+              }
+            ],
+            "short": [
+              {
+                "kind": "ExactTypeDef",
+                "value": {
+                  "type": "S"
+                }
+              }
+            ],
+            "float": [
+              {
+                "kind": "ExactTypeDef",
+                "value": {
+                  "type": "F"
+                }
+              }
+            ],
+            "long": [
+              {
+                "kind": "ExactTypeDef",
+                "value": {
+                  "type": "J"
+                }
+              }
+            ],
+            "int": [
+              {
+                "kind": "ExactTypeDef",
+                "value": {
+                  "type": "I"
+                }
+              }
+            ]
+          },
+          "locals": []
+        },
+        "allowIncompleteListInputs": false,
+        "commonSuperClass": {
+          "commonSuperClass": true
+        },
+        "cancellationChecker": {
+          "cancellationChecker": true
+        },
+        "classBytesKey": "63412b8e00f5175554112b3090bb7dac0764b21eb1bd520a7fc932587dcaa069"
+      },
+      "key": [
+        0,
+        0,
+        2,
+        186
+      ],
+      "legalAlternatives": [
+        {
+          "expressionIndex": 0,
+          "expressionStartOffset": 0,
+          "originalInstructionOpcode": 186,
+          "originalInstructionIndex": 2,
+          "capturedType": {
+            "kind": "Exact",
+            "fields": {
+              "descriptor": "Ljava/lang/String;"
+            }
+          },
+          "decorations": {
+            "SIMPLE_EXPRESSION_TYPE": {
+              "constraint": {
+                "kind": "Exact",
+                "fields": {
+                  "descriptor": "Ljava/lang/String;"
+                }
+              }
+            }
+          },
+          "instructionMetadata": null
+        },
+        {
+          "expressionIndex": 0,
+          "expressionStartOffset": 0,
+          "originalInstructionOpcode": 186,
+          "originalInstructionIndex": 2,
+          "capturedType": {
+            "kind": "Exact",
+            "fields": {
+              "descriptor": "Ljava/lang/StringBuilder;"
+            }
+          },
+          "decorations": {
+            "SIMPLE_EXPRESSION_TYPE": {
+              "constraint": {
+                "kind": "Exact",
+                "fields": {
+                  "descriptor": "Ljava/lang/StringBuilder;"
+                }
+              }
+            }
+          },
+          "instructionMetadata": null
+        }
+      ]
+    },
+    {
+      "case": "mcdev-core/tests/fixtures/expression_engine/EngineAdditionalOracle.kt::javacFlowCases",
+      "args": {
+        "methodName": "concat",
+        "methodDescriptor": "(ILjava/lang/String;)Ljava/lang/String;",
+        "expressions": [
+          "?<?"
+        ],
+        "contextType": "WRAP_OPERATION",
+        "identifierPool": {
+          "members": {
+            "length": [
+              {
+                "kind": "ArrayLengthDef",
+                "value": {}
+              }
+            ]
+          },
+          "types": {
+            "double": [
+              {
+                "kind": "ExactTypeDef",
+                "value": {
+                  "type": "D"
+                }
+              }
+            ],
+            "byte": [
+              {
+                "kind": "ExactTypeDef",
+                "value": {
+                  "type": "B"
+                }
+              }
+            ],
+            "char": [
+              {
+                "kind": "ExactTypeDef",
+                "value": {
+                  "type": "C"
+                }
+              }
+            ],
+            "short": [
+              {
+                "kind": "ExactTypeDef",
+                "value": {
+                  "type": "S"
+                }
+              }
+            ],
+            "float": [
+              {
+                "kind": "ExactTypeDef",
+                "value": {
+                  "type": "F"
+                }
+              }
+            ],
+            "long": [
+              {
+                "kind": "ExactTypeDef",
+                "value": {
+                  "type": "J"
+                }
+              }
+            ],
+            "int": [
+              {
+                "kind": "ExactTypeDef",
+                "value": {
+                  "type": "I"
+                }
+              }
+            ]
+          },
+          "locals": []
+        },
+        "allowIncompleteListInputs": false,
+        "commonSuperClass": {
+          "commonSuperClass": true
+        },
+        "cancellationChecker": {
+          "cancellationChecker": true
+        },
+        "classBytesKey": "63412b8e00f5175554112b3090bb7dac0764b21eb1bd520a7fc932587dcaa069"
+      },
+      "key": [
+        0,
+        0,
+        2,
+        186
+      ],
+      "legalAlternatives": [
+        {
+          "expressionIndex": 0,
+          "expressionStartOffset": 0,
+          "originalInstructionOpcode": 186,
+          "originalInstructionIndex": 2,
+          "capturedType": {
+            "kind": "Exact",
+            "fields": {
+              "descriptor": "Ljava/lang/String;"
+            }
+          },
+          "decorations": {
+            "SIMPLE_EXPRESSION_TYPE": {
+              "constraint": {
+                "kind": "Exact",
+                "fields": {
+                  "descriptor": "Z"
+                }
+              }
+            },
+            "SIMPLE_OPERATION_ARGS": {
+              "constraints": [
+                {
+                  "kind": "Exact",
+                  "fields": {
+                    "descriptor": "Ljava/lang/Object;"
+                  }
+                },
+                {
+                  "kind": "Exact",
+                  "fields": {
+                    "descriptor": "Ljava/lang/Object;"
+                  }
+                }
+              ]
+            },
+            "SIMPLE_OPERATION_PARAM_NAMES": {
+              "names": [
+                "left",
+                "right"
+              ]
+            },
+            "SIMPLE_OPERATION_RETURN_TYPE": {
+              "constraint": {
+                "kind": "Exact",
+                "fields": {
+                  "descriptor": "Z"
+                }
+              }
+            }
+          },
+          "instructionMetadata": null
+        },
+        {
+          "expressionIndex": 0,
+          "expressionStartOffset": 0,
+          "originalInstructionOpcode": 186,
+          "originalInstructionIndex": 2,
+          "capturedType": {
+            "kind": "Exact",
+            "fields": {
+              "descriptor": "Ljava/lang/StringBuilder;"
+            }
+          },
+          "decorations": {
+            "SIMPLE_EXPRESSION_TYPE": {
+              "constraint": {
+                "kind": "Exact",
+                "fields": {
+                  "descriptor": "Z"
+                }
+              }
+            },
+            "SIMPLE_OPERATION_ARGS": {
+              "constraints": [
+                {
+                  "kind": "Exact",
+                  "fields": {
+                    "descriptor": "Ljava/lang/Object;"
+                  }
+                },
+                {
+                  "kind": "Exact",
+                  "fields": {
+                    "descriptor": "Ljava/lang/Object;"
+                  }
+                }
+              ]
+            },
+            "SIMPLE_OPERATION_PARAM_NAMES": {
+              "names": [
+                "left",
+                "right"
+              ]
+            },
+            "SIMPLE_OPERATION_RETURN_TYPE": {
+              "constraint": {
+                "kind": "Exact",
+                "fields": {
+                  "descriptor": "Z"
+                }
+              }
+            }
+          },
+          "instructionMetadata": null
+        }
+      ]
+    },
+    {
+      "case": "mcdev-core/tests/fixtures/expression_engine/EngineAdditionalOracle.kt::javacFlowCases",
+      "args": {
+        "methodName": "concat",
+        "methodDescriptor": "(ILjava/lang/String;)Ljava/lang/String;",
+        "expressions": [
+          "?<=?"
+        ],
+        "contextType": "WRAP_OPERATION",
+        "identifierPool": {
+          "members": {
+            "length": [
+              {
+                "kind": "ArrayLengthDef",
+                "value": {}
+              }
+            ]
+          },
+          "types": {
+            "double": [
+              {
+                "kind": "ExactTypeDef",
+                "value": {
+                  "type": "D"
+                }
+              }
+            ],
+            "byte": [
+              {
+                "kind": "ExactTypeDef",
+                "value": {
+                  "type": "B"
+                }
+              }
+            ],
+            "char": [
+              {
+                "kind": "ExactTypeDef",
+                "value": {
+                  "type": "C"
+                }
+              }
+            ],
+            "short": [
+              {
+                "kind": "ExactTypeDef",
+                "value": {
+                  "type": "S"
+                }
+              }
+            ],
+            "float": [
+              {
+                "kind": "ExactTypeDef",
+                "value": {
+                  "type": "F"
+                }
+              }
+            ],
+            "long": [
+              {
+                "kind": "ExactTypeDef",
+                "value": {
+                  "type": "J"
+                }
+              }
+            ],
+            "int": [
+              {
+                "kind": "ExactTypeDef",
+                "value": {
+                  "type": "I"
+                }
+              }
+            ]
+          },
+          "locals": []
+        },
+        "allowIncompleteListInputs": false,
+        "commonSuperClass": {
+          "commonSuperClass": true
+        },
+        "cancellationChecker": {
+          "cancellationChecker": true
+        },
+        "classBytesKey": "63412b8e00f5175554112b3090bb7dac0764b21eb1bd520a7fc932587dcaa069"
+      },
+      "key": [
+        0,
+        0,
+        2,
+        186
+      ],
+      "legalAlternatives": [
+        {
+          "expressionIndex": 0,
+          "expressionStartOffset": 0,
+          "originalInstructionOpcode": 186,
+          "originalInstructionIndex": 2,
+          "capturedType": {
+            "kind": "Exact",
+            "fields": {
+              "descriptor": "Ljava/lang/StringBuilder;"
+            }
+          },
+          "decorations": {
+            "SIMPLE_EXPRESSION_TYPE": {
+              "constraint": {
+                "kind": "Exact",
+                "fields": {
+                  "descriptor": "Z"
+                }
+              }
+            },
+            "SIMPLE_OPERATION_ARGS": {
+              "constraints": [
+                {
+                  "kind": "Exact",
+                  "fields": {
+                    "descriptor": "Ljava/lang/Object;"
+                  }
+                },
+                {
+                  "kind": "Exact",
+                  "fields": {
+                    "descriptor": "Ljava/lang/Object;"
+                  }
+                }
+              ]
+            },
+            "SIMPLE_OPERATION_PARAM_NAMES": {
+              "names": [
+                "left",
+                "right"
+              ]
+            },
+            "SIMPLE_OPERATION_RETURN_TYPE": {
+              "constraint": {
+                "kind": "Exact",
+                "fields": {
+                  "descriptor": "Z"
+                }
+              }
+            }
+          },
+          "instructionMetadata": null
+        },
+        {
+          "expressionIndex": 0,
+          "expressionStartOffset": 0,
+          "originalInstructionOpcode": 186,
+          "originalInstructionIndex": 2,
+          "capturedType": {
+            "kind": "Exact",
+            "fields": {
+              "descriptor": "Ljava/lang/String;"
+            }
+          },
+          "decorations": {
+            "SIMPLE_EXPRESSION_TYPE": {
+              "constraint": {
+                "kind": "Exact",
+                "fields": {
+                  "descriptor": "Z"
+                }
+              }
+            },
+            "SIMPLE_OPERATION_ARGS": {
+              "constraints": [
+                {
+                  "kind": "Exact",
+                  "fields": {
+                    "descriptor": "Ljava/lang/Object;"
+                  }
+                },
+                {
+                  "kind": "Exact",
+                  "fields": {
+                    "descriptor": "Ljava/lang/Object;"
+                  }
+                }
+              ]
+            },
+            "SIMPLE_OPERATION_PARAM_NAMES": {
+              "names": [
+                "left",
+                "right"
+              ]
+            },
+            "SIMPLE_OPERATION_RETURN_TYPE": {
+              "constraint": {
+                "kind": "Exact",
+                "fields": {
+                  "descriptor": "Z"
+                }
+              }
+            }
+          },
+          "instructionMetadata": null
+        }
+      ]
+    },
+    {
+      "case": "mcdev-core/tests/fixtures/expression_engine/EngineAdditionalOracle.kt::javacFlowCases",
+      "args": {
+        "methodName": "concat",
+        "methodDescriptor": "(ILjava/lang/String;)Ljava/lang/String;",
+        "expressions": [
+          "?>?"
+        ],
+        "contextType": "WRAP_OPERATION",
+        "identifierPool": {
+          "members": {
+            "length": [
+              {
+                "kind": "ArrayLengthDef",
+                "value": {}
+              }
+            ]
+          },
+          "types": {
+            "double": [
+              {
+                "kind": "ExactTypeDef",
+                "value": {
+                  "type": "D"
+                }
+              }
+            ],
+            "byte": [
+              {
+                "kind": "ExactTypeDef",
+                "value": {
+                  "type": "B"
+                }
+              }
+            ],
+            "char": [
+              {
+                "kind": "ExactTypeDef",
+                "value": {
+                  "type": "C"
+                }
+              }
+            ],
+            "short": [
+              {
+                "kind": "ExactTypeDef",
+                "value": {
+                  "type": "S"
+                }
+              }
+            ],
+            "float": [
+              {
+                "kind": "ExactTypeDef",
+                "value": {
+                  "type": "F"
+                }
+              }
+            ],
+            "long": [
+              {
+                "kind": "ExactTypeDef",
+                "value": {
+                  "type": "J"
+                }
+              }
+            ],
+            "int": [
+              {
+                "kind": "ExactTypeDef",
+                "value": {
+                  "type": "I"
+                }
+              }
+            ]
+          },
+          "locals": []
+        },
+        "allowIncompleteListInputs": false,
+        "commonSuperClass": {
+          "commonSuperClass": true
+        },
+        "cancellationChecker": {
+          "cancellationChecker": true
+        },
+        "classBytesKey": "63412b8e00f5175554112b3090bb7dac0764b21eb1bd520a7fc932587dcaa069"
+      },
+      "key": [
+        0,
+        0,
+        2,
+        186
+      ],
+      "legalAlternatives": [
+        {
+          "expressionIndex": 0,
+          "expressionStartOffset": 0,
+          "originalInstructionOpcode": 186,
+          "originalInstructionIndex": 2,
+          "capturedType": {
+            "kind": "Exact",
+            "fields": {
+              "descriptor": "Ljava/lang/String;"
+            }
+          },
+          "decorations": {
+            "SIMPLE_EXPRESSION_TYPE": {
+              "constraint": {
+                "kind": "Exact",
+                "fields": {
+                  "descriptor": "Z"
+                }
+              }
+            },
+            "SIMPLE_OPERATION_ARGS": {
+              "constraints": [
+                {
+                  "kind": "Exact",
+                  "fields": {
+                    "descriptor": "Ljava/lang/Object;"
+                  }
+                },
+                {
+                  "kind": "Exact",
+                  "fields": {
+                    "descriptor": "Ljava/lang/Object;"
+                  }
+                }
+              ]
+            },
+            "SIMPLE_OPERATION_PARAM_NAMES": {
+              "names": [
+                "left",
+                "right"
+              ]
+            },
+            "SIMPLE_OPERATION_RETURN_TYPE": {
+              "constraint": {
+                "kind": "Exact",
+                "fields": {
+                  "descriptor": "Z"
+                }
+              }
+            }
+          },
+          "instructionMetadata": null
+        },
+        {
+          "expressionIndex": 0,
+          "expressionStartOffset": 0,
+          "originalInstructionOpcode": 186,
+          "originalInstructionIndex": 2,
+          "capturedType": {
+            "kind": "Exact",
+            "fields": {
+              "descriptor": "Ljava/lang/StringBuilder;"
+            }
+          },
+          "decorations": {
+            "SIMPLE_EXPRESSION_TYPE": {
+              "constraint": {
+                "kind": "Exact",
+                "fields": {
+                  "descriptor": "Z"
+                }
+              }
+            },
+            "SIMPLE_OPERATION_ARGS": {
+              "constraints": [
+                {
+                  "kind": "Exact",
+                  "fields": {
+                    "descriptor": "Ljava/lang/Object;"
+                  }
+                },
+                {
+                  "kind": "Exact",
+                  "fields": {
+                    "descriptor": "Ljava/lang/Object;"
+                  }
+                }
+              ]
+            },
+            "SIMPLE_OPERATION_PARAM_NAMES": {
+              "names": [
+                "left",
+                "right"
+              ]
+            },
+            "SIMPLE_OPERATION_RETURN_TYPE": {
+              "constraint": {
+                "kind": "Exact",
+                "fields": {
+                  "descriptor": "Z"
+                }
+              }
+            }
+          },
+          "instructionMetadata": null
+        }
+      ]
+    },
+    {
+      "case": "mcdev-core/tests/fixtures/expression_engine/EngineAdditionalOracle.kt::javacFlowCases",
+      "args": {
+        "methodName": "concat",
+        "methodDescriptor": "(ILjava/lang/String;)Ljava/lang/String;",
+        "expressions": [
+          "?>=?"
+        ],
+        "contextType": "WRAP_OPERATION",
+        "identifierPool": {
+          "members": {
+            "length": [
+              {
+                "kind": "ArrayLengthDef",
+                "value": {}
+              }
+            ]
+          },
+          "types": {
+            "double": [
+              {
+                "kind": "ExactTypeDef",
+                "value": {
+                  "type": "D"
+                }
+              }
+            ],
+            "byte": [
+              {
+                "kind": "ExactTypeDef",
+                "value": {
+                  "type": "B"
+                }
+              }
+            ],
+            "char": [
+              {
+                "kind": "ExactTypeDef",
+                "value": {
+                  "type": "C"
+                }
+              }
+            ],
+            "short": [
+              {
+                "kind": "ExactTypeDef",
+                "value": {
+                  "type": "S"
+                }
+              }
+            ],
+            "float": [
+              {
+                "kind": "ExactTypeDef",
+                "value": {
+                  "type": "F"
+                }
+              }
+            ],
+            "long": [
+              {
+                "kind": "ExactTypeDef",
+                "value": {
+                  "type": "J"
+                }
+              }
+            ],
+            "int": [
+              {
+                "kind": "ExactTypeDef",
+                "value": {
+                  "type": "I"
+                }
+              }
+            ]
+          },
+          "locals": []
+        },
+        "allowIncompleteListInputs": false,
+        "commonSuperClass": {
+          "commonSuperClass": true
+        },
+        "cancellationChecker": {
+          "cancellationChecker": true
+        },
+        "classBytesKey": "63412b8e00f5175554112b3090bb7dac0764b21eb1bd520a7fc932587dcaa069"
+      },
+      "key": [
+        0,
+        0,
+        2,
+        186
+      ],
+      "legalAlternatives": [
+        {
+          "expressionIndex": 0,
+          "expressionStartOffset": 0,
+          "originalInstructionOpcode": 186,
+          "originalInstructionIndex": 2,
+          "capturedType": {
+            "kind": "Exact",
+            "fields": {
+              "descriptor": "Ljava/lang/String;"
+            }
+          },
+          "decorations": {
+            "SIMPLE_EXPRESSION_TYPE": {
+              "constraint": {
+                "kind": "Exact",
+                "fields": {
+                  "descriptor": "Z"
+                }
+              }
+            },
+            "SIMPLE_OPERATION_ARGS": {
+              "constraints": [
+                {
+                  "kind": "Exact",
+                  "fields": {
+                    "descriptor": "Ljava/lang/Object;"
+                  }
+                },
+                {
+                  "kind": "Exact",
+                  "fields": {
+                    "descriptor": "Ljava/lang/Object;"
+                  }
+                }
+              ]
+            },
+            "SIMPLE_OPERATION_PARAM_NAMES": {
+              "names": [
+                "left",
+                "right"
+              ]
+            },
+            "SIMPLE_OPERATION_RETURN_TYPE": {
+              "constraint": {
+                "kind": "Exact",
+                "fields": {
+                  "descriptor": "Z"
+                }
+              }
+            }
+          },
+          "instructionMetadata": null
+        },
+        {
+          "expressionIndex": 0,
+          "expressionStartOffset": 0,
+          "originalInstructionOpcode": 186,
+          "originalInstructionIndex": 2,
+          "capturedType": {
+            "kind": "Exact",
+            "fields": {
+              "descriptor": "Ljava/lang/StringBuilder;"
+            }
+          },
+          "decorations": {
+            "SIMPLE_EXPRESSION_TYPE": {
+              "constraint": {
+                "kind": "Exact",
+                "fields": {
+                  "descriptor": "Z"
+                }
+              }
+            },
+            "SIMPLE_OPERATION_ARGS": {
+              "constraints": [
+                {
+                  "kind": "Exact",
+                  "fields": {
+                    "descriptor": "Ljava/lang/Object;"
+                  }
+                },
+                {
+                  "kind": "Exact",
+                  "fields": {
+                    "descriptor": "Ljava/lang/Object;"
+                  }
+                }
+              ]
+            },
+            "SIMPLE_OPERATION_PARAM_NAMES": {
+              "names": [
+                "left",
+                "right"
+              ]
+            },
+            "SIMPLE_OPERATION_RETURN_TYPE": {
+              "constraint": {
+                "kind": "Exact",
+                "fields": {
+                  "descriptor": "Z"
+                }
+              }
+            }
+          },
+          "instructionMetadata": null
+        }
+      ]
+    },
+    {
+      "case": "mcdev-core/tests/fixtures/expression_engine/EngineAdditionalOracle.kt::javacFlowCases",
+      "args": {
+        "methodName": "concat",
+        "methodDescriptor": "(ILjava/lang/String;)Ljava/lang/String;",
+        "expressions": [
+          "@(?+?)"
+        ],
+        "contextType": "INJECT",
+        "identifierPool": {
+          "members": {
+            "length": [
+              {
+                "kind": "ArrayLengthDef",
+                "value": {}
+              }
+            ]
+          },
+          "types": {
+            "double": [
+              {
+                "kind": "ExactTypeDef",
+                "value": {
+                  "type": "D"
+                }
+              }
+            ],
+            "byte": [
+              {
+                "kind": "ExactTypeDef",
+                "value": {
+                  "type": "B"
+                }
+              }
+            ],
+            "char": [
+              {
+                "kind": "ExactTypeDef",
+                "value": {
+                  "type": "C"
+                }
+              }
+            ],
+            "short": [
+              {
+                "kind": "ExactTypeDef",
+                "value": {
+                  "type": "S"
+                }
+              }
+            ],
+            "float": [
+              {
+                "kind": "ExactTypeDef",
+                "value": {
+                  "type": "F"
+                }
+              }
+            ],
+            "long": [
+              {
+                "kind": "ExactTypeDef",
+                "value": {
+                  "type": "J"
+                }
+              }
+            ],
+            "int": [
+              {
+                "kind": "ExactTypeDef",
+                "value": {
+                  "type": "I"
+                }
+              }
+            ]
+          },
+          "locals": []
+        },
+        "allowIncompleteListInputs": false,
+        "commonSuperClass": {
+          "commonSuperClass": true
+        },
+        "cancellationChecker": {
+          "cancellationChecker": true
+        },
+        "classBytesKey": "63412b8e00f5175554112b3090bb7dac0764b21eb1bd520a7fc932587dcaa069"
+      },
+      "key": [
+        0,
+        2,
+        2,
+        186
+      ],
+      "legalAlternatives": [
+        {
+          "expressionIndex": 0,
+          "expressionStartOffset": 2,
+          "originalInstructionOpcode": 186,
+          "originalInstructionIndex": 2,
+          "capturedType": {
+            "kind": "Exact",
+            "fields": {
+              "descriptor": "Ljava/lang/StringBuilder;"
+            }
+          },
+          "decorations": {
+            "SIMPLE_EXPRESSION_TYPE": {
+              "constraint": {
+                "kind": "Exact",
+                "fields": {
+                  "descriptor": "Ljava/lang/StringBuilder;"
+                }
+              }
+            },
+            "IS_STRING_CONCAT_EXPRESSION": {
+              "value": true
+            }
+          },
+          "instructionMetadata": null
+        },
+        {
+          "expressionIndex": 0,
+          "expressionStartOffset": 2,
+          "originalInstructionOpcode": 186,
+          "originalInstructionIndex": 2,
+          "capturedType": {
+            "kind": "Exact",
+            "fields": {
+              "descriptor": "Ljava/lang/String;"
+            }
+          },
+          "decorations": {
+            "SIMPLE_EXPRESSION_TYPE": {
+              "constraint": {
+                "kind": "Exact",
+                "fields": {
+                  "descriptor": "Ljava/lang/String;"
+                }
+              }
+            }
+          },
+          "instructionMetadata": null
+        }
+      ]
+    },
+    {
+      "case": "mcdev-core/tests/fixtures/expression_engine/EngineAdditionalOracle.kt::javacFlowCases",
+      "args": {
+        "methodName": "concat",
+        "methodDescriptor": "(ILjava/lang/String;)Ljava/lang/String;",
+        "expressions": [
+          "@(?+?)"
+        ],
+        "contextType": "MODIFY_EXPRESSION_VALUE",
+        "identifierPool": {
+          "members": {
+            "length": [
+              {
+                "kind": "ArrayLengthDef",
+                "value": {}
+              }
+            ]
+          },
+          "types": {
+            "double": [
+              {
+                "kind": "ExactTypeDef",
+                "value": {
+                  "type": "D"
+                }
+              }
+            ],
+            "byte": [
+              {
+                "kind": "ExactTypeDef",
+                "value": {
+                  "type": "B"
+                }
+              }
+            ],
+            "char": [
+              {
+                "kind": "ExactTypeDef",
+                "value": {
+                  "type": "C"
+                }
+              }
+            ],
+            "short": [
+              {
+                "kind": "ExactTypeDef",
+                "value": {
+                  "type": "S"
+                }
+              }
+            ],
+            "float": [
+              {
+                "kind": "ExactTypeDef",
+                "value": {
+                  "type": "F"
+                }
+              }
+            ],
+            "long": [
+              {
+                "kind": "ExactTypeDef",
+                "value": {
+                  "type": "J"
+                }
+              }
+            ],
+            "int": [
+              {
+                "kind": "ExactTypeDef",
+                "value": {
+                  "type": "I"
+                }
+              }
+            ]
+          },
+          "locals": []
+        },
+        "allowIncompleteListInputs": false,
+        "commonSuperClass": {
+          "commonSuperClass": true
+        },
+        "cancellationChecker": {
+          "cancellationChecker": true
+        },
+        "classBytesKey": "63412b8e00f5175554112b3090bb7dac0764b21eb1bd520a7fc932587dcaa069"
+      },
+      "key": [
+        0,
+        2,
+        2,
+        186
+      ],
+      "legalAlternatives": [
+        {
+          "expressionIndex": 0,
+          "expressionStartOffset": 2,
+          "originalInstructionOpcode": 186,
+          "originalInstructionIndex": 2,
+          "capturedType": {
+            "kind": "Exact",
+            "fields": {
+              "descriptor": "Ljava/lang/StringBuilder;"
+            }
+          },
+          "decorations": {
+            "SIMPLE_EXPRESSION_TYPE": {
+              "constraint": {
+                "kind": "Exact",
+                "fields": {
+                  "descriptor": "Ljava/lang/StringBuilder;"
+                }
+              }
+            },
+            "IS_STRING_CONCAT_EXPRESSION": {
+              "value": true
+            }
+          },
+          "instructionMetadata": null
+        },
+        {
+          "expressionIndex": 0,
+          "expressionStartOffset": 2,
+          "originalInstructionOpcode": 186,
+          "originalInstructionIndex": 2,
+          "capturedType": {
+            "kind": "Exact",
+            "fields": {
+              "descriptor": "Ljava/lang/String;"
+            }
+          },
+          "decorations": {
+            "SIMPLE_EXPRESSION_TYPE": {
+              "constraint": {
+                "kind": "Exact",
+                "fields": {
+                  "descriptor": "Ljava/lang/String;"
+                }
+              }
+            }
+          },
+          "instructionMetadata": null
+        }
+      ]
+    },
+    {
+      "case": "mcdev-core/tests/fixtures/expression_engine/EngineAdditionalOracle.kt::javacFlowCases",
+      "args": {
+        "methodName": "concat",
+        "methodDescriptor": "(ILjava/lang/String;)Ljava/lang/String;",
+        "expressions": [
+          "@(?+?)"
+        ],
+        "contextType": "MODIFY_VARIABLE",
+        "identifierPool": {
+          "members": {
+            "length": [
+              {
+                "kind": "ArrayLengthDef",
+                "value": {}
+              }
+            ]
+          },
+          "types": {
+            "double": [
+              {
+                "kind": "ExactTypeDef",
+                "value": {
+                  "type": "D"
+                }
+              }
+            ],
+            "byte": [
+              {
+                "kind": "ExactTypeDef",
+                "value": {
+                  "type": "B"
+                }
+              }
+            ],
+            "char": [
+              {
+                "kind": "ExactTypeDef",
+                "value": {
+                  "type": "C"
+                }
+              }
+            ],
+            "short": [
+              {
+                "kind": "ExactTypeDef",
+                "value": {
+                  "type": "S"
+                }
+              }
+            ],
+            "float": [
+              {
+                "kind": "ExactTypeDef",
+                "value": {
+                  "type": "F"
+                }
+              }
+            ],
+            "long": [
+              {
+                "kind": "ExactTypeDef",
+                "value": {
+                  "type": "J"
+                }
+              }
+            ],
+            "int": [
+              {
+                "kind": "ExactTypeDef",
+                "value": {
+                  "type": "I"
+                }
+              }
+            ]
+          },
+          "locals": []
+        },
+        "allowIncompleteListInputs": false,
+        "commonSuperClass": {
+          "commonSuperClass": true
+        },
+        "cancellationChecker": {
+          "cancellationChecker": true
+        },
+        "classBytesKey": "63412b8e00f5175554112b3090bb7dac0764b21eb1bd520a7fc932587dcaa069"
+      },
+      "key": [
+        0,
+        2,
+        2,
+        186
+      ],
+      "legalAlternatives": [
+        {
+          "expressionIndex": 0,
+          "expressionStartOffset": 2,
+          "originalInstructionOpcode": 186,
+          "originalInstructionIndex": 2,
+          "capturedType": {
+            "kind": "Exact",
+            "fields": {
+              "descriptor": "Ljava/lang/String;"
+            }
+          },
+          "decorations": {
+            "SIMPLE_EXPRESSION_TYPE": {
+              "constraint": {
+                "kind": "Exact",
+                "fields": {
+                  "descriptor": "Ljava/lang/String;"
+                }
+              }
+            }
+          },
+          "instructionMetadata": null
+        },
+        {
+          "expressionIndex": 0,
+          "expressionStartOffset": 2,
+          "originalInstructionOpcode": 186,
+          "originalInstructionIndex": 2,
+          "capturedType": {
+            "kind": "Exact",
+            "fields": {
+              "descriptor": "Ljava/lang/StringBuilder;"
+            }
+          },
+          "decorations": {
+            "SIMPLE_EXPRESSION_TYPE": {
+              "constraint": {
+                "kind": "Exact",
+                "fields": {
+                  "descriptor": "Ljava/lang/StringBuilder;"
+                }
+              }
+            },
+            "IS_STRING_CONCAT_EXPRESSION": {
+              "value": true
+            }
+          },
+          "instructionMetadata": null
+        }
+      ]
+    },
+    {
+      "case": "mcdev-core/tests/fixtures/expression_engine/EngineAdditionalOracle.kt::javacFlowCases",
+      "args": {
+        "methodName": "concat",
+        "methodDescriptor": "(ILjava/lang/String;)Ljava/lang/String;",
+        "expressions": [
+          "@(?+?)"
+        ],
+        "contextType": "SLICE",
+        "identifierPool": {
+          "members": {
+            "length": [
+              {
+                "kind": "ArrayLengthDef",
+                "value": {}
+              }
+            ]
+          },
+          "types": {
+            "double": [
+              {
+                "kind": "ExactTypeDef",
+                "value": {
+                  "type": "D"
+                }
+              }
+            ],
+            "byte": [
+              {
+                "kind": "ExactTypeDef",
+                "value": {
+                  "type": "B"
+                }
+              }
+            ],
+            "char": [
+              {
+                "kind": "ExactTypeDef",
+                "value": {
+                  "type": "C"
+                }
+              }
+            ],
+            "short": [
+              {
+                "kind": "ExactTypeDef",
+                "value": {
+                  "type": "S"
+                }
+              }
+            ],
+            "float": [
+              {
+                "kind": "ExactTypeDef",
+                "value": {
+                  "type": "F"
+                }
+              }
+            ],
+            "long": [
+              {
+                "kind": "ExactTypeDef",
+                "value": {
+                  "type": "J"
+                }
+              }
+            ],
+            "int": [
+              {
+                "kind": "ExactTypeDef",
+                "value": {
+                  "type": "I"
+                }
+              }
+            ]
+          },
+          "locals": []
+        },
+        "allowIncompleteListInputs": false,
+        "commonSuperClass": {
+          "commonSuperClass": true
+        },
+        "cancellationChecker": {
+          "cancellationChecker": true
+        },
+        "classBytesKey": "63412b8e00f5175554112b3090bb7dac0764b21eb1bd520a7fc932587dcaa069"
+      },
+      "key": [
+        0,
+        2,
+        2,
+        186
+      ],
+      "legalAlternatives": [
+        {
+          "expressionIndex": 0,
+          "expressionStartOffset": 2,
+          "originalInstructionOpcode": 186,
+          "originalInstructionIndex": 2,
+          "capturedType": {
+            "kind": "Exact",
+            "fields": {
+              "descriptor": "Ljava/lang/StringBuilder;"
+            }
+          },
+          "decorations": {
+            "SIMPLE_EXPRESSION_TYPE": {
+              "constraint": {
+                "kind": "Exact",
+                "fields": {
+                  "descriptor": "Ljava/lang/StringBuilder;"
+                }
+              }
+            },
+            "IS_STRING_CONCAT_EXPRESSION": {
+              "value": true
+            }
+          },
+          "instructionMetadata": null
+        },
+        {
+          "expressionIndex": 0,
+          "expressionStartOffset": 2,
+          "originalInstructionOpcode": 186,
+          "originalInstructionIndex": 2,
+          "capturedType": {
+            "kind": "Exact",
+            "fields": {
+              "descriptor": "Ljava/lang/String;"
+            }
+          },
+          "decorations": {
+            "SIMPLE_EXPRESSION_TYPE": {
+              "constraint": {
+                "kind": "Exact",
+                "fields": {
+                  "descriptor": "Ljava/lang/String;"
+                }
+              }
+            }
+          },
+          "instructionMetadata": null
+        }
+      ]
+    },
+    {
+      "case": "mcdev-core/tests/fixtures/expression_engine/EngineAdditionalOracle.kt::stackWideAndConstantKinds",
+      "args": {
+        "methodName": "run",
+        "methodDescriptor": "()I",
+        "expressions": [
+          "?"
+        ],
+        "contextType": "WRAP_OPERATION",
+        "identifierPool": {
+          "members": {
+            "length": [
+              {
+                "kind": "ArrayLengthDef",
+                "value": {}
+              }
+            ]
+          },
+          "types": {
+            "double": [
+              {
+                "kind": "ExactTypeDef",
+                "value": {
+                  "type": "D"
+                }
+              }
+            ],
+            "byte": [
+              {
+                "kind": "ExactTypeDef",
+                "value": {
+                  "type": "B"
+                }
+              }
+            ],
+            "char": [
+              {
+                "kind": "ExactTypeDef",
+                "value": {
+                  "type": "C"
+                }
+              }
+            ],
+            "short": [
+              {
+                "kind": "ExactTypeDef",
+                "value": {
+                  "type": "S"
+                }
+              }
+            ],
+            "float": [
+              {
+                "kind": "ExactTypeDef",
+                "value": {
+                  "type": "F"
+                }
+              }
+            ],
+            "long": [
+              {
+                "kind": "ExactTypeDef",
+                "value": {
+                  "type": "J"
+                }
+              }
+            ],
+            "int": [
+              {
+                "kind": "ExactTypeDef",
+                "value": {
+                  "type": "I"
+                }
+              }
+            ]
+          },
+          "locals": []
+        },
+        "allowIncompleteListInputs": false,
+        "commonSuperClass": {
+          "commonSuperClass": true
+        },
+        "cancellationChecker": {
+          "cancellationChecker": true
+        },
+        "classBytesKey": "12e26e4873ba1ce2bbc11dc613f4fe78210b66ac93b643d4a54ac277fcac8c69"
+      },
+      "key": [
+        0,
+        0,
+        2,
+        132
+      ],
+      "legalAlternatives": [
+        {
+          "expressionIndex": 0,
+          "expressionStartOffset": 0,
+          "originalInstructionOpcode": 132,
+          "originalInstructionIndex": 2,
+          "capturedType": {
+            "kind": "Exact",
+            "fields": {
+              "descriptor": "I"
+            }
+          },
+          "decorations": {
+            "SIMPLE_EXPRESSION_TYPE": {
+              "constraint": {
+                "kind": "Exact",
+                "fields": {
+                  "descriptor": "I"
+                }
+              }
+            }
+          },
+          "instructionMetadata": null
+        },
+        {
+          "expressionIndex": 0,
+          "expressionStartOffset": 0,
+          "originalInstructionOpcode": 132,
+          "originalInstructionIndex": 2,
+          "capturedType": {
+            "kind": "Exact",
+            "fields": {
+              "descriptor": "V"
+            }
+          },
+          "decorations": {},
+          "instructionMetadata": null
+        }
+      ]
+    }
+  ]
+}

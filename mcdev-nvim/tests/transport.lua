@@ -4,6 +4,7 @@ package.path = root .. "/mcdev-nvim/lua/?.lua;" .. root .. "/mcdev-nvim/lua/?/in
 local helpers = dofile(root .. "/mcdev-nvim/tests/test_helpers.lua")
 require("mcdev")
 local transport = require("mcdev.transport")
+local protocol = require("mcdev.protocol")
 
 helpers.assert_true(
   type(vim.lsp.handlers[transport.notification_method]) == "function",
@@ -11,7 +12,7 @@ helpers.assert_true(
 )
 
 local original_get_clients = vim.lsp.get_clients
-local active_client = { id = 71, name = "jdtls", config = { root_dir = root } }
+local active_client = { id = 71, name = "ktlsp", config = { root_dir = root } }
 vim.lsp.handlers[transport.notification_method](nil, {
   protocolVersion = 1,
   host = "127.0.0.1",
@@ -22,7 +23,7 @@ vim.lsp.handlers[transport.notification_method](nil, {
 helpers.assert_eq(transport.endpoint(active_client.id).port, 38740)
 
 vim.lsp.get_clients = function(opts)
-  if opts and (opts.bufnr == 0 or opts.name == "jdtls") then
+  if opts and (opts.bufnr == 0 or opts.name == "ktlsp") then
     return { active_client }
   end
   return {}
@@ -42,7 +43,7 @@ transport.handle_notification(nil, {
 }, { client_id = active_client.id })
 helpers.assert_eq(transport.endpoint(active_client.id).port, 38741)
 
-active_client = { id = 74, name = "jdtls", config = { root_dir = root } }
+active_client = { id = 74, name = "ktlsp", config = { root_dir = root } }
 transport.handle_notification(nil, {
   {
     protocolVersion = 1,
@@ -62,7 +63,7 @@ transport.handle_notification(nil, {
 }, { client_id = 75 })
 helpers.assert_nil(transport.endpoint(75))
 
-active_client = { id = 73, name = "jdtls", config = { root_dir = root } }
+active_client = { id = 73, name = "ktlsp", config = { root_dir = root } }
 local cancelled, unavailable = transport.request({}, function() end, 0)
 helpers.assert_nil(cancelled)
 helpers.assert_true(unavailable:find("unavailable", 1, true) ~= nil)
@@ -76,6 +77,7 @@ helpers.assert_nil(transport.endpoint(71))
 
 local ready_count = 0
 local removed_count = 0
+active_client.server_capabilities = { executeCommandProvider = { commands = vim.tbl_values(protocol.commands) } }
 local stop_ready = transport.when_ready(0, function() ready_count = ready_count + 1 end)
 local remove_ready = transport.when_ready(0, function() removed_count = removed_count + 1 end)
 remove_ready()

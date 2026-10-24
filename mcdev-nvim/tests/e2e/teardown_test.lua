@@ -8,7 +8,7 @@ local client = {
   stop = function(_, force) stops[#stops + 1] = force end,
   is_stopped = function() return true end,
 }
-_G.mcdev_e2e_jdtls_exit = { exited = false }
+_G.mcdev_e2e_ktlsp_exit = { exited = false }
 _G.dofile = function() end -- The editor assertions have already finished.
 vim.wait = function() return false end -- Process remains alive past the deadline.
 vim.lsp.get_clients = function() return { client } end

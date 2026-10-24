@@ -1,0 +1,92 @@
+[
+  {
+    "path": "classes/demo/Alpha.class.bin",
+    "sha256": "e55af085e71df48a10d89702a62269149b64373f9dfdc152dc48b86eb5cb4f4a",
+    "bytes": 254
+  },
+  {
+    "path": "classes/demo/Beta.class.bin",
+    "sha256": "13969b42db4ea361410c3efc9f17360220c2f4f344b8659939cc47dd8b4e0440",
+    "bytes": 267
+  },
+  {
+    "path": "classes/demo/Cache0.class.bin",
+    "sha256": "bf9abda47742b585a463ec20e04a976c38011bf69672c2dc9498db23c74d2911",
+    "bytes": 235
+  },
+  {
+    "path": "classes/demo/Cache1.class.bin",
+    "sha256": "040c80b11ebb90e45e5464e18bd79094ae3be4234204cede9d0d2d7c4e95ebd0",
+    "bytes": 235
+  },
+  {
+    "path": "classes/demo/Cache2.class.bin",
+    "sha256": "b73716c9a9a3f5916e1f551da00792d429bdf0529c6bd1c989a793c110e1fc7d",
+    "bytes": 235
+  },
+  {
+    "path": "classes/demo/Cache3.class.bin",
+    "sha256": "7b8071b4ea96be89848f0385d4fc4e0545885b186ef2e8b4f3c5e5bff4518c24",
+    "bytes": 235
+  },
+  {
+    "path": "classes/demo/Cache4.class.bin",
+    "sha256": "dc6942fb9c457be085c06689962fd460cb28a36225ffa6e3dade71f3647ebb48",
+    "bytes": 235
+  },
+  {
+    "path": "classes/exact/demo/Alpha.class.bin",
+    "sha256": "f0ed577dafbb084916d870ef08387508c2244da1471b7222e2b3bf030925fd76",
+    "bytes": 234
+  },
+  {
+    "path": "classes/hierarchy/Base.class.bin",
+    "sha256": "503b054e7838784194cb8eefb4f2bb1d79a92de294c1838f3b98a758d7b61f2a",
+    "bytes": 192
+  },
+  {
+    "path": "classes/hierarchy/ChildOne.class.bin",
+    "sha256": "fa2aa9e1335cb87cde6c5aac4d413ca734391f83e5f3d408dc0e64c718b45506",
+    "bytes": 198
+  },
+  {
+    "path": "classes/hierarchy/ChildTwo.class.bin",
+    "sha256": "6dfc17b984088d0c153852b394bbaebd608e71ad7c3b394f3801432d9c2b6fc3",
+    "bytes": 198
+  },
+  {
+    "path": "classes/hierarchy/Peer.class.bin",
+    "sha256": "44a6e1292c704b4ed9cb7c33c00acf02707ecbd352612c9bb552710e7354f90e",
+    "bytes": 192
+  },
+  {
+    "path": "classes/test/ClassBytesSamples.class.bin",
+    "sha256": "7a52620bb002209e34aa3422fb5b32ce96b1bb98b9262ce6b46c51773e826410",
+    "bytes": 213
+  },
+  {
+    "path": "classes/test/ConcurrentSamples.class.bin",
+    "sha256": "fb0c79ac3ce8e5d981eb33004567c31fa455e130abc6f0ab9739bf8d8268cd2b",
+    "bytes": 467
+  },
+  {
+    "path": "classes/test/ConstantSamples.class.bin",
+    "sha256": "9886a4eb47ded98cbbc08f5944a92f480f18d0be19025794c9aa8fbdcb9b2efe",
+    "bytes": 272
+  },
+  {
+    "path": "classes/test/FieldAccessSamples.class.bin",
+    "sha256": "de3e366b985abbc2301440dffe3a1a622a5713a728365d4a59243c092a2332f7",
+    "bytes": 437
+  },
+  {
+    "path": "classes/test/InvokeClassificationSamples.class.bin",
+    "sha256": "a8e7b93feade5c95b8396e127dd342e2775487ecbe423796191f60691b197abc",
+    "bytes": 349
+  },
+  {
+    "path": "classes/test/OverloadInvokeSamples.class.bin",
+    "sha256": "73dfb8de512ac2db28f928a11f47d993f55d15c8390bfeb61c0385b9198f49ec",
+    "bytes": 526
+  }
+]

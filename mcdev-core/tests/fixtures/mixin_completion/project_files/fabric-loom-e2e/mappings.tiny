@@ -1,0 +1,3 @@
+tiny	2	0	named	intermediary
+c	com/example/target/SimpleTarget	com/example/target/SimpleTarget
+	m	(Ljava/lang/String;FF)V	draw	method_1
