@@ -1,4 +1,16 @@
 vim.opt.runtimepath:prepend(vim.fn.getcwd() .. "/mcdev-nvim")
+if package.config:sub(1, 1) == "\\" then
+  local set_name = vim.api.nvim_buf_set_name
+  vim.api.nvim_buf_set_name = function(bufnr, name)
+    -- Neovim 0.11 treats POSIX fixture names as cwd-relative on Windows.
+    if name:sub(1, 1) == "/" and name:sub(1, 2) ~= "//" then
+      local cwd = ((vim.uv or vim.loop).cwd() or ""):gsub("\\", "/")
+      local volume = cwd:match("^%a:") or cwd:match("^//[^/]+/[^/]+")
+      if volume then name = volume .. name end
+    end
+    return set_name(bufnr, name)
+  end
+end
 local evidence = {}
 _G.mcdev_record_assertion = function(kind, caller)
   if not caller then return end

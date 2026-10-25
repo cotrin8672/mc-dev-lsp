@@ -490,6 +490,39 @@ check("mcdev actions without standard clients", function()
   h.assert_eq(#result, 1)
 end)
 
+check("code action params retain per-client request snapshots", function()
+  local original_buf_request_all = vim.lsp.buf_request_all
+  local original_standard_actions = actions.code_actions
+  local ok, err = pcall(function()
+    clients = { client(1, "utf-16"), client(2, "utf-8") }
+    actions.code_actions = function(_, _, _, cb) cb({}, nil) end
+    local sent = {}
+    vim.lsp.buf_request_all = function(_, _, request_params, handler)
+      for _, standard_client in ipairs(clients) do
+        sent[standard_client.id] = request_params(standard_client)
+      end
+      handler({
+        [1] = { result = { { title = "UTF-16 action" } } },
+        [2] = { result = { { title = "UTF-8 action" } } },
+      }, { client_id = 2, params = sent[2] })
+    end
+
+    local merged
+    lsp.code_actions(bufnr, range(4), {}, function(items) merged = items end)
+    local by_client = {}
+    for _, action in ipairs(merged) do
+      by_client[action._mcdev_client_id] = action
+    end
+    for client_id, request_params in pairs(sent) do
+      h.assert_true(vim.deep_equal(by_client[client_id]._mcdev_request_params, request_params),
+        "retain request params for each client")
+    end
+  end)
+  vim.lsp.buf_request_all = original_buf_request_all
+  actions.code_actions = original_standard_actions
+  if not ok then error(err) end
+end)
+
 vim.lsp.get_clients = original_get_clients
 vim.lsp.get_client_by_id = original_get_client
 actions.code_actions = original_actions

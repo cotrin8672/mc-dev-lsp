@@ -249,7 +249,15 @@ function M.code_actions(bufnr, range, diagnostic_codes, cb)
     if cb then cb(merged, err) end
   end
 
-  local function collect_standard(results)
+  local standard_request_params = {}
+  local function request_params_for(client)
+    if standard_request_params[client.id] == nil then
+      standard_request_params[client.id] = params(client)
+    end
+    return standard_request_params[client.id]
+  end
+
+  local function collect_standard(results, request_context)
     standard_actions = {}
     for client_id, response in pairs(results or {}) do
       local response_error = response.err or response.error
@@ -257,13 +265,15 @@ function M.code_actions(bufnr, range, diagnostic_codes, cb)
         standard_error = type(response_error) == "table" and (response_error.message or vim.inspect(response_error))
           or tostring(response_error)
       end
-      local request_context = response.context or response.ctx
+      local response_context = response.context or response.ctx
       for _, action in ipairs(response.result ~= vim.NIL and response.result or {}) do
         local item = vim.deepcopy(action)
         item._mcdev_snapshots = buffer.edit_snapshots(item.edit, snapshot and { [snapshot.uri] = snapshot } or {})
         item._mcdev_client_id = client_id
-        if request_context and request_context.params then
-          item._mcdev_request_params = vim.deepcopy(request_context.params)
+        local params = response_context and response_context.params or standard_request_params[client_id]
+        if not params and request_context then params = request_context.params end
+        if params then
+          item._mcdev_request_params = vim.deepcopy(params)
         end
         standard_actions[#standard_actions + 1] = item
       end
@@ -271,8 +281,15 @@ function M.code_actions(bufnr, range, diagnostic_codes, cb)
     finish()
   end
 
-  if #vim.lsp.get_clients({ bufnr = bufnr, method = "textDocument/codeAction" }) > 0 then
-    vim.lsp.buf_request_all(bufnr, "textDocument/codeAction", params, collect_standard)
+  local standard_clients = vim.lsp.get_clients({ bufnr = bufnr, method = "textDocument/codeAction" })
+  for _, client in ipairs(standard_clients) do
+    request_params_for(client)
+  end
+
+  if #standard_clients > 0 then
+    vim.lsp.buf_request_all(bufnr, "textDocument/codeAction", request_params_for, function(results, request_context)
+      collect_standard(results, request_context)
+    end)
   else
     collect_standard({})
   end
