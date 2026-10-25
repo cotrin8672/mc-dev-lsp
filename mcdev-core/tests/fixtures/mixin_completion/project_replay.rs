@@ -167,6 +167,19 @@ fn materialize(v: &Value, root: &Path) -> Value {
         _ => v.clone(),
     }
 }
+// The captured Kotlin tests serialize Path values with Windows separators. Keep
+// the conversion at the replay boundary so production Path semantics remain
+// native and the fixture's path fields work on POSIX hosts too.
+fn replay_path(raw: &str) -> PathBuf {
+    #[cfg(windows)]
+    {
+        PathBuf::from(raw)
+    }
+    #[cfg(not(windows))]
+    {
+        PathBuf::from(raw.replace('\\', "/"))
+    }
+}
 fn base64(s: &str) -> Vec<u8> {
     let mut bits = 0u32;
     let mut count = 0;
@@ -228,7 +241,7 @@ fn context(v: &Value) -> ProjectContext {
 }
 fn replay(row: &Value) -> Result<Value, String> {
     let a = &row["args"];
-    let path = |k| PathBuf::from(text(a, k));
+    let path = |k| replay_path(text(a, k));
     let io = |e: std::io::Error| e.to_string();
     Ok(match text(row, "api") {
         "PlatformDetector.detect" => encoded(PlatformDetector::detect(&parse::<Vec<String>>(
@@ -433,5 +446,19 @@ pub fn replay_case(case: &str) {
                 row["api"]
             );
         }
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::replay_path;
+    use std::path::Path;
+
+    #[test]
+    fn replay_path_maps_recorded_windows_separators_to_native_components() {
+        assert_eq!(
+            replay_path(r"build\loom-cache\remapped"),
+            Path::new("build").join("loom-cache").join("remapped")
+        );
     }
 }

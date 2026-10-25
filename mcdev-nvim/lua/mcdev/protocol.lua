@@ -31,6 +31,12 @@ local function normalize_path(path)
     return nil
   end
   local normalized = vim.fs and vim.fs.normalize and vim.fs.normalize(path) or path:gsub("\\", "/")
+  if package.config:sub(1, 1) == "\\" and normalized:sub(1, 1) == "/" and normalized:sub(1, 2) ~= "//" then
+    -- Neovim 0.11 adds a drive to buffer names on Windows.
+    local cwd = ((vim.uv or vim.loop).cwd() or ""):gsub("\\", "/")
+    local volume = cwd:match("^%a:") or cwd:match("^//[^/]+/[^/]+")
+    if volume then normalized = volume .. normalized end
+  end
   return normalized:gsub("/+$", "")
 end
 

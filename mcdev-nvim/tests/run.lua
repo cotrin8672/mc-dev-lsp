@@ -2008,5 +2008,23 @@ dofile(vim.fn.getcwd() .. "/mcdev-nvim/tests/cmp_positions.lua")
 dofile(vim.fn.getcwd() .. "/mcdev-nvim/tests/cmp_routing.lua")
 dofile(vim.fn.getcwd() .. "/mcdev-nvim/tests/transport.lua")
 dofile(vim.fn.getcwd() .. "/mcdev-nvim/tests/backend_contract.lua")
+if package.config:sub(1, 1) == "\\" then
+  local explicit_drive = vim.fs.normalize(vim.fn.fnamemodify("/project", ":p")) .. "/src/main/java/DriveRoot.java"
+  with_named_buffer(explicit_drive, "java", { "class DriveRoot {}" }, function(bufnr)
+    local original = vim.lsp.get_clients
+    local client = { name = "ktlsp", config = { root_dir = "/project" } }
+    vim.lsp.get_clients = function() return { client } end
+    local selected = protocol.active_ktlsp_client(bufnr)
+    local uv = vim.uv or vim.loop
+    local original_cwd = uv.cwd
+    local other_drive = explicit_drive:sub(1, 1):upper() == "Z" and "Y" or "Z"
+    uv.cwd = function() return other_drive .. ":/mcdev-test-cwd" end
+    local other_volume = protocol.active_ktlsp_client(bufnr)
+    uv.cwd = original_cwd
+    vim.lsp.get_clients = original
+    helpers.assert_eq(selected, client)
+    helpers.assert_nil(other_volume)
+  end)
+end
 print("mcdev-nvim adapter tests passed")
 vim.cmd("qa!")
