@@ -12,6 +12,7 @@ use mcdev_core::{
         ProjectSourceQuery, SemanticAvailability, SourceAuthority, SourceQueryResult,
     },
     mixin_facade::{HostMixinSourceProvider, RegisteredMixinSource},
+    mixin_navigation::ResolvedDefinition,
     mixin_source::{MixinSemanticModelParser, ParseConfidence, ParseSource},
     mixinextras_handler::HandlerReferenceTypeResolver,
     model::{ClassIndex, ClassIndexEntry, FieldIndexEntry, MethodIndexEntry, SourceScanEntry},
@@ -21,10 +22,11 @@ use mcdev_core::{
     },
 };
 use mcdev_protocol::{
-    McdevClientInfo, McdevCodeActionResponse, McdevCommands, McdevCompletionOptions,
-    McdevCompletionRequest, McdevCompletionResponse, McdevCompletionTrigger,
-    McdevDiagnosticsResponse, McdevErrorCode, McdevPosition, McdevRange, McdevRequestContext,
-    McdevTextEdit, PROTOCOL_VERSION,
+    McdevClientInfo, McdevCodeActionRequest, McdevCodeActionResponse, McdevCommands,
+    McdevCompletionOptions, McdevCompletionRequest, McdevCompletionResponse,
+    McdevCompletionTrigger, McdevDefinitionRequest, McdevDefinitionResponse,
+    McdevDiagnosticsRequest, McdevDiagnosticsResponse, McdevErrorCode, McdevPosition, McdevRange,
+    McdevRequestContext, McdevTextEdit, PROTOCOL_VERSION,
 };
 use std::{
     path::Path,
@@ -36,6 +38,13 @@ use std::{
 
 const SOURCE: &str = r#"@Mixin(Target.class) class Patch { @Inject(method = "ti", at = @At("HEAD")) void handler() {} }"#;
 const EXPRESSION_SOURCE: &str = r#"@Mixin(Target.class) class Patch { @ModifyExpressionValue(method = "tick", at = @At("MIXINEXTRAS:EXPRESSION")) @Expression("Target.") int handler(int value) { return value; } }"#;
+const DIRECT_DEFINITION_SOURCE: &str = r#"@Mixin(com.example.target.SimpleTarget.class)
+abstract class ExampleMixin {
+    @Definition(id = "drawCall")
+    @ModifyExpressionValue(method = "draw(Ljava/lang/String;FF)V", at = @At("MIXINEXTRAS:EXPRESSION"))
+    @Expression("drawCall")
+    private int mcdev$handler(int original) { return original; }
+}"#;
 const REFERENCE_SOURCE: &str = r#"@Mixin(Target.class) class Patch { @Inject(method = "tick", at = @At("HEAD")) UnknownType handler(UnknownType value) { return value; } }"#;
 const CONFIG_SOURCE: &str = r#"package fixture; @Mixin(Target.class) class Patch {}"#;
 const CONFIG_CONTENT: &str = r#"{"package":"fixture","mixins":[]}"#;
@@ -46,8 +55,10 @@ struct Query {
     stale: Arc<AtomicBool>,
     catalog_reads: Arc<AtomicUsize>,
     bytes_reads: Arc<AtomicUsize>,
+    definition_reads: Arc<AtomicUsize>,
     catalog_unavailable: bool,
     bytes_unavailable: bool,
+    definition: HostFact<ResolvedDefinition>,
 }
 
 impl HostProjectQuery for Query {
@@ -94,10 +105,23 @@ impl HostProjectQuery for Query {
             Ok(HostAnswer::missing(vec![]))
         }
     }
+
+    fn definition(
+        &self,
+        _identity: &HostSessionIdentity,
+        _target: &mcdev_core::McDefinitionTarget,
+    ) -> Result<HostAnswer<ResolvedDefinition>, HostSourceError> {
+        self.definition_reads.fetch_add(1, Ordering::AcqRel);
+        Ok(HostAnswer {
+            fact: self.definition.clone(),
+            reads: vec![],
+        })
+    }
 }
 
 struct SemanticFacts {
     stale_after_parse: Option<Arc<AtomicBool>>,
+    parse_calls: Arc<AtomicUsize>,
 }
 
 impl HostReadValidator for SemanticFacts {
@@ -115,6 +139,7 @@ impl HostSemanticModelProvider for SemanticFacts {
         &self,
         request: &HostSemanticRequest<'_>,
     ) -> Result<HostAnswer<HostSemanticModel>, HostSourceError> {
+        self.parse_calls.fetch_add(1, Ordering::AcqRel);
         let mut model = MixinSemanticModelParser::parse(request.source, request.source_uri);
         for target in &mut model.targets {
             if target.internal_name == "Target" {
@@ -308,6 +333,7 @@ struct Fixture {
     session: Arc<HostProjectSession>,
     workspace: String,
     query: Query,
+    semantic_calls: Arc<AtomicUsize>,
 }
 
 fn fixture(
@@ -316,6 +342,24 @@ fn fixture(
     bytes_unavailable: bool,
     source_inventory: HostFact<Vec<SourceScanEntry>>,
     stale_during_compute: bool,
+) -> Fixture {
+    fixture_with_definition(
+        source_overlay,
+        catalog_unavailable,
+        bytes_unavailable,
+        source_inventory,
+        stale_during_compute,
+        HostFact::Missing,
+    )
+}
+
+fn fixture_with_definition(
+    source_overlay: bool,
+    catalog_unavailable: bool,
+    bytes_unavailable: bool,
+    source_inventory: HostFact<Vec<SourceScanEntry>>,
+    stale_during_compute: bool,
+    definition: HostFact<ResolvedDefinition>,
 ) -> Fixture {
     static NEXT_FIXTURE: AtomicUsize = AtomicUsize::new(0);
     let root = std::env::temp_dir().join(format!(
@@ -368,8 +412,10 @@ fn fixture(
         stale: Arc::new(AtomicBool::new(false)),
         catalog_reads: Arc::new(AtomicUsize::new(0)),
         bytes_reads: Arc::new(AtomicUsize::new(0)),
+        definition_reads: Arc::new(AtomicUsize::new(0)),
         catalog_unavailable,
         bytes_unavailable,
+        definition,
     };
     let query_arc: Arc<dyn HostProjectQuery> = Arc::new(query.clone());
     let mut context = ProjectContextBuilder::empty("fixture", root);
@@ -403,6 +449,7 @@ fn fixture(
         cache_hit: true,
         fingerprint: "fixture-fingerprint".into(),
     };
+    let semantic_calls = Arc::new(AtomicUsize::new(0));
     let host = Arc::new(
         CoreCommandHost::new(
             session.clone(),
@@ -410,6 +457,7 @@ fn fixture(
             query_arc,
             Arc::new(SemanticFacts {
                 stale_after_parse: stale_during_compute.then_some(query.stale.clone()),
+                parse_calls: semantic_calls.clone(),
             }),
             Arc::new(Sources { config }),
             source_inventory,
@@ -430,6 +478,7 @@ fn fixture(
         session,
         workspace,
         query,
+        semantic_calls,
     }
 }
 
@@ -452,6 +501,15 @@ fn context(
             name: "core-command-fixture".into(),
             version: "1".into(),
         },
+    }
+}
+
+fn position_at(source: &str, offset: usize) -> McdevPosition {
+    let position =
+        mcdev_core::model::offset_to_position(source, offset).expect("fixture offset is valid");
+    McdevPosition {
+        line: i32::try_from(position.line).expect("fixture line fits protocol"),
+        character: i32::try_from(position.character).expect("fixture character fits protocol"),
     }
 }
 
@@ -533,6 +591,291 @@ fn apply_protocol_edits(text: &str, edits: &[McdevTextEdit]) -> String {
         result.replace_range(start..end, &replacement);
     }
     result
+}
+
+#[test]
+fn definition_direct_source_is_resolved_without_host_lookup() {
+    let fixture = fixture_with_definition(
+        true,
+        false,
+        true,
+        HostFact::Known(vec![]),
+        false,
+        HostFact::Unavailable {
+            reason: "direct source target must bypass host definition lookup".into(),
+        },
+    );
+    let uri = format!("{}/src/main/java/fixture/Patch.java", fixture.workspace);
+    let position = position_at(
+        DIRECT_DEFINITION_SOURCE,
+        DIRECT_DEFINITION_SOURCE.rfind("drawCall").unwrap() + 2,
+    );
+    let response = envelope(
+        &fixture,
+        "mcdev.definition",
+        McdevDefinitionRequest {
+            context: context(&fixture, DIRECT_DEFINITION_SOURCE, &uri, position),
+        },
+    );
+    assert!(
+        response.error.is_none(),
+        "definition error: {:?}",
+        response.error
+    );
+    let response: McdevDefinitionResponse =
+        serde_json::from_value(response.result.unwrap()).unwrap();
+    let id_start = DIRECT_DEFINITION_SOURCE.find("drawCall").unwrap();
+    let id_range = McdevRange {
+        start: position_at(DIRECT_DEFINITION_SOURCE, id_start),
+        end: position_at(DIRECT_DEFINITION_SOURCE, id_start + "drawCall".len()),
+    };
+    assert_eq!(
+        serde_json::to_value(response).unwrap(),
+        serde_json::json!({
+            "locations": [{
+                "documentUri": uri,
+                "range": id_range,
+                "metadata": {
+                    "kind": "class",
+                    "namespace": "NAMED",
+                    "owner": "",
+                    "name": "drawCall"
+                },
+                "resolution": "SOURCE"
+            }]
+        })
+    );
+    assert_eq!(
+        fixture.query.definition_reads.load(Ordering::Acquire),
+        0,
+        "direct source resolution must not query host definition facts"
+    );
+}
+
+#[test]
+fn definition_missing_host_location_is_an_unresolved_location() {
+    let fixture = fixture(true, false, true, HostFact::Known(vec![]), false);
+    let uri = format!("{}/src/main/java/fixture/Patch.java", fixture.workspace);
+    let target_start = SOURCE.find("Target.class").unwrap();
+    let response = envelope(
+        &fixture,
+        "mcdev.definition",
+        McdevDefinitionRequest {
+            context: context(
+                &fixture,
+                SOURCE,
+                &uri,
+                position_at(SOURCE, target_start + 2),
+            ),
+        },
+    );
+    assert!(
+        response.error.is_none(),
+        "definition error: {:?}",
+        response.error
+    );
+    let response: McdevDefinitionResponse =
+        serde_json::from_value(response.result.unwrap()).unwrap();
+    let location = response.locations.first().expect("unresolved location");
+    assert_eq!(location.document_uri, "");
+    assert_eq!(
+        location.range,
+        McdevRange {
+            start: position_at(SOURCE, target_start),
+            end: position_at(SOURCE, target_start + "Target.class".len()),
+        }
+    );
+    assert_eq!(
+        location.resolution,
+        mcdev_protocol::McdevDefinitionResolution::Unresolved
+    );
+    assert_eq!(
+        location.resolution_message.as_deref(),
+        Some("no navigable definition found")
+    );
+    assert_eq!(
+        fixture.query.definition_reads.load(Ordering::Acquire),
+        1,
+        "a missing location is a checked host answer"
+    );
+}
+
+#[test]
+fn definition_invalid_direct_source_preserves_resolution_message() {
+    let fixture = fixture_with_definition(
+        true,
+        false,
+        true,
+        HostFact::Known(vec![]),
+        false,
+        HostFact::Unavailable {
+            reason: "invalid direct source must bypass host definition lookup".into(),
+        },
+    );
+    let position = position_at(
+        DIRECT_DEFINITION_SOURCE,
+        DIRECT_DEFINITION_SOURCE.rfind("drawCall").unwrap() + 2,
+    );
+    let mut request_context = context(&fixture, DIRECT_DEFINITION_SOURCE, "", position);
+    request_context.document_uri.clear();
+    let response = envelope(
+        &fixture,
+        "mcdev.definition",
+        McdevDefinitionRequest {
+            context: request_context,
+        },
+    );
+    assert!(
+        response.error.is_none(),
+        "definition error: {:?}",
+        response.error
+    );
+    let response: McdevDefinitionResponse =
+        serde_json::from_value(response.result.unwrap()).unwrap();
+    let location = response.locations.first().expect("invalid direct location");
+    let id_start = DIRECT_DEFINITION_SOURCE.find("drawCall").unwrap();
+    assert_eq!(location.document_uri, "");
+    assert_eq!(
+        location.range,
+        McdevRange {
+            start: position_at(DIRECT_DEFINITION_SOURCE, id_start),
+            end: position_at(DIRECT_DEFINITION_SOURCE, id_start + "drawCall".len()),
+        }
+    );
+    assert_eq!(
+        location.resolution,
+        mcdev_protocol::McdevDefinitionResolution::Unresolved
+    );
+    assert_eq!(
+        location.resolution_message.as_deref(),
+        Some("direct source target missing uri or range")
+    );
+    assert_eq!(fixture.query.definition_reads.load(Ordering::Acquire), 0);
+}
+
+#[test]
+fn definition_unknown_host_location_is_a_typed_error() {
+    let fixture = fixture_with_definition(
+        true,
+        false,
+        true,
+        HostFact::Known(vec![]),
+        false,
+        HostFact::Unavailable {
+            reason: "definition locations are unavailable".into(),
+        },
+    );
+    let uri = format!("{}/src/main/java/fixture/Patch.java", fixture.workspace);
+    let target_start = SOURCE.find("Target.class").unwrap();
+    let response = envelope(
+        &fixture,
+        "mcdev.definition",
+        McdevDefinitionRequest {
+            context: context(
+                &fixture,
+                SOURCE,
+                &uri,
+                position_at(SOURCE, target_start + 2),
+            ),
+        },
+    );
+    let error = response.error.expect("unknown host answer must fail");
+    assert_eq!(error.code, McdevErrorCode::IncompleteProjectContext);
+    assert_eq!(error.message, "definition locations are unavailable");
+    assert!(response.result.is_none());
+    assert_eq!(fixture.query.definition_reads.load(Ordering::Acquire), 1);
+}
+
+#[test]
+fn missing_document_version_uses_one_semantic_provider_call_per_command() {
+    let definition = fixture(true, false, true, HostFact::Known(vec![]), false);
+    let uri = format!("{}/src/main/java/fixture/Patch.java", definition.workspace);
+    let mut definition_context = context(
+        &definition,
+        SOURCE,
+        &uri,
+        McdevPosition {
+            line: 0,
+            character: 0,
+        },
+    );
+    definition_context.document_version = None;
+    let response = envelope(
+        &definition,
+        "mcdev.definition",
+        McdevDefinitionRequest {
+            context: definition_context,
+        },
+    );
+    assert!(
+        response.error.is_none(),
+        "definition error: {:?}",
+        response.error
+    );
+    assert_eq!(definition.semantic_calls.load(Ordering::Acquire), 1);
+
+    let diagnostics = fixture(true, false, true, HostFact::Known(vec![]), false);
+    let uri = format!("{}/src/main/java/fixture/Patch.java", diagnostics.workspace);
+    let mut diagnostics_context = context(
+        &diagnostics,
+        SOURCE,
+        &uri,
+        McdevPosition {
+            line: 0,
+            character: 0,
+        },
+    );
+    diagnostics_context.document_version = None;
+    let response = envelope(
+        &diagnostics,
+        "mcdev.diagnostics",
+        McdevDiagnosticsRequest {
+            context: diagnostics_context,
+        },
+    );
+    assert!(
+        response.error.is_none(),
+        "diagnostics error: {:?}",
+        response.error
+    );
+    assert_eq!(diagnostics.semantic_calls.load(Ordering::Acquire), 1);
+
+    let actions = fixture(true, false, true, HostFact::Known(vec![]), false);
+    let uri = format!("{}/src/main/java/fixture/Patch.java", actions.workspace);
+    let mut actions_context = context(
+        &actions,
+        SOURCE,
+        &uri,
+        McdevPosition {
+            line: 0,
+            character: 0,
+        },
+    );
+    actions_context.document_version = None;
+    let response = envelope(
+        &actions,
+        "mcdev.codeAction",
+        McdevCodeActionRequest {
+            context: actions_context,
+            range: McdevRange {
+                start: McdevPosition {
+                    line: 0,
+                    character: 0,
+                },
+                end: McdevPosition {
+                    line: 0,
+                    character: SOURCE.len() as i32,
+                },
+            },
+            diagnostic_codes: vec![],
+        },
+    );
+    assert!(
+        response.error.is_none(),
+        "code action error: {:?}",
+        response.error
+    );
+    assert_eq!(actions.semantic_calls.load(Ordering::Acquire), 1);
 }
 
 #[test]

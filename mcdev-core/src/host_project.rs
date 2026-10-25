@@ -721,67 +721,6 @@ impl HostCheckedClassIndex {
             result => Ok(result),
         }
     }
-
-    /// Verify that the class and its member index are actually available.
-    /// Catalog presence alone is deliberately insufficient: a lazy binary
-    /// index can expose `find_class(Some)` before class bytes are readable.
-    pub fn owner_result(&self, owner: &str) -> HostProjectResult<HostFact<ClassIndexEntry>> {
-        let mut partial_source_class = false;
-        if let Some(source) = &self.source {
-            let class = source.find_class(owner)?;
-            match class.authority {
-                SourceAuthority::Complete => {
-                    let Some(entry) = class.value else {
-                        return Ok(HostFact::Missing);
-                    };
-                    let methods = self.get_methods_result(owner)?;
-                    let fields = self.get_fields_result(owner)?;
-                    if matches!(methods, HostFact::Known(_)) && matches!(fields, HostFact::Known(_))
-                    {
-                        return Ok(HostFact::Known(entry));
-                    }
-                    partial_source_class = true;
-                }
-                SourceAuthority::Partial if class.value.is_some() => {
-                    partial_source_class = true;
-                }
-                SourceAuthority::Partial | SourceAuthority::Unavailable => {}
-            }
-        }
-
-        let class = self.binary_find_class_result(owner)?;
-        let entry = match class {
-            HostFact::Known(Some(entry)) => entry,
-            HostFact::Known(None) | HostFact::Missing => {
-                if partial_source_class {
-                    return Err(HostSourceError::Failure(format!(
-                        "source class facts for {owner} are incomplete and binary class facts are missing"
-                    )));
-                }
-                return Ok(HostFact::Missing);
-            }
-            HostFact::Unavailable { reason } => {
-                return Ok(HostFact::Unavailable { reason });
-            }
-        };
-
-        match self.binary.provider.class_bytes_result(owner)? {
-            Some(_) => {
-                let methods = self.binary.methods_result(owner)?;
-                let fields = self.binary.fields_result(owner)?;
-                if matches!(methods, HostFact::Known(_)) && matches!(fields, HostFact::Known(_)) {
-                    Ok(HostFact::Known(entry))
-                } else {
-                    Err(HostSourceError::Failure(format!(
-                        "binary member facts for {owner} are unavailable"
-                    )))
-                }
-            }
-            None => Err(HostSourceError::Failure(format!(
-                "class bytes for catalog owner {owner} are unavailable"
-            ))),
-        }
-    }
 }
 
 pub struct HostBytecodeAdapter {

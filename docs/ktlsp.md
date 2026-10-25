@@ -38,7 +38,7 @@ Real project-aware commands still require the host-owned generic facts and
 command routing described in the [remaining integration contract](mcdev-command-host-contract.md).
 
 The optional `projectContext`/`typeJvm` operations are implemented in the fixed,
-unpublished host 37 candidate. Its actual serializer matches the isolated MC
+host 37 candidate, and their API source is published as `16580db`. Its actual serializer matches the isolated MC
 adapter; [the capability record](mcdev-host-capabilities.md) pins the evidence.
 The MC production child still negotiates semantic-v1. These limited metadata
 operations do not establish a complete project session, class catalog, source/resource

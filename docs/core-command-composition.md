@@ -268,8 +268,9 @@ gate.
   `HostMixinFacade::try_complete_buffer_only` and `--stdio-completion`; it
   does not claim a project session.
 - Keep `mcdev-companion/tests/core_commands.rs` as the fixture-host proof for
-  completion, diagnostics and config edit. It calls the real dispatcher,
-  facade and converters; only generic semantic/source/index facts are faked.
+  completion, diagnostics, config edits, and definition resolution. It calls
+  the real dispatcher, facade and converters; only generic semantic/source/
+  index/definition facts are faked.
   Do not advertise this library proof as connected to semantic-v1.
 
 ### Must wait for host/provider/control authority
@@ -322,16 +323,33 @@ are fake.
 6. `stale_project_after_semantic_compute_is_a_typed_failure` changes the project
    during semantic computation and requires `IncompleteProjectContext` with no
    successful result.
+7. `definition_direct_source_is_resolved_without_host_lookup` proves that a
+   direct source URI/range is returned as `SOURCE` without querying host
+   definition facts.
+8. `definition_missing_host_location_is_an_unresolved_location` preserves one
+   `UNRESOLVED` location, its source range, and the exact
+   `no navigable definition found` message for a checked host absence.
+9. `definition_invalid_direct_source_preserves_resolution_message` preserves
+   the existing `direct source target missing uri or range` message and avoids
+   host lookup for an invalid direct target.
+10. `definition_unknown_host_location_is_a_typed_error` preserves an
+    unavailable host definition answer as `IncompleteProjectContext`.
+11. `missing_document_version_uses_one_semantic_provider_call_per_command`
+    proves exactly one semantic provider call for `definition`, `diagnostics`,
+    and `codeAction` when `documentVersion` is absent.
 
-Navigation should be a follow-up, not a fake callback test:
-`definitionReturnsMixinClassTarget` needs real `HostSourceSnapshot`/location
-facts (or `HostProjectQuery::definition`), and
-`referencesReturnsMixinUsages` needs a complete `SourceScanEntry` inventory.
+Definition navigation is now covered through `HostProjectQuery::definition`
+and the existing `DefinitionResolutionService`. References remain a follow-up:
+`referencesReturnsMixinUsages` still needs a complete owned
+`SourceScanEntry` inventory, including the Java/AW/AT deduplication path.
 
-Focused verification passes all six `core_commands` tests in
-`build/rust-test-logs/core-focused-after-stale/`, with complete raw stdout/stderr.
-The 60 affected host-project checks and seven validation checks pass in
-`build/rust-test-logs/core-affected-manual/`. The actual facade regression covers
+Focused verification passes all eleven `core_commands` tests in
+`build/rust-test-logs/core-command-p1p2-20261025/core_commands.retry3.stdout-stderr.log`.
+The same focused command was also run through `Invoke-RustCheck`, with complete
+stdout/stderr retained under the sibling `invoke/` directory. Directly affected
+navigation and host-project checks were run separately through the raw cargo and
+`Invoke-RustCheck` paths, with their complete logs under the same unique
+`core-command-p1p2-20261025` directory. The actual facade regression still covers
 source-complete expression bytecode and handler reference facts. The stable
 workspace pipeline includes repository-wide formatting and editor checks.
 The legacy callback proof and 189-case facade proof remain valid for their

@@ -1,0 +1,14 @@
+{
+  "producerStatus": "unpublished candidate 37",
+  "binarySha256": "a3f1248d6aa39cf582f87c88477ca175964f3e55d11f45348b8f353a0675e1b6",
+  "serializerManifestSha256": "517f3f3906e46345854cccec8b94e37ea3b88d235ecfcf1c5f2f29485eb0b2af",
+  "source": "C:\\Users\\gummy\\.codex\\ktlsp-facts143\\r37-optional2\\project-facts\\editor\\artifacts\\extension-ipc-proof.json",
+  "sourceSha256": "8fb2092e6b5fa868bec7181216fedd69085c32b4e13cf345da39849dd450a3b7",
+  "sourceJsonPointer": "/project_facts/fresh/observed",
+  "fixture": "candidate37-fresh.json",
+  "fixtureSha256": "88aa75de899ab7e66fa617103e74f5a2df2eb02d7d994cf93e606fc6c79e6f63",
+  "publishedApiCommit": "16580dbbb7ccb3dbbb42bee3afa90ee6aeef0e3b",
+  "publishedApiUrl": "https://github.com/cotrin8672/ktlsp/commit/16580dbbb7ccb3dbbb42bee3afa90ee6aeef0e3b",
+  "binaryRevisionNote": "The candidate is a combined working-tree build, not a build of the API commit alone.",
+  "scope": "Exact JSON subtree from the producer's recorded fresh facts; this is not a byte-for-byte RPC frame or live MC command proof."
+}

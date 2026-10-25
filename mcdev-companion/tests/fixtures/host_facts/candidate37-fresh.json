@@ -1,0 +1,148 @@
+{
+  "evaluation": "4",
+  "facts": [
+    {
+      "classpath": {
+        "state": "found",
+        "value": {
+          "entries": [
+            {
+              "displayPath": "C:\\Users\\gummy\\.codex\\ktlsp-facts143\\r37\\project\\home\\.m2\\repository\\fixture\\reload\\added\\1.0\\added-1.0.jar",
+              "id": "file:C:/Users/gummy/.codex/ktlsp-facts143/r37/project/home/.m2/repository/fixture/reload/added/1.0/added-1.0.jar#1792838162302810600:694|source:C:/Users/gummy/.codex/ktlsp-facts143/r37/project/home/.m2/repository/fixture/reload/added/1.0/added-1.0-sources.jar#1792838162609849200:536"
+            },
+            {
+              "displayPath": "C:\\Users\\gummy\\.codex\\ktlsp-facts143\\r37\\project\\home\\.m2\\repository\\org\\jetbrains\\kotlin\\kotlin-stdlib\\2.4.0\\kotlin-stdlib-2.4.0.jar",
+              "id": "file:C:/Users/gummy/.codex/ktlsp-facts143/r37/project/home/.m2/repository/org/jetbrains/kotlin/kotlin-stdlib/2.4.0/kotlin-stdlib-2.4.0.jar#1792818931019194700:1841929|source:C:/Users/gummy/.codex/ktlsp-facts143/r37/project/home/.m2/repository/org/jetbrains/kotlin/kotlin-stdlib/2.4.0/kotlin-stdlib-2.4.0-sources.jar#1792819793870467100:757669"
+            },
+            {
+              "displayPath": "C:\\Users\\gummy\\.codex\\ktlsp-facts143\\r37\\project\\home\\.m2\\repository\\fixture\\reload\\versioned\\1.0\\versioned-1.0.jar",
+              "id": "file:C:/Users/gummy/.codex/ktlsp-facts143/r37/project/home/.m2/repository/fixture/reload/versioned/1.0/versioned-1.0.jar#1792838162483334000:704|source:C:/Users/gummy/.codex/ktlsp-facts143/r37/project/home/.m2/repository/fixture/reload/versioned/1.0/versioned-1.0-sources.jar#1792838162653811200:548"
+            },
+            {
+              "displayPath": "C:\\Users\\gummy\\.codex\\ktlsp-facts143\\r37\\project\\home\\.m2\\repository\\org\\jetbrains\\annotations\\13.0\\annotations-13.0.jar",
+              "id": "file:C:/Users/gummy/.codex/ktlsp-facts143/r37/project/home/.m2/repository/org/jetbrains/annotations/13.0/annotations-13.0.jar#1792818931036958500:17536|source:C:/Users/gummy/.codex/ktlsp-facts143/r37/project/home/.m2/repository/org/jetbrains/annotations/13.0/annotations-13.0-sources.jar#1792819793780334300:17566"
+            }
+          ],
+          "coverage": {
+            "state": "found",
+            "value": null
+          }
+        }
+      },
+      "sdk": {
+        "state": "found",
+        "value": {
+          "api": {
+            "kind": "full"
+          },
+          "identity": "jdk-api:C:/Program Files/Java/jdk-21#release=full#aaacaf6b3e59fec0a521388ee27b89ae37d6addff7aba9110e1be20e300fdb32"
+        }
+      },
+      "outputRoots": {
+        "state": "found",
+        "value": [
+          "C:\\Users\\gummy\\.codex\\ktlsp-facts143\\r37\\project\\modules\\editing\\build\\classes\\java\\main",
+          "C:\\Users\\gummy\\.codex\\ktlsp-facts143\\r37\\project\\modules\\editing\\build\\classes\\kotlin\\main",
+          "C:\\Users\\gummy\\.codex\\ktlsp-facts143\\r37\\project\\modules\\editing\\build\\resources\\main"
+        ]
+      },
+      "scope": {
+        "state": "found",
+        "value": {
+          "sourceSet": "main",
+          "module": ":app"
+        }
+      },
+      "sourceRoots": {
+        "state": "found",
+        "value": [
+          "C:\\Users\\gummy\\.codex\\ktlsp-facts143\\r37\\project\\modules\\editing\\src\\main\\java",
+          "C:\\Users\\gummy\\.codex\\ktlsp-facts143\\r37\\project\\modules\\editing\\build\\generated\\sources\\fixture\\java\\main",
+          "C:\\Users\\gummy\\.codex\\ktlsp-facts143\\r37\\project\\modules\\editing\\build\\ktlsp-custom-java",
+          "C:\\Users\\gummy\\.codex\\ktlsp-facts143\\r37\\project\\modules\\editing\\src\\main\\kotlin",
+          "C:\\Users\\gummy\\.codex\\ktlsp-facts143\\r37\\project\\modules\\editing\\build\\generated\\sources\\annotationProcessor\\java\\main"
+        ]
+      },
+      "workspaceUri": {
+        "state": "unknown",
+        "reasons": [
+          {
+            "code": "MissingFacts"
+          }
+        ]
+      }
+    },
+    {
+      "binaryName": {
+        "state": "found",
+        "value": {
+          "descriptor": "Lfixture/Target;",
+          "internalName": "fixture/Target"
+        }
+      },
+      "abi": {
+        "state": "unknown",
+        "reasons": [
+          {
+            "code": "MissingFacts"
+          }
+        ]
+      },
+      "jvmAbiCoverage": {
+        "state": "unknown",
+        "reasons": [
+          {
+            "code": "MissingFacts"
+          }
+        ]
+      },
+      "classFlags": {
+        "state": "unknown",
+        "reasons": [
+          {
+            "code": "MissingFacts"
+          }
+        ]
+      },
+      "declaredMembers": {
+        "members": [
+          {
+            "visibility": {
+              "state": "found",
+              "value": "Public"
+            },
+            "signature": {
+              "state": "found",
+              "value": {
+                "descriptor": "(I)I",
+                "id": "4:10",
+                "kind": "method"
+              }
+            },
+            "kind": "method",
+            "dispatch": {
+              "state": "found",
+              "value": "instance"
+            },
+            "name": "twice",
+            "mismatches": [],
+            "id": "4:9",
+            "synthetic": {
+              "state": "found",
+              "value": false
+            }
+          }
+        ],
+        "coverage": {
+          "state": "unknown",
+          "reasons": [
+            {
+              "code": "IncompleteTarget"
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "owner": "C:/Users/gummy/.codex/ktlsp-facts143/r37/project/modules/editing/src/main/java/fixture/CaseMixin.java"
+}

@@ -8,7 +8,7 @@ and accepted-contribution tracing. Real MC/editor acceptance is recorded in
 The earlier `f5953350928eb8af1ab34bb39db23ba7370d14af` interop checkpoint also
 lacks these two operations; the new host pin does not enable their advertisement.
 
-The host's unpublished **candidate 37 implements these two operations**. Its fixed
+The host's **candidate 37 implements these two operations**. Its fixed
 serializer handoff is
 `C:/Users/gummy/.codex/ktlsp-runs/01a12550-7d56-71f2-8c34-8ab8c5fe5dda/candidate37-semantic-handoff/manifest.json`,
 SHA256 `517f3f3906e46345854cccec8b94e37ea3b88d235ecfcf1c5f2f29485eb0b2af`.
@@ -17,7 +17,14 @@ SHA256 `ecfc4d8bfbd7b5fe35dfa9ede4c3859c0f2535a6c429c948adae8d6526f9f7a5`.
 All five copied sources match the producer's pre-test and post-release guards.
 The candidate executable SHA256 is
 `a3f1248d6aa39cf582f87c88477ca175964f3e55d11f45348b8f353a0675e1b6`;
-this is an artifact pin, not a published Git revision.
+this is an artifact pin, not a build of a single published Git revision.
+
+The API source is now published in
+[`16580db`](https://github.com/cotrin8672/ktlsp/commit/16580dbbb7ccb3dbbb42bee3afa90ee6aeef0e3b).
+All five source blobs were checked against GitHub at that exact commit: three
+match the frozen bytes directly and two match after Git's CRLF-to-LF normalization.
+The candidate executable remains a combined working-tree build; the API commit
+must not be used as its complete binary source identity.
 
 The actual serializer and recorded frames agree with the isolated MC `host_facts`
 adapter. The producer's `project-facts143-37-final.json`, SHA256
@@ -27,6 +34,12 @@ That proves the producer's optional reader, not its integration into the MC
 command host. The MC production child still negotiates only semantic-v1.
 Its 112-check/29-request editor smoke also passes against this candidate in
 `build/rust-test-logs/host-smoke-20261025-125351932/`.
+
+`mcdev-companion/tests/fixtures/host_facts/candidate37-fresh.json` preserves the
+producer's recorded fresh fact subtree, with its input pointer and hashes in
+the adjacent provenance record. It retains opaque classpath/SDK/member IDs and
+the exact Unknown fields. The fixture is a recorded payload, not a complete
+RPC frame or a live MC command connection.
 
 The earlier MC proposal for an eight-counter project identity, external
 `validateReads`, catalog/blob queries and a full project adapter was not accepted

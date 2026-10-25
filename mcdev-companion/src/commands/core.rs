@@ -29,7 +29,7 @@ use mcdev_core::{
         HostFacadeError, HostMixinFacade, HostMixinServiceFacade, HostMixinSourceProvider,
         MixinFacadeRequest,
     },
-    mixin_navigation::DefinitionResolution,
+    mixin_navigation::{DefinitionBackend, DefinitionResolution, DefinitionResolutionService},
     mixinextras_expression::ExpressionMemberCompletionCache,
     model::{ClassIndex, ClassIndexEntry, FieldIndexEntry, MethodIndexEntry},
     project::{normalize_path, uri_to_path, CachedProjectSession, ProjectContext},
@@ -110,6 +110,31 @@ impl ClassIndex for CheckedClassIndex {
 
 struct CheckedBytecodeIndex {
     index: Arc<HostBytecodeAdapter>,
+}
+
+/// The compatibility `DefinitionBackend` cannot represent an unavailable
+/// host answer. Keep that answer fallible at this command boundary instead of
+/// turning it into the same `None` used for a checked missing location.
+struct CheckedDefinitionBackend<'a> {
+    session: &'a HostProjectSession,
+}
+
+impl DefinitionBackend for CheckedDefinitionBackend<'_> {
+    fn resolve(
+        &self,
+        target: &McDefinitionTarget,
+        _context: &ProjectContext,
+        _workspace_root_uri: &str,
+    ) -> Option<mcdev_core::mixin_navigation::ResolvedDefinition> {
+        match self.session.definition_result(target) {
+            Ok(HostFact::Known(value)) => Some(value),
+            Ok(HostFact::Missing) => None,
+            Ok(HostFact::Unavailable { reason }) => {
+                std::panic::panic_any(HostSourceError::Failure(reason))
+            }
+            Err(error) => std::panic::panic_any(error),
+        }
+    }
 }
 
 fn checked_bytecode<T>(result: Result<T, HostSourceError>) -> T {
@@ -770,19 +795,17 @@ impl CommandHost for CoreCommandHost {
             return Ok(diagnostics);
         }
         self.validate_semantic_capability(context)?;
-        let version = context
-            .document_version
-            .unwrap_or_else(|| i64::from(super::cache::java_text_hash(&context.buffer_text)));
-        let semantic = self.semantic_model(context, version, project, cancellation)?;
         let reference_types = self.session.checked_reference_types();
         let facade = self.facade(context.document_version);
-        let mut request = self.build_facade_request(
+        let request = self.build_facade_request(
             &facade,
             context,
             context.position.line,
             context.position.character,
         )?;
-        request.semantic_model = Some(semantic.model);
+        cancellation
+            .check_cancelled()
+            .map_err(CommandFailure::Cancelled)?;
         let mut facade = facade;
         facade.reference_types = Some(&reference_types);
         let diagnostics = catch_facade(|| facade.diagnose(&request))?;
@@ -840,10 +863,6 @@ impl CommandHost for CoreCommandHost {
             return Ok(targets);
         }
         self.validate_semantic_capability(context)?;
-        let version = context
-            .document_version
-            .unwrap_or_else(|| i64::from(super::cache::java_text_hash(&context.buffer_text)));
-        self.semantic_model(context, version, project, cancellation)?;
         let reference_types = self.session.checked_reference_types();
         let mut facade = self.facade(context.document_version);
         facade.reference_types = Some(&reference_types);
@@ -876,23 +895,19 @@ impl CommandHost for CoreCommandHost {
         targets: &[McDefinitionTarget],
     ) -> Result<Vec<ResolvedDefinition>, CommandFailure> {
         self.validate_project(project, workspace_root)?;
-        let mut resolved = Vec::with_capacity(targets.len());
-        for target in targets {
-            match self
-                .session
-                .definition_result(target)
-                .map_err(map_source_error)?
-            {
-                HostFact::Known(value) => resolved.push(convert_definition(value)),
-                HostFact::Missing => {}
-                HostFact::Unavailable { reason } => {
-                    return Err(unavailable(
-                        McdevErrorCode::IncompleteProjectContext,
-                        reason,
-                    ))
-                }
-            }
-        }
+        let backend = CheckedDefinitionBackend {
+            session: self.session.as_ref(),
+        };
+        let resolved = catch_command(|| {
+            DefinitionResolutionService::new(vec![&backend]).resolve_all(
+                targets,
+                project,
+                workspace_root,
+            )
+        })?
+        .into_iter()
+        .map(convert_definition)
+        .collect();
         self.validate_workspace(workspace_root)?;
         Ok(resolved)
     }
@@ -994,15 +1009,13 @@ impl CommandHost for CoreCommandHost {
             return Ok(fixes);
         }
         self.validate_semantic_capability(context)?;
-        let version = context
-            .document_version
-            .unwrap_or_else(|| i64::from(super::cache::java_text_hash(&context.buffer_text)));
-        let semantic = self.semantic_model(context, version, project, cancellation)?;
         let reference_types = self.session.checked_reference_types();
         let facade = self.facade(context.document_version);
-        let mut request =
+        let request =
             self.build_facade_request(&facade, context, range.start.line, range.start.character)?;
-        request.semantic_model = Some(semantic.model);
+        cancellation
+            .check_cancelled()
+            .map_err(CommandFailure::Cancelled)?;
         let mut facade = facade;
         facade.reference_types = Some(&reference_types);
         let fixes = catch_facade(|| facade.code_actions(&request, diagnostic_code))?;

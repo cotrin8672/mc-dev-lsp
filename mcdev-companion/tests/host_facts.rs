@@ -61,6 +61,53 @@ fn project_metadata_keeps_independent_knowledge_and_classpath_order() {
 }
 
 #[test]
+fn candidate37_recorded_facts_preserve_partial_knowledge_and_opaque_identities() {
+    // Captured fact payloads use the fixture reader; this is not live MC routing.
+    let captured: serde_json::Value =
+        serde_json::from_str(include_str!("fixtures/host_facts/candidate37-fresh.json")).unwrap();
+    let mut reader = Reader::new();
+    reader.project = captured["facts"][0].clone();
+    reader.ty = captured["facts"][1].clone();
+    let mut registry = new_registry();
+    let ops = ops();
+    let mut scoped = ScopedFacts::new(EVALUATION, &ops, &mut registry, &mut reader).unwrap();
+    let project = scoped.project_context().unwrap();
+    assert_eq!(
+        serde_json::to_value(&project).unwrap(),
+        captured["facts"][0]
+    );
+    assert!(project.workspace_uri.found().is_none());
+    let scope = project.scope.found().unwrap();
+    assert_eq!(
+        (scope.module.as_str(), scope.source_set.as_str()),
+        (":app", "main")
+    );
+    assert_eq!(project.classpath.found().unwrap().entries.len(), 4);
+    assert!(matches!(project.sdk.found().unwrap().api, SdkApi::Full));
+
+    let ty = scoped.type_jvm(TYPE).unwrap();
+    assert_eq!(serde_json::to_value(&ty).unwrap(), captured["facts"][1]);
+    assert_eq!(
+        ty.binary_name.found().unwrap().internal_name,
+        "fixture/Target"
+    );
+    assert!(ty.class_flags.found().is_none());
+    assert!(ty.declared_members.coverage.found().is_none());
+    assert_eq!(ty.declared_members.members[0].member.name, "twice");
+    assert!(matches!(abi_members(&ty), Err(FactsError::Unknown(_))));
+    assert!(matches!(
+        full_project_session(),
+        HostFact::Unavailable { .. }
+    ));
+    assert!(matches!(
+        executable_bytecode(),
+        Err(FactsError::BytecodeUnavailable(_))
+    ));
+    assert!(registry.require("4:9", HandleKind::Member).is_ok());
+    assert!(registry.require("4:10", HandleKind::Signature).is_ok());
+}
+
+#[test]
 fn sdk_full_release_and_unknown_are_distinct() {
     let mut project: ProjectContext = serde_json::from_value(project()).unwrap();
     assert!(matches!(project.sdk.found().unwrap().api, SdkApi::Full));
