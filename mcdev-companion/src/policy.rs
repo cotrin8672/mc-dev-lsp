@@ -244,7 +244,7 @@ pub(crate) fn analyze(e: &Evaluation, host: &mut impl Host) -> Result<Contributi
                     "host authored member spelling mismatch".into(),
                 ));
             }
-            if member.kind == "field" && authored.starts_with(prefix) {
+            if member.kind == "field" && !prefix.is_empty() && authored.starts_with(prefix) {
                 output.diagnostics.push(Diagnostic{range:declaration.range.clone(),severity:"error".into(),code:None,message:"[mcdev.mixin.shadow.field-prefix] Shadow fields cannot use the method prefix".into()});
                 continue;
             }

@@ -1,0 +1,87 @@
+{
+  "retiredPackage": "mcdev-ktlsp",
+  "originalCommit": "93b20b3",
+  "originalSource": "mcdev-ktlsp/tests/mixin.rs",
+  "preservedSource": "mcdev-companion/tests/fixtures/semantic_v1/linked-prototype-cases.rs.txt",
+  "sourceSha256": "b1f45f287abf01942b048aacf3325e83b825cf256dbf01e5689008f7241ca86f",
+  "scenarios": [
+    {
+      "original": "java_exact_methods_fields_dispatch_and_prefixes",
+      "replacement": "mcdev-companion/tests/semantic.rs::java_exact_methods_fields_dispatch_and_prefixes"
+    },
+    {
+      "original": "exact_signature_selects_the_correct_overload_location",
+      "replacement": "mcdev-companion/tests/semantic.rs::exact_signature_selects_the_correct_overload_location"
+    },
+    {
+      "original": "kotlin_nominal_types_arrays_and_backticks_use_shared_facts",
+      "replacement": "mcdev-companion/tests/semantic.rs::kotlin_nominal_types_arrays_and_backticks_use_shared_facts"
+    },
+    {
+      "original": "single_class_and_fully_qualified_string_targets_bind",
+      "replacement": "mcdev-companion/tests/semantic.rs::single_class_and_fully_qualified_string_targets_bind"
+    },
+    {
+      "original": "unsupported_or_multiple_targets_never_choose_a_first_target",
+      "replacement": "mcdev-companion/tests/semantic.rs::unsupported_or_multiple_targets_never_choose_a_first_target"
+    },
+    {
+      "original": "exact_annotation_identity_is_required",
+      "replacement": "mcdev-companion/tests/semantic.rs::exact_annotation_identity_is_required"
+    },
+    {
+      "original": "descriptor_dispatch_unknown_and_aliases_do_not_guess",
+      "replacement": "mcdev-companion/tests/semantic.rs::descriptor_dispatch_unknown_and_aliases_do_not_guess"
+    },
+    {
+      "original": "kotlin_accessors_and_unknown_abi_are_not_fields_or_plain_methods",
+      "replacement": "mcdev-companion/tests/semantic.rs::kotlin_accessors_and_unknown_abi_are_not_fields_or_plain_methods"
+    },
+    {
+      "original": "fields_do_not_strip_the_method_prefix",
+      "replacement": "mcdev-companion/tests/semantic.rs::fields_do_not_strip_the_method_prefix"
+    },
+    {
+      "original": "empty_effective_name_does_not_discard_other_contributions",
+      "replacement": "mcdev-companion/tests/semantic.rs::empty_effective_name_does_not_discard_other_contributions"
+    },
+    {
+      "original": "ambiguous_owner_never_binds_to_another_declaration",
+      "replacement": "mcdev-companion/tests/semantic.rs::ambiguous_owner_never_binds_to_another_declaration"
+    },
+    {
+      "original": "unsaved_edits_and_provider_configuration_retract_and_rebind",
+      "replacement": "mcdev-companion/tests/semantic.rs::unsaved_edits_and_provider_configuration_retract_and_rebind"
+    },
+    {
+      "original": "rename_preserves_prefix_backticks_and_unrelated_source",
+      "replacement": "mcdev-companion/tests/semantic.rs::rename_preserves_prefix_backticks_and_unrelated_source"
+    }
+  ],
+  "nativeCoverage": "mcdev-companion/tests/fixtures/coverage.md",
+  "publishedHostEvidence": "mcdev-companion/tests/fixtures/semantic_v1/interop_receipt.json",
+  "correctionDeltas": [
+    {
+      "case": "fields_do_not_strip_the_method_prefix",
+      "inputs": [
+        {
+          "source": "@Shadow int shadow$count;",
+          "old": "field-prefix diagnostic; no requirement or binding",
+          "new": "field-prefix diagnostic; no requirement or binding"
+        },
+        {
+          "source": "@Shadow(prefix=\"\") int count;",
+          "old": "field-prefix diagnostic; no requirement or binding",
+          "new": "one exact binding for count; no error diagnostic"
+        }
+      ],
+      "reason": "The native guard applied starts_with(prefix) to fields without filtering an empty prefix. Rust str::starts_with(\"\") is always true, while the existing mcdev-core ShadowValidationService filters an empty prefix before matching.",
+      "regressionLocators": [
+        "mcdev-companion/src/policy.rs:247",
+        "mcdev-companion/tests/semantic.rs::empty_shadow_prefix_field_binds_without_field_prefix_error",
+        "mcdev-core/tests/mixin_validation.rs::shadow_empty_prefix_field_matches_the_authored_name"
+      ]
+    }
+  ],
+  "scope": "Retires the linked Mixin/Shadow prototype; does not claim full legacy MC capabilities are connected."
+}

@@ -1,5 +1,10 @@
 # mc-dev-lsp Design Dossier
 
+The active Rust branch uses [native installation](native-distribution.md),
+[ktlsp integration](ktlsp.md), [Neovim setup](lazy-nvim.md),
+and the [migration record](rust-migration.md). The older Kotlin/JDT LS design
+dossier below remains a reference for the preserved implementation.
+
 This directory is an onboarding dossier for building `mc-dev-lsp`, a Kotlin/JVM semantic extension for Minecraft modding support in Neovim through JDT LS.
 
 The goal is not to build a small Neovim plugin. The goal is to provide an IDEA MinecraftDev-like semantic editing experience for the selected Minecraft modding surfaces:

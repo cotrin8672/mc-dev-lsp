@@ -14,8 +14,9 @@ package. A successful package build is not a full-replacement claim.
 
 ## Install
 
-1. Download the archive for the existing release tag or workflow-dispatch
-   version and extract it.
+1. Extract an archive built with the command below or published by the native
+   release workflow. On Linux, mark the extracted companion executable with
+   `chmod +x /absolute/path/to/mcdev-companion`.
 2. Add the extracted `mcdev-nvim` directory to Neovim's runtime path.
 3. Configure the separately installed ktlsp and the extracted companion with
    explicit argv arrays:
@@ -48,6 +49,17 @@ this usage text as `README-native.md`, and `manifest.json`. It deliberately
 does not contain tests, test corpora, Kotlin/JDT jars, a host executable, or
 build output other than the companion binary.
 
+## Build metadata
+
+When the native `mcdev.info` path is connected, `BuildIdentity::current()`
+reports the companion executable path and compile-time build metadata. Release
+packaging injects the existing product version, the UTC ISO build time, and the
+Git commit; a dirty checkout is marked with `+dirty`. A source archive or
+checkout without Git may provide `MCDEV_BUILD_COMMIT`, `MCDEV_BUILD_TIME`, or
+`MCDEV_BUILD_VERSION` explicitly at compile time. Missing commit/time values
+are reported as `unknown`; the version otherwise falls back to the companion's
+Cargo package version. No metadata is inferred from an unrelated artifact.
+
 ## Build and verify locally
 
 From the repository root on PowerShell 7 with Rust and Neovim available:
@@ -65,14 +77,12 @@ existing `mcdev-nvim/tests/native_helper.lua` entry as a finite
 under `build/rust-test-logs/native-release-*`; the archive is written under
 `build/release/native/`.
 
-The archive name uses the existing release tag or `workflow_dispatch` input
-(without its leading `v`). The current script checks that value against the
-existing root Gradle text version (`0.7.7`) while the native migration is being
-staged. That Gradle reference is temporary; a future native-only release should
-make a dedicated native version field the canonical source instead of inferring
-it from the legacy build file. The companion Cargo package currently retains
-its independent `0.1.0` package version; the package manifest records both
-values and does not silently bump or rename either version namespace.
+The archive name uses the release tag or `workflow_dispatch` input without its
+leading `v`. The existing product version remains `0.7.7`; its canonical source
+is now `[workspace.package].version` in the root `Cargo.toml`, inherited by all
+three native crates. The packager uses Cargo metadata to validate the requested
+version. Building or packaging the companion does not read a Gradle build file
+or fetch ktlsp source.
 
 Verify an extracted payload with the included `manifest.json`; its `files`
 entries contain each payload path, byte count and SHA-256. The manifest excludes

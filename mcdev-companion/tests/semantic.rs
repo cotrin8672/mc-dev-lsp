@@ -280,22 +280,40 @@ fn kotlin_accessors_and_unknown_abi_are_not_fields_or_plain_methods() {
 }
 #[test]
 fn fields_do_not_strip_the_method_prefix() {
-    for spec in [
-        Shadow::field("@Shadow int shadow$count;", "shadow$count", "I"),
-        Shadow::field("@Shadow(prefix=\"\") int count;", "count", "I").prefix(""),
-    ] {
-        let result = evaluate(&Case::java("@Mixin(Target.class)", vec![spec]));
-        assert_eq!(result.bound(), 0);
-        assert!(result.requirements.is_empty());
-        assert!(result.contributions["diagnostics"]
-            .as_array()
+    let result = evaluate(&Case::java(
+        "@Mixin(Target.class)",
+        vec![Shadow::field(
+            "@Shadow int shadow$count;",
+            "shadow$count",
+            "I",
+        )],
+    ));
+    assert_eq!(result.bound(), 0);
+    assert!(result.requirements.is_empty());
+    assert!(result.contributions["diagnostics"]
+        .as_array()
+        .unwrap()
+        .iter()
+        .any(|d| d["message"]
+            .as_str()
             .unwrap()
-            .iter()
-            .any(|d| d["message"]
-                .as_str()
-                .unwrap()
-                .starts_with("[mcdev.mixin.shadow.field-prefix]")));
-    }
+            .starts_with("[mcdev.mixin.shadow.field-prefix]")));
+}
+#[test]
+fn empty_shadow_prefix_field_binds_without_field_prefix_error() {
+    let result = evaluate(&Case::java(
+        "@Mixin(Target.class)",
+        vec![Shadow::field("@Shadow(prefix=\"\") int count;", "count", "I").prefix("")],
+    ));
+    assert_eq!(result.bound(), 1);
+    assert_eq!(result.requirements.len(), 1);
+    assert!(!result.incomplete());
+    assert!(!result.missing());
+    assert!(result.contributions["diagnostics"]
+        .as_array()
+        .unwrap()
+        .iter()
+        .all(|d| d["severity"] != "error"));
 }
 #[test]
 fn empty_effective_name_does_not_discard_other_contributions() {

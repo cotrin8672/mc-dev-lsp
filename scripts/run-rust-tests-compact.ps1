@@ -56,52 +56,40 @@ $logs = Join-Path $repo ('build/rust-test-logs/' + (Get-Date -Format 'yyyyMMdd-H
 $null = New-Item -ItemType Directory -Force -Path $logs
 $results = [System.Collections.Generic.List[string]]::new()
 $exitCode = 1
-$editorProject = $null
 try {
+    foreach ($name in @('MCDEV_FACADE_CASE', 'MCDEV_TWO_OPS_TEST_PORT')) {
+        if ([Environment]::GetEnvironmentVariables('Process').Contains($name)) {
+            throw "Full-suite runner requires $name to be absent, including an empty value"
+        }
+    }
     $steps = @(
         @{ Name = 'fmt'; Command = 'cargo'; Arguments = @('fmt', '--all', '--', '--check'); Timeout = 120 },
-        @{ Name = 'tests'; Command = 'cargo'; Arguments = @('test', '--workspace', '--all-targets', '--locked'); Timeout = 900 },
-        @{ Name = 'build'; Command = 'cargo'; Arguments = @('build', '--bin', 'mcdev-ktlsp', '--locked'); Timeout = 900 }
+        @{ Name = 'tests'; Command = 'cargo'; Arguments = @('test', '--workspace', '--locked', '--all-targets', '--', '--test-threads=1'); Timeout = 900 },
+        @{ Name = 'doc'; Command = 'cargo'; Arguments = @('test', '--workspace', '--locked', '--doc', '--', '--test-threads=1'); Timeout = 900 },
+        @{ Name = 'companion-build'; Command = 'cargo'; Arguments = @('build', '--locked', '-p', 'mcdev-companion', '--bin', 'mcdev-companion'); Timeout = 900 }
     )
     if (-not $SkipEditor) {
-        $binary = Join-Path $repo ('target/debug/mcdev-ktlsp' + $(if ($IsWindows) { '.exe' }))
-        $env:MCDEV_SMOKE_BINARY = $binary
-        # The host scans Git-visible sources; a fixture under ignored build/ would be invisible.
-        $editorProject = Join-Path ([System.IO.Path]::GetTempPath()) ('mcdev-editor-' + [guid]::NewGuid())
-        $env:MCDEV_SMOKE_PROJECT = $editorProject
-        $env:MCDEV_SMOKE_ARTIFACTS = $logs
-        $env:KTLSP_CACHE_DIR = Join-Path $logs 'cache'
-        $env:XDG_STATE_HOME = Join-Path $logs 'editor-state'
-        # Primitive-only smoke needs a bounded SDK fixture, rather than parsing the installed JDK.
-        $env:KTLSP_JDK_SRC = Join-Path $logs 'jdk-src.zip'
-        $jdk = [System.IO.Compression.ZipFile]::Open($env:KTLSP_JDK_SRC, [System.IO.Compression.ZipArchiveMode]::Create)
-        try {
-            $entry = $jdk.CreateEntry('java.base/java/lang/Object.java')
-            $writer = [System.IO.StreamWriter]::new($entry.Open())
-            try { $writer.Write('package java.lang; public class Object {}') } finally { $writer.Dispose() }
-        } finally { $jdk.Dispose() }
-        $steps += @{ Name = 'editor'; Command = 'nvim'; Arguments = @('--headless', '-u', 'NONE', '-l', (Join-Path $repo 'mcdev-ktlsp/tests/editor_smoke.lua')); Timeout = 120 }
+        $pwsh = (Get-Process -Id $PID).Path
+        $steps += @{ Name = 'nvim-suite'; Command = $pwsh; Arguments = @(
+            '-NoLogo', '-NoProfile', '-ExecutionPolicy', 'Bypass', '-File',
+            (Join-Path $repo 'scripts/run-nvim-tests-compact.ps1'), '-Name', 'native-ci', '-Suite'
+        ); Timeout = 420 }
     }
     foreach ($step in $steps) {
         $result = Invoke-RustCheck $step.Name $step.Command $step.Arguments $repo $logs $step.Timeout
         $line = '{0}: exit={1} timeout={2} seconds={3} pid={4}' -f $result.Name, $result.ExitCode, $result.TimedOut, $result.Seconds, $result.Pid
         $results.Add($line)
         Write-Output $line
-        if ($result.ExitCode -ne 0) { throw "$($step.Name) failed; see complete logs" }
+        if ($result.ExitCode -ne 0) {
+            Get-Content -LiteralPath (Join-Path $logs "$($step.Name).stderr.log") -Tail 40
+            throw "$($step.Name) failed; see complete logs"
+        }
     }
     $exitCode = 0
 } catch {
     $results.Add($_.Exception.Message)
     Write-Output $_.Exception.Message
 } finally {
-    if ($editorProject -and (Test-Path -LiteralPath $editorProject)) {
-        $resolved = [System.IO.Path]::GetFullPath($editorProject)
-        $temporaryRoot = [System.IO.Path]::GetFullPath([System.IO.Path]::GetTempPath())
-        if ((Split-Path -Parent $resolved) -eq $temporaryRoot.TrimEnd([System.IO.Path]::DirectorySeparatorChar) -and
-            (Split-Path -Leaf $resolved) -like 'mcdev-editor-*') {
-            Remove-Item -LiteralPath $resolved -Recurse -Force
-        } else { throw "Refusing to remove unexpected fixture path: $resolved" }
-    }
     $results.Add("exit code: $exitCode")
     $results.Add("logs: $logs")
     $results | Set-Content -LiteralPath (Join-Path $logs 'summary.txt')

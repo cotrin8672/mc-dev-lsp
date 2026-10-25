@@ -5,6 +5,7 @@ use crate::{
     descriptor,
     host_source::{
         HostAnswer, HostFact, HostGenerations, HostReadSet, HostReferenceTypeFact, HostSourceError,
+        ProjectSourceQuery, SourceAuthority,
     },
     model::*,
     project::*,
@@ -499,6 +500,290 @@ impl ClassIndex for LazyHostClassIndex {
     }
 }
 
+/// Fallible class/index capability checks for command hosts.
+///
+/// `ClassIndex` is an intentionally compatibility-oriented trait: its methods
+/// return empty values when a provider cannot answer.  Command dispatch must
+/// not use those methods to decide whether a project is ready.  This adapter
+/// keeps the checked path beside the same lazy binary index and optionally
+/// consults the caller-owned source query when that query is authoritative.
+pub struct HostCheckedClassIndex {
+    binary: Arc<LazyHostClassIndex>,
+    source: Option<Arc<dyn ProjectSourceQuery>>,
+}
+impl HostCheckedClassIndex {
+    pub fn new(
+        binary: Arc<LazyHostClassIndex>,
+        source: Option<Arc<dyn ProjectSourceQuery>>,
+    ) -> Self {
+        Self { binary, source }
+    }
+
+    fn binary_find_class_result(
+        &self,
+        owner: &str,
+    ) -> HostProjectResult<HostFact<Option<ClassIndexEntry>>> {
+        let catalog = self.binary.provider.catalog_result()?;
+        Ok(HostFact::Known(
+            catalog
+                .iter()
+                .find(|candidate| candidate.as_str() == owner)
+                .map(|_| class_entry(owner)),
+        ))
+    }
+
+    /// Return a fallible class lookup.  A partial source answer is never
+    /// promoted to a negative fact; the complete binary catalog is consulted
+    /// instead, and an inconsistent source-present/binary-absent answer is an
+    /// explicit failure.
+    pub fn find_class_result(
+        &self,
+        owner: &str,
+    ) -> HostProjectResult<HostFact<Option<ClassIndexEntry>>> {
+        if let Some(source) = &self.source {
+            let result = source.find_class(owner)?;
+            if result.authority == SourceAuthority::Complete {
+                return Ok(HostFact::Known(result.value));
+            }
+            let source_present = result.value.is_some();
+            let binary = self.binary_find_class_result(owner)?;
+            if source_present && matches!(binary, HostFact::Known(None)) {
+                return Err(HostSourceError::Failure(format!(
+                    "source class facts for {owner} are partial and binary class facts are missing"
+                )));
+            }
+            return Ok(binary);
+        }
+        self.binary_find_class_result(owner)
+    }
+
+    /// Return a fallible catalog lookup.  Source values are used only when the
+    /// source provider explicitly declares the result complete; otherwise the
+    /// lazy provider's catalog remains the authority.
+    pub fn find_classes_result(
+        &self,
+        prefix: &str,
+        limit: usize,
+    ) -> HostProjectResult<HostFact<Vec<ClassIndexEntry>>> {
+        if let Some(source) = &self.source {
+            let result = source.find_classes(prefix, limit)?;
+            if result.authority == SourceAuthority::Complete {
+                return Ok(HostFact::Known(
+                    result.value.into_iter().take(limit).collect(),
+                ));
+            }
+        }
+        let prefix = prefix.to_lowercase();
+        Ok(HostFact::Known(
+            self.binary
+                .provider
+                .catalog_result()?
+                .into_iter()
+                .filter(|name| {
+                    name.to_lowercase().starts_with(&prefix)
+                        || name.replace('/', ".").to_lowercase().starts_with(&prefix)
+                        || name
+                            .rsplit('/')
+                            .next()
+                            .unwrap_or(name)
+                            .to_lowercase()
+                            .starts_with(&prefix)
+                })
+                .take(limit)
+                .map(|name| class_entry(&name))
+                .collect(),
+        ))
+    }
+
+    /// Return a fallible fully-qualified class lookup.  The compatibility
+    /// `LazyHostClassIndex` method uses `Option` and therefore cannot retain a
+    /// catalog/read failure.  Command composition must keep that failure
+    /// visible while still allowing an authoritative complete source answer
+    /// to avoid a binary read.
+    pub fn find_class_by_fqn_result(
+        &self,
+        fqn: &str,
+    ) -> HostProjectResult<HostFact<Option<ClassIndexEntry>>> {
+        if let Some(source) = &self.source {
+            let result = source.find_class_by_fqn(fqn)?;
+            if result.authority == SourceAuthority::Complete {
+                return Ok(HostFact::Known(result.value));
+            }
+            let source_present = result.value.is_some();
+            let catalog = self.binary.provider.catalog_result()?;
+            let value = catalog
+                .iter()
+                .find(|candidate| candidate.replace('/', ".").eq_ignore_ascii_case(fqn))
+                .map(|owner| class_entry(owner));
+            if source_present && value.is_none() {
+                return Err(HostSourceError::Failure(format!(
+                    "source class facts for {fqn} are partial and binary class facts are missing"
+                )));
+            }
+            return Ok(HostFact::Known(value));
+        }
+        let catalog = self.binary.provider.catalog_result()?;
+        Ok(HostFact::Known(
+            catalog
+                .iter()
+                .find(|candidate| candidate.replace('/', ".").eq_ignore_ascii_case(fqn))
+                .map(|owner| class_entry(owner)),
+        ))
+    }
+
+    fn binary_member_result<T>(
+        &self,
+        owner: &str,
+        member: impl FnOnce(&LazyHostClassIndex) -> HostProjectResult<HostFact<Vec<T>>>,
+    ) -> HostProjectResult<HostFact<Vec<T>>> {
+        match self.binary_find_class_result(owner)? {
+            HostFact::Known(Some(_)) => {}
+            HostFact::Known(None) | HostFact::Missing => return Ok(HostFact::Missing),
+            HostFact::Unavailable { reason } => {
+                return Ok(HostFact::Unavailable { reason });
+            }
+        }
+        if self.binary.provider.class_bytes_result(owner)?.is_none() {
+            return Err(HostSourceError::Failure(format!(
+                "class bytes for catalog owner {owner} are unavailable"
+            )));
+        }
+        match member(&self.binary)? {
+            HostFact::Known(values) => Ok(HostFact::Known(values)),
+            HostFact::Missing => Err(HostSourceError::Failure(format!(
+                "binary member facts for {owner} are unavailable"
+            ))),
+            HostFact::Unavailable { reason } => Ok(HostFact::Unavailable { reason }),
+        }
+    }
+
+    /// Return fallible method facts.  A source member result is used only when
+    /// its authority is complete; otherwise binary member facts are checked
+    /// for both catalog presence and readable class bytes.
+    pub fn get_methods_result(
+        &self,
+        owner: &str,
+    ) -> HostProjectResult<HostFact<Vec<MethodIndexEntry>>> {
+        let mut partial_source = false;
+        if let Some(source) = &self.source {
+            let class = source.find_class(owner)?;
+            match class.authority {
+                SourceAuthority::Complete => {
+                    let Some(_) = class.value else {
+                        return Ok(HostFact::Missing);
+                    };
+                    let methods = source.get_methods(owner)?;
+                    if methods.authority == SourceAuthority::Complete {
+                        return Ok(HostFact::Known(methods.value));
+                    }
+                    partial_source = true;
+                }
+                SourceAuthority::Partial if class.value.is_some() => partial_source = true,
+                SourceAuthority::Partial | SourceAuthority::Unavailable => {}
+            }
+        }
+        match self.binary_member_result(owner, |binary| binary.methods_result(owner))? {
+            HostFact::Missing if partial_source => Err(HostSourceError::Failure(format!(
+                "source method facts for {owner} are incomplete and binary class facts are missing"
+            ))),
+            result => Ok(result),
+        }
+    }
+
+    /// Return fallible field facts with the same source-first/binary-checked
+    /// policy as `get_methods_result`.
+    pub fn get_fields_result(
+        &self,
+        owner: &str,
+    ) -> HostProjectResult<HostFact<Vec<FieldIndexEntry>>> {
+        let mut partial_source = false;
+        if let Some(source) = &self.source {
+            let class = source.find_class(owner)?;
+            match class.authority {
+                SourceAuthority::Complete => {
+                    let Some(_) = class.value else {
+                        return Ok(HostFact::Missing);
+                    };
+                    let fields = source.get_fields(owner)?;
+                    if fields.authority == SourceAuthority::Complete {
+                        return Ok(HostFact::Known(fields.value));
+                    }
+                    partial_source = true;
+                }
+                SourceAuthority::Partial if class.value.is_some() => partial_source = true,
+                SourceAuthority::Partial | SourceAuthority::Unavailable => {}
+            }
+        }
+        match self.binary_member_result(owner, |binary| binary.fields_result(owner))? {
+            HostFact::Missing if partial_source => Err(HostSourceError::Failure(format!(
+                "source field facts for {owner} are incomplete and binary class facts are missing"
+            ))),
+            result => Ok(result),
+        }
+    }
+
+    /// Verify that the class and its member index are actually available.
+    /// Catalog presence alone is deliberately insufficient: a lazy binary
+    /// index can expose `find_class(Some)` before class bytes are readable.
+    pub fn owner_result(&self, owner: &str) -> HostProjectResult<HostFact<ClassIndexEntry>> {
+        let mut partial_source_class = false;
+        if let Some(source) = &self.source {
+            let class = source.find_class(owner)?;
+            match class.authority {
+                SourceAuthority::Complete => {
+                    let Some(entry) = class.value else {
+                        return Ok(HostFact::Missing);
+                    };
+                    let methods = self.get_methods_result(owner)?;
+                    let fields = self.get_fields_result(owner)?;
+                    if matches!(methods, HostFact::Known(_)) && matches!(fields, HostFact::Known(_))
+                    {
+                        return Ok(HostFact::Known(entry));
+                    }
+                    partial_source_class = true;
+                }
+                SourceAuthority::Partial if class.value.is_some() => {
+                    partial_source_class = true;
+                }
+                SourceAuthority::Partial | SourceAuthority::Unavailable => {}
+            }
+        }
+
+        let class = self.binary_find_class_result(owner)?;
+        let entry = match class {
+            HostFact::Known(Some(entry)) => entry,
+            HostFact::Known(None) | HostFact::Missing => {
+                if partial_source_class {
+                    return Err(HostSourceError::Failure(format!(
+                        "source class facts for {owner} are incomplete and binary class facts are missing"
+                    )));
+                }
+                return Ok(HostFact::Missing);
+            }
+            HostFact::Unavailable { reason } => {
+                return Ok(HostFact::Unavailable { reason });
+            }
+        };
+
+        match self.binary.provider.class_bytes_result(owner)? {
+            Some(_) => {
+                let methods = self.binary.methods_result(owner)?;
+                let fields = self.binary.fields_result(owner)?;
+                if matches!(methods, HostFact::Known(_)) && matches!(fields, HostFact::Known(_)) {
+                    Ok(HostFact::Known(entry))
+                } else {
+                    Err(HostSourceError::Failure(format!(
+                        "binary member facts for {owner} are unavailable"
+                    )))
+                }
+            }
+            None => Err(HostSourceError::Failure(format!(
+                "class bytes for catalog owner {owner} are unavailable"
+            ))),
+        }
+    }
+}
+
 pub struct HostBytecodeAdapter {
     pub provider: Arc<HostClassBytesProvider>,
     pub class_index: Arc<dyn ClassIndex>,
@@ -779,9 +1064,11 @@ pub struct HostProjectSession {
     pub identity: HostSessionIdentity,
     pub class_bytes_provider: Arc<HostClassBytesProvider>,
     pub binary_index: Arc<LazyHostClassIndex>,
+    pub checked_class_index: Arc<HostCheckedClassIndex>,
     pub class_index: Arc<dyn ClassIndex>,
     pub bytecode_index: Arc<HostBytecodeAdapter>,
     overlay: Arc<HostClassIndexOverlay>,
+    checked_source: Option<Arc<dyn ProjectSourceQuery>>,
 }
 pub type HostClassIndexOverlay = dyn Fn(Arc<dyn ClassIndex>) -> Arc<dyn ClassIndex> + Send + Sync;
 struct SessionClassIndex {
@@ -833,6 +1120,30 @@ impl HostProjectSession {
         host: Arc<dyn HostProjectQuery>,
         overlay: Arc<HostClassIndexOverlay>,
     ) -> Self {
+        Self::with_class_index_and_source(context, identity, host, overlay, None)
+    }
+
+    /// Build a session whose fallible index checks use the same caller-owned
+    /// source query as the source overlay.  Existing `with_class_index` and
+    /// `create` callers retain their compatibility index behavior and receive
+    /// checked binary fallback automatically.
+    pub fn with_checked_source_index(
+        context: Arc<ProjectContext>,
+        identity: HostSessionIdentity,
+        host: Arc<dyn HostProjectQuery>,
+        overlay: Arc<HostClassIndexOverlay>,
+        source: Arc<dyn ProjectSourceQuery>,
+    ) -> Self {
+        Self::with_class_index_and_source(context, identity, host, overlay, Some(source))
+    }
+
+    fn with_class_index_and_source(
+        context: Arc<ProjectContext>,
+        identity: HostSessionIdentity,
+        host: Arc<dyn HostProjectQuery>,
+        overlay: Arc<HostClassIndexOverlay>,
+        checked_source: Option<Arc<dyn ProjectSourceQuery>>,
+    ) -> Self {
         let entries = identity
             .facts
             .classpath
@@ -863,6 +1174,10 @@ impl HostProjectSession {
             provider: provider.clone(),
             index: overlay(binary.clone()),
         });
+        let checked_class_index = Arc::new(HostCheckedClassIndex::new(
+            binary.clone(),
+            checked_source.clone(),
+        ));
         let bytecode = Arc::new(HostBytecodeAdapter::new(
             provider.clone(),
             class_index.clone(),
@@ -872,17 +1187,20 @@ impl HostProjectSession {
             identity,
             class_bytes_provider: provider,
             binary_index: binary,
+            checked_class_index,
             class_index,
             bytecode_index: bytecode,
             overlay,
+            checked_source,
         }
     }
     pub fn reindex(&self) -> Self {
-        Self::with_class_index(
+        Self::with_class_index_and_source(
             self.context.clone(),
             self.identity.clone(),
             self.class_bytes_provider.host.clone(),
             self.overlay.clone(),
+            self.checked_source.clone(),
         )
     }
     pub fn close(&self) {
@@ -901,6 +1219,12 @@ impl HostProjectSession {
     }
     pub fn reference_types(&self) -> HostReferenceTypes {
         HostReferenceTypes {
+            provider: self.class_bytes_provider.clone(),
+        }
+    }
+
+    pub fn checked_reference_types(&self) -> HostCheckedReferenceTypes {
+        HostCheckedReferenceTypes {
             provider: self.class_bytes_provider.clone(),
         }
     }
@@ -930,6 +1254,45 @@ impl HostReferenceTypes {
                 .host
                 .is_assignable(&self.provider.identity, from, to)?,
         )
+    }
+}
+
+/// Strict facade adapter for reference facts.  The compatibility trait uses
+/// `Option<bool>` by design, so an unavailable host answer must leave that
+/// boundary as an error rather than becoming `None` and later a false/empty
+/// core result.  The facade's existing panic boundary converts the preserved
+/// `HostSourceError` back into a typed command failure.
+pub struct HostCheckedReferenceTypes {
+    pub provider: Arc<HostClassBytesProvider>,
+}
+impl HostCheckedReferenceTypes {
+    fn reference_types(&self) -> HostReferenceTypes {
+        HostReferenceTypes {
+            provider: self.provider.clone(),
+        }
+    }
+}
+impl crate::mixinextras_handler::HandlerReferenceTypeResolver for HostCheckedReferenceTypes {
+    fn is_known_reference(&self, owner: &str) -> Option<bool> {
+        match self.reference_types().reference_type_result(owner) {
+            Ok(HostFact::Known(_)) => Some(true),
+            Ok(HostFact::Missing) => Some(false),
+            Ok(HostFact::Unavailable { reason }) => {
+                std::panic::panic_any(HostSourceError::Failure(reason))
+            }
+            Err(error) => std::panic::panic_any(error),
+        }
+    }
+
+    fn is_assignable(&self, from: &str, to: &str) -> Option<bool> {
+        match self.reference_types().assignability_result(from, to) {
+            Ok(HostFact::Known(value)) => Some(value),
+            Ok(HostFact::Missing) => Some(false),
+            Ok(HostFact::Unavailable { reason }) => {
+                std::panic::panic_any(HostSourceError::Failure(reason))
+            }
+            Err(error) => std::panic::panic_any(error),
+        }
     }
 }
 impl crate::mixinextras_handler::HandlerReferenceTypeResolver for HostReferenceTypes {

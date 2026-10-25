@@ -8,12 +8,25 @@ and accepted-contribution tracing. Real MC/editor acceptance is recorded in
 The earlier `f5953350928eb8af1ab34bb39db23ba7370d14af` interop checkpoint also
 lacks these two operations; the new host pin does not enable their advertisement.
 
-The authoritative **proposed, not implemented or advertised** contract is
-`C:/Users/gummy/.codex/ktlsp-runs/01a12550-7d56-71f2-8c34-8ab8c5fe5dda/project-type-facts143-wire.md`,
-SHA256 `3951de07529737cef9df3a66610c163fe6f2baa8f47dc7bf367d3237911dd8e2`.
-The isolated `host_facts` adapter models its two operations. Production negotiation
-remains semantic-v1 until the host implementation and fixed published checkpoint
-are available. A compiled DTO is not live host proof.
+The host's unpublished **candidate 37 implements these two operations**. Its fixed
+serializer handoff is
+`C:/Users/gummy/.codex/ktlsp-runs/01a12550-7d56-71f2-8c34-8ab8c5fe5dda/candidate37-semantic-handoff/manifest.json`,
+SHA256 `517f3f3906e46345854cccec8b94e37ea3b88d235ecfcf1c5f2f29485eb0b2af`.
+The copied `crates/ktlsp/src/extension_ipc.rs` is the actual wire authority,
+SHA256 `ecfc4d8bfbd7b5fe35dfa9ede4c3859c0f2535a6c429c948adae8d6526f9f7a5`.
+All five copied sources match the producer's pre-test and post-release guards.
+The candidate executable SHA256 is
+`a3f1248d6aa39cf582f87c88477ca175964f3e55d11f45348b8f353a0675e1b6`;
+this is an artifact pin, not a published Git revision.
+
+The actual serializer and recorded frames agree with the isolated MC `host_facts`
+adapter. The producer's `project-facts143-37-final.json`, SHA256
+`dc09e9a59770fd859c7ede28426307e4ee5e329bd92387f7934687b7262ff096`,
+records 46 matched optional checks with no mismatch or unmeasured checks.
+That proves the producer's optional reader, not its integration into the MC
+command host. The MC production child still negotiates only semantic-v1.
+Its 112-check/29-request editor smoke also passes against this candidate in
+`build/rust-test-logs/host-smoke-20261025-125351932/`.
 
 The earlier MC proposal for an eight-counter project identity, external
 `validateReads`, catalog/blob queries and a full project adapter was not accepted
@@ -84,7 +97,8 @@ establish raw JVM coverage. Source-only, dirty, unsupported-lowering, wrong-owne
 and oversize ABI remain Unknown while other positive facts survive.
 The host confirmed `contentSha256` as a lowercase 64-digit hexadecimal JSON
 string without `0x`; the child preserves that lossless identity without hashing
-bytes. The implemented serializer and fixed commit will remain the final source.
+bytes. The fixed candidate serializer above is the current wire source; a later
+published revision must be checked before replacing that pin.
 
 Complete headers do not provide Code, LVT, annotation payloads, callability or
 source location authority. `executable_bytecode()` reports BYTECODE_UNAVAILABLE

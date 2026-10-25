@@ -36,30 +36,73 @@ $buildResult = $null
 $smokeResult = $null
 $exitCode = 1
 try {
-    $cargoManifest = Join-Path $repo 'mcdev-companion/Cargo.toml'
-    $cargoText = Get-Content -LiteralPath $cargoManifest -Raw
-    if ($cargoText -notmatch '(?m)^version\s*=\s*"([^"]+)"') {
-        throw 'mcdev-companion Cargo package version was not found'
+    $metadataResult = Invoke-RustCheck -Name 'native-release-metadata' -Command 'cargo' -Arguments @(
+        'metadata', '--locked', '--offline', '--no-deps', '--format-version', '1'
+    ) -Directory $repo -LogDirectory $logs -TimeoutSeconds 60
+    if ($metadataResult.ExitCode -ne 0) {
+        throw 'native Cargo metadata failed; see complete logs'
     }
-    $companionPackageVersion = $Matches[1]
-
-    $gradleManifest = Join-Path $repo 'build.gradle.kts'
-    $gradleText = Get-Content -LiteralPath $gradleManifest -Raw
-    if ($gradleText -notmatch '(?m)^version\s*=\s*"([^"]+)"') {
-        throw 'root Gradle product version was not found'
-    }
-    $productVersion = $Matches[1]
+    $metadata = Get-Content -LiteralPath (Join-Path $logs 'native-release-metadata.stdout.log') -Raw | ConvertFrom-Json
+    $companionPackage = @($metadata.packages | Where-Object name -eq 'mcdev-companion')
+    if ($companionPackage.Count -ne 1) { throw 'native companion package was not found' }
+    $companionPackageVersion = [string]$companionPackage[0].version
+    $productVersion = $companionPackageVersion
     if ($Version -ne $productVersion) {
-        throw "release version $Version does not match the existing root product version $productVersion"
+        throw "release version $Version does not match the native Cargo product version $productVersion"
     }
+
+    $buildCommit = $null
+    $buildCommitOverride = [Environment]::GetEnvironmentVariable('MCDEV_BUILD_COMMIT', 'Process')
+    try {
+        $gitCommitOutput = & git -C $repo rev-parse HEAD 2>$null
+        $gitCommit = ([string](@($gitCommitOutput) | Select-Object -First 1)).Trim()
+        if ($LASTEXITCODE -eq 0 -and $gitCommit -match '^[0-9a-fA-F]{40}$') {
+            $dirtyOutput = & git -C $repo status --porcelain 2>$null
+            if ($LASTEXITCODE -eq 0) {
+                $buildCommit = $gitCommit
+                if (-not [string]::IsNullOrWhiteSpace(($dirtyOutput -join [Environment]::NewLine))) {
+                    $buildCommit += '+dirty'
+                }
+            }
+        }
+    } catch {
+        $buildCommit = $null
+    }
+    if ([string]::IsNullOrWhiteSpace($buildCommit)) {
+        $buildCommit = $buildCommitOverride
+    }
+    if ([string]::IsNullOrWhiteSpace($buildCommit)) {
+        $buildCommit = $null
+    }
+    $buildTime = [DateTimeOffset]::UtcNow.ToString(
+        'yyyy-MM-ddTHH:mm:ss.fffZ',
+        [Globalization.CultureInfo]::InvariantCulture)
 
     $buildTimeout = 900
-    $buildResult = Invoke-RustCheck -Name 'native-release-build' -Command 'cargo' -Arguments @(
-        'build', '--release', '--locked', '-p', 'mcdev-companion', '--bin', 'mcdev-companion'
-    ) -Directory $repo -LogDirectory $logs -TimeoutSeconds $buildTimeout
+    $oldBuildCommit = [Environment]::GetEnvironmentVariable('MCDEV_BUILD_COMMIT', 'Process')
+    $oldBuildTime = [Environment]::GetEnvironmentVariable('MCDEV_BUILD_TIME', 'Process')
+    $oldBuildVersion = [Environment]::GetEnvironmentVariable('MCDEV_BUILD_VERSION', 'Process')
+    try {
+        if ($null -eq $buildCommit) { Remove-Item Env:MCDEV_BUILD_COMMIT -ErrorAction SilentlyContinue }
+        else { $env:MCDEV_BUILD_COMMIT = $buildCommit }
+        $env:MCDEV_BUILD_TIME = $buildTime
+        $env:MCDEV_BUILD_VERSION = $Version
+        $buildResult = Invoke-RustCheck -Name 'native-release-build' -Command 'cargo' -Arguments @(
+            'build', '--release', '--locked', '-p', 'mcdev-companion', '--bin', 'mcdev-companion'
+        ) -Directory $repo -LogDirectory $logs -TimeoutSeconds $buildTimeout
+    } finally {
+        if ($null -eq $oldBuildCommit) { Remove-Item Env:MCDEV_BUILD_COMMIT -ErrorAction SilentlyContinue }
+        else { $env:MCDEV_BUILD_COMMIT = $oldBuildCommit }
+        if ($null -eq $oldBuildTime) { Remove-Item Env:MCDEV_BUILD_TIME -ErrorAction SilentlyContinue }
+        else { $env:MCDEV_BUILD_TIME = $oldBuildTime }
+        if ($null -eq $oldBuildVersion) { Remove-Item Env:MCDEV_BUILD_VERSION -ErrorAction SilentlyContinue }
+        else { $env:MCDEV_BUILD_VERSION = $oldBuildVersion }
+    }
     $buildResult | ConvertTo-Json | Set-Content -Encoding utf8 (Join-Path $logs 'native-release-build.result.json')
     $summary.Add(('build: exit={0} timeout={1} seconds={2} pid={3} deadline={4}s' -f
         $buildResult.ExitCode, $buildResult.TimedOut, $buildResult.Seconds, $buildResult.Pid, $buildTimeout))
+    $summary.Add(('build metadata: commit={0}; time={1}; version={2}' -f
+        ($buildCommit ?? 'unknown'), $buildTime, $Version))
     if ($buildResult.ExitCode -ne 0) {
         Get-Content -LiteralPath (Join-Path $logs 'native-release-build.stderr.log') -Tail 40
         throw 'native release build failed; see complete logs'

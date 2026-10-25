@@ -1,246 +1,75 @@
 # mc-dev-lsp
 
-`codex/ktlsp-rust` is the Rust replacement branch, currently under
-implementation and parity verification. The original JDT LS checkout and its uncommitted work remain on
-`main`. The target is stock ktlsp plus a separately built `mcdev-companion`
-executable over versioned stdio JSON-RPC; rebuilding ktlsp with the extension is
-not required.
+Minecraft development support implemented in Rust, with a separate
+`mcdev-companion` executable connected to stock ktlsp over stdio JSON-RPC and a
+thin Neovim client. Building the companion does not build or link ktlsp.
 
-See [the migration and verification record](docs/rust-migration.md),
-[the companion contract](docs/mcdev-companion-contract.md) and
-[native Neovim configuration](docs/lazy-nvim.md). The linked `mcdev-ktlsp`
-prototype is retained temporarily as a migration oracle. Full feature parity is
-still being verified. The JDT LS description and build instructions below are
-the legacy baseline and are awaiting replacement; use the linked native setup
-for this branch.
+This is the `codex/ktlsp-rust` replacement branch. The original JDT LS checkout
+and its uncommitted work remain on `main`. Full replacement is still in
+progress: all 2,604 original JUnit cases have native replacements, but the full
+MC command surface and original editor workflows are not yet connected to the
+host. See the [migration record](docs/rust-migration.md) for verified scope and
+remaining work.
 
-Minecraft modding semantic support for Neovim through a JDT LS extension.
-
-The repository follows the design dossier in [docs](docs/README.md). Kotlin owns Minecraft modding semantics, the JDT LS bundle owns Java/project integration, and Lua owns only Neovim transport and UI adaptation.
-
-## Features
-
-- **Completion** — Mixin targets, inject methods, `@At` bytecode targets, MixinExtras handlers, Access Widener, and Access Transformer slots with readable labels and exact insertion text
-- **Diagnostics** — Mixin, MixinExtras, AW, and AT issues with stable diagnostic codes via `mcdev.diagnostics`
-- **Code actions** — Mixin config entries, descriptor fixes, handler signature generation, AW/AT entry generation and remapping
-- **Definition and references** — Mixin target navigation through `mcdev.definition` and `mcdev.references`; Neovim keymaps are always user-defined
-- **Project introspection** — `:McdevInfo` and `:McdevReindex` for platform, mappings, configs, and index state
+The current real-host integration supports the bounded Mixin/Shadow slice:
+Java/Kotlin target bindings, definition/references/rename, diagnostics, and
+shared completion. The 112-check editor proof covers that slice. Mappings,
+AW/AT, MixinExtras, all eleven MC commands, and source/resource/class-byte/SDK
+integration remain outside the published live capability.
 
 ## Modules
 
-- `mcdev-ktlsp`: initial Rust Mixin provider and ktlsp-based LSP executable on this branch.
-- `mcdev-core`: editor-independent JVM descriptor, mapping, bytecode, Mixin, MixinExtras, Access Widener, and Access Transformer semantics.
-- `mcdev-protocol`: command payload and response DTOs shared by Neovim and the JDT LS extension.
-- `mcdev-jdtls-extension`: OSGi bundle entry point and JDT LS command integration.
-- `mcdev-nvim`: Neovim plugin that sends `workspace/executeCommand` requests to JDT LS.
-- `mcdev-test-fixtures`: fixture projects for semantic and packaging tests.
+- `mcdev-core`: descriptors, mappings, bytecode, project/resource models, Mixin,
+  MixinExtras, Access Widener and Access Transformer services.
+- `mcdev-protocol`: existing command payloads, response DTOs and conversions.
+- `mcdev-companion`: standalone extension process and command/core composition.
+- `mcdev-nvim`: Neovim transport and UI; Minecraft rules stay in Rust.
+- `mcdev-test-fixtures`: preserved source/resource inputs for regression and
+  editor tests.
 
-## User documentation
+The earlier statically linked `mcdev-ktlsp` prototype has been retired. Its
+thirteen scenario families execute in the native companion process tests, and
+its original test source is preserved with provenance in the fixtures.
 
-- [Installation](docs/installation.md) — prerequisites, JDT LS, prebuilt jar, build from source
-- [Native distribution](docs/native-distribution.md) — standalone companion archives and semantic-v1 scope
-- [Mason setup](docs/mason.md) — use Mason for JDT LS while loading the mcdev bundle separately
-- [Lazy.nvim setup](docs/lazy-nvim.md) — full Lazy spec with mcdev-nvim and jdtls bundles
-- [Troubleshooting](docs/troubleshooting.md) — bundle loading, workspace root, AW/AT buffers, diagnostics
-- [Contributing](docs/contributing.md) — architecture boundaries and the no-Lua-semantics rule
+## Build and verify
 
-## Build
-
-This project targets Java 21 and Kotlin JVM target 21.
+Rust builds the companion. The complete verification runner additionally needs
+PowerShell 7 and Neovim 0.11.5 or newer. A JVM is not required for native core,
+protocol, process, or client tests.
 
 ```powershell
-gradle test
-gradle :mcdev-jdtls-extension:jar
-gradle :mcdev-jdtls-extension:checkBundle
-nvim --headless -u mcdev-nvim/tests/minimal_init.lua -c "luafile mcdev-nvim/tests/run.lua" -c qa
-powershell -NoProfile -ExecutionPolicy Bypass -File scripts/check-layout.ps1
+rtk cargo build --release --locked -p mcdev-companion
+rtk proxy pwsh -NoProfile -File scripts/run-rust-tests-compact.ps1
 ```
 
-The `CI` GitHub Actions workflow runs `gradle test --no-daemon`, the headless Neovim adapter tests, and `scripts/check-layout.ps1` on Linux and Windows for pull requests and pushes to `main`.
+The runner checks formatting, all workspace targets and doc tests, builds the
+companion, and runs the finite Neovim suite. Full logs are retained under
+`build/rust-test-logs` and `build/nvim-test-logs`. The Rust CI workflow uses the
+same path on Ubuntu and Windows. Real stock-host tests require a separately
+provided, pinned ktlsp executable; the native suite alone does not prove full
+editor compatibility.
 
-The JDT LS extension jar is produced as:
+For that separate proof, `scripts/run-host-smoke-compact.ps1` accepts explicit
+`-HostBinary`, `-HostSha256`, `-CompanionBinary` and `-CompanionSha256` arguments.
+It verifies both binaries, executes the 112-check fixture with a 120-second
+deadline, and records input hashes and the observed scope.
 
-```text
-mcdev-jdtls-extension/build/libs/io.github.mcdev.jdtls-<version>.jar
-```
-
-## Neovim Setup
-
-Mason should own the `jdtls` executable and ordinary formatter/linter tools.
-Do not register this repository as a Mason registry; `mcdev-jdtls-extension`
-is built from this repo and passed to JDT LS through `init_options.bundles`.
-
-With lazy.nvim, a minimal setup looks like this:
-
-```lua
-return {
-  -- Optional example with mason-tool-installer. Use Mason UI or another
-  -- ensure-installed layer if that is how your config manages tools.
-  {
-    "WhoIsSethDaniel/mason-tool-installer.nvim",
-    dependencies = { "mason-org/mason.nvim" },
-    opts = {
-      ensure_installed = {
-        "jdtls",
-      },
-    },
-  },
-
-  {
-    "cotrin8672/mc-dev-lsp",
-    name = "mcdev-nvim",
-    build = "gradle :mcdev-jdtls-extension:jar --no-daemon",
-    init = function(plugin)
-      vim.opt.rtp:prepend(plugin.dir .. "/mcdev-nvim")
-    end,
-    opts = {
-      insert = {
-        at_target = "smart",
-        mixin_class_import = true,
-        inject_method_descriptor = "auto",
-      },
-    },
-    config = function(plugin, opts)
-      vim.opt.rtp:prepend(plugin.dir .. "/mcdev-nvim")
-      require("mcdev").setup(opts)
-    end,
-  },
-
-  {
-    "mfussenegger/nvim-jdtls",
-    dependencies = { "mcdev-nvim" },
-    ft = "java",
-    config = function()
-      local jdtls = require("jdtls")
-      local config = require("my.java.jdtls").config()
-
-      if require("mcdev.jdtls").extend_config(config) then
-        jdtls.start_or_attach(config)
-      end
-    end,
-  },
-}
-```
-
-The plugin auto-discovers the newest repo-built jar under
-`mcdev-jdtls-extension/build/libs`. Set `jdtls.extension_jar` only when the jar
-is installed elsewhere. `extend_config(config)` only appends the resolved bundle to
-`config.init_options.bundles`; it does not change your JDT LS `cmd`, `root_dir`,
-`settings`, or `capabilities`.
-
-### Completion Sources
-
-mcdev completion is a separate source because it uses the `mcdev.completion`
-command, not plain `textDocument/completion`.
-
-Blink:
-
-```lua
-{
-  "saghen/blink.cmp",
-  dependencies = { "mcdev-nvim" },
-  opts = {
-    sources = {
-      default = function()
-        return require("mcdev.blink").route_sources({
-          "snippets", "buffer", "path", "lsp", "mcdev",
-        })()
-      end,
-      providers = {
-        mcdev = {
-          name = "mcdev",
-          module = "mcdev.blink",
-          score_offset = 100,
-          async = true,
-          timeout_ms = 5000,
-        },
-      },
-    },
-  },
-}
-```
-
-`route_sources` keeps annotation names and valid Java values (class literals,
-enum constants, and nested annotations) mixed with `lsp`, but switches to the
-`mcdev` source alone for Mixin-owned selectors and DSL strings. This prevents
-buffer, snippet, path, AI, and ordinary Java words from appearing in values
-such as `method = "…"`, `@At(target = "…")`, or `@Expression("…")` while
-preserving normal Java completion where the annotation grammar still expects a
-Java value. The callback defers loading until Lazy has added the plugin to the
-runtime path. The score offset makes mcdev's complete snippets win over JDT
-LS' incomplete annotation-attribute items.
-
-nvim-cmp:
-
-```lua
-{
-  "hrsh7th/nvim-cmp",
-  dependencies = { "mcdev-nvim" },
-  config = function()
-    local cmp = require("cmp")
-    local mcdev_cmp = require("mcdev.cmp")
-    cmp.register_source("mcdev", mcdev_cmp.new())
-    cmp.setup({
-      sources = {
-        { name = "mcdev", priority = 1100 },
-        mcdev_cmp.with_exclusive_filter({ name = "nvim_lsp", priority = 1000 }),
-      },
-    })
-  end,
-}
-```
-
-Wrap other generic sources, such as `buffer` and `path`, with `with_exclusive_filter` too. It preserves their existing options and entry filters while excluding their candidates in Mixin-only positions. The `mcdev` source checks its own position and does not need this wrapper.
-
-Use your normal Neovim keymap layer for navigation and code actions. The current JDT LS bundle exposes mcdev navigation through `workspace/executeCommand` commands (`mcdev.definition`, `mcdev.references`); it does not contribute to JDT LS `textDocument/definition` directly.
-
-Diagnostics are off by default in `mcdev-nvim`. Enable them explicitly for debounced diagnostics while editing and after saving:
-
-```lua
-require("mcdev").setup({
-  diagnostics = {
-    enabled = true,
-    events = { "TextChanged", "TextChangedI", "TextChangedP", "InsertLeave", "BufWritePost" },
-    debounce_ms = 500,
-    insert_mode = true,
-  },
-})
-```
-
-Use `:McdevDiagnosticsRefresh` for a manual refresh, `:McdevDiagnosticsStatus` to inspect the current state, `:McdevHealth` when completion does not appear, and `:McdevDebugCompletion` to see the raw completion response.
-
-mcdev hover is currently implemented as a custom `workspace/executeCommand` request through the `mcdev.hover` command. When mcdev navigation support is enabled, the Neovim adapter binds `K` to that custom hover UI. It is not yet integrated into standard `textDocument/hover`.
-
-Example navigation keymap:
-
-```lua
-vim.keymap.set("n", "gd", function()
-  require("mcdev.navigation").definition(0, nil, function(locations, err)
-    if err then
-      vim.notify(tostring(err), vim.log.levels.WARN)
-      return
-    end
-    if locations and locations[1] then
-      vim.lsp.util.show_document(locations[1], "utf-8", { focus = true })
-      return
-    end
-    vim.lsp.buf.definition()
-  end)
-end)
-```
-
-See [docs/lazy-nvim.md](docs/lazy-nvim.md) for a complete Lazy.nvim configuration.
-
-## Local OSGi Bundle E2E
-
-Verify the extension bundle loads in real Mason `jdtls` and answers `mcdev.info` / `mcdev.completion`:
+The existing product version is `0.7.7`, now defined by the native Cargo
+workspace. Build a native archive with:
 
 ```powershell
-powershell -NoProfile -ExecutionPolicy Bypass -File scripts/run-osgi-e2e.ps1
+rtk proxy pwsh -NoProfile -File scripts/build-native-release.ps1 -Version 0.7.7
 ```
 
-See [docs/local-osgi-e2e.md](docs/local-osgi-e2e.md) for manual Neovim setup.
+## Setup and development
 
-## Current Implementation Status
+- [Native distribution and installation](docs/native-distribution.md)
+- [Neovim configuration](docs/lazy-nvim.md)
+- [ktlsp integration](docs/ktlsp.md)
+- [Process protocol and verified host pins](docs/mcdev-companion-contract.md)
+- [Remaining host capabilities](docs/mcdev-command-host-contract.md)
+- [Contributing](docs/contributing.md)
+- [Exact test migration ledger](docs/rust-test-migration.json)
 
-See [docs/10-implementation-status.md](docs/10-implementation-status.md) for the current feature and test matrix.
+The Kotlin/OSGi sources and older design documents remain migration references;
+they are not part of the native build or release.

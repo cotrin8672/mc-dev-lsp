@@ -1,6 +1,9 @@
 # semantic-v1 companion coverage
 
-The source scenario set is `mcdev-ktlsp/tests/mixin.rs` (13 linked prototype tests).
+The source scenario set is the preserved
+`semantic_v1/linked-prototype-cases.rs.txt` (13 former linked-prototype tests).
+`semantic_v1/linked-retirement.json` records its original Git commit, SHA-256
+and one-to-one native scenario mapping. The linked crate is no longer built.
 Each corresponding function in `../semantic.rs` spawns the actual
 `mcdev-companion` executable. `../support/semantic.rs` supplies explicit owned
 normalized host facts and scoped opaque handles. It does not run a language
@@ -18,7 +21,7 @@ binding; the companion cannot decide that a member resolved successfully.
 | `exact_annotation_identity_is_required` | Fake Mixin and fake Shadow with matching qualified source spelling; no requirement/binding/missing-target diagnostic. Identity classification reuses `mcdev-core::mixin_source::MixinAnnotation`. |
 | `descriptor_dispatch_unknown_and_aliases_do_not_guess` | All seven original return/static/unresolved-type/prefix/alias/generic negative forms plus Unknown target; Unknown never becomes missing. An additional DefinitelyAbsent target does produce missing. |
 | `kotlin_accessors_and_unknown_abi_are_not_fields_or_plain_methods` | All six getter/setter/property/nullable-ABI forms remain incomplete and unbound without a false missing-target diagnostic. |
-| `fields_do_not_strip_the_method_prefix` | Both original prefixed/empty-prefix field cases produce the field-prefix error and no requirement/binding. |
+| `fields_do_not_strip_the_method_prefix` | The original `@Shadow int shadow$count;` remains a field-prefix error with no requirement/binding; the original empty-prefix input is independently covered by `empty_shadow_prefix_field_binds_without_field_prefix_error`, which binds `count` without an error. |
 | `empty_effective_name_does_not_discard_other_contributions` | Invalid effective name emits a hint while the unrelated valid member still binds. |
 | `ambiguous_owner_never_binds_to_another_declaration` | Host's authoritative declarationMember is Unknown; no name-based selection, requirement or missing-target diagnostic. |
 | `unsaved_edits_and_provider_configuration_retract_and_rebind` | One persistent child evaluates original/changed-target/restored-target/changed-owner/restored-owner facts; a fresh child rebinds after closure. Real host disable/re-enable/retraction is parent-owned editor acceptance. |
@@ -28,6 +31,12 @@ Additional native process regressions:
 
 - 257 authored members cross both fact and requirement batch boundaries. The mock
   host enforces the published 256-item limit, and all 257 exact bindings survive.
+- The preserved `@Shadow(prefix="") int count;` input now binds its exact field
+  without an error; the default-prefix `@Shadow int shadow$count;` input remains
+  rejected. The native regression is
+  `../semantic.rs::empty_shadow_prefix_field_binds_without_field_prefix_error`,
+  and the direct core regression is
+  `../../../mcdev-core/tests/mixin_validation.rs::shadow_empty_prefix_field_matches_the_authored_name`.
 - Cancellation while a requirement reply is outstanding discards both pending
   sites and already accumulated diagnostics; the old reply cannot contaminate a
   fresh evaluation in the same process.

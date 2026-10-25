@@ -138,6 +138,15 @@ fn shadow_field_method_static_descriptor_prefix_and_multiowner() {
     assert_eq!(ds[0].code, C::SHADOW_TARGET_NOT_FOUND);
 }
 #[test]
+fn shadow_empty_prefix_field_matches_the_authored_name() {
+    let idx = Index::default();
+    let svc = ShadowValidationService::new(&idx);
+    let declaration = shadow("counter", "I", false, false);
+    assert!(svc
+        .validate(&[OWNER.into()], &declaration, Some(""), true)
+        .is_empty());
+}
+#[test]
 fn accessor_inference_all_shapes_and_signature_branches() {
     let idx = Index::default();
     let svc = AccessorService::new(&idx);

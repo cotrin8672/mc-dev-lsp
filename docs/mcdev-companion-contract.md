@@ -2,8 +2,9 @@
 
 `mcdev-companion` is a separate Rust executable. Its dependency graph contains
 `mcdev-core`, `mcdev-protocol`, serde, serde_json and the OS random-source helper;
-it does not link ktlsp or ktcore. The existing
-linked `mcdev-ktlsp` prototype remains available.
+it does not link ktlsp or ktcore. The linked `mcdev-ktlsp` prototype has been
+retired; its thirteen scenario families execute in companion process tests,
+and its original test source is preserved with provenance in the fixtures.
 
 The verified stock-host checkpoint is
 `f76a43fbeddf4fbdc69768fd0f7544e5a4a3610f` in cotrin8672/ktlsp.
@@ -159,8 +160,8 @@ including the previous 29 semantic/framing/lifecycle tests. Full logs are under
 `build/rust-test-logs/companion-real-config-native-final/`.
 
 Further project/class, resource and command capabilities are separate work.
-The next host draft provides only optional `projectContext` and `typeJvm`
+The fixed unpublished host 37 candidate provides only optional `projectContext` and `typeJvm`
 operations, with per-instance supported-operation negotiation and existing host
 readset validation. It cannot establish a complete MC project session, class
 catalog or bytecode provider. See [the capability record](mcdev-host-capabilities.md)
-for the exact proposed boundary and what remains unavailable.
+for the actual serializer pin, the still isolated MC adapter and what remains unavailable.

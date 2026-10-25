@@ -56,6 +56,63 @@ pub struct BuildIdentity {
     pub version: String,
     pub artifact_location: String,
 }
+
+impl BuildIdentity {
+    pub fn current() -> Self {
+        Self {
+            commit: option_env!("MCDEV_BUILD_COMMIT")
+                .filter(|value| !value.is_empty())
+                .unwrap_or("unknown")
+                .to_owned(),
+            build_time: option_env!("MCDEV_BUILD_TIME")
+                .filter(|value| !value.is_empty())
+                .unwrap_or("unknown")
+                .to_owned(),
+            version: option_env!("MCDEV_BUILD_VERSION")
+                .filter(|value| !value.is_empty())
+                .unwrap_or(env!("CARGO_PKG_VERSION"))
+                .to_owned(),
+            artifact_location: std::env::current_exe()
+                .ok()
+                .map(|path| path.to_string_lossy().into_owned())
+                .filter(|path| !path.is_empty())
+                .unwrap_or_else(|| "unknown".to_owned()),
+        }
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::BuildIdentity;
+    use std::path::Path;
+
+    #[test]
+    fn current_reports_executable_and_compile_time_metadata() {
+        let identity = BuildIdentity::current();
+
+        assert!(!identity.version.is_empty());
+        assert!(Path::new(&identity.artifact_location).is_file());
+        assert_eq!(
+            identity.commit,
+            option_env!("MCDEV_BUILD_COMMIT")
+                .filter(|value| !value.is_empty())
+                .unwrap_or("unknown")
+        );
+        assert_eq!(
+            identity.build_time,
+            option_env!("MCDEV_BUILD_TIME")
+                .filter(|value| !value.is_empty())
+                .unwrap_or("unknown")
+        );
+        assert_eq!(
+            identity.version,
+            option_env!("MCDEV_BUILD_VERSION")
+                .filter(|value| !value.is_empty())
+                .unwrap_or(env!("CARGO_PKG_VERSION"))
+        );
+    }
+}
+
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum SourceFamily {
     JavaKotlin,

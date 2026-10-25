@@ -26,4 +26,18 @@ if ($timeout.ExitCode -ne 124 -or -not $timeout.TimedOut -or $timeout.Seconds -g
 if (Get-Process -Id $timeout.Pid -ErrorAction SilentlyContinue) { throw 'Owned timed-out process survived' }
 $childPid = [int](Get-Content -LiteralPath $childPidFile -Raw)
 if (Get-Process -Id $childPid -ErrorAction SilentlyContinue) { throw 'Owned descendant survived timeout' }
-Write-Output "runner checks: PASS (failure, retained streams, timeout, owned process tree exit); logs: $logs"
+foreach ($name in @('MCDEV_FACADE_CASE', 'MCDEV_TWO_OPS_TEST_PORT')) {
+    $previous = [Environment]::GetEnvironmentVariable($name, 'Process')
+    try {
+        Set-Item -LiteralPath "Env:$name" -Value 'runner-guard-check'
+        $guard = Invoke-RustCheck "guard-$name" $pwsh @('-NoProfile', '-File', (Join-Path $PSScriptRoot 'run-rust-tests-compact.ps1'), '-SkipEditor') $repo $logs 10
+        if ($guard.ExitCode -ne 1 -or $guard.TimedOut) { throw "$name did not reject an incomplete full-suite run" }
+        if ((Get-Content -LiteralPath (Join-Path $logs "guard-$name.stdout.log") -Raw) -notlike "*requires $name to be absent*") {
+            throw "$name did not fail at the full-suite environment gate"
+        }
+    } finally {
+        if ($null -eq $previous) { Remove-Item -LiteralPath "Env:$name" -ErrorAction SilentlyContinue }
+        else { Set-Item -LiteralPath "Env:$name" -Value $previous }
+    }
+}
+Write-Output "runner checks: PASS (failure, retained streams, timeout, owned process tree exit, unfiltered suite gate); logs: $logs"
