@@ -1,17 +1,22 @@
 # Remaining command and resource integration
 
 This is a requirements record, not an implemented or advertised wire API.
-Stock host `f76a43fbeddf4fbdc69768fd0f7544e5a4a3610f` provides the verified
-semantic-v1 source Shadow slice. The proposed projectContext/typeJvm operations
-are a separate, unpublished two-operation slice. Neither surface provides the
-eleven commands below.
+Published host binary checkpoint `f76a43fbeddf4fbdc69768fd0f7544e5a4a3610f`
+provides the verified semantic-v1 source Shadow slice. The projectContext/typeJvm
+API source is published in
+[`16580db`](https://github.com/cotrin8672/ktlsp/commit/16580dbbb7ccb3dbbb42bee3afa90ee6aeef0e3b),
+and its fixed candidate37 serializer matches the isolated MC reader. The
+candidate binary is a combined working-tree build, not a build of that API
+commit alone. Neither surface provides the eleven commands below.
 
 The Rust implementation already contains the exact command decoder, response
 DTOs, dispatcher, domain services and transport library. All 127 original
-command cases execute natively. Real integration still needs command routing,
-an implementation of the core-facing `CommandHost`, and authoritative generic
-host facts. A mock CommandHost returning captured domain results does not prove
-that composition or its live connection.
+command cases execute natively. `CoreCommandHost` now composes real domain
+services over complete caller-owned generic facts; whole-command tests compare
+the final completion/diagnostic/action/definition DTOs and applied config edits.
+Real integration still needs command routing and production adapters supplying
+the authoritative generic host facts. A mock CommandHost returning captured
+domain results does not prove that composition or its live connection.
 
 Primary implementation references:
 
@@ -20,6 +25,8 @@ Primary implementation references:
   [protocol conversion](../mcdev-protocol/src/convert.rs).
 - [Dispatcher](../mcdev-companion/src/commands/runtime.rs) and
   [required host boundary](../mcdev-companion/src/commands/host.rs).
+- [Concrete core composition](../mcdev-companion/src/commands/core.rs) and
+  [its proof and remaining paths](core-command-composition.md).
 - [Original command evidence](../mcdev-companion/tests/fixtures/commands/README.md).
 - [Current host fact subset](mcdev-host-capabilities.md) and
   [concrete original editor observations](neovim-host-contract.md).

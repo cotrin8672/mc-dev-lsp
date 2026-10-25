@@ -64,7 +64,7 @@ client”.
 | `mcdev.diagnostics` | `load_session` → `diagnostics` → `HostMixinServiceFacade::diagnose` → `MixinServiceFacade::diagnose` and the AW/AT service → `DiagnosticConverter`. | Current source, semantic model, mappings/resources, exact class/member facts and bytecode where a diagnostic needs them. |
 | `mcdev.context` | Same path as diagnostics; `DecodedCommand::Context` is an alias and returns the diagnostics envelope. | Exactly the diagnostics authority; it is not a cheaper context probe. |
 | `mcdev.definition` | `load_session` → `definitions` → `HostMixinServiceFacade::definitions` → `MixinDefinitionService::definitions_at`; then `resolve_definitions` → `DefinitionResolutionService` backends (`HostProjectSession` and/or `SourceDefinitionBackend`/`SourceIndex`) → `DefinitionConverter`. | Target identity plus a current source declaration/location or a host `definition` fact. Unresolved/unknown locations must remain typed unresolved/unavailable, not fabricated URI/range data. |
-| `mcdev.references` | `load_session` → `definitions`; if targets exist, `source_entries` for Java/Kotlin and AW/AT → `references` → `MixinReferenceService::find_references` → URI/range conversion and dispatcher deduplication. | Complete, current source inventory including unsaved overlays and negative inventory reads. The current public providers do not enumerate/read all Java/Kotlin source entries. |
+| `mcdev.references` | `load_session` → `definitions`; if targets exist, `source_entries` for Java/Kotlin and AW/AT → `references` → `MixinReferenceService::find_references` plus `AwAtServiceFacade::find_references` → URI/range conversion and dispatcher deduplication. | Complete, current source inventory including unsaved overlays and negative inventory reads. The current public providers do not enumerate/read all Java/Kotlin source entries. |
 | `mcdev.hover` | `load_session` → `definitions` → dispatcher `format_hover` → `McdevHoverResponse`. | Same target/project facts as definition. No second fake hover model is needed. |
 | `mcdev.codeAction` | Kotlin is an explicit known-empty fast path. Otherwise `load_session` → `selected_mixin_config_content` → `HostMixinFacade::selected_mixin_config` plus a separate provider content read; `code_actions` → `HostMixinServiceFacade::code_actions` → core fix services; `resolve_fix` for fixes needing source/config materialization → `CodeActionConverter`. | Current source/diagnostics, selected config content, file versions and safe edit preconditions. Host owns actual source/resource reads and any editor-side mutation; Rust owns fix computation/edit shape. |
 | `mcdev.info` | `load_session` + `build_identity` → `InfoService::format_lines` and `McdevInfoResponse`. | Owned project snapshot and real build identity. Advertise only commands actually connected. |
@@ -268,7 +268,8 @@ gate.
   `HostMixinFacade::try_complete_buffer_only` and `--stdio-completion`; it
   does not claim a project session.
 - Keep `mcdev-companion/tests/core_commands.rs` as the fixture-host proof for
-  completion, diagnostics, config edits, and definition resolution. It calls
+  completion, diagnostics, config edits, definition resolution, references,
+  and hover. It calls
   the real dispatcher, facade and converters; only generic semantic/source/
   index/definition facts are faked.
   Do not advertise this library proof as connected to semantic-v1.
@@ -337,20 +338,45 @@ are fake.
 11. `missing_document_version_uses_one_semantic_provider_call_per_command`
     proves exactly one semantic provider call for `definition`, `diagnostics`,
     and `codeAction` when `documentVersion` is absent.
+12. `references_find_java_mixin_member_through_the_real_command_host` resolves
+    a Java `@Inject(method = "tick()V")` target and compares both the current
+    buffer and an owned inventory source as complete `SOURCE` locations with
+    the exact `mixin.inject` URI/range metadata.
+13. `references_find_mixed_java_aw_at_locations_from_an_aw_buffer` resolves an
+    AW class target from the current buffer, then searches an owned mixed
+    Java/AW/AT inventory through both real reference services. The literal DTO
+    expectation covers all seven resulting URI/range/metadata locations,
+    including current-buffer overlay precedence, duplicate AW URI suppression,
+    and the baseline's same-URI/different-range AW/AT service outputs.
+14. `hover_formats_the_real_java_definition_target` runs the same real
+    definition extraction through `mcdev.hover` and compares the complete
+    formatted contents and source range.
 
-Definition navigation is now covered through `HostProjectQuery::definition`
-and the existing `DefinitionResolutionService`. References remain a follow-up:
-`referencesReturnsMixinUsages` still needs a complete owned
-`SourceScanEntry` inventory, including the Java/AW/AT deduplication path.
+Definition navigation is covered through `HostProjectQuery::definition` and
+the existing `DefinitionResolutionService`. Java, AW/AT, mixed-inventory,
+duplicate-URI, and hover navigation are now also covered by the real host and
+dispatcher path. Production still needs the host to publish a complete
+`SourceScanEntry` inventory; the tests deliberately provide that inventory as
+owned generic facts and do not scan files or invent a wire.
 
-Focused verification passes all eleven `core_commands` tests in
-`build/rust-test-logs/core-command-p1p2-20261025/core_commands.retry3.stdout-stderr.log`.
-The same focused command was also run through `Invoke-RustCheck`, with complete
-stdout/stderr retained under the sibling `invoke/` directory. Directly affected
-navigation and host-project checks were run separately through the raw cargo and
-`Invoke-RustCheck` paths, with their complete logs under the same unique
-`core-command-p1p2-20261025` directory. The actual facade regression still covers
-source-complete expression bytecode and handler reference facts. The stable
-workspace pipeline includes repository-wide formatting and editor checks.
+Focused verification passes all 14 `core_commands` tests in
+`build/rust-test-logs/core-reference-proof-20261025/invoke/core-reference-focused-final.stdout.log`.
+The focused navigation and host-project checks also pass: `mixin_navigation_boundary`
+and `host_project` each pass through `Invoke-RustCheck`; their complete
+stdout/stderr logs are in the same
+`build/rust-test-logs/core-reference-proof-20261025/invoke/` directory. The
+initial focused attempt and rerun are retained there as well, including the
+bounded assertion diagnostics that established the exact AW/AT range behavior.
+The frozen `McdevReferencesHandler.kt` combines both reference services and
+deduplicates by URI/start position. Its `MixinReferenceService.kt` includes AW/AT
+whole-match ranges, while the dedicated services use token ranges. Those
+different starts explain the seven mixed locations and must remain distinct.
+The parent also supplies a stale inventory entry for the current AW URI: the
+fresh buffer must replace it. All 14 tests pass with that stronger overlay
+assertion in
+`build/rust-test-logs/core-reference-parent-20261025-134234087/`.
+All production inputs and fixtures retain the hashes from the preceding full
+pipeline; only this test file changes. The full 1,666-function run remains its
+own checkpoint, with the three new navigation cases verified by this focused run.
 The legacy callback proof and 189-case facade proof remain valid for their
 stated scopes and are not live command-wire proof.

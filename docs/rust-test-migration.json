@@ -52052,12 +52052,26 @@
     },
     "coreCommandComposition": {
       "status": "native fixture host verified; live routing incomplete",
-      "tests": 11,
-      "focusedLog": "build/rust-test-logs/core-command-p1p2-20261025/invoke",
-      "affectedLog": "build/rust-test-logs/core-command-p1p2-20261025/affected-invoke",
+      "tests": 14,
+      "focusedLog": "build/rust-test-logs/core-reference-parent-20261025-134234087",
+      "affectedLog": "build/rust-test-logs/core-reference-proof-20261025/invoke",
       "fullWorkspaceLog": "build/rust-test-logs/20261025-132046489",
       "productionRouting": false,
-      "note": "Real core completion, diagnostics, config edits, direct-source/Missing/invalid/unavailable definition results, exactly one semantic provider call without documentVersion, checked unavailable facts, cancellation and mid-compute staleness. Remaining command paths need direct composition proof."
+      "note": "14 native whole-command tests cover completion, diagnostics, applied config edits, source/unresolved/invalid/unknown definitions, semantic provider reuse, Java and mixed Java/AW/AT references with overlay/dedup, hover, cancellation and staleness. Production routing remains incomplete.",
+      "navigationProof": {
+        "javaMethodLocations": 2,
+        "mixedJavaAwAtLocations": 7,
+        "hover": true,
+        "staleInventoryReplacedByCurrentOverlay": true,
+        "duplicateSourceUrisSuppressed": true,
+        "distinctSameUriRangesPreserved": true,
+        "productionSourcesUnchanged": true,
+        "changedNativeInputs": [
+          "mcdev-companion/tests/core_commands.rs"
+        ],
+        "latestInputFingerprint": "6ef8d3f66f653491d8017885ac0036e8a2ed3c51b1c314f415eacbaf8b141d3f",
+        "scope": "Complete caller-owned fixture facts through the real core dispatcher; not live MC command routing."
+      }
     },
     "projectTypeFactsContract": {
       "apiCommit": "16580dbbb7ccb3dbbb42bee3afa90ee6aeef0e3b",

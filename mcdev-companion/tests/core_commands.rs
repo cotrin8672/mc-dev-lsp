@@ -25,7 +25,8 @@ use mcdev_protocol::{
     McdevClientInfo, McdevCodeActionRequest, McdevCodeActionResponse, McdevCommands,
     McdevCompletionOptions, McdevCompletionRequest, McdevCompletionResponse,
     McdevCompletionTrigger, McdevDefinitionRequest, McdevDefinitionResponse,
-    McdevDiagnosticsRequest, McdevDiagnosticsResponse, McdevErrorCode, McdevPosition, McdevRange,
+    McdevDiagnosticsRequest, McdevDiagnosticsResponse, McdevErrorCode, McdevHoverRequest,
+    McdevHoverResponse, McdevPosition, McdevRange, McdevReferencesRequest, McdevReferencesResponse,
     McdevRequestContext, McdevTextEdit, PROTOCOL_VERSION,
 };
 use std::{
@@ -46,6 +47,9 @@ abstract class ExampleMixin {
     private int mcdev$handler(int original) { return original; }
 }"#;
 const REFERENCE_SOURCE: &str = r#"@Mixin(Target.class) class Patch { @Inject(method = "tick", at = @At("HEAD")) UnknownType handler(UnknownType value) { return value; } }"#;
+const METHOD_REFERENCE_SOURCE: &str = r#"@Mixin(Target.class) class Patch { @Inject(method = "tick()V", at = @At("HEAD")) void handler() {} }"#;
+const ACCESS_WIDENER_CLASS_SOURCE: &str = "accessWidener v2 named\naccessible class game/Target\n";
+const ACCESS_TRANSFORMER_CLASS_SOURCE: &str = "public game.Target\n";
 const CONFIG_SOURCE: &str = r#"package fixture; @Mixin(Target.class) class Patch {}"#;
 const CONFIG_CONTENT: &str = r#"{"package":"fixture","mixins":[]}"#;
 
@@ -876,6 +880,245 @@ fn missing_document_version_uses_one_semantic_provider_call_per_command() {
         response.error
     );
     assert_eq!(actions.semantic_calls.load(Ordering::Acquire), 1);
+}
+
+#[test]
+fn references_find_java_mixin_member_through_the_real_command_host() {
+    let current_source = METHOD_REFERENCE_SOURCE;
+    let other_uri = "fixture://other/Other.java".to_owned();
+    let fixture = fixture(
+        true,
+        false,
+        true,
+        HostFact::Known(vec![
+            SourceScanEntry {
+                document_uri: other_uri.clone(),
+                text: current_source.into(),
+            },
+            SourceScanEntry {
+                document_uri: other_uri.clone(),
+                text: current_source.into(),
+            },
+        ]),
+        false,
+    );
+    let current_uri = format!("{}/src/main/java/fixture/Patch.java", fixture.workspace);
+    let method_value = current_source.find("\"tick()V\"").unwrap();
+    let position = position_at(current_source, method_value + 2);
+    let response = envelope(
+        &fixture,
+        McdevCommands::REFERENCES,
+        McdevReferencesRequest {
+            context: context(&fixture, current_source, &current_uri, position),
+        },
+    );
+    assert!(
+        response.error.is_none(),
+        "references error: {:?}",
+        response.error
+    );
+    let response: McdevReferencesResponse =
+        serde_json::from_value(response.result.unwrap()).unwrap();
+    let reference_start = current_source.find("method =").unwrap();
+    let reference_value = current_source.find("\"tick()V\"").unwrap();
+    let reference_range = McdevRange {
+        start: position_at(current_source, reference_start),
+        end: position_at(current_source, reference_value + "\"tick()V\"".len()),
+    };
+    assert_eq!(
+        serde_json::to_value(response).unwrap(),
+        serde_json::json!({
+            "locations": [
+                {
+                    "documentUri": current_uri,
+                    "range": reference_range,
+                    "metadata": {"source": "mixin.inject"},
+                    "resolution": "SOURCE"
+                },
+                {
+                    "documentUri": other_uri,
+                    "range": reference_range,
+                    "metadata": {"source": "mixin.inject"},
+                    "resolution": "SOURCE"
+                }
+            ]
+        })
+    );
+}
+
+#[test]
+fn references_find_mixed_java_aw_at_locations_from_an_aw_buffer() {
+    let java_uri = "fixture://mixed/Patch.java".to_owned();
+    let aw_uri_current = "fixture://mixed/current.accesswidener".to_owned();
+    let aw_uri = "fixture://mixed/duplicate.accesswidener".to_owned();
+    let at_uri = "fixture://mixed/target_at.cfg".to_owned();
+    let fixture = fixture(
+        true,
+        false,
+        true,
+        HostFact::Known(vec![
+            SourceScanEntry {
+                document_uri: aw_uri_current.clone(),
+                text: "accessWidener v2 named\naccessible class stale/Target\n".into(),
+            },
+            SourceScanEntry {
+                document_uri: java_uri.clone(),
+                text: "@Mixin(Target.class) class Patch {}".into(),
+            },
+            SourceScanEntry {
+                document_uri: aw_uri.clone(),
+                text: ACCESS_WIDENER_CLASS_SOURCE.into(),
+            },
+            SourceScanEntry {
+                document_uri: aw_uri.clone(),
+                text: ACCESS_WIDENER_CLASS_SOURCE.into(),
+            },
+            SourceScanEntry {
+                document_uri: at_uri.clone(),
+                text: ACCESS_TRANSFORMER_CLASS_SOURCE.into(),
+            },
+        ]),
+        false,
+    );
+    let owner_offset = ACCESS_WIDENER_CLASS_SOURCE.find("game/Target").unwrap();
+    let mut request_context = context(
+        &fixture,
+        ACCESS_WIDENER_CLASS_SOURCE,
+        &aw_uri_current,
+        position_at(ACCESS_WIDENER_CLASS_SOURCE, owner_offset + 2),
+    );
+    request_context.language_id = "accesswidener".into();
+    let response = envelope(
+        &fixture,
+        McdevCommands::REFERENCES,
+        McdevReferencesRequest {
+            context: request_context,
+        },
+    );
+    assert!(
+        response.error.is_none(),
+        "mixed references error: {:?}",
+        response.error
+    );
+    let response: McdevReferencesResponse =
+        serde_json::from_value(response.result.unwrap()).unwrap();
+    let java_range = McdevRange {
+        start: position_at("@Mixin(Target.class) class Patch {}", 0),
+        end: position_at(
+            "@Mixin(Target.class) class Patch {}",
+            "@Mixin(Target.class)".len(),
+        ),
+    };
+    let aw_range = McdevRange {
+        start: position_at(
+            ACCESS_WIDENER_CLASS_SOURCE,
+            "accessWidener v2 named\n".len(),
+        ),
+        end: position_at(
+            ACCESS_WIDENER_CLASS_SOURCE,
+            "accessWidener v2 named\naccessible class game/Target".len(),
+        ),
+    };
+    let at_range = McdevRange {
+        start: position_at(ACCESS_TRANSFORMER_CLASS_SOURCE, 0),
+        end: position_at(
+            ACCESS_TRANSFORMER_CLASS_SOURCE,
+            ACCESS_TRANSFORMER_CLASS_SOURCE.len(),
+        ),
+    };
+    assert_eq!(
+        serde_json::to_value(response).unwrap(),
+        serde_json::json!({
+            "locations": [
+                {
+                    "documentUri": java_uri,
+                    "range": java_range,
+                    "metadata": {"source": "mixin.class"},
+                    "resolution": "SOURCE"
+                },
+                {
+                    "documentUri": aw_uri_current,
+                    "range": aw_range,
+                    "metadata": {"source": "aw.class"},
+                    "resolution": "SOURCE"
+                },
+                {
+                    "documentUri": aw_uri,
+                    "range": aw_range,
+                    "metadata": {"source": "aw.class"},
+                    "resolution": "SOURCE"
+                },
+                {
+                    "documentUri": at_uri,
+                    "range": at_range,
+                    "metadata": {"source": "at.class"},
+                    "resolution": "SOURCE"
+                },
+                {
+                    "documentUri": aw_uri_current,
+                    "range": {
+                        "start": {"line": 1, "character": 17},
+                        "end": {"line": 1, "character": 28}
+                    },
+                    "metadata": {"source": "aw.class"},
+                    "resolution": "SOURCE"
+                },
+                {
+                    "documentUri": aw_uri,
+                    "range": {
+                        "start": {"line": 1, "character": 17},
+                        "end": {"line": 1, "character": 28}
+                    },
+                    "metadata": {"source": "aw.class"},
+                    "resolution": "SOURCE"
+                },
+                {
+                    "documentUri": at_uri,
+                    "range": {
+                        "start": {"line": 0, "character": 7},
+                        "end": {"line": 0, "character": 18}
+                    },
+                    "metadata": {"source": "at.class"},
+                    "resolution": "SOURCE"
+                }
+            ]
+        })
+    );
+}
+
+#[test]
+fn hover_formats_the_real_java_definition_target() {
+    let fixture = fixture(true, false, true, HostFact::Known(vec![]), false);
+    let uri = format!("{}/src/main/java/fixture/Patch.java", fixture.workspace);
+    let target_start = SOURCE.find("Target.class").unwrap();
+    let response = envelope(
+        &fixture,
+        McdevCommands::HOVER,
+        McdevHoverRequest {
+            context: context(
+                &fixture,
+                SOURCE,
+                &uri,
+                position_at(SOURCE, target_start + 2),
+            ),
+        },
+    );
+    assert!(
+        response.error.is_none(),
+        "hover error: {:?}",
+        response.error
+    );
+    let response: McdevHoverResponse = serde_json::from_value(response.result.unwrap()).unwrap();
+    assert_eq!(
+        serde_json::to_value(response).unwrap(),
+        serde_json::json!({
+            "contents": ["```mcdev\nclass game.Target\nowner: game/Target\nnamespace: named\n```"],
+            "range": {
+                "start": position_at(SOURCE, target_start),
+                "end": position_at(SOURCE, target_start + "Target.class".len())
+            }
+        })
+    );
 }
 
 #[test]
