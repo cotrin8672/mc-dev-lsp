@@ -361,29 +361,33 @@ fn manifest_is_the_exact_frozen_executable_case_set() {
             .map(|v| v["legacyCase"].as_str().unwrap())
             .collect()
     );
-    let source = include_str!("../../commands_legacy.rs");
-    let mut cases = BTreeSet::new();
-    let mut functions = BTreeSet::new();
-    let mut count = 0;
-    for (at, _) in source.match_indices("replay::replay_case(") {
-        let start = source[at..].find('"').unwrap() + at + 1;
-        let end = source[start..].find('"').unwrap() + start;
-        assert!(
-            cases.insert(&source[start..end]),
-            "duplicate executable case"
-        );
-        let before = &source[..at];
-        let function = before.rfind("fn ").unwrap() + 3;
-        let finish = before[function..].find('(').unwrap() + function;
-        assert!(
-            functions.insert(&source[function..finish]),
-            "duplicate executable function"
-        );
-        assert!(before[..function].ends_with("#[test]\nfn "));
-        count += 1;
+    let lf = include_str!("../../commands_legacy.rs").replace("\r\n", "\n");
+    for source in [lf.clone(), lf.replace('\n', "\r\n")] {
+        // Git checkouts may use either source newline style.
+        let source = source.replace("\r\n", "\n");
+        let mut cases = BTreeSet::new();
+        let mut functions = BTreeSet::new();
+        let mut count = 0;
+        for (at, _) in source.match_indices("replay::replay_case(") {
+            let start = source[at..].find('"').unwrap() + at + 1;
+            let end = source[start..].find('"').unwrap() + start;
+            assert!(
+                cases.insert(&source[start..end]),
+                "duplicate executable case"
+            );
+            let before = &source[..at];
+            let function = before.rfind("fn ").unwrap() + 3;
+            let finish = before[function..].find('(').unwrap() + function;
+            assert!(
+                functions.insert(&source[function..finish]),
+                "duplicate executable function"
+            );
+            assert!(before[..function].ends_with("#[test]\nfn "));
+            count += 1;
+        }
+        assert_eq!(count, 127);
+        assert_eq!(originals, cases);
     }
-    assert_eq!(count, 127);
-    assert_eq!(originals, cases);
     assert_eq!(rows().len(), 1015);
     assert_eq!(rows().iter().filter(|r| r["frameDepth"] == 1).count(), 474);
 }

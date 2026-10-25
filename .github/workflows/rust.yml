@@ -29,6 +29,12 @@ jobs:
       - name: Verify Rust and editor integration
         shell: pwsh
         run: ./scripts/run-rust-tests-compact.ps1
+      - name: Verify native package
+        shell: pwsh
+        run: |
+          $nativeMetadata = cargo metadata --locked --offline --no-deps --format-version 1 | ConvertFrom-Json
+          $nativeVersion = ($nativeMetadata.packages | Where-Object name -eq 'mcdev-companion').version
+          ./scripts/build-native-release.ps1 -Version $nativeVersion
       - uses: actions/upload-artifact@v4
         if: always()
         with:
@@ -36,3 +42,4 @@ jobs:
           path: |
             build/rust-test-logs
             build/nvim-test-logs
+            build/release/native

@@ -68,6 +68,289 @@ fn decode<T: DeserializeOwned>(value: &Value) -> T {
 fn output<T: Serialize>(value: T) -> Value {
     serde_json::to_value(value).unwrap()
 }
+
+const PATH_FIELDS: &[&str] = &[
+    "root",
+    "projectOutputs",
+    "dependencyJars",
+    "minecraftJars",
+    "generatedOutputs",
+    "allEntries",
+    "sourceDirectories",
+    "resourceDirectories",
+    "outputDirectory",
+    "mappingFiles",
+    "path",
+];
+
+#[derive(Clone)]
+struct FixturePathMap {
+    old_root: String,
+    new_root: std::path::PathBuf,
+}
+
+impl FixturePathMap {
+    fn new(old_root: impl Into<String>, new_root: std::path::PathBuf) -> Self {
+        Self {
+            old_root: old_root.into(),
+            new_root,
+        }
+    }
+
+    fn for_replay(old_root: &str) -> Option<Self> {
+        if cfg!(windows) || !old_root.contains('\\') {
+            return None;
+        }
+        let name = old_root
+            .rsplit(['/', '\\'])
+            .find(|part| !part.is_empty())
+            .unwrap_or("root");
+        Some(Self::new(
+            old_root,
+            std::env::temp_dir().join("mcdev-facade-replay").join(name),
+        ))
+    }
+
+    fn map_path(&self, value: &str) -> Option<std::path::PathBuf> {
+        let old = recorded_components(&self.old_root);
+        let path = recorded_components(value);
+        if path.len() < old.len() || path[..old.len()] != old[..] {
+            return None;
+        }
+        let mut mapped = self.new_root.clone();
+        for component in &path[old.len()..] {
+            mapped.push(component);
+        }
+        Some(mapped)
+    }
+
+    fn map_path_ref(&self, value: &std::path::Path) -> Option<std::path::PathBuf> {
+        self.map_path(&value.to_string_lossy())
+    }
+
+    fn map_uri(&self, value: &str) -> Option<String> {
+        let path = mcdev_core::project::uri_to_path(value).ok()?;
+        let mapped = self.map_path(&path.to_string_lossy())?;
+        Some(mcdev_core::project::path_to_uri(&mapped))
+    }
+
+    fn map_string(&self, value: &str) -> Option<String> {
+        if value.starts_with("file:") {
+            self.map_uri(value)
+        } else {
+            self.map_path(value)
+                .map(|path| path.to_string_lossy().into_owned())
+        }
+    }
+}
+
+fn recorded_components(value: &str) -> Vec<&str> {
+    value
+        .split(['/', '\\'])
+        .filter(|part| !part.is_empty())
+        .collect()
+}
+
+fn remap_value_strings(value: &mut Value, paths: &FixturePathMap) {
+    match value {
+        Value::String(text) => {
+            if let Some(mapped) = paths.map_string(text) {
+                *text = mapped;
+            }
+        }
+        Value::Array(values) => {
+            for value in values {
+                remap_value_strings(value, paths);
+            }
+        }
+        Value::Object(values) => {
+            for value in values.values_mut() {
+                remap_value_strings(value, paths);
+            }
+        }
+        Value::Null | Value::Bool(_) | Value::Number(_) => {}
+    }
+}
+
+fn remap_object_keys(value: &mut Value, paths: &FixturePathMap) {
+    let Value::Object(values) = value else {
+        return;
+    };
+    let old = std::mem::take(values);
+    for (key, value) in old {
+        let key = paths.map_string(&key).unwrap_or(key);
+        values.insert(key, value);
+    }
+}
+
+fn remap_context_paths(value: &mut Value, paths: &FixturePathMap) {
+    match value {
+        Value::Object(values) => {
+            for (key, value) in values.iter_mut() {
+                if key == "files" {
+                    remap_object_keys(value, paths);
+                } else if PATH_FIELDS.contains(&key.as_str()) {
+                    remap_value_strings(value, paths);
+                } else {
+                    remap_context_paths(value, paths);
+                }
+            }
+        }
+        Value::Array(values) => {
+            for value in values {
+                remap_context_paths(value, paths);
+            }
+        }
+        Value::String(_) | Value::Null | Value::Bool(_) | Value::Number(_) => {}
+    }
+}
+
+fn remap_host_output_paths(value: &mut Value, paths: &FixturePathMap) {
+    match value {
+        Value::Object(values) => {
+            for (key, value) in values.iter_mut() {
+                if matches!(key.as_str(), "configPath" | "documentUri") {
+                    remap_value_strings(value, paths);
+                } else {
+                    remap_host_output_paths(value, paths);
+                }
+            }
+        }
+        Value::Array(values) => {
+            for value in values {
+                remap_host_output_paths(value, paths);
+            }
+        }
+        Value::String(_) | Value::Null | Value::Bool(_) | Value::Number(_) => {}
+    }
+}
+
+fn normalized_host_row(row: &Value) -> Value {
+    let Some(args) = row.get("args") else {
+        return row.clone();
+    };
+    let context = args
+        .get("session")
+        .and_then(|session| session.get("context"))
+        .or_else(|| args.get("projectContext"));
+    let Some(old_root) = context
+        .and_then(|context| context.get("root"))
+        .and_then(Value::as_str)
+    else {
+        return row.clone();
+    };
+    let Some(paths) = FixturePathMap::for_replay(old_root) else {
+        return row.clone();
+    };
+    relocated_host_row(row, &paths)
+}
+
+fn relocated_host_row(row: &Value, paths: &FixturePathMap) -> Value {
+    let mut row = row.clone();
+    let args = row.get_mut("args").unwrap();
+    if let Some(session) = args.get_mut("session") {
+        if let Some(context) = session.get_mut("context") {
+            remap_context_paths(context, &paths);
+        }
+        if let Some(files) = session.get_mut("files") {
+            remap_object_keys(files, &paths);
+        }
+    }
+    if let Some(context) = args.get_mut("projectContext") {
+        remap_context_paths(context, &paths);
+    }
+    for field in ["documentUri", "workspaceRootUri"] {
+        if let Some(value) = args.get_mut(field) {
+            remap_value_strings(value, &paths);
+        }
+    }
+    if let Some(files) = args.get_mut("files") {
+        remap_object_keys(files, &paths);
+    }
+    // These are facade-generated path fields. Opaque host semantic payloads
+    // such as `sourceUri` remain byte-for-byte fixture data.
+    if let Some(output) = row.get_mut("output") {
+        remap_host_output_paths(output, &paths);
+    }
+    if let Some(reads) = row.get_mut("reads").and_then(Value::as_array_mut) {
+        for read in reads {
+            match read["api"].as_str() {
+                Some("Host.semanticProvider") => {
+                    remap_value_strings(&mut read["args"][1], paths);
+                    for field in ["classpathEntries", "sourcepathEntries"] {
+                        if let Some(value) = read["args"][2].get_mut(field) {
+                            remap_value_strings(value, paths);
+                        }
+                    }
+                }
+                Some("Host.unitSource") => remap_value_strings(&mut read["args"][1], paths),
+                Some("Host.documentProject" | "Host.workspaceProject") => {
+                    remap_value_strings(&mut read["args"][0], paths)
+                }
+                _ => {}
+            }
+        }
+    }
+    row
+}
+
+#[test]
+fn fixture_relocation_changes_only_selected_root_path_fields() {
+    let old_root = r"C:\recorded\root";
+    let old_uri = "file:///C:/recorded/root/Example.java";
+    let literal = r"C:\recorded\root\literal-source-text";
+    let paths = FixturePathMap::new(
+        old_root,
+        std::env::temp_dir().join("mcdev-facade-relocation-check"),
+    );
+    assert!(paths
+        .map_path(r"C:\recorded\root-sibling\Example.java")
+        .is_none());
+    assert!(paths.map_path("/unrelated/Example.java").is_none());
+    let row = json!({
+        "args": {
+            "source": literal,
+            "documentUri": old_uri,
+            "projectContext": {"root": old_root, "sourceUri": old_uri},
+            "files": {r"C:\recorded\root\Example.java": literal}
+        },
+        "output": {"documentUri": old_uri, "sourceUri": old_uri, "text": literal},
+        "reads": [
+            {"api": "Host.semanticProvider", "args": [literal, old_uri, {
+                "classpathEntries": [r"C:\recorded\root\library.jar"],
+                "sourcepathEntries": [r"C:\recorded\root\src"],
+                "unitName": literal
+            }], "value": {"sourceUri": old_uri, "text": literal, "sha256": "unchanged", "authority": "Complete"}},
+            {"api": "Host.opaque", "args": [literal, old_uri]}
+        ]
+    });
+    let relocated = relocated_host_row(&row, &paths);
+    assert_eq!(relocated["args"]["source"], literal);
+    assert_eq!(
+        relocated["args"]["documentUri"],
+        paths.map_uri(old_uri).unwrap()
+    );
+    assert_eq!(relocated["args"]["projectContext"]["sourceUri"], old_uri);
+    assert_eq!(
+        relocated["args"]["files"][paths
+            .map_path(r"C:\recorded\root\Example.java")
+            .unwrap()
+            .to_string_lossy()
+            .as_ref()],
+        literal
+    );
+    assert_eq!(relocated["output"]["sourceUri"], old_uri);
+    assert_eq!(relocated["output"]["text"], literal);
+    assert_eq!(relocated["reads"][0]["args"][0], literal);
+    assert_eq!(
+        relocated["reads"][0]["args"][1],
+        paths.map_uri(old_uri).unwrap()
+    );
+    assert_eq!(relocated["reads"][0]["args"][2]["unitName"], literal);
+    assert_eq!(relocated["reads"][0]["value"], row["reads"][0]["value"]);
+    assert_eq!(relocated["reads"][1], row["reads"][1]);
+}
+
 struct Reads<'a> {
     rows: &'a [Value],
     calls: std::sync::Mutex<Vec<Value>>,
@@ -298,6 +581,8 @@ fn recorded_at<'a>(reads: &'a Reads<'a>) -> AtValueCompletionService<'a> {
     )
 }
 fn replay_host(row: &Value) -> (Value, Value) {
+    let normalized = normalized_host_row(row);
+    let row = &normalized;
     let args = &row["args"];
     let source = args["source"].as_str().unwrap();
     let uri = args["documentUri"].as_str().unwrap();
@@ -1110,7 +1395,12 @@ pub fn registered_files() {
             "root-{}",
             prior.keys().position(|k| k == &key).unwrap_or(prior.len())
         ));
-        let remap = |p: &std::path::Path| root.join(p.strip_prefix(old).unwrap());
+        let path_map = FixturePathMap::new(&key, root.clone());
+        let remap = |p: &std::path::Path| {
+            path_map
+                .map_path_ref(p)
+                .unwrap_or_else(|| panic!("fixture path is outside recorded root: {p:?}"))
+        };
         let mut context = host_context(&args["projectContext"]);
         context.root = root.clone();
         for set in &mut context.source_sets {
@@ -1125,21 +1415,21 @@ pub fn registered_files() {
         for config in &mut context.mixin_configs {
             config.path = remap(&config.path);
         }
-        let mut paths = std::collections::BTreeSet::new();
+        let mut written_paths = std::collections::BTreeSet::new();
         for (path, text) in args["files"].as_object().unwrap() {
             let path = remap(std::path::Path::new(path));
             assert!(path.starts_with(&base));
             std::fs::create_dir_all(path.parent().unwrap()).unwrap();
             std::fs::write(&path, text.as_str().unwrap()).unwrap();
-            paths.insert(path);
+            written_paths.insert(path);
         }
         if let Some(previous) = prior.get(&key) {
-            for path in previous.difference(&paths) {
+            for path in previous.difference(&written_paths) {
                 assert!(path.starts_with(&base));
                 std::fs::remove_file(path).unwrap();
             }
         }
-        prior.insert(key, paths);
+        prior.insert(key, written_paths);
         let units = row["reads"]
             .as_array()
             .unwrap()
@@ -1154,9 +1444,8 @@ pub fn registered_files() {
             .collect();
         *provider.units.lock().unwrap() = units;
         provider.file_reads.lock().unwrap().clear();
-        let uri = mcdev_core::project::uri_to_path(args["documentUri"].as_str().unwrap())
-            .ok()
-            .map(|p| mcdev_core::project::path_to_uri(&remap(&p)))
+        let uri = path_map
+            .map_uri(args["documentUri"].as_str().unwrap())
             .unwrap();
         if row["legacyCase"]
             .as_str()
