@@ -6,7 +6,9 @@ capability with Rust, using the ktlsp extension direction. The earlier
 
 The original JDT LS checkout and its uncommitted changes remain untouched.
 Implementation continues in `codex/ktlsp-rust`. No JVM helper, JNI bridge, or
-Kotlin subprocess can count as a completed Rust port.
+Kotlin subprocess can count as a completed Rust port. The current published-host
+connection work and concrete input differences are tracked in
+[the IPC integration checkpoint](ipc-integration-status.md).
 
 ## Authoritative baseline
 
@@ -65,7 +67,7 @@ implementation was requested from the ktlsp task; at goal start it was not prese
 | Command handlers and transports | All 127 exact legacy cases pass; concrete `CoreCommandHost` also reaches real core completion, diagnostics and applied config edits with checked fact/error propagation | Remaining command composition paths need direct proof; all 11 commands still need the live host capability bridge |
 | Neovim client | Original 27 files and 1,014 assertion sites inventoried; Kotlin inputs restored byte-for-byte; independent suite passes 1,521 assertion calls | Sixteen files have complete native coverage, two have partial real-host coverage and nine await host capabilities |
 | Independent process and host integration | Separate MC executable built without ktlsp/ktcore linkage; whole native workspace passes; latest stock host/MC/Neovim passes 112 checks and 29 first-attempt RPCs | This proves the semantic-v1 Mixin/Shadow slice; further MC capabilities and full editor parity remain pending |
-| Packaging/docs/legacy removal | Windows packaging and both CI workflows use the three-crate native workspace, version 0.7.7 from Cargo; the linked package and all host Git dependencies are removed | Linux/workflow execution, full product wiring and final legacy runtime retirement remain pending |
+| Packaging/docs/legacy removal | Windows/Linux CI and optimized packages pass at `c1f0fd4`; both archives have 24 verified payloads; version 0.7.7 comes from Cargo and no linked host Git dependency remains | The new IPC working tree, full product wiring and final legacy runtime retirement remain pending |
 
 The preserved thirteen prototype scenarios and their companion replacements
 prove only the earlier Mixin/Shadow slice. They do not prove this migration complete. Full Rust and
@@ -75,11 +77,19 @@ deadlines.
 
 ## Current proof and unresolved items
 
+The earlier published branch checkpoint `c1f0fd430e30bab2867a725ab1089fbd3efbf2a1`
+passes actual Windows/Linux CI. Full downloaded logs verify all 2,604 original
+case locators on both systems, with 1,671/1,670 native functions and 1,525/1,487
+editor assertions respectively. Both optimized archives and stdio smoke results
+are verified. See `verification.nativeCi` in the test ledger and
+[the scoped checkpoint](ipc-integration-status.md). These are results for that
+commit, not acceptance of the later IPC working tree.
+
 The original legacy suite completed successfully once: 2,604 tests, no failures, errors or skips, across 164 JUnit XML files. Full log: `build/migration-baseline/current-20261023/build/test-logs/gradle-tests-20261023-215757745.log`. This is a baseline, not Rust parity evidence.
 
-The parent has matched **all 2,604 original JUnit cases** to executable native tests and successful logs in [the test ledger](rust-test-migration.json). There are no remaining legacy JUnit case or caller entries. The latest stable native pipeline passes **1,666 functions across 69 targets, zero failures, ignored or filtered tests**, followed by doc tests, the companion build and the independent Neovim suite's 1,521 assertions. All 814 source/fixture/script/workflow inputs retain identical pre/post hashes, fingerprint `eafb16459e33d9d08f9b858a8e162e44cb5a38629faa3196bfcb459209d3c1b0`. The linked prototype's thirteen duplicate functions were removed while new command/error and captured-fact regressions were added; no original case was removed. Original case counts and native function counts differ because exact cases can share an executable table/harness. This completes native case verification, not the full product replacement. Original editor workflows, live host capabilities and final distribution remain incomplete.
+The parent has matched **all 2,604 original JUnit cases** to executable native tests and successful logs in [the test ledger](rust-test-migration.json). There are no remaining legacy JUnit case or caller entries. The earlier local native pipeline passed **1,666 functions across 69 targets, zero failures, ignored or filtered tests**, followed by doc tests, the companion build and the independent Neovim suite's 1,521 assertions. All 814 source/fixture/script/workflow inputs retain identical pre/post hashes, fingerprint `eafb16459e33d9d08f9b858a8e162e44cb5a38629faa3196bfcb459209d3c1b0`. The linked prototype's thirteen duplicate functions were removed while new command/error and captured-fact regressions were added; no original case was removed. Original case counts and native function counts differ because exact cases can share an executable table/harness. This completes native case verification, not the full product replacement. Original editor workflows, live host capabilities and final distribution remain incomplete.
 
-The latest Windows archive has 24 hashed payload files plus its manifest, with no JVM, JDT jar or host executable. Cargo is now the sole build/version authority; product and all three native package versions are 0.7.7. Archive SHA256 is `fcf0d0346c914faff8c5f08f0a06bddcd06b22673199f68f8e470d151e03ad10`; the independently verified and extracted executable is `c21f24bce3016e93cdfba3eef1237de88d6cd493d5237dd78f4adb157dfb2687`. Against fixed host candidate 37, all 112 checks/29 first-attempt RPCs pass in 8.1 seconds with six unchanged input hashes and clean shutdown. This confirms only the semantic-v1 slice, not full MC commands or partial-name completion insertion. Logs: `build/rust-test-logs/native-release-20261025-132618048` and `build/rust-test-logs/host-smoke-20261025-132851153`. Earlier archives and published-host proofs remain in the ledger history. Linux and actual GitHub workflow execution remain unverified; nothing was published.
+The earlier locally verified Windows archive has 24 hashed payload files plus its manifest, with no JVM, JDT jar or host executable. Cargo is now the sole build/version authority; product and all three native package versions are 0.7.7. Archive SHA256 is `fcf0d0346c914faff8c5f08f0a06bddcd06b22673199f68f8e470d151e03ad10`; the independently verified and extracted executable is `c21f24bce3016e93cdfba3eef1237de88d6cd493d5237dd78f4adb157dfb2687`. Against fixed host candidate 37, all 112 checks/29 first-attempt RPCs pass in 8.1 seconds with six unchanged input hashes and clean shutdown. This confirms only the semantic-v1 slice, not full MC commands or partial-name completion insertion. Logs: `build/rust-test-logs/native-release-20261025-132618048` and `build/rust-test-logs/host-smoke-20261025-132851153`. Later Windows/Linux CI package hashes and full workflow results are recorded separately in `verification.nativeCi`. The Rust branch is pushed; no release tag or production rollout has been published.
 
 Completed domain runs, inspected after completion:
 

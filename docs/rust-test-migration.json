@@ -51565,7 +51565,7 @@
       "protocol": 40
     },
     "wholeMigrationVerified": false,
-    "remainingAcceptance": "All 2604 original JUnit replacements and the stable native/editor pipeline pass. Complete live command, source/resource inventory, class-byte and SDK adapters/routing; finish the eleven pending or partial original editor/support files, support-role provenance, Linux and actual CI execution, and final legacy runtime retirement.",
+    "remainingAcceptance": "All original JUnit replacements pass on Windows/Linux CI, including independent editor and optimized package checks. Complete MC live source/resource/class-byte/SDK adapters and eleven-command routing; finish pending/partial original editor workflows, support-role provenance and final legacy runtime retirement.",
     "independentSemanticV1Evidence": {
       "receipt": "mcdev-companion/tests/fixtures/semantic_v1/interop_receipt.json",
       "stockHostRevision": "f76a43fbeddf4fbdc69768fd0f7544e5a4a3610f",
@@ -51842,12 +51842,68 @@
         },
         "scope": "MC semantic-v1 source slice only; optional project/type facts and full MC commands are not exercised by this child."
       },
-      "linuxExecutionVerified": false,
-      "githubWorkflowExecuted": false,
+      "linuxExecutionVerified": true,
+      "githubWorkflowExecuted": true,
       "releasePublished": false,
       "fullMcCapabilitiesVerified": false,
       "versionAuthority": "Native Cargo workspace version, validated through locked offline cargo metadata. No Gradle input or JVM execution.",
-      "binaryReceipt": "build/companion-artifacts/release-c21f24bce301/receipt-fcf0d0346c91.json"
+      "binaryReceipt": "build/companion-artifacts/release-c21f24bce301/receipt-fcf0d0346c91.json",
+      "platformPackageEvidence": {
+        "status": "passed",
+        "runId": 40168190710,
+        "headRevision": "c1f0fd430e30bab2867a725ab1089fbd3efbf2a1",
+        "url": "https://github.com/cotrin8672/mc-dev-lsp/actions/runs/40168190710",
+        "platforms": {
+          "windows-latest": {
+            "passedFunctions": 1671,
+            "targets": 69,
+            "originalCasesVerified": 2604,
+            "failed": 0,
+            "ignored": 0,
+            "filtered": 0,
+            "independentEditorAssertions": 1525,
+            "assertionCountsByRun": {
+              "native-ci-adapters.assertions.json": 1408,
+              "native-ci-helper.assertions.json": 26,
+              "native-ci-syntax.assertions.json": 50,
+              "native-ci-teardown-process.assertions.json": 35,
+              "native-ci-teardown-unit.assertions.json": 6
+            },
+            "logs": "build/ci-runs/40168190710/native-ci-logs-windows-latest/rust-test-logs/20261025-061138740",
+            "archive": "build/ci-runs/40168190710/native-ci-logs-windows-latest/release/native/mcdev-companion-0.7.7-windows-x86_64.zip",
+            "archiveSha256": "8abb41949361b75b8ccbec2e9122c543605ea46668be2416a31b4facba23c9b0",
+            "binarySha256": "08863f310313daef8f28ace47e2b8de2b51702b306685d0500d6bd2f916dcd7a",
+            "manifestFilesVerified": 24,
+            "optimizedStdioSmoke": true,
+            "fullMcLiveCapabilitiesVerified": false
+          },
+          "ubuntu-latest": {
+            "passedFunctions": 1670,
+            "targets": 69,
+            "originalCasesVerified": 2604,
+            "failed": 0,
+            "ignored": 0,
+            "filtered": 0,
+            "independentEditorAssertions": 1487,
+            "assertionCountsByRun": {
+              "native-ci-adapters.assertions.json": 1406,
+              "native-ci-helper.assertions.json": 26,
+              "native-ci-syntax.assertions.json": 50,
+              "native-ci-teardown-process.assertions.json": 0,
+              "native-ci-teardown-unit.assertions.json": 5
+            },
+            "logs": "build/ci-runs/40168190710/native-ci-logs-ubuntu-latest/rust-test-logs/20261025-061123662",
+            "archive": "build/ci-runs/40168190710/native-ci-logs-ubuntu-latest/release/native/mcdev-companion-0.7.7-linux-x86_64.zip",
+            "archiveSha256": "3871907a3ae1793385632a6e0786869f9df4f75fd49bce07bff634a97bf93a77",
+            "binarySha256": "ec4ec520d82ad6a06958f18e88f6104435cc7b1dc1a3c6fe0f4f54d743073603",
+            "manifestFilesVerified": 24,
+            "optimizedStdioSmoke": true,
+            "fullMcLiveCapabilitiesVerified": false
+          }
+        },
+        "rawDirectory": "build/ci-runs/40168190710",
+        "scope": "Native library/process and independent editor tests plus optimized native packages; full live MC command wiring remains incomplete."
+      }
     },
     "nativeWorkspaceHistory": [
       {
@@ -52081,6 +52137,62 @@
       "focusedLog": "build/rust-test-logs/host-facts-20261025-131926090",
       "passedFunctions": 14,
       "scope": "Recorded producer payload decoded through the scoped fixture reader; MC production child still negotiates semantic-v1 only."
+    },
+    "nativeCi": {
+      "status": "passed",
+      "runId": 40168190710,
+      "headRevision": "c1f0fd430e30bab2867a725ab1089fbd3efbf2a1",
+      "url": "https://github.com/cotrin8672/mc-dev-lsp/actions/runs/40168190710",
+      "platforms": {
+        "windows-latest": {
+          "passedFunctions": 1671,
+          "targets": 69,
+          "originalCasesVerified": 2604,
+          "failed": 0,
+          "ignored": 0,
+          "filtered": 0,
+          "independentEditorAssertions": 1525,
+          "assertionCountsByRun": {
+            "native-ci-adapters.assertions.json": 1408,
+            "native-ci-helper.assertions.json": 26,
+            "native-ci-syntax.assertions.json": 50,
+            "native-ci-teardown-process.assertions.json": 35,
+            "native-ci-teardown-unit.assertions.json": 6
+          },
+          "logs": "build/ci-runs/40168190710/native-ci-logs-windows-latest/rust-test-logs/20261025-061138740",
+          "archive": "build/ci-runs/40168190710/native-ci-logs-windows-latest/release/native/mcdev-companion-0.7.7-windows-x86_64.zip",
+          "archiveSha256": "8abb41949361b75b8ccbec2e9122c543605ea46668be2416a31b4facba23c9b0",
+          "binarySha256": "08863f310313daef8f28ace47e2b8de2b51702b306685d0500d6bd2f916dcd7a",
+          "manifestFilesVerified": 24,
+          "optimizedStdioSmoke": true,
+          "fullMcLiveCapabilitiesVerified": false
+        },
+        "ubuntu-latest": {
+          "passedFunctions": 1670,
+          "targets": 69,
+          "originalCasesVerified": 2604,
+          "failed": 0,
+          "ignored": 0,
+          "filtered": 0,
+          "independentEditorAssertions": 1487,
+          "assertionCountsByRun": {
+            "native-ci-adapters.assertions.json": 1406,
+            "native-ci-helper.assertions.json": 26,
+            "native-ci-syntax.assertions.json": 50,
+            "native-ci-teardown-process.assertions.json": 0,
+            "native-ci-teardown-unit.assertions.json": 5
+          },
+          "logs": "build/ci-runs/40168190710/native-ci-logs-ubuntu-latest/rust-test-logs/20261025-061123662",
+          "archive": "build/ci-runs/40168190710/native-ci-logs-ubuntu-latest/release/native/mcdev-companion-0.7.7-linux-x86_64.zip",
+          "archiveSha256": "3871907a3ae1793385632a6e0786869f9df4f75fd49bce07bff634a97bf93a77",
+          "binarySha256": "ec4ec520d82ad6a06958f18e88f6104435cc7b1dc1a3c6fe0f4f54d743073603",
+          "manifestFilesVerified": 24,
+          "optimizedStdioSmoke": true,
+          "fullMcLiveCapabilitiesVerified": false
+        }
+      },
+      "rawDirectory": "build/ci-runs/40168190710",
+      "scope": "Native library/process and independent editor tests plus optimized native packages; full live MC command wiring remains incomplete."
     }
   }
 }
