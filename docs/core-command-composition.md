@@ -1,5 +1,11 @@
 # Core command composition audit
 
+The original generation-based constructor audit below is retained for the legacy
+library path. Production IPC now has `CoreCommandHost::with_evaluation`, which
+uses host evaluation lifetime/final validation and does not synthesize those
+eight counters. See [the current integration checkpoint](ipc-integration-status.md)
+for that entry, published inputs and the still-incomplete eleven-command surface.
+
 This is the design and implementation note for the Rust command boundary. It
 adds only the concrete library host and focused whole-command proof; it does
 not add a command wire, a product type, a DTO, or a second parser. The command

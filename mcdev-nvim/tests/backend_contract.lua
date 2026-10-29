@@ -21,7 +21,7 @@ local saved = { clients = vim.lsp.get_clients, request = protocol.code_action,
   notify = vim.notify, get_client = vim.lsp.get_client_by_id }
 local calls, notices = 0, {}
 vim.notify = function(message) notices[#notices + 1] = message end
-local host = { id = 81, name = "custom-host", config = { init_options = {
+local host = { id = 81, name = "custom-host", server_capabilities = { executeCommandProvider = { commands = { protocol.commands.info } } }, config = { init_options = {
   analysisProviders = { ["mcdev.mixin"] = {} },
 } }, request = function() calls = calls + 1; return true, calls end }
 vim.lsp.get_clients = function() return { host } end

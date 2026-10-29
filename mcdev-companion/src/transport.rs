@@ -9,6 +9,11 @@ fn invalid(message: &str) -> io::Error {
 }
 
 pub fn read_frame(reader: &mut impl BufRead) -> io::Result<Option<Value>> {
+    Ok(read_frame_with_length(reader)?.map(|(value, _)| value))
+}
+
+/// Returns the actual JSON body length, excluding Content-Length framing.
+pub fn read_frame_with_length(reader: &mut impl BufRead) -> io::Result<Option<(Value, usize)>> {
     let mut length = None;
     let mut header_bytes = 0;
     loop {
@@ -49,7 +54,7 @@ pub fn read_frame(reader: &mut impl BufRead) -> io::Result<Option<Value>> {
     let mut body = vec![0; length];
     reader.read_exact(&mut body)?;
     serde_json::from_slice(&body)
-        .map(Some)
+        .map(|value| Some((value, length)))
         .map_err(|_| invalid("invalid JSON frame"))
 }
 

@@ -1,8 +1,14 @@
-# Host project/type facts: limited slice 143
+# Host project/type facts: historical two-operation slice
 
 ## Status and primary contract
 
-Current published host `f76a43fbeddf4fbdc69768fd0f7544e5a4a3610f` implements semantic-v1
+This document preserves candidate37's isolated project/type proof. Current
+production IPC negotiation and the additional source/resource/JVM readers are
+recorded in [the companion contract](mcdev-companion-contract.md) and
+[integration checkpoint](ipc-integration-status.md). The two-operation reader
+alone still cannot construct a complete project/session.
+
+At that checkpoint, published host `f76a43fbeddf4fbdc69768fd0f7544e5a4a3610f` implemented semantic-v1
 and accepted-contribution tracing. Real MC/editor acceptance is recorded in
 `mcdev-companion-contract.md`. It does not implement the optional operations below.
 The earlier `f5953350928eb8af1ab34bb39db23ba7370d14af` interop checkpoint also
@@ -31,7 +37,7 @@ adapter. The producer's `project-facts143-37-final.json`, SHA256
 `dc09e9a59770fd859c7ede28426307e4ee5e329bd92387f7934687b7262ff096`,
 records 46 matched optional checks with no mismatch or unmeasured checks.
 That proves the producer's optional reader, not its integration into the MC
-command host. The MC production child still negotiates only semantic-v1.
+command host. At that checkpoint the MC production child negotiated only semantic-v1.
 Its 112-check/29-request editor smoke also passes against this candidate in
 `build/rust-test-logs/host-smoke-20261025-125351932/`.
 

@@ -2,6 +2,7 @@
 //! deliberately absent from the production semantic-v1 capability negotiation.
 pub mod bridge;
 pub mod draft;
+pub mod inputs;
 
 use mcdev_core::host_source::{HostFact, HostSourceError};
 use mcdev_protocol::{McdevError, McdevErrorCode};

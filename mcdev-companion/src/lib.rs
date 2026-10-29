@@ -4,6 +4,7 @@ pub mod completion_lines;
 pub mod completion_transport;
 pub mod host_facts;
 mod policy;
+pub mod provider_commands;
 mod server;
 pub mod transport;
 pub mod wire;

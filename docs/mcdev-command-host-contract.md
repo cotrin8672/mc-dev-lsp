@@ -1,5 +1,10 @@
 # Remaining command and resource integration
 
+The requirements below remain the full replacement boundary. The introductory
+implementation-status paragraphs describe the earlier two-operation checkpoint;
+later published inputs, implemented readers and concrete remaining differences
+are tracked in [the current integration checkpoint](ipc-integration-status.md).
+
 This is a requirements record, not an implemented or advertised wire API.
 Published host binary checkpoint `f76a43fbeddf4fbdc69768fd0f7544e5a4a3610f`
 provides the verified semantic-v1 source Shadow slice. The projectContext/typeJvm

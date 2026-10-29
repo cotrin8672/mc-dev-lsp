@@ -18,14 +18,34 @@ the hash and native mappings in the adjacent `linked-retirement.json`.
 rtk cargo build --release --locked -p mcdev-companion
 ```
 
-Use a separately installed ktlsp binary that implements the agreed extension
-protocol. [Native installation](native-distribution.md) and
+Use a separately installed ktlsp binary built from
+[`ea8be67`](https://github.com/cotrin8672/ktlsp/commit/ea8be671ed4a876a5d5514fb63daa043e953c08f)
+or a compatible revision of its experimental extension protocol.
+[Native installation](native-distribution.md) and
 [Neovim configuration](lazy-nvim.md) show explicit executable argv arrays and
 `mcdev.ktlsp.extend_config` integration with an existing client configuration.
 The MC setup function does not start a second host.
 
-The provider ID is `mcdev.mixin`. The currently verified production capability
-is only `semantic-v1`; it is not a claim that every MC command is connected.
+```lua
+local host = {
+  cmd = { "/absolute/path/to/ktlsp" },
+  root_dir = "/absolute/path/to/project",
+}
+assert(require("mcdev.ktlsp").extend_config(host, {
+  companion = { cmd = { "/absolute/path/to/mcdev-companion" } },
+}))
+vim.lsp.start(host)
+```
+
+The provider ID is `mcdev.mixin`. When no explicit `executeCommands` list is
+configured, `extend_config` registers the eleven MC command IDs. An existing
+list and an explicit `enabled = false` are respected. Neovim sends those domain
+commands through the host's advertised `ktlsp.providerCommand` and passes the
+current LSP buffer text, document version and selected workspace. Reindex and
+project reload request one host refresh before dispatch.
+
+The companion must also acknowledge and implement each registered command; a
+configuration entry alone does not establish feature availability.
 The [process contract](mcdev-companion-contract.md) records published host
 revisions, wire sources, artifact hashes, accepted trace barriers and exact
 editor evidence.
@@ -34,16 +54,16 @@ editor evidence.
 
 The standalone process handles the bounded Mixin/Shadow contribution policy.
 The Rust library also contains all migrated domain services and command DTOs.
-Real project-aware commands still require the host-owned generic facts and
-command routing described in the [remaining integration contract](mcdev-command-host-contract.md).
+Real project-aware commands still require the companion to consume host-owned
+facts through the routing described in the
+[remaining integration contract](mcdev-command-host-contract.md).
 
-The optional `projectContext`/`typeJvm` operations are implemented in the fixed,
-host 37 candidate, and their API source is published as `16580db`. Its actual serializer matches the isolated MC
-adapter; [the capability record](mcdev-host-capabilities.md) pins the evidence.
-The MC production child still negotiates semantic-v1. These limited metadata
-operations do not establish a complete project session, class catalog, source/resource
-inventory, executable bytecode, Java SDK hierarchy or refresh authority. Unknown
-facts must stay unknown; display paths do not grant filesystem access.
+The pinned host also exposes scoped source and resource snapshots, selected
+runtime bytes, a physical JVM catalog and provider-command routing. Coverage is
+limited to the selected module and source set. Unavailable semantic facts,
+unsaved-source authority, unsupported inputs and incomplete inventories remain
+Unknown; a display path does not grant filesystem access. Companion adapters and
+full editor parity require their own integration verification.
 
 ## Verification
 

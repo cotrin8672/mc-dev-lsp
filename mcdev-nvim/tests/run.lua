@@ -2012,7 +2012,7 @@ if package.config:sub(1, 1) == "\\" then
   local explicit_drive = vim.fs.normalize(vim.fn.fnamemodify("/project", ":p")) .. "/src/main/java/DriveRoot.java"
   with_named_buffer(explicit_drive, "java", { "class DriveRoot {}" }, function(bufnr)
     local original = vim.lsp.get_clients
-    local client = { name = "ktlsp", config = { root_dir = "/project" } }
+    local client = { name = "ktlsp", config = { root_dir = "/project" }, server_capabilities = { executeCommandProvider = { commands = { protocol.commands.completion } } } }
     vim.lsp.get_clients = function() return { client } end
     local selected = protocol.active_ktlsp_client(bufnr)
     local uv = vim.uv or vim.loop
@@ -2026,5 +2026,7 @@ if package.config:sub(1, 1) == "\\" then
     helpers.assert_nil(other_volume)
   end)
 end
+dofile(vim.fn.getcwd() .. "/mcdev-nvim/tests/ktlsp_provider.lua")
+dofile(vim.fn.getcwd() .. "/mcdev-nvim/tests/ktlsp_provider_lsp.lua")
 print("mcdev-nvim adapter tests passed")
 vim.cmd("qa!")

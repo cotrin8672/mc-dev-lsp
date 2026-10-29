@@ -1,18 +1,22 @@
-# mcdev semantic companion
+# mcdev standalone companion
 
 `mcdev-companion` is a separate Rust executable. Its dependency graph contains
-`mcdev-core`, `mcdev-protocol`, serde, serde_json and the OS random-source helper;
+`mcdev-core`, `mcdev-protocol`, serde, serde_json, SHA-256 and the OS random-source helper;
 it does not link ktlsp or ktcore. The linked `mcdev-ktlsp` prototype has been
 retired; its thirteen scenario families execute in companion process tests,
 and its original test source is preserved with provenance in the fixtures.
 
-The verified stock-host checkpoint is
+The original semantic-v1 stock-host checkpoint was
 `f76a43fbeddf4fbdc69768fd0f7544e5a4a3610f` in cotrin8672/ktlsp.
 `docs/architecture/extension-ipc.md`, `crates/ktlsp/src/extension_ipc.rs` and
 `crates/ktlsp/src/analysis_extensions/ipc.rs` define the wire. The host's
 `dev/external-extension/{src/bin/ipc-child.rs,ipc-manifest.json,ipc-probes.lua,README.md}`
 contains the separate process/editor fixture. Host revisions must be pinned
-alongside this experimental contract.
+alongside this experimental contract. Current command/input integration uses
+[`ea8be671`](https://github.com/cotrin8672/ktlsp/blob/ea8be671ed4a876a5d5514fb63daa043e953c08f/docs/architecture/extension-ipc.md).
+The exact verified scope and remaining gaps are recorded in
+[the integration checkpoint](ipc-integration-status.md); the historical traces
+below retain their original artifact pins.
 
 An explicit registration uses an executable/argv array, for example:
 
@@ -32,12 +36,15 @@ Minecraft annotation identity and JVM descriptor validation reuse mcdev-core.
 
 stdin/stdout carry UTF-8 JSON-RPC 2.0 with byte-counted Content-Length frames;
 stderr carries process errors only. Initialization negotiates major 1/minor 0
-and advertises only `semantic-v1`. No native Rust ABI is exposed. The process
+with `semantic-v1` as its base. Offered optional capabilities and their operations
+are acknowledged by intersection. No native Rust ABI is exposed. The process
 accepts repeated evaluations while retaining no previous evaluation's handles.
 
 Frames are limited to 1 MiB, headers to 4 KiB and the reader queue to 32 frames.
-The child limits one evaluation to 25 seconds, 64 host batches and 16,384 opaque
-handles; fact batches contain at most 256 queries. Invalid framing terminates
+The child limits one evaluation to 25 seconds, 64 metadata batches and 16,384 opaque
+handles; fact batches contain at most 256 queries. Stream continuations have a
+separate 256-query/64 MiB serialized-reply budget, so a class byte stream does not
+consume one metadata batch per chunk. Invalid framing terminates
 the child. Invalid source facts or failed host batches produce an evaluation
 error without publishing partial contributions. Host acceptance remains the
 final authority for stale generations and foreign handles.
@@ -59,6 +66,41 @@ diagnostics. EOF, shutdown and exit also interrupt an outstanding host read.
 The published host currently shuts down by closing/reaping its owned child.
 The companion additionally understands JSON-RPC shutdown/exit for a direct
 client; this does not claim the host implements that graceful exchange.
+
+## Provider commands and owned inputs
+
+The production child also negotiates `project-class-facts-v1`,
+`source-snapshots-v1`, `owned-resources-v1`, `runtime-class-bytes-v1`,
+`jvm-catalog-v1`, and `provider-commands-v1` when the host offers them.
+Typed readers preserve Unknown, incomplete coverage, origin/order and opaque
+evaluation-scoped tokens. Reassembled resource/runtime bytes are checked against
+their identities, offsets, lengths and SHA-256. Catalog ABI never grants runtime
+Code access or certifies current unsaved source.
+
+For commands, registration uses `analysisProviders.<id>.executeCommands`.
+The configured IDs are intersected with the companion's implemented routes;
+currently completion, diagnostics/context, definition and hover are acknowledged.
+References, code actions, info/dump and project refresh commands remain required
+but are not advertised as connected before their complete project inputs exist.
+
+The editor sends `workspace/executeCommand` with the outer command
+`ktlsp.providerCommand`. The host validates its provider/document/workspace and
+forwards the original domain arguments to `analysis/executeCommand`. The companion
+keeps the existing decoder, complete result-or-error DTOs and typed converters.
+Outer host context uses the selected native workspace path and exact current LSP
+text/version; the original inner payload remains intact. Cancellation, stale text
+and invalid/fatal reads close the evaluation. Late responses cannot satisfy a
+later request, and at most eight command workers may remain draining.
+
+`CoreCommandHost::with_evaluation` uses this lifetime instead of inventing the
+legacy library's eight generation counters. Its semantic/expression caches do not
+cross evaluations. SDK-dependent reads remain unavailable without SDK authority;
+SDK-independent source/resource operations do not require a fabricated SDK.
+
+Source-local definitions use host-resolved annotation identities, exact string
+values/ranges and same-declaration ownership before invoking the existing Rust
+definition services. Other unprovided semantic facts remain unavailable. This
+does not declare the full eleven-command or original-editor migration complete.
 
 ## Current policy scope and pending contract
 

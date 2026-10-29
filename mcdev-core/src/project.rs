@@ -566,19 +566,29 @@ impl MappingDiscoveryService {
         files: &[PathBuf],
         platform: ModPlatform,
     ) -> io::Result<ProjectMappingContext> {
+        let inputs = files
+            .iter()
+            .map(|path| fs::read_to_string(path).map(|text| (path.clone(), text)))
+            .collect::<io::Result<Vec<_>>>()?;
+        Self::build_mapping_context_from_contents(&inputs, platform)
+    }
+    /// Build from host-owned snapshots without opening their display paths.
+    pub fn build_mapping_context_from_contents(
+        inputs: &[(PathBuf, String)],
+        platform: ModPlatform,
+    ) -> io::Result<ProjectMappingContext> {
         let mut namespaces = vec![];
         let mut resolvers = Vec::<Arc<dyn MappingResolver>>::new();
-        for path in files {
-            let text = fs::read_to_string(path)?;
+        for (path, text) in inputs {
             let ext = path
                 .extension()
                 .unwrap_or_default()
                 .to_string_lossy()
                 .to_ascii_lowercase();
             let parsed = if ext == "tiny" || text.trim_start().starts_with("tiny\t") {
-                TinyV2Parser::parse(&text)
+                TinyV2Parser::parse(text)
             } else {
-                SrgParser::parse(&text)
+                SrgParser::parse(text)
             };
             if let Ok(set) = parsed {
                 for ns in &set.namespaces {

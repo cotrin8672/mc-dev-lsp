@@ -4,6 +4,7 @@ mod completion;
 mod core;
 mod delegate;
 pub mod host;
+pub mod ipc;
 mod runtime;
 pub(crate) use completion::provisional_response;
 pub use completion::{completion_from_core, completion_options};

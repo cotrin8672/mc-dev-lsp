@@ -31,6 +31,7 @@ use mcdev_core::{
     },
     mixin_navigation::{DefinitionBackend, DefinitionResolution, DefinitionResolutionService},
     mixinextras_expression::ExpressionMemberCompletionCache,
+    mixinextras_handler::HandlerReferenceTypeResolver,
     model::{ClassIndex, ClassIndexEntry, FieldIndexEntry, MethodIndexEntry},
     project::{normalize_path, uri_to_path, CachedProjectSession, ProjectContext},
     McDefinitionTarget, McFix, SourceScanEntry,
@@ -52,11 +53,12 @@ use std::{
 /// host's lifetime. This type does not discover a project, walk source roots,
 /// or manufacture SDK/classpath facts.
 pub struct CoreCommandHost {
-    session: Arc<HostProjectSession>,
-    checked_class_index: Arc<CheckedClassIndex>,
-    checked_bytecode_index: Arc<CheckedBytecodeIndex>,
+    authority: SessionAuthority,
+    checked_class_index: Arc<dyn ClassIndex>,
+    checked_bytecode_index: Arc<dyn BytecodeIndex>,
+    reference_types: Arc<dyn HandlerReferenceTypeResolver>,
+    definitions: Arc<dyn DefinitionBackend>,
     cached_session: CachedProjectSession,
-    project_query: Arc<dyn HostProjectQuery>,
     semantic_provider: Arc<dyn HostSemanticModelProvider>,
     semantic_cache: Arc<SemanticModelCache>,
     expression_cache: Arc<ExpressionMemberCompletionCache>,
@@ -64,6 +66,40 @@ pub struct CoreCommandHost {
     source_inventory: HostFact<Vec<SourceScanEntry>>,
     build_identity: BuildIdentity,
     host_supports_kotlin_semantics: bool,
+}
+
+type ActiveCheck = dyn Fn() -> Result<(), HostSourceError> + Send + Sync;
+type SpecifierProbe = dyn Fn() -> Result<bool, HostSourceError> + Send + Sync;
+type AdditionalAtValues = dyn Fn() -> Result<Vec<String>, HostSourceError> + Send + Sync;
+
+/// Owned inputs valid only for one host evaluation. Infallible compatibility
+/// traits preserve unavailable facts as typed `CommandFailure` panic payloads.
+pub struct EvaluationCommandInputs {
+    pub workspace_root_uri: String,
+    pub cached_session: CachedProjectSession,
+    pub class_index: Arc<dyn ClassIndex>,
+    pub bytecode_index: Arc<dyn BytecodeIndex>,
+    pub reference_types: Arc<dyn HandlerReferenceTypeResolver>,
+    pub definitions: Arc<dyn DefinitionBackend>,
+    pub check_active: Arc<ActiveCheck>,
+    pub specifier_supported: Arc<SpecifierProbe>,
+    pub additional_at_values: Arc<AdditionalAtValues>,
+    /// Host-issued context.refreshGeneration, present only after host refresh.
+    pub refresh_generation: Option<String>,
+}
+
+enum SessionAuthority {
+    Legacy {
+        session: Arc<HostProjectSession>,
+        project_query: Arc<dyn HostProjectQuery>,
+    },
+    Evaluation {
+        workspace_root_uri: String,
+        check_active: Arc<ActiveCheck>,
+        specifier_supported: Arc<SpecifierProbe>,
+        additional_at_values: Arc<AdditionalAtValues>,
+        refresh_generation: Option<String>,
+    },
 }
 
 /// The core traits predate the host fact protocol and intentionally expose
@@ -112,14 +148,44 @@ struct CheckedBytecodeIndex {
     index: Arc<HostBytecodeAdapter>,
 }
 
+struct EvaluationReferenceTypes {
+    resolver: Arc<dyn HandlerReferenceTypeResolver>,
+}
+
+impl HandlerReferenceTypeResolver for EvaluationReferenceTypes {
+    fn is_known_reference(&self, internal: &str) -> Option<bool> {
+        Some(
+            self.resolver
+                .is_known_reference(internal)
+                .unwrap_or_else(|| {
+                    std::panic::panic_any(HostSourceError::Failure(
+                        "reference type facts are unavailable".into(),
+                    ))
+                }),
+        )
+    }
+
+    fn is_assignable(&self, from: &str, expected: &str) -> Option<bool> {
+        Some(
+            self.resolver
+                .is_assignable(from, expected)
+                .unwrap_or_else(|| {
+                    std::panic::panic_any(HostSourceError::Failure(
+                        "reference assignability is unavailable".into(),
+                    ))
+                }),
+        )
+    }
+}
+
 /// The compatibility `DefinitionBackend` cannot represent an unavailable
 /// host answer. Keep that answer fallible at this command boundary instead of
 /// turning it into the same `None` used for a checked missing location.
-struct CheckedDefinitionBackend<'a> {
-    session: &'a HostProjectSession,
+struct CheckedDefinitionBackend {
+    session: Arc<HostProjectSession>,
 }
 
-impl DefinitionBackend for CheckedDefinitionBackend<'_> {
+impl DefinitionBackend for CheckedDefinitionBackend {
     fn resolve(
         &self,
         target: &McDefinitionTarget,
@@ -195,14 +261,23 @@ impl CoreCommandHost {
             session.class_bytes_provider.clone(),
             checked_class_index.clone(),
         ));
+        let reference_types = Arc::new(session.checked_reference_types());
+        let definitions = Arc::new(CheckedDefinitionBackend {
+            session: session.clone(),
+        });
+        let workspace_root_uri = session.identity.workspace_root_uri.clone();
         let host = Self {
-            session,
+            authority: SessionAuthority::Legacy {
+                session,
+                project_query,
+            },
             checked_class_index,
             checked_bytecode_index: Arc::new(CheckedBytecodeIndex {
                 index: checked_bytecode,
             }),
+            reference_types,
+            definitions,
             cached_session,
-            project_query,
             semantic_provider,
             semantic_cache: Arc::new(SemanticModelCache::default()),
             expression_cache: Arc::new(ExpressionMemberCompletionCache::default()),
@@ -212,16 +287,81 @@ impl CoreCommandHost {
             host_supports_kotlin_semantics,
         };
         host.validate_cached_identity()?;
-        host.validate_workspace(&host.session.identity.workspace_root_uri)?;
+        host.validate_workspace(&workspace_root_uri)?;
         Ok(host)
     }
 
+    #[allow(clippy::too_many_arguments)]
+    pub fn with_evaluation(
+        inputs: EvaluationCommandInputs,
+        semantic_provider: Arc<dyn HostSemanticModelProvider>,
+        source_provider: Arc<dyn HostMixinSourceProvider>,
+        source_inventory: HostFact<Vec<SourceScanEntry>>,
+        build_identity: BuildIdentity,
+        host_supports_kotlin_semantics: bool,
+    ) -> Result<Self, CommandFailure> {
+        if inputs.cached_session.cache_hit {
+            return Err(unavailable(
+                McdevErrorCode::IncompleteProjectContext,
+                "an evaluation cannot reuse a project session from another evaluation",
+            ));
+        }
+        if inputs.refresh_generation.as_ref().is_some_and(|value| {
+            value.is_empty()
+                || !value.bytes().all(|byte| byte.is_ascii_digit())
+                || value.parse::<u64>().is_err()
+        }) {
+            return Err(unavailable(
+                McdevErrorCode::IncompleteProjectContext,
+                "invalid host refresh generation",
+            ));
+        }
+        let root = inputs.workspace_root_uri.clone();
+        let host = Self {
+            authority: SessionAuthority::Evaluation {
+                workspace_root_uri: inputs.workspace_root_uri,
+                check_active: inputs.check_active,
+                specifier_supported: inputs.specifier_supported,
+                additional_at_values: inputs.additional_at_values,
+                refresh_generation: inputs.refresh_generation,
+            },
+            checked_class_index: inputs.class_index,
+            checked_bytecode_index: inputs.bytecode_index,
+            reference_types: Arc::new(EvaluationReferenceTypes {
+                resolver: inputs.reference_types,
+            }),
+            definitions: inputs.definitions,
+            cached_session: inputs.cached_session,
+            semantic_provider,
+            semantic_cache: Arc::new(SemanticModelCache::default()),
+            expression_cache: Arc::new(ExpressionMemberCompletionCache::default()),
+            source_provider,
+            source_inventory,
+            build_identity,
+            host_supports_kotlin_semantics,
+        };
+        host.validate_workspace(&root)?;
+        Ok(host)
+    }
+
+    fn workspace_root_uri(&self) -> &str {
+        match &self.authority {
+            SessionAuthority::Legacy { session, .. } => &session.identity.workspace_root_uri,
+            SessionAuthority::Evaluation {
+                workspace_root_uri, ..
+            } => workspace_root_uri,
+        }
+    }
+
     fn validate_cached_identity(&self) -> Result<(), CommandFailure> {
-        let identity = &self.session.identity;
+        let SessionAuthority::Legacy { session, .. } = &self.authority else {
+            return Ok(());
+        };
+        let identity = &session.identity;
         if self.cached_session.version != identity.project_session_version
-            || self.cached_session.context.project_id != self.session.context.project_id
+            || self.cached_session.context.project_id != session.context.project_id
             || normalize_path(&self.cached_session.context.root)
-                != normalize_path(&self.session.context.root)
+                != normalize_path(&session.context.root)
         {
             return Err(unavailable(
                 McdevErrorCode::IncompleteProjectContext,
@@ -238,16 +378,14 @@ impl CoreCommandHost {
                 format!("invalid workspace root: {error}"),
             )
         })?);
-        let session_root = normalize_path(
-            &uri_to_path(&self.session.identity.workspace_root_uri).map_err(|error| {
+        let session_root =
+            normalize_path(&uri_to_path(self.workspace_root_uri()).map_err(|error| {
                 unavailable(
                     McdevErrorCode::IncompleteProjectContext,
                     format!("invalid session workspace root: {error}"),
                 )
-            })?,
-        );
+            })?);
         if requested != session_root
-            || normalize_path(&self.session.context.root) != session_root
             || normalize_path(&self.cached_session.context.root) != session_root
         {
             return Err(unavailable(
@@ -255,26 +393,41 @@ impl CoreCommandHost {
                 "workspace root does not match the owned project session",
             ));
         }
-        if !self.project_query.is_open(&self.session.identity) {
-            return Err(unavailable(
-                McdevErrorCode::IncompleteProjectContext,
-                "project session is closed",
-            ));
+        match &self.authority {
+            SessionAuthority::Legacy {
+                session,
+                project_query,
+            } => {
+                if normalize_path(&session.context.root) != session_root {
+                    return Err(unavailable(
+                        McdevErrorCode::IncompleteProjectContext,
+                        "workspace root does not match the owned project session",
+                    ));
+                }
+                if !project_query.is_open(&session.identity) {
+                    return Err(unavailable(
+                        McdevErrorCode::IncompleteProjectContext,
+                        "project session is closed",
+                    ));
+                }
+                if !project_query
+                    .validate(&session.identity, &Vec::new())
+                    .map_err(map_source_error)?
+                {
+                    return Err(unavailable(
+                        McdevErrorCode::IncompleteProjectContext,
+                        "project session generations are stale",
+                    ));
+                }
+                session
+                    .class_bytes_provider
+                    .current_revision()
+                    .map_err(map_source_error)?;
+            }
+            SessionAuthority::Evaluation { check_active, .. } => {
+                check_active().map_err(map_source_error)?;
+            }
         }
-        let valid = self
-            .project_query
-            .validate(&self.session.identity, &Vec::new())
-            .map_err(map_source_error)?;
-        if !valid {
-            return Err(unavailable(
-                McdevErrorCode::IncompleteProjectContext,
-                "project session generations are stale",
-            ));
-        }
-        self.session
-            .class_bytes_provider
-            .current_revision()
-            .map_err(map_source_error)?;
         Ok(())
     }
 
@@ -284,8 +437,8 @@ impl CoreCommandHost {
         workspace_root: &str,
     ) -> Result<(), CommandFailure> {
         self.validate_workspace(workspace_root)?;
-        if project.project_id != self.session.context.project_id
-            || normalize_path(&project.root) != normalize_path(&self.session.context.root)
+        if project.project_id != self.cached_session.context.project_id
+            || normalize_path(&project.root) != normalize_path(&self.cached_session.context.root)
         {
             return Err(unavailable(
                 McdevErrorCode::IncompleteProjectContext,
@@ -310,41 +463,52 @@ impl CoreCommandHost {
         Ok(())
     }
 
-    fn project_key(&self) -> HostProjectKey {
-        HostProjectKey {
-            project_id: self.session.context.project_id.clone(),
-            generations: self.session.identity.generations,
+    fn project_key(&self) -> Option<HostProjectKey> {
+        match &self.authority {
+            SessionAuthority::Legacy { session, .. } => Some(HostProjectKey {
+                project_id: session.context.project_id.clone(),
+                generations: session.identity.generations,
+            }),
+            SessionAuthority::Evaluation { .. } => None,
         }
     }
 
     fn facade<'a>(&'a self, document_version: Option<i64>) -> HostMixinServiceFacade<'a> {
         let key = self.project_key();
-        let workspace = self.session.identity.workspace_root_uri.clone();
+        let workspace = normalize_path(&self.cached_session.context.root);
         let mut facade = HostMixinServiceFacade::new(
             self.checked_class_index.as_ref(),
             self.checked_bytecode_index.as_ref(),
             self.semantic_provider.as_ref(),
             self.semantic_cache.as_ref(),
-        )
-        .with_expression_cache(self.expression_cache.clone(), key.clone())
-        .with_registered_sources(self.source_provider.as_ref());
-        facade.context = Some(self.session.context.as_ref());
-        facade.project = Some(key.clone());
-        facade.project_session_version = self.session.identity.project_session_version;
+        );
+        facade.context = Some(self.cached_session.context.as_ref());
+        if let Some(key) = &key {
+            facade = facade.with_expression_cache(self.expression_cache.clone(), key.clone());
+        }
+        facade = facade.with_registered_sources(self.source_provider.as_ref());
+        facade.project = key.clone();
+        facade.project_session_version = self.cached_session.version;
         facade.document_version = document_version;
         facade.host_supports_kotlin_semantics = self.host_supports_kotlin_semantics;
         let resolver_key = key.clone();
         facade.project_resolver = Box::new(move |_, requested_workspace, _| {
-            if requested_workspace.is_some_and(|root| root != workspace) {
+            if requested_workspace.is_some_and(|root| {
+                uri_to_path(root)
+                    .ok()
+                    .map(|path| normalize_path(&path))
+                    .as_ref()
+                    != Some(&workspace)
+            }) {
                 return Err(HostSourceError::Failure(
                     "workspace root does not match the owned project session".into(),
                 ));
             }
-            Ok(Some(resolver_key.clone()))
+            Ok(resolver_key.clone())
         });
         let ready_key = key.clone();
         facade.source_query_ready = Box::new(move |candidate| {
-            if candidate == &ready_key {
+            if ready_key.as_ref() == Some(candidate) {
                 Ok(())
             } else {
                 Err(HostSourceError::Failure(
@@ -352,17 +516,33 @@ impl CoreCommandHost {
                 ))
             }
         });
-        facade.specifier_supported = Box::new(|_, _| {
-            Err(HostSourceError::Failure(
-                "specifier support facts are unavailable".into(),
-            ))
-        });
-        facade.additional_at_values = Box::new(|_, _| {
-            Err(HostSourceError::Failure(
-                "additional AtValue facts are unavailable".into(),
-            ))
-        });
+        facade.specifier_supported = Box::new(|_, _| self.specifier_supported());
+        facade.additional_at_values = Box::new(|_, _| self.additional_at_values());
         facade
+    }
+
+    fn specifier_supported(&self) -> Result<bool, HostSourceError> {
+        match &self.authority {
+            SessionAuthority::Evaluation {
+                specifier_supported,
+                ..
+            } => specifier_supported(),
+            SessionAuthority::Legacy { .. } => Err(HostSourceError::Failure(
+                "specifier support facts are unavailable".into(),
+            )),
+        }
+    }
+
+    fn additional_at_values(&self) -> Result<Vec<String>, HostSourceError> {
+        match &self.authority {
+            SessionAuthority::Evaluation {
+                additional_at_values,
+                ..
+            } => additional_at_values(),
+            SessionAuthority::Legacy { .. } => Err(HostSourceError::Failure(
+                "additional AtValue facts are unavailable".into(),
+            )),
+        }
     }
 
     fn semantic_model(
@@ -386,9 +566,13 @@ impl CoreCommandHost {
                 &HostSemanticRequest {
                     source: &context.buffer_text,
                     source_uri: &context.document_uri,
-                    document_version: Some(snapshot_version),
+                    // An internal snapshot sequence is not a host LSP version.
+                    document_version: match &self.authority {
+                        SessionAuthority::Legacy { .. } => Some(snapshot_version),
+                        SessionAuthority::Evaluation { .. } => context.document_version,
+                    },
                     environment: &environment,
-                    project: Some(&key),
+                    project: key.as_ref(),
                 },
                 self.semantic_provider.as_ref(),
             )
@@ -462,17 +646,15 @@ impl CoreCommandHost {
         }
     }
 
-    fn buffer_only_at_values() -> AtValueCompletionService<'static> {
+    fn buffer_only_at_values(&self) -> AtValueCompletionService<'_> {
         AtValueCompletionService::new(
             || {
-                std::panic::panic_any(HostSourceError::Failure(
-                    "specifier support facts are unavailable".into(),
-                ))
+                self.specifier_supported()
+                    .unwrap_or_else(|error| std::panic::panic_any(error))
             },
             || {
-                std::panic::panic_any(HostSourceError::Failure(
-                    "additional AtValue facts are unavailable".into(),
-                ))
+                self.additional_at_values()
+                    .unwrap_or_else(|error| std::panic::panic_any(error))
             },
         )
     }
@@ -579,7 +761,7 @@ impl CommandHost for CoreCommandHost {
 
     fn load_session(&self, workspace_root: &str) -> Result<Arc<ProjectContext>, CommandFailure> {
         self.validate_workspace(workspace_root)?;
-        Ok(self.session.context.clone())
+        Ok(self.cached_session.context.clone())
     }
 
     fn load_cached_session(
@@ -590,18 +772,42 @@ impl CommandHost for CoreCommandHost {
         Ok(self.cached_session.clone())
     }
 
-    fn reindex(&self, _workspace_root: &str) -> Result<Arc<ProjectContext>, CommandFailure> {
-        Err(unavailable(
-            McdevErrorCode::IncompleteProjectContext,
-            "host project refresh authority is unavailable",
-        ))
+    fn reindex(&self, workspace_root: &str) -> Result<Arc<ProjectContext>, CommandFailure> {
+        self.validate_workspace(workspace_root)?;
+        // ktlsp ea8be67, crates/ktlsp/src/lsp.rs, sets this only after refresh succeeds.
+        if matches!(
+            &self.authority,
+            SessionAuthority::Evaluation {
+                refresh_generation: Some(_),
+                ..
+            }
+        ) {
+            Ok(self.cached_session.context.clone())
+        } else {
+            Err(unavailable(
+                McdevErrorCode::IncompleteProjectContext,
+                "host project refresh authority is unavailable",
+            ))
+        }
     }
 
     fn clear_project_cache(&self) -> Result<(), CommandFailure> {
-        Err(unavailable(
-            McdevErrorCode::IncompleteProjectContext,
-            "host project refresh authority is unavailable",
-        ))
+        self.validate_workspace(self.workspace_root_uri())?;
+        if matches!(
+            &self.authority,
+            SessionAuthority::Evaluation {
+                refresh_generation: Some(_),
+                ..
+            }
+        ) {
+            self.semantic_cache.clear();
+            Ok(())
+        } else {
+            Err(unavailable(
+                McdevErrorCode::IncompleteProjectContext,
+                "host project refresh authority is unavailable",
+            ))
+        }
     }
 
     fn semantic_model(
@@ -633,7 +839,7 @@ impl CommandHost for CoreCommandHost {
                 &context.document_uri,
                 &context.language_id,
                 false,
-                Self::buffer_only_at_values(),
+                self.buffer_only_at_values(),
             )
         }));
         let result = match result {
@@ -661,7 +867,7 @@ impl CommandHost for CoreCommandHost {
     ) -> Result<RuntimeCompletion, CommandFailure> {
         self.validate_project(project, &context.workspace_root)?;
         self.validate_semantic_capability(context)?;
-        if project_version != self.session.identity.project_session_version {
+        if project_version != self.cached_session.version {
             return Err(unavailable(
                 McdevErrorCode::IncompleteProjectContext,
                 "completion project session version is stale",
@@ -670,7 +876,6 @@ impl CommandHost for CoreCommandHost {
         cancellation
             .check_cancelled()
             .map_err(CommandFailure::Cancelled)?;
-        let reference_types = self.session.checked_reference_types();
         let facade = self.facade(context.document_version);
         let mut request = self.build_facade_request(
             &facade,
@@ -680,7 +885,7 @@ impl CommandHost for CoreCommandHost {
         )?;
         request.semantic_model = Some(semantic.clone());
         let mut facade = facade;
-        facade.reference_types = Some(&reference_types);
+        facade.reference_types = Some(self.reference_types.as_ref());
         let result =
             catch_facade(|| facade.complete_with_debug(&request, options, &context.language_id))?;
         cancellation
@@ -795,7 +1000,6 @@ impl CommandHost for CoreCommandHost {
             return Ok(diagnostics);
         }
         self.validate_semantic_capability(context)?;
-        let reference_types = self.session.checked_reference_types();
         let facade = self.facade(context.document_version);
         let request = self.build_facade_request(
             &facade,
@@ -807,7 +1011,7 @@ impl CommandHost for CoreCommandHost {
             .check_cancelled()
             .map_err(CommandFailure::Cancelled)?;
         let mut facade = facade;
-        facade.reference_types = Some(&reference_types);
+        facade.reference_types = Some(self.reference_types.as_ref());
         let diagnostics = catch_facade(|| facade.diagnose(&request))?;
         cancellation
             .check_cancelled()
@@ -863,9 +1067,8 @@ impl CommandHost for CoreCommandHost {
             return Ok(targets);
         }
         self.validate_semantic_capability(context)?;
-        let reference_types = self.session.checked_reference_types();
         let mut facade = self.facade(context.document_version);
-        facade.reference_types = Some(&reference_types);
+        facade.reference_types = Some(self.reference_types.as_ref());
         let line = usize::try_from(context.position.line).map_err(|_| {
             unavailable(
                 McdevErrorCode::NoApplicableContext,
@@ -895,11 +1098,8 @@ impl CommandHost for CoreCommandHost {
         targets: &[McDefinitionTarget],
     ) -> Result<Vec<ResolvedDefinition>, CommandFailure> {
         self.validate_project(project, workspace_root)?;
-        let backend = CheckedDefinitionBackend {
-            session: self.session.as_ref(),
-        };
         let resolved = catch_command(|| {
-            DefinitionResolutionService::new(vec![&backend]).resolve_all(
+            DefinitionResolutionService::new(vec![self.definitions.as_ref()]).resolve_all(
                 targets,
                 project,
                 workspace_root,
@@ -932,7 +1132,7 @@ impl CommandHost for CoreCommandHost {
         family: SourceFamily,
         cancellation: &dyn CancellationChecker,
     ) -> Result<Vec<mcdev_core::McReferenceLocation>, CommandFailure> {
-        self.validate_project(project, &self.session.identity.workspace_root_uri)?;
+        self.validate_project(project, self.workspace_root_uri())?;
         cancellation
             .check_cancelled()
             .map_err(CommandFailure::Cancelled)?;
@@ -953,7 +1153,7 @@ impl CommandHost for CoreCommandHost {
         cancellation
             .check_cancelled()
             .map_err(CommandFailure::Cancelled)?;
-        self.validate_workspace(&self.session.identity.workspace_root_uri)?;
+        self.validate_workspace(self.workspace_root_uri())?;
         Ok(result)
     }
 
@@ -1009,7 +1209,6 @@ impl CommandHost for CoreCommandHost {
             return Ok(fixes);
         }
         self.validate_semantic_capability(context)?;
-        let reference_types = self.session.checked_reference_types();
         let facade = self.facade(context.document_version);
         let request =
             self.build_facade_request(&facade, context, range.start.line, range.start.character)?;
@@ -1017,7 +1216,7 @@ impl CommandHost for CoreCommandHost {
             .check_cancelled()
             .map_err(CommandFailure::Cancelled)?;
         let mut facade = facade;
-        facade.reference_types = Some(&reference_types);
+        facade.reference_types = Some(self.reference_types.as_ref());
         let fixes = catch_facade(|| facade.code_actions(&request, diagnostic_code))?;
         cancellation
             .check_cancelled()
@@ -1166,7 +1365,7 @@ fn panic_failure(payload: Box<dyn Any + Send>) -> CommandFailure {
     CommandFailure::Runtime("core command panicked".into())
 }
 
-fn convert_definition(
+pub(super) fn convert_definition(
     value: mcdev_core::mixin_navigation::ResolvedDefinition,
 ) -> ResolvedDefinition {
     ResolvedDefinition {

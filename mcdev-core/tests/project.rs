@@ -199,6 +199,62 @@ fn mapping_context_parses_merges_and_selects_namespaces() {
     assert!(MappingDiscoveryService::parse_mapping_file(&t.0.join("bad.tiny")).is_err());
 }
 #[test]
+fn host_mapping_snapshots_use_the_same_order_and_namespace_selection() {
+    let t = Temp::new();
+    let first = t.write("first.tiny", TINY);
+    let second_text = "tiny\t2\t0\tnamed\tintermediary\nc\tnet/minecraft/Client\tother/Client\nc\tnet/minecraft/Screen\tnet/minecraft/class_437\n";
+    let second = t.write("second.tiny", second_text);
+    let invalid = t.write("invalid.tiny", "broken");
+    let from_files = MappingDiscoveryService::build_mapping_context(
+        &[first.clone(), second.clone(), invalid.clone()],
+        ModPlatform::Fabric,
+    )
+    .unwrap();
+    let snapshots = vec![
+        (first, TINY.to_owned()),
+        (second, second_text.to_owned()),
+        (invalid, "broken".to_owned()),
+    ];
+    // Snapshot paths are display metadata; the host owns all byte access.
+    for (path, _) in &snapshots {
+        fs::remove_file(path).unwrap();
+    }
+    let from_snapshots = MappingDiscoveryService::build_mapping_context_from_contents(
+        &snapshots,
+        ModPlatform::Fabric,
+    )
+    .unwrap();
+    assert_eq!(
+        from_snapshots.available_namespaces,
+        from_files.available_namespaces
+    );
+    assert_eq!(from_snapshots.source_namespace, from_files.source_namespace);
+    assert_eq!(
+        from_snapshots.runtime_namespace,
+        from_files.runtime_namespace
+    );
+    assert_eq!(from_snapshots.aw_namespace, from_files.aw_namespace);
+    assert_eq!(from_snapshots.at_namespace, from_files.at_namespace);
+    for name in [
+        "net/minecraft/Client",
+        "net/minecraft/Screen",
+        "missing/Class",
+    ] {
+        let class = ClassRef {
+            internal_name: name.into(),
+            namespace: MappingNamespace::Named,
+        };
+        assert_eq!(
+            from_snapshots
+                .resolver
+                .remap_class(&class, MappingNamespace::Intermediary),
+            from_files
+                .resolver
+                .remap_class(&class, MappingNamespace::Intermediary),
+        );
+    }
+}
+#[test]
 fn forge_mapping_namespaces_and_empty_context() {
     let t = Temp::new();
     t.write("joined.srg", "CL: a/b c/d\nMD: a/b/m ()V c/d/func_1 ()V\n");

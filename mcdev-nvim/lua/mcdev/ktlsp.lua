@@ -35,6 +35,10 @@ function M.extend_config(client_config, opts)
   provider.command = command
   if provider.enabled == nil then provider.enabled = true end
   provider.configuration = provider.configuration or {}
+  if provider.executeCommands == nil then
+    provider.executeCommands = vim.tbl_values(require("mcdev.protocol").commands)
+    table.sort(provider.executeCommands)
+  end
   init.analysisProviders[M.provider_id] = provider
   client_config.init_options = init
   return client_config
