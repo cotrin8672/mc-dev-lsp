@@ -4,7 +4,6 @@ local artifacts = assert(vim.env.MCDEV_COMMAND_ARTIFACTS)
 local binary = assert(vim.env.MCDEV_COMMAND_HOST)
 local companion = assert(vim.env.MCDEV_COMMAND_COMPANION)
 local repo = vim.fn.getcwd()
-vim.opt.runtimepath:append(repo .. '/mcdev-nvim')
 vim.lsp.set_log_level('debug')
 vim.env.KTLSP_TRACE = artifacts .. '/host.trace.jsonl'
 local acceptance_module = dofile(repo .. '/mcdev-companion/tests/support/accepted_trace.lua')
@@ -16,7 +15,7 @@ local command_ids = {
   'mcdev.hover', 'mcdev.references', 'mcdev.codeAction', 'mcdev.reindex',
   'mcdev.reloadProjectContext', 'mcdev.dumpContext', 'mcdev.info',
 }
-local pending_ids = {
+local incomplete_ids = {
   'mcdev.references', 'mcdev.codeAction', 'mcdev.reindex',
   'mcdev.reloadProjectContext', 'mcdev.dumpContext', 'mcdev.info',
 }
@@ -26,7 +25,7 @@ local proof = {
   editorPid = vim.uv.os_getpid(), gradleBuildSucceeded = vim.env.MCDEV_COMMAND_GRADLE_BUILD_OK == '1',
   completeReplacementVerified = false, sdkSourceFixture = 'reduced Object.java',
 }
-local client, buffers = nil, {}
+local client, buffers, exited = nil, {}, nil
 local host_system, host_debug = vim.system, vim.lsp.log.debug
 local cancel_id, cancel_wire
 local paths = {
@@ -34,6 +33,8 @@ local paths = {
   patch = project .. '/src/main/java/fixture/Patch.java',
   expression = project .. '/src/main/java/fixture/ExampleMixin.java',
   target = project .. '/src/main/java/fixture/Target.java',
+  kotlin = project .. '/src/main/java/fixture/NoActions.kt',
+  aw = project .. '/src/main/resources/access.aw',
 }
 local function saved(value) return value == nil and vim.NIL or vim.deepcopy(value) end
 local function save()
@@ -47,6 +48,10 @@ local function check(label, condition, detail)
   proof.assertions[#proof.assertions + 1] = { label = label, passed = condition == true, detail = saved(detail) }
   if not condition then error(label .. ': ' .. vim.inspect(detail)) end
 end
+local function check_phase(label, condition, detail)
+  if not condition then proof.phaseFailure = { phase = label, detail = saved(detail) } end
+  check(label, condition, detail)
+end
 local function run_case(label, command, body)
   local ok, value = xpcall(body, debug.traceback)
   proof.matrix[#proof.matrix + 1] = {
@@ -55,6 +60,7 @@ local function run_case(label, command, body)
   }
   save()
   if ok then print('PASS ' .. label) else print('FAIL ' .. label .. ': ' .. tostring(value)) end
+  if not ok and proof.phaseFailure then error(value, 0) end
   return ok, value
 end
 local function provider_settings(enabled)
@@ -70,8 +76,9 @@ local function uri(bufnr) return vim.uri_from_bufnr(bufnr) end
 local function await_accepted(bufnr, floor, options)
   local expected = {}
   expected[acceptance_module.owner_key(vim.uri_to_fname(uri(bufnr)))] = vim.fn.sha256(full_text(bufnr))
-  local ok, found = acceptance:wait_for(expected, floor, 20000, options or {})
-  check('host accepted current source hash', ok, { expected = expected, found = found })
+  local waited, ok, found = pcall(acceptance.wait_for, acceptance, expected, floor, 30000, options or {})
+  check_phase('host accepted current source hash', waited and ok,
+    { expected = expected, found = found, error = not waited and tostring(ok) or nil, deadlineMs = 30000 })
   return found
 end
 local function observe_client(current)
@@ -85,17 +92,20 @@ local function observe_client(current)
       frame.responseAt = vim.uv.hrtime()
       if callback then return callback(err, result, ...) end
     end
-    return original(self, method, params, wrapped, bufnr)
+    local sent, id = original(self, method, params, wrapped, bufnr)
+    frame.requestId = id
+    return sent, id
   end
 end
 local function start_server()
-  local indexing = { project = false, libraries = false, messages = {} }
-  local exited = { exited = false }
+  local indexing = { project = false, libraries = false, messages = {}, deadlineMs = 180000 }
+  local server_exit = { exited = false }
+  exited = server_exit
   local id = assert(vim.lsp.start({
     name = 'mcdev-command-proof', cmd = { binary }, root_dir = project,
     init_options = { analysisProviders = { [provider] = provider_settings(true) } },
     on_exit = function(code, signal)
-      exited.exited, exited.exit_code, exited.signal = true, code, signal
+      server_exit.exited, server_exit.exit_code, server_exit.signal = true, code, signal
     end,
     handlers = { ['window/logMessage'] = function(_, params)
       local message = params and params.message or ''
@@ -104,20 +114,19 @@ local function start_server()
       indexing.messages[#indexing.messages + 1] = message
     end },
   }, { bufnr = buffers.owner }))
-  check('LSP initializes', vim.wait(30000, function()
+  check_phase('LSP initializes', vim.wait(30000, function()
     client = vim.lsp.get_client_by_id(id)
     return client ~= nil and client.initialized
   end, 20), id)
   observe_client(client)
   for _, bufnr in pairs(buffers) do vim.lsp.buf_attach_client(bufnr, id) end
-  local indexed = vim.wait(90000, function() return indexing.project and indexing.libraries end, 20)
+  local indexed = vim.wait(indexing.deadlineMs, function() return indexing.project and indexing.libraries end, 20)
   proof.indexing[#proof.indexing + 1] = indexing
-  proof.checks = proof.checks + 1
-  proof.assertions[#proof.assertions + 1] = { label = 'host finished project and library indexing', passed = indexed, detail = saved(indexing) }
   if not indexed then proof.indexingIncomplete = true end
+  check_phase('host finished project and library indexing', indexed, indexing)
   local commands = client.server_capabilities.executeCommandProvider
   check('host advertises providerCommand', commands and vim.list_contains(commands.commands or {}, 'ktlsp.providerCommand'), commands)
-  return exited
+  return server_exit
 end
 local function stop_server(exited)
   if not client then return end
@@ -129,8 +138,8 @@ local function stop_server(exited)
     vim.wait(5000, function() return exited.exited end, 20)
   end
   proof.shutdown[#proof.shutdown + 1] = exited
-  check('server shut down cleanly', exited.clean, exited)
   client = nil
+  check_phase('server shut down cleanly', exited.clean, exited)
 end
 local function snapshot_child_processes()
   if vim.fn.has('win32') ~= 1 or not proof.hostPids[#proof.hostPids] then return end
@@ -142,16 +151,23 @@ end
 local function request(label, command, payload, bufnr)
   flush()
   local complete, value, problem = false, nil, nil
-  local request_record = { case = label, command = command, payload = vim.deepcopy(payload), attempts = 1 }
+  local deadline = (command == 'mcdev.reindex' or command == 'mcdev.reloadProjectContext') and 120000 or 25000
+  local request_record = { case = label, command = command, payload = vim.deepcopy(payload), attempts = 1, deadlineMs = deadline }
   proof.requests[#proof.requests + 1] = request_record
-  protocol.request(command, payload, function(result, err)
+  local cancel = protocol.request(command, payload, function(result, err)
     complete, value, problem = true, result, err
     request_record.result, request_record.error = saved(result), saved(err)
   end, bufnr)
-  local done = vim.wait(25000, function() return complete end, 10)
+  local done = vim.wait(deadline, function() return complete end, 10)
   request_record.completed = done
+  if not done then
+    request_record.timedOut = true
+    local cancelled, cancel_error = pcall(function() cancel() end)
+    request_record.cancelRequested = cancelled
+    if not cancelled then request_record.cancelError = tostring(cancel_error) end
+  end
   save()
-  check(label .. ' received one response', done, request_record)
+  check_phase(label .. ' received one response', done, request_record)
   return value, problem
 end
 local function domain_payload(bufnr, position)
@@ -235,6 +251,15 @@ local function expected_definition()
     }} },
   }
 end
+local function expected_incomplete()
+  return {
+    protocolVersion = 1, serverVersion = '0.1.0', capabilities = {},
+    error = {
+      code = 'INCOMPLETE_PROJECT_CONTEXT',
+      message = 'complete project source-set and resource inventory is unavailable', details = {},
+    },
+  }
+end
 local function absolute_cursor(bufnr, row, token)
   local line = vim.api.nvim_buf_get_lines(bufnr, row - 1, row, false)[1]
   return { row, assert(line:find(token, 1, true)) - 1 + #token }
@@ -259,7 +284,7 @@ local function raw_outer(command, bufnr, payload, version)
   }} }
 end
 
-local exited, completion
+local completion
 local ok, failure = xpcall(function()
   vim.system = function(cmd, opts, callback)
     if type(cmd) ~= 'table' or cmd[1] ~= binary then return host_system(cmd, opts, callback) end
@@ -292,9 +317,33 @@ local ok, failure = xpcall(function()
   for key, path in pairs(paths) do
     local bufnr = vim.fn.bufadd(path)
     vim.fn.bufload(bufnr)
-    vim.bo[bufnr].filetype = 'java'
+    vim.bo[bufnr].filetype = key == 'aw' and 'accesswidener' or key == 'kotlin' and 'kotlin' or 'java'
+    if key == 'kotlin' then
+      vim.api.nvim_buf_set_lines(bufnr, 0, -1, false, { 'package fixture', 'class NoActions' })
+    end
     buffers[key] = bufnr
   end
+  run_case('original E2E startup support', nil, function()
+    local startup = vim.fs.normalize(repo .. '/mcdev-nvim/tests/e2e/minimal_init.lua')
+    local sourced = false
+    for _, script in ipairs(vim.fn.getscriptinfo()) do
+      if vim.fs.normalize(script.name) == startup then sourced = true; break end
+    end
+    local runtime_root = vim.fs.normalize(repo .. '/mcdev-nvim')
+    local protocol_source = vim.fs.normalize(debug.getinfo(protocol.context, 'S').source:sub(2))
+    proof.startup = {
+      path = startup, sourced = sourced, swapfileDisabled = not vim.o.swapfile,
+      runtimeRoot = vim.fs.normalize(vim.api.nvim_list_runtime_paths()[1]), protocolSource = protocol_source,
+    }
+    check('preserved original startup was actually sourced', sourced, proof.startup)
+    check('original startup disables swap files for fixture buffers',
+      not vim.o.swapfile and not vim.bo[buffers.owner].swapfile, proof.startup)
+    exact('original startup prepends the MC runtime', proof.startup.runtimeRoot, runtime_root)
+    exact('MC protocol loads from the original startup runtime', protocol_source,
+      runtime_root .. '/lua/mcdev/protocol.lua')
+    proof.startup.verified = true
+    return proof.startup
+  end)
   vim.api.nvim_set_current_buf(buffers.owner)
   local initial = acceptance:mark()
   exited = start_server()
@@ -345,16 +394,46 @@ local ok, failure = xpcall(function()
     local params = raw_outer('mcdev.completion', buffers.owner, payload, version - 1)
     local response, err = client:request_sync('workspace/executeCommand', params, 10000, buffers.owner)
     proof.requests[#proof.requests + 1] = { case = 'stale', command = 'mcdev.completion', params = params, response = saved(response), error = saved(err), attempts = 1 }
+    check_phase('stale-version request completed', response ~= nil, { response = response, error = err })
     check('host rejects stale version', response and response.err and response.err.code == -32801, response or err)
     return response
   end)
-  for _, command in ipairs(pending_ids) do
-    run_case('unimplemented command is not acknowledged: ' .. command, nil, function()
-      local value, err = request('not acknowledged ' .. command, command, domain_payload(buffers.patch, { 1, 0 }), buffers.patch)
-      check('unimplemented command returns host unavailable', value == nil and type(err) == 'table' and err.code == -32002, { value, err })
-      return err
+  for _, command in ipairs(incomplete_ids) do
+    run_case('typed incomplete project result: ' .. command, nil, function()
+      local pos = command == 'mcdev.references' and absolute_cursor(buffers.patch, 1, 'Target') or { 1, 0 }
+      local value, err = request('incomplete ' .. command, command, domain_payload(buffers.patch, pos), buffers.patch)
+      check('incomplete command transport succeeded', err == nil, err)
+      exact('complete typed incomplete envelope ' .. command, value, expected_incomplete())
+      if command == 'mcdev.reindex' or command == 'mcdev.reloadProjectContext' then
+        local outer = proof.frames[#proof.frames].params.arguments[1]
+        check(command .. ' requested a real host refresh', outer.refreshProject == true, outer)
+      end
+      return value
     end)
   end
+  run_case('full AW header empty references DTO', 'mcdev.references', function()
+    exact('AW header has no reference target', full_text(buffers.aw), 'accessWidener v2 named\n')
+    check('AW buffer is attached to the real host', vim.lsp.buf_is_attached(buffers.aw, client.id), nil)
+    local payload = domain_payload(buffers.aw, { 1, 0 })
+    exact('AW request uses the actual buffer language', payload.context.languageId, 'accesswidener')
+    check('AW request carries the current LSP document version',
+      type(payload.context.documentVersion) == 'number'
+        and payload.context.documentVersion == vim.lsp.util.buf_versions[buffers.aw], payload.context)
+    local value, err = request('AW header empty references', 'mcdev.references', payload, buffers.aw)
+    check('empty references transport succeeded', err == nil, err)
+    exact('complete empty references envelope', value, {
+      protocolVersion = 1, serverVersion = '0.1.0', capabilities = { 'references' }, result = { locations = {} },
+    })
+    return value
+  end)
+  run_case('full Kotlin empty code action DTO', 'mcdev.codeAction', function()
+    local value, err = request('Kotlin empty code action', 'mcdev.codeAction', domain_payload(buffers.kotlin, { 1, 0 }), buffers.kotlin)
+    check('Kotlin code action transport succeeded', err == nil, err)
+    exact('complete Kotlin empty code action envelope', value, {
+      protocolVersion = 1, serverVersion = '0.1.0', capabilities = { 'codeAction' }, result = { actions = {} },
+    })
+    return value
+  end)
   for _, command in ipairs({ 'mcdev.diagnostics', 'mcdev.context' }) do
     run_case('full config diagnostic DTO ' .. command, command, function()
       local value, err = request(command, command, domain_payload(buffers.patch, { 1, 0 }), buffers.patch)
@@ -384,6 +463,87 @@ local ok, failure = xpcall(function()
     exact('complete definition envelope', value, expected_definition())
     return value
   end)
+  run_case('real MixinExtras definition navigation', 'mcdev.definition', function()
+    local previous = {
+      window = vim.api.nvim_get_current_win(), buffer = vim.api.nvim_get_current_buf(),
+      cursor = vim.api.nvim_win_get_cursor(0), modified = vim.bo[buffers.expression].modified,
+    }
+    local original = vim.api.nvim_buf_get_lines(buffers.expression, 8, 9, false)[1]
+    local passed, result = xpcall(function()
+      local destination = '/* 日😀 */ ' .. original
+      local target_byte = assert(destination:find('drawCall', 1, true)) - 1
+      local target_utf16 = vim.str_utfindex(destination, 'utf-16', target_byte, false)
+      check('navigation fixture requires UTF-16 to byte conversion', target_byte > target_utf16,
+        { byte = target_byte, utf16 = target_utf16 })
+      local floor = acceptance:mark()
+      vim.api.nvim_buf_set_lines(buffers.expression, 8, 9, false, { destination })
+      vim.api.nvim_set_current_buf(buffers.expression)
+      local source = absolute_cursor(buffers.expression, 11, 'drawCall')
+      source[2] = source[2] - #'drawCall' + 2
+      vim.api.nvim_win_set_cursor(0, source)
+      flush()
+      await_accepted(buffers.expression, floor)
+      local complete, locations, navigation_error, raw_locations = false, nil, nil, nil
+      local frame_count = #proof.frames
+      require('mcdev.navigation').definition(buffers.expression, nil, function(found, err, raw)
+        locations, navigation_error, raw_locations, complete = found, err, raw, true
+      end)
+      local navigated = vim.wait(25000, function() return complete end, 10)
+      if not navigated then
+        local pending = proof.frames[frame_count + 1]
+        if pending then
+          pending.timedOut = true
+          local cancelled, result = pcall(function()
+            return pending.requestId ~= nil and client:cancel_request(pending.requestId)
+          end)
+          pending.cancelRequested = cancelled and result == true
+          if not cancelled then pending.cancelError = tostring(result) end
+        end
+      end
+      check_phase('public navigation callback completed', navigated, proof.frames[frame_count + 1])
+      check('public navigation succeeded', navigation_error == nil, navigation_error)
+      exact('navigation sent one real provider request', #proof.frames, frame_count + 1)
+      local frame = proof.frames[frame_count + 1]
+      local outer = frame.params.arguments[1]
+      exact('navigation uses attached ktlsp provider command',
+        { frame.params.command, outer.provider, outer.command },
+        { 'ktlsp.providerCommand', provider, 'mcdev.definition' })
+      exact('navigation sends the current expression UTF-16 position',
+        outer.arguments[1].context.position, { line = 10, character = 19 })
+      local expected_range = {
+        start = { line = 8, character = target_utf16 },
+        ['end'] = { line = 8, character = target_utf16 + #'drawCall' },
+      }
+      exact('navigation retains the exact selectable source location', locations, {{
+        uri = uri(buffers.expression), range = expected_range, resolution = 'SOURCE',
+      }})
+      exact('navigation retains the original source range', raw_locations[1].range, expected_range)
+      local shown = vim.lsp.util.show_document(locations[1], 'utf-16', { focus = true })
+      check('real show_document accepted the source location', shown == true, shown)
+      check('real show_document moved the editor to the selected Definition', vim.wait(10000, function()
+        return vim.api.nvim_get_current_win() == previous.window
+          and vim.api.nvim_get_current_buf() == buffers.expression
+          and vim.uri_from_bufnr(vim.api.nvim_get_current_buf()) == locations[1].uri
+          and vim.deep_equal(vim.api.nvim_win_get_cursor(0), { 9, target_byte })
+      end, 20), { window = vim.api.nvim_get_current_win(), buffer = vim.api.nvim_get_current_buf(),
+        cursor = vim.api.nvim_win_get_cursor(0), expected = { 9, target_byte } })
+      proof.navigation = {
+        sourceCursor = source, selectedLocation = vim.deepcopy(locations[1]),
+        window = vim.api.nvim_get_current_win(), buffer = vim.api.nvim_get_current_buf(),
+        documentUri = vim.uri_from_bufnr(vim.api.nvim_get_current_buf()), cursor = vim.api.nvim_win_get_cursor(0),
+        expectedCursor = { 9, target_byte },
+      }
+      return proof.navigation
+    end, debug.traceback)
+    vim.api.nvim_buf_set_lines(buffers.expression, 8, 9, false, { original })
+    vim.bo[buffers.expression].modified = previous.modified
+    vim.api.nvim_set_current_win(previous.window)
+    vim.api.nvim_win_set_buf(previous.window, previous.buffer)
+    vim.api.nvim_win_set_cursor(previous.window, previous.cursor)
+    flush()
+    if not passed then error(result) end
+    return result
+  end)
   run_case('cancel command through real host', nil, function()
     flush()
     local params = raw_outer('mcdev.diagnostics', buffers.patch,
@@ -399,7 +559,7 @@ local ok, failure = xpcall(function()
     local wire = cancel_wire or received
     proof.requests[#proof.requests + 1] = { case = 'cancel', command = 'mcdev.diagnostics', params = params, response = saved(wire), attempts = 1 }
     cancel_id = nil
-    check('host returned cancellation', measured and wire and wire.error and wire.error.code == -32800, wire)
+    check_phase('host returned cancellation', measured and wire and wire.error and wire.error.code == -32800, wire)
     return wire
   end)
   run_case('disabled provider rejects a command', nil, function()
@@ -447,9 +607,12 @@ local required = {
   ['stale document version is rejected'] = true, ['cancel command through real host'] = true,
   ['disabled provider rejects a command'] = true, ['reenabled provider uses a fresh instance'] = true,
   ['restart host and companion'] = true, ['unsaved Unicode source and current LSP version'] = true,
+  ['full AW header empty references DTO'] = true, ['full Kotlin empty code action DTO'] = true,
+  ['real MixinExtras definition navigation'] = true,
+  ['original E2E startup support'] = true,
 }
-for _, command in ipairs(pending_ids) do
-  required['unimplemented command is not acknowledged: ' .. command] = true
+for _, command in ipairs(incomplete_ids) do
+  required['typed incomplete project result: ' .. command] = true
 end
 for _, row in ipairs(proof.matrix) do
   if row.status == 'passed' then required[row.case] = nil end

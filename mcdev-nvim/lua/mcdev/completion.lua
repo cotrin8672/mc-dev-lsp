@@ -109,6 +109,10 @@ local function merge_items(first, second)
 end
 
 local function decode_completion(envelope, err)
+  if not err and envelope ~= nil and (type(envelope) ~= "table"
+    or (envelope.error ~= nil and type(envelope.error) ~= "table")) then
+    return nil, "mcdev: invalid completion response"
+  end
   local result, unwrap_err = convert.unwrap_envelope(envelope, err)
   if unwrap_err then
     return nil, unwrap_err
@@ -300,7 +304,7 @@ function M.complete(callback, bufnr, position, opts)
   end
 
   local wait_for_project
-  local function on_jdt(envelope, err)
+  local function on_jdt(envelope, err, origin)
     if operation.cancelled or active_requests[bufnr] ~= operation or operation.completed then
       M.stale_dropped_count = M.stale_dropped_count + 1
       return
@@ -332,6 +336,14 @@ function M.complete(callback, bufnr, position, opts)
       return
     end
 
+    if origin and origin.route == "ktlsp.providerCommand" and origin.provider == "mcdev.mixin"
+      and origin.command == protocol.commands.completion and type(envelope) == "table"
+      and type(envelope.result) == "table" and type(envelope.result.items) == "table"
+      and vim.islist(envelope.result.items)
+      and (envelope.result.isIncomplete == nil or type(envelope.result.isIncomplete) == "boolean")
+      and vim.iter(result.items):all(function(item) return type(item.label) == "string" end) then
+      M.last_project_transport_error = nil
+    end
     M.last_error = nil
     M.last_debug = result.debug
     local items = merge_items(result.items, helper_items)

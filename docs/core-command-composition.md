@@ -6,10 +6,11 @@ uses host evaluation lifetime/final validation and does not synthesize those
 eight counters. See [the current integration checkpoint](ipc-integration-status.md)
 for that entry, published inputs and the still-incomplete eleven-command surface.
 
-This is the design and implementation note for the Rust command boundary. It
-adds only the concrete library host and focused whole-command proof; it does
-not add a command wire, a product type, a DTO, or a second parser. The command
-corpus and the facade corpus prove different things:
+This is the original design and implementation audit for the Rust command
+boundary. The constructor work added the concrete library host and focused
+whole-command proof. Production IPC routing was added later and is tracked in
+the integration checkpoint above. The command corpus and the facade corpus
+prove different things:
 
 - `mcdev-companion/tests/fixtures/commands` proves all 127 legacy callers
   through `CommandDispatcher` with `RecordedHost` callback facts.
@@ -17,9 +18,9 @@ corpus and the facade corpus prove different things:
   host-adapter composition with complete owned fixtures.
 - The focused `core_commands.rs` proof now connects a concrete
   `CoreCommandHost` to the dispatcher and real MC core, but it is a generic
-  fixture-host proof. It does not claim that the stock semantic-v1 child has
-  eleven-command routing. `main.rs` still exposes only semantic-v1 or
-  `--stdio-completion`.
+  fixture-host proof. The separate production evaluation path now routes all
+  eleven commands, retaining typed incomplete results when host facts are
+  insufficient; this fixture proof alone does not establish live editor parity.
 
 The relevant public boundary is
 [`CommandHost`](../mcdev-companion/src/commands/host.rs#L67-L162); the

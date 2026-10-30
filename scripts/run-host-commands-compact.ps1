@@ -7,7 +7,8 @@ param(
     [Parameter(Mandatory = $true)][ValidatePattern('^[0-9a-fA-F]{64}$')][string] $CompanionSha256,
     [string] $NvimBinary = 'nvim',
     [string] $GradleBinary = 'gradle',
-    [ValidateRange(30, 600)][int] $EditorTimeoutSeconds = 240
+    # Cold indexing, two Gradle model refreshes, and restart each have finite phase budgets.
+    [ValidateRange(30, 600)][int] $EditorTimeoutSeconds = 600
 )
 $ErrorActionPreference = 'Stop'
 $repo = [IO.Path]::GetFullPath((Join-Path $PSScriptRoot '..'))
@@ -75,6 +76,7 @@ try {
         ''
     ) -join $lf)
     Write-FixtureFile 'src/main/resources/fixture.mixins.json' '{"package":"fixture","mixins":[]}'
+    Write-FixtureFile 'src/main/resources/access.aw' ('accessWidener v2 named' + $lf)
     Write-FixtureFile 'src/main/java/fixture/Owner.java' (@(
         'package fixture;',
         'import org.spongepowered.asm.mixin.Mixin;',
@@ -108,15 +110,18 @@ try {
     } finally { $jdk.Dispose() }
 
     $editor = Join-Path $repo 'mcdev-companion/tests/command_editor_smoke.lua'
+    $startupSource = 'mcdev-nvim/tests/e2e/minimal_init.lua'
+    $startup = Join-Path $repo $startupSource
     $sourceFiles = @('mcdev-core/src', 'mcdev-protocol/src', 'mcdev-companion/src', 'mcdev-nvim/lua') |
         ForEach-Object { Get-ChildItem -LiteralPath (Join-Path $repo $_) -Recurse -File } |
         Where-Object { $_.Extension -in @('.rs', '.lua') } | ForEach-Object FullName
-    $inputs = @($sourceFiles) + @($editor, $hostPath, $companionPath, $editorPath, $gradlePath,
+    $inputs = @($sourceFiles) + @($editor, $startup, $hostPath, $companionPath, $editorPath, $gradlePath,
         $PSCommandPath, (Join-Path $PSScriptRoot 'run-rust-tests-compact.ps1'),
         (Join-Path $repo 'Cargo.toml'), (Join-Path $repo 'Cargo.lock'),
         (Join-Path $repo 'mcdev-companion/Cargo.toml'),
         (Join-Path $repo 'mcdev-companion/tests/support/accepted_trace.lua'))
     $before = @(Get-FileHash -LiteralPath $inputs -Algorithm SHA256)
+    $startupHash = ($before | Where-Object { $_.Path -eq $startup }).Hash.ToLowerInvariant()
     $before | ConvertTo-Json | Set-Content -Encoding utf8 (Join-Path $logs 'proof-inputs.before.json')
     $head = (& rtk proxy git -C $repo rev-parse HEAD | Select-Object -Last 1).Trim()
     $gradleArguments = @('--offline', '--no-daemon', '--max-workers=2', '--console=plain', 'classes')
@@ -138,7 +143,7 @@ try {
     if (Test-Path -LiteralPath $targetClass) { Copy-Item -LiteralPath $targetClass -Destination $fixtureArchive }
     $env:MCDEV_COMMAND_GRADLE_BUILD_OK = if ($gradle.ExitCode -eq 0 -and -not $gradle.TimedOut) { '1' } else { '0' }
     $editorRun = Invoke-RustCheck -Name editor -Command $editorPath -Arguments @(
-        '--headless', '-u', 'NONE', '-i', 'NONE', '-l', $editor
+        '--headless', '-u', $startup, '-i', 'NONE', '-l', $editor
     ) -Directory $repo -LogDirectory $logs -TimeoutSeconds $EditorTimeoutSeconds
     $editorRun | ConvertTo-Json | Set-Content -Encoding utf8 (Join-Path $logs 'summary.json')
     $after = @(Get-FileHash -LiteralPath $inputs -Algorithm SHA256)
@@ -150,6 +155,10 @@ try {
         head = $head; hostSha256 = $HostSha256.ToLowerInvariant(); companionSha256 = $CompanionSha256.ToLowerInvariant()
         gradle = $gradle; editor = $editorRun; deadlineSeconds = $EditorTimeoutSeconds
         inputHashesStable = $stable; project = $project; proof = $proof
+        startupSupport = [ordered]@{
+            source = $startupSource; path = $startup; sha256 = $startupHash; role = 'editor-startup'
+            verified = [bool]($stable -and $proof -and $proof.startup -and $proof.startup.verified)
+        }
         requestedDomainCommands = 11; fullMcCapabilitiesVerified = $false
         sdkSourceFixture = 'reduced Object.java; selected runtime SDK remains host-owned'
         fixtureBuild = 'Java-only Gradle project with an isolated Gradle user directory'

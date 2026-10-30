@@ -1,5 +1,5 @@
 local helpers = dofile(vim.fn.getcwd() .. "/mcdev-nvim/tests/test_helpers.lua")
-local buffer = require("mcdev.buffer")
+local protocol = require("mcdev.protocol")
 
 local companion_cmd = vim.env.MCDEV_E2E_COMPANION
 local workspace = vim.env.MCDEV_E2E_WORKSPACE
@@ -25,6 +25,11 @@ local function workspace_uri(path)
 end
 
 local workspace_root_uri = workspace_uri(workspace)
+local bufnr = vim.fn.bufadd(mixin_file)
+vim.fn.bufload(bufnr)
+vim.api.nvim_set_current_buf(bufnr)
+vim.bo[bufnr].filetype = "java"
+
 require("mcdev").setup({ ktlsp = { cmd = { ktlsp_cmd } }, companion = { cmd = { companion_cmd } } })
 local client_id = require("mcdev.ktlsp").start_or_attach({
   root_dir = workspace,
@@ -49,40 +54,24 @@ end
 
 local client = vim.lsp.get_client_by_id(client_id)
 helpers.assert_not_nil(client, "ktlsp client disappeared after initialize")
+helpers.assert_true(vim.lsp.buf_attach_client(bufnr, client_id), "failed to attach ktlsp to the mixin document")
 
-local function sync_request(method, params, timeout_ms)
-  local result = nil
-  local err = nil
-  client:request(method, params, function(request_err, request_result)
-    err = request_err
-    result = request_result
-  end)
-  local completed = vim.wait(timeout_ms or 120000, function()
-    return result ~= nil or err ~= nil
-  end, 100)
-  helpers.assert_true(completed, method .. " timed out")
+local function mcdev_command(command, payload, timeout_ms)
+  local result, err, completed
+  local cancel = protocol.request(command, payload, function(request_result, request_err)
+    result, err, completed = request_result, request_err, true
+  end, bufnr)
+  local settled = vim.wait(timeout_ms or 120000, function() return completed end, 100)
+  if not settled then cancel() end
+  helpers.assert_true(settled, command .. " timed out")
   return result, err
 end
 
-local function mcdev_command(command, payload, timeout_ms)
-  return sync_request("workspace/executeCommand", {
-    command = command,
-    arguments = { payload },
-  }, timeout_ms)
-end
-
-sync_request("workspace/executeCommand", {
-  command = "mcdev.reloadProjectContext",
-  arguments = { { context = require("mcdev.protocol").context() } },
-}, 120000)
+mcdev_command("mcdev.reloadProjectContext", { context = protocol.context(bufnr, { 1, 0 }) }, 120000)
 
 vim.wait(60000, function()
   return #vim.lsp.get_clients({ name = "ktlsp" }) > 0
 end, 250)
-
-local bufnr = vim.fn.bufadd(mixin_file)
-vim.fn.bufload(bufnr)
-vim.bo[bufnr].filetype = "java"
 
 local mixin_line = nil
 for index, line in ipairs(vim.api.nvim_buf_get_lines(bufnr, 0, -1, false)) do
@@ -93,15 +82,8 @@ for index, line in ipairs(vim.api.nvim_buf_get_lines(bufnr, 0, -1, false)) do
 end
 helpers.assert_not_nil(mixin_line, "@Mixin line not found")
 
-local context = {
-  protocolVersion = 1,
-  workspaceRoot = workspace_root_uri,
-  documentUri = vim.uri_from_bufnr(bufnr),
-  languageId = buffer.effective_language_id(bufnr),
-  position = { line = mixin_line, character = 8 },
-  bufferText = table.concat(vim.api.nvim_buf_get_lines(bufnr, 0, -1, false), "\n"),
-  client = { name = "mcdev.nvim-loom-e2e", version = "0.1.0" },
-}
+local context = protocol.context(bufnr, { mixin_line + 1, 8 })
+context.client.name = "mcdev.nvim-loom-e2e"
 
 mcdev_command("mcdev.reindex", { context = context }, 120000)
 

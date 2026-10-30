@@ -11,11 +11,14 @@ MC command surface and original editor workflows are not yet connected to the
 host. See the [migration record](docs/rust-migration.md) for verified scope and
 remaining work.
 
-The current real-host integration supports the bounded Mixin/Shadow slice:
-Java/Kotlin target bindings, definition/references/rename, diagnostics, and
-shared completion. The 112-check editor proof covers that slice. Mappings,
-AW/AT, MixinExtras, all eleven MC commands, and source/resource/class-byte/SDK
-integration remain outside the published live capability.
+The companion uses the published host operations for project/class facts,
+source snapshots, owned resources, runtime class bytes, the JVM catalog and
+provider commands. All eleven command IDs have evaluation routes; complete
+project-wide results still need host facts that are not published. Missing
+facts return typed unavailable results. The bounded Mixin/Shadow editor proof
+and provider-command proof have separate scopes; see the
+[integration checkpoint](docs/ipc-integration-status.md). Neither proves full
+Minecraft editor parity.
 
 ## Modules
 
@@ -49,10 +52,12 @@ same path on Ubuntu and Windows. Real stock-host tests require a separately
 provided, pinned ktlsp executable; the native suite alone does not prove full
 editor compatibility.
 
-For that separate proof, `scripts/run-host-smoke-compact.ps1` accepts explicit
-`-HostBinary`, `-HostSha256`, `-CompanionBinary` and `-CompanionSha256` arguments.
-It verifies both binaries, executes the 112-check fixture with a 120-second
-deadline, and records input hashes and the observed scope.
+For separate host proofs, `scripts/run-host-smoke-compact.ps1` runs the bounded
+semantic fixture, and `scripts/run-host-commands-compact.ps1` runs provider
+commands through Neovim. Both accept explicit `-HostBinary`, `-HostSha256`,
+`-CompanionBinary` and `-CompanionSha256` arguments, verify the binaries, and
+record input hashes and scope under finite deadlines. The command fixture also
+requires Gradle and a Java toolchain.
 
 The existing product version is `0.7.7`, now defined by the native Cargo
 workspace. Build a native archive with:

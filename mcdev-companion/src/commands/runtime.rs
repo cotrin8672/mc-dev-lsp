@@ -2,7 +2,7 @@ use super::{cache::*, host::*};
 use mcdev_core::{
     awat::AwAtBufferSupport,
     expression_engine::{CancellationChecker, NO_CANCELLATION},
-    mixin_source::JavaTypeDescriptorResolver,
+    mixin_source::{JavaTypeDescriptorResolver, ParseConfidence, ParseSource},
     project::{InfoService, ProjectContext},
     McDefinitionTarget, MemberKind,
 };
@@ -23,6 +23,9 @@ pub struct CommandDispatcher<H: CommandHost> {
     pub(super) negative: Mutex<NegativeCompletionCache>,
     pub(super) documents: Mutex<DocumentSnapshotCache>,
     pub(super) in_flight: Mutex<BTreeMap<String, Arc<Mutex<()>>>>,
+    registered_commands: Vec<String>,
+    project_complete: bool,
+    evaluation_scoped: bool,
 }
 pub(super) fn runtime_error(error: impl std::fmt::Display) -> CommandFailure {
     CommandFailure::Runtime(error.to_string())
@@ -60,6 +63,32 @@ impl<H: CommandHost> CommandDispatcher<H> {
             negative: Mutex::new(Default::default()),
             documents: Mutex::new(Default::default()),
             in_flight: Mutex::new(Default::default()),
+            registered_commands: COMMANDS.iter().map(|command| command.id().into()).collect(),
+            project_complete: true,
+            evaluation_scoped: false,
+        }
+    }
+
+    /// Restrict one evaluation to its acknowledged commands and project coverage.
+    pub fn for_evaluation(host: Arc<H>, commands: &[String], project_complete: bool) -> Self {
+        let mut dispatcher = Self::new(host);
+        dispatcher
+            .registered_commands
+            .retain(|command| commands.contains(command));
+        dispatcher.project_complete = project_complete;
+        dispatcher.evaluation_scoped = true;
+        dispatcher
+    }
+
+    fn require_complete_project(&self) -> Result<(), CommandFailure> {
+        if self.project_complete {
+            Ok(())
+        } else {
+            Err(CommandFailure::Unavailable(McdevError {
+                code: McdevErrorCode::IncompleteProjectContext,
+                message: "complete project source-set and resource inventory is unavailable".into(),
+                details: Default::default(),
+            }))
         }
     }
     pub fn execute(
@@ -146,12 +175,10 @@ impl<H: CommandHost> CommandDispatcher<H> {
         }
         match command {
             DecodedCommand::Info(request) => {
+                self.require_complete_project()?;
                 let project = self.host.load_session(&request.context.workspace_root)?;
                 let build = self.host.build_identity()?;
-                let commands = COMMANDS
-                    .iter()
-                    .map(|c| c.id().to_string())
-                    .collect::<Vec<_>>();
+                let commands = self.registered_commands.clone();
                 let mut lines =
                     InfoService::format_lines(&project, PROTOCOL_VERSION as u32, &build.version);
                 lines.extend([
@@ -186,6 +213,7 @@ impl<H: CommandHost> CommandDispatcher<H> {
             }
             DecodedCommand::Reindex(request) => {
                 let project = self.host.reindex(&request.context.workspace_root)?;
+                self.require_complete_project()?;
                 success(
                     McdevReindexResponse {
                         status: "reindex complete".into(),
@@ -199,6 +227,7 @@ impl<H: CommandHost> CommandDispatcher<H> {
             DecodedCommand::ReloadProjectContext(request) => {
                 self.host.clear_project_cache()?;
                 let project = self.host.reindex(&request.context.workspace_root)?;
+                self.require_complete_project()?;
                 success(
                     McdevReloadProjectContextResponse {
                         status: "project context reloaded".into(),
@@ -215,6 +244,7 @@ impl<H: CommandHost> CommandDispatcher<H> {
                 )
             }
             DecodedCommand::DumpContext(request) => {
+                self.require_complete_project()?;
                 let project = self.host.load_session(&request.context.workspace_root)?;
                 success(dump(&project)?, &["dumpContext", "info"])
             }
@@ -264,11 +294,30 @@ impl<H: CommandHost> CommandDispatcher<H> {
                     cancellation,
                 )?;
                 if targets.is_empty() {
+                    if self.evaluation_scoped
+                        && family(&request.context) == SourceFamily::JavaKotlin
+                    {
+                        let semantic = self.host.semantic_model(
+                            &request.context,
+                            request.context.document_version.unwrap_or_default(),
+                            &project,
+                            cancellation,
+                        )?;
+                        if semantic.model.parse_source != ParseSource::HostNormalized
+                            || semantic.model.confidence != ParseConfidence::High
+                        {
+                            return Ok(failure(
+                                McdevErrorCode::IncompleteProjectContext,
+                                "host source declaration coverage and ranges are unavailable",
+                            ));
+                        }
+                    }
                     return success(
                         McdevReferencesResponse { locations: vec![] },
                         &["references"],
                     );
                 }
+                self.require_complete_project()?;
                 let java = self.host.source_entries(
                     &project,
                     &request.context,
@@ -354,6 +403,7 @@ impl<H: CommandHost> CommandDispatcher<H> {
                 if is_kotlin(&request.context) {
                     return success(McdevCodeActionResponse { actions: vec![] }, &["codeAction"]);
                 }
+                self.require_complete_project()?;
                 let project = self.host.load_session(&request.context.workspace_root)?;
                 let config = self
                     .host

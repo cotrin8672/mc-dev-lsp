@@ -33,16 +33,7 @@ use super::{
 
 /// Advertise only commands with an implemented evaluation route.
 pub fn supports_command(name: &str) -> bool {
-    matches!(
-        Command::parse(name),
-        Some(
-            Command::Completion
-                | Command::Diagnostics
-                | Command::Context
-                | Command::Definition
-                | Command::Hover
-        )
-    )
+    Command::parse(name).is_some()
 }
 
 #[derive(Debug)]
@@ -213,6 +204,19 @@ fn execute_inner(
         Ok(value) => value,
         Err(error) => return domain_failure(error),
     };
+    let protocol_version = validated.decoded.context().protocol_version;
+    if protocol_version != mcdev_protocol::PROTOCOL_VERSION {
+        return encode_envelope(&mcdev_protocol::protocol_mismatch(protocol_version));
+    }
+    if let DecodedCommand::CodeAction(request) = &validated.decoded {
+        if super::runtime::is_kotlin(&request.context) {
+            facts.check_active()?;
+            return encode_envelope(&McdevResponseEnvelope::success(
+                serde_json::json!({"actions": []}),
+                ["codeAction".to_owned()],
+            ));
+        }
+    }
     if let DecodedCommand::Completion(request) = &validated.decoded {
         if let Some(response) =
             crate::completion_lines::complete_no_index(request).map_err(|error| match error {
@@ -226,11 +230,6 @@ fn execute_inner(
         }
     }
     if let DecodedCommand::Definition(request) = &validated.decoded {
-        if request.context.protocol_version != mcdev_protocol::PROTOCOL_VERSION {
-            return encode_envelope(&mcdev_protocol::protocol_mismatch(
-                request.context.protocol_version,
-            ));
-        }
         if let (Ok(line), Ok(character)) = (
             usize::try_from(request.context.position.line),
             usize::try_from(request.context.position.character),
@@ -272,21 +271,7 @@ fn execute_inner(
         &validated.workspace_root,
         &validated.evaluation.evaluation,
     )?;
-    if !project.project_complete
-        && matches!(
-            validated.decoded.command(),
-            Command::Info
-                | Command::DumpContext
-                | Command::References
-                | Command::CodeAction
-                | Command::Reindex
-                | Command::ReloadProjectContext
-        )
-    {
-        return Err(FactsError::Unknown(
-            "complete project source-set and resource inventory is unavailable".into(),
-        ));
-    }
+    let project_complete = project.project_complete;
     let inputs = Arc::new(Mutex::new(inputs));
     let index = Arc::new(index::EvaluationIndex::new(inputs, facts.clone()));
     let runtime_index = Arc::new(index.physical_view());
@@ -343,7 +328,15 @@ fn execute_inner(
         CommandFailure::Unavailable(error) => FactsError::Unknown(error.message),
         CommandFailure::Runtime(error) => FactsError::Protocol(error),
     })?;
-    let dispatcher = CommandDispatcher::new(Arc::new(host));
+    let commands = initialization["commands"]
+        .as_array()
+        .into_iter()
+        .flatten()
+        .filter_map(Value::as_str)
+        .filter(|command| supports_command(command))
+        .map(str::to_owned)
+        .collect::<Vec<_>>();
+    let dispatcher = CommandDispatcher::for_evaluation(Arc::new(host), &commands, project_complete);
     let envelope = dispatcher
         .execute_decoded(
             validated.decoded,

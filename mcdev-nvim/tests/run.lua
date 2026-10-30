@@ -2003,6 +2003,8 @@ dofile(vim.fn.getcwd() .. "/mcdev-nvim/tests/diagnostic_positions.lua")
 dofile(vim.fn.getcwd() .. "/mcdev-nvim/tests/jdtls_workspace.lua")
 dofile(vim.fn.getcwd() .. "/mcdev-nvim/tests/blink_positions.lua")
 dofile(vim.fn.getcwd() .. "/mcdev-nvim/tests/completion_readiness.lua")
+dofile(vim.fn.getcwd() .. "/mcdev-nvim/tests/completion_provider_origin.lua")
+dofile(vim.fn.getcwd() .. "/mcdev-nvim/tests/cem_preflight.lua")
 dofile(vim.fn.getcwd() .. "/mcdev-nvim/tests/blink_routing.lua")
 dofile(vim.fn.getcwd() .. "/mcdev-nvim/tests/cmp_positions.lua")
 dofile(vim.fn.getcwd() .. "/mcdev-nvim/tests/cmp_routing.lua")
@@ -2028,5 +2030,33 @@ if package.config:sub(1, 1) == "\\" then
 end
 dofile(vim.fn.getcwd() .. "/mcdev-nvim/tests/ktlsp_provider.lua")
 dofile(vim.fn.getcwd() .. "/mcdev-nvim/tests/ktlsp_provider_lsp.lua")
+dofile(vim.fn.getcwd() .. "/mcdev-nvim/tests/legacy_e2e_routing.lua")
+do
+  local before = { window = vim.api.nvim_get_current_win(), buffer = vim.api.nvim_get_current_buf(),
+    cursor = vim.api.nvim_win_get_cursor(0) }
+  local phase_assertions = dofile(vim.fn.getcwd() .. "/mcdev-companion/tests/command_phase_selfcheck.lua")
+  helpers.assert_eq(phase_assertions, 27, "new command phase helper checks returned to the adapter suite")
+  helpers.assert_eq(vim.api.nvim_get_current_win(), before.window, "phase helper preserves the caller window")
+  helpers.assert_eq(vim.api.nvim_get_current_buf(), before.buffer, "phase helper preserves the caller buffer")
+  helpers.assert_true(vim.deep_equal(vim.api.nvim_win_get_cursor(0), before.cursor), "phase helper preserves the caller cursor")
+  print("mcdev-nvim adapter suite continued after 27 new command phase helper checks")
+end
+do
+  local before = { window = vim.api.nvim_get_current_win(), buffer = vim.api.nvim_get_current_buf(),
+    cursor = vim.api.nvim_win_get_cursor(0), virtualedit = vim.o.virtualedit,
+    complete = completion.complete, record = _G.mcdev_record_assertion,
+    error = completion.last_error, transport_error = completion.last_project_transport_error }
+  local snippet_cases = dofile(vim.fn.getcwd() .. "/mcdev-nvim/tests/cem_snippets_selfcheck.lua")
+  helpers.assert_eq(snippet_cases, 4, "all shared CEM snippet self-checks returned to the adapter suite")
+  helpers.assert_eq(vim.api.nvim_get_current_win(), before.window, "snippet self-check preserves the caller window")
+  helpers.assert_eq(vim.api.nvim_get_current_buf(), before.buffer, "snippet self-check preserves the caller buffer")
+  helpers.assert_true(vim.deep_equal(vim.api.nvim_win_get_cursor(0), before.cursor), "snippet self-check preserves the caller cursor")
+  helpers.assert_eq(vim.o.virtualedit, before.virtualedit, "snippet self-check preserves the caller options")
+  helpers.assert_eq(completion.complete, before.complete, "snippet self-check restores the completion function")
+  helpers.assert_eq(_G.mcdev_record_assertion, before.record, "snippet self-check restores assertion recording")
+  helpers.assert_eq(completion.last_error, before.error, "snippet self-check restores the completion error")
+  helpers.assert_eq(completion.last_project_transport_error, before.transport_error, "snippet self-check restores the transport error")
+  print("mcdev-nvim adapter suite continued after four shared CEM snippet self-checks")
+end
 print("mcdev-nvim adapter tests passed")
 vim.cmd("qa!")

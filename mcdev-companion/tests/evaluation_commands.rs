@@ -630,3 +630,272 @@ fn evaluation_facade_preserves_unknown_references_and_bytecode_error_codes() {
     );
     assert!(diagnostics.result.is_none());
 }
+
+#[test]
+fn incomplete_evaluation_returns_empty_references_only_after_resolving_targets() {
+    let fixture = fixture(true, false, true, HostFact::Known(vec![]), false);
+    let evaluation = evaluation_host(&fixture, HostFact::Known(vec![]), None, false).unwrap();
+    let dispatcher = CommandDispatcher::for_evaluation(evaluation, &[], false);
+    let uri = format!("{}/src/main/resources/access.aw", fixture.workspace);
+    let response = dispatcher
+        .execute(
+            McdevCommands::REFERENCES,
+            &[serde_json::to_value(McdevReferencesRequest {
+                context: context(
+                    &fixture,
+                    "accessWidener v2 named\n",
+                    &uri,
+                    McdevPosition::default(),
+                ),
+            })
+            .unwrap()],
+        )
+        .unwrap();
+    assert_eq!(
+        serde_json::to_value(response).unwrap(),
+        serde_json::json!({
+            "protocolVersion":1,"serverVersion":"0.1.0","capabilities":["references"],
+            "result":{"locations":[]}
+        })
+    );
+
+    let uri = format!("{}/src/main/java/fixture/Patch.java", fixture.workspace);
+    let source = METHOD_REFERENCE_SOURCE;
+    let response = dispatcher
+        .execute(
+            McdevCommands::REFERENCES,
+            &[serde_json::to_value(McdevReferencesRequest {
+                context: context(
+                    &fixture,
+                    source,
+                    &uri,
+                    position_at(source, source.find("\"tick()V\"").unwrap() + 2),
+                ),
+            })
+            .unwrap()],
+        )
+        .unwrap();
+    let error = response.error.unwrap();
+    assert_eq!(error.code, McdevErrorCode::IncompleteProjectContext);
+    assert_eq!(
+        error.message,
+        "complete project source-set and resource inventory is unavailable"
+    );
+    assert!(response.result.is_none());
+    assert!(fixture.semantic_calls.load(Ordering::Acquire) > 0);
+}
+
+#[test]
+fn source_reference_absence_needs_normalized_facts_regardless_of_project_coverage() {
+    struct FallbackSemantic;
+    impl HostReadValidator for FallbackSemantic {
+        fn validate_current_reads(
+            &self,
+            _: HostGenerations,
+            _: &HostReadSet,
+        ) -> Result<bool, HostSourceError> {
+            panic!("evaluation source facts cannot reuse a prior read set")
+        }
+    }
+    impl HostSemanticModelProvider for FallbackSemantic {
+        fn parse(
+            &self,
+            request: &HostSemanticRequest<'_>,
+        ) -> Result<HostAnswer<HostSemanticModel>, HostSourceError> {
+            let model = HostSemanticModel::fallback(
+                request.source,
+                request.source_uri,
+                "host declaration coverage and ranges are unavailable",
+                true,
+                0,
+            );
+            assert!(
+                !model.model.targets.is_empty(),
+                "fallback contains a known Mixin target"
+            );
+            Ok(HostAnswer::known(model, vec![]))
+        }
+    }
+
+    for project_complete in [false, true] {
+        for (language, extension, source) in [
+            (
+                "java",
+                "java",
+                "import org.spongepowered.asm.mixin.Mixin;\n@Mixin(Target.class)\nclass Patch {}",
+            ),
+            (
+                "kotlin",
+                "kt",
+                "import org.spongepowered.asm.mixin.Mixin\n@Mixin(Target::class)\nclass Patch {}",
+            ),
+        ] {
+            let fixture = fixture(true, false, true, HostFact::Known(vec![]), false);
+            let uri = format!("{}/src/main/fixture/Patch.{extension}", fixture.workspace);
+            let mut context = context(&fixture, source, &uri, position_at(source, source.len()));
+            context.language_id = language.into();
+            for fallback in [false, true] {
+                let host = if fallback {
+                    evaluation_host_with_provider(
+                        &fixture,
+                        HostFact::Known(vec![]),
+                        None,
+                        Arc::new(ReferenceFacts),
+                        Arc::new(FallbackSemantic),
+                    )
+                } else {
+                    evaluation_host(&fixture, HostFact::Known(vec![]), None, false)
+                }
+                .unwrap();
+                let response = CommandDispatcher::for_evaluation(host, &[], project_complete)
+                    .execute(
+                        McdevCommands::REFERENCES,
+                        &[serde_json::json!({"context":context})],
+                    )
+                    .unwrap();
+                if fallback {
+                    let error = response.error.unwrap();
+                    assert_eq!(error.code, McdevErrorCode::IncompleteProjectContext);
+                    assert_eq!(
+                        error.message,
+                        "host source declaration coverage and ranges are unavailable"
+                    );
+                    assert!(response.result.is_none());
+                } else {
+                    assert!(response.error.is_none());
+                    assert_eq!(
+                        response.result.unwrap(),
+                        serde_json::json!({"locations":[]})
+                    );
+                }
+            }
+        }
+    }
+}
+
+#[test]
+fn incomplete_evaluation_keeps_kotlin_actions_empty_and_project_dtos_unavailable() {
+    let fixture = fixture(true, false, true, HostFact::Known(vec![]), false);
+    let evaluation = evaluation_host(&fixture, HostFact::Known(vec![]), None, false).unwrap();
+    let dispatcher = CommandDispatcher::for_evaluation(evaluation, &[], false);
+    let uri = format!("{}/src/main/java/fixture/Patch.kt", fixture.workspace);
+    let mut request_context = context(&fixture, "class Patch", &uri, McdevPosition::default());
+    request_context.language_id = "kotlin".into();
+    let response = dispatcher
+        .execute(
+            McdevCommands::CODE_ACTION,
+            &[serde_json::to_value(McdevCodeActionRequest {
+                context: request_context.clone(),
+                range: McdevRange::default(),
+                diagnostic_codes: vec![],
+            })
+            .unwrap()],
+        )
+        .unwrap();
+    assert_eq!(
+        serde_json::to_value(response).unwrap(),
+        serde_json::json!({
+            "protocolVersion":1,"serverVersion":"0.1.0","capabilities":["codeAction"],
+            "result":{"actions":[]}
+        })
+    );
+    assert_eq!(fixture.semantic_calls.load(Ordering::Acquire), 0);
+
+    request_context.document_uri =
+        format!("{}/src/main/java/fixture/Patch.java", fixture.workspace);
+    request_context.language_id = "java".into();
+    for command in [
+        McdevCommands::CODE_ACTION,
+        McdevCommands::INFO,
+        McdevCommands::DUMP_CONTEXT,
+    ] {
+        let response = dispatcher
+            .execute(command, &[serde_json::json!({"context":request_context})])
+            .unwrap();
+        assert_eq!(
+            response.error.unwrap().code,
+            McdevErrorCode::IncompleteProjectContext,
+            "{command}"
+        );
+        assert!(response.result.is_none());
+    }
+}
+
+#[test]
+fn acknowledged_info_reports_only_negotiated_commands() {
+    let fixture = fixture(true, false, true, HostFact::Known(vec![]), false);
+    let evaluation = evaluation_host(&fixture, HostFact::Known(vec![]), None, false).unwrap();
+    let commands = [
+        "mcdev.references".into(),
+        "mcdev.unimplemented".into(),
+        "mcdev.info".into(),
+        "mcdev.info".into(),
+    ];
+    let dispatcher = CommandDispatcher::for_evaluation(evaluation, &commands, true);
+    let uri = format!("{}/src/main/java/fixture/Patch.java", fixture.workspace);
+    let response = dispatcher
+        .execute(
+            McdevCommands::INFO,
+            &[serde_json::json!({
+                "context": context(&fixture, CONFIG_SOURCE, &uri, McdevPosition::default())
+            })],
+        )
+        .unwrap();
+    assert!(response.error.is_none());
+    let result = response.result.unwrap();
+    assert_eq!(
+        result["registeredCommands"],
+        serde_json::json!(["mcdev.info", "mcdev.references"])
+    );
+    let lines = result["lines"].as_array().unwrap();
+    assert_eq!(
+        &lines[lines.len() - 3..],
+        &[
+            serde_json::json!("Registered commands:"),
+            serde_json::json!("  - mcdev.info"),
+            serde_json::json!("  - mcdev.references"),
+        ]
+    );
+}
+
+#[test]
+fn refreshed_generation_does_not_certify_a_complete_project_summary() {
+    let fixture = fixture(true, false, true, HostFact::Known(vec![]), false);
+    let uri = format!("{}/src/main/java/fixture/Patch.java", fixture.workspace);
+    let payload = serde_json::json!({"context":context(&fixture, CONFIG_SOURCE, &uri, McdevPosition::default())});
+    for generation in [None, Some("129")] {
+        let evaluation =
+            evaluation_host(&fixture, HostFact::Known(vec![]), generation, false).unwrap();
+        let dispatcher = CommandDispatcher::for_evaluation(evaluation, &[], false);
+        for command in [
+            McdevCommands::REINDEX,
+            McdevCommands::RELOAD_PROJECT_CONTEXT,
+        ] {
+            let response = dispatcher.execute(command, &[payload.clone()]).unwrap();
+            let error = response.error.unwrap();
+            assert_eq!(error.code, McdevErrorCode::IncompleteProjectContext);
+            assert_eq!(
+                error.message,
+                if generation.is_some() {
+                    "complete project source-set and resource inventory is unavailable"
+                } else {
+                    "host project refresh authority is unavailable"
+                }
+            );
+            assert!(response.result.is_none());
+        }
+    }
+    let evaluation =
+        evaluation_host(&fixture, HostFact::Known(vec![]), Some("130"), false).unwrap();
+    let dispatcher = CommandDispatcher::for_evaluation(evaluation, &[], false);
+    fixture.query.open.store(false, Ordering::Release);
+    for command in [
+        McdevCommands::REINDEX,
+        McdevCommands::RELOAD_PROJECT_CONTEXT,
+    ] {
+        assert!(matches!(
+            dispatcher.execute(command, &[payload.clone()]),
+            Err(CommandFailure::Cancelled(_))
+        ));
+    }
+}

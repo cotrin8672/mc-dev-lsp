@@ -1,5 +1,4 @@
 local helpers = dofile(vim.fn.getcwd() .. "/mcdev-nvim/tests/test_helpers.lua")
-local buffer = require("mcdev.buffer")
 local mcdev = require("mcdev")
 local convert = require("mcdev.convert")
 local completion = require("mcdev.completion")
@@ -153,49 +152,25 @@ local commands_ready = vim.wait(120000, function()
 end, 100)
 helpers.assert_true(commands_ready, "ktlsp must advertise every MC command before indexed E2E; this contract is not yet available on older hosts")
 
-local function sync_request(method, params, timeout_ms)
-  log_step("request " .. method)
-  local result = nil
-  local err = nil
-  client:request(method, params, function(request_err, request_result)
-    err = request_err
-    result = request_result
-  end)
-  local completed = vim.wait(timeout_ms or 60000, function()
-    return result ~= nil or err ~= nil
-  end, 100)
-  helpers.assert_true(completed, method .. " timed out")
-  log_step("response " .. method .. " err=" .. tostring(err ~= nil) .. " result=" .. tostring(result ~= nil))
-  if err ~= nil then
-    log_step("error " .. method .. " " .. vim.inspect(err))
-  end
+local function mcdev_command(command, payload, timeout_ms)
+  log_step("command " .. command)
+  local result, err, completed
+  local bufnr = vim.uri_to_bufnr(payload.context.documentUri)
+  local cancel = protocol.request(command, payload, function(request_result, request_err)
+    result, err, completed = request_result, request_err, true
+  end, bufnr)
+  local settled = vim.wait(timeout_ms or 60000, function() return completed end, 100)
+  if not settled then cancel() end
+  helpers.assert_true(settled, command .. " timed out")
+  log_step("response " .. command .. " err=" .. tostring(err ~= nil) .. " result=" .. tostring(result ~= nil))
+  if err ~= nil then log_step("error " .. command .. " " .. vim.inspect(err)) end
   return result, err
 end
 
-local function mcdev_command(command, payload, timeout_ms)
-  log_step("command " .. command)
-  return sync_request("workspace/executeCommand", {
-    command = command,
-    arguments = { payload },
-  }, timeout_ms)
-end
-
 local function build_context(bufnr, position)
-  return {
-    protocolVersion = 1,
-    workspaceRoot = workspace_root_uri,
-    documentUri = vim.uri_from_bufnr(bufnr),
-    languageId = buffer.effective_language_id(bufnr),
-    position = {
-      line = position[1] - 1,
-      character = position[2],
-    },
-    bufferText = table.concat(vim.api.nvim_buf_get_lines(bufnr, 0, -1, false), "\n"),
-    client = {
-      name = "mcdev.nvim-e2e",
-      version = "0.1.0",
-    },
-  }
+  local context = protocol.context(bufnr, position)
+  context.client.name = "mcdev.nvim-e2e"
+  return context
 end
 
 local compile_sequence = 0
@@ -326,10 +301,6 @@ with_buffer(mixin_file, "java", nil, function(bufnr)
   end
   helpers.assert_not_nil(mixin_line, "@Mixin line not found")
 
-  local context = build_context(bufnr, { mixin_line + 1, 8 })
-  log_step("request workspaceRoot: " .. tostring(context.workspaceRoot))
-  log_step("request documentUri: " .. tostring(context.documentUri))
-
   if fixture == "fabric-basic" then
     local at_line, at_character
     for index, line in ipairs(vim.api.nvim_buf_get_lines(bufnr, 0, -1, false)) do
@@ -394,6 +365,10 @@ with_buffer(mixin_file, "java", nil, function(bufnr)
     )
     vim.api.nvim_buf_set_lines(bufnr, 0, -1, false, before_lines)
   end
+
+  local context = build_context(bufnr, { mixin_line + 1, 8 })
+  log_step("request workspaceRoot: " .. tostring(context.workspaceRoot))
+  log_step("request documentUri: " .. tostring(context.documentUri))
 
   local info_result, info_err = mcdev_command("mcdev.info", { context = context })
   helpers.assert_nil(info_err, "mcdev.info failed: " .. vim.inspect(info_err))

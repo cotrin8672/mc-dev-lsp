@@ -191,7 +191,19 @@ try {
         companionPackageVersion = $companionPackageVersion
         platform = $platform
         architecture = $architecture
+        # Keep the required base compatible with semantic-only hosts.
         capabilities = @('semantic-v1')
+        optionalCapabilities = @(
+            'project-class-facts-v1', 'source-snapshots-v1', 'owned-resources-v1',
+            'runtime-class-bytes-v1', 'jvm-catalog-v1', 'provider-commands-v1'
+        )
+        supportedOps = [ordered]@{
+            'project-class-facts-v1' = @('projectContext', 'typeJvm')
+            'source-snapshots-v1' = @('sourceInventory', 'sourceSnapshot')
+            'owned-resources-v1' = @('resourceInventory', 'resourceLookup', 'resourceSnapshot')
+            'runtime-class-bytes-v1' = @('runtimeClass', 'classBytes')
+            'jvm-catalog-v1' = @('jvmCatalog', 'jvmClass')
+        }
         runtimeDirectories = @($runtimeDirectories)
         files = $entries
         manifestFilesExcludedFromSelfHash = $true
@@ -275,14 +287,28 @@ try {
 
     $smokeTimeout = 120
     $oldCompanion = [Environment]::GetEnvironmentVariable('MCDEV_COMPANION_BINARY', 'Process')
+    $oldManifest = [Environment]::GetEnvironmentVariable('MCDEV_NATIVE_MANIFEST', 'Process')
     try {
         $env:MCDEV_COMPANION_BINARY = $binary
+        $env:MCDEV_NATIVE_MANIFEST = $manifestPath
+        $capabilityResult = Invoke-RustCheck -Name 'native-release-capability-smoke' -Command 'nvim' -Arguments @(
+            '--headless', '-u', 'mcdev-nvim/tests/minimal_init.lua', '-l', 'mcdev-nvim/tests/native_package.lua'
+        ) -Directory $repo -LogDirectory $logs -TimeoutSeconds 30
+        $capabilityResult | ConvertTo-Json | Set-Content -Encoding utf8 (Join-Path $logs 'native-release-capability-smoke.result.json')
+        $summary.Add(('capability-smoke: exit={0} timeout={1} seconds={2} pid={3} deadline=30s' -f
+            $capabilityResult.ExitCode, $capabilityResult.TimedOut, $capabilityResult.Seconds, $capabilityResult.Pid))
+        if ($capabilityResult.ExitCode -ne 0) {
+            Get-Content -LiteralPath (Join-Path $logs 'native-release-capability-smoke.stderr.log') -Tail 40
+            throw 'native release capability metadata smoke failed; see complete logs'
+        }
         $smokeResult = Invoke-RustCheck -Name 'native-release-stdio-smoke' -Command 'nvim' -Arguments @(
             '--headless', '-u', 'mcdev-nvim/tests/minimal_init.lua', '-l', 'mcdev-nvim/tests/native_helper.lua'
         ) -Directory $repo -LogDirectory $logs -TimeoutSeconds $smokeTimeout
     } finally {
         if ($null -eq $oldCompanion) { Remove-Item Env:MCDEV_COMPANION_BINARY -ErrorAction SilentlyContinue }
         else { $env:MCDEV_COMPANION_BINARY = $oldCompanion }
+        if ($null -eq $oldManifest) { Remove-Item Env:MCDEV_NATIVE_MANIFEST -ErrorAction SilentlyContinue }
+        else { $env:MCDEV_NATIVE_MANIFEST = $oldManifest }
     }
     $smokeResult | ConvertTo-Json | Set-Content -Encoding utf8 (Join-Path $logs 'native-release-stdio-smoke.result.json')
     $summary.Add(('stdio-smoke: exit={0} timeout={1} seconds={2} pid={3} deadline={4}s' -f
@@ -298,7 +324,7 @@ try {
         $Version, $productVersion, $companionPackageVersion))
     $summary.Add(('runtime directories: {0}' -f (@($runtimeDirectories) -join ', ')))
     $summary.Add(('archive: {0} bytes={1} sha256={2}' -f $archive, $archiveInfo.Length, $archiveHash))
-    $summary.Add('scope: semantic-v1 only; no host, JVM, tests, corpora, Kotlin, JDT jar, or full MC command/resource/classbytes/SDK wire')
+    $summary.Add('scope: semantic-v1 required base; optional inputs require host operation negotiation and provider commands require configured allowlists; no bundled host/JVM/tests/corpora/Kotlin/JDT jar or complete MC project/SDK authority')
     Write-Output ('artifact: {0}' -f $archive)
     Write-Output ('artifact bytes: {0}' -f $archiveInfo.Length)
     Write-Output ('artifact sha256: {0}' -f $archiveHash)

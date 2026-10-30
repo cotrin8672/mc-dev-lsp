@@ -327,9 +327,18 @@ function M.request(command, payload, callback, bufnr)
       }},
     }
   end
-  local status, request_id = client:request("workspace/executeCommand", params, function(err, result)
+  local origin = {
+    client = client,
+    client_id = client.id,
+    command = command,
+    route = params.command,
+    provider = params.command == provider_command and provider_id or nil,
+  }
+  local status, request_id = client:request("workspace/executeCommand", params, function(err, result, context)
     if callback then
-      callback(result, err)
+      local matches = context == nil or (type(context) == "table"
+        and (context.client_id == nil or context.client_id == origin.client_id))
+      callback(result, err, matches and origin or nil)
     end
   end, bufnr)
 

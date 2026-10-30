@@ -79,9 +79,13 @@ Code access or certifies current unsaved source.
 
 For commands, registration uses `analysisProviders.<id>.executeCommands`.
 The configured IDs are intersected with the companion's implemented routes;
-currently completion, diagnostics/context, definition and hover are acknowledged.
-References, code actions, info/dump and project refresh commands remain required
-but are not advertised as connected before their complete project inputs exist.
+all eleven command IDs can be acknowledged. A route can return a typed
+`INCOMPLETE_PROJECT_CONTEXT` result: acknowledgement does not certify complete
+feature support. Project-wide references, Java code actions, info/dump and
+refresh summaries still need complete host inputs. Resource-header references
+and Kotlin code actions retain the original empty success DTOs where absence
+can be established independently. Low-confidence Java/Kotlin source models
+cannot certify empty reference targets.
 
 The editor sends `workspace/executeCommand` with the outer command
 `ktlsp.providerCommand`. The host validates its provider/document/workspace and

@@ -137,7 +137,7 @@ fn negotiation_and_command_preserve_opaque_payload_and_host_facts() {
         Ok(json!({"original":params,"acknowledgement":initialization,"host":result}))
     });
     let ack = acknowledge(&session);
-    assert_eq!(ack["commands"], json!(["mcdev.completion"]));
+    assert_eq!(ack["commands"], json!(["mcdev.completion", "mcdev.info"]));
     assert_eq!(
         ack["supportedOps"]["source-snapshots-v1"],
         json!(["sourceInventory", "sourceSnapshot"])
@@ -167,7 +167,7 @@ fn negotiation_and_command_preserve_opaque_payload_and_host_facts() {
     assert_eq!(response["result"]["original"], original["params"]);
     assert_eq!(response["result"]["acknowledgement"], ack);
     assert_eq!(response["result"]["host"], payload);
-    session.send(command("not-supported", "mcdev.info", json!([])));
+    session.send(command("not-supported", "unknown.command", json!([])));
     assert_eq!(session.receive()["error"]["code"], -32602);
     session.send(command("not-allowed", "mcdev.diagnostics", json!([])));
     assert_eq!(session.receive()["error"]["code"], -32602);
