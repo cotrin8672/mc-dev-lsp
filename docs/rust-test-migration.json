@@ -61999,7 +61999,7 @@
       "protocol": 40
     },
     "wholeMigrationVerified": false,
-    "remainingAcceptance": "All 2604 original JUnit replacements and the latest 1875-function native/editor pipeline pass. CEM still fails host validation before original assertions, including after one observed-fresh outer retry; guard attribution is pending upstream. Finish original editor workflows, complete static helper census, generic type arguments, primitive class literals, floating literal facts, current source hierarchy, dependency source navigation, extract-local and final legacy retirement. Readonly snapshot binary names are published. Current cross-platform CI for the final fixes is pending; historical proofs retain their pins.",
+    "remainingAcceptance": "All 2604 original JUnit replacements pass on Windows and Linux; native/editor/package CI7e338e4 passes. Complete original CEM/editor acceptance after upstream model-generation invalidation fix, 183 restored original Lua site correspondences, generic type arguments, primitive class literals, floating literal facts, source hierarchy, dependency navigation, extract-local and legacy retirement. Full replacement remains unverified.",
     "independentSemanticV1Evidence": {
       "receipt": "mcdev-companion/tests/fixtures/semantic_v1/interop_receipt.json",
       "stockHostRevision": "f76a43fbeddf4fbdc69768fd0f7544e5a4a3610f",
@@ -62182,7 +62182,7 @@
       "execution": "mcdev-nvim/tests/migration_evidence.json",
       "originalFiles": 27,
       "originalModules": 20,
-      "originalAssertionSites": 1014,
+      "originalAssertionSites": 1197,
       "nativeAssertionCalls": 1521,
       "fileStatuses": {
         "ported": 17,
@@ -62200,8 +62200,8 @@
         "originalAssertionSites": 0,
         "realHostReceipt": "build/rust-test-logs/host-commands-20261030-090521312/receipt.json"
       },
-      "enforcedInputChecksPassed": true,
-      "strictFidelityNote": "Enforced input checks pass; backend-adapted state/assertions are explicitly non-strict and do not establish full E2E parity.",
+      "enforcedInputChecksPassed": false,
+      "strictFidelityNote": "Existing scoped results remain historical evidence. Current strict assertion correspondence is pending for the newly catalogued sites; no additional runtime pass or full E2E parity is claimed.",
       "latestIndependentClientSuite": {
         "prefix": "migration-current-20261101-014259296",
         "finiteEntries": [
@@ -62215,6 +62215,23 @@
         "allOriginalEditorE2EVerified": false,
         "nativeAssertionCalls": 2977,
         "receipt": "build/rust-test-logs/migration-current-20261101-014259296/receipt.json"
+      },
+      "assertionCensusCorrection": {
+        "previouslyCataloguedSites": 1014,
+        "addedFrozenSites": 183,
+        "totalFrozenSites": 1197,
+        "sameLineIDCollisions": 0,
+        "preservedExactMappings": 571,
+        "newSitesPending": 183,
+        "newRuntimePassesCredited": 0,
+        "newTestCases": 0,
+        "scanner": "mcdev-nvim/tests/migration_inventory.py",
+        "scannerSha256": "da3db0a19b26b64a01fe56015023c4ba0e484f0b55b85902b4bff9998162492d",
+        "selfcheck": "mcdev-nvim/tests/migration_inventory_selfcheck.py",
+        "selfcheckSha256": "ba12a4524fba443bd3026aad56959037827fadee3f7fb7c7c02d7b2281aa84c5",
+        "selfcheckEvidence": "build/rust-test-logs/assertion-census-20261101-031657307/selfcheck-result.json",
+        "saveCheckEvidence": "build/rust-test-logs/assertion-census-20261101-031657307/receipt.json",
+        "observationPolicy": "All added sites remain pending/unknown. Historical native collections and live MC slices retain their original scope; helper calls and assertions they invoke are separate static sites."
       }
     },
     "nativeWorkspace": {
@@ -63036,15 +63053,14 @@
     "resumedIntegration": {
       "date": "2026-11-01",
       "status": "native-verified-live-incomplete",
-      "hostPin": "2e4671f085f199ea5bb970bbc2f9e15e2c07dff1",
-      "hostReceipt": "build/host-artifacts/published-2e4671f-fd64b18a5716/receipt.json",
+      "hostPin": "64cbb25e8d6a7c632d0e283edbf98865909e0f7d",
+      "hostReceipt": "build/host-artifacts/published-64cbb25-e2d769e1f628/receipt.json",
       "hostSerializerFixture": "mcdev-companion/tests/fixtures/host_inputs/root_files/actual-serializer-sample.json",
       "nativePipeline": "build/rust-test-logs/native-pipeline-proof-20261101-025824638",
       "optimizedPackage": {
-        "status": "passed-prior-to-metadata-read-optimization",
-        "payloadFiles": 24,
-        "logs": "build/rust-test-logs/native-release-20261101-022932747",
-        "archiveSha256": "9aae6e45a510981f4ad4c5d03ffb19364774c2241c41badefce29290a4db5968"
+        "status": "passed-on-both-platforms",
+        "payloadFilesPerPlatform": 24,
+        "proof": "build/rust-test-logs/ci-7e338e4/packages-proof.json"
       },
       "originalCemAttempt": {
         "status": "failed-before-original-assertions",
@@ -63159,7 +63175,32 @@
       "sourceMembershipNamespaceFix": "Raw Gradle project paths and semantic module identities are separate; issued token/project/name joins and semantic identity consistency remain enforced.",
       "metadataSourceCapture": "Info/Dump/Reindex/Reload skip compiler source inventories and bodies; unrequested source coverage remains Unknown. Full DTO equivalence and 67 affected checks pass.",
       "readinessRecovery": "One distinct outer request only after observed new accepted evaluation/publication with same provider instance/owner/SHA and unchanged editor version; original errors retained. Seven mock groups pass. D4 and D5 fail again and are not retried.",
-      "staticHelperCensusLimitation": "Existing 1014-entry census omits multi-underscore helper names such as assert_not_nil; complete static-census acceptance is pending."
+      "staticHelperCensusLimitation": "Scanner omission fixed: 1197 original sites, existing 1014 IDs and 571 exact mappings preserved; 183 additions pending/unknown, runtime credit zero.",
+      "crossPlatformCI": {
+        "status": "passed",
+        "commit": "7e338e40bb1a92e4ef8deb31130fda305dacfee2",
+        "url": "https://github.com/cotrin8672/mc-dev-lsp/actions/runs/41228019825",
+        "nativeProof": "build/rust-test-logs/ci-7e338e4/native-cases-proof.json",
+        "packagesProof": "build/rust-test-logs/ci-7e338e4/packages-proof.json",
+        "windowsFunctions": 1875,
+        "linuxFunctions": 1874,
+        "targets": 80,
+        "originalCaseLocatorsPerPlatform": 2604,
+        "editorEntriesPerPlatform": 5
+      },
+      "hostGuardAttribution": {
+        "receipt": "build/rust-test-logs/cem-project-20261101-031413365-96dd433e/receipt.json",
+        "reason": "model",
+        "firstCommandEvaluation": 8,
+        "expected": 30,
+        "current": 31,
+        "precedingEvent": "index-changed",
+        "freshEvaluation": 11,
+        "freshExpected": 31,
+        "freshCurrent": 32,
+        "originalAssertions": 0,
+        "scope": "Attribution only; full CEM remains failed."
+      }
     }
   }
 }

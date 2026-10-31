@@ -17,12 +17,13 @@ The host has also published `root-files-v1` at
 Its accepted serializer sample has SHA-256
 `af49d91e7e42dada7314a953b710ebe2d998176b7ed00ee361b410db1c3a4c41`.
 This is the host's file-input proof, separate from MC command/editor acceptance.
-Readonly snapshot JVM names are now published in the following release89 pin.
+Readonly snapshot JVM names are published from release89. The current release90
+pin adds bounded attribution of the first failed guard without relaxing it.
 
 ## Published contract
 
 The current integration pin is ktlsp
-[`2e4671f085f199ea5bb970bbc2f9e15e2c07dff1`](https://github.com/cotrin8672/ktlsp/blob/2e4671f085f199ea5bb970bbc2f9e15e2c07dff1/docs/architecture/extension-ipc.md).
+[`64cbb25e8d6a7c632d0e283edbf98865909e0f7d`](https://github.com/cotrin8672/ktlsp/blob/64cbb25e8d6a7c632d0e283edbf98865909e0f7d/docs/architecture/extension-ipc.md).
 It adds normalized authored facts, owning-project input records, exact source
 locations and typed binary declaration annotations to source snapshots, owned
 resources, selected runtime bytes, the physical JVM catalog and provider
@@ -30,10 +31,10 @@ commands. The companion negotiates capabilities and individual operations;
 binary annotations are selected by capability alone. Configured command IDs
 are intersected with the implemented domain routes.
 
-The copied release89 host has SHA-256
-`fd64b18a57161e9b727880545120a8d1fc8b4aadaa1f2240fd5c90e7f0a0e0e1`.
+The copied release90 host has SHA-256
+`e2d769e1f6280df29ca27c589414335b5679e7442fa1cf9bf9e5fc57c7080d40`.
 Its provenance is retained in
-`build/host-artifacts/published-2e4671f-fd64b18a5716/receipt.json`.
+`build/host-artifacts/published-64cbb25-e2d769e1f628/receipt.json`.
 This identifies the integration input; upstream API tests do not prove MC
 feature or original editor parity. The acceptance results below retain their
 historical host and companion pins.
@@ -57,6 +58,19 @@ when that selection is unproven. Callable parameter facts are optional knowledge
 an omitted or unsupported list does not establish a zero-parameter callable.
 
 ## Follow-up acceptance checkpoints
+
+The full Windows/Linux CI for `7e338e4` passes:
+https://github.com/cotrin8672/mc-dev-lsp/actions/runs/41228019825.
+Downloaded logs independently verify Windows 1,875 / Linux 1,874 functions,
+80 targets and all 2,604 original case locators on each platform, with no failed,
+ignored or filtered native tests. All five editor entries pass, including the
+real process suite. Both optimized archives have all 24 payload sizes/hashes
+verified, 11 optional capabilities and 9 operation maps. Evidence is retained in
+`build/rust-test-logs/ci-7e338e4/{native-cases-proof,packages-proof}.json`.
+Archive SHA-256 values are
+`f3f0b15c0014baf881c6a628cefb795a727429e6da99508ed20a65acadebb9d9`
+(Windows) and `e073ce19066eadbdc86aed967610abe721dccfb567d764f6445b571bc1b45dec`
+(Linux). These checks do not certify the unpassed live CEM workflow.
 
 The latest native pipeline is
 `build/rust-test-logs/native-pipeline-proof-20261101-025824638/`: 1,875 functions,
@@ -85,10 +99,20 @@ All paths above are under `build/rust-test-logs/`. Original assertion and golden
 comparison credit remains zero. The host is preparing a diagnostic that reports
 the first failed guard from the same validation; no admission rule is relaxed.
 
+Release90 D6 (`cem-project-20261101-031413365-96dd433e`) identifies that guard:
+the first command failure is model generation 30 to 31, evaluation 8, directly
+after index-changed invalidation. The fresh command evaluation 11 fails model
+31 to 32. Source SHA/version and provider instance stay unchanged. The upstream
+fix is separating project/resource dependencies from semantic-index updates,
+while retaining real model/source/host-input and semantic lookup invalidation.
+This run still credits zero original assertions or member comparisons.
+
 Current-source metadata preserves the 2,604 cases, 17 ported / 3 partial / 7
 pending editor-file states and historical four-snippet/169-call proof. Its
-1,014-entry static census is not a complete helper-name census: the existing
-scanner misses names such as assert_not_nil. An optional broad metadata check
+scanner has now been corrected to include repeated-underscore helper names.
+Its census retains all 1,014 previous IDs and adds 183 frozen sites, with zero
+ID collisions and no remaining lexer omissions (1,197 total). All additions
+remain pending/unknown with no runtime or test-case credit. An optional broad metadata check
 hit its finite 60-second deadline and is recorded as failed, separately from
 the passing product/client checks. Full original editor parity remains false.
 

@@ -68,7 +68,7 @@ def literal_strings(text):
 def calls(text, assertion=True):
     masked = mask_lua(text)
     if assertion:
-        pattern = r"\b(?:[\w]+\.)*assert(?:_[a-z]+)?\s*\("
+        pattern = r"\b(?:[\w]+\.)*assert(?:_[a-z]+)*\s*\("
     else:
         pattern = (
             r"\b(?:[\w]+\.)?(?:with_buffer|with_named_buffer|run_case|"

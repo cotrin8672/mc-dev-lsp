@@ -7,14 +7,14 @@
     "support": 3,
     "process-fixture": 1
   },
-  "staticAssertionCallSites": 1014,
+  "staticAssertionCallSites": 1197,
   "fidelity": {
     "baselineRoot": "build/migration-baseline/current-20261023",
     "originalTestAndSupportFiles": 27,
     "originalLuaModules": 20,
     "strictFailureFiles": [],
-    "strictPassed": true,
-    "assertionSites": 1014,
+    "strictPassed": false,
+    "assertionSites": 1197,
     "caseEntryCalls": 93,
     "loopInputTables": 34,
     "loopInputRows": 180,
@@ -27,7 +27,24 @@
       "native ktlsp replacement for legacy JDT module": 1
     },
     "allOriginalSourcesStrict": false,
-    "strictMeaning": "Enforced input checks pass; backend-adapted state/assertions are explicitly non-strict and do not establish full E2E parity."
+    "strictMeaning": "Existing scoped results remain historical evidence. Current strict assertion correspondence is pending for the newly catalogued sites; no additional runtime pass or full E2E parity is claimed.",
+    "pendingAssertionSites": 183,
+    "pendingAssertionCorrespondenceFiles": [
+      "mcdev-nvim/tests/cmp_positions.lua",
+      "mcdev-nvim/tests/cmp_routing.lua",
+      "mcdev-nvim/tests/completion_readiness.lua",
+      "mcdev-nvim/tests/e2e/cem_project_e2e.lua",
+      "mcdev-nvim/tests/e2e/create_drill_definition_diagnostics_e2e.lua",
+      "mcdev-nvim/tests/e2e/expression_e2e.lua",
+      "mcdev-nvim/tests/e2e/jdt_action_aliases_e2e.lua",
+      "mcdev-nvim/tests/e2e/jdtls_bundle_e2e.lua",
+      "mcdev-nvim/tests/e2e/jdtls_loom_e2e.lua",
+      "mcdev-nvim/tests/e2e/placement_offset_completion_e2e.lua",
+      "mcdev-nvim/tests/e2e/real_project_e2e.lua",
+      "mcdev-nvim/tests/e2e/sugar_e2e.lua",
+      "mcdev-nvim/tests/lsp_regressions.lua",
+      "mcdev-nvim/tests/run.lua"
+    ]
   },
   "note": "Assertion call sites, loop input tables and runtime executions are separate counts; no count is inflated into a JUnit-style case total.",
   "files": [
@@ -2207,6 +2224,16 @@
           "legacyAssertionId": "mcdev-nvim/tests/cmp_positions.lua::assert@51"
         },
         {
+          "line": 52,
+          "call": "helpers.assert_not_nil(result)",
+          "legacyAssertionId": "mcdev-nvim/tests/cmp_positions.lua::assert@52",
+          "replacementPath": null,
+          "replacementLine": null,
+          "mapping": "pending assertion correspondence after lexical census correction",
+          "nativeStatus": "pending",
+          "runtimeObservation": "unknown"
+        },
+        {
           "line": 53,
           "call": "helpers.assert_eq(#result.items, 1)",
           "legacyAssertionId": "mcdev-nvim/tests/cmp_positions.lua::assert@53"
@@ -2220,18 +2247,22 @@
       "caseEntryCalls": [],
       "loopInputs": [],
       "fidelity": {
-        "status": "verified",
-        "strict": true,
+        "status": "pending assertion correspondence",
+        "strict": false,
         "oldLineCount": 61,
         "newLineCount": 61,
-        "assertionSiteCount": 6,
+        "assertionSiteCount": 7,
         "caseEntryCount": 0,
         "loopInputCount": 0,
         "stateMarkerCount": 4,
         "missingAssertions": [],
         "missingCaseEntries": [],
         "missingLoopInputs": [],
-        "missingStateMarkers": []
+        "missingStateMarkers": [],
+        "pendingAssertionSites": [
+          "mcdev-nvim/tests/cmp_positions.lua::assert@52"
+        ],
+        "pendingAssertionSiteCount": 1
       },
       "nativeExecution": "see execution evidence",
       "nativeStatus": "passed",
@@ -2254,6 +2285,16 @@
           "legacyAssertionId": "mcdev-nvim/tests/cmp_routing.lua::assert@46"
         },
         {
+          "line": 54,
+          "call": "helpers.assert_not_nil(result)",
+          "legacyAssertionId": "mcdev-nvim/tests/cmp_routing.lua::assert@54",
+          "replacementPath": null,
+          "replacementLine": null,
+          "mapping": "pending assertion correspondence after lexical census correction",
+          "nativeStatus": "pending",
+          "runtimeObservation": "unknown"
+        },
+        {
           "line": 55,
           "call": "helpers.assert_eq(#result.items, 0)",
           "legacyAssertionId": "mcdev-nvim/tests/cmp_routing.lua::assert@55"
@@ -2267,6 +2308,16 @@
           "line": 63,
           "call": "helpers.assert_true(source:is_available())",
           "legacyAssertionId": "mcdev-nvim/tests/cmp_routing.lua::assert@63"
+        },
+        {
+          "line": 71,
+          "call": "helpers.assert_not_nil(result)",
+          "legacyAssertionId": "mcdev-nvim/tests/cmp_routing.lua::assert@71",
+          "replacementPath": null,
+          "replacementLine": null,
+          "mapping": "pending assertion correspondence after lexical census correction",
+          "nativeStatus": "pending",
+          "runtimeObservation": "unknown"
         },
         {
           "line": 72,
@@ -2304,6 +2355,16 @@
           "legacyAssertionId": "mcdev-nvim/tests/cmp_routing.lua::assert@84"
         },
         {
+          "line": 91,
+          "call": "helpers.assert_not_nil(ordinary_result)",
+          "legacyAssertionId": "mcdev-nvim/tests/cmp_routing.lua::assert@91",
+          "replacementPath": null,
+          "replacementLine": null,
+          "mapping": "pending assertion correspondence after lexical census correction",
+          "nativeStatus": "pending",
+          "runtimeObservation": "unknown"
+        },
+        {
           "line": 92,
           "call": "helpers.assert_eq(#ordinary_result.items, 0)",
           "legacyAssertionId": "mcdev-nvim/tests/cmp_routing.lua::assert@92"
@@ -2319,9 +2380,29 @@
           "legacyAssertionId": "mcdev-nvim/tests/cmp_routing.lua::assert@103"
         },
         {
+          "line": 111,
+          "call": "helpers.assert_not_nil(result)",
+          "legacyAssertionId": "mcdev-nvim/tests/cmp_routing.lua::assert@111",
+          "replacementPath": null,
+          "replacementLine": null,
+          "mapping": "pending assertion correspondence after lexical census correction",
+          "nativeStatus": "pending",
+          "runtimeObservation": "unknown"
+        },
+        {
           "line": 112,
           "call": "helpers.assert_eq(#result.items, 2)",
           "legacyAssertionId": "mcdev-nvim/tests/cmp_routing.lua::assert@112"
+        },
+        {
+          "line": 130,
+          "call": "helpers.assert_not_nil(explicit_result)",
+          "legacyAssertionId": "mcdev-nvim/tests/cmp_routing.lua::assert@130",
+          "replacementPath": null,
+          "replacementLine": null,
+          "mapping": "pending assertion correspondence after lexical census correction",
+          "nativeStatus": "pending",
+          "runtimeObservation": "unknown"
         },
         {
           "line": 131,
@@ -2404,18 +2485,26 @@
       ],
       "loopInputs": [],
       "fidelity": {
-        "status": "verified",
-        "strict": true,
+        "status": "pending assertion correspondence",
+        "strict": false,
         "oldLineCount": 178,
         "newLineCount": 178,
-        "assertionSiteCount": 27,
+        "assertionSiteCount": 32,
         "caseEntryCount": 4,
         "loopInputCount": 0,
         "stateMarkerCount": 24,
         "missingAssertions": [],
         "missingCaseEntries": [],
         "missingLoopInputs": [],
-        "missingStateMarkers": []
+        "missingStateMarkers": [],
+        "pendingAssertionSites": [
+          "mcdev-nvim/tests/cmp_routing.lua::assert@54",
+          "mcdev-nvim/tests/cmp_routing.lua::assert@71",
+          "mcdev-nvim/tests/cmp_routing.lua::assert@91",
+          "mcdev-nvim/tests/cmp_routing.lua::assert@111",
+          "mcdev-nvim/tests/cmp_routing.lua::assert@130"
+        ],
+        "pendingAssertionSiteCount": 5
       },
       "nativeExecution": "see execution evidence",
       "nativeStatus": "passed",
@@ -2508,6 +2597,16 @@
           "line": 41,
           "call": "helpers.assert_true(results[1].isProvisional)",
           "legacyAssertionId": "mcdev-nvim/tests/completion_readiness.lua::assert@41"
+        },
+        {
+          "line": 42,
+          "call": "helpers.assert_not_nil(on_ready)",
+          "legacyAssertionId": "mcdev-nvim/tests/completion_readiness.lua::assert@42",
+          "replacementPath": null,
+          "replacementLine": null,
+          "mapping": "pending assertion correspondence after lexical census correction",
+          "nativeStatus": "pending",
+          "runtimeObservation": "unknown"
         },
         {
           "line": 43,
@@ -2613,18 +2712,22 @@
       "caseEntryCalls": [],
       "loopInputs": [],
       "fidelity": {
-        "status": "verified",
-        "strict": true,
+        "status": "pending assertion correspondence",
+        "strict": false,
         "oldLineCount": 107,
         "newLineCount": 107,
-        "assertionSiteCount": 23,
+        "assertionSiteCount": 24,
         "caseEntryCount": 0,
         "loopInputCount": 0,
         "stateMarkerCount": 20,
         "missingAssertions": [],
         "missingCaseEntries": [],
         "missingLoopInputs": [],
-        "missingStateMarkers": []
+        "missingStateMarkers": [],
+        "pendingAssertionSites": [
+          "mcdev-nvim/tests/completion_readiness.lua::assert@42"
+        ],
+        "pendingAssertionSiteCount": 1
       },
       "nativeExecution": "see execution evidence",
       "nativeStatus": "passed",
@@ -2720,6 +2823,16 @@
           "mapping": "exact assertion in corresponding source region"
         },
         {
+          "line": 70,
+          "call": "h.helpers.assert_not_nil(raw_owner, 'invalid member reference line ' .. tostring(line_number))",
+          "legacyAssertionId": "mcdev-nvim/tests/e2e/cem_project_e2e.lua::assert@70",
+          "replacementPath": null,
+          "replacementLine": null,
+          "mapping": "pending assertion correspondence after lexical census correction",
+          "nativeStatus": "pending",
+          "runtimeObservation": "unknown"
+        },
+        {
           "line": 124,
           "call": "h.helpers.assert_true(false, 'CEM ' .. owner .. ' exact member reference mismatch')",
           "legacyAssertionId": "mcdev-nvim/tests/e2e/cem_project_e2e.lua::assert@124",
@@ -2808,12 +2921,32 @@
           "mapping": "exact assertion in corresponding source region"
         },
         {
+          "line": 216,
+          "call": "h.helpers.assert_not_nil(start, 'missing caret marker for ' .. description)",
+          "legacyAssertionId": "mcdev-nvim/tests/e2e/cem_project_e2e.lua::assert@216",
+          "replacementPath": null,
+          "replacementLine": null,
+          "mapping": "pending assertion correspondence after lexical census correction",
+          "nativeStatus": "pending",
+          "runtimeObservation": "unknown"
+        },
+        {
           "line": 224,
           "call": "h.helpers.assert_nil(match, description .. ' returned duplicate ' .. name)",
           "legacyAssertionId": "mcdev-nvim/tests/e2e/cem_project_e2e.lua::assert@224",
           "replacementPath": "mcdev-nvim/tests/e2e/cem_project_e2e.lua",
           "replacementLine": 224,
           "mapping": "exact assertion in corresponding source region"
+        },
+        {
+          "line": 232,
+          "call": "h.helpers.assert_not_nil(match, description .. ' missing ' .. name)",
+          "legacyAssertionId": "mcdev-nvim/tests/e2e/cem_project_e2e.lua::assert@232",
+          "replacementPath": null,
+          "replacementLine": null,
+          "mapping": "pending assertion correspondence after lexical census correction",
+          "nativeStatus": "pending",
+          "runtimeObservation": "unknown"
         },
         {
           "line": 238,
@@ -2824,6 +2957,16 @@
           "mapping": "exact assertion in corresponding source region"
         },
         {
+          "line": 244,
+          "call": "h.helpers.assert_not_nil(items.isEnchantable)",
+          "legacyAssertionId": "mcdev-nvim/tests/e2e/cem_project_e2e.lua::assert@244",
+          "replacementPath": null,
+          "replacementLine": null,
+          "mapping": "pending assertion correspondence after lexical census correction",
+          "nativeStatus": "pending",
+          "runtimeObservation": "unknown"
+        },
+        {
           "line": 245,
           "call": "h.helpers.assert_nil(items.getEnchantmentValue)",
           "legacyAssertionId": "mcdev-nvim/tests/e2e/cem_project_e2e.lua::assert@245",
@@ -2832,12 +2975,42 @@
           "mapping": "exact assertion in corresponding source region"
         },
         {
+          "line": 250,
+          "call": "h.helpers.assert_not_nil(expanded[name], 'missing Item.' .. name)",
+          "legacyAssertionId": "mcdev-nvim/tests/e2e/cem_project_e2e.lua::assert@250",
+          "replacementPath": null,
+          "replacementLine": null,
+          "mapping": "pending assertion correspondence after lexical census correction",
+          "nativeStatus": "pending",
+          "runtimeObservation": "unknown"
+        },
+        {
+          "line": 253,
+          "call": "h.helpers.assert_not_nil(chosen.textEdit)",
+          "legacyAssertionId": "mcdev-nvim/tests/e2e/cem_project_e2e.lua::assert@253",
+          "replacementPath": null,
+          "replacementLine": null,
+          "mapping": "pending assertion correspondence after lexical census correction",
+          "nativeStatus": "pending",
+          "runtimeObservation": "unknown"
+        },
+        {
           "line": 256,
           "call": "h.helpers.assert_eq(table.concat(vim.api.nvim_buf_get_lines(bufnr,0,-1,false),'\\n'), table.concat(lines,'\\n'))",
           "legacyAssertionId": "mcdev-nvim/tests/e2e/cem_project_e2e.lua::assert@256",
           "replacementPath": "mcdev-nvim/tests/e2e/cem_project_e2e.lua",
           "replacementLine": 256,
           "mapping": "exact assertion in corresponding source region"
+        },
+        {
+          "line": 259,
+          "call": "h.helpers.assert_not_nil(block[name], 'missing BlockItem.' .. name)",
+          "legacyAssertionId": "mcdev-nvim/tests/e2e/cem_project_e2e.lua::assert@259",
+          "replacementPath": null,
+          "replacementLine": null,
+          "mapping": "pending assertion correspondence after lexical census correction",
+          "nativeStatus": "pending",
+          "runtimeObservation": "unknown"
         },
         {
           "line": 261,
@@ -2864,12 +3037,32 @@
           "mapping": "exact assertion in corresponding source region"
         },
         {
+          "line": 291,
+          "call": "h.helpers.assert_not_nil(shadow_field_item.textEdit, 'BlockItem @Shadow field must provide a text edit')",
+          "legacyAssertionId": "mcdev-nvim/tests/e2e/cem_project_e2e.lua::assert@291",
+          "replacementPath": null,
+          "replacementLine": null,
+          "mapping": "pending assertion correspondence after lexical census correction",
+          "nativeStatus": "pending",
+          "runtimeObservation": "unknown"
+        },
+        {
           "line": 294,
           "call": "h.helpers.assert_eq(shadow_after_field[shadow_field_row], '    @Shadow private Block block;')",
           "legacyAssertionId": "mcdev-nvim/tests/e2e/cem_project_e2e.lua::assert@294",
           "replacementPath": "mcdev-nvim/tests/e2e/cem_project_e2e.lua",
           "replacementLine": 294,
           "mapping": "exact assertion in corresponding source region"
+        },
+        {
+          "line": 300,
+          "call": "assert_no_item(shadow_field_all, 'getBlock', 'BlockItem @Shadow field kind filter')",
+          "legacyAssertionId": "mcdev-nvim/tests/e2e/cem_project_e2e.lua::assert@300",
+          "replacementPath": null,
+          "replacementLine": null,
+          "mapping": "pending assertion correspondence after lexical census correction",
+          "nativeStatus": "pending",
+          "runtimeObservation": "unknown"
         },
         {
           "line": 305,
@@ -2888,6 +3081,16 @@
           "mapping": "exact assertion in corresponding source region"
         },
         {
+          "line": 307,
+          "call": "h.helpers.assert_not_nil(shadow_method_item.textEdit, 'BlockItem @Shadow method must provide a text edit')",
+          "legacyAssertionId": "mcdev-nvim/tests/e2e/cem_project_e2e.lua::assert@307",
+          "replacementPath": null,
+          "replacementLine": null,
+          "mapping": "pending assertion correspondence after lexical census correction",
+          "nativeStatus": "pending",
+          "runtimeObservation": "unknown"
+        },
+        {
           "line": 310,
           "call": "h.helpers.assert_eq(shadow_after_method[shadow_field_row], '    @Shadow private Block block;')",
           "legacyAssertionId": "mcdev-nvim/tests/e2e/cem_project_e2e.lua::assert@310",
@@ -2902,6 +3105,46 @@
           "replacementPath": "mcdev-nvim/tests/e2e/cem_project_e2e.lua",
           "replacementLine": 311,
           "mapping": "exact assertion in corresponding source region"
+        },
+        {
+          "line": 317,
+          "call": "assert_no_item(shadow_method_all, 'block', 'BlockItem @Shadow method kind filter')",
+          "legacyAssertionId": "mcdev-nvim/tests/e2e/cem_project_e2e.lua::assert@317",
+          "replacementPath": null,
+          "replacementLine": null,
+          "mapping": "pending assertion correspondence after lexical census correction",
+          "nativeStatus": "pending",
+          "runtimeObservation": "unknown"
+        },
+        {
+          "line": 318,
+          "call": "assert_no_item(shadow_method_all, '<init>', 'BlockItem @Shadow method kind filter')",
+          "legacyAssertionId": "mcdev-nvim/tests/e2e/cem_project_e2e.lua::assert@318",
+          "replacementPath": null,
+          "replacementLine": null,
+          "mapping": "pending assertion correspondence after lexical census correction",
+          "nativeStatus": "pending",
+          "runtimeObservation": "unknown"
+        },
+        {
+          "line": 319,
+          "call": "assert_no_item(shadow_method_all, '<clinit>', 'BlockItem @Shadow method kind filter')",
+          "legacyAssertionId": "mcdev-nvim/tests/e2e/cem_project_e2e.lua::assert@319",
+          "replacementPath": null,
+          "replacementLine": null,
+          "mapping": "pending assertion correspondence after lexical census correction",
+          "nativeStatus": "pending",
+          "runtimeObservation": "unknown"
+        },
+        {
+          "line": 327,
+          "call": "h.helpers.assert_not_nil(blink_path, 'MCDEV_E2E_BLINK_RTP must point to the installed blink.cmp checkout')",
+          "legacyAssertionId": "mcdev-nvim/tests/e2e/cem_project_e2e.lua::assert@327",
+          "replacementPath": null,
+          "replacementLine": null,
+          "mapping": "pending assertion correspondence after lexical census correction",
+          "nativeStatus": "pending",
+          "runtimeObservation": "unknown"
         },
         {
           "line": 339,
@@ -3080,6 +3323,16 @@
           "mapping": "exact assertion in corresponding source region"
         },
         {
+          "line": 578,
+          "call": "assert_exclusive_items(mixin_items, 'Mixin method selector')",
+          "legacyAssertionId": "mcdev-nvim/tests/e2e/cem_project_e2e.lua::assert@578",
+          "replacementPath": null,
+          "replacementLine": null,
+          "mapping": "pending assertion correspondence after lexical census correction",
+          "nativeStatus": "pending",
+          "runtimeObservation": "unknown"
+        },
+        {
           "line": 591,
           "call": "h.helpers.assert_true(item.source_id == 'lsp' or item.source_id == 'mcdev',\n        'unexpected source in Mixin class literal: ' .. tostring(item.source_id))",
           "legacyAssertionId": "mcdev-nvim/tests/e2e/cem_project_e2e.lua::assert@591",
@@ -3096,12 +3349,42 @@
           "mapping": "exact assertion in corresponding source region"
         },
         {
+          "line": 610,
+          "call": "assert_exclusive_items(same_position_items, 'same-position Mixin attribute boundary')",
+          "legacyAssertionId": "mcdev-nvim/tests/e2e/cem_project_e2e.lua::assert@610",
+          "replacementPath": null,
+          "replacementLine": null,
+          "mapping": "pending assertion correspondence after lexical census correction",
+          "nativeStatus": "pending",
+          "runtimeObservation": "unknown"
+        },
+        {
           "line": 621,
           "call": "h.helpers.assert_true(item.source_id == 'lsp' or item.source_id == 'mcdev',\n        'unexpected source in restored Mixin class literal: ' .. tostring(item.source_id))",
           "legacyAssertionId": "mcdev-nvim/tests/e2e/cem_project_e2e.lua::assert@621",
           "replacementPath": "mcdev-nvim/tests/e2e/cem_project_e2e.lua",
           "replacementLine": 621,
           "mapping": "exact assertion in corresponding source region"
+        },
+        {
+          "line": 638,
+          "call": "assert_exclusive_items(at_items, 'Mixin @At value')",
+          "legacyAssertionId": "mcdev-nvim/tests/e2e/cem_project_e2e.lua::assert@638",
+          "replacementPath": null,
+          "replacementLine": null,
+          "mapping": "pending assertion correspondence after lexical census correction",
+          "nativeStatus": "pending",
+          "runtimeObservation": "unknown"
+        },
+        {
+          "line": 647,
+          "call": "assert_exclusive_items(expression_items, 'MixinExtras Expression value')",
+          "legacyAssertionId": "mcdev-nvim/tests/e2e/cem_project_e2e.lua::assert@647",
+          "replacementPath": null,
+          "replacementLine": null,
+          "mapping": "pending assertion correspondence after lexical census correction",
+          "nativeStatus": "pending",
+          "runtimeObservation": "unknown"
         },
         {
           "line": 655,
@@ -3128,12 +3411,32 @@
           "mapping": "reviewed exact source relocation"
         },
         {
+          "line": 674,
+          "call": "h.helpers.assert_not_nil(snippet,'@In must offer the Inject template')",
+          "legacyAssertionId": "mcdev-nvim/tests/e2e/cem_project_e2e.lua::assert@674",
+          "replacementPath": null,
+          "replacementLine": null,
+          "mapping": "pending assertion correspondence after lexical census correction",
+          "nativeStatus": "pending",
+          "runtimeObservation": "unknown"
+        },
+        {
           "line": 675,
           "call": "h.helpers.assert_eq(snippet.insertTextFormat,vim.lsp.protocol.InsertTextFormat.Snippet)",
           "legacyAssertionId": "mcdev-nvim/tests/e2e/cem_project_e2e.lua::assert@675",
           "replacementPath": "mcdev-nvim/tests/e2e/cem_feature_snippets.lua",
           "replacementLine": 78,
           "mapping": "reviewed exact source relocation"
+        },
+        {
+          "line": 677,
+          "call": "h.helpers.assert_not_nil(edit,'annotation template must supply its exact replacement range')",
+          "legacyAssertionId": "mcdev-nvim/tests/e2e/cem_project_e2e.lua::assert@677",
+          "replacementPath": null,
+          "replacementLine": null,
+          "mapping": "pending assertion correspondence after lexical census correction",
+          "nativeStatus": "pending",
+          "runtimeObservation": "unknown"
         },
         {
           "line": 687,
@@ -3176,6 +3479,16 @@
           "mapping": "reviewed exact source relocation"
         },
         {
+          "line": 722,
+          "call": "h.helpers.assert_not_nil(snippet, description .. ' missing ' .. label .. ' snippet')",
+          "legacyAssertionId": "mcdev-nvim/tests/e2e/cem_project_e2e.lua::assert@722",
+          "replacementPath": null,
+          "replacementLine": null,
+          "mapping": "pending assertion correspondence after lexical census correction",
+          "nativeStatus": "pending",
+          "runtimeObservation": "unknown"
+        },
+        {
           "line": 723,
           "call": "h.helpers.assert_eq(snippet.insertTextFormat, vim.lsp.protocol.InsertTextFormat.Snippet,\n        description .. ' must be a native snippet')",
           "legacyAssertionId": "mcdev-nvim/tests/e2e/cem_project_e2e.lua::assert@723",
@@ -3190,6 +3503,26 @@
           "replacementPath": "mcdev-nvim/tests/e2e/cem_feature_snippets.lua",
           "replacementLine": 131,
           "mapping": "reviewed exact source relocation"
+        },
+        {
+          "line": 728,
+          "call": "h.helpers.assert_not_nil(edit, description .. ' must supply a replacement range')",
+          "legacyAssertionId": "mcdev-nvim/tests/e2e/cem_project_e2e.lua::assert@728",
+          "replacementPath": null,
+          "replacementLine": null,
+          "mapping": "pending assertion correspondence after lexical census correction",
+          "nativeStatus": "pending",
+          "runtimeObservation": "unknown"
+        },
+        {
+          "line": 729,
+          "call": "h.helpers.assert_not_nil(edit.newText, description .. ' must supply snippet text')",
+          "legacyAssertionId": "mcdev-nvim/tests/e2e/cem_project_e2e.lua::assert@729",
+          "replacementPath": null,
+          "replacementLine": null,
+          "mapping": "pending assertion correspondence after lexical census correction",
+          "nativeStatus": "pending",
+          "runtimeObservation": "unknown"
         },
         {
           "line": 737,
@@ -3371,7 +3704,7 @@
         },
         "oldLineCount": 787,
         "newLineCount": 672,
-        "assertionSiteCount": 68,
+        "assertionSiteCount": 91,
         "caseEntryCount": 1,
         "loopInputCount": 4,
         "stateMarkerCount": 66,
@@ -3533,7 +3866,33 @@
           "reason": "The original snippet assertions and five-row preserved-source input loop moved to the shared CEM helper. Member, Shadow and Blink workflows remain in the original file.",
           "sharedSnippetObserver": "mcdev-nvim/tests/e2e/cem_feature_snippets.lua",
           "fullCemWorkflowVerified": false
-        }
+        },
+        "pendingAssertionSites": [
+          "mcdev-nvim/tests/e2e/cem_project_e2e.lua::assert@70",
+          "mcdev-nvim/tests/e2e/cem_project_e2e.lua::assert@216",
+          "mcdev-nvim/tests/e2e/cem_project_e2e.lua::assert@232",
+          "mcdev-nvim/tests/e2e/cem_project_e2e.lua::assert@244",
+          "mcdev-nvim/tests/e2e/cem_project_e2e.lua::assert@250",
+          "mcdev-nvim/tests/e2e/cem_project_e2e.lua::assert@253",
+          "mcdev-nvim/tests/e2e/cem_project_e2e.lua::assert@259",
+          "mcdev-nvim/tests/e2e/cem_project_e2e.lua::assert@291",
+          "mcdev-nvim/tests/e2e/cem_project_e2e.lua::assert@300",
+          "mcdev-nvim/tests/e2e/cem_project_e2e.lua::assert@307",
+          "mcdev-nvim/tests/e2e/cem_project_e2e.lua::assert@317",
+          "mcdev-nvim/tests/e2e/cem_project_e2e.lua::assert@318",
+          "mcdev-nvim/tests/e2e/cem_project_e2e.lua::assert@319",
+          "mcdev-nvim/tests/e2e/cem_project_e2e.lua::assert@327",
+          "mcdev-nvim/tests/e2e/cem_project_e2e.lua::assert@578",
+          "mcdev-nvim/tests/e2e/cem_project_e2e.lua::assert@610",
+          "mcdev-nvim/tests/e2e/cem_project_e2e.lua::assert@638",
+          "mcdev-nvim/tests/e2e/cem_project_e2e.lua::assert@647",
+          "mcdev-nvim/tests/e2e/cem_project_e2e.lua::assert@674",
+          "mcdev-nvim/tests/e2e/cem_project_e2e.lua::assert@677",
+          "mcdev-nvim/tests/e2e/cem_project_e2e.lua::assert@722",
+          "mcdev-nvim/tests/e2e/cem_project_e2e.lua::assert@728",
+          "mcdev-nvim/tests/e2e/cem_project_e2e.lua::assert@729"
+        ],
+        "pendingAssertionSiteCount": 23
       },
       "nativeExecution": "pending host contract",
       "nativeStatus": "partial live feature-snippet scope; member/Shadow/Blink workflows remain unverified",
@@ -3843,14 +4202,44 @@
           "legacyAssertionId": "mcdev-nvim/tests/e2e/create_drill_definition_diagnostics_e2e.lua::assert@63"
         },
         {
+          "line": 70,
+          "call": "helpers.assert_not_nil(selector_line, \"useItemOn selector not found\")",
+          "legacyAssertionId": "mcdev-nvim/tests/e2e/create_drill_definition_diagnostics_e2e.lua::assert@70",
+          "replacementPath": null,
+          "replacementLine": null,
+          "mapping": "pending assertion correspondence after lexical census correction",
+          "nativeStatus": "pending",
+          "runtimeObservation": "unknown"
+        },
+        {
           "line": 74,
           "call": "helpers.assert_nil(info_err, \"mcdev.info failed: \" .. vim.inspect(info_err))",
           "legacyAssertionId": "mcdev-nvim/tests/e2e/create_drill_definition_diagnostics_e2e.lua::assert@74"
         },
         {
+          "line": 75,
+          "call": "helpers.assert_not_nil(info_result, \"mcdev.info returned no payload\")",
+          "legacyAssertionId": "mcdev-nvim/tests/e2e/create_drill_definition_diagnostics_e2e.lua::assert@75",
+          "replacementPath": null,
+          "replacementLine": null,
+          "mapping": "pending assertion correspondence after lexical census correction",
+          "nativeStatus": "pending",
+          "runtimeObservation": "unknown"
+        },
+        {
           "line": 81,
           "call": "helpers.assert_nil(definition_err, \"mcdev.definition failed: \" .. vim.inspect(definition_err))",
           "legacyAssertionId": "mcdev-nvim/tests/e2e/create_drill_definition_diagnostics_e2e.lua::assert@81"
+        },
+        {
+          "line": 88,
+          "call": "helpers.assert_not_nil(\n      method_location,\n      \"useItemOn definition was not returned: \" .. vim.inspect(locations)\n    )",
+          "legacyAssertionId": "mcdev-nvim/tests/e2e/create_drill_definition_diagnostics_e2e.lua::assert@88",
+          "replacementPath": null,
+          "replacementLine": null,
+          "mapping": "pending assertion correspondence after lexical census correction",
+          "nativeStatus": "pending",
+          "runtimeObservation": "unknown"
         },
         {
           "line": 92,
@@ -3980,7 +4369,7 @@
         "strict": false,
         "oldLineCount": 203,
         "newLineCount": 196,
-        "assertionSiteCount": 27,
+        "assertionSiteCount": 30,
         "caseEntryCount": 1,
         "loopInputCount": 1,
         "stateMarkerCount": 23,
@@ -4033,7 +4422,13 @@
             "line": 58,
             "text": "vim.wait(timeout_ms or 60000, function()"
           }
-        ]
+        ],
+        "pendingAssertionSites": [
+          "mcdev-nvim/tests/e2e/create_drill_definition_diagnostics_e2e.lua::assert@70",
+          "mcdev-nvim/tests/e2e/create_drill_definition_diagnostics_e2e.lua::assert@75",
+          "mcdev-nvim/tests/e2e/create_drill_definition_diagnostics_e2e.lua::assert@88"
+        ],
+        "pendingAssertionSiteCount": 3
       },
       "nativeExecution": "pending host contract",
       "nativeStatus": "pending real host E2E",
@@ -4126,6 +4521,16 @@
           "line": 70,
           "call": "helpers.assert_eq(#candidates, 1, \"reachable counter field must be offered exactly once: \" .. vim.inspect(response))",
           "legacyAssertionId": "mcdev-nvim/tests/e2e/expression_e2e.lua::assert@70"
+        },
+        {
+          "line": 72,
+          "call": "helpers.assert_not_nil(item.textEdit, \"expression completion must contain its primary edit\")",
+          "legacyAssertionId": "mcdev-nvim/tests/e2e/expression_e2e.lua::assert@72",
+          "replacementPath": null,
+          "replacementLine": null,
+          "mapping": "pending assertion correspondence after lexical census correction",
+          "nativeStatus": "pending",
+          "runtimeObservation": "unknown"
         },
         {
           "line": 73,
@@ -4278,6 +4683,26 @@
           "legacyAssertionId": "mcdev-nvim/tests/e2e/expression_e2e.lua::assert@223"
         },
         {
+          "line": 240,
+          "call": "helpers.assert_not_nil(bad_line)",
+          "legacyAssertionId": "mcdev-nvim/tests/e2e/expression_e2e.lua::assert@240",
+          "replacementPath": null,
+          "replacementLine": null,
+          "mapping": "pending assertion correspondence after lexical census correction",
+          "nativeStatus": "pending",
+          "runtimeObservation": "unknown"
+        },
+        {
+          "line": 241,
+          "call": "helpers.assert_not_nil(expression_line)",
+          "legacyAssertionId": "mcdev-nvim/tests/e2e/expression_e2e.lua::assert@241",
+          "replacementPath": null,
+          "replacementLine": null,
+          "mapping": "pending assertion correspondence after lexical census correction",
+          "nativeStatus": "pending",
+          "runtimeObservation": "unknown"
+        },
+        {
           "line": 246,
           "call": "helpers.assert_nil(retained_err)",
           "legacyAssertionId": "mcdev-nvim/tests/e2e/expression_e2e.lua::assert@246"
@@ -4363,18 +4788,24 @@
         }
       ],
       "fidelity": {
-        "status": "verified",
-        "strict": true,
+        "status": "pending assertion correspondence",
+        "strict": false,
         "oldLineCount": 269,
         "newLineCount": 269,
-        "assertionSiteCount": 45,
+        "assertionSiteCount": 48,
         "caseEntryCount": 3,
         "loopInputCount": 1,
         "stateMarkerCount": 22,
         "missingAssertions": [],
         "missingCaseEntries": [],
         "missingLoopInputs": [],
-        "missingStateMarkers": []
+        "missingStateMarkers": [],
+        "pendingAssertionSites": [
+          "mcdev-nvim/tests/e2e/expression_e2e.lua::assert@72",
+          "mcdev-nvim/tests/e2e/expression_e2e.lua::assert@240",
+          "mcdev-nvim/tests/e2e/expression_e2e.lua::assert@241"
+        ],
+        "pendingAssertionSiteCount": 3
       },
       "nativeExecution": "pending host contract",
       "nativeStatus": "pending real host E2E",
@@ -4448,6 +4879,16 @@
       "classification": "e2e",
       "assertionSites": [
         {
+          "line": 6,
+          "call": "helpers.assert_not_nil(client, \"JDT code action alias check requires an attached jdtls client\")",
+          "legacyAssertionId": "mcdev-nvim/tests/e2e/jdt_action_aliases_e2e.lua::assert@6",
+          "replacementPath": null,
+          "replacementLine": null,
+          "mapping": "pending assertion correspondence after lexical census correction",
+          "nativeStatus": "pending",
+          "runtimeObservation": "unknown"
+        },
+        {
           "line": 9,
           "call": "helpers.assert_true(original_name ~= \"\", \"JDT code action alias check requires a named fixture buffer\")",
           "legacyAssertionId": "mcdev-nvim/tests/e2e/jdt_action_aliases_e2e.lua::assert@9"
@@ -4493,6 +4934,16 @@
           "legacyAssertionId": "mcdev-nvim/tests/e2e/jdt_action_aliases_e2e.lua::assert@121"
         },
         {
+          "line": 133,
+          "call": "helpers.assert_not_nil(expression_line, \"extract fixture expression not found\")",
+          "legacyAssertionId": "mcdev-nvim/tests/e2e/jdt_action_aliases_e2e.lua::assert@133",
+          "replacementPath": null,
+          "replacementLine": null,
+          "mapping": "pending assertion correspondence after lexical census correction",
+          "nativeStatus": "pending",
+          "runtimeObservation": "unknown"
+        },
+        {
           "line": 142,
           "call": "helpers.assert_true(\n    vim.wait(15000, function() return extract_actions ~= nil end, 100),\n    \"mcdev extract code action request timed out\"\n  )",
           "legacyAssertionId": "mcdev-nvim/tests/e2e/jdt_action_aliases_e2e.lua::assert@142"
@@ -4501,6 +4952,16 @@
           "line": 146,
           "call": "helpers.assert_nil(extract_error, \"mcdev extract code action request failed\")",
           "legacyAssertionId": "mcdev-nvim/tests/e2e/jdt_action_aliases_e2e.lua::assert@146"
+        },
+        {
+          "line": 151,
+          "call": "helpers.assert_not_nil(extract_action, \"real JDT did not offer Extract to local variable\")",
+          "legacyAssertionId": "mcdev-nvim/tests/e2e/jdt_action_aliases_e2e.lua::assert@151",
+          "replacementPath": null,
+          "replacementLine": null,
+          "mapping": "pending assertion correspondence after lexical census correction",
+          "nativeStatus": "pending",
+          "runtimeObservation": "unknown"
         },
         {
           "line": 152,
@@ -4525,7 +4986,7 @@
         "strict": false,
         "oldLineCount": 182,
         "newLineCount": 158,
-        "assertionSiteCount": 14,
+        "assertionSiteCount": 17,
         "caseEntryCount": 0,
         "loopInputCount": 0,
         "stateMarkerCount": 15,
@@ -4574,7 +5035,13 @@
             "line": 63,
             "text": "helpers.assert_true(started, \"raw JDT code action request did not start\")"
           }
-        ]
+        ],
+        "pendingAssertionSites": [
+          "mcdev-nvim/tests/e2e/jdt_action_aliases_e2e.lua::assert@6",
+          "mcdev-nvim/tests/e2e/jdt_action_aliases_e2e.lua::assert@133",
+          "mcdev-nvim/tests/e2e/jdt_action_aliases_e2e.lua::assert@151"
+        ],
+        "pendingAssertionSiteCount": 3
       },
       "nativeExecution": "pending host contract",
       "nativeStatus": "native materialized action verified; original extract-local workflow pending host implementation",
@@ -4609,6 +5076,36 @@
           "replacementPath": null,
           "replacementLine": null,
           "mapping": "backend adaptation; see explicit_deltas.json; equivalence not asserted"
+        },
+        {
+          "line": 37,
+          "call": "helpers.assert_not_nil(bundle_jar, \"MCDEV_BUNDLE_JAR is required\")",
+          "legacyAssertionId": "mcdev-nvim/tests/e2e/jdtls_bundle_e2e.lua::assert@37",
+          "replacementPath": null,
+          "replacementLine": null,
+          "mapping": "pending assertion correspondence after lexical census correction",
+          "nativeStatus": "pending",
+          "runtimeObservation": "unknown"
+        },
+        {
+          "line": 38,
+          "call": "helpers.assert_not_nil(workspace, \"MCDEV_E2E_WORKSPACE is required\")",
+          "legacyAssertionId": "mcdev-nvim/tests/e2e/jdtls_bundle_e2e.lua::assert@38",
+          "replacementPath": null,
+          "replacementLine": null,
+          "mapping": "pending assertion correspondence after lexical census correction",
+          "nativeStatus": "pending",
+          "runtimeObservation": "unknown"
+        },
+        {
+          "line": 39,
+          "call": "helpers.assert_not_nil(jdtls_cmd, \"JDTLS_CMD is required\")",
+          "legacyAssertionId": "mcdev-nvim/tests/e2e/jdtls_bundle_e2e.lua::assert@39",
+          "replacementPath": null,
+          "replacementLine": null,
+          "mapping": "pending assertion correspondence after lexical census correction",
+          "nativeStatus": "pending",
+          "runtimeObservation": "unknown"
         },
         {
           "line": 40,
@@ -4675,6 +5172,26 @@
           "mapping": "backend adaptation; see explicit_deltas.json; equivalence not asserted"
         },
         {
+          "line": 224,
+          "call": "helpers.assert_not_nil(client_id, \"failed to start jdtls client\")",
+          "legacyAssertionId": "mcdev-nvim/tests/e2e/jdtls_bundle_e2e.lua::assert@224",
+          "replacementPath": null,
+          "replacementLine": null,
+          "mapping": "pending assertion correspondence after lexical census correction",
+          "nativeStatus": "pending",
+          "runtimeObservation": "unknown"
+        },
+        {
+          "line": 242,
+          "call": "helpers.assert_not_nil(client, \"jdtls client disappeared after initialize\")",
+          "legacyAssertionId": "mcdev-nvim/tests/e2e/jdtls_bundle_e2e.lua::assert@242",
+          "replacementPath": null,
+          "replacementLine": null,
+          "mapping": "pending assertion correspondence after lexical census correction",
+          "nativeStatus": "pending",
+          "runtimeObservation": "unknown"
+        },
+        {
           "line": 262,
           "call": "helpers.assert_true(completed, method .. \" timed out\")",
           "legacyAssertionId": "mcdev-nvim/tests/e2e/jdtls_bundle_e2e.lua::assert@262",
@@ -4683,12 +5200,52 @@
           "mapping": "backend adaptation; see explicit_deltas.json; equivalence not asserted"
         },
         {
+          "line": 302,
+          "call": "helpers.assert_not_nil(mixin_jar, \"Mixin 0.8.7 jar is required for javac E2E verification\")",
+          "legacyAssertionId": "mcdev-nvim/tests/e2e/jdtls_bundle_e2e.lua::assert@302",
+          "replacementPath": null,
+          "replacementLine": null,
+          "mapping": "pending assertion correspondence after lexical census correction",
+          "nativeStatus": "pending",
+          "runtimeObservation": "unknown"
+        },
+        {
+          "line": 303,
+          "call": "helpers.assert_not_nil(mixinextras_jar, \"MixinExtras Fabric 0.5.5 jar is required for javac E2E verification\")",
+          "legacyAssertionId": "mcdev-nvim/tests/e2e/jdtls_bundle_e2e.lua::assert@303",
+          "replacementPath": null,
+          "replacementLine": null,
+          "mapping": "pending assertion correspondence after lexical census correction",
+          "nativeStatus": "pending",
+          "runtimeObservation": "unknown"
+        },
+        {
           "line": 321,
           "call": "helpers.assert_eq(\n    vim.v.shell_error,\n    0,\n    \"javac failed for \" .. source_path .. \": \" .. table.concat(output or {}, \"\\n\")\n  )",
           "legacyAssertionId": "mcdev-nvim/tests/e2e/jdtls_bundle_e2e.lua::assert@321",
           "replacementPath": null,
           "replacementLine": null,
           "mapping": "backend adaptation; see explicit_deltas.json; equivalence not asserted"
+        },
+        {
+          "line": 364,
+          "call": "helpers.assert_not_nil(message, \"expected notification output\")",
+          "legacyAssertionId": "mcdev-nvim/tests/e2e/jdtls_bundle_e2e.lua::assert@364",
+          "replacementPath": null,
+          "replacementLine": null,
+          "mapping": "pending assertion correspondence after lexical census correction",
+          "nativeStatus": "pending",
+          "runtimeObservation": "unknown"
+        },
+        {
+          "line": 425,
+          "call": "helpers.assert_not_nil(start, \"Kotlin source fragment missing: \" .. old)",
+          "legacyAssertionId": "mcdev-nvim/tests/e2e/jdtls_bundle_e2e.lua::assert@425",
+          "replacementPath": null,
+          "replacementLine": null,
+          "mapping": "pending assertion correspondence after lexical census correction",
+          "nativeStatus": "pending",
+          "runtimeObservation": "unknown"
         },
         {
           "line": 430,
@@ -4705,6 +5262,16 @@
           "replacementPath": null,
           "replacementLine": null,
           "mapping": "backend adaptation; see explicit_deltas.json; equivalence not asserted"
+        },
+        {
+          "line": 436,
+          "call": "helpers.assert_not_nil(line, \"Kotlin request marker missing: \" .. marker)",
+          "legacyAssertionId": "mcdev-nvim/tests/e2e/jdtls_bundle_e2e.lua::assert@436",
+          "replacementPath": null,
+          "replacementLine": null,
+          "mapping": "pending assertion correspondence after lexical census correction",
+          "nativeStatus": "pending",
+          "runtimeObservation": "unknown"
         },
         {
           "line": 440,
@@ -4747,6 +5314,16 @@
           "mapping": "backend adaptation; see explicit_deltas.json; equivalence not asserted"
         },
         {
+          "line": 457,
+          "call": "helpers.assert_not_nil(result, command .. \" Kotlin result missing\")",
+          "legacyAssertionId": "mcdev-nvim/tests/e2e/jdtls_bundle_e2e.lua::assert@457",
+          "replacementPath": null,
+          "replacementLine": null,
+          "mapping": "pending assertion correspondence after lexical census correction",
+          "nativeStatus": "pending",
+          "runtimeObservation": "unknown"
+        },
+        {
           "line": 458,
           "call": "helpers.assert_eq(kotlin_text(), before, command .. \" must not mutate unsaved Kotlin\")",
           "legacyAssertionId": "mcdev-nvim/tests/e2e/jdtls_bundle_e2e.lua::assert@458",
@@ -4777,6 +5354,16 @@
           "replacementPath": null,
           "replacementLine": null,
           "mapping": "backend adaptation; see explicit_deltas.json; equivalence not asserted"
+        },
+        {
+          "line": 471,
+          "call": "helpers.assert_not_nil(item, \"Kotlin completion missing: \" .. expected)",
+          "legacyAssertionId": "mcdev-nvim/tests/e2e/jdtls_bundle_e2e.lua::assert@471",
+          "replacementPath": null,
+          "replacementLine": null,
+          "mapping": "pending assertion correspondence after lexical census correction",
+          "nativeStatus": "pending",
+          "runtimeObservation": "unknown"
         },
         {
           "line": 472,
@@ -4843,12 +5430,32 @@
           "mapping": "backend adaptation; see explicit_deltas.json; equivalence not asserted"
         },
         {
+          "line": 516,
+          "call": "assert_kotlin_diagnostics(\"useItemOn\")",
+          "legacyAssertionId": "mcdev-nvim/tests/e2e/jdtls_bundle_e2e.lua::assert@516",
+          "replacementPath": null,
+          "replacementLine": null,
+          "mapping": "pending assertion correspondence after lexical census correction",
+          "nativeStatus": "pending",
+          "runtimeObservation": "unknown"
+        },
+        {
           "line": 518,
           "call": "helpers.assert_true(table.concat(hover.contents or {}, \"\\n\"):find(\"useItemOn\", 1, true) ~= nil,\n    \"Kotlin hover must resolve the unsaved method selector\")",
           "legacyAssertionId": "mcdev-nvim/tests/e2e/jdtls_bundle_e2e.lua::assert@518",
           "replacementPath": null,
           "replacementLine": null,
           "mapping": "backend adaptation; see explicit_deltas.json; equivalence not asserted"
+        },
+        {
+          "line": 524,
+          "call": "helpers.assert_not_nil(method_location, \"Kotlin method definition missing\")",
+          "legacyAssertionId": "mcdev-nvim/tests/e2e/jdtls_bundle_e2e.lua::assert@524",
+          "replacementPath": null,
+          "replacementLine": null,
+          "mapping": "pending assertion correspondence after lexical census correction",
+          "nativeStatus": "pending",
+          "runtimeObservation": "unknown"
         },
         {
           "line": 525,
@@ -4891,6 +5498,16 @@
           "mapping": "backend adaptation; see explicit_deltas.json; equivalence not asserted"
         },
         {
+          "line": 559,
+          "call": "assert_kotlin_diagnostics(\"placeInWorld\")",
+          "legacyAssertionId": "mcdev-nvim/tests/e2e/jdtls_bundle_e2e.lua::assert@559",
+          "replacementPath": null,
+          "replacementLine": null,
+          "mapping": "pending assertion correspondence after lexical census correction",
+          "nativeStatus": "pending",
+          "runtimeObservation": "unknown"
+        },
+        {
           "line": 560,
           "call": "helpers.assert_eq(#vim.lsp.get_clients({ bufnr = kotlin_buf, name = \"jdtls\" }), 0)",
           "legacyAssertionId": "mcdev-nvim/tests/e2e/jdtls_bundle_e2e.lua::assert@560",
@@ -4905,6 +5522,26 @@
           "replacementPath": null,
           "replacementLine": null,
           "mapping": "backend adaptation; see explicit_deltas.json; equivalence not asserted"
+        },
+        {
+          "line": 576,
+          "call": "helpers.assert_not_nil(mixin_line, \"@Mixin line not found\")",
+          "legacyAssertionId": "mcdev-nvim/tests/e2e/jdtls_bundle_e2e.lua::assert@576",
+          "replacementPath": null,
+          "replacementLine": null,
+          "mapping": "pending assertion correspondence after lexical census correction",
+          "nativeStatus": "pending",
+          "runtimeObservation": "unknown"
+        },
+        {
+          "line": 591,
+          "call": "helpers.assert_not_nil(at_line, \"@At(\\\"HEAD\\\") line not found\")",
+          "legacyAssertionId": "mcdev-nvim/tests/e2e/jdtls_bundle_e2e.lua::assert@591",
+          "replacementPath": null,
+          "replacementLine": null,
+          "mapping": "pending assertion correspondence after lexical census correction",
+          "nativeStatus": "pending",
+          "runtimeObservation": "unknown"
         },
         {
           "line": 614,
@@ -4931,6 +5568,16 @@
           "mapping": "exact assertion in corresponding source region"
         },
         {
+          "line": 638,
+          "call": "helpers.assert_not_nil(applied_item.textEdit, \"cold adapter HEAD completion should include a text edit\")",
+          "legacyAssertionId": "mcdev-nvim/tests/e2e/jdtls_bundle_e2e.lua::assert@638",
+          "replacementPath": null,
+          "replacementLine": null,
+          "mapping": "pending assertion correspondence after lexical census correction",
+          "nativeStatus": "pending",
+          "runtimeObservation": "unknown"
+        },
+        {
           "line": 640,
           "call": "helpers.assert_true(\n      vim.api.nvim_buf_get_lines(bufnr, at_line - 1, at_line, false)[1]:find('@At(\"HEAD\")', 1, true) ~= nil,\n      \"cold adapter HEAD edit should complete the partial value\"\n    )",
           "legacyAssertionId": "mcdev-nvim/tests/e2e/jdtls_bundle_e2e.lua::assert@640",
@@ -4947,12 +5594,52 @@
           "mapping": "exact assertion in corresponding source region"
         },
         {
+          "line": 649,
+          "call": "helpers.assert_not_nil(info_result, \"mcdev.info returned no payload\")",
+          "legacyAssertionId": "mcdev-nvim/tests/e2e/jdtls_bundle_e2e.lua::assert@649",
+          "replacementPath": null,
+          "replacementLine": null,
+          "mapping": "pending assertion correspondence after lexical census correction",
+          "nativeStatus": "pending",
+          "runtimeObservation": "unknown"
+        },
+        {
           "line": 652,
           "call": "helpers.assert_true(#info_lines > 0, \"mcdev.info returned no lines\")",
           "legacyAssertionId": "mcdev-nvim/tests/e2e/jdtls_bundle_e2e.lua::assert@652",
           "replacementPath": "mcdev-nvim/tests/e2e/jdtls_bundle_e2e.lua",
           "replacementLine": 403,
           "mapping": "exact assertion in corresponding source region"
+        },
+        {
+          "line": 653,
+          "call": "helpers.assert_not_nil(info_result.result.buildCommit, \"mcdev.info should include extension build commit\")",
+          "legacyAssertionId": "mcdev-nvim/tests/e2e/jdtls_bundle_e2e.lua::assert@653",
+          "replacementPath": null,
+          "replacementLine": null,
+          "mapping": "pending assertion correspondence after lexical census correction",
+          "nativeStatus": "pending",
+          "runtimeObservation": "unknown"
+        },
+        {
+          "line": 654,
+          "call": "helpers.assert_not_nil(info_result.result.buildTime, \"mcdev.info should include extension build time\")",
+          "legacyAssertionId": "mcdev-nvim/tests/e2e/jdtls_bundle_e2e.lua::assert@654",
+          "replacementPath": null,
+          "replacementLine": null,
+          "mapping": "pending assertion correspondence after lexical census correction",
+          "nativeStatus": "pending",
+          "runtimeObservation": "unknown"
+        },
+        {
+          "line": 655,
+          "call": "helpers.assert_not_nil(info_result.result.jarLocation, \"mcdev.info should include extension jar location\")",
+          "legacyAssertionId": "mcdev-nvim/tests/e2e/jdtls_bundle_e2e.lua::assert@655",
+          "replacementPath": null,
+          "replacementLine": null,
+          "mapping": "pending assertion correspondence after lexical census correction",
+          "nativeStatus": "pending",
+          "runtimeObservation": "unknown"
         },
         {
           "line": 656,
@@ -4993,6 +5680,16 @@
           "replacementPath": "mcdev-nvim/tests/e2e/jdtls_bundle_e2e.lua",
           "replacementLine": 433,
           "mapping": "exact assertion in corresponding source region"
+        },
+        {
+          "line": 683,
+          "call": "helpers.assert_not_nil(completion_result, \"mcdev.completion returned no payload\")",
+          "legacyAssertionId": "mcdev-nvim/tests/e2e/jdtls_bundle_e2e.lua::assert@683",
+          "replacementPath": null,
+          "replacementLine": null,
+          "mapping": "pending assertion correspondence after lexical census correction",
+          "nativeStatus": "pending",
+          "runtimeObservation": "unknown"
         },
         {
           "line": 687,
@@ -5099,12 +5796,52 @@
           "mapping": "exact assertion in corresponding source region"
         },
         {
+          "line": 716,
+          "call": "helpers.assert_not_nil(main_target_item, \"main source-set completion should return SimpleTarget from classpath\")",
+          "legacyAssertionId": "mcdev-nvim/tests/e2e/jdtls_bundle_e2e.lua::assert@716",
+          "replacementPath": null,
+          "replacementLine": null,
+          "mapping": "pending assertion correspondence after lexical census correction",
+          "nativeStatus": "pending",
+          "runtimeObservation": "unknown"
+        },
+        {
+          "line": 726,
+          "call": "helpers.assert_not_nil(client_mixin_line, \"client @Mixin line not found\")",
+          "legacyAssertionId": "mcdev-nvim/tests/e2e/jdtls_bundle_e2e.lua::assert@726",
+          "replacementPath": null,
+          "replacementLine": null,
+          "mapping": "pending assertion correspondence after lexical census correction",
+          "nativeStatus": "pending",
+          "runtimeObservation": "unknown"
+        },
+        {
           "line": 739,
           "call": "helpers.assert_nil(client_err, \"client source-set mcdev.completion failed: \" .. vim.inspect(client_err))",
           "legacyAssertionId": "mcdev-nvim/tests/e2e/jdtls_bundle_e2e.lua::assert@739",
           "replacementPath": "mcdev-nvim/tests/e2e/jdtls_bundle_e2e.lua",
           "replacementLine": 490,
           "mapping": "exact assertion in corresponding source region"
+        },
+        {
+          "line": 740,
+          "call": "helpers.assert_not_nil(client_result, \"client source-set mcdev.completion returned no payload\")",
+          "legacyAssertionId": "mcdev-nvim/tests/e2e/jdtls_bundle_e2e.lua::assert@740",
+          "replacementPath": null,
+          "replacementLine": null,
+          "mapping": "pending assertion correspondence after lexical census correction",
+          "nativeStatus": "pending",
+          "runtimeObservation": "unknown"
+        },
+        {
+          "line": 750,
+          "call": "helpers.assert_not_nil(\n        vim.tbl_filter(function(item)\n          return item.label == \"SimpleTarget\" or item.insertText == \"SimpleTarget\"\n        end, client_items)[1],\n        \"client source-set completion should return SimpleTarget from classpath\"\n      )",
+          "legacyAssertionId": "mcdev-nvim/tests/e2e/jdtls_bundle_e2e.lua::assert@750",
+          "replacementPath": null,
+          "replacementLine": null,
+          "mapping": "pending assertion correspondence after lexical census correction",
+          "nativeStatus": "pending",
+          "runtimeObservation": "unknown"
         },
         {
           "line": 756,
@@ -5291,6 +6028,16 @@
           "mapping": "exact assertion in corresponding source region"
         },
         {
+          "line": 841,
+          "call": "helpers.assert_not_nil(inject_line, \"@Inject method open quote line not found\")",
+          "legacyAssertionId": "mcdev-nvim/tests/e2e/jdtls_bundle_e2e.lua::assert@841",
+          "replacementPath": null,
+          "replacementLine": null,
+          "mapping": "pending assertion correspondence after lexical census correction",
+          "nativeStatus": "pending",
+          "runtimeObservation": "unknown"
+        },
+        {
           "line": 852,
           "call": "helpers.assert_nil(inject_err, \"mixin inject mcdev.completion failed: \" .. vim.inspect(inject_err))",
           "legacyAssertionId": "mcdev-nvim/tests/e2e/jdtls_bundle_e2e.lua::assert@852",
@@ -5395,12 +6142,32 @@
           "mapping": "exact assertion in corresponding source region"
         },
         {
+          "line": 900,
+          "call": "helpers.assert_not_nil(mixin_class_line, \"@Mixin(SourceOnlyT line not found\")",
+          "legacyAssertionId": "mcdev-nvim/tests/e2e/jdtls_bundle_e2e.lua::assert@900",
+          "replacementPath": null,
+          "replacementLine": null,
+          "mapping": "pending assertion correspondence after lexical census correction",
+          "nativeStatus": "pending",
+          "runtimeObservation": "unknown"
+        },
+        {
           "line": 911,
           "call": "helpers.assert_nil(mixin_class_err, \"source-only @Mixin mcdev.completion failed: \" .. vim.inspect(mixin_class_err))",
           "legacyAssertionId": "mcdev-nvim/tests/e2e/jdtls_bundle_e2e.lua::assert@911",
           "replacementPath": "mcdev-nvim/tests/e2e/jdtls_bundle_e2e.lua",
           "replacementLine": 662,
           "mapping": "exact assertion in corresponding source region"
+        },
+        {
+          "line": 915,
+          "call": "helpers.assert_not_nil(\n        vim.tbl_filter(function(item)\n          return item.label == \"SourceOnlyTarget\"\n        end, mixin_class_items)[1],\n        \"source-only @Mixin class completion should return SourceOnlyTarget\"\n      )",
+          "legacyAssertionId": "mcdev-nvim/tests/e2e/jdtls_bundle_e2e.lua::assert@915",
+          "replacementPath": null,
+          "replacementLine": null,
+          "mapping": "pending assertion correspondence after lexical census correction",
+          "nativeStatus": "pending",
+          "runtimeObservation": "unknown"
         },
         {
           "line": 921,
@@ -5433,6 +6200,16 @@
           "replacementPath": "mcdev-nvim/tests/e2e/jdtls_bundle_e2e.lua",
           "replacementLine": 675,
           "mapping": "exact assertion in corresponding source region"
+        },
+        {
+          "line": 948,
+          "call": "helpers.assert_not_nil(source_only_inject_line, \"source-only @Inject method open quote line not found\")",
+          "legacyAssertionId": "mcdev-nvim/tests/e2e/jdtls_bundle_e2e.lua::assert@948",
+          "replacementPath": null,
+          "replacementLine": null,
+          "mapping": "pending assertion correspondence after lexical census correction",
+          "nativeStatus": "pending",
+          "runtimeObservation": "unknown"
         },
         {
           "line": 959,
@@ -5571,6 +6348,16 @@
           "mapping": "exact assertion in corresponding source region"
         },
         {
+          "line": 1048,
+          "call": "helpers.assert_not_nil(handler_item,\n      \"completed @Inject must offer a handler declaration snippet; project_transport=\" ..\n      vim.inspect(completion.last_project_transport_error))",
+          "legacyAssertionId": "mcdev-nvim/tests/e2e/jdtls_bundle_e2e.lua::assert@1048",
+          "replacementPath": null,
+          "replacementLine": null,
+          "mapping": "pending assertion correspondence after lexical census correction",
+          "nativeStatus": "pending",
+          "runtimeObservation": "unknown"
+        },
+        {
           "line": 1055,
           "call": "helpers.assert_eq(handler_item.insertTextFormat, vim.lsp.protocol.InsertTextFormat.Snippet)",
           "legacyAssertionId": "mcdev-nvim/tests/e2e/jdtls_bundle_e2e.lua::assert@1055",
@@ -5627,6 +6414,16 @@
           "mapping": "exact assertion in corresponding source region"
         },
         {
+          "line": 1078,
+          "call": "helpers.assert_not_nil(open_paren, \"handler declaration must contain a parameter list\")",
+          "legacyAssertionId": "mcdev-nvim/tests/e2e/jdtls_bundle_e2e.lua::assert@1078",
+          "replacementPath": null,
+          "replacementLine": null,
+          "mapping": "pending assertion correspondence after lexical census correction",
+          "nativeStatus": "pending",
+          "runtimeObservation": "unknown"
+        },
+        {
           "line": 1079,
           "call": "helpers.assert_eq(name_cursor[2], open_paren - 1,\n      \"first handler tabstop must select the complete method name\")",
           "legacyAssertionId": "mcdev-nvim/tests/e2e/jdtls_bundle_e2e.lua::assert@1079",
@@ -5651,12 +6448,32 @@
           "mapping": "exact assertion in corresponding source region"
         },
         {
+          "line": 1125,
+          "call": "helpers.assert_not_nil(share_line, \"@Share(\\\"sp\\\") line not found\")",
+          "legacyAssertionId": "mcdev-nvim/tests/e2e/jdtls_bundle_e2e.lua::assert@1125",
+          "replacementPath": null,
+          "replacementLine": null,
+          "mapping": "pending assertion correspondence after lexical census correction",
+          "nativeStatus": "pending",
+          "runtimeObservation": "unknown"
+        },
+        {
           "line": 1135,
           "call": "helpers.assert_nil(share_err, \"mixinextras share mcdev.completion failed: \" .. vim.inspect(share_err))",
           "legacyAssertionId": "mcdev-nvim/tests/e2e/jdtls_bundle_e2e.lua::assert@1135",
           "replacementPath": "mcdev-nvim/tests/e2e/jdtls_bundle_e2e.lua",
           "replacementLine": 886,
           "mapping": "exact assertion in corresponding source region"
+        },
+        {
+          "line": 1136,
+          "call": "helpers.assert_not_nil(share_result, \"mixinextras share mcdev.completion returned no payload\")",
+          "legacyAssertionId": "mcdev-nvim/tests/e2e/jdtls_bundle_e2e.lua::assert@1136",
+          "replacementPath": null,
+          "replacementLine": null,
+          "mapping": "pending assertion correspondence after lexical census correction",
+          "nativeStatus": "pending",
+          "runtimeObservation": "unknown"
         },
         {
           "line": 1139,
@@ -5691,6 +6508,16 @@
           "mapping": "backend adaptation; see explicit_deltas.json; equivalence not asserted"
         },
         {
+          "line": 1164,
+          "call": "helpers.assert_not_nil(namespaced_share_line, \"namespaced @Share value line not found\")",
+          "legacyAssertionId": "mcdev-nvim/tests/e2e/jdtls_bundle_e2e.lua::assert@1164",
+          "replacementPath": null,
+          "replacementLine": null,
+          "mapping": "pending assertion correspondence after lexical census correction",
+          "nativeStatus": "pending",
+          "runtimeObservation": "unknown"
+        },
+        {
           "line": 1174,
           "call": "helpers.assert_nil(\n      namespaced_share_err,\n      \"namespaced mixinextras share mcdev.completion failed: \" .. vim.inspect(namespaced_share_err)\n    )",
           "legacyAssertionId": "mcdev-nvim/tests/e2e/jdtls_bundle_e2e.lua::assert@1174",
@@ -5699,12 +6526,32 @@
           "mapping": "exact assertion in corresponding source region"
         },
         {
+          "line": 1178,
+          "call": "helpers.assert_not_nil(namespaced_share_result, \"namespaced mixinextras share mcdev.completion returned no payload\")",
+          "legacyAssertionId": "mcdev-nvim/tests/e2e/jdtls_bundle_e2e.lua::assert@1178",
+          "replacementPath": null,
+          "replacementLine": null,
+          "mapping": "pending assertion correspondence after lexical census correction",
+          "nativeStatus": "pending",
+          "runtimeObservation": "unknown"
+        },
+        {
           "line": 1180,
           "call": "helpers.assert_true(\n      vim.tbl_filter(function(item)\n        return item.insertText == \"speedAcrossFiles\"\n      end, namespaced_share_items)[1] ~= nil,\n      \"namespaced mixinextras share completion should return speedAcrossFiles\"\n    )",
           "legacyAssertionId": "mcdev-nvim/tests/e2e/jdtls_bundle_e2e.lua::assert@1180",
           "replacementPath": "mcdev-nvim/tests/e2e/jdtls_bundle_e2e.lua",
           "replacementLine": 931,
           "mapping": "exact assertion in corresponding source region"
+        },
+        {
+          "line": 1211,
+          "call": "helpers.assert_not_nil(method_line, \"mixinextras method completion line not found\")",
+          "legacyAssertionId": "mcdev-nvim/tests/e2e/jdtls_bundle_e2e.lua::assert@1211",
+          "replacementPath": null,
+          "replacementLine": null,
+          "mapping": "pending assertion correspondence after lexical census correction",
+          "nativeStatus": "pending",
+          "runtimeObservation": "unknown"
         },
         {
           "line": 1221,
@@ -5747,12 +6594,42 @@
           "mapping": "backend adaptation; see explicit_deltas.json; equivalence not asserted"
         },
         {
+          "line": 1259,
+          "call": "helpers.assert_not_nil(target_line, \"mixinextras target completion line not found\")",
+          "legacyAssertionId": "mcdev-nvim/tests/e2e/jdtls_bundle_e2e.lua::assert@1259",
+          "replacementPath": null,
+          "replacementLine": null,
+          "mapping": "pending assertion correspondence after lexical census correction",
+          "nativeStatus": "pending",
+          "runtimeObservation": "unknown"
+        },
+        {
           "line": 1269,
           "call": "helpers.assert_nil(target_err, \"mixinextras target completion failed: \" .. vim.inspect(target_err))",
           "legacyAssertionId": "mcdev-nvim/tests/e2e/jdtls_bundle_e2e.lua::assert@1269",
           "replacementPath": "mcdev-nvim/tests/e2e/jdtls_bundle_e2e.lua",
           "replacementLine": 1020,
           "mapping": "exact assertion in corresponding source region"
+        },
+        {
+          "line": 1271,
+          "call": "helpers.assert_not_nil(\n      vim.tbl_filter(function(item)\n        return item.insertText == \"Ljava/lang/String;length()I\"\n      end, target_items)[1],\n      \"mixinextras target completion should return String.length: \" .. vim.inspect({\n        debug = target_result.result and target_result.result.debug,\n        candidates = vim.tbl_map(function(item) return item.insertText end, target_items),\n      })\n    )",
+          "legacyAssertionId": "mcdev-nvim/tests/e2e/jdtls_bundle_e2e.lua::assert@1271",
+          "replacementPath": null,
+          "replacementLine": null,
+          "mapping": "pending assertion correspondence after lexical census correction",
+          "nativeStatus": "pending",
+          "runtimeObservation": "unknown"
+        },
+        {
+          "line": 1306,
+          "call": "helpers.assert_not_nil(bad_line, \"mixinextras bad handler line not found\")",
+          "legacyAssertionId": "mcdev-nvim/tests/e2e/jdtls_bundle_e2e.lua::assert@1306",
+          "replacementPath": null,
+          "replacementLine": null,
+          "mapping": "pending assertion correspondence after lexical census correction",
+          "nativeStatus": "pending",
+          "runtimeObservation": "unknown"
         },
         {
           "line": 1309,
@@ -5763,6 +6640,16 @@
           "mapping": "exact assertion in corresponding source region"
         },
         {
+          "line": 1314,
+          "call": "helpers.assert_not_nil(wrong_return, \"mixinextras diagnostics should report wrong WrapOperation return type\")",
+          "legacyAssertionId": "mcdev-nvim/tests/e2e/jdtls_bundle_e2e.lua::assert@1314",
+          "replacementPath": null,
+          "replacementLine": null,
+          "mapping": "pending assertion correspondence after lexical census correction",
+          "nativeStatus": "pending",
+          "runtimeObservation": "unknown"
+        },
+        {
           "line": 1321,
           "call": "helpers.assert_nil(code_action_err, \"mixinextras code action failed: \" .. vim.inspect(code_action_err))",
           "legacyAssertionId": "mcdev-nvim/tests/e2e/jdtls_bundle_e2e.lua::assert@1321",
@@ -5771,12 +6658,32 @@
           "mapping": "exact assertion in corresponding source region"
         },
         {
+          "line": 1323,
+          "call": "helpers.assert_not_nil(\n      vim.tbl_filter(function(action)\n        return action.kind == \"quickfix.mixinextras.fixHandlerSignature\"\n      end, actions)[1],\n      \"mixinextras code action should offer a handler signature fix\"\n    )",
+          "legacyAssertionId": "mcdev-nvim/tests/e2e/jdtls_bundle_e2e.lua::assert@1323",
+          "replacementPath": null,
+          "replacementLine": null,
+          "mapping": "pending assertion correspondence after lexical census correction",
+          "nativeStatus": "pending",
+          "runtimeObservation": "unknown"
+        },
+        {
           "line": 1334,
           "call": "helpers.assert_true(\n      before_fix:find(\"return original.call(instance);\", 1, true) ~= nil,\n      \"bad WrapOperation handler should start with a compilable body\"\n    )",
           "legacyAssertionId": "mcdev-nvim/tests/e2e/jdtls_bundle_e2e.lua::assert@1334",
           "replacementPath": "mcdev-nvim/tests/e2e/jdtls_bundle_e2e.lua",
           "replacementLine": 1085,
           "mapping": "exact assertion in corresponding source region"
+        },
+        {
+          "line": 1339,
+          "call": "helpers.assert_not_nil(lsp_action.edit, \"mixinextras signature fix should include a workspace edit\")",
+          "legacyAssertionId": "mcdev-nvim/tests/e2e/jdtls_bundle_e2e.lua::assert@1339",
+          "replacementPath": null,
+          "replacementLine": null,
+          "mapping": "pending assertion correspondence after lexical census correction",
+          "nativeStatus": "pending",
+          "runtimeObservation": "unknown"
         },
         {
           "line": 1343,
@@ -5843,6 +6750,26 @@
           "mapping": "exact assertion in corresponding source region"
         },
         {
+          "line": 1457,
+          "call": "helpers.assert_not_nil(\n      generated_action,\n      \"mixinextras code action should generate a WrapMethod handler for a handler-less annotation\"\n    )",
+          "legacyAssertionId": "mcdev-nvim/tests/e2e/jdtls_bundle_e2e.lua::assert@1457",
+          "replacementPath": null,
+          "replacementLine": null,
+          "mapping": "pending assertion correspondence after lexical census correction",
+          "nativeStatus": "pending",
+          "runtimeObservation": "unknown"
+        },
+        {
+          "line": 1462,
+          "call": "helpers.assert_not_nil(\n      generated_lsp_action.edit,\n      \"mixinextras WrapMethod generation action should include a workspace edit\"\n    )",
+          "legacyAssertionId": "mcdev-nvim/tests/e2e/jdtls_bundle_e2e.lua::assert@1462",
+          "replacementPath": null,
+          "replacementLine": null,
+          "mapping": "pending assertion correspondence after lexical census correction",
+          "nativeStatus": "pending",
+          "runtimeObservation": "unknown"
+        },
+        {
           "line": 1469,
           "call": "helpers.assert_true(\n      generated_source:find(\"Operation<Void>\", 1, true) ~= nil\n        or generated_source:find(\"Operation<java.lang.Void>\", 1, true) ~= nil,\n      \"generated WrapMethod handler should declare Operation<Void>\"\n    )",
           "legacyAssertionId": "mcdev-nvim/tests/e2e/jdtls_bundle_e2e.lua::assert@1469",
@@ -5859,6 +6786,16 @@
           "mapping": "exact assertion in corresponding source region"
         },
         {
+          "line": 1561,
+          "call": "helpers.assert_not_nil(generated_case_line, test_case.name .. \" annotation line not found\")",
+          "legacyAssertionId": "mcdev-nvim/tests/e2e/jdtls_bundle_e2e.lua::assert@1561",
+          "replacementPath": null,
+          "replacementLine": null,
+          "mapping": "pending assertion correspondence after lexical census correction",
+          "nativeStatus": "pending",
+          "runtimeObservation": "unknown"
+        },
+        {
           "line": 1571,
           "call": "helpers.assert_nil(\n        generated_case_err,\n        \"mixinextras \" .. test_case.name .. \" generation code action failed: \" .. vim.inspect(generated_case_err)\n      )",
           "legacyAssertionId": "mcdev-nvim/tests/e2e/jdtls_bundle_e2e.lua::assert@1571",
@@ -5873,6 +6810,16 @@
           "replacementPath": "mcdev-nvim/tests/e2e/jdtls_bundle_e2e.lua",
           "replacementLine": 1331,
           "mapping": "exact assertion in corresponding source region"
+        },
+        {
+          "line": 1588,
+          "call": "helpers.assert_not_nil(\n        generated_case_lsp_action.edit,\n        \"mixinextras \" .. test_case.name .. \" generation action should include a workspace edit\"\n      )",
+          "legacyAssertionId": "mcdev-nvim/tests/e2e/jdtls_bundle_e2e.lua::assert@1588",
+          "replacementPath": null,
+          "replacementLine": null,
+          "mapping": "pending assertion correspondence after lexical census correction",
+          "nativeStatus": "pending",
+          "runtimeObservation": "unknown"
         },
         {
           "line": 1599,
@@ -5979,6 +6926,16 @@
           "mapping": "exact assertion in corresponding source region"
         },
         {
+          "line": 1720,
+          "call": "helpers.assert_not_nil(method_item, \"AT completion should return mapped method insert text\")",
+          "legacyAssertionId": "mcdev-nvim/tests/e2e/jdtls_bundle_e2e.lua::assert@1720",
+          "replacementPath": null,
+          "replacementLine": null,
+          "mapping": "pending assertion correspondence after lexical census correction",
+          "nativeStatus": "pending",
+          "runtimeObservation": "unknown"
+        },
+        {
           "line": 1721,
           "call": "helpers.assert_true(\n      method_item.metadata and method_item.metadata.source == \"at.member.method\",\n      \"AT completion should tag at.member.method metadata\"\n    )",
           "legacyAssertionId": "mcdev-nvim/tests/e2e/jdtls_bundle_e2e.lua::assert@1721",
@@ -6025,7 +6982,7 @@
         },
         "oldLineCount": 1743,
         "newLineCount": 1494,
-        "assertionSiteCount": 173,
+        "assertionSiteCount": 222,
         "caseEntryCount": 6,
         "loopInputCount": 0,
         "stateMarkerCount": 78,
@@ -6353,7 +7310,59 @@
           "assertionObservers": "mcdev-nvim/tests/explicit_deltas.json",
           "observedScope": "Only the scoped finite client/unit/process counts in migration_evidence.json; original real-host E2E operations remain unverified.",
           "fullOriginalEditorE2EVerified": false
-        }
+        },
+        "pendingAssertionSites": [
+          "mcdev-nvim/tests/e2e/jdtls_bundle_e2e.lua::assert@37",
+          "mcdev-nvim/tests/e2e/jdtls_bundle_e2e.lua::assert@38",
+          "mcdev-nvim/tests/e2e/jdtls_bundle_e2e.lua::assert@39",
+          "mcdev-nvim/tests/e2e/jdtls_bundle_e2e.lua::assert@224",
+          "mcdev-nvim/tests/e2e/jdtls_bundle_e2e.lua::assert@242",
+          "mcdev-nvim/tests/e2e/jdtls_bundle_e2e.lua::assert@302",
+          "mcdev-nvim/tests/e2e/jdtls_bundle_e2e.lua::assert@303",
+          "mcdev-nvim/tests/e2e/jdtls_bundle_e2e.lua::assert@364",
+          "mcdev-nvim/tests/e2e/jdtls_bundle_e2e.lua::assert@425",
+          "mcdev-nvim/tests/e2e/jdtls_bundle_e2e.lua::assert@436",
+          "mcdev-nvim/tests/e2e/jdtls_bundle_e2e.lua::assert@457",
+          "mcdev-nvim/tests/e2e/jdtls_bundle_e2e.lua::assert@471",
+          "mcdev-nvim/tests/e2e/jdtls_bundle_e2e.lua::assert@516",
+          "mcdev-nvim/tests/e2e/jdtls_bundle_e2e.lua::assert@524",
+          "mcdev-nvim/tests/e2e/jdtls_bundle_e2e.lua::assert@559",
+          "mcdev-nvim/tests/e2e/jdtls_bundle_e2e.lua::assert@576",
+          "mcdev-nvim/tests/e2e/jdtls_bundle_e2e.lua::assert@591",
+          "mcdev-nvim/tests/e2e/jdtls_bundle_e2e.lua::assert@638",
+          "mcdev-nvim/tests/e2e/jdtls_bundle_e2e.lua::assert@649",
+          "mcdev-nvim/tests/e2e/jdtls_bundle_e2e.lua::assert@653",
+          "mcdev-nvim/tests/e2e/jdtls_bundle_e2e.lua::assert@654",
+          "mcdev-nvim/tests/e2e/jdtls_bundle_e2e.lua::assert@655",
+          "mcdev-nvim/tests/e2e/jdtls_bundle_e2e.lua::assert@683",
+          "mcdev-nvim/tests/e2e/jdtls_bundle_e2e.lua::assert@716",
+          "mcdev-nvim/tests/e2e/jdtls_bundle_e2e.lua::assert@726",
+          "mcdev-nvim/tests/e2e/jdtls_bundle_e2e.lua::assert@740",
+          "mcdev-nvim/tests/e2e/jdtls_bundle_e2e.lua::assert@750",
+          "mcdev-nvim/tests/e2e/jdtls_bundle_e2e.lua::assert@841",
+          "mcdev-nvim/tests/e2e/jdtls_bundle_e2e.lua::assert@900",
+          "mcdev-nvim/tests/e2e/jdtls_bundle_e2e.lua::assert@915",
+          "mcdev-nvim/tests/e2e/jdtls_bundle_e2e.lua::assert@948",
+          "mcdev-nvim/tests/e2e/jdtls_bundle_e2e.lua::assert@1048",
+          "mcdev-nvim/tests/e2e/jdtls_bundle_e2e.lua::assert@1078",
+          "mcdev-nvim/tests/e2e/jdtls_bundle_e2e.lua::assert@1125",
+          "mcdev-nvim/tests/e2e/jdtls_bundle_e2e.lua::assert@1136",
+          "mcdev-nvim/tests/e2e/jdtls_bundle_e2e.lua::assert@1164",
+          "mcdev-nvim/tests/e2e/jdtls_bundle_e2e.lua::assert@1178",
+          "mcdev-nvim/tests/e2e/jdtls_bundle_e2e.lua::assert@1211",
+          "mcdev-nvim/tests/e2e/jdtls_bundle_e2e.lua::assert@1259",
+          "mcdev-nvim/tests/e2e/jdtls_bundle_e2e.lua::assert@1271",
+          "mcdev-nvim/tests/e2e/jdtls_bundle_e2e.lua::assert@1306",
+          "mcdev-nvim/tests/e2e/jdtls_bundle_e2e.lua::assert@1314",
+          "mcdev-nvim/tests/e2e/jdtls_bundle_e2e.lua::assert@1323",
+          "mcdev-nvim/tests/e2e/jdtls_bundle_e2e.lua::assert@1339",
+          "mcdev-nvim/tests/e2e/jdtls_bundle_e2e.lua::assert@1457",
+          "mcdev-nvim/tests/e2e/jdtls_bundle_e2e.lua::assert@1462",
+          "mcdev-nvim/tests/e2e/jdtls_bundle_e2e.lua::assert@1561",
+          "mcdev-nvim/tests/e2e/jdtls_bundle_e2e.lua::assert@1588",
+          "mcdev-nvim/tests/e2e/jdtls_bundle_e2e.lua::assert@1720"
+        ],
+        "pendingAssertionSiteCount": 49
       },
       "nativeExecution": "pending host contract",
       "nativeStatus": "pending real host E2E",
@@ -6419,6 +7428,36 @@
       "classification": "e2e",
       "assertionSites": [
         {
+          "line": 8,
+          "call": "helpers.assert_not_nil(bundle_jar, \"MCDEV_BUNDLE_JAR is required\")",
+          "legacyAssertionId": "mcdev-nvim/tests/e2e/jdtls_loom_e2e.lua::assert@8",
+          "replacementPath": null,
+          "replacementLine": null,
+          "mapping": "pending assertion correspondence after lexical census correction",
+          "nativeStatus": "pending",
+          "runtimeObservation": "unknown"
+        },
+        {
+          "line": 9,
+          "call": "helpers.assert_not_nil(workspace, \"MCDEV_E2E_WORKSPACE is required\")",
+          "legacyAssertionId": "mcdev-nvim/tests/e2e/jdtls_loom_e2e.lua::assert@9",
+          "replacementPath": null,
+          "replacementLine": null,
+          "mapping": "pending assertion correspondence after lexical census correction",
+          "nativeStatus": "pending",
+          "runtimeObservation": "unknown"
+        },
+        {
+          "line": 10,
+          "call": "helpers.assert_not_nil(jdtls_cmd, \"JDTLS_CMD is required\")",
+          "legacyAssertionId": "mcdev-nvim/tests/e2e/jdtls_loom_e2e.lua::assert@10",
+          "replacementPath": null,
+          "replacementLine": null,
+          "mapping": "pending assertion correspondence after lexical census correction",
+          "nativeStatus": "pending",
+          "runtimeObservation": "unknown"
+        },
+        {
           "line": 11,
           "call": "helpers.assert_true(vim.fn.filereadable(bundle_jar) == 1, \"bundle jar must exist: \" .. bundle_jar)",
           "legacyAssertionId": "mcdev-nvim/tests/e2e/jdtls_loom_e2e.lua::assert@11",
@@ -6459,12 +7498,42 @@
           "mapping": "exact assertion in corresponding source region"
         },
         {
+          "line": 61,
+          "call": "helpers.assert_not_nil(client_id, \"failed to start jdtls client\")",
+          "legacyAssertionId": "mcdev-nvim/tests/e2e/jdtls_loom_e2e.lua::assert@61",
+          "replacementPath": null,
+          "replacementLine": null,
+          "mapping": "pending assertion correspondence after lexical census correction",
+          "nativeStatus": "pending",
+          "runtimeObservation": "unknown"
+        },
+        {
+          "line": 77,
+          "call": "helpers.assert_not_nil(client, \"jdtls client disappeared after initialize\")",
+          "legacyAssertionId": "mcdev-nvim/tests/e2e/jdtls_loom_e2e.lua::assert@77",
+          "replacementPath": null,
+          "replacementLine": null,
+          "mapping": "pending assertion correspondence after lexical census correction",
+          "nativeStatus": "pending",
+          "runtimeObservation": "unknown"
+        },
+        {
           "line": 89,
           "call": "helpers.assert_true(completed, method .. \" timed out\")",
           "legacyAssertionId": "mcdev-nvim/tests/e2e/jdtls_loom_e2e.lua::assert@89",
           "replacementPath": null,
           "replacementLine": null,
           "mapping": "backend adaptation; see explicit_deltas.json; equivalence not asserted"
+        },
+        {
+          "line": 120,
+          "call": "helpers.assert_not_nil(mixin_line, \"@Mixin line not found\")",
+          "legacyAssertionId": "mcdev-nvim/tests/e2e/jdtls_loom_e2e.lua::assert@120",
+          "replacementPath": null,
+          "replacementLine": null,
+          "mapping": "pending assertion correspondence after lexical census correction",
+          "nativeStatus": "pending",
+          "runtimeObservation": "unknown"
         },
         {
           "line": 135,
@@ -6568,7 +7637,7 @@
         },
         "oldLineCount": 175,
         "newLineCount": 131,
-        "assertionSiteCount": 17,
+        "assertionSiteCount": 23,
         "caseEntryCount": 0,
         "loopInputCount": 0,
         "stateMarkerCount": 7,
@@ -6608,7 +7677,16 @@
           "assertionObservers": "mcdev-nvim/tests/explicit_deltas.json",
           "observedScope": "Only the scoped finite client/unit/process counts in migration_evidence.json; original real-host E2E operations remain unverified.",
           "fullOriginalEditorE2EVerified": false
-        }
+        },
+        "pendingAssertionSites": [
+          "mcdev-nvim/tests/e2e/jdtls_loom_e2e.lua::assert@8",
+          "mcdev-nvim/tests/e2e/jdtls_loom_e2e.lua::assert@9",
+          "mcdev-nvim/tests/e2e/jdtls_loom_e2e.lua::assert@10",
+          "mcdev-nvim/tests/e2e/jdtls_loom_e2e.lua::assert@61",
+          "mcdev-nvim/tests/e2e/jdtls_loom_e2e.lua::assert@77",
+          "mcdev-nvim/tests/e2e/jdtls_loom_e2e.lua::assert@120"
+        ],
+        "pendingAssertionSiteCount": 6
       },
       "nativeExecution": "pending host contract",
       "nativeStatus": "pending real host E2E",
@@ -6662,14 +7740,54 @@
       "classification": "e2e",
       "assertionSites": [
         {
+          "line": 43,
+          "call": "helpers.assert_not_nil(line_number, \"PlacementOffset @At target line not found\")",
+          "legacyAssertionId": "mcdev-nvim/tests/e2e/placement_offset_completion_e2e.lua::assert@43",
+          "replacementPath": null,
+          "replacementLine": null,
+          "mapping": "pending assertion correspondence after lexical census correction",
+          "nativeStatus": "pending",
+          "runtimeObservation": "unknown"
+        },
+        {
           "line": 50,
           "call": "helpers.assert_true(\n      lines[first_line]:find(\"setPlacedBy(\", 1, true) ~= nil,\n      \"PlacementOffset source must contain the original setPlacedBy target\"\n    )",
           "legacyAssertionId": "mcdev-nvim/tests/e2e/placement_offset_completion_e2e.lua::assert@50"
         },
         {
+          "line": 57,
+          "call": "helpers.assert_not_nil(opening_quote, \"concatenated target continuation not found\")",
+          "legacyAssertionId": "mcdev-nvim/tests/e2e/placement_offset_completion_e2e.lua::assert@57",
+          "replacementPath": null,
+          "replacementLine": null,
+          "mapping": "pending assertion correspondence after lexical census correction",
+          "nativeStatus": "pending",
+          "runtimeObservation": "unknown"
+        },
+        {
           "line": 73,
           "call": "helpers.assert_true(remap_line <= #lines, \"PlacementOffset nested @At remap flag not found\")",
           "legacyAssertionId": "mcdev-nvim/tests/e2e/placement_offset_completion_e2e.lua::assert@73"
+        },
+        {
+          "line": 98,
+          "call": "helpers.assert_not_nil(target_attribute_start, label .. \" target attribute not found\")",
+          "legacyAssertionId": "mcdev-nvim/tests/e2e/placement_offset_completion_e2e.lua::assert@98",
+          "replacementPath": null,
+          "replacementLine": null,
+          "mapping": "pending assertion correspondence after lexical census correction",
+          "nativeStatus": "pending",
+          "runtimeObservation": "unknown"
+        },
+        {
+          "line": 101,
+          "call": "helpers.assert_not_nil(target_value_end, label .. \" target attribute is not closed\")",
+          "legacyAssertionId": "mcdev-nvim/tests/e2e/placement_offset_completion_e2e.lua::assert@101",
+          "replacementPath": null,
+          "replacementLine": null,
+          "mapping": "pending assertion correspondence after lexical census correction",
+          "nativeStatus": "pending",
+          "runtimeObservation": "unknown"
         },
         {
           "line": 103,
@@ -6707,6 +7825,16 @@
           "legacyAssertionId": "mcdev-nvim/tests/e2e/placement_offset_completion_e2e.lua::assert@124"
         },
         {
+          "line": 125,
+          "call": "helpers.assert_not_nil(response, label .. \" completion returned no response\")",
+          "legacyAssertionId": "mcdev-nvim/tests/e2e/placement_offset_completion_e2e.lua::assert@125",
+          "replacementPath": null,
+          "replacementLine": null,
+          "mapping": "pending assertion correspondence after lexical census correction",
+          "nativeStatus": "pending",
+          "runtimeObservation": "unknown"
+        },
+        {
           "line": 133,
           "call": "helpers.assert_eq(#matches, 1, label .. \" must select one setPlacedBy item: \" .. vim.inspect(items))",
           "legacyAssertionId": "mcdev-nvim/tests/e2e/placement_offset_completion_e2e.lua::assert@133"
@@ -6715,6 +7843,36 @@
           "line": 134,
           "call": "helpers.assert_eq(matches[1].insertText, expected_target, label .. \" must return the full remapped target\")",
           "legacyAssertionId": "mcdev-nvim/tests/e2e/placement_offset_completion_e2e.lua::assert@134"
+        },
+        {
+          "line": 136,
+          "call": "helpers.assert_not_nil(item.textEdit, label .. \" must return a textEdit\")",
+          "legacyAssertionId": "mcdev-nvim/tests/e2e/placement_offset_completion_e2e.lua::assert@136",
+          "replacementPath": null,
+          "replacementLine": null,
+          "mapping": "pending assertion correspondence after lexical census correction",
+          "nativeStatus": "pending",
+          "runtimeObservation": "unknown"
+        },
+        {
+          "line": 144,
+          "call": "helpers.assert_not_nil(blink_path, \"MCDEV_E2E_BLINK_RTP must point to the installed blink.cmp checkout\")",
+          "legacyAssertionId": "mcdev-nvim/tests/e2e/placement_offset_completion_e2e.lua::assert@144",
+          "replacementPath": null,
+          "replacementLine": null,
+          "mapping": "pending assertion correspondence after lexical census correction",
+          "nativeStatus": "pending",
+          "runtimeObservation": "unknown"
+        },
+        {
+          "line": 146,
+          "call": "helpers.assert_not_nil(blink_lib_path, \"MCDEV_E2E_BLINK_LIB_RTP must point to the installed blink.lib checkout\")",
+          "legacyAssertionId": "mcdev-nvim/tests/e2e/placement_offset_completion_e2e.lua::assert@146",
+          "replacementPath": null,
+          "replacementLine": null,
+          "mapping": "pending assertion correspondence after lexical census correction",
+          "nativeStatus": "pending",
+          "runtimeObservation": "unknown"
         },
         {
           "line": 162,
@@ -6737,6 +7895,26 @@
           "legacyAssertionId": "mcdev-nvim/tests/e2e/placement_offset_completion_e2e.lua::assert@298"
         },
         {
+          "line": 299,
+          "call": "assert_final_target(bufnr, label)",
+          "legacyAssertionId": "mcdev-nvim/tests/e2e/placement_offset_completion_e2e.lua::assert@299",
+          "replacementPath": null,
+          "replacementLine": null,
+          "mapping": "pending assertion correspondence after lexical census correction",
+          "nativeStatus": "pending",
+          "runtimeObservation": "unknown"
+        },
+        {
+          "line": 305,
+          "call": "helpers.assert_not_nil(target_row, label .. \" target row not found after native accept\")",
+          "legacyAssertionId": "mcdev-nvim/tests/e2e/placement_offset_completion_e2e.lua::assert@305",
+          "replacementPath": null,
+          "replacementLine": null,
+          "mapping": "pending assertion correspondence after lexical census correction",
+          "nativeStatus": "pending",
+          "runtimeObservation": "unknown"
+        },
+        {
           "line": 309,
           "call": "helpers.assert_eq(normal_cursor[1], target_row, label .. \" normal-mode cursor row\")",
           "legacyAssertionId": "mcdev-nvim/tests/e2e/placement_offset_completion_e2e.lua::assert@309"
@@ -6752,6 +7930,16 @@
           "legacyAssertionId": "mcdev-nvim/tests/e2e/placement_offset_completion_e2e.lua::assert@311"
         },
         {
+          "line": 317,
+          "call": "helpers.assert_not_nil(line, label .. \" target marker not found for diagnostics\")",
+          "legacyAssertionId": "mcdev-nvim/tests/e2e/placement_offset_completion_e2e.lua::assert@317",
+          "replacementPath": null,
+          "replacementLine": null,
+          "mapping": "pending assertion correspondence after lexical census correction",
+          "nativeStatus": "pending",
+          "runtimeObservation": "unknown"
+        },
+        {
           "line": 321,
           "call": "helpers.assert_nil(err, label .. \" diagnostics failed: \" .. vim.inspect(err))",
           "legacyAssertionId": "mcdev-nvim/tests/e2e/placement_offset_completion_e2e.lua::assert@321"
@@ -6760,6 +7948,136 @@
           "line": 326,
           "call": "helpers.assert_eq(\n      #errors,\n      0,\n      label .. \" must not report mcdev errors: \" .. diagnostic_failure_summary(errors)\n    )",
           "legacyAssertionId": "mcdev-nvim/tests/e2e/placement_offset_completion_e2e.lua::assert@326"
+        },
+        {
+          "line": 336,
+          "call": "helpers.assert_not_nil(find_fragment(original_lines, \"setPlacedBy(\"), \"unchanged PlacementOffset target not found\")",
+          "legacyAssertionId": "mcdev-nvim/tests/e2e/placement_offset_completion_e2e.lua::assert@336",
+          "replacementPath": null,
+          "replacementLine": null,
+          "mapping": "pending assertion correspondence after lexical census correction",
+          "nativeStatus": "pending",
+          "runtimeObservation": "unknown"
+        },
+        {
+          "line": 337,
+          "call": "assert_clean_diagnostics(bufnr, \"unchanged LF source\")",
+          "legacyAssertionId": "mcdev-nvim/tests/e2e/placement_offset_completion_e2e.lua::assert@337",
+          "replacementPath": null,
+          "replacementLine": null,
+          "mapping": "pending assertion correspondence after lexical census correction",
+          "nativeStatus": "pending",
+          "runtimeObservation": "unknown"
+        },
+        {
+          "line": 343,
+          "call": "assert_clean_diagnostics(bufnr, \"unchanged CRLF source\")",
+          "legacyAssertionId": "mcdev-nvim/tests/e2e/placement_offset_completion_e2e.lua::assert@343",
+          "replacementPath": null,
+          "replacementLine": null,
+          "mapping": "pending assertion correspondence after lexical census correction",
+          "nativeStatus": "pending",
+          "runtimeObservation": "unknown"
+        },
+        {
+          "line": 348,
+          "call": "assert_clean_diagnostics(bufnr, \"single full descriptor\")",
+          "legacyAssertionId": "mcdev-nvim/tests/e2e/placement_offset_completion_e2e.lua::assert@348",
+          "replacementPath": null,
+          "replacementLine": null,
+          "mapping": "pending assertion correspondence after lexical census correction",
+          "nativeStatus": "pending",
+          "runtimeObservation": "unknown"
+        },
+        {
+          "line": 353,
+          "call": "assert_final_target(bufnr, \"standalone target\")",
+          "legacyAssertionId": "mcdev-nvim/tests/e2e/placement_offset_completion_e2e.lua::assert@353",
+          "replacementPath": null,
+          "replacementLine": null,
+          "mapping": "pending assertion correspondence after lexical census correction",
+          "nativeStatus": "pending",
+          "runtimeObservation": "unknown"
+        },
+        {
+          "line": 354,
+          "call": "assert_clean_diagnostics(bufnr, \"standalone target\")",
+          "legacyAssertionId": "mcdev-nvim/tests/e2e/placement_offset_completion_e2e.lua::assert@354",
+          "replacementPath": null,
+          "replacementLine": null,
+          "mapping": "pending assertion correspondence after lexical census correction",
+          "nativeStatus": "pending",
+          "runtimeObservation": "unknown"
+        },
+        {
+          "line": 360,
+          "call": "assert_final_target(bufnr, \"concatenated target first segment\")",
+          "legacyAssertionId": "mcdev-nvim/tests/e2e/placement_offset_completion_e2e.lua::assert@360",
+          "replacementPath": null,
+          "replacementLine": null,
+          "mapping": "pending assertion correspondence after lexical census correction",
+          "nativeStatus": "pending",
+          "runtimeObservation": "unknown"
+        },
+        {
+          "line": 361,
+          "call": "assert_clean_diagnostics(bufnr, \"concatenated target first segment\")",
+          "legacyAssertionId": "mcdev-nvim/tests/e2e/placement_offset_completion_e2e.lua::assert@361",
+          "replacementPath": null,
+          "replacementLine": null,
+          "mapping": "pending assertion correspondence after lexical census correction",
+          "nativeStatus": "pending",
+          "runtimeObservation": "unknown"
+        },
+        {
+          "line": 366,
+          "call": "assert_final_target(bufnr, \"concatenated target later segment\")",
+          "legacyAssertionId": "mcdev-nvim/tests/e2e/placement_offset_completion_e2e.lua::assert@366",
+          "replacementPath": null,
+          "replacementLine": null,
+          "mapping": "pending assertion correspondence after lexical census correction",
+          "nativeStatus": "pending",
+          "runtimeObservation": "unknown"
+        },
+        {
+          "line": 367,
+          "call": "assert_clean_diagnostics(bufnr, \"concatenated target later segment\")",
+          "legacyAssertionId": "mcdev-nvim/tests/e2e/placement_offset_completion_e2e.lua::assert@367",
+          "replacementPath": null,
+          "replacementLine": null,
+          "mapping": "pending assertion correspondence after lexical census correction",
+          "nativeStatus": "pending",
+          "runtimeObservation": "unknown"
+        },
+        {
+          "line": 375,
+          "call": "assert_clean_diagnostics(bufnr, \"concatenated target first literal native Blink completion\")",
+          "legacyAssertionId": "mcdev-nvim/tests/e2e/placement_offset_completion_e2e.lua::assert@375",
+          "replacementPath": null,
+          "replacementLine": null,
+          "mapping": "pending assertion correspondence after lexical census correction",
+          "nativeStatus": "pending",
+          "runtimeObservation": "unknown"
+        },
+        {
+          "line": 383,
+          "call": "assert_clean_diagnostics(bufnr, \"concatenated target native Blink completion\")",
+          "legacyAssertionId": "mcdev-nvim/tests/e2e/placement_offset_completion_e2e.lua::assert@383",
+          "replacementPath": null,
+          "replacementLine": null,
+          "mapping": "pending assertion correspondence after lexical census correction",
+          "nativeStatus": "pending",
+          "runtimeObservation": "unknown"
+        },
+        {
+          "line": 392,
+          "call": "assert_clean_diagnostics(bufnr, \"original BlockPos literal native Blink completion\")",
+          "legacyAssertionId": "mcdev-nvim/tests/e2e/placement_offset_completion_e2e.lua::assert@392",
+          "replacementPath": null,
+          "replacementLine": null,
+          "mapping": "pending assertion correspondence after lexical census correction",
+          "nativeStatus": "pending",
+          "runtimeObservation": "unknown"
         }
       ],
       "caseEntryCalls": [
@@ -6770,18 +8088,45 @@
       ],
       "loopInputs": [],
       "fidelity": {
-        "status": "verified",
-        "strict": true,
+        "status": "pending assertion correspondence",
+        "strict": false,
         "oldLineCount": 394,
         "newLineCount": 394,
-        "assertionSiteCount": 20,
+        "assertionSiteCount": 44,
         "caseEntryCount": 1,
         "loopInputCount": 0,
         "stateMarkerCount": 34,
         "missingAssertions": [],
         "missingCaseEntries": [],
         "missingLoopInputs": [],
-        "missingStateMarkers": []
+        "missingStateMarkers": [],
+        "pendingAssertionSites": [
+          "mcdev-nvim/tests/e2e/placement_offset_completion_e2e.lua::assert@43",
+          "mcdev-nvim/tests/e2e/placement_offset_completion_e2e.lua::assert@57",
+          "mcdev-nvim/tests/e2e/placement_offset_completion_e2e.lua::assert@98",
+          "mcdev-nvim/tests/e2e/placement_offset_completion_e2e.lua::assert@101",
+          "mcdev-nvim/tests/e2e/placement_offset_completion_e2e.lua::assert@125",
+          "mcdev-nvim/tests/e2e/placement_offset_completion_e2e.lua::assert@136",
+          "mcdev-nvim/tests/e2e/placement_offset_completion_e2e.lua::assert@144",
+          "mcdev-nvim/tests/e2e/placement_offset_completion_e2e.lua::assert@146",
+          "mcdev-nvim/tests/e2e/placement_offset_completion_e2e.lua::assert@299",
+          "mcdev-nvim/tests/e2e/placement_offset_completion_e2e.lua::assert@305",
+          "mcdev-nvim/tests/e2e/placement_offset_completion_e2e.lua::assert@317",
+          "mcdev-nvim/tests/e2e/placement_offset_completion_e2e.lua::assert@336",
+          "mcdev-nvim/tests/e2e/placement_offset_completion_e2e.lua::assert@337",
+          "mcdev-nvim/tests/e2e/placement_offset_completion_e2e.lua::assert@343",
+          "mcdev-nvim/tests/e2e/placement_offset_completion_e2e.lua::assert@348",
+          "mcdev-nvim/tests/e2e/placement_offset_completion_e2e.lua::assert@353",
+          "mcdev-nvim/tests/e2e/placement_offset_completion_e2e.lua::assert@354",
+          "mcdev-nvim/tests/e2e/placement_offset_completion_e2e.lua::assert@360",
+          "mcdev-nvim/tests/e2e/placement_offset_completion_e2e.lua::assert@361",
+          "mcdev-nvim/tests/e2e/placement_offset_completion_e2e.lua::assert@366",
+          "mcdev-nvim/tests/e2e/placement_offset_completion_e2e.lua::assert@367",
+          "mcdev-nvim/tests/e2e/placement_offset_completion_e2e.lua::assert@375",
+          "mcdev-nvim/tests/e2e/placement_offset_completion_e2e.lua::assert@383",
+          "mcdev-nvim/tests/e2e/placement_offset_completion_e2e.lua::assert@392"
+        ],
+        "pendingAssertionSiteCount": 24
       },
       "nativeExecution": "pending host contract",
       "nativeStatus": "pending real host E2E",
@@ -6806,6 +8151,36 @@
       "replacementSha256": "3cce7756a3f6201aaa6fc3420185a842b438b0ae63d8feedd07e70a23b8bbf35",
       "classification": "e2e",
       "assertionSites": [
+        {
+          "line": 14,
+          "call": "h.helpers.assert_not_nil(line_number, \"real GuiMixin method selector must exist\")",
+          "legacyAssertionId": "mcdev-nvim/tests/e2e/real_project_e2e.lua::assert@14",
+          "replacementPath": null,
+          "replacementLine": null,
+          "mapping": "pending assertion correspondence after lexical census correction",
+          "nativeStatus": "pending",
+          "runtimeObservation": "unknown"
+        },
+        {
+          "line": 28,
+          "call": "h.helpers.assert_not_nil(hover_client, \"real Java hover requires the attached JDT client\")",
+          "legacyAssertionId": "mcdev-nvim/tests/e2e/real_project_e2e.lua::assert@28",
+          "replacementPath": null,
+          "replacementLine": null,
+          "mapping": "pending assertion correspondence after lexical census correction",
+          "nativeStatus": "pending",
+          "runtimeObservation": "unknown"
+        },
+        {
+          "line": 34,
+          "call": "h.helpers.assert_not_nil(hover_position)",
+          "legacyAssertionId": "mcdev-nvim/tests/e2e/real_project_e2e.lua::assert@34",
+          "replacementPath": null,
+          "replacementLine": null,
+          "mapping": "pending assertion correspondence after lexical census correction",
+          "nativeStatus": "pending",
+          "runtimeObservation": "unknown"
+        },
         {
           "line": 42,
           "call": "h.helpers.assert_true(requested, \"standard Java hover request must start\")",
@@ -6852,6 +8227,16 @@
           "legacyAssertionId": "mcdev-nvim/tests/e2e/real_project_e2e.lua::assert@86"
         },
         {
+          "line": 88,
+          "call": "h.helpers.assert_not_nil(item.textEdit, \"real project completion must provide its edit\")",
+          "legacyAssertionId": "mcdev-nvim/tests/e2e/real_project_e2e.lua::assert@88",
+          "replacementPath": null,
+          "replacementLine": null,
+          "mapping": "pending assertion correspondence after lexical census correction",
+          "nativeStatus": "pending",
+          "runtimeObservation": "unknown"
+        },
+        {
           "line": 92,
           "call": "h.helpers.assert_eq(table.concat(vim.api.nvim_buf_get_lines(bufnr, 0, -1, false), \"\\n\"),\n        table.concat(original, \"\\n\"), \"real project edit must exactly restore the original source\")",
           "legacyAssertionId": "mcdev-nvim/tests/e2e/real_project_e2e.lua::assert@92"
@@ -6885,7 +8270,7 @@
         "strict": false,
         "oldLineCount": 98,
         "newLineCount": 98,
-        "assertionSiteCount": 10,
+        "assertionSiteCount": 14,
         "caseEntryCount": 1,
         "loopInputCount": 1,
         "stateMarkerCount": 7,
@@ -6897,7 +8282,14 @@
         ],
         "missingCaseEntries": [],
         "missingLoopInputs": [],
-        "missingStateMarkers": []
+        "missingStateMarkers": [],
+        "pendingAssertionSites": [
+          "mcdev-nvim/tests/e2e/real_project_e2e.lua::assert@14",
+          "mcdev-nvim/tests/e2e/real_project_e2e.lua::assert@28",
+          "mcdev-nvim/tests/e2e/real_project_e2e.lua::assert@34",
+          "mcdev-nvim/tests/e2e/real_project_e2e.lua::assert@88"
+        ],
+        "pendingAssertionSiteCount": 4
       },
       "nativeExecution": "pending host contract",
       "nativeStatus": "pending real host E2E",
@@ -7008,9 +8400,29 @@
           "legacyAssertionId": "mcdev-nvim/tests/e2e/sugar_e2e.lua::assert@6"
         },
         {
+          "line": 62,
+          "call": "helpers.assert_not_nil(line, test_case.name .. \" completion marker not found\")",
+          "legacyAssertionId": "mcdev-nvim/tests/e2e/sugar_e2e.lua::assert@62",
+          "replacementPath": null,
+          "replacementLine": null,
+          "mapping": "pending assertion correspondence after lexical census correction",
+          "nativeStatus": "pending",
+          "runtimeObservation": "unknown"
+        },
+        {
           "line": 72,
           "call": "helpers.assert_nil(err, test_case.name .. \" completion failed: \" .. vim.inspect(err))",
           "legacyAssertionId": "mcdev-nvim/tests/e2e/sugar_e2e.lua::assert@72"
+        },
+        {
+          "line": 73,
+          "call": "helpers.assert_not_nil(response, test_case.name .. \" completion returned no response\")",
+          "legacyAssertionId": "mcdev-nvim/tests/e2e/sugar_e2e.lua::assert@73",
+          "replacementPath": null,
+          "replacementLine": null,
+          "mapping": "pending assertion correspondence after lexical census correction",
+          "nativeStatus": "pending",
+          "runtimeObservation": "unknown"
         },
         {
           "line": 78,
@@ -7028,14 +8440,44 @@
           "legacyAssertionId": "mcdev-nvim/tests/e2e/sugar_e2e.lua::assert@97"
         },
         {
+          "line": 105,
+          "call": "helpers.assert_not_nil(item.textEdit, test_case.name .. \" completion must provide a text edit\")",
+          "legacyAssertionId": "mcdev-nvim/tests/e2e/sugar_e2e.lua::assert@105",
+          "replacementPath": null,
+          "replacementLine": null,
+          "mapping": "pending assertion correspondence after lexical census correction",
+          "nativeStatus": "pending",
+          "runtimeObservation": "unknown"
+        },
+        {
           "line": 112,
           "call": "helpers.assert_true(\n        source:find(expected, 1, true) ~= nil,\n        test_case.name .. \" completion edit missing expected source: \" .. expected\n      )",
           "legacyAssertionId": "mcdev-nvim/tests/e2e/sugar_e2e.lua::assert@112"
         },
         {
+          "line": 123,
+          "call": "helpers.assert_not_nil(line, test_case.name .. \" diagnostic marker not found\")",
+          "legacyAssertionId": "mcdev-nvim/tests/e2e/sugar_e2e.lua::assert@123",
+          "replacementPath": null,
+          "replacementLine": null,
+          "mapping": "pending assertion correspondence after lexical census correction",
+          "nativeStatus": "pending",
+          "runtimeObservation": "unknown"
+        },
+        {
           "line": 127,
           "call": "helpers.assert_nil(err, test_case.name .. \" diagnostics failed: \" .. vim.inspect(err))",
           "legacyAssertionId": "mcdev-nvim/tests/e2e/sugar_e2e.lua::assert@127"
+        },
+        {
+          "line": 128,
+          "call": "helpers.assert_not_nil(response, test_case.name .. \" diagnostics returned no response\")",
+          "legacyAssertionId": "mcdev-nvim/tests/e2e/sugar_e2e.lua::assert@128",
+          "replacementPath": null,
+          "replacementLine": null,
+          "mapping": "pending assertion correspondence after lexical census correction",
+          "nativeStatus": "pending",
+          "runtimeObservation": "unknown"
         },
         {
           "line": 135,
@@ -7061,18 +8503,26 @@
       ],
       "loopInputs": [],
       "fidelity": {
-        "status": "verified",
-        "strict": true,
+        "status": "pending assertion correspondence",
+        "strict": false,
         "oldLineCount": 366,
         "newLineCount": 366,
-        "assertionSiteCount": 14,
+        "assertionSiteCount": 19,
         "caseEntryCount": 1,
         "loopInputCount": 0,
         "stateMarkerCount": 14,
         "missingAssertions": [],
         "missingCaseEntries": [],
         "missingLoopInputs": [],
-        "missingStateMarkers": []
+        "missingStateMarkers": [],
+        "pendingAssertionSites": [
+          "mcdev-nvim/tests/e2e/sugar_e2e.lua::assert@62",
+          "mcdev-nvim/tests/e2e/sugar_e2e.lua::assert@73",
+          "mcdev-nvim/tests/e2e/sugar_e2e.lua::assert@105",
+          "mcdev-nvim/tests/e2e/sugar_e2e.lua::assert@123",
+          "mcdev-nvim/tests/e2e/sugar_e2e.lua::assert@128"
+        ],
+        "pendingAssertionSiteCount": 5
       },
       "nativeExecution": "pending host contract",
       "nativeStatus": "pending real host E2E",
@@ -8104,6 +9554,46 @@
           "mapping": "exact assertion in corresponding source region"
         },
         {
+          "line": 228,
+          "call": "assert_visual_range(\"v\", { 1, first_col }, { 1, emoji_col }, \"inclusive\", {\n      start = { line = 0, character = first_col },\n      [\"end\"] = { line = 0, character = emoji_end },\n    })",
+          "legacyAssertionId": "mcdev-nvim/tests/lsp_regressions.lua::assert@228",
+          "replacementPath": null,
+          "replacementLine": null,
+          "mapping": "pending assertion correspondence after lexical census correction",
+          "nativeStatus": "pending",
+          "runtimeObservation": "unknown"
+        },
+        {
+          "line": 232,
+          "call": "assert_visual_range(\"v\", { 1, emoji_col }, { 1, first_col }, \"inclusive\", {\n      start = { line = 0, character = first_col },\n      [\"end\"] = { line = 0, character = emoji_end },\n    })",
+          "legacyAssertionId": "mcdev-nvim/tests/lsp_regressions.lua::assert@232",
+          "replacementPath": null,
+          "replacementLine": null,
+          "mapping": "pending assertion correspondence after lexical census correction",
+          "nativeStatus": "pending",
+          "runtimeObservation": "unknown"
+        },
+        {
+          "line": 236,
+          "call": "assert_visual_range(\"v\", { 1, first_col }, { 1, emoji_col }, \"exclusive\", {\n      start = { line = 0, character = first_col },\n      [\"end\"] = { line = 0, character = emoji_col },\n    })",
+          "legacyAssertionId": "mcdev-nvim/tests/lsp_regressions.lua::assert@236",
+          "replacementPath": null,
+          "replacementLine": null,
+          "mapping": "pending assertion correspondence after lexical census correction",
+          "nativeStatus": "pending",
+          "runtimeObservation": "unknown"
+        },
+        {
+          "line": 241,
+          "call": "assert_visual_range(\"V\", { 1, 0 }, { 3, 0 }, \"inclusive\", {\n      start = { line = 0, character = 0 },\n      [\"end\"] = { line = 2, character = #\"third\" },\n    })",
+          "legacyAssertionId": "mcdev-nvim/tests/lsp_regressions.lua::assert@241",
+          "replacementPath": null,
+          "replacementLine": null,
+          "mapping": "pending assertion correspondence after lexical census correction",
+          "nativeStatus": "pending",
+          "runtimeObservation": "unknown"
+        },
+        {
           "line": 253,
           "call": "h.assert_eq(pending[2].params.range.start.character, 4, \"omitted range uses cursor\")",
           "legacyAssertionId": "mcdev-nvim/tests/lsp_regressions.lua::assert@253",
@@ -8496,6 +9986,16 @@
           "mapping": "exact assertion in corresponding source region"
         },
         {
+          "line": 489,
+          "call": "h.assert_not_nil(result, \"no standard clients must not stall merge\")",
+          "legacyAssertionId": "mcdev-nvim/tests/lsp_regressions.lua::assert@489",
+          "replacementPath": null,
+          "replacementLine": null,
+          "mapping": "pending assertion correspondence after lexical census correction",
+          "nativeStatus": "pending",
+          "runtimeObservation": "unknown"
+        },
+        {
           "line": 490,
           "call": "h.assert_eq(#result, 1)",
           "legacyAssertionId": "mcdev-nvim/tests/lsp_regressions.lua::assert@490",
@@ -8707,8 +10207,8 @@
         }
       ],
       "fidelity": {
-        "status": "verified",
-        "strict": true,
+        "status": "pending assertion correspondence",
+        "strict": false,
         "enforcedChecks": {
           "assertions": true,
           "cases": true,
@@ -8717,14 +10217,22 @@
         },
         "oldLineCount": 503,
         "newLineCount": 536,
-        "assertionSiteCount": 80,
+        "assertionSiteCount": 85,
         "caseEntryCount": 10,
         "loopInputCount": 10,
         "stateMarkerCount": 97,
         "missingAssertions": [],
         "missingCaseEntries": [],
         "missingLoopInputs": [],
-        "missingStateMarkers": []
+        "missingStateMarkers": [],
+        "pendingAssertionSites": [
+          "mcdev-nvim/tests/lsp_regressions.lua::assert@228",
+          "mcdev-nvim/tests/lsp_regressions.lua::assert@232",
+          "mcdev-nvim/tests/lsp_regressions.lua::assert@236",
+          "mcdev-nvim/tests/lsp_regressions.lua::assert@241",
+          "mcdev-nvim/tests/lsp_regressions.lua::assert@489"
+        ],
+        "pendingAssertionSiteCount": 5
       },
       "nativeExecution": "see execution evidence",
       "nativeStatus": "passed",
@@ -9572,6 +11080,16 @@
           "mapping": "exact assertion in corresponding source region"
         },
         {
+          "line": 125,
+          "call": "helpers.assert_not_nil(payload.context)",
+          "legacyAssertionId": "mcdev-nvim/tests/run.lua::assert@125",
+          "replacementPath": null,
+          "replacementLine": null,
+          "mapping": "pending assertion correspondence after lexical census correction",
+          "nativeStatus": "pending",
+          "runtimeObservation": "unknown"
+        },
+        {
           "line": 126,
           "call": "helpers.assert_eq(payload.context.protocolVersion, protocol.VERSION)",
           "legacyAssertionId": "mcdev-nvim/tests/run.lua::assert@126",
@@ -9644,6 +11162,16 @@
           "mapping": "exact assertion in corresponding source region"
         },
         {
+          "line": 135,
+          "call": "helpers.assert_not_nil(payload.context.client)",
+          "legacyAssertionId": "mcdev-nvim/tests/run.lua::assert@135",
+          "replacementPath": null,
+          "replacementLine": null,
+          "mapping": "pending assertion correspondence after lexical census correction",
+          "nativeStatus": "pending",
+          "runtimeObservation": "unknown"
+        },
+        {
           "line": 136,
           "call": "helpers.assert_eq(payload.context.client.name, \"mcdev.nvim\")",
           "legacyAssertionId": "mcdev-nvim/tests/run.lua::assert@136",
@@ -9658,6 +11186,16 @@
           "replacementPath": "mcdev-nvim/tests/run.lua",
           "replacementLine": 94,
           "mapping": "exact assertion in corresponding source region"
+        },
+        {
+          "line": 138,
+          "call": "helpers.assert_not_nil(payload.context.bufferTextFallback)",
+          "legacyAssertionId": "mcdev-nvim/tests/run.lua::assert@138",
+          "replacementPath": null,
+          "replacementLine": null,
+          "mapping": "pending assertion correspondence after lexical census correction",
+          "nativeStatus": "pending",
+          "runtimeObservation": "unknown"
         },
         {
           "line": 150,
@@ -9682,6 +11220,16 @@
           "replacementPath": "mcdev-nvim/tests/run.lua",
           "replacementLine": 118,
           "mapping": "exact assertion in corresponding source region"
+        },
+        {
+          "line": 193,
+          "call": "helpers.assert_not_nil(blink_result)",
+          "legacyAssertionId": "mcdev-nvim/tests/run.lua::assert@193",
+          "replacementPath": null,
+          "replacementLine": null,
+          "mapping": "pending assertion correspondence after lexical census correction",
+          "nativeStatus": "pending",
+          "runtimeObservation": "unknown"
         },
         {
           "line": 194,
@@ -9828,6 +11376,16 @@
           "mapping": "exact assertion in corresponding source region"
         },
         {
+          "line": 247,
+          "call": "helpers.assert_not_nil(cmp_result)",
+          "legacyAssertionId": "mcdev-nvim/tests/run.lua::assert@247",
+          "replacementPath": null,
+          "replacementLine": null,
+          "mapping": "pending assertion correspondence after lexical census correction",
+          "nativeStatus": "pending",
+          "runtimeObservation": "unknown"
+        },
+        {
           "line": 248,
           "call": "helpers.assert_eq(#cmp_result.items, 1)",
           "legacyAssertionId": "mcdev-nvim/tests/run.lua::assert@248",
@@ -9866,6 +11424,116 @@
           "replacementPath": "mcdev-nvim/tests/run.lua",
           "replacementLine": 209,
           "mapping": "exact assertion in corresponding source region"
+        },
+        {
+          "line": 256,
+          "call": "helpers.assert_not_nil(commands.McdevInfo)",
+          "legacyAssertionId": "mcdev-nvim/tests/run.lua::assert@256",
+          "replacementPath": null,
+          "replacementLine": null,
+          "mapping": "pending assertion correspondence after lexical census correction",
+          "nativeStatus": "pending",
+          "runtimeObservation": "unknown"
+        },
+        {
+          "line": 257,
+          "call": "helpers.assert_not_nil(commands.McdevReindex)",
+          "legacyAssertionId": "mcdev-nvim/tests/run.lua::assert@257",
+          "replacementPath": null,
+          "replacementLine": null,
+          "mapping": "pending assertion correspondence after lexical census correction",
+          "nativeStatus": "pending",
+          "runtimeObservation": "unknown"
+        },
+        {
+          "line": 258,
+          "call": "helpers.assert_not_nil(commands.McdevReloadProjectContext)",
+          "legacyAssertionId": "mcdev-nvim/tests/run.lua::assert@258",
+          "replacementPath": null,
+          "replacementLine": null,
+          "mapping": "pending assertion correspondence after lexical census correction",
+          "nativeStatus": "pending",
+          "runtimeObservation": "unknown"
+        },
+        {
+          "line": 259,
+          "call": "helpers.assert_not_nil(commands.McdevDumpContext)",
+          "legacyAssertionId": "mcdev-nvim/tests/run.lua::assert@259",
+          "replacementPath": null,
+          "replacementLine": null,
+          "mapping": "pending assertion correspondence after lexical census correction",
+          "nativeStatus": "pending",
+          "runtimeObservation": "unknown"
+        },
+        {
+          "line": 260,
+          "call": "helpers.assert_not_nil(commands.McdevHealth)",
+          "legacyAssertionId": "mcdev-nvim/tests/run.lua::assert@260",
+          "replacementPath": null,
+          "replacementLine": null,
+          "mapping": "pending assertion correspondence after lexical census correction",
+          "nativeStatus": "pending",
+          "runtimeObservation": "unknown"
+        },
+        {
+          "line": 261,
+          "call": "helpers.assert_not_nil(commands.McdevDebugCompletion)",
+          "legacyAssertionId": "mcdev-nvim/tests/run.lua::assert@261",
+          "replacementPath": null,
+          "replacementLine": null,
+          "mapping": "pending assertion correspondence after lexical census correction",
+          "nativeStatus": "pending",
+          "runtimeObservation": "unknown"
+        },
+        {
+          "line": 262,
+          "call": "helpers.assert_not_nil(commands.McdevDebugDiagnostics)",
+          "legacyAssertionId": "mcdev-nvim/tests/run.lua::assert@262",
+          "replacementPath": null,
+          "replacementLine": null,
+          "mapping": "pending assertion correspondence after lexical census correction",
+          "nativeStatus": "pending",
+          "runtimeObservation": "unknown"
+        },
+        {
+          "line": 263,
+          "call": "helpers.assert_not_nil(commands.McdevDiagnosticsRefresh)",
+          "legacyAssertionId": "mcdev-nvim/tests/run.lua::assert@263",
+          "replacementPath": null,
+          "replacementLine": null,
+          "mapping": "pending assertion correspondence after lexical census correction",
+          "nativeStatus": "pending",
+          "runtimeObservation": "unknown"
+        },
+        {
+          "line": 264,
+          "call": "helpers.assert_not_nil(commands.McdevDiagnosticsStop)",
+          "legacyAssertionId": "mcdev-nvim/tests/run.lua::assert@264",
+          "replacementPath": null,
+          "replacementLine": null,
+          "mapping": "pending assertion correspondence after lexical census correction",
+          "nativeStatus": "pending",
+          "runtimeObservation": "unknown"
+        },
+        {
+          "line": 265,
+          "call": "helpers.assert_not_nil(commands.McdevDiagnosticsStart)",
+          "legacyAssertionId": "mcdev-nvim/tests/run.lua::assert@265",
+          "replacementPath": null,
+          "replacementLine": null,
+          "mapping": "pending assertion correspondence after lexical census correction",
+          "nativeStatus": "pending",
+          "runtimeObservation": "unknown"
+        },
+        {
+          "line": 266,
+          "call": "helpers.assert_not_nil(commands.McdevDiagnosticsStatus)",
+          "legacyAssertionId": "mcdev-nvim/tests/run.lua::assert@266",
+          "replacementPath": null,
+          "replacementLine": null,
+          "mapping": "pending assertion correspondence after lexical census correction",
+          "nativeStatus": "pending",
+          "runtimeObservation": "unknown"
         },
         {
           "line": 268,
@@ -10092,6 +11760,16 @@
           "mapping": "exact assertion in corresponding source region"
         },
         {
+          "line": 501,
+          "call": "helpers.assert_not_nil(second)",
+          "legacyAssertionId": "mcdev-nvim/tests/run.lua::assert@501",
+          "replacementPath": null,
+          "replacementLine": null,
+          "mapping": "pending assertion correspondence after lexical census correction",
+          "nativeStatus": "pending",
+          "runtimeObservation": "unknown"
+        },
+        {
           "line": 502,
           "call": "helpers.assert_eq(server_requests, 2)",
           "legacyAssertionId": "mcdev-nvim/tests/run.lua::assert@502",
@@ -10164,6 +11842,16 @@
           "mapping": "exact assertion in corresponding source region"
         },
         {
+          "line": 579,
+          "call": "helpers.assert_not_nil(second)",
+          "legacyAssertionId": "mcdev-nvim/tests/run.lua::assert@579",
+          "replacementPath": null,
+          "replacementLine": null,
+          "mapping": "pending assertion correspondence after lexical census correction",
+          "nativeStatus": "pending",
+          "runtimeObservation": "unknown"
+        },
+        {
           "line": 580,
           "call": "helpers.assert_eq(#second.items, 1)",
           "legacyAssertionId": "mcdev-nvim/tests/run.lua::assert@580",
@@ -10180,6 +11868,16 @@
           "mapping": "exact assertion in corresponding source region"
         },
         {
+          "line": 598,
+          "call": "helpers.assert_not_nil(failed)",
+          "legacyAssertionId": "mcdev-nvim/tests/run.lua::assert@598",
+          "replacementPath": null,
+          "replacementLine": null,
+          "mapping": "pending assertion correspondence after lexical census correction",
+          "nativeStatus": "pending",
+          "runtimeObservation": "unknown"
+        },
+        {
           "line": 599,
           "call": "helpers.assert_eq(#failed.items, 0)",
           "legacyAssertionId": "mcdev-nvim/tests/run.lua::assert@599",
@@ -10194,6 +11892,16 @@
           "replacementPath": "mcdev-nvim/tests/run.lua",
           "replacementLine": 558,
           "mapping": "exact assertion in corresponding source region"
+        },
+        {
+          "line": 631,
+          "call": "helpers.assert_not_nil(failed)",
+          "legacyAssertionId": "mcdev-nvim/tests/run.lua::assert@631",
+          "replacementPath": null,
+          "replacementLine": null,
+          "mapping": "pending assertion correspondence after lexical census correction",
+          "nativeStatus": "pending",
+          "runtimeObservation": "unknown"
         },
         {
           "line": 632,
@@ -10226,6 +11934,16 @@
           "replacementPath": "mcdev-nvim/tests/run.lua",
           "replacementLine": 599,
           "mapping": "exact assertion in corresponding source region"
+        },
+        {
+          "line": 642,
+          "call": "helpers.assert_not_nil(recovered)",
+          "legacyAssertionId": "mcdev-nvim/tests/run.lua::assert@642",
+          "replacementPath": null,
+          "replacementLine": null,
+          "mapping": "pending assertion correspondence after lexical census correction",
+          "nativeStatus": "pending",
+          "runtimeObservation": "unknown"
         },
         {
           "line": 643,
@@ -10284,6 +12002,16 @@
           "mapping": "exact assertion in corresponding source region"
         },
         {
+          "line": 684,
+          "call": "helpers.assert_not_nil(second)",
+          "legacyAssertionId": "mcdev-nvim/tests/run.lua::assert@684",
+          "replacementPath": null,
+          "replacementLine": null,
+          "mapping": "pending assertion correspondence after lexical census correction",
+          "nativeStatus": "pending",
+          "runtimeObservation": "unknown"
+        },
+        {
           "line": 685,
           "call": "helpers.assert_eq(#second.items, 1)",
           "legacyAssertionId": "mcdev-nvim/tests/run.lua::assert@685",
@@ -10300,12 +12028,42 @@
           "mapping": "exact assertion in corresponding source region"
         },
         {
+          "line": 694,
+          "call": "assert_overlapping_prefix_lifecycle(bufnr, { 3, 2, 1 })",
+          "legacyAssertionId": "mcdev-nvim/tests/run.lua::assert@694",
+          "replacementPath": null,
+          "replacementLine": null,
+          "mapping": "pending assertion correspondence after lexical census correction",
+          "nativeStatus": "pending",
+          "runtimeObservation": "unknown"
+        },
+        {
+          "line": 700,
+          "call": "assert_overlapping_prefix_lifecycle(bufnr, { 1, 2, 3 })",
+          "legacyAssertionId": "mcdev-nvim/tests/run.lua::assert@700",
+          "replacementPath": null,
+          "replacementLine": null,
+          "mapping": "pending assertion correspondence after lexical census correction",
+          "nativeStatus": "pending",
+          "runtimeObservation": "unknown"
+        },
+        {
           "line": 742,
           "call": "helpers.assert_eq(#pending, 1)",
           "legacyAssertionId": "mcdev-nvim/tests/run.lua::assert@742",
           "replacementPath": "mcdev-nvim/tests/run.lua",
           "replacementLine": 701,
           "mapping": "exact assertion in corresponding source region"
+        },
+        {
+          "line": 753,
+          "call": "helpers.assert_not_nil(stale)",
+          "legacyAssertionId": "mcdev-nvim/tests/run.lua::assert@753",
+          "replacementPath": null,
+          "replacementLine": null,
+          "mapping": "pending assertion correspondence after lexical census correction",
+          "nativeStatus": "pending",
+          "runtimeObservation": "unknown"
         },
         {
           "line": 754,
@@ -10348,6 +12106,16 @@
           "mapping": "exact assertion in corresponding source region"
         },
         {
+          "line": 766,
+          "call": "helpers.assert_not_nil(queued)",
+          "legacyAssertionId": "mcdev-nvim/tests/run.lua::assert@766",
+          "replacementPath": null,
+          "replacementLine": null,
+          "mapping": "pending assertion correspondence after lexical census correction",
+          "nativeStatus": "pending",
+          "runtimeObservation": "unknown"
+        },
+        {
           "line": 767,
           "call": "helpers.assert_eq(#queued.items, 1)",
           "legacyAssertionId": "mcdev-nvim/tests/run.lua::assert@767",
@@ -10380,6 +12148,16 @@
           "mapping": "exact assertion in corresponding source region"
         },
         {
+          "line": 786,
+          "call": "helpers.assert_not_nil(extended)",
+          "legacyAssertionId": "mcdev-nvim/tests/run.lua::assert@786",
+          "replacementPath": null,
+          "replacementLine": null,
+          "mapping": "pending assertion correspondence after lexical census correction",
+          "nativeStatus": "pending",
+          "runtimeObservation": "unknown"
+        },
+        {
           "line": 787,
           "call": "helpers.assert_eq(#extended.items, 1)",
           "legacyAssertionId": "mcdev-nvim/tests/run.lua::assert@787",
@@ -10402,6 +12180,16 @@
           "replacementPath": "mcdev-nvim/tests/run.lua",
           "replacementLine": 748,
           "mapping": "exact assertion in corresponding source region"
+        },
+        {
+          "line": 814,
+          "call": "helpers.assert_not_nil(stale)",
+          "legacyAssertionId": "mcdev-nvim/tests/run.lua::assert@814",
+          "replacementPath": null,
+          "replacementLine": null,
+          "mapping": "pending assertion correspondence after lexical census correction",
+          "nativeStatus": "pending",
+          "runtimeObservation": "unknown"
         },
         {
           "line": 815,
@@ -10444,6 +12232,16 @@
           "mapping": "exact assertion in corresponding source region"
         },
         {
+          "line": 831,
+          "call": "helpers.assert_not_nil(cmp_stale_result)",
+          "legacyAssertionId": "mcdev-nvim/tests/run.lua::assert@831",
+          "replacementPath": null,
+          "replacementLine": null,
+          "mapping": "pending assertion correspondence after lexical census correction",
+          "nativeStatus": "pending",
+          "runtimeObservation": "unknown"
+        },
+        {
           "line": 832,
           "call": "helpers.assert_true(cmp_stale_result.isIncomplete)",
           "legacyAssertionId": "mcdev-nvim/tests/run.lua::assert@832",
@@ -10468,6 +12266,16 @@
           "mapping": "exact assertion in corresponding source region"
         },
         {
+          "line": 844,
+          "call": "helpers.assert_not_nil(cmp_fresh)",
+          "legacyAssertionId": "mcdev-nvim/tests/run.lua::assert@844",
+          "replacementPath": null,
+          "replacementLine": null,
+          "mapping": "pending assertion correspondence after lexical census correction",
+          "nativeStatus": "pending",
+          "runtimeObservation": "unknown"
+        },
+        {
           "line": 845,
           "call": "helpers.assert_eq(#cmp_fresh.items, 1)",
           "legacyAssertionId": "mcdev-nvim/tests/run.lua::assert@845",
@@ -10482,6 +12290,16 @@
           "replacementPath": "mcdev-nvim/tests/run.lua",
           "replacementLine": 811,
           "mapping": "exact assertion in corresponding source region"
+        },
+        {
+          "line": 854,
+          "call": "helpers.assert_not_nil(fresh)",
+          "legacyAssertionId": "mcdev-nvim/tests/run.lua::assert@854",
+          "replacementPath": null,
+          "replacementLine": null,
+          "mapping": "pending assertion correspondence after lexical census correction",
+          "nativeStatus": "pending",
+          "runtimeObservation": "unknown"
         },
         {
           "line": 855,
@@ -10506,6 +12324,26 @@
           "replacementPath": "mcdev-nvim/tests/run.lua",
           "replacementLine": 824,
           "mapping": "exact assertion in corresponding source region"
+        },
+        {
+          "line": 881,
+          "call": "helpers.assert_not_nil(payload.context)",
+          "legacyAssertionId": "mcdev-nvim/tests/run.lua::assert@881",
+          "replacementPath": null,
+          "replacementLine": null,
+          "mapping": "pending assertion correspondence after lexical census correction",
+          "nativeStatus": "pending",
+          "runtimeObservation": "unknown"
+        },
+        {
+          "line": 882,
+          "call": "helpers.assert_not_nil(payload.context.bufferTextFallback)",
+          "legacyAssertionId": "mcdev-nvim/tests/run.lua::assert@882",
+          "replacementPath": null,
+          "replacementLine": null,
+          "mapping": "pending assertion correspondence after lexical census correction",
+          "nativeStatus": "pending",
+          "runtimeObservation": "unknown"
         },
         {
           "line": 906,
@@ -10724,6 +12562,16 @@
           "mapping": "exact assertion in corresponding source region"
         },
         {
+          "line": 982,
+          "call": "helpers.assert_not_nil(result)",
+          "legacyAssertionId": "mcdev-nvim/tests/run.lua::assert@982",
+          "replacementPath": null,
+          "replacementLine": null,
+          "mapping": "pending assertion correspondence after lexical census correction",
+          "nativeStatus": "pending",
+          "runtimeObservation": "unknown"
+        },
+        {
           "line": 983,
           "call": "helpers.assert_eq(#result.items, 1)",
           "legacyAssertionId": "mcdev-nvim/tests/run.lua::assert@983",
@@ -10738,6 +12586,16 @@
           "replacementPath": "mcdev-nvim/tests/run.lua",
           "replacementLine": 943,
           "mapping": "exact assertion in corresponding source region"
+        },
+        {
+          "line": 1014,
+          "call": "helpers.assert_not_nil(jdt_callback, \"unavailable endpoint must retain normal fallback\")",
+          "legacyAssertionId": "mcdev-nvim/tests/run.lua::assert@1014",
+          "replacementPath": null,
+          "replacementLine": null,
+          "mapping": "pending assertion correspondence after lexical census correction",
+          "nativeStatus": "pending",
+          "runtimeObservation": "unknown"
         },
         {
           "line": 1015,
@@ -10884,6 +12742,26 @@
           "mapping": "exact assertion in corresponding source region"
         },
         {
+          "line": 1147,
+          "call": "helpers.assert_not_nil(jdt_callback)",
+          "legacyAssertionId": "mcdev-nvim/tests/run.lua::assert@1147",
+          "replacementPath": null,
+          "replacementLine": null,
+          "mapping": "pending assertion correspondence after lexical census correction",
+          "nativeStatus": "pending",
+          "runtimeObservation": "unknown"
+        },
+        {
+          "line": 1149,
+          "call": "helpers.assert_not_nil(result)",
+          "legacyAssertionId": "mcdev-nvim/tests/run.lua::assert@1149",
+          "replacementPath": null,
+          "replacementLine": null,
+          "mapping": "pending assertion correspondence after lexical census correction",
+          "nativeStatus": "pending",
+          "runtimeObservation": "unknown"
+        },
+        {
           "line": 1150,
           "call": "helpers.assert_eq(#result.items, 1)",
           "legacyAssertionId": "mcdev-nvim/tests/run.lua::assert@1150",
@@ -10906,6 +12784,16 @@
           "replacementPath": "mcdev-nvim/tests/run.lua",
           "replacementLine": 1140,
           "mapping": "exact assertion in corresponding source region"
+        },
+        {
+          "line": 1205,
+          "call": "helpers.assert_not_nil(pending)",
+          "legacyAssertionId": "mcdev-nvim/tests/run.lua::assert@1205",
+          "replacementPath": null,
+          "replacementLine": null,
+          "mapping": "pending assertion correspondence after lexical census correction",
+          "nativeStatus": "pending",
+          "runtimeObservation": "unknown"
         },
         {
           "line": 1225,
@@ -11060,6 +12948,16 @@
           "mapping": "exact assertion in corresponding source region"
         },
         {
+          "line": 1306,
+          "call": "helpers.assert_not_nil(plain_java_result)",
+          "legacyAssertionId": "mcdev-nvim/tests/run.lua::assert@1306",
+          "replacementPath": null,
+          "replacementLine": null,
+          "mapping": "pending assertion correspondence after lexical census correction",
+          "nativeStatus": "pending",
+          "runtimeObservation": "unknown"
+        },
+        {
           "line": 1307,
           "call": "helpers.assert_eq(#plain_java_result.items, 0)",
           "legacyAssertionId": "mcdev-nvim/tests/run.lua::assert@1307",
@@ -11090,6 +12988,16 @@
           "replacementPath": "mcdev-nvim/tests/run.lua",
           "replacementLine": 1286,
           "mapping": "exact assertion in corresponding source region"
+        },
+        {
+          "line": 1328,
+          "call": "helpers.assert_not_nil(plain_json_result)",
+          "legacyAssertionId": "mcdev-nvim/tests/run.lua::assert@1328",
+          "replacementPath": null,
+          "replacementLine": null,
+          "mapping": "pending assertion correspondence after lexical census correction",
+          "nativeStatus": "pending",
+          "runtimeObservation": "unknown"
         },
         {
           "line": 1329,
@@ -11234,6 +13142,16 @@
           "replacementPath": "mcdev-nvim/tests/run.lua",
           "replacementLine": 1424,
           "mapping": "exact assertion in corresponding source region"
+        },
+        {
+          "line": 1465,
+          "call": "helpers.assert_not_nil(request_result)",
+          "legacyAssertionId": "mcdev-nvim/tests/run.lua::assert@1465",
+          "replacementPath": null,
+          "replacementLine": null,
+          "mapping": "pending assertion correspondence after lexical census correction",
+          "nativeStatus": "pending",
+          "runtimeObservation": "unknown"
         },
         {
           "line": 1466,
@@ -11628,6 +13546,16 @@
           "mapping": "exact assertion in corresponding source region"
         },
         {
+          "line": 1757,
+          "call": "helpers.assert_not_nil(hover_result)",
+          "legacyAssertionId": "mcdev-nvim/tests/run.lua::assert@1757",
+          "replacementPath": null,
+          "replacementLine": null,
+          "mapping": "pending assertion correspondence after lexical census correction",
+          "nativeStatus": "pending",
+          "runtimeObservation": "unknown"
+        },
+        {
           "line": 1758,
           "call": "helpers.assert_eq(hover_result.contents[1], \"```mcdev\\nclass com.example.target.SimpleTarget\\n```\")",
           "legacyAssertionId": "mcdev-nvim/tests/run.lua::assert@1758",
@@ -11660,6 +13588,16 @@
           "mapping": "exact assertion in corresponding source region"
         },
         {
+          "line": 1791,
+          "call": "helpers.assert_not_nil(fetched_diagnostics)",
+          "legacyAssertionId": "mcdev-nvim/tests/run.lua::assert@1791",
+          "replacementPath": null,
+          "replacementLine": null,
+          "mapping": "pending assertion correspondence after lexical census correction",
+          "nativeStatus": "pending",
+          "runtimeObservation": "unknown"
+        },
+        {
           "line": 1794,
           "call": "helpers.assert_eq(#published, 1)",
           "legacyAssertionId": "mcdev-nvim/tests/run.lua::assert@1794",
@@ -11684,12 +13622,72 @@
           "mapping": "exact assertion in corresponding source region"
         },
         {
+          "line": 1832,
+          "call": "helpers.assert_not_nil(converted_actions)",
+          "legacyAssertionId": "mcdev-nvim/tests/run.lua::assert@1832",
+          "replacementPath": null,
+          "replacementLine": null,
+          "mapping": "pending assertion correspondence after lexical census correction",
+          "nativeStatus": "pending",
+          "runtimeObservation": "unknown"
+        },
+        {
           "line": 1833,
           "call": "helpers.assert_eq(converted_actions[1].kind, \"quickfix.at.addDescriptor\")",
           "legacyAssertionId": "mcdev-nvim/tests/run.lua::assert@1833",
           "replacementPath": "mcdev-nvim/tests/run.lua",
           "replacementLine": 1796,
           "mapping": "exact assertion in corresponding source region"
+        },
+        {
+          "line": 1836,
+          "call": "helpers.assert_not_nil(mcdev.navigation)",
+          "legacyAssertionId": "mcdev-nvim/tests/run.lua::assert@1836",
+          "replacementPath": null,
+          "replacementLine": null,
+          "mapping": "pending assertion correspondence after lexical census correction",
+          "nativeStatus": "pending",
+          "runtimeObservation": "unknown"
+        },
+        {
+          "line": 1837,
+          "call": "helpers.assert_not_nil(mcdev.code_action)",
+          "legacyAssertionId": "mcdev-nvim/tests/run.lua::assert@1837",
+          "replacementPath": null,
+          "replacementLine": null,
+          "mapping": "pending assertion correspondence after lexical census correction",
+          "nativeStatus": "pending",
+          "runtimeObservation": "unknown"
+        },
+        {
+          "line": 1838,
+          "call": "helpers.assert_not_nil(mcdev.diagnostics)",
+          "legacyAssertionId": "mcdev-nvim/tests/run.lua::assert@1838",
+          "replacementPath": null,
+          "replacementLine": null,
+          "mapping": "pending assertion correspondence after lexical census correction",
+          "nativeStatus": "pending",
+          "runtimeObservation": "unknown"
+        },
+        {
+          "line": 1839,
+          "call": "helpers.assert_not_nil(mcdev.convert)",
+          "legacyAssertionId": "mcdev-nvim/tests/run.lua::assert@1839",
+          "replacementPath": null,
+          "replacementLine": null,
+          "mapping": "pending assertion correspondence after lexical census correction",
+          "nativeStatus": "pending",
+          "runtimeObservation": "unknown"
+        },
+        {
+          "line": 1840,
+          "call": "helpers.assert_not_nil(mcdev.lsp)",
+          "legacyAssertionId": "mcdev-nvim/tests/run.lua::assert@1840",
+          "replacementPath": null,
+          "replacementLine": null,
+          "mapping": "pending assertion correspondence after lexical census correction",
+          "nativeStatus": "pending",
+          "runtimeObservation": "unknown"
         },
         {
           "line": 1841,
@@ -11812,6 +13810,16 @@
           "mapping": "exact assertion in corresponding source region"
         },
         {
+          "line": 1967,
+          "call": "helpers.assert_not_nil(merged)",
+          "legacyAssertionId": "mcdev-nvim/tests/run.lua::assert@1967",
+          "replacementPath": null,
+          "replacementLine": null,
+          "mapping": "pending assertion correspondence after lexical census correction",
+          "nativeStatus": "pending",
+          "runtimeObservation": "unknown"
+        },
+        {
           "line": 1968,
           "call": "helpers.assert_eq(#merged, 3)",
           "legacyAssertionId": "mcdev-nvim/tests/run.lua::assert@1968",
@@ -11882,6 +13890,16 @@
           "replacementPath": "mcdev-nvim/tests/run.lua",
           "replacementLine": 1980,
           "mapping": "exact assertion in corresponding source region"
+        },
+        {
+          "line": 2028,
+          "call": "helpers.assert_not_nil(second_result)",
+          "legacyAssertionId": "mcdev-nvim/tests/run.lua::assert@2028",
+          "replacementPath": null,
+          "replacementLine": null,
+          "mapping": "pending assertion correspondence after lexical census correction",
+          "nativeStatus": "pending",
+          "runtimeObservation": "unknown"
         },
         {
           "line": 2029,
@@ -12074,7 +14092,7 @@
         },
         "oldLineCount": 2050,
         "newLineCount": 2085,
-        "assertionSiteCount": 306,
+        "assertionSiteCount": 357,
         "caseEntryCount": 38,
         "loopInputCount": 1,
         "stateMarkerCount": 278,
@@ -12150,7 +14168,61 @@
           "assertionObservers": "mcdev-nvim/tests/explicit_deltas.json",
           "observedScope": "Only the scoped finite client/unit/process counts in migration_evidence.json; original real-host E2E operations remain unverified.",
           "fullOriginalEditorE2EVerified": false
-        }
+        },
+        "pendingAssertionSites": [
+          "mcdev-nvim/tests/run.lua::assert@125",
+          "mcdev-nvim/tests/run.lua::assert@135",
+          "mcdev-nvim/tests/run.lua::assert@138",
+          "mcdev-nvim/tests/run.lua::assert@193",
+          "mcdev-nvim/tests/run.lua::assert@247",
+          "mcdev-nvim/tests/run.lua::assert@256",
+          "mcdev-nvim/tests/run.lua::assert@257",
+          "mcdev-nvim/tests/run.lua::assert@258",
+          "mcdev-nvim/tests/run.lua::assert@259",
+          "mcdev-nvim/tests/run.lua::assert@260",
+          "mcdev-nvim/tests/run.lua::assert@261",
+          "mcdev-nvim/tests/run.lua::assert@262",
+          "mcdev-nvim/tests/run.lua::assert@263",
+          "mcdev-nvim/tests/run.lua::assert@264",
+          "mcdev-nvim/tests/run.lua::assert@265",
+          "mcdev-nvim/tests/run.lua::assert@266",
+          "mcdev-nvim/tests/run.lua::assert@501",
+          "mcdev-nvim/tests/run.lua::assert@579",
+          "mcdev-nvim/tests/run.lua::assert@598",
+          "mcdev-nvim/tests/run.lua::assert@631",
+          "mcdev-nvim/tests/run.lua::assert@642",
+          "mcdev-nvim/tests/run.lua::assert@684",
+          "mcdev-nvim/tests/run.lua::assert@694",
+          "mcdev-nvim/tests/run.lua::assert@700",
+          "mcdev-nvim/tests/run.lua::assert@753",
+          "mcdev-nvim/tests/run.lua::assert@766",
+          "mcdev-nvim/tests/run.lua::assert@786",
+          "mcdev-nvim/tests/run.lua::assert@814",
+          "mcdev-nvim/tests/run.lua::assert@831",
+          "mcdev-nvim/tests/run.lua::assert@844",
+          "mcdev-nvim/tests/run.lua::assert@854",
+          "mcdev-nvim/tests/run.lua::assert@881",
+          "mcdev-nvim/tests/run.lua::assert@882",
+          "mcdev-nvim/tests/run.lua::assert@982",
+          "mcdev-nvim/tests/run.lua::assert@1014",
+          "mcdev-nvim/tests/run.lua::assert@1147",
+          "mcdev-nvim/tests/run.lua::assert@1149",
+          "mcdev-nvim/tests/run.lua::assert@1205",
+          "mcdev-nvim/tests/run.lua::assert@1306",
+          "mcdev-nvim/tests/run.lua::assert@1328",
+          "mcdev-nvim/tests/run.lua::assert@1465",
+          "mcdev-nvim/tests/run.lua::assert@1757",
+          "mcdev-nvim/tests/run.lua::assert@1791",
+          "mcdev-nvim/tests/run.lua::assert@1832",
+          "mcdev-nvim/tests/run.lua::assert@1836",
+          "mcdev-nvim/tests/run.lua::assert@1837",
+          "mcdev-nvim/tests/run.lua::assert@1838",
+          "mcdev-nvim/tests/run.lua::assert@1839",
+          "mcdev-nvim/tests/run.lua::assert@1840",
+          "mcdev-nvim/tests/run.lua::assert@1967",
+          "mcdev-nvim/tests/run.lua::assert@2028"
+        ],
+        "pendingAssertionSiteCount": 51
       },
       "nativeExecution": "see execution evidence",
       "nativeStatus": "passed",
@@ -13474,5 +15546,22 @@
       }
     }
   ],
-  "executionEvidenceScope": "Existing executedAssertionCalls/Sites and native loop/case records retain the historical native-client-final pin. Current replacement SHA/line mappings and the fresh collection are separate; old runtime line IDs are not remapped."
+  "executionEvidenceScope": "Existing executedAssertionCalls/Sites and native loop/case records retain the historical native-client-final pin. Current replacement SHA/line mappings and the fresh collection are separate; old runtime line IDs are not remapped.",
+  "assertionCensusCorrection": {
+    "previouslyCataloguedSites": 1014,
+    "addedFrozenSites": 183,
+    "totalFrozenSites": 1197,
+    "sameLineIDCollisions": 0,
+    "preservedExactMappings": 571,
+    "newSitesPending": 183,
+    "newRuntimePassesCredited": 0,
+    "newTestCases": 0,
+    "scanner": "mcdev-nvim/tests/migration_inventory.py",
+    "scannerSha256": "da3db0a19b26b64a01fe56015023c4ba0e484f0b55b85902b4bff9998162492d",
+    "selfcheck": "mcdev-nvim/tests/migration_inventory_selfcheck.py",
+    "selfcheckSha256": "ba12a4524fba443bd3026aad56959037827fadee3f7fb7c7c02d7b2281aa84c5",
+    "selfcheckEvidence": "build/rust-test-logs/assertion-census-20261101-031657307/selfcheck-result.json",
+    "saveCheckEvidence": "build/rust-test-logs/assertion-census-20261101-031657307/receipt.json",
+    "observationPolicy": "All added sites remain pending/unknown. Historical native collections and live MC slices retain their original scope; helper calls and assertions they invoke are separate static sites."
+  }
 }

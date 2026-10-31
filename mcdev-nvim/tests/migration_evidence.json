@@ -1,7 +1,7 @@
 {
   "originalTestAndSupportFiles": 27,
   "originalLuaModules": 20,
-  "originalStaticAssertionCallSites": 1014,
+  "originalStaticAssertionCallSites": 1197,
   "loadedClientModules": [
     "mcdev",
     "mcdev.attach",
@@ -3727,5 +3727,22 @@
     ],
     "scope": "One finite five-entry current-source client/unit/process collection plus fixture compilation; client/mock counts do not establish new original cases or full MC editor parity.",
     "allOriginalEditorE2EVerified": false
+  },
+  "assertionCensusCorrection": {
+    "previouslyCataloguedSites": 1014,
+    "addedFrozenSites": 183,
+    "totalFrozenSites": 1197,
+    "sameLineIDCollisions": 0,
+    "preservedExactMappings": 571,
+    "newSitesPending": 183,
+    "newRuntimePassesCredited": 0,
+    "newTestCases": 0,
+    "scanner": "mcdev-nvim/tests/migration_inventory.py",
+    "scannerSha256": "da3db0a19b26b64a01fe56015023c4ba0e484f0b55b85902b4bff9998162492d",
+    "selfcheck": "mcdev-nvim/tests/migration_inventory_selfcheck.py",
+    "selfcheckSha256": "ba12a4524fba443bd3026aad56959037827fadee3f7fb7c7c02d7b2281aa84c5",
+    "selfcheckEvidence": "build/rust-test-logs/assertion-census-20261101-031657307/selfcheck-result.json",
+    "saveCheckEvidence": "build/rust-test-logs/assertion-census-20261101-031657307/receipt.json",
+    "observationPolicy": "All added sites remain pending/unknown. Historical native collections and live MC slices retain their original scope; helper calls and assertions they invoke are separate static sites."
   }
 }
