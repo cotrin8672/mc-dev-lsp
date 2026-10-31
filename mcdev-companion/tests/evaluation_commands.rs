@@ -89,6 +89,69 @@ fn evaluation_host(
     )
 }
 
+#[test]
+fn references_coalesce_file_uri_aliases_without_changing_ranges_or_preferred_uris() {
+    let fixture = fixture(true, false, true, HostFact::Known(vec![]), false);
+    let current_uri = format!("{}/src/main/java/fixture/Patch.java", fixture.workspace);
+    let other_uri = format!("{}/src/main/java/fixture/Other.java", fixture.workspace);
+    let alias = |uri: &str| {
+        if let Some(path) = uri.strip_prefix("file:///") {
+            if path.as_bytes().get(1) == Some(&b':') {
+                return format!("file:///{}%3A{}", &path[..1], &path[2..]);
+            }
+        }
+        uri.replace("/fixture/", "/%66ixture/")
+    };
+    let other_alias = alias(&other_uri);
+    let source = METHOD_REFERENCE_SOURCE;
+    let other_source = format!("{source}\n{source}");
+    let inventory = HostFact::Known(vec![
+        SourceScanEntry {
+            document_uri: alias(&current_uri),
+            text: format!("// old captured text\n{source}"),
+        },
+        SourceScanEntry {
+            document_uri: other_alias.clone(),
+            text: other_source.clone(),
+        },
+        SourceScanEntry {
+            document_uri: other_uri,
+            text: other_source,
+        },
+    ]);
+    let host = evaluation_host(&fixture, inventory, None, false).unwrap();
+    let dispatcher = CommandDispatcher::for_evaluation(host, &[], true);
+    let response = dispatcher.execute(McdevCommands::REFERENCES, &[serde_json::json!({
+        "context":context(&fixture,source,&current_uri,position_at(source,source.find("\"tick()V\"").unwrap()+2))
+    })]).unwrap();
+    assert!(response.error.is_none(), "{:?}", response.error);
+    let first_range = McdevRange {
+        start: position_at(source, source.find("method =").unwrap()),
+        end: position_at(
+            source,
+            source.find("\"tick()V\"").unwrap() + "\"tick()V\"".len(),
+        ),
+    };
+    let second_range = McdevRange {
+        start: McdevPosition {
+            line: first_range.start.line + 1,
+            character: first_range.start.character,
+        },
+        end: McdevPosition {
+            line: first_range.end.line + 1,
+            character: first_range.end.character,
+        },
+    };
+    assert_eq!(
+        response.result.unwrap(),
+        serde_json::json!({"locations":[
+            {"documentUri":current_uri,"range":first_range,"metadata":{"source":"mixin.inject"},"resolution":"SOURCE"},
+            {"documentUri":other_alias,"range":first_range,"metadata":{"source":"mixin.inject"},"resolution":"SOURCE"},
+            {"documentUri":other_alias,"range":second_range,"metadata":{"source":"mixin.inject"},"resolution":"SOURCE"}
+        ]})
+    );
+}
+
 fn evaluation_host_with_references(
     fixture: &Fixture,
     inventory: HostFact<Vec<SourceScanEntry>>,

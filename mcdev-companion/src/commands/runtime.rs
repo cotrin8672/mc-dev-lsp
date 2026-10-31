@@ -3,6 +3,7 @@ use mcdev_core::{
     awat::AwAtBufferSupport,
     expression_engine::{CancellationChecker, NO_CANCELLATION},
     mixin_actions::MixinCodeActionService,
+    mixin_navigation::{reference_document_key, ReferenceDocumentKey},
     mixin_source::{JavaTypeDescriptorResolver, ParseConfidence, ParseSource},
     project::{InfoService, ProjectContext},
     McDefinitionTarget, MemberKind,
@@ -344,11 +345,19 @@ impl<H: CommandHost> CommandDispatcher<H> {
                 let awat =
                     self.host
                         .source_entries(&project, &request.context, SourceFamily::AwAt)?;
+                // Recorded legacy hosts keep raw URI identity in their callbacks and DTOs.
+                let document_key = |uri: &str| {
+                    if self.evaluation_scoped {
+                        reference_document_key(uri)
+                    } else {
+                        ReferenceDocumentKey::Opaque(uri.into())
+                    }
+                };
                 let mut seen = BTreeSet::new();
                 let sources = java
                     .into_iter()
                     .chain(awat.iter().cloned())
-                    .filter(|s| seen.insert(s.document_uri.clone()))
+                    .filter(|s| seen.insert(document_key(&s.document_uri)))
                     .collect::<Vec<_>>();
                 let mut references = vec![];
                 for target in targets {
@@ -369,7 +378,7 @@ impl<H: CommandHost> CommandDispatcher<H> {
                     let mut seen = BTreeSet::new();
                     references.extend(java_refs.into_iter().chain(awat_refs).filter(|r| {
                         seen.insert((
-                            r.document_uri.clone(),
+                            document_key(&r.document_uri),
                             r.range.start.line,
                             r.range.start.character,
                         ))

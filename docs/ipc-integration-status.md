@@ -172,8 +172,31 @@ returns typed incomplete context because an annotation reference alias lacks a
 positive identity. The original two helper invocations are observed; the
 85-row comparison is not reached. Shutdown exits zero. A bounded diagnostic now
 distinguishes missing collection, Unknown and DefinitelyAbsent and records the
-pair/ranges without dumping source text; its 22 affected tests pass. The exact
-nonpositive host fact remains unmeasured until the next diagnostic run.
+pair/ranges without dumping source text; its 22 affected tests pass.
+
+D9, retained under
+`build/cem-diagnostic-source-faeecb9/build/rust-test-logs/cem-project-20261101-060502760-d1a95c4b/`,
+identifies the actual facts: command evaluation 12, annotation type at UTF-8
+177..195 (`@Mixin(Item.class)`), sourceFacts reference `12:33` and annotationSites
+reference `12:35`, both requested and both Unknown with `MissingSource`. Both
+owners are `12:0`; source revision 110 and SHA `7bd1004f...` match. This is not a
+collector omission or a positive type identity. The host task is investigating
+dependency semantic-source preparation. D9 has stable inputs, two original
+helper calls, one failed completion and clean shutdown; no member comparison
+or full CEM success is credited.
+
+The first positive 11-command run uses a frozen `0c69d6b` source checkout and
+its independently recorded build identity. Full Info/Dump/config-action and
+the earlier command/lifecycle cases pass. References correctly fail duplicate
+rejection for equivalent Windows `C:` / `C%3A` file URIs. The native collection
+and result keys now share normalized file identity while preserving preferred
+display URIs and the legacy replay boundary; 183 affected tests pass, including
+all 135 unchanged command replays and an exact three-location regression.
+The refresh check separately misread zero newly installed source batches as
+incomplete indexing. Its counter predicate is corrected, keeping completed
+SDK/classpath/generation checks and actual config-change expectations. A new
+live command run remains required. ISO build timestamps are also read as exact
+JSON strings rather than PowerShell-coerced dates.
 
 Current-source metadata preserves the 2,604 cases, 17 ported / 3 partial / 7
 pending editor-file states and historical four-snippet/169-call proof. Its

@@ -10,7 +10,31 @@ use crate::{
 };
 use regex::Regex;
 use serde::{Deserialize, Serialize};
-use std::collections::{BTreeMap, BTreeSet};
+use std::{
+    collections::{BTreeMap, BTreeSet},
+    path::PathBuf,
+};
+
+/// Comparison only: this key grants no source, module or compiler-view authority.
+#[derive(Debug, Clone, PartialEq, Eq, PartialOrd, Ord)]
+pub enum ReferenceDocumentKey {
+    File(PathBuf),
+    Opaque(String),
+}
+
+pub fn reference_document_key(uri: &str) -> ReferenceDocumentKey {
+    if uri.starts_with("file:") {
+        if let Ok(path) = crate::project::uri_to_path(uri) {
+            let path = crate::project::normalize_path(&path);
+            return ReferenceDocumentKey::File(if cfg!(windows) {
+                PathBuf::from(path.to_string_lossy().to_ascii_lowercase())
+            } else {
+                path
+            });
+        }
+    }
+    ReferenceDocumentKey::Opaque(uri.into())
+}
 
 fn range(source: &str, start: usize, end: usize) -> McTextRange {
     let start = start.min(source.len());

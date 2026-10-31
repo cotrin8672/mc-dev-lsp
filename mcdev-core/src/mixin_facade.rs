@@ -2131,7 +2131,8 @@ impl HostMixinFacade {
         current_source: &str,
         sources: impl IntoIterator<Item = SourceScanEntry>,
     ) -> Vec<SourceScanEntry> {
-        let mut seen = BTreeSet::from([current_uri.to_string()]);
+        use crate::mixin_navigation::reference_document_key;
+        let mut seen = BTreeSet::from([reference_document_key(current_uri)]);
         let mut entries = vec![SourceScanEntry {
             document_uri: current_uri.into(),
             text: current_source.into(),
@@ -2139,7 +2140,7 @@ impl HostMixinFacade {
         entries.extend(
             sources
                 .into_iter()
-                .filter(|s| seen.insert(s.document_uri.clone())),
+                .filter(|s| seen.insert(reference_document_key(&s.document_uri))),
         );
         entries
     }
