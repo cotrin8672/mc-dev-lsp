@@ -115,6 +115,13 @@ fn negotiate(params: &Value) -> Result<(Value, BTreeSet<String>), String> {
             &["runtimeClass", "classBytes"][..],
         ),
         ("jvm-catalog-v1", &["jvmCatalog", "jvmClass"][..]),
+        ("source-facts-v2", &["sourceFacts"][..]),
+        ("source-locations-v1", &["sourceLocation"][..]),
+        ("project-inputs-v1", &["projectInputs"][..]),
+        (
+            "root-files-v1",
+            &["rootFileInventory", "rootFileSnapshot"][..],
+        ),
     ] {
         if !offered(capability) {
             continue;
@@ -135,6 +142,9 @@ fn negotiate(params: &Value) -> Result<(Value, BTreeSet<String>), String> {
             accepted.push(capability.into());
             operations.insert(capability.into(), Value::Array(intersection));
         }
+    }
+    if offered("binary-annotations-v1") {
+        accepted.push("binary-annotations-v1".into());
     }
     let mut commands = BTreeSet::new();
     if offered("provider-commands-v1") {
@@ -587,7 +597,13 @@ impl<W: Write> Host for Server<W> {
                 .filter(|query| {
                     matches!(
                         query["op"].as_str(),
-                        Some("resourceSnapshot" | "classBytes" | "jvmCatalog")
+                        Some(
+                            "resourceSnapshot"
+                                | "classBytes"
+                                | "jvmCatalog"
+                                | "rootFileInventory"
+                                | "rootFileSnapshot"
+                        )
                     ) && query.get("after").is_some_and(|value| !value.is_null())
                 })
                 .count()
@@ -699,6 +715,65 @@ impl<W: Write> crate::host_facts::bridge::FactReader for Server<W> {
 mod tests {
     use super::*;
     use crate::transport::read_frame;
+
+    #[test]
+    fn root_file_negotiation_is_optional_and_operation_scoped() {
+        let base = json!({"protocol":{"major":1,"minor":0},"provider":"mcdev","capabilities":["semantic-v1"]});
+        let (legacy, _) = negotiate(&base).unwrap();
+        assert_eq!(legacy["capabilities"], json!(["semantic-v1"]));
+        assert!(legacy.get("supportedOps").is_none());
+        let mut host = base.clone();
+        host["capabilities"] = json!(["semantic-v1", "root-files-v1"]);
+        let (unselected, _) = negotiate(&host).unwrap();
+        assert_eq!(unselected["capabilities"], json!(["semantic-v1"]));
+        host["supportedOps"] = json!({"root-files-v1":["rootFileSnapshot","future"]});
+        let (selected, _) = negotiate(&host).unwrap();
+        assert_eq!(
+            selected["capabilities"],
+            json!(["semantic-v1", "root-files-v1"])
+        );
+        assert_eq!(
+            selected["supportedOps"],
+            json!({"root-files-v1":["rootFileSnapshot"]})
+        );
+    }
+
+    #[test]
+    fn new_input_operations_intersect_and_binary_annotations_select_by_capability_only() {
+        let params = json!({"protocol":{"major":1,"minor":0},"provider":"mcdev",
+            "capabilities":["semantic-v1","source-facts-v2","source-locations-v1","project-inputs-v1","binary-annotations-v1"],
+            "supportedOps":{"source-facts-v2":["sourceFacts","future"],"source-locations-v1":["sourceLocation"],
+                "project-inputs-v1":["projectInputs"]},"requiredCapabilities":["binary-annotations-v1"]});
+        let (reply, _) = negotiate(&params).unwrap();
+        assert!(reply["capabilities"]
+            .as_array()
+            .unwrap()
+            .contains(&json!("binary-annotations-v1")));
+        assert_eq!(
+            reply["supportedOps"]["source-facts-v2"],
+            json!(["sourceFacts"])
+        );
+        assert_eq!(
+            reply["supportedOps"]["source-locations-v1"],
+            json!(["sourceLocation"])
+        );
+        assert_eq!(
+            reply["supportedOps"]["project-inputs-v1"],
+            json!(["projectInputs"])
+        );
+        assert!(reply["supportedOps"].get("binary-annotations-v1").is_none());
+        let mut no_operations = params.clone();
+        no_operations
+            .as_object_mut()
+            .unwrap()
+            .remove("supportedOps");
+        let (reply, _) = negotiate(&no_operations).unwrap();
+        assert_eq!(
+            reply["capabilities"],
+            json!(["semantic-v1", "binary-annotations-v1"])
+        );
+        assert!(reply.get("supportedOps").is_none());
+    }
 
     fn incoming(value: Value) -> Incoming {
         let length = serde_json::to_vec(&value).unwrap().len();
@@ -820,6 +895,91 @@ mod tests {
             .unwrap_err()
             .to_string()
             .contains("stream response limit"));
+    }
+
+    #[test]
+    fn root_file_continuations_share_limits_without_consuming_metadata_batches() {
+        let (sender, receiver) = mpsc::sync_channel(1);
+        let mut server = test_server(receiver);
+        server.batches = MAX_BATCHES;
+        for operation in ["rootFileInventory", "rootFileSnapshot"] {
+            for _ in 0..70 {
+                let id = format!("mcdev-rpc:{}", server.next + 1);
+                sender
+                    .send(incoming(
+                        json!({"jsonrpc":"2.0","id":id,"result":{"facts":[]}}),
+                    ))
+                    .unwrap();
+                let query = if operation == "rootFileInventory" {
+                    json!({"op":operation,"filter":{},"after":"cursor"})
+                } else {
+                    json!({"op":operation,"file":"issued","after":"cursor"})
+                };
+                server
+                    .request(
+                        "analysis/readFacts",
+                        json!({"evaluation":"e1","queries":[query]}),
+                    )
+                    .unwrap();
+                assert_eq!(server.batches, MAX_BATCHES);
+            }
+        }
+        assert_eq!(server.continuations, 140);
+        server.continuations = MAX_CONTINUATIONS;
+        let length = server.output.len();
+        assert!(server
+            .request(
+                "analysis/readFacts",
+                json!({"evaluation":"e1","queries":[
+            {"op":"rootFileSnapshot","file":"issued","after":"cursor"}]})
+            )
+            .unwrap_err()
+            .to_string()
+            .contains("continuation limit"));
+        assert_eq!(server.output.len(), length);
+
+        let (_sender, receiver) = mpsc::sync_channel(1);
+        let mut server = test_server(receiver);
+        server.batches = MAX_BATCHES;
+        assert!(server
+            .request(
+                "analysis/readFacts",
+                json!({"evaluation":"e1","queries":[
+            {"op":"rootFileSnapshot","file":"issued","after":null}]})
+            )
+            .unwrap_err()
+            .to_string()
+            .contains("batch limit"));
+        assert!(server.output.is_empty());
+        server.batches = MAX_BATCHES;
+        assert!(server.request("analysis/readFacts",json!({"evaluation":"e1","queries":[
+            {"op":"rootFileSnapshot","file":"issued","after":"cursor"},{"op":"resolveType","name":"Other"}]}))
+            .unwrap_err().to_string().contains("batch limit"));
+        assert!(server.output.is_empty());
+    }
+
+    #[test]
+    fn root_file_stream_limit_counts_original_escaped_response_bytes() {
+        for operation in ["rootFileInventory", "rootFileSnapshot"] {
+            let (sender, receiver) = mpsc::sync_channel(1);
+            let mut server = test_server(receiver);
+            let body = r#"{  "jsonrpc":"2.0", "id":"mcdev-rpc:1", "result":{"facts":[{"text":"\u0000"}]} }"#;
+            let frame = format!("Content-Length: {}\r\n\r\n{}", body.len(), body);
+            let parsed = read_frame_with_length(&mut std::io::Cursor::new(frame)).unwrap();
+            let (value, length) = parsed.as_ref().unwrap();
+            assert!(serde_json::to_vec(value).unwrap().len() < *length);
+            server.stream_bytes = MAX_STREAM_BYTES - length + 1;
+            sender.send(Ok(parsed)).unwrap();
+            assert!(server
+                .request(
+                    "analysis/readFacts",
+                    json!({"evaluation":"e1","queries":[
+                {"op":operation,"after":"cursor"}]})
+                )
+                .unwrap_err()
+                .to_string()
+                .contains("stream response limit"));
+        }
     }
 
     #[test]

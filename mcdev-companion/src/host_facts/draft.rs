@@ -2,6 +2,8 @@
 //! No project identity, revision counter or external read-set authority is added.
 use super::FactsError;
 use crate::wire::{Fact, Member};
+mod binary;
+pub use binary::*;
 use serde::{Deserialize, Serialize};
 use serde_json::Value;
 use std::collections::BTreeSet;
@@ -169,6 +171,12 @@ pub struct RawMember {
     pub access_flags: u16,
     pub signature: Option<String>,
     pub attribute_names: Vec<String>,
+    #[serde(
+        default,
+        skip_serializing_if = "Option::is_none",
+        deserialize_with = "binary::deserialize_annotations"
+    )]
+    pub annotations: Option<Vec<BinaryAnnotation>>,
 }
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
 #[serde(rename_all = "camelCase")]
@@ -193,6 +201,12 @@ pub struct RawAbi {
     pub inner_classes: Vec<InnerClass>,
     pub fields: Vec<RawMember>,
     pub methods: Vec<RawMember>,
+    #[serde(
+        default,
+        skip_serializing_if = "Option::is_none",
+        deserialize_with = "binary::deserialize_annotations"
+    )]
+    pub annotations: Option<Vec<BinaryAnnotation>>,
 }
 #[derive(Debug, Clone, Serialize, Deserialize)]
 #[serde(rename_all = "camelCase")]

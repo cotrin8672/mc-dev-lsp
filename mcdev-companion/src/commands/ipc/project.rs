@@ -1,9 +1,16 @@
 //! Project inputs derived only from the selected host evaluation.
+#[cfg(test)]
+mod root_tests;
+mod roots;
 use crate::{
     host_facts::{
         bridge::FactReader,
         draft,
-        inputs::{ResourceAssociation, ResourceEntry, ScopedInputs},
+        inputs::{
+            ClasspathRole, Inventory, ProjectInputRecord, ProjectInputs, ProjectSourceSet,
+            ResourceAssociation, ResourceEntry, RootRole, ScopedInputs, SourceEntry,
+            SourceSnapshot,
+        },
         FactsError,
     },
     wire::Fact,
@@ -20,6 +27,7 @@ use mcdev_core::{
         ProjectIndexState, ResourceIssue, SourceSetContext,
     },
 };
+pub(crate) use roots::DiscoveryNeeds;
 use std::{
     collections::{BTreeMap, BTreeSet},
     path::{Path, PathBuf},
@@ -29,12 +37,23 @@ use std::{
     },
 };
 
-/// `source_entries` is unavailable until the host proves all project source sets.
 pub(crate) struct SelectedProject {
     pub cached_session: CachedProjectSession,
     pub sources: HostFact<Vec<SourceScanEntry>>,
     pub provider: Arc<dyn HostMixinSourceProvider>,
+    /// Complete legacy context DTO discovery; reference coverage is separate.
     pub project_complete: bool,
+    pub config_selection_complete: bool,
+    pub mapping_complete: bool,
+    pub references_complete: bool,
+    /// Positive accepted snapshots retain their host-issued descriptor for sourceFacts.
+    pub source_snapshots: Vec<(SourceEntry, SourceSnapshot)>,
+    pub owner_sources: CapturedSources,
+}
+
+pub(crate) struct CapturedSources {
+    pub inventory: Inventory<SourceEntry>,
+    pub snapshots: Vec<Fact<SourceSnapshot>>,
 }
 
 fn required<T>(fact: Fact<T>, name: &str) -> Result<T, FactsError> {
@@ -75,6 +94,21 @@ fn path_from_uri(fact: &Fact<String>) -> Result<Option<PathBuf>, FactsError> {
         ));
     }
     Ok(Some(normalize_path(&path)))
+}
+
+fn path_key(path: &Path) -> PathBuf {
+    let path = normalize_path(path);
+    if cfg!(windows) {
+        PathBuf::from(path.to_string_lossy().to_ascii_lowercase())
+    } else {
+        path
+    }
+}
+
+#[derive(Clone)]
+struct CapturedText {
+    path: PathBuf,
+    text: String,
 }
 
 fn relative_name(entry: &ResourceEntry) -> PathBuf {
@@ -161,11 +195,276 @@ fn source_root(path: &Path, relative: &Path) -> Option<PathBuf> {
 struct SnapshotProvider {
     text_by_path: BTreeMap<PathBuf, String>,
     configs: BTreeMap<PathBuf, MixinConfigRef>,
+    versions: BTreeMap<PathBuf, Option<i64>>,
+}
+
+impl SnapshotProvider {
+    fn insert_text(
+        &mut self,
+        path: &Path,
+        text: &str,
+        version: Option<i64>,
+    ) -> Result<(), FactsError> {
+        let key = path_key(path);
+        if self
+            .text_by_path
+            .get(&key)
+            .is_some_and(|previous| previous != text)
+            || self
+                .versions
+                .get(&key)
+                .copied()
+                .flatten()
+                .zip(version)
+                .is_some_and(|(a, b)| a != b)
+        {
+            return Err(FactsError::Stale(
+                "host returned conflicting snapshots for one URI".into(),
+            ));
+        }
+        self.text_by_path.insert(key.clone(), text.into());
+        let previous = self.versions.get(&key).copied().flatten();
+        self.versions.insert(key, previous.or(version));
+        Ok(())
+    }
+}
+
+struct OwnedModel {
+    root: PathBuf,
+    project_id: String,
+    scopes: Vec<ProjectSourceSet>,
+    source_sets: Vec<SourceSetContext>,
+    classpath: ClasspathSnapshot,
+    index_state: ProjectIndexState,
+    complete: bool,
+    inventory_complete: bool,
+    plugin_classes: Vec<String>,
+}
+
+fn absolute_path(path: &str) -> Result<PathBuf, FactsError> {
+    let path = Path::new(path);
+    if !path.is_absolute() {
+        return Err(FactsError::Protocol(
+            "host project input path is not absolute".into(),
+        ));
+    }
+    Ok(normalize_path(path))
+}
+
+fn observed_index(index: &crate::host_facts::inputs::ProjectIndex) -> ProjectIndexState {
+    if index.project_refresh_pending {
+        ProjectIndexState::Stale
+    } else if index.completed_analysis_generation == index.analysis_generation
+        && index.project_scan_complete
+        && index.library_index_complete
+        && index.jdk_index_complete
+    {
+        ProjectIndexState::Ready
+    } else {
+        ProjectIndexState::Building
+    }
+}
+
+impl OwnedModel {
+    fn from_inputs(
+        inputs: ProjectInputs,
+        selected: &draft::SelectedScope,
+    ) -> Result<Self, FactsError> {
+        let project = inputs
+            .records
+            .iter()
+            .find_map(|record| match record {
+                ProjectInputRecord::Project(project) => Some(project),
+                _ => None,
+            })
+            .ok_or_else(|| {
+                FactsError::Unknown("owning project input model is unavailable".into())
+            })?;
+        let owner = required(project.owning_source_set.clone(), "owning source set")?;
+        if !inputs.source_sets.iter().any(|scope| {
+            scope.descriptor.id == owner && scope.descriptor.name == selected.source_set
+        }) {
+            return Err(FactsError::Protocol(
+                "owning source-set identity disagrees with selected scope".into(),
+            ));
+        }
+        let root = absolute_path(&project.project_directory)?;
+        let capture = project.capture.found();
+        let mut complete = inputs.coverage.found().is_some()
+            && capture.is_some()
+            && project.build_identity.found().is_some()
+            && project.index.found().is_some();
+        let mut by_scope = BTreeMap::new();
+        let mut names = BTreeSet::new();
+        for scope in &inputs.source_sets {
+            if !names.insert(scope.descriptor.name.clone()) {
+                return Err(FactsError::Protocol(
+                    "duplicate project source-set name".into(),
+                ));
+            }
+            complete &= scope
+                .descriptor
+                .compile_classpath_coverage
+                .found()
+                .is_some()
+                && scope.descriptor.runtime_coverage.found().is_some();
+            by_scope.insert(
+                scope.descriptor.id.clone(),
+                SourceSetContext {
+                    name: scope.descriptor.name.clone(),
+                    ..Default::default()
+                },
+            );
+        }
+        let mut roots = BTreeMap::new();
+        let mut compile_entries = BTreeMap::new();
+        let mut runtime_entries = BTreeMap::new();
+        let mut class_outputs = BTreeMap::new();
+        for record in &inputs.records {
+            match record {
+                ProjectInputRecord::Root(record) => {
+                    let path = absolute_path(&record.path)?;
+                    if roots
+                        .insert(
+                            (record.scope.clone(), record.role as u8, record.order),
+                            path,
+                        )
+                        .is_some()
+                    {
+                        return Err(FactsError::Protocol(
+                            "duplicate ordered project root".into(),
+                        ));
+                    }
+                }
+                ProjectInputRecord::ClasspathEntry(record) => {
+                    let entries = match record.role {
+                        ClasspathRole::Compile => &mut compile_entries,
+                        ClasspathRole::Runtime => &mut runtime_entries,
+                        ClasspathRole::ClassOutput => &mut class_outputs,
+                    };
+                    if entries
+                        .insert(
+                            (record.scope.clone(), record.order),
+                            absolute_path(&record.path)?,
+                        )
+                        .is_some()
+                    {
+                        return Err(FactsError::Protocol(
+                            "duplicate ordered classpath entry".into(),
+                        ));
+                    }
+                }
+                _ => {}
+            }
+        }
+        for scope in &inputs.source_sets {
+            for (entries, expected) in [
+                (
+                    &compile_entries,
+                    Some(scope.descriptor.counts.compile_classpath),
+                ),
+                (&runtime_entries, scope.descriptor.counts.runtime_classpath),
+                (&class_outputs, scope.descriptor.counts.class_outputs),
+            ] {
+                let orders = entries
+                    .keys()
+                    .filter_map(|(id, order)| (id == &scope.descriptor.id).then_some(*order))
+                    .collect::<Vec<_>>();
+                if expected.is_some_and(|count| orders != (0..count).collect::<Vec<_>>()) {
+                    return Err(FactsError::Protocol(
+                        "project classpath count or order disagrees with records".into(),
+                    ));
+                }
+            }
+        }
+        let mut output_paths = BTreeSet::new();
+        for ((scope, role, _), path) in &roots {
+            let set = by_scope
+                .get_mut(scope)
+                .ok_or_else(|| FactsError::Protocol("foreign project root scope".into()))?;
+            if *role == RootRole::Source as u8 {
+                set.source_directories.push(path.clone());
+            } else if *role == RootRole::Resource as u8 {
+                set.resource_directories.push(path.clone());
+            } else if *role == RootRole::Output as u8 {
+                set.output_directory.get_or_insert_with(|| path.clone());
+                output_paths.insert(path.clone());
+            }
+        }
+        let mut source_sets = by_scope
+            .into_values()
+            .map(|set| (set.name.clone(), set))
+            .collect::<BTreeMap<_, _>>();
+        for record in &inputs.records {
+            if let ProjectInputRecord::LogicalRoot(record) = record {
+                let set = source_sets
+                    .entry(record.source_set.clone())
+                    .or_insert_with(|| SourceSetContext {
+                        name: record.source_set.clone(),
+                        ..Default::default()
+                    });
+                let directories = match record.role {
+                    RootRole::Source => &mut set.source_directories,
+                    RootRole::Resource => &mut set.resource_directories,
+                    _ => {
+                        return Err(FactsError::Protocol(
+                            "invalid logical source-set root role".into(),
+                        ))
+                    }
+                };
+                let path = absolute_path(&record.path)?;
+                if !directories.contains(&path) {
+                    directories.push(path);
+                }
+            }
+        }
+        output_paths.extend(class_outputs.values().cloned());
+        let mut dependencies = BTreeSet::new();
+        let mut minecraft = BTreeSet::new();
+        for path in compile_entries.values().chain(runtime_entries.values()) {
+            if output_paths.contains(path) {
+                continue;
+            }
+            let name = path
+                .file_name()
+                .unwrap_or_default()
+                .to_string_lossy()
+                .to_ascii_lowercase();
+            if name.contains("minecraft") || (name.contains("client") && name.contains("mapped")) {
+                minecraft.insert(path.clone());
+            } else {
+                dependencies.insert(path.clone());
+            }
+        }
+        let classpath = ClasspathSnapshot {
+            project_outputs: output_paths.into_iter().collect(),
+            dependency_jars: dependencies.into_iter().collect(),
+            minecraft_jars: minecraft.into_iter().collect(),
+            captured_at: capture.map_or(0, |capture| capture.captured_at_unix_ms),
+            ..Default::default()
+        };
+        let index_state = project
+            .index
+            .found()
+            .map(observed_index)
+            .unwrap_or_default();
+        Ok(Self {
+            root,
+            project_id: selected.module.clone(),
+            scopes: inputs.source_sets,
+            source_sets: source_sets.into_values().collect(),
+            classpath,
+            index_state,
+            complete,
+            inventory_complete: inputs.coverage.found().is_some(),
+            plugin_classes: capture.map_or_else(Vec::new, |capture| capture.plugin_classes.clone()),
+        })
+    }
 }
 
 impl HostMixinSourceProvider for SnapshotProvider {
     fn config(&self, path: &Path) -> HostSourceResult<MixinConfigRef> {
-        let path = normalize_path(path);
+        let path = path_key(path);
         Ok(match self.configs.get(&path) {
             Some(config) => HostAnswer::known(config.clone(), vec![]),
             None => HostAnswer::unavailable("configuration outside the captured resource snapshot"),
@@ -183,7 +482,7 @@ impl HostMixinSourceProvider for SnapshotProvider {
     }
 
     fn read_source_file(&self, path: &Path) -> HostSourceResult<String> {
-        let path = normalize_path(path);
+        let path = path_key(path);
         Ok(match self.text_by_path.get(&path) {
             Some(text) => HostAnswer::known(text.clone(), vec![]),
             None => HostAnswer::unavailable("source is outside the captured host inventory"),
@@ -191,11 +490,44 @@ impl HostMixinSourceProvider for SnapshotProvider {
     }
 }
 
+#[cfg(test)]
 pub(crate) fn selected_project<R: FactReader>(
     inputs: &mut ScopedInputs<R>,
     facts: draft::ProjectContext,
     workspace_root: &str,
     evaluation: &str,
+) -> Result<SelectedProject, FactsError> {
+    selected_project_inner(
+        inputs,
+        facts,
+        workspace_root,
+        evaluation,
+        DiscoveryNeeds::ALL,
+    )
+}
+
+pub(crate) fn selected_project_for_command<R: FactReader>(
+    inputs: &mut ScopedInputs<R>,
+    facts: draft::ProjectContext,
+    workspace_root: &str,
+    evaluation: &str,
+    command: &mcdev_protocol::DecodedCommand,
+) -> Result<SelectedProject, FactsError> {
+    selected_project_inner(
+        inputs,
+        facts,
+        workspace_root,
+        evaluation,
+        DiscoveryNeeds::for_command(command),
+    )
+}
+
+fn selected_project_inner<R: FactReader>(
+    inputs: &mut ScopedInputs<R>,
+    facts: draft::ProjectContext,
+    workspace_root: &str,
+    evaluation: &str,
+    needs: DiscoveryNeeds,
 ) -> Result<SelectedProject, FactsError> {
     let root = uri_to_path(workspace_root).map_err(FactsError::Protocol)?;
     if !root.is_absolute() {
@@ -203,7 +535,7 @@ pub(crate) fn selected_project<R: FactReader>(
             "workspace root is not absolute".into(),
         ));
     }
-    let root = normalize_path(&root);
+    let mut root = normalize_path(&root);
     let scope = required(facts.scope, "selected project scope")?;
     let source_roots = required(facts.source_roots, "selected source roots")?;
     let output_roots = required(facts.output_roots, "selected output roots")?;
@@ -225,52 +557,143 @@ pub(crate) fn selected_project<R: FactReader>(
     required(selected_classpath.coverage, "selected classpath coverage")?;
     // SDK authority is checked by class and bytecode queries when used.
     facts.sdk.validate().map_err(FactsError::Protocol)?;
-
-    let source_inventory = inputs.source_inventory()?;
-    // A partial selected source inventory cannot prove absence; individual
-    // successfully returned snapshots can still serve their exact URI.
-    source_inventory
-        .coverage
-        .validate()
-        .map_err(FactsError::Protocol)?;
-    if !matches!(
-        &source_inventory.coverage,
-        Fact::Found {
-            value: serde_json::Value::Null
-        } | Fact::Unknown { .. }
-    ) {
-        return Err(FactsError::Protocol(
-            "invalid source inventory coverage".into(),
-        ));
+    let owned_model = match inputs.project_inputs() {
+        Ok(model) if !model.records.is_empty() => Some(OwnedModel::from_inputs(model, &scope)?),
+        Ok(_) | Err(FactsError::Unsupported(_)) => None,
+        Err(error) => return Err(error),
+    };
+    if let Some(model) = &owned_model {
+        root = model.root.clone();
     }
-    let snapshots = inputs.source_snapshots(&source_inventory.entries)?;
-    if snapshots.len() != source_inventory.entries.len() {
-        return Err(FactsError::Protocol(
-            "source snapshot cardinality mismatch".into(),
-        ));
-    }
+    let scopes: Vec<_> = owned_model.as_ref().map_or_else(
+        || vec![None],
+        |model| model.scopes.iter().map(Some).collect(),
+    );
     let mut provider = SnapshotProvider::default();
-    for snapshot in snapshots {
-        match snapshot {
-            Fact::Found { value: snapshot } => {
-                if let Some(path) = path_from_uri(&snapshot.descriptor.document_uri)? {
-                    provider.text_by_path.insert(path, snapshot.text);
+    let mut source_snapshots = vec![];
+    let mut owner_sources = None;
+    let mut source_paths = BTreeSet::new();
+    for project_scope in &scopes {
+        let inventory = match project_scope {
+            Some(scope) => inputs.source_inventory_in(scope)?,
+            None => inputs.source_inventory()?,
+        };
+        inventory
+            .coverage
+            .validate()
+            .map_err(FactsError::Protocol)?;
+        if !matches!(
+            &inventory.coverage,
+            Fact::Found {
+                value: serde_json::Value::Null
+            } | Fact::Unknown { .. }
+        ) {
+            return Err(FactsError::Protocol(
+                "invalid source inventory coverage".into(),
+            ));
+        }
+        if let Some(model) = &owned_model {
+            for source in &inventory.entries {
+                for member in source
+                    .descriptor
+                    .memberships
+                    .as_ref()
+                    .and_then(Fact::found)
+                    .into_iter()
+                    .flatten()
+                {
+                    if let Some(issued) = model
+                        .scopes
+                        .iter()
+                        .find(|issued| member.id.as_deref() == Some(issued.descriptor.id.as_str()))
+                    {
+                        if member.module != scope.module
+                            || member.source_set != issued.descriptor.name
+                        {
+                            return Err(FactsError::Protocol(
+                                "source membership differs from authoritative project scope".into(),
+                            ));
+                        }
+                    }
                 }
             }
-            Fact::Unknown { .. } | Fact::DefinitelyAbsent => {}
+        }
+        let snapshots = inputs.source_snapshots(&inventory.entries)?;
+        if snapshots.len() != inventory.entries.len() {
+            return Err(FactsError::Protocol(
+                "source snapshot cardinality mismatch".into(),
+            ));
+        }
+        if project_scope
+            .is_none_or(|project_scope| project_scope.descriptor.name == scope.source_set)
+        {
+            owner_sources = Some(CapturedSources {
+                inventory: inventory.clone(),
+                snapshots: snapshots.clone(),
+            });
+        }
+        for (entry, snapshot) in inventory.entries.iter().zip(snapshots) {
+            match snapshot {
+                Fact::Found { value: snapshot } => {
+                    if let Some(path) = path_from_uri(&snapshot.descriptor.document_uri)? {
+                        provider.insert_text(
+                            &path,
+                            &snapshot.text,
+                            snapshot.descriptor.document_version,
+                        )?;
+                        let key = path_key(&path);
+                        if source_paths.insert(key) {
+                            source_snapshots.push((entry.clone(), snapshot.clone()));
+                        }
+                    }
+                }
+                Fact::Unknown { .. } | Fact::DefinitelyAbsent => {}
+            }
         }
     }
-
-    let resources = inputs.resource_inventory()?;
-    coverage(
-        resources.coverage,
-        serde_json::json!(true),
-        "selected resource inventory coverage",
-    )?;
+    let mut resources_complete = true;
     let mut entries = Vec::new();
-    for entry in resources.entries {
-        if required_resource(&entry, &root)? {
-            entries.push(entry);
+    for project_scope in &scopes {
+        let resources = match project_scope {
+            Some(scope) => inputs.resource_inventory_in(scope)?,
+            None => inputs.resource_inventory()?,
+        };
+        if owned_model.is_none() {
+            coverage(
+                resources.coverage,
+                serde_json::json!(true),
+                "selected resource inventory coverage",
+            )?;
+        } else {
+            resources
+                .coverage
+                .validate()
+                .map_err(FactsError::Protocol)?;
+            match resources.coverage {
+                Fact::Found { value } if value == serde_json::json!(true) => {}
+                Fact::Unknown { .. } => resources_complete = false,
+                _ => {
+                    return Err(FactsError::Protocol(
+                        "invalid resource inventory coverage".into(),
+                    ))
+                }
+            }
+        }
+        for entry in resources.entries {
+            if owned_model.is_some()
+                && entry
+                    .descriptor
+                    .membership_scope
+                    .as_ref()
+                    .is_some_and(|membership| membership.module != scope.module)
+            {
+                return Err(FactsError::Protocol(
+                    "resource membership differs from authoritative project scope".into(),
+                ));
+            }
+            if required_resource(&entry, &root)? {
+                entries.push(entry);
+            }
         }
     }
     let contents = inputs.resource_snapshots(&entries)?;
@@ -279,113 +702,32 @@ pub(crate) fn selected_project<R: FactReader>(
             "resource snapshot cardinality mismatch".into(),
         ));
     }
-    let mut gradle = vec![];
-    let mut mapping_inputs = vec![];
-    let mut configs = vec![];
-    let mut wideners = vec![];
-    let mut transformers = vec![];
-    let mut issues = vec![];
+    let mut selected_texts = BTreeMap::new();
     let mut resource_roots = BTreeSet::new();
     for (entry, content) in entries.into_iter().zip(contents) {
-        let content = required(content, "selected resource snapshot")?;
+        let Some(path) = path_from_uri(&entry.descriptor.document_uri)? else {
+            continue;
+        };
+        let relative = relative_name(&entry);
+        if entry.descriptor.association == ResourceAssociation::Source {
+            if let Some(dir) = source_root(&path, &relative) {
+                resource_roots.insert(dir);
+            }
+        }
+        let Fact::Found { value: content } = content else {
+            continue;
+        };
         if !content.utf8 {
-            return Err(FactsError::Unknown(format!(
-                "resource {} is not UTF-8",
-                entry.descriptor.relative_path
-            )));
+            continue;
         }
         let text = String::from_utf8(content.bytes)
             .map_err(|_| FactsError::Protocol("host marked non-UTF-8 resource as UTF-8".into()))?;
-        let relative = relative_name(&entry);
-        let path = path_from_uri(&entry.descriptor.document_uri)?;
-        if let Some(path) = &path {
-            if provider
-                .text_by_path
-                .get(path)
-                .is_some_and(|previous| previous != &text)
-            {
-                return Err(FactsError::Stale(
-                    "host returned conflicting snapshots for one URI".into(),
-                ));
-            }
-            provider.text_by_path.insert(path.clone(), text.clone());
-            if entry.descriptor.association == ResourceAssociation::Source {
-                if let Some(dir) = source_root(path, &relative) {
-                    resource_roots.insert(dir);
-                }
-            }
-        }
-        let name = relative.file_name().unwrap_or_default().to_string_lossy();
-        if matches!(
-            name.as_ref(),
-            "build.gradle" | "build.gradle.kts" | "settings.gradle" | "settings.gradle.kts"
-        ) {
-            gradle.push(text.clone());
-        }
-        let ext = relative
-            .extension()
-            .unwrap_or_default()
-            .to_string_lossy()
-            .to_ascii_lowercase();
-        if matches!(ext.as_str(), "tiny" | "srg" | "tsrg") {
-            mapping_inputs.push((
-                path.clone().unwrap_or_else(|| relative.clone()),
-                text.clone(),
-            ));
-        }
-        // A known file URI is required before using a resource as a config/edit target.
-        let path = path.ok_or_else(|| {
-            FactsError::Unknown(format!(
-                "editable resource {} has no authoritative URI",
-                entry.descriptor.relative_path
-            ))
-        })?;
-        if MixinConfigDiscoveryService::is_mixin_config_file(&relative) {
-            match MixinConfigDiscoveryService::parse_content(&path, &text) {
-                Some(config) => {
-                    provider.configs.insert(path.clone(), config.clone());
-                    configs.push(config);
-                }
-                None => issues.push(ResourceIssue {
-                    path: path.clone(),
-                    message: "Invalid or unreadable Mixin config".into(),
-                }),
-            }
-        }
-        if AwAtDiscoveryService::is_access_widener_file(&relative) {
-            let parsed = mcdev_core::aw::AccessWidenerParser::parse(&text).ok();
-            wideners.push(AccessWidenerRef {
-                path: path.clone(),
-                namespace: parsed.as_ref().map(|p| p.namespace),
-                parsed,
-            });
-        }
-        if AwAtDiscoveryService::is_access_transformer_file(&relative) {
-            transformers.push(AccessTransformerRef {
-                path,
-                parsed: mcdev_core::at::AccessTransformerParser::parse(&text).ok(),
-            });
-        }
+        provider.insert_text(&path, &text, content.document_version)?;
+        selected_texts.insert(path_key(&path), CapturedText { path, text });
     }
-    let sort_path = |path: &Path| {
-        let value = path.to_string_lossy().into_owned();
-        if cfg!(windows) {
-            value.replace('/', "\\").to_uppercase()
-        } else {
-            value
-        }
-    };
-    mapping_inputs.sort_by_key(|(path, _)| sort_path(path));
-    configs.sort_by_key(|config| sort_path(&config.path));
-    wideners.sort_by_key(|aw| sort_path(&aw.path));
-    transformers.sort_by_key(|at| sort_path(&at.path));
-    let platform = PlatformDetector::detect(&gradle);
-    let mappings =
-        MappingDiscoveryService::build_mapping_context_from_contents(&mapping_inputs, platform)
-            .map_err(|error| FactsError::Unknown(format!("mapping snapshots: {error}")))?;
     let output_paths: Vec<PathBuf> = output_roots.into_iter().map(PathBuf::from).collect();
     let output_set: BTreeSet<_> = output_paths.iter().cloned().collect();
-    let classpath = ClasspathSnapshot {
+    let selected_classpath = ClasspathSnapshot {
         project_outputs: output_paths.clone(),
         dependency_jars: selected_classpath
             .entries
@@ -395,14 +737,186 @@ pub(crate) fn selected_project<R: FactReader>(
             .collect(),
         ..Default::default()
     };
-    let source_set = SourceSetContext {
+    let selected_source_set = SourceSetContext {
         name: scope.source_set,
         source_directories: source_roots.into_iter().map(PathBuf::from).collect(),
         resource_directories: resource_roots.into_iter().collect(),
         output_directory: output_paths.first().cloned(),
     };
+    let source_sets = owned_model.as_ref().map_or_else(
+        || vec![selected_source_set],
+        |model| model.source_sets.clone(),
+    );
+    let root_inputs = roots::discover(inputs, workspace_root, &source_sets, needs)?;
+    if let Some(workspace) = &root_inputs.workspace {
+        root = workspace.clone();
+    }
+    for domain in [
+        &root_inputs.resources,
+        &root_inputs.mappings,
+        &root_inputs.references,
+    ] {
+        for body in domain.bodies.values() {
+            let path = uri_to_path(&body.uri).map_err(FactsError::Protocol)?;
+            provider.insert_text(&path, &body.text, body.document_version.map(i64::from))?;
+        }
+    }
+    // Positive selected snapshots cannot coexist with an attested absence in the same root domain.
+    for body in selected_texts.values() {
+        if let Some(relative) = workspace_relative(&root, &body.path) {
+            for (domain, required) in [
+                (&root_inputs.resources, roots::is_resource(&relative)),
+                (&root_inputs.mappings, roots::is_mapping(&relative)),
+                (
+                    &root_inputs.references,
+                    roots::is_reference(&body.path, &source_sets),
+                ),
+            ] {
+                if domain.inventory_complete
+                    && required
+                    && !domain.listed.contains(&path_key(&body.path))
+                {
+                    return Err(FactsError::Stale(
+                        "root inventory contradicts a current selected resource".into(),
+                    ));
+                }
+            }
+        }
+    }
+    for (_, snapshot) in &source_snapshots {
+        if let Some(path) = path_from_uri(&snapshot.descriptor.document_uri)? {
+            if root_inputs.references.inventory_complete
+                && roots::is_reference(&path, &source_sets)
+                && workspace_relative(&root, &path).is_some()
+                && !root_inputs.references.listed.contains(&path_key(&path))
+            {
+                return Err(FactsError::Stale(
+                    "root inventory contradicts a current compiler snapshot".into(),
+                ));
+            }
+        }
+    }
+    let mut resource_texts = BTreeMap::new();
+    let mut mapping_texts = BTreeMap::new();
+    for (key, body) in &selected_texts {
+        if let Some(relative) = workspace_relative(&root, &body.path) {
+            if !root_inputs.resources.complete && roots::is_resource(&relative) {
+                resource_texts.insert(key.clone(), body.clone());
+            }
+            if !root_inputs.mappings.complete && roots::is_mapping(&relative) {
+                mapping_texts.insert(key.clone(), body.clone());
+            }
+        }
+    }
+    for (domain, texts) in [
+        (&root_inputs.resources, &mut resource_texts),
+        (&root_inputs.mappings, &mut mapping_texts),
+    ] {
+        for (key, body) in &domain.bodies {
+            texts.insert(
+                key.clone(),
+                CapturedText {
+                    path: uri_to_path(&body.uri).map_err(FactsError::Protocol)?,
+                    text: body.text.clone(),
+                },
+            );
+        }
+    }
+    let mut gradle = vec![];
+    let mut configs = vec![];
+    let mut wideners = vec![];
+    let mut transformers = vec![];
+    let mut issues = vec![];
+    for body in resource_texts.values() {
+        let Some(relative) = workspace_relative(&root, &body.path) else {
+            continue;
+        };
+        if roots::is_gradle(&relative) {
+            gradle.push(body.text.clone());
+        }
+        if MixinConfigDiscoveryService::is_mixin_config_file(&body.path) {
+            match MixinConfigDiscoveryService::parse_content(&body.path, &body.text) {
+                Some(config) => {
+                    provider
+                        .configs
+                        .insert(path_key(&body.path), config.clone());
+                    configs.push(config);
+                }
+                None => issues.push(ResourceIssue {
+                    path: body.path.clone(),
+                    message: "Invalid or unreadable Mixin config".into(),
+                }),
+            }
+        }
+        if AwAtDiscoveryService::is_access_widener_file(&body.path) {
+            let parsed = mcdev_core::aw::AccessWidenerParser::parse(&body.text).ok();
+            wideners.push(AccessWidenerRef {
+                path: body.path.clone(),
+                namespace: parsed.as_ref().map(|p| p.namespace),
+                parsed,
+            });
+        }
+        if AwAtDiscoveryService::is_access_transformer_file(&body.path) {
+            transformers.push(AccessTransformerRef {
+                path: body.path.clone(),
+                parsed: mcdev_core::at::AccessTransformerParser::parse(&body.text).ok(),
+            });
+        }
+    }
+    let sort_path = |path: &Path| path_key(path).to_string_lossy().into_owned();
+    let mut mapping_inputs = mapping_texts
+        .into_values()
+        .map(|body| (body.path, body.text))
+        .collect::<Vec<_>>();
+    mapping_inputs.sort_by_key(|(path, _)| sort_path(path));
+    configs.sort_by_key(|config| sort_path(&config.path));
+    wideners.sort_by_key(|aw| sort_path(&aw.path));
+    transformers.sort_by_key(|at| sort_path(&at.path));
+    if !root_inputs.platform_complete() {
+        if let Some(model) = &owned_model {
+            for plugin in &model.plugin_classes {
+                let plugin = plugin.to_ascii_lowercase();
+                if plugin.contains("fabricmc.loom") {
+                    gradle.push("fabric-loom".into());
+                } else if plugin.contains("neoforged") {
+                    gradle.push("org.neoforged.moddev".into());
+                } else if plugin.contains("forgegradle") || plugin.contains("minecraftforge.gradle")
+                {
+                    gradle.push("net.minecraftforge.gradle".into());
+                }
+            }
+        }
+    }
+    let platform = PlatformDetector::detect(&gradle);
+    let mappings =
+        MappingDiscoveryService::build_mapping_context_from_contents(&mapping_inputs, platform)
+            .map_err(|error| FactsError::Unknown(format!("mapping snapshots: {error}")))?;
+    let mapping_complete = root_inputs.mappings.complete && root_inputs.platform_complete();
+    let config_selection_complete = owned_model
+        .as_ref()
+        .is_some_and(|model| model.inventory_complete)
+        && resources_complete
+        && root_inputs.resources.complete;
+    let project_complete = owned_model.as_ref().is_some_and(|model| model.complete)
+        && resources_complete
+        && root_inputs.resources.complete
+        && mapping_complete;
+    let references_complete = owned_model
+        .as_ref()
+        .is_some_and(|model| model.inventory_complete)
+        && resources_complete
+        && root_inputs.references.complete;
+    let (project_id, classpath, index_state) = match owned_model {
+        Some(model) => (model.project_id, model.classpath, model.index_state),
+        None => (
+            scope.module,
+            selected_classpath,
+            ProjectIndexState::NotReady,
+        ),
+    };
+    let minecraft_jars = classpath.minecraft_jars.clone();
     let context = Arc::new(ProjectContext {
-        project_id: scope.module,
+        project_id,
         root,
         platform,
         classpath,
@@ -410,9 +924,9 @@ pub(crate) fn selected_project<R: FactReader>(
         mixin_configs: configs,
         access_wideners: wideners,
         access_transformers: transformers,
-        minecraft_jars: vec![],
-        source_sets: vec![source_set],
-        index_state: ProjectIndexState::NotReady,
+        minecraft_jars,
+        source_sets,
+        index_state,
         mapping_files: mapping_inputs.into_iter().map(|(path, _)| path).collect(),
         resource_issues: issues,
     });
@@ -428,13 +942,32 @@ pub(crate) fn selected_project<R: FactReader>(
     };
     Ok(SelectedProject {
         cached_session,
-        sources: HostFact::Unavailable {
-            reason: "host inventory covers the selected source set, not all project source sets"
-                .into(),
+        sources: if references_complete {
+            HostFact::Known(
+                root_inputs
+                    .references
+                    .bodies
+                    .into_values()
+                    .map(|body| SourceScanEntry {
+                        document_uri: body.uri,
+                        text: body.text,
+                    })
+                    .collect(),
+            )
+        } else {
+            HostFact::Unavailable {
+                reason: "complete legacy source/resource reference discovery is unavailable".into(),
+            }
         },
         provider: Arc::new(provider),
-        // shortcut: this API enumerates one source set, switch to complete project coverage when host publishes it.
-        project_complete: false,
+        project_complete,
+        config_selection_complete,
+        mapping_complete,
+        references_complete,
+        source_snapshots,
+        owner_sources: owner_sources.ok_or_else(|| {
+            FactsError::Protocol("evaluation owner source inventory is unavailable".into())
+        })?,
     })
 }
 
@@ -454,7 +987,7 @@ mod tests {
         time::{SystemTime, UNIX_EPOCH},
     };
 
-    struct Reader(VecDeque<Value>);
+    pub(super) struct Reader(pub(super) VecDeque<Value>);
     impl FactReader for Reader {
         fn read_facts(
             &mut self,
@@ -467,10 +1000,10 @@ mod tests {
                 .ok_or_else(|| FactsError::Protocol("unexpected host read".into()))
         }
     }
-    fn found(value: Value) -> Value {
+    pub(super) fn found(value: Value) -> Value {
         json!({"state":"found","value":value})
     }
-    fn sha(bytes: &[u8]) -> String {
+    pub(super) fn sha(bytes: &[u8]) -> String {
         format!("{:x}", Sha256::digest(bytes))
     }
     fn base64(bytes: &[u8]) -> String {
@@ -526,12 +1059,324 @@ mod tests {
         }))
         .unwrap()
     }
-    fn unique_root() -> PathBuf {
+    pub(super) fn unique_root() -> PathBuf {
         let nonce = SystemTime::now()
             .duration_since(UNIX_EPOCH)
             .unwrap()
             .as_nanos();
         std::env::temp_dir().join(format!("mcdev-ipc-snapshot-{}-{nonce}", std::process::id()))
+    }
+
+    fn project_operations() -> InputOps {
+        InputOps::intersect(&json!({
+            "capabilities":["project-inputs-v1","source-snapshots-v1","owned-resources-v1"],
+            "supportedOps":{"project-inputs-v1":["projectInputs"],
+                "source-snapshots-v1":["sourceInventory","sourceSnapshot"],
+                "owned-resources-v1":["resourceInventory","resourceLookup","resourceSnapshot"]}
+        }))
+        .unwrap()
+    }
+
+    fn project_records(root: &Path) -> Vec<Value> {
+        let mut records = vec![json!({"kind":"project","id":"project-demo",
+            "owningSourceSet":found(json!("scope-main")),"projectPath":":demo","projectDirectory":root,
+            "buildIdentity":found(json!("captured-build")),"capture":found(json!({
+                "identity":"original-capture","capturedAtUnixMs":1700000123456u64,"gradleVersion":"9.6.1",
+                "domain":crate::host_facts::inputs::PROJECT_INPUTS_DOMAIN,"javaSourceSetsComplete":true,
+                "kotlinPresent":false,"kotlinSourceSetsCaptured":false,"kotlinTargets":null,
+                "pluginClasses":["net.fabricmc.loom.LoomGradlePlugin"]})),
+            "index":found(json!({"analysisGeneration":9,"completedAnalysisGeneration":9,"indexRevision":81,
+                "projectRefreshPending":false,"projectScanComplete":true,"libraryIndexComplete":true,"jdkIndexComplete":true,
+                "counts":{"domain":"workspace-accepted-unique-inputs","projectSourceFiles":2,
+                    "completedDependencyOrigins":1,"liveDependencyOrigins":1}}))})];
+        for name in ["main", "client"] {
+            let scope = format!("scope-{name}");
+            records.push(json!({"kind":"sourceSet","id":scope,"project":"project-demo","name":name,
+                "configurations":found(json!({"compile_classpath":format!("{name}CompileClasspath"),
+                    "runtime_classpath":format!("{name}RuntimeClasspath"),"annotation_processor":"annotationProcessor",
+                    "api_elements":"apiElements","runtime_elements":"runtimeElements"})),
+                "compileClasspathCoverage":found(Value::Null),"runtimeCoverage":found(Value::Null),
+                "compilerMetadataComplete":true,"unresolved":[],
+                "counts":{"domain":"this-source-set-ordered-entries","compileClasspath":2,"runtimeClasspath":2,"classOutputs":1}}));
+            for (role, path) in [
+                ("source", root.join(format!("src/{name}/java"))),
+                ("resource", root.join(format!("src/{name}/resources"))),
+                ("output", root.join(format!("build/classes/java/{name}"))),
+                ("configuration", root.join("build.gradle")),
+            ] {
+                records
+                    .push(json!({"kind":"root","scope":scope,"role":role,"order":0,"path":path}));
+            }
+            records.push(json!({"kind":"root","scope":scope,"role":"configuration","order":1,"path":root.join("mixins.shared.json")}));
+            for role in ["compile", "runtime"] {
+                for (order, file) in ["minecraft-mapped.jar", "library.jar"]
+                    .into_iter()
+                    .enumerate()
+                {
+                    records.push(json!({"kind":"classpathEntry","scope":scope,"role":role,"order":order,
+                        "path":root.join("libs").join(file),"identity":found(json!(format!("origin-{file}"))),
+                        "component":found(json!("File"))}));
+                }
+            }
+            records.push(json!({"kind":"classpathEntry","scope":scope,"role":"classOutput","order":0,
+                "path":root.join(format!("build/classes/java/{name}")),"identity":found(json!(format!("output-{name}"))),
+                "component":found(json!("File"))}));
+        }
+        records
+    }
+
+    pub(super) fn model_replies(root: &Path, local_configs: &[(&str, &str)]) -> VecDeque<Value> {
+        let records = project_records(root);
+        let mut replies = vec![
+            json!({"facts":[{"records":records[..2],"next":"project-page-2", "coverage":{"state":"unknown","reasons":[{"code":"IncompleteModel"}]}}]}),
+            json!({"facts":[{"records":records[2..],"next":null,"coverage":found(json!({"domain":crate::host_facts::inputs::PROJECT_INPUTS_DOMAIN}))}]}),
+        ];
+        for name in ["main", "client"] {
+            let path = root.join(format!(
+                "src/{name}/java/{}.java",
+                if name == "main" { "Patch" } else { "Other" }
+            ));
+            let text = if name == "main" {
+                "package fixture; class Patch {}"
+            } else {
+                "package fixture; class Other {}"
+            };
+            let scope =
+                json!({"module":"gradle::|:demo","sourceSet":name,"id":format!("scope-{name}")});
+            let descriptor = json!({"id":format!("source-{name}"),"displayPath":path,
+                "documentUri":found(json!(path_to_uri(&path))),"languageId":"java",
+                "identity":{"kind":"source","revision":"23"},"ownerScope":found(scope.clone()),
+                "memberships":found(json!([scope])),"editable":found(json!(true))});
+            let mut snapshot = descriptor.clone();
+            snapshot["text"] = json!(text);
+            snapshot["sha256"] = json!(sha(text.as_bytes()));
+            replies.push(json!({"facts":[{"sources":[descriptor],"next":null,"coverage":found(Value::Null)}]}));
+            replies.push(json!({"facts":[found(snapshot)]}));
+        }
+        let client_path = root.join("src/client/resources/client.mixins.json");
+        let shared_path = root.join("mixins.shared.json");
+        let aw_path = root.join("src/client/resources/demo.aw");
+        let empty = r#"{"package":"fixture","mixins":[]}"#;
+        let shared = r#"{"package":"fixture","mixins":["Patch"]}"#;
+        let mut bodies = vec![chunk(empty), chunk(shared)];
+        let resource = |id: &str,
+                        relative: &str,
+                        association: &str,
+                        path: &Path,
+                        member: &str,
+                        owner: Option<&str>| {
+            let mut descriptor = descriptor(id, relative, association, path);
+            descriptor["membershipScope"] = json!({"module":"gradle::|:demo","sourceSet":member});
+            descriptor["ownerScope"] = owner.map_or_else(
+                || json!({"state":"unknown","reasons":[{"code":"MissingFacts"}]}),
+                |owner| found(json!({"module":"gradle::|:demo","sourceSet":owner})),
+            );
+            descriptor
+        };
+        let mut main_resources = vec![
+            resource(
+                "main-client-config",
+                "client.mixins.json",
+                "compileClasspath",
+                &client_path,
+                "main",
+                Some("client"),
+            ),
+            resource(
+                "main-shared-config",
+                "mixins.shared.json",
+                "configuration",
+                &shared_path,
+                "main",
+                None,
+            ),
+        ];
+        for (index, (name, text)) in local_configs.iter().enumerate() {
+            main_resources.push(resource(
+                &format!("main-local-{index}"),
+                name,
+                "source",
+                &root.join("src/main/resources").join(name),
+                "main",
+                Some("main"),
+            ));
+            bodies.push(chunk(text));
+        }
+        replies.push(json!({"facts":[{"resources":main_resources,"next":null,"coverage":found(json!(true))}]}));
+        replies.push(json!({"facts":[{"resources":[
+            resource("client-config", "client.mixins.json", "source", &client_path, "client", Some("client")),
+            resource("client-aw", "demo.aw", "source", &aw_path, "client", Some("client"))],
+            "next":null,"coverage":found(json!(true))}]}));
+        bodies.extend([chunk(empty), chunk("accessWidener v2 named\n")]);
+        replies.push(json!({"facts":bodies}));
+        replies.into()
+    }
+
+    pub(super) fn owning_metadata(root: &Path) -> draft::ProjectContext {
+        let mut metadata = metadata(root);
+        metadata.scope =
+            serde_json::from_value(found(json!({"module":"gradle::|:demo","sourceSet":"main"})))
+                .unwrap();
+        metadata
+    }
+
+    fn selected_model(root: &Path, local_configs: &[(&str, &str)]) -> SelectedProject {
+        let mut inputs = ScopedInputs::new(
+            "eval-1",
+            &project_operations(),
+            Reader(model_replies(root, local_configs)),
+        )
+        .unwrap();
+        selected_project(
+            &mut inputs,
+            owning_metadata(root),
+            &root.parent().unwrap().to_string_lossy(),
+            "eval-1",
+        )
+        .unwrap()
+    }
+
+    #[test]
+    fn owning_model_keeps_all_source_sets_and_client_configs_out_of_shared_selection() {
+        let empty = r#"{"package":"fixture","mixins":[]}"#;
+        let registered = r#"{"package":"fixture","mixins":["Patch"]}"#;
+        for (locals, expected) in [
+            (vec![], "mixins.shared.json"),
+            (
+                vec![("empty.mixins.json", empty)],
+                "src/main/resources/empty.mixins.json",
+            ),
+            (
+                vec![
+                    ("empty.mixins.json", empty),
+                    ("registered.mixins.json", registered),
+                ],
+                "src/main/resources/registered.mixins.json",
+            ),
+        ] {
+            let root = unique_root().join("module");
+            let selected = selected_model(&root, &locals);
+            let context = &selected.cached_session.context;
+            assert_eq!(context.root, root);
+            assert_eq!(context.project_id, "gradle::|:demo");
+            assert_eq!(
+                context
+                    .source_sets
+                    .iter()
+                    .map(|set| set.name.as_str())
+                    .collect::<Vec<_>>(),
+                ["client", "main"]
+            );
+            assert_eq!(context.mixin_configs.len(), 2 + locals.len());
+            let config = mcdev_core::mixin_facade::HostMixinFacade::selected_mixin_config(
+                context,
+                "package fixture; class Patch {}",
+                Some(&path_to_uri(&root.join("src/main/java/Patch.java"))),
+                selected.provider.as_ref(),
+            )
+            .unwrap()
+            .unwrap();
+            assert_eq!(config.path, root.join(expected));
+            assert_eq!(context.platform, ModPlatform::Fabric);
+            assert_eq!(context.index_state, ProjectIndexState::Ready);
+            assert_eq!(context.classpath.captured_at, 1700000123456);
+            assert_eq!(context.classpath.entry_count(), 4);
+            assert_eq!(
+                context.classpath.minecraft_jars,
+                [root.join("libs/minecraft-mapped.jar")]
+            );
+            assert_eq!(selected.source_snapshots.len(), 2);
+            assert_eq!(selected.owner_sources.inventory.entries.len(), 1);
+            assert_eq!(
+                selected.owner_sources.inventory.entries[0].descriptor.id,
+                "source-main"
+            );
+            assert_eq!(selected.owner_sources.snapshots.len(), 1);
+            assert!(matches!(selected.sources, HostFact::Unavailable { .. }));
+            assert!(!selected.project_complete);
+            assert!(!selected.config_selection_complete);
+            assert!(!root.exists());
+        }
+    }
+
+    #[test]
+    fn project_index_counts_do_not_supply_completion_and_capture_does_not_become_current_time() {
+        let root = unique_root();
+        let mut records = project_records(&root);
+        records[0]["index"]["value"]["projectScanComplete"] = json!(false);
+        records[0]["index"]["value"]["counts"]["projectSourceFiles"] = json!(0);
+        let reader = Reader(VecDeque::from([
+            json!({"facts":[{"records":records,"next":null,
+            "coverage":found(json!({"domain":crate::host_facts::inputs::PROJECT_INPUTS_DOMAIN}))}]} ),
+        ]));
+        let mut inputs = ScopedInputs::new("eval-1", &project_operations(), reader).unwrap();
+        let model = OwnedModel::from_inputs(
+            inputs.project_inputs().unwrap(),
+            &draft::SelectedScope {
+                module: ":demo".into(),
+                source_set: "main".into(),
+            },
+        )
+        .unwrap();
+        assert_eq!(model.index_state, ProjectIndexState::Building);
+        assert_eq!(model.classpath.captured_at, 1700000123456);
+    }
+
+    #[test]
+    fn project_model_coverage_and_source_coverage_remain_independent() {
+        for missing_model in [false, true] {
+            let root = unique_root();
+            let mut replies = model_replies(&root, &[]);
+            let unknown = json!({"state":"unknown","reasons":[{"code":"IncompleteModel"}]});
+            if missing_model {
+                replies[1]["facts"][0]["coverage"] = unknown;
+            } else {
+                replies[2]["facts"][0]["coverage"] = unknown;
+            }
+            let mut inputs =
+                ScopedInputs::new("eval-1", &project_operations(), Reader(replies)).unwrap();
+            let selected = selected_project(
+                &mut inputs,
+                owning_metadata(&root),
+                &root.to_string_lossy(),
+                "eval-1",
+            )
+            .unwrap();
+            assert!(matches!(selected.sources, HostFact::Unavailable { .. }));
+            assert_eq!(selected.source_snapshots.len(), 2);
+            assert!(!selected.project_complete);
+            assert_eq!(
+                selected.owner_sources.inventory.coverage.found().is_some(),
+                missing_model
+            );
+            assert_eq!(selected.cached_session.context.source_sets.len(), 2);
+            assert_eq!(
+                selected.cached_session.context.classpath.captured_at,
+                1700000123456
+            );
+            assert!(!selected.config_selection_complete);
+        }
+    }
+
+    #[test]
+    fn scoped_membership_must_match_the_raw_module_from_project_context() {
+        for source_membership in [false, true] {
+            let root = unique_root();
+            let mut replies = model_replies(&root, &[]);
+            if source_membership {
+                replies[2]["facts"][0]["sources"][0]["memberships"]["value"][0]["module"] =
+                    json!(":demo");
+            } else {
+                replies[6]["facts"][0]["resources"][0]["membershipScope"]["module"] =
+                    json!(":demo");
+            }
+            let mut inputs =
+                ScopedInputs::new("eval-1", &project_operations(), Reader(replies)).unwrap();
+            assert!(
+                matches!(selected_project(&mut inputs, owning_metadata(&root), &root.to_string_lossy(), "eval-1"),
+                Err(FactsError::Protocol(message)) if message.contains("authoritative project scope"))
+            );
+        }
     }
 
     #[test]

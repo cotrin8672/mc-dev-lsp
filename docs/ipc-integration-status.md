@@ -1,16 +1,42 @@
 # Published host integration checkpoint
 
-The complete replacement objective is unchanged. This records work in progress
-on 2026-10-30; routing coverage is not complete command or editor parity.
+The complete replacement objective is unchanged. Integration resumed on
+2026-10-31; routing coverage is not complete command or editor parity.
+
+The resumed implementation now connects normalized callable parameters,
+Constant/Slice selectors, URI-preserving cross-file Share, and separate workspace
+config/mapping/reference discovery domains. The fresh whole native pipeline
+passes; original live editor acceptance is still being updated.
+The first fresh whole-suite run exposed six legacy callback-order regressions;
+the evaluation-only optimization was corrected without changing those fixtures,
+and all 135 command replay tests plus 34 evaluation tests then passed.
+
+The host has also published `root-files-v1` at
+`392076bc5e364e02426450c574c1227db2c3be8f` (release86, host SHA-256
+`4d2bcbc10601628e59ea1640145cb3f8ddd2a13be8eaf1a73cf29b56919d2019`).
+Its accepted serializer sample has SHA-256
+`af49d91e7e42dada7314a953b710ebe2d998176b7ed00ee361b410db1c3a4c41`.
+This is the host's file-input proof, separate from MC command/editor acceptance.
+Readonly snapshot JVM names are the host's next bounded slice.
 
 ## Published contract
 
 The current integration pin is ktlsp
-[`ea8be671ed4a876a5d5514fb63daa043e953c08f`](https://github.com/cotrin8672/ktlsp/blob/ea8be671ed4a876a5d5514fb63daa043e953c08f/docs/architecture/extension-ipc.md).
-It publishes source snapshots, owned resources, selected runtime bytes, the
-physical JVM catalog, and explicit provider command routing. The companion
-negotiates capabilities and individual operations; configured command IDs are
-intersected with the implemented domain routes.
+[`392076bc5e364e02426450c574c1227db2c3be8f`](https://github.com/cotrin8672/ktlsp/blob/392076bc5e364e02426450c574c1227db2c3be8f/docs/architecture/extension-ipc.md).
+It adds normalized authored facts, owning-project input records, exact source
+locations and typed binary declaration annotations to source snapshots, owned
+resources, selected runtime bytes, the physical JVM catalog and provider
+commands. The companion negotiates capabilities and individual operations;
+binary annotations are selected by capability alone. Configured command IDs
+are intersected with the implemented domain routes.
+
+The copied release86 host has SHA-256
+`4d2bcbc10601628e59ea1640145cb3f8ddd2a13be8eaf1a73cf29b56919d2019`.
+Its provenance is retained in
+`build/host-artifacts/published-392076b-4d2bcbc10601/receipt.json`.
+This identifies the integration input; upstream API tests do not prove MC
+feature or original editor parity. The acceptance results below retain their
+historical host and companion pins.
 
 The host's evaluation lifetime, accumulated reads and final validation govern
 these inputs. They do not provide the earlier prototype's eight generation
@@ -22,7 +48,51 @@ source editing members and executable runtime bytes remain distinct. Header-only
 SDK input cannot supply Code/LVT, and `sourceCurrent: Unknown` does not certify
 compiled output against unsaved source.
 
+Authored declaration ranges use UTF-8 bytes; `sourceLocation` uses UTF-16 LSP
+positions. Snapshot source tokens are read-only and retain their compiler view.
+Source-set membership does not establish ownership. A complete selected Gradle
+resource inventory does not by itself certify the original whole-project
+shared Mixin configuration search. Config-dependent results remain unavailable
+when that selection is unproven. Callable parameter facts are optional knowledge:
+an omitted or unsupported list does not establish a zero-parameter callable.
+
 ## Follow-up acceptance checkpoints
+
+The resumed pipeline in
+`build/rust-test-logs/native-pipeline-proof-20261101-003939212/` passes 1,871
+functions across 80 targets, all 2,604 original JUnit case locators, doc tests,
+the companion build and all five independent Neovim entries. All 872 input files
+retain fingerprint `74eb3ef7ee4ddbc5f0d930c1c020056cd64d420f25f31f863f3d5579889792f3`.
+The full pipeline takes 136.4 seconds with no timeout. The independently copied
+debug companion has SHA-256
+`2c6793521ee4371dd8d82d0f2c7ae40b623df847f67bd9b7432a5928d5c33afe`.
+The Windows optimized package also passes its 24-payload hash checks, stdio
+completion, semantic-only fallback and exact optional negotiation (11
+capabilities / 9 operation maps, with annotations selected by capability alone).
+Its archive SHA-256 is
+`fdddf559c9fc0118216d7b76870363aa088a6bb4e86e5dcc9754f0fb0f27296c`;
+logs are in `build/rust-test-logs/native-release-20261101-004324420/`.
+
+The original CEM workflow was attempted with release86 and the copied debug
+companion in `build/rust-test-logs/cem-project-20261101-004634121-336c13de/`.
+Its isolated fixture uses the seven fixed inputs and the separately observed
+legacy Kotlin 85-row member oracle. Indexing completed and the source SHA was
+accepted, but the first `mcdev.info` readiness preflight returned outer
+`-32801 / Stale`. The run failed before any original assertion or golden
+comparison. Input hashes stayed stable and the host shut down cleanly. The
+saved trace cannot identify which guard returned Stale; the host task has been
+asked for bounded command/read diagnostics. No same-evaluation read retry or
+empty-success fallback has been added.
+
+The member oracle directly executes the old compiled Kotlin builder, adapter and
+completion service twice with byte-identical results. Its 155 source files match
+the frozen baseline and 698 core/fat-JAR class entries agree; the compiled JAR's
+build provenance against that source is not proven. Its receipt is in
+`build/legacy-member-reference/20261031T144315699851Z/receipt.json`. This is an
+observed core-service oracle, not a complete old JDT editor-route proof.
+
+The following historical results predate the resumed input adapters and retain
+their own pins and narrower live acceptance scope.
 
 The stable native pipeline in
 `build/rust-test-logs/native-pipeline-proof-20261030-090912525/` passed 1,777
@@ -119,41 +189,51 @@ The follow-up host receipt above retains its narrower fixture scope.
 
 ## Concrete remaining input differences
 
-An adapter issue remains open in addition to the producer gaps below:
-configuration-dependent diagnostics still select a Mixin config from the
-incomplete owner-scoped project projection. Other source-set resources visible
-through a compile classpath can be misclassified as shared, so a known config
-snapshot does not certify the original selection or its negative registration
-diagnostic. This needs a selection-authority guard and a counterexample test;
-the passing single-config fixture is not proof of general correctness. This
-work was recorded, without implementation, when the user requested stopping.
+The owning-project adapter now preserves all captured source sets, distinguishes
+source/resource ownership from membership, and guards config-dependent results.
+The client/shared configuration counterexample no longer becomes a successful
+registration diagnostic. Root-file coverage now supplies the original config,
+mapping and reference domains independently. Missing or unreadable domains still
+prevent the affected commands from claiming full discovery.
 
-Requests with these examples have been sent to the ktlsp task. Public operations
-are used where available; missing facts remain typed unavailable.
+The published pin resolves the previous transport gaps for nested annotations,
+integer/enum values, decoded string maps, declaration ranges/modifiers, sibling
+inventories, source locations and typed binary declaration annotations. Remaining
+requirements have been checked with the host task:
 
-- The current source/project/resource surfaces select the owner's module/source
-  set. The original project dump and reference/config searches also consume other
-  source sets. A main-owned request must not silently omit a test-only reference
-  or advertise a complete project dump from the main inventory alone.
-- Current normalized annotation values do not represent nested annotations,
-  integer/enum values or escaped/folded string/source correspondence. For example,
-  `@Inject(method="tick()V", at=@At(value="INVOKE", target="Lpkg/C;m()V", ordinal=1))`
-  needs the nested annotation, typed ordinal and exact ranges. Authored full/header
-  declaration ranges and source modifiers are also needed by existing consumers.
-  A child parser must not turn missing host semantic authority into normalized facts.
-- The additional injection-point index needs subtype annotations such as
-  `@AtCode(value="CUSTOM", namespace="example")` from compile-only inputs too.
-  Catalog ABI attribute names alone do not supply those values, and runtime-byte
-  tokens cannot be used to read a compile-only class.
-- Source ownership/current member coverage must stay distinct from physical SDK
-  and dependency ABI. Unknown source freshness cannot erase a known unsaved
-  override; it also must not prevent legitimate physical/runtime queries from
-  consuming their independently authoritative inputs.
-- A `typeJvm` direct-member list does not identify its representation as current
-  authored source or certify that it matches the physical ABI. Independently
-  issued opaque type tokens need not be identical even for the same internal
-  type. Future adapters must preserve the selected host identity and obtain
-  completeness/provenance authority before exposing a complete editing list.
+- The original Mixin configuration walker also searches project-root and Java
+  source directories, excluding `build`, `.gradle` and `node_modules`. Gradle
+  resource coverage includes its own include/exclude selection. Even a resource
+  root equal to the project root cannot prove the original candidate set.
+  The separate root-bound filtered inventory/snapshot contract is published in
+  release86. The companion connects its complete membership and body coverage
+  to each original discovery policy; MC live selection still needs acceptance.
+- Callable parameter annotations are published in `db0f080` as the optional
+  knowledge-bearing `parameters` field of `source-facts-v2`. The transport
+  distinguishes missing/unsupported facts from known zero parameters. Nominal
+  generic class resolution does not expose its generic arguments; unsupported
+  lowering and type-variable cases remain Unknown. Host parameter probes are
+  separate from full product Sugar acceptance.
+- Foreign snapshot types remain read-only. Their `typeJvm` fields, including
+  `binaryName`, are `UnsupportedSource`. Registered Mixin class literals need an
+  exact binary name from that same source view; the child cannot construct nested
+  JVM names from qualified source names or substitute the evaluation-owner view.
+- Typed `@AtCode` annotations are available for selected physical inputs,
+  including compile-only inputs. Current source supertype/subtype relations are
+  not public. A physical subtype scan alone does not certify the complete current
+  injection-point index and grants no executable-byte authority.
+- Standard host definition supports dependency source attachment, but extension
+  `sourceLocation` remains Unknown for binary-only inputs. Those are separate
+  paths; original Create/Drill and simulated Loom source-navigation acceptance
+  still needs the corresponding extension authority and actual artifacts.
+- The host has no extract-local action implementation. Materialized code-action
+  support alone does not satisfy the original action-alias scenario.
+
+Current authored source, selected physical ABI and executable runtime bytes remain
+distinct. `sourceLocation` can connect an issued type/member to an accepted source
+URI and digest; it does not establish that compiled bytes match that source.
+Independently issued handle strings are not a type-equality test. Runtime Code/LVT
+reads retain their own authority even when `sourceCurrent` is Unknown.
 
 All eleven commands remain required. A temporarily smaller negotiated command
 set, typed unavailable responses, or a passing five-command smoke is not the

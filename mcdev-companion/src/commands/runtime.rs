@@ -2,6 +2,7 @@ use super::{cache::*, host::*};
 use mcdev_core::{
     awat::AwAtBufferSupport,
     expression_engine::{CancellationChecker, NO_CANCELLATION},
+    mixin_actions::MixinCodeActionService,
     mixin_source::{JavaTypeDescriptorResolver, ParseConfidence, ParseSource},
     project::{InfoService, ProjectContext},
     McDefinitionTarget, MemberKind,
@@ -25,6 +26,8 @@ pub struct CommandDispatcher<H: CommandHost> {
     pub(super) in_flight: Mutex<BTreeMap<String, Arc<Mutex<()>>>>,
     registered_commands: Vec<String>,
     project_complete: bool,
+    config_complete: bool,
+    references_complete: bool,
     evaluation_scoped: bool,
 }
 pub(super) fn runtime_error(error: impl std::fmt::Display) -> CommandFailure {
@@ -65,23 +68,38 @@ impl<H: CommandHost> CommandDispatcher<H> {
             in_flight: Mutex::new(Default::default()),
             registered_commands: COMMANDS.iter().map(|command| command.id().into()).collect(),
             project_complete: true,
+            config_complete: true,
+            references_complete: true,
             evaluation_scoped: false,
         }
     }
 
-    /// Restrict one evaluation to its acknowledged commands and project coverage.
+    /// Restrict one evaluation to its acknowledged commands and legacy discovery coverage.
     pub fn for_evaluation(host: Arc<H>, commands: &[String], project_complete: bool) -> Self {
         let mut dispatcher = Self::new(host);
         dispatcher
             .registered_commands
             .retain(|command| commands.contains(command));
         dispatcher.project_complete = project_complete;
+        dispatcher.config_complete = project_complete;
+        dispatcher.references_complete = project_complete;
         dispatcher.evaluation_scoped = true;
         dispatcher
     }
 
-    fn require_complete_project(&self) -> Result<(), CommandFailure> {
-        if self.project_complete {
+    /// Keep independent root discovery domains separate from the full context DTO.
+    pub fn with_discovery_coverage(
+        mut self,
+        config_complete: bool,
+        references_complete: bool,
+    ) -> Self {
+        self.config_complete = config_complete;
+        self.references_complete = references_complete;
+        self
+    }
+
+    fn require_discovery(complete: bool) -> Result<(), CommandFailure> {
+        if complete {
             Ok(())
         } else {
             Err(CommandFailure::Unavailable(McdevError {
@@ -175,7 +193,7 @@ impl<H: CommandHost> CommandDispatcher<H> {
         }
         match command {
             DecodedCommand::Info(request) => {
-                self.require_complete_project()?;
+                Self::require_discovery(self.project_complete)?;
                 let project = self.host.load_session(&request.context.workspace_root)?;
                 let build = self.host.build_identity()?;
                 let commands = self.registered_commands.clone();
@@ -213,7 +231,7 @@ impl<H: CommandHost> CommandDispatcher<H> {
             }
             DecodedCommand::Reindex(request) => {
                 let project = self.host.reindex(&request.context.workspace_root)?;
-                self.require_complete_project()?;
+                Self::require_discovery(self.project_complete)?;
                 success(
                     McdevReindexResponse {
                         status: "reindex complete".into(),
@@ -227,7 +245,7 @@ impl<H: CommandHost> CommandDispatcher<H> {
             DecodedCommand::ReloadProjectContext(request) => {
                 self.host.clear_project_cache()?;
                 let project = self.host.reindex(&request.context.workspace_root)?;
-                self.require_complete_project()?;
+                Self::require_discovery(self.project_complete)?;
                 success(
                     McdevReloadProjectContextResponse {
                         status: "project context reloaded".into(),
@@ -244,7 +262,7 @@ impl<H: CommandHost> CommandDispatcher<H> {
                 )
             }
             DecodedCommand::DumpContext(request) => {
-                self.require_complete_project()?;
+                Self::require_discovery(self.project_complete)?;
                 let project = self.host.load_session(&request.context.workspace_root)?;
                 success(dump(&project)?, &["dumpContext", "info"])
             }
@@ -317,7 +335,7 @@ impl<H: CommandHost> CommandDispatcher<H> {
                         &["references"],
                     );
                 }
-                self.require_complete_project()?;
+                Self::require_discovery(self.references_complete)?;
                 let java = self.host.source_entries(
                     &project,
                     &request.context,
@@ -403,11 +421,25 @@ impl<H: CommandHost> CommandDispatcher<H> {
                 if is_kotlin(&request.context) {
                     return success(McdevCodeActionResponse { actions: vec![] }, &["codeAction"]);
                 }
-                self.require_complete_project()?;
+                let source_family = family(&request.context);
+                let config_independent = !request.diagnostic_codes.is_empty()
+                    && request
+                        .diagnostic_codes
+                        .iter()
+                        .all(|code| MixinCodeActionService::is_config_independent_diagnostic(code));
+                if source_family == SourceFamily::JavaKotlin && !config_independent {
+                    Self::require_discovery(self.config_complete)?;
+                }
                 let project = self.host.load_session(&request.context.workspace_root)?;
-                let config = self
-                    .host
-                    .selected_mixin_config_content(&project, &request.context)?;
+                // Legacy hosts retain this callback for AW/AT and independent fixes too.
+                let config = if !self.evaluation_scoped
+                    || (source_family == SourceFamily::JavaKotlin && !config_independent)
+                {
+                    self.host
+                        .selected_mixin_config_content(&project, &request.context)?
+                } else {
+                    None
+                };
                 let mut fixes = vec![];
                 if request.diagnostic_codes.is_empty() {
                     fixes = self.host.code_actions(

@@ -12,6 +12,57 @@ pub struct MixinCodeActionService<'a> {
     pub invoker_service: Option<InvokerService<'a>>,
 }
 impl<'a> MixinCodeActionService<'a> {
+    /// Unknown codes do not establish that configuration can be omitted.
+    pub fn is_config_independent_diagnostic(code: &str) -> bool {
+        use crate::mixinextras_handler::diagnostic_codes as E;
+        matches!(
+            code,
+            C::UNRESOLVED_MIXIN_TARGET
+                | C::DUPLICATE_MIXIN_TARGET
+                | C::UNSUPPORTED_ANNOTATION
+                | C::INVALID_MIXIN_TARGET_STRING
+                | C::UNRESOLVED_INJECT_METHOD
+                | C::AMBIGUOUS_INJECT_METHOD
+                | C::DESCRIPTOR_MISMATCH
+                | C::UNRESOLVED_AT_TARGET
+                | C::INVALID_AT_TARGET_DESCRIPTOR
+                | C::AT_TARGET_NOT_PRESENT
+                | C::ORDINAL_OUT_OF_RANGE
+                | C::SHADOW_TARGET_NOT_FOUND
+                | C::SHADOW_DESCRIPTOR_MISMATCH
+                | C::SHADOW_STATIC_MISMATCH
+                | C::SHADOW_KIND_MISMATCH
+                | C::ACCESSOR_FIELD_NOT_FOUND
+                | C::ACCESSOR_SIGNATURE_MISMATCH
+                | C::INVOKER_METHOD_NOT_FOUND
+                | C::INVOKER_DESCRIPTOR_MISMATCH
+                | C::OVERWRITE_TARGET_NOT_FOUND
+                | C::OVERWRITE_DESCRIPTOR_MISMATCH
+                | C::OVERWRITE_STATIC_MISMATCH
+                | C::UNRESOLVED_JAVA_TYPE
+                | C::UNRESOLVED_HANDLER_DESCRIPTOR
+                | C::LOW_CONFIDENCE_MEMBER_PARSE
+                | E::INVALID_DEFINITION
+                | E::HANDLER_SIGNATURE_MISMATCH
+                | E::MISSING_OPERATION_PARAMETER
+                | E::WRONG_OPERATION_GENERIC
+                | E::WRONG_ORIGINAL_VALUE_TYPE
+                | E::WRONG_RETURN_TYPE
+                | E::UNSUPPORTED_EXPRESSION_CONTEXT
+                | E::MISSING_EXPRESSION_ANNOTATION
+                | E::INVALID_SHARE_PARAMETER_TYPE
+                | E::UNSUPPORTED_SUGAR_PARAMETER
+                | E::WRAP_WITH_CONDITION_INVALID_TARGET
+                | E::WRAP_WITH_CONDITION_POPPED_NON_VOID
+                | E::WRONG_OPERATION_CALL_ARGUMENTS
+                | E::LOCAL_CAPTURE_NOT_FOUND
+                | E::LOCAL_CAPTURE_AMBIGUOUS
+                | E::SHARE_TYPE_CONFLICT
+                | E::WRAP_METHOD_STATIC_MISMATCH
+                | E::WRAP_METHOD_INVALID_TARGET
+        )
+    }
+
     pub fn new(index: &'a dyn ClassIndex) -> Self {
         Self {
             accessor_service: Some(AccessorService::new(index)),

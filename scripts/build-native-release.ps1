@@ -195,7 +195,9 @@ try {
         capabilities = @('semantic-v1')
         optionalCapabilities = @(
             'project-class-facts-v1', 'source-snapshots-v1', 'owned-resources-v1',
-            'runtime-class-bytes-v1', 'jvm-catalog-v1', 'provider-commands-v1'
+            'runtime-class-bytes-v1', 'jvm-catalog-v1', 'provider-commands-v1',
+            'source-locations-v1', 'source-facts-v2', 'project-inputs-v1', 'binary-annotations-v1',
+            'root-files-v1'
         )
         supportedOps = [ordered]@{
             'project-class-facts-v1' = @('projectContext', 'typeJvm')
@@ -203,6 +205,10 @@ try {
             'owned-resources-v1' = @('resourceInventory', 'resourceLookup', 'resourceSnapshot')
             'runtime-class-bytes-v1' = @('runtimeClass', 'classBytes')
             'jvm-catalog-v1' = @('jvmCatalog', 'jvmClass')
+            'source-locations-v1' = @('sourceLocation')
+            'source-facts-v2' = @('sourceFacts')
+            'project-inputs-v1' = @('projectInputs')
+            'root-files-v1' = @('rootFileInventory', 'rootFileSnapshot')
         }
         runtimeDirectories = @($runtimeDirectories)
         files = $entries

@@ -106,6 +106,10 @@ fn evaluation_host_with_references(
         refresh_generation,
         reference_types,
         provider,
+        true,
+        None,
+        None,
+        true,
     )
 }
 
@@ -115,6 +119,10 @@ fn evaluation_host_with_provider(
     refresh_generation: Option<&str>,
     reference_types: Arc<dyn HandlerReferenceTypeResolver>,
     semantic_provider: Arc<dyn HostSemanticModelProvider>,
+    config_selection_complete: bool,
+    project_context: Option<Arc<ProjectContext>>,
+    source_provider: Option<Arc<dyn HostMixinSourceProvider>>,
+    mapping_discovery_complete: bool,
 ) -> Result<Arc<CoreCommandHost>, CommandFailure> {
     let stale = fixture.query.stale.clone();
     let open = fixture.query.open.clone();
@@ -127,7 +135,7 @@ fn evaluation_host_with_provider(
     let inputs = EvaluationCommandInputs {
         workspace_root_uri: fixture.workspace.clone(),
         cached_session: CachedProjectSession {
-            context: fixture.session.context.clone(),
+            context: project_context.unwrap_or_else(|| fixture.session.context.clone()),
             version: 7,
             cache_hit: false,
             fingerprint: "evaluation-owned".into(),
@@ -150,12 +158,16 @@ fn evaluation_host_with_provider(
         specifier_supported: Arc::new(|| Ok(true)),
         additional_at_values: Arc::new(|| Ok(vec!["CUSTOM:RETURN".into()])),
         refresh_generation: refresh_generation.map(str::to_owned),
+        config_selection_complete,
+        mapping_discovery_complete,
     };
     CoreCommandHost::with_evaluation(
         inputs,
         semantic_provider,
-        Arc::new(Sources {
-            config: fixture.session.context.mixin_configs[0].clone(),
+        source_provider.unwrap_or_else(|| {
+            Arc::new(Sources {
+                config: fixture.session.context.mixin_configs[0].clone(),
+            })
         }),
         inventory,
         BuildIdentity {
@@ -208,6 +220,10 @@ fn evaluation_semantic_version_is_host_version_not_local_snapshot_sequence() {
         None,
         Arc::new(ReferenceFacts),
         provider.clone(),
+        true,
+        None,
+        None,
+        true,
     )
     .unwrap();
     let uri = format!("{}/src/main/java/fixture/Patch.java", fixture.workspace);
@@ -387,6 +403,489 @@ fn evaluation_commands_preserve_complete_core_outputs_without_generation_keys() 
         assert_eq!(actual.result, expected.result, "{command}");
     }
     assert!(fixture.semantic_calls.load(Ordering::Acquire) >= 2);
+}
+
+#[test]
+fn incomplete_config_selection_cannot_emit_java_warnings_or_a_successful_empty_result() {
+    let fixture = fixture(true, false, true, HostFact::Known(vec![]), false);
+    let semantic = Arc::new(ProjectlessSemantic {
+        calls: fixture.semantic_calls.clone(),
+        stale_after_parse: None,
+    });
+    let host = evaluation_host_with_provider(
+        &fixture,
+        HostFact::Known(vec![]),
+        None,
+        Arc::new(ReferenceFacts),
+        semantic,
+        false,
+        None,
+        None,
+        true,
+    )
+    .unwrap();
+    let dispatcher = CommandDispatcher::for_evaluation(host, &[], false);
+    let uri = format!("{}/src/main/java/fixture/Patch.java", fixture.workspace);
+    for command in [McdevCommands::DIAGNOSTICS, McdevCommands::CONTEXT] {
+        let response = dispatcher
+            .execute(
+                command,
+                &[serde_json::json!({"context":context(&fixture, CONFIG_SOURCE, &uri, McdevPosition::default())})],
+            )
+            .unwrap();
+        assert_eq!(
+            response.error.unwrap().code,
+            McdevErrorCode::IncompleteProjectContext
+        );
+        assert!(response.result.is_none());
+    }
+    assert_eq!(fixture.semantic_calls.load(Ordering::Acquire), 0);
+
+    for (source, uri) in [
+        (
+            "accessWidener v2 named\n",
+            format!("{}/src/main/resources/demo.aw", fixture.workspace),
+        ),
+        (
+            "@Mixin(Target::class) class Patch {}",
+            format!("{}/src/main/kotlin/fixture/Patch.kt", fixture.workspace),
+        ),
+    ] {
+        let response = dispatcher
+            .execute(
+                McdevCommands::DIAGNOSTICS,
+                &[serde_json::json!({"context":context(&fixture, source, &uri, McdevPosition::default())})],
+            )
+            .unwrap();
+        assert!(response.error.is_none(), "{uri}: {:?}", response.error);
+        assert_eq!(
+            response.result.unwrap(),
+            serde_json::json!({"diagnostics":[]})
+        );
+    }
+    let uri = format!("{}/src/main/resources/demo.aw", fixture.workspace);
+    let response = dispatcher.execute(McdevCommands::CODE_ACTION, &[serde_json::json!({
+        "context":context(&fixture, "accessWidener v2 named\n", &uri, McdevPosition::default()),
+        "range":McdevRange::default(), "diagnosticCodes":[]
+    })]).unwrap();
+    assert!(
+        response.error.is_none(),
+        "AW action unexpectedly depended on Mixin config selection: {:?}",
+        response.error
+    );
+    assert_eq!(response.result.unwrap(), serde_json::json!({"actions":[]}));
+}
+
+#[test]
+fn evaluation_owning_subproject_root_keeps_the_original_workspace_identity() {
+    let fixture = fixture(true, false, true, HostFact::Known(vec![]), false);
+    let mut project = fixture.session.context.as_ref().clone();
+    project.root = project.root.join("subproject");
+    project.project_id = "gradle::|:subproject".into();
+    let semantic = Arc::new(ProjectlessSemantic {
+        calls: fixture.semantic_calls.clone(),
+        stale_after_parse: None,
+    });
+    let host = evaluation_host_with_provider(
+        &fixture,
+        HostFact::Known(vec![]),
+        None,
+        Arc::new(ReferenceFacts),
+        semantic,
+        false,
+        Some(Arc::new(project.clone())),
+        None,
+        true,
+    )
+    .unwrap();
+    let loaded = host.load_session(&fixture.workspace).unwrap();
+    assert_eq!(loaded.root, project.root);
+    assert_eq!(loaded.project_id, project.project_id);
+    assert!(matches!(host.load_session(&path_to_uri(&project.root)),
+        Err(CommandFailure::Unavailable(error)) if error.code == McdevErrorCode::IncompleteProjectContext));
+    let uri = path_to_uri(&project.root.join("src/main/java/fixture/Patch.java"));
+    let request = completion_request(context(
+        &fixture,
+        SOURCE,
+        &uri,
+        position_at(SOURCE, SOURCE.find("\"ti\"").unwrap() + 3),
+    ));
+    let response = CommandDispatcher::new(host)
+        .execute_project_aware_completion(
+            &[serde_json::to_value(request).unwrap()],
+            &mcdev_core::expression_engine::NO_CANCELLATION,
+        )
+        .unwrap();
+    assert!(
+        response.error.is_none(),
+        "owning-project completion rejected its root: {:?}",
+        response.error
+    );
+    assert!(response.result.unwrap()["items"]
+        .as_array()
+        .unwrap()
+        .iter()
+        .any(|item| item["label"]
+            .as_str()
+            .is_some_and(|label| label.contains("tick"))));
+}
+
+struct ForbiddenConfigSources;
+impl HostMixinSourceProvider for ForbiddenConfigSources {
+    fn config(&self, _: &Path) -> Result<HostAnswer<MixinConfigRef>, HostSourceError> {
+        panic!("config-independent action read a Mixin config")
+    }
+    fn compilation_unit_source(
+        &self,
+        _: &str,
+        _: Option<&Path>,
+    ) -> Result<HostAnswer<RegisteredMixinSource>, HostSourceError> {
+        panic!("config-independent action selected registered mixins")
+    }
+    fn read_source_file(&self, _: &Path) -> Result<HostAnswer<String>, HostSourceError> {
+        panic!("config-independent action read config content")
+    }
+}
+
+fn config_unknown_action_host(fixture: &Fixture) -> Arc<CoreCommandHost> {
+    evaluation_host_with_provider(
+        fixture,
+        HostFact::Known(vec![]),
+        None,
+        Arc::new(ReferenceFacts),
+        Arc::new(ProjectlessSemantic {
+            calls: fixture.semantic_calls.clone(),
+            stale_after_parse: None,
+        }),
+        false,
+        None,
+        Some(Arc::new(ForbiddenConfigSources)),
+        false,
+    )
+    .unwrap()
+}
+
+#[test]
+fn explicit_config_independent_actions_preserve_exact_fixes_and_handler_generation() {
+    let fixture = fixture(true, false, true, HostFact::Known(vec![]), false);
+    let uri = format!("{}/src/main/java/fixture/Patch.java", fixture.workspace);
+    let prefix = "import com.llamalad7.mixinextras.injector.wrapmethod.WrapMethod;\n@Mixin(Target.class) class Patch { ";
+    let known = CommandDispatcher::new(
+        evaluation_host(&fixture, HostFact::Known(vec![]), None, false).unwrap(),
+    );
+    for (tail, codes) in [
+        (
+            "@WrapMethod(method = \"tick\") int handler() { return 1; } }",
+            vec![
+                "MIXINEXTRAS_WRONG_RETURN_TYPE",
+                "MIXINEXTRAS_MISSING_OPERATION_PARAMETER",
+            ],
+        ),
+        (
+            "@WrapMethod(method = \"tick\")\n}",
+            vec!["MIXIN_DUPLICATE_TARGET"],
+        ),
+    ] {
+        let source = format!("{prefix}{tail}");
+        let position = position_at(&source, source.find("@WrapMethod").unwrap() + 5);
+        let request = McdevCodeActionRequest {
+            context: context(&fixture, &source, &uri, position.clone()),
+            range: McdevRange {
+                start: position.clone(),
+                end: position,
+            },
+            diagnostic_codes: codes.into_iter().map(str::to_owned).collect(),
+        };
+        let args = [serde_json::to_value(request).unwrap()];
+        let expected = known.execute(McdevCommands::CODE_ACTION, &args).unwrap();
+        assert!(
+            expected.error.is_none(),
+            "known-config action failed: {:?}",
+            expected.error
+        );
+        let actions = expected.result.as_ref().unwrap()["actions"]
+            .as_array()
+            .unwrap();
+        assert!(
+            !actions.is_empty(),
+            "fixture must exercise actual fixes or unconditional handler generation: {tail}"
+        );
+        assert!(actions.iter().any(|action| action["edits"]
+            .as_array()
+            .is_some_and(|edits| !edits.is_empty())));
+        for project_complete in [false, true] {
+            let dispatcher = CommandDispatcher::for_evaluation(
+                config_unknown_action_host(&fixture),
+                &[],
+                project_complete,
+            );
+            let actual = dispatcher
+                .execute(McdevCommands::CODE_ACTION, &args)
+                .unwrap();
+            assert!(
+                actual.error.is_none(),
+                "config-independent action failed: {:?}",
+                actual.error
+            );
+            assert_eq!(actual.result, expected.result);
+        }
+    }
+}
+
+#[test]
+fn unknown_config_actions_require_a_nonempty_entirely_classified_independent_code_list() {
+    let fixture = fixture(true, false, true, HostFact::Known(vec![]), false);
+    let uri = format!("{}/src/main/java/fixture/Patch.java", fixture.workspace);
+    let source = "import com.llamalad7.mixinextras.injector.wrapmethod.WrapMethod;\n@Mixin(Target.class) class Patch { @WrapMethod(method = \"tick\")\n}";
+    let position = position_at(source, source.find("@WrapMethod").unwrap() + 5);
+    for project_complete in [false, true] {
+        let dispatcher = CommandDispatcher::for_evaluation(
+            config_unknown_action_host(&fixture),
+            &[],
+            project_complete,
+        );
+        for codes in [
+            vec![],
+            vec!["MIXIN_CLASS_NOT_LISTED_IN_CONFIG"],
+            vec!["MIXIN_DUPLICATE_CONFIG_ENTRY"],
+            vec!["MIXIN_FUTURE_CODE"],
+            vec!["MIXINEXTRAS_FUTURE_CODE"],
+            vec!["MIXIN_DUPLICATE_TARGET", "MIXIN_CLASS_NOT_LISTED_IN_CONFIG"],
+            vec!["MIXINEXTRAS_WRONG_RETURN_TYPE", "MIXINEXTRAS_FUTURE_CODE"],
+        ] {
+            let request = McdevCodeActionRequest {
+                context: context(&fixture, source, &uri, position.clone()),
+                range: McdevRange {
+                    start: position.clone(),
+                    end: position.clone(),
+                },
+                diagnostic_codes: codes.into_iter().map(str::to_owned).collect(),
+            };
+            let response = dispatcher
+                .execute(
+                    McdevCommands::CODE_ACTION,
+                    &[serde_json::to_value(request).unwrap()],
+                )
+                .unwrap();
+            assert_eq!(
+                response.error.unwrap().code,
+                McdevErrorCode::IncompleteProjectContext
+            );
+            assert!(response.result.is_none());
+        }
+        let response = dispatcher
+            .execute(
+                McdevCommands::DIAGNOSTICS,
+                &[serde_json::json!({
+                    "context":context(&fixture, source, &uri, position.clone())
+                })],
+            )
+            .unwrap();
+        assert_eq!(
+            response.error.unwrap().code,
+            McdevErrorCode::IncompleteProjectContext
+        );
+        assert!(
+            response.result.is_none(),
+            "full diagnostics cannot return a partial success"
+        );
+    }
+}
+
+#[test]
+fn unknown_mapping_discovery_preserves_proven_names_but_not_remap_or_default_namespace_answers() {
+    let fixture = fixture(true, false, true, HostFact::Known(vec![]), false);
+    let dispatcher =
+        CommandDispatcher::for_evaluation(config_unknown_action_host(&fixture), &[], false);
+    for (text, extension, expected_error) in [
+        ("accessWidener v2 named\n", "aw", false),
+        (
+            "accessWidener v2 named\naccessible class game/Target\n",
+            "aw",
+            false,
+        ),
+        (
+            "accessWidener v2 named\naccessible method game/Target tick ()V\n",
+            "aw",
+            false,
+        ),
+        ("accessWidener v2 named\naccessible class x/T\n", "aw", true),
+        ("public game.Target\n", "at", false),
+        ("public game.Target tick()V\n", "at", true),
+    ] {
+        let uri = format!("{}/src/main/resources/test.{extension}", fixture.workspace);
+        let response = dispatcher
+            .execute(
+                McdevCommands::DIAGNOSTICS,
+                &[serde_json::json!({
+                    "context":context(&fixture,text,&uri,McdevPosition::default())
+                })],
+            )
+            .unwrap();
+        if expected_error {
+            assert_eq!(
+                response.error.unwrap().code,
+                McdevErrorCode::IncompleteProjectContext,
+                "{text}"
+            );
+            assert!(response.result.is_none());
+        } else {
+            assert!(response.error.is_none(), "{text}: {:?}", response.error);
+            assert_eq!(
+                response.result.unwrap(),
+                serde_json::json!({"diagnostics":[]})
+            );
+        }
+    }
+    for (text, extension, expected_error, expected_label) in [
+        ("accessWidener v2 i", "aw", false, "intermediary"),
+        (
+            "accessWidener v2 named\naccessible class Tar",
+            "aw",
+            false,
+            "Target",
+        ),
+        (
+            "accessWidener v2 intermediary\naccessible class Tar",
+            "aw",
+            true,
+            "",
+        ),
+        ("public game.T", "at", false, "Target"),
+        ("public game.Target ti", "at", true, ""),
+    ] {
+        let uri = format!("{}/src/main/resources/test.{extension}", fixture.workspace);
+        let request =
+            completion_request(context(&fixture, text, &uri, position_at(text, text.len())));
+        let response = dispatcher
+            .execute(
+                McdevCommands::COMPLETION,
+                &[serde_json::to_value(request).unwrap()],
+            )
+            .unwrap();
+        if expected_error {
+            assert_eq!(
+                response.error.unwrap().code,
+                McdevErrorCode::IncompleteProjectContext,
+                "{text}"
+            );
+            assert!(response.result.is_none());
+        } else {
+            assert!(response.error.is_none(), "{text}: {:?}", response.error);
+            assert!(
+                response.result.unwrap()["items"]
+                    .as_array()
+                    .unwrap()
+                    .iter()
+                    .any(|item| item["label"]
+                        .as_str()
+                        .is_some_and(|label| label.contains(expected_label))),
+                "{text}"
+            );
+        }
+    }
+}
+
+#[test]
+fn independent_root_domains_do_not_require_a_complete_context_dto() {
+    let inventory = HostFact::Known(vec![SourceScanEntry {
+        document_uri: "fixture://other/Other.java".into(),
+        text: METHOD_REFERENCE_SOURCE.into(),
+    }]);
+    let fixture = fixture(true, false, true, inventory.clone(), false);
+    let host = evaluation_host_with_provider(
+        &fixture,
+        inventory,
+        None,
+        Arc::new(ReferenceFacts),
+        Arc::new(ProjectlessSemantic {
+            calls: fixture.semantic_calls.clone(),
+            stale_after_parse: None,
+        }),
+        true,
+        None,
+        None,
+        false,
+    )
+    .unwrap();
+    let dispatcher =
+        CommandDispatcher::for_evaluation(host, &[], false).with_discovery_coverage(true, true);
+    let uri = format!("{}/src/main/java/fixture/Patch.java", fixture.workspace);
+    let action = McdevCodeActionRequest {
+        context: context(&fixture, CONFIG_SOURCE, &uri, McdevPosition::default()),
+        range: McdevRange::default(),
+        diagnostic_codes: vec!["MIXIN_CLASS_NOT_LISTED_IN_CONFIG".into()],
+    };
+    let args = [serde_json::to_value(action).unwrap()];
+    let expected = fixture
+        .dispatcher
+        .execute(McdevCommands::CODE_ACTION, &args)
+        .unwrap();
+    let actual = dispatcher
+        .execute(McdevCommands::CODE_ACTION, &args)
+        .unwrap();
+    assert!(actual.error.is_none(), "{:?}", actual.error);
+    assert_eq!(actual.result, expected.result);
+    assert!(!actual.result.unwrap()["actions"]
+        .as_array()
+        .unwrap()
+        .is_empty());
+    let refs = McdevReferencesRequest {
+        context: context(
+            &fixture,
+            METHOD_REFERENCE_SOURCE,
+            &uri,
+            position_at(
+                METHOD_REFERENCE_SOURCE,
+                METHOD_REFERENCE_SOURCE.find("\"tick()V\"").unwrap() + 2,
+            ),
+        ),
+    };
+    let args = [serde_json::to_value(refs).unwrap()];
+    let expected = fixture
+        .dispatcher
+        .execute(McdevCommands::REFERENCES, &args)
+        .unwrap();
+    let actual = dispatcher
+        .execute(McdevCommands::REFERENCES, &args)
+        .unwrap();
+    assert!(actual.error.is_none(), "{:?}", actual.error);
+    assert_eq!(actual.result, expected.result);
+    assert!(!actual.result.unwrap()["locations"]
+        .as_array()
+        .unwrap()
+        .is_empty());
+    let info=dispatcher.execute(McdevCommands::INFO,&[serde_json::json!({"context":context(&fixture,CONFIG_SOURCE,&uri,McdevPosition::default())})]).unwrap();
+    assert_eq!(
+        info.error.unwrap().code,
+        McdevErrorCode::IncompleteProjectContext
+    );
+    assert!(info.result.is_none());
+}
+
+#[test]
+fn unknown_config_roster_cannot_be_reported_as_successful_empty_share_completion() {
+    let fixture = fixture(true, false, true, HostFact::Known(vec![]), false);
+    let dispatcher =
+        CommandDispatcher::for_evaluation(config_unknown_action_host(&fixture), &[], false);
+    let source="@Mixin(Target.class) class Patch { @WrapMethod(method = \"tick\") void handler(@Share(\"te\") Object value) {} }";
+    let uri = format!("{}/src/main/java/fixture/Patch.java", fixture.workspace);
+    let request = completion_request(context(
+        &fixture,
+        source,
+        &uri,
+        position_at(source, source.find("\"te\"").unwrap() + 3),
+    ));
+    let response = dispatcher
+        .execute(
+            McdevCommands::COMPLETION,
+            &[serde_json::to_value(request).unwrap()],
+        )
+        .unwrap();
+    let error = response.error.unwrap();
+    assert_eq!(error.code, McdevErrorCode::IncompleteProjectContext);
+    assert!(error.message.contains("Mixin config"));
+    assert!(response.result.is_none());
 }
 
 #[test]
@@ -742,6 +1241,10 @@ fn source_reference_absence_needs_normalized_facts_regardless_of_project_coverag
                         None,
                         Arc::new(ReferenceFacts),
                         Arc::new(FallbackSemantic),
+                        true,
+                        None,
+                        None,
+                        true,
                     )
                 } else {
                     evaluation_host(&fixture, HostFact::Known(vec![]), None, false)

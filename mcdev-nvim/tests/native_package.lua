@@ -2,8 +2,10 @@ local h = dofile(vim.fn.getcwd() .. "/mcdev-nvim/tests/test_helpers.lua")
 local manifest = vim.json.decode(table.concat(vim.fn.readfile(assert(vim.env.MCDEV_NATIVE_MANIFEST)), "\n"))
 local binary = assert(vim.env.MCDEV_COMPANION_BINARY)
 h.assert_true(vim.deep_equal(manifest.capabilities, { "semantic-v1" }), "required base stays compatible")
-h.assert_eq(#manifest.optionalCapabilities, 6)
-h.assert_eq(vim.tbl_count(manifest.supportedOps), 5)
+h.assert_eq(#manifest.optionalCapabilities, 11)
+h.assert_eq(vim.tbl_count(manifest.supportedOps), 9)
+h.assert_true(vim.deep_equal(manifest.supportedOps["root-files-v1"], { "rootFileInventory", "rootFileSnapshot" }), "root file operations match the contract")
+h.assert_nil(manifest.supportedOps["binary-annotations-v1"], "binary annotations select a representation without an operation")
 
 local function negotiate(params)
   local stdout, stderr = {}, {}
@@ -39,6 +41,13 @@ h.assert_true(vim.deep_equal(base.capabilities, manifest.capabilities), "semanti
 h.assert_nil(base.supportedOps)
 h.assert_nil(base.commands)
 
+local annotations = negotiate({
+  protocol = { major = 1, minor = 0 }, provider = "mcdev",
+  capabilities = { "semantic-v1", "binary-annotations-v1" },
+})
+h.assert_true(vim.deep_equal(annotations.capabilities, { "semantic-v1", "binary-annotations-v1" }), "binary annotations negotiate without supportedOps")
+h.assert_nil(annotations.supportedOps)
+
 local expected = vim.list_extend(vim.deepcopy(manifest.capabilities), manifest.optionalCapabilities)
 params.capabilities = vim.list_extend(vim.deepcopy(expected), { "future-capability-v1" })
 params.supportedOps = vim.deepcopy(manifest.supportedOps)
@@ -48,7 +57,7 @@ end
 params.supportedOps["future-capability-v1"] = { "futureOperation" }
 params.commands = { "unknown.command" }
 local optional = negotiate(params)
-h.assert_true(vim.deep_equal(optional.capabilities, expected), "manifest lists exactly the negotiated capabilities")
+h.assert_true(vim.deep_equal(vim.fn.sort(optional.capabilities), vim.fn.sort(expected)), "manifest lists exactly the negotiated capabilities")
 h.assert_true(vim.deep_equal(optional.supportedOps, manifest.supportedOps), "manifest operations match the binary")
 h.assert_eq(#optional.commands, 0, "provider commands still require a configured implemented command")
-print("native package metadata: semantic-only fallback, six optional capabilities, exact operations and unknown rejection passed")
+print("native package metadata: semantic-only fallback, eleven optional capabilities, capability-only annotations, exact operations and unknown rejection passed")

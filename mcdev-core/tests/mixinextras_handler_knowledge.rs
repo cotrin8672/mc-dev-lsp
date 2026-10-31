@@ -193,6 +193,36 @@ fn primitive_and_array_decisions_do_not_require_reference_facts() {
         None
     );
 }
+
+#[test]
+fn identical_normalized_sites_cannot_borrow_each_others_slice() {
+    use mcdev_core::host_source::{HostFact, HostSourceError};
+    use sha2::{Digest, Sha256};
+    let (mut site, handler) = input();
+    site.handler_method = Some(handler);
+    let source = HostHandlerSource {
+        document_uri: "file:///Mixin.java".into(),
+        sha256: format!("{:x}", Sha256::digest(b"")),
+        qualified_name: "Mixin".into(),
+        targets: vec!["test/Target".into()],
+        sites: HostFact::Known(vec![site.clone(), site.clone()]),
+        slice_selections: vec![HostSliceSelection {
+            site_index: 1,
+            slice: HostMethodSlice {
+                id: "named".into(),
+                from: None,
+                to: None,
+                range: McTextRange::default(),
+            },
+        }],
+    };
+    let service = HandlerSignatureService::new(&Index, None).with_host_source(source);
+    let error = std::panic::catch_unwind(std::panic::AssertUnwindSafe(|| {
+        service.selected_slice("", &site)
+    }))
+    .unwrap_err();
+    assert!(error.is::<HostSourceError>());
+}
 #[test]
 fn java_hex_float_rounding_avoids_intermediate_overflow_and_double_rounding() {
     use mcdev_core::mixinextras_occurrence::{parse_java_f32 as float, parse_java_float as double};

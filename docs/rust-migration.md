@@ -10,6 +10,15 @@ Kotlin subprocess can count as a completed Rust port. The current published-host
 connection work and concrete input differences are tracked in
 [the IPC integration checkpoint](ipc-integration-status.md).
 
+The 2026-11-01 resumed checkpoint passes 1,871 native functions across 80
+targets and verifies all 2,604 original case locators, doc tests, the executable
+and five independent editor entries. The optimized Windows package verifies all
+24 payloads. The first complete original CEM attempt against published host86
+stopped at its initial `mcdev.info` preflight with typed `Stale`, before any
+original assertion or member-golden comparison. This remains a failed live
+attempt; full replacement is not verified. Current evidence and unresolved host
+facts are linked above; the dated records below retain their historical pins.
+
 ## Authoritative baseline
 
 The current legacy implementation, including uncommitted Kotlin support, was

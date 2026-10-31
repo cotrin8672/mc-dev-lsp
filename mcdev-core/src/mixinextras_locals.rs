@@ -232,6 +232,20 @@ impl<'a> LocalCaptureTypeResolver<'a> {
         source: &str,
         parameter: &HandlerParameterDeclaration,
     ) -> Option<String> {
+        if let Some(descriptor) = parameter.type_descriptor.as_deref() {
+            crate::descriptor::parse_field_descriptor(descriptor).ok()?;
+            if object_internal(descriptor) == Some("com/llamalad7/mixinextras/sugar/ref/LocalRef") {
+                if !parameter.type_name.contains('<') {
+                    return None;
+                }
+            } else {
+                return Some(
+                    HandlerSignatureService::share_ref_value_descriptor(descriptor)
+                        .unwrap_or(descriptor)
+                        .into(),
+                );
+            }
+        }
         let imports = JavaTypeDescriptorResolver::imports_for(source);
         let lookup = ClassIndexJavaTypeLookup {
             class_index: self.class_index,
@@ -536,13 +550,19 @@ impl<'a> MixinExtrasCompletionService<'a> {
 pub struct LocalCaptureValidationService<'a> {
     pub class_index: &'a dyn ClassIndex,
     pub bytecode_index: &'a dyn BytecodeIndex,
+    pub signature_service: HandlerSignatureService<'a>,
 }
 impl<'a> LocalCaptureValidationService<'a> {
     pub fn new(class_index: &'a dyn ClassIndex, bytecode_index: &'a dyn BytecodeIndex) -> Self {
         Self {
             class_index,
             bytecode_index,
+            signature_service: HandlerSignatureService::new(class_index, Some(bytecode_index)),
         }
+    }
+    pub fn with_signature_service(mut self, service: HandlerSignatureService<'a>) -> Self {
+        self.signature_service = service;
+        self
     }
     pub fn validate(
         &self,
@@ -591,18 +611,18 @@ impl<'a> LocalCaptureValidationService<'a> {
             };
             let mut site = point.site.clone();
             site.handler_method = site.handler_method.as_ref().map(|handler| {
-                HandlerSignatureService::enrich_handler_types(
-                    handler,
-                    self.class_index,
-                    Some(source),
-                )
+                self.signature_service
+                    .enrich_declared_handler(handler, source)
             });
-            let Some(indices) = InjectionPointOccurrenceResolver::new(self.bytecode_index).resolve(
-                &point.owner,
-                &point.target_method,
-                &site,
-                point.expression_instruction_indices.as_ref(),
-            ) else {
+            let Some(indices) = InjectionPointOccurrenceResolver::new(self.bytecode_index)
+                .resolve_in_slice(
+                    &point.owner,
+                    &point.target_method,
+                    &site,
+                    point.expression_instruction_indices.as_ref(),
+                    self.signature_service.selected_slice(source, &point.site),
+                )
+            else {
                 results.push(unavailable());
                 continue;
             };
@@ -671,10 +691,43 @@ impl<'a> LocalCaptureValidationService<'a> {
 
 pub struct ShareCompletionService<'a> {
     pub class_index: &'a dyn ClassIndex,
+    host_source: Option<HostHandlerSource>,
 }
 impl<'a> ShareCompletionService<'a> {
     pub fn new(class_index: &'a dyn ClassIndex) -> Self {
-        Self { class_index }
+        Self {
+            class_index,
+            host_source: None,
+        }
+    }
+    pub fn with_host_source(mut self, source: Option<HostHandlerSource>) -> Self {
+        self.host_source = source;
+        self
+    }
+    pub fn has_host_source(&self) -> bool {
+        self.host_source.is_some()
+    }
+    pub fn complete_with_normalized_sources(
+        &self,
+        source: &str,
+        context: &AnnotationContext,
+        additional_sources: impl IntoIterator<Item = HostShareSource>,
+    ) -> Vec<McCompletionItem> {
+        if context.annotation != MixinAnnotation::Share
+            || context.slot != AnnotationSlot::Value
+            || context.attribute_name.as_deref() == Some("namespace")
+        {
+            return vec![];
+        }
+        let host = self.host_source.as_ref().unwrap_or_else(|| {
+            std::panic::panic_any(crate::host_source::HostSourceError::Failure(
+                "current normalized Share source is unavailable".into(),
+            ))
+        });
+        let sites = host
+            .checked_sites(source)
+            .unwrap_or_else(|error| std::panic::panic_any(error));
+        self.complete_normalized(source, context, host, sites, additional_sources)
     }
     pub fn complete<I, S>(
         &self,
@@ -691,6 +744,23 @@ impl<'a> ShareCompletionService<'a> {
             || context.attribute_name.as_deref() == Some("namespace")
         {
             return vec![];
+        }
+        if let Some(host) = &self.host_source {
+            let sites = host
+                .checked_sites(source)
+                .unwrap_or_else(|error| std::panic::panic_any(error));
+            return self.complete_normalized(
+                source,
+                context,
+                host,
+                sites,
+                additional_sources.into_iter().map(|_| -> HostShareSource {
+                    std::panic::panic_any(crate::host_source::HostSourceError::Failure(
+                        "normalized Share declarations for additional sources are unavailable"
+                            .into(),
+                    ))
+                }),
+            );
         }
         if AnnotationContextExtractor::resolve_mixin_class_scope(
             source,
@@ -854,19 +924,186 @@ impl<'a> ShareCompletionService<'a> {
             self.class_index,
             Some(imports),
         );
+        self.target_keys(site, &targets)
+    }
+    fn target_keys(
+        &self,
+        site: &MixinExtrasAnnotationSite,
+        targets: &[String],
+    ) -> BTreeSet<(String, String, String)> {
         let Some(resolved) = HandlerSignatureService::new(self.class_index, None)
             .resolve_target_method(&targets, &site.method_attribute)
         else {
             return BTreeSet::new();
         };
         targets
-            .into_iter()
+            .iter()
+            .cloned()
             .flat_map(|owner| {
                 self.class_index
                     .get_methods(&owner)
                     .into_iter()
                     .filter(|m| m.name == resolved.name && m.descriptor == resolved.descriptor)
                     .map(move |m| (owner.clone(), m.name, m.descriptor))
+            })
+            .collect()
+    }
+    fn complete_normalized<I>(
+        &self,
+        source: &str,
+        context: &AnnotationContext,
+        host: &HostHandlerSource,
+        sites: &[MixinExtrasAnnotationSite],
+        additional_sources: I,
+    ) -> Vec<McCompletionItem>
+    where
+        I: IntoIterator<Item = HostShareSource>,
+    {
+        let mut current = BTreeSet::new();
+        for site in sites {
+            let Some(handler) = &site.handler_method else {
+                continue;
+            };
+            for parameter in &handler.parameters {
+                let Some(HandlerParameterSugarSpec::Share(share)) = &parameter.sugar_spec else {
+                    continue;
+                };
+                if !contains(
+                    source,
+                    parameter.sugar_annotation_range,
+                    context.annotation_start_offset,
+                ) {
+                    continue;
+                }
+                let Some(namespace) = effective_namespace(share, &host.qualified_name) else {
+                    continue;
+                };
+                let Some(descriptor) = parameter
+                    .type_descriptor
+                    .as_deref()
+                    .and_then(HandlerSignatureService::share_ref_value_descriptor)
+                else {
+                    continue;
+                };
+                let targets = self.target_keys(site, &host.targets);
+                if targets.is_empty() {
+                    std::panic::panic_any(crate::host_source::HostSourceError::Failure(
+                        "normalized Share target method facts are unavailable".into(),
+                    ))
+                }
+                for target in targets {
+                    current.insert((
+                        target.0,
+                        target.1,
+                        target.2,
+                        namespace.to_owned(),
+                        descriptor.to_owned(),
+                    ));
+                }
+            }
+        }
+        if current.is_empty() {
+            return vec![];
+        }
+        let mut values = BTreeSet::new();
+        let mut collect = |candidate: &HostHandlerSource,
+                           text: &str,
+                           sites: &[MixinExtrasAnnotationSite],
+                           is_current: bool| {
+            for site in sites {
+                let Some(handler) = &site.handler_method else {
+                    continue;
+                };
+                for parameter in &handler.parameters {
+                    let Some(HandlerParameterSugarSpec::Share(share)) = &parameter.sugar_spec
+                    else {
+                        continue;
+                    };
+                    if is_current
+                        && contains(
+                            text,
+                            parameter.sugar_annotation_range,
+                            context.annotation_start_offset,
+                        )
+                    {
+                        continue;
+                    }
+                    let Some(value) = share.value.as_ref().filter(|value| !value.is_empty()) else {
+                        continue;
+                    };
+                    let Some(namespace) = effective_namespace(share, &candidate.qualified_name)
+                    else {
+                        continue;
+                    };
+                    let Some(descriptor) = parameter
+                        .type_descriptor
+                        .as_deref()
+                        .and_then(HandlerSignatureService::share_ref_value_descriptor)
+                    else {
+                        continue;
+                    };
+                    let targets = self.target_keys(site, &candidate.targets);
+                    if targets.is_empty() {
+                        std::panic::panic_any(crate::host_source::HostSourceError::Failure(
+                            "normalized Share target method facts are unavailable".into(),
+                        ))
+                    }
+                    if targets.iter().any(|target| {
+                        current.contains(&(
+                            target.0.clone(),
+                            target.1.clone(),
+                            target.2.clone(),
+                            namespace.into(),
+                            descriptor.into(),
+                        ))
+                    }) {
+                        values.insert(value.clone());
+                    }
+                }
+            }
+        };
+        collect(host, source, sites, true);
+        let mut seen =
+            std::collections::BTreeMap::from([(host.document_uri.clone(), host.sha256.clone())]);
+        for candidate in additional_sources {
+            let sites = candidate
+                .handlers
+                .checked_sites(&candidate.text)
+                .unwrap_or_else(|error| std::panic::panic_any(error));
+            match seen.get(&candidate.handlers.document_uri) {
+                Some(sha) if sha == &candidate.handlers.sha256 => continue,
+                Some(_) => std::panic::panic_any(crate::host_source::HostSourceError::Failure(
+                    "normalized Share source URI has a changed digest".into(),
+                )),
+                None => {
+                    seen.insert(
+                        candidate.handlers.document_uri.clone(),
+                        candidate.handlers.sha256.clone(),
+                    );
+                }
+            }
+            collect(&candidate.handlers, &candidate.text, sites, false);
+        }
+        values
+            .into_iter()
+            .filter_map(|value| {
+                let escaped = escape_java_string(&value);
+                escaped
+                    .starts_with(&context.partial_value)
+                    .then_some((value, escaped))
+            })
+            .enumerate()
+            .map(|(index, (value, escaped))| {
+                let mut result = item(
+                    value.clone(),
+                    escaped,
+                    McCompletionKind::Value,
+                    format!("0200_{index:04}_{value}"),
+                    "mixinextras.share",
+                );
+                result.detail = Some("@Share".into());
+                result.metadata.name = Some(value);
+                result
             })
             .collect()
     }

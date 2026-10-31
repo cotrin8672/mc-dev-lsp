@@ -37,12 +37,8 @@ impl<'a> MixinExtrasCodeActionService<'a> {
         self
     }
     fn enrich(&self, handler: &HandlerMethodDeclaration, source: &str) -> HandlerMethodDeclaration {
-        HandlerSignatureService::enrich_handler_types_with_reference_types(
-            handler,
-            self.class_index,
-            Some(source),
-            self.signature_service.reference_types,
-        )
+        self.signature_service
+            .enrich_declared_handler(handler, source)
     }
     pub fn fixes_for_diagnostics(
         &self,
@@ -51,9 +47,14 @@ impl<'a> MixinExtrasCodeActionService<'a> {
         source: &str,
         contexts: &[ResolvedMixinExtrasContext],
     ) -> Vec<McFix> {
-        let targets = MixinTargetResolver::resolve_targets_from_source(source, self.class_index);
-        let sites = HandlerSignatureService::find_annotation_sites(source);
-        let sugar = HandlerSignatureService::find_sugar_handler_annotation_sites(source);
+        let targets = self
+            .signature_service
+            .source_targets(source)
+            .unwrap_or_else(|| {
+                MixinTargetResolver::resolve_targets_from_source(source, self.class_index)
+            });
+        let sites = self.signature_service.annotation_sites(source, false);
+        let sugar = self.signature_service.annotation_sites(source, true);
         let mut fixes = vec![];
         for diagnostic in diagnostics {
             if diagnostic.code == diagnostic_codes::HANDLER_SIGNATURE_MISMATCH
@@ -108,7 +109,7 @@ impl<'a> MixinExtrasCodeActionService<'a> {
             uri,
             source,
             site,
-            &HandlerSignatureService::find_annotation_sites(source),
+            &self.signature_service.annotation_sites(source, false),
             targets,
             contexts,
         )
@@ -128,7 +129,7 @@ impl<'a> MixinExtrasCodeActionService<'a> {
             return vec![];
         };
         let mut fixes = vec![];
-        for site in HandlerSignatureService::find_annotation_sites(source) {
+        for site in self.signature_service.annotation_sites(source, false) {
             if site.handler_method.is_some() {
                 continue;
             }
@@ -149,7 +150,7 @@ impl<'a> MixinExtrasCodeActionService<'a> {
         contexts: &[ResolvedMixinExtrasContext],
         cursor: Option<usize>,
     ) -> Vec<McCompletionItem> {
-        let sites = HandlerSignatureService::find_sugar_handler_annotation_sites(source);
+        let sites = self.signature_service.annotation_sites(source, true);
         let selected: Vec<_> = sites
             .iter()
             .filter(|site| {
@@ -478,7 +479,7 @@ impl<'a> MixinExtrasCodeActionService<'a> {
         targets: &[String],
         contexts: &[ResolvedMixinExtrasContext],
     ) -> Option<McFix> {
-        let sites = HandlerSignatureService::find_annotation_sites(source);
+        let sites = self.signature_service.annotation_sites(source, false);
         let mut matching_sites = vec![];
         let mut issues = vec![];
         for site in &sites {

@@ -31,6 +31,16 @@ helpers.assert_true(vim.fn.executable(ktlsp_cmd) == 1, "ktlsp executable must ex
 helpers.assert_true(vim.fn.isdirectory(workspace) == 1, "workspace must exist: " .. workspace)
 log_step("environment validated")
 
+local readiness
+if vim.env.MCDEV_E2E_ACCEPTANCE_PROOF and vim.env.MCDEV_E2E_ACCEPTANCE_PROOF ~= "" then
+  helpers.assert_eq(fixture, "real-cem", "the isolated acceptance proof runs the original CEM suite")
+  vim.opt.runtimepath:append(assert(vim.env.MCDEV_E2E_BLINK_LIB_RTP, "Blink library runtime is required"))
+  readiness = dofile(vim.fn.getcwd() .. "/mcdev-companion/tests/support/accepted_command_readiness.lua").start({
+    trace = assert(vim.env.KTLSP_TRACE, "a fresh KTLSP_TRACE is required"),
+    proof = vim.env.MCDEV_E2E_ACCEPTANCE_PROOF,
+  })
+end
+
 local fixture_specs = {
   ["real-cem"] = {
     mixin = "src/main/java/io/github/cotrin8672/cem/mixin/ItemMixin.java",
@@ -117,6 +127,9 @@ local host_config = assert(require("mcdev.ktlsp").extend_config({
   workspace_folders = { { uri = workspace_root_uri, name = "mcdev-e2e-workspace" } },
   capabilities = vim.lsp.protocol.make_client_capabilities(),
   flags = { debounce_text_changes = 0 },
+  handlers = readiness and { ["window/logMessage"] = function(_, params)
+    readiness:log_message(params and params.message or "")
+  end } or nil,
   on_exit = function(code, signal)
     ktlsp_exit.exited, ktlsp_exit.code, ktlsp_exit.signal = true, code, signal
   end,
@@ -151,6 +164,10 @@ local commands_ready = vim.wait(120000, function()
   return true
 end, 100)
 helpers.assert_true(commands_ready, "ktlsp must advertise every MC command before indexed E2E; this contract is not yet available on older hosts")
+if readiness then
+  readiness:attach(client, protocol, completion, ktlsp_exit)
+  readiness:wait_indexed()
+end
 
 local function mcdev_command(command, payload, timeout_ms)
   log_step("command " .. command)
@@ -216,10 +233,15 @@ local function with_buffer(file_path, filetype, lines, callback)
   if lines then
     vim.api.nvim_buf_set_lines(bufnr, 0, -1, false, lines)
   end
+  if readiness then readiness:track(bufnr) end
   vim.lsp.buf_attach_client(bufnr, client_id)
   vim.wait(1000, function()
     return vim.lsp.get_clients({ bufnr = bufnr, name = "ktlsp" })[1] ~= nil
   end, 50)
+  if readiness then
+    readiness:await(bufnr)
+    readiness:preflight(bufnr)
+  end
   callback(bufnr)
 end
 
@@ -251,9 +273,12 @@ end
 log_step("bundle provided through init_options.bundles")
 
 if fixture == "real-cem" then
-  dofile(vim.fn.getcwd() .. "/mcdev-nvim/tests/e2e/cem_project_e2e.lua")({
-    helpers = helpers, with_buffer = with_buffer, mixin_file = mixin_file, log_step = log_step,
-  })
+  local function run_cem()
+    dofile(vim.fn.getcwd() .. "/mcdev-nvim/tests/e2e/cem_project_e2e.lua")({
+      helpers = helpers, with_buffer = with_buffer, mixin_file = mixin_file, log_step = log_step,
+    })
+  end
+  if readiness then readiness:run(run_cem) else run_cem() end
   return
 end
 

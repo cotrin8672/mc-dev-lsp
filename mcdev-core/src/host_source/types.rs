@@ -130,6 +130,7 @@ impl HostNodeValidity {
 pub enum HostExpressionKind {
     Constant(HostConstant),
     TypeLiteral(HostTypeFact),
+    Enum { owner: HostTypeFact, name: String },
     Array(Vec<Option<HostExpressionFact>>),
     Annotation(Box<HostAnnotationFact>),
     Unresolved,

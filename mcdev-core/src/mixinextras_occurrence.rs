@@ -1,7 +1,7 @@
 //! Exact injection-point occurrence selection. `None` means unknown; `Some(empty)` proves no match.
 use crate::bytecode::{AtTargetCandidate, AtTargetKind, BytecodeIndex, ConstantValue};
 use crate::descriptor::{self, MemberTarget, Pattern};
-use crate::extras_model::{AtShiftSpec, MixinExtrasAnnotationSite};
+use crate::extras_model::{AtShiftSpec, HostMethodSlice, HostSliceAt, MixinExtrasAnnotationSite};
 use crate::mixin_completion::AtTargetCompletionService;
 use crate::MethodIndexEntry;
 use std::collections::{BTreeMap, BTreeSet};
@@ -243,22 +243,109 @@ impl<'a> InjectionPointOccurrenceResolver<'a> {
         site: &MixinExtrasAnnotationSite,
         expression_instruction_indices: Option<&BTreeSet<i32>>,
     ) -> Option<BTreeSet<i32>> {
+        self.resolve_bounds(
+            owner,
+            target_method,
+            site,
+            expression_instruction_indices,
+            None,
+        )
+    }
+    pub fn resolve_in_slice(
+        &self,
+        owner: &str,
+        target_method: &MethodIndexEntry,
+        site: &MixinExtrasAnnotationSite,
+        expression_instruction_indices: Option<&BTreeSet<i32>>,
+        slice: Option<&HostMethodSlice>,
+    ) -> Option<BTreeSet<i32>> {
+        let Some(slice) = slice else {
+            return self.resolve(owner, target_method, site, expression_instruction_indices);
+        };
+        let boundary = |point: &HostSliceAt, fail: i32| {
+            let mut query = site.clone();
+            query.at_value = Some(point.value.clone());
+            query.at_target = point.target.clone();
+            query.at_args = point.args.clone();
+            query.at_id = point.id.clone();
+            query.at_ordinal = point.ordinal;
+            query.at_shift = point.shift;
+            query.expand_zero_conditions.clear();
+            let (_, specifier) = parse_at_value(&point.value)?;
+            if specifier == Some("ALL") {
+                return None;
+            }
+            let indices = self.resolve(owner, target_method, &query, None)?;
+            Some(
+                if specifier == Some("LAST") {
+                    indices.last().copied()
+                } else {
+                    indices.first().copied()
+                }
+                .unwrap_or(fail),
+            )
+        };
+        let start = slice
+            .from
+            .as_ref()
+            .map(|point| boundary(point, 0))
+            .unwrap_or(Some(0))?;
+        let end = slice
+            .to
+            .as_ref()
+            .map(|point| boundary(point, start))
+            .unwrap_or(Some(i32::MAX))?;
+        if start > end {
+            return None;
+        }
+        self.resolve_bounds(
+            owner,
+            target_method,
+            site,
+            expression_instruction_indices,
+            Some((start, end)),
+        )
+    }
+    fn resolve_bounds(
+        &self,
+        owner: &str,
+        target_method: &MethodIndexEntry,
+        site: &MixinExtrasAnnotationSite,
+        expression_instruction_indices: Option<&BTreeSet<i32>>,
+        bounds: Option<(i32, i32)>,
+    ) -> Option<BTreeSet<i32>> {
+        let within = |index: i32| bounds.is_none_or(|(start, end)| start <= index && index <= end);
         let (value, specifier) = parse_at_value(site.at_value.as_deref()?)?;
         let value = value.to_ascii_uppercase();
         let selected = match value.as_str() {
-            "MIXINEXTRAS:EXPRESSION" => select_indices(expression_instruction_indices?, specifier)?,
-            "HEAD" => select_indices(&BTreeSet::from([0]), specifier)?,
+            "MIXINEXTRAS:EXPRESSION" => select_indices(
+                &expression_instruction_indices?
+                    .iter()
+                    .copied()
+                    .filter(|index| within(*index))
+                    .collect(),
+                specifier,
+            )?,
+            "HEAD" => select_indices(
+                &BTreeSet::from([bounds.map_or(0, |(start, _)| start)]),
+                specifier,
+            )?,
             "TAIL" => {
                 let max = self
                     .candidates(owner, target_method, "RETURN")
                     .into_iter()
                     .map(|c| c.instruction_occurrence_index)
                     .filter(|i| *i >= 0)
+                    .filter(|index| within(*index))
                     .max()?;
                 select_indices(&BTreeSet::from([max]), specifier)?
             }
             "INVOKE" | "FIELD" | "NEW" | "RETURN" | "CONSTANT" => {
-                let candidates = self.candidates(owner, target_method, &value);
+                let candidates = self
+                    .candidates(owner, target_method, &value)
+                    .into_iter()
+                    .filter(|candidate| within(candidate.instruction_occurrence_index))
+                    .collect();
                 let filtered = if value == "CONSTANT" {
                     filter_constants(candidates, site)?
                 } else {
@@ -269,6 +356,7 @@ impl<'a> InjectionPointOccurrenceResolver<'a> {
             _ => return None,
         };
         apply_shift(selected, site.at_shift)
+            .map(|indices| indices.into_iter().filter(|index| within(*index)).collect())
     }
     fn candidates(
         &self,

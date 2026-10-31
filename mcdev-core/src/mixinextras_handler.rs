@@ -9,7 +9,7 @@ use crate::{
 };
 use std::collections::{BTreeMap, BTreeSet};
 const OPERATION_FQN: &str = "com.llamalad7.mixinextras.injector.wrapoperation.Operation";
-const COERCE_FQN: &str = "org.spongepowered.asm.mixin.injection.Coerce";
+pub const COERCE_FQN: &str = "org.spongepowered.asm.mixin.injection.Coerce";
 const CANCELLABLE_FQN: &str = "com.llamalad7.mixinextras.sugar.Cancellable";
 const CALLBACK_INFO: &str = "Lorg/spongepowered/asm/mixin/injection/callback/CallbackInfo;";
 const CALLBACK_INFO_RETURNABLE: &str =
@@ -40,6 +40,7 @@ pub struct HandlerSignatureService<'a> {
     pub class_index: &'a dyn ClassIndex,
     pub bytecode_index: Option<&'a dyn BytecodeIndex>,
     pub reference_types: Option<&'a dyn HandlerReferenceTypeResolver>,
+    pub host_source: Option<HostHandlerSource>,
 }
 #[derive(Clone, PartialEq, Eq)]
 struct WrappedTarget {
@@ -62,11 +63,103 @@ impl<'a> HandlerSignatureService<'a> {
             class_index,
             bytecode_index,
             reference_types: None,
+            host_source: None,
         }
     }
     pub fn with_reference_types(mut self, resolver: &'a dyn HandlerReferenceTypeResolver) -> Self {
         self.reference_types = Some(resolver);
         self
+    }
+    pub fn with_host_source(mut self, source: HostHandlerSource) -> Self {
+        self.host_source = Some(source);
+        self
+    }
+    pub fn annotation_sites(&self, source: &str, sugar: bool) -> Vec<MixinExtrasAnnotationSite> {
+        if let Some(host) = &self.host_source {
+            return host
+                .checked_sites(source)
+                .unwrap_or_else(|error| std::panic::panic_any(error))
+                .iter()
+                .filter(|site| {
+                    if sugar {
+                        site.annotation.is_sugar_handler_injector()
+                    } else {
+                        site.annotation.is_injector()
+                    }
+                })
+                .cloned()
+                .collect();
+        }
+        if sugar {
+            Self::find_sugar_handler_annotation_sites(source)
+        } else {
+            Self::find_annotation_sites(source)
+        }
+    }
+    pub fn enrich_declared_handler(
+        &self,
+        handler: &HandlerMethodDeclaration,
+        source: &str,
+    ) -> HandlerMethodDeclaration {
+        if let Some(host) = &self.host_source {
+            host.checked_sites(source)
+                .unwrap_or_else(|error| std::panic::panic_any(error));
+            return handler.clone();
+        }
+        Self::enrich_handler_types_with_reference_types(
+            handler,
+            self.class_index,
+            Some(source),
+            self.reference_types,
+        )
+    }
+    pub fn source_targets(&self, source: &str) -> Option<Vec<String>> {
+        self.host_source.as_ref().map(|host| {
+            host.validate_source(source)
+                .unwrap_or_else(|error| std::panic::panic_any(error));
+            host.targets.clone()
+        })
+    }
+    pub fn selected_slice(
+        &self,
+        source: &str,
+        site: &MixinExtrasAnnotationSite,
+    ) -> Option<&HostMethodSlice> {
+        let host = self.host_source.as_ref()?;
+        let sites = host
+            .checked_sites(source)
+            .unwrap_or_else(|error| std::panic::panic_any(error));
+        let mut found = None;
+        let mut matched = false;
+        for (index, _) in sites
+            .iter()
+            .enumerate()
+            .filter(|(_, candidate)| *candidate == site)
+        {
+            let mut selections = host
+                .slice_selections
+                .iter()
+                .filter(|selection| selection.site_index == index);
+            let selected = selections.next().map(|selection| &selection.slice);
+            if selections.next().is_some() || matched && found != selected {
+                std::panic::panic_any(crate::host_source::HostSourceError::Failure(
+                    "identical handler sites have ambiguous Slice selection".into(),
+                ));
+            }
+            found = selected;
+            matched = true;
+        }
+        if !matched
+            || host
+                .slice_selections
+                .iter()
+                .any(|selection| selection.site_index >= sites.len())
+        {
+            std::panic::panic_any(crate::host_source::HostSourceError::Failure(
+                "normalized Slice site identity is invalid".into(),
+            ));
+        }
+        found
     }
     pub fn generate_handler_stub(
         &self,

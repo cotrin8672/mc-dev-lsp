@@ -4,6 +4,7 @@
 //! the composition boundary: it validates the caller-owned project session,
 //! assembles the existing MC facades, and preserves unavailable host facts as
 //! typed command failures.
+mod mapping_coverage;
 
 use super::{
     completion::completion_from_core,
@@ -30,6 +31,7 @@ use mcdev_core::{
         MixinFacadeRequest,
     },
     mixin_navigation::{DefinitionBackend, DefinitionResolution, DefinitionResolutionService},
+    mixin_source::{AnnotationContextExtractor, AnnotationSlot, MixinAnnotation},
     mixinextras_expression::ExpressionMemberCompletionCache,
     mixinextras_handler::HandlerReferenceTypeResolver,
     model::{ClassIndex, ClassIndexEntry, FieldIndexEntry, MethodIndexEntry},
@@ -86,6 +88,10 @@ pub struct EvaluationCommandInputs {
     pub additional_at_values: Arc<AdditionalAtValues>,
     /// Host-issued context.refreshGeneration, present only after host refresh.
     pub refresh_generation: Option<String>,
+    /// All config candidates and their source-set owners were captured.
+    pub config_selection_complete: bool,
+    /// The legacy root/cache mapping domain and its platform inputs were captured.
+    pub mapping_discovery_complete: bool,
 }
 
 enum SessionAuthority {
@@ -99,6 +105,8 @@ enum SessionAuthority {
         specifier_supported: Arc<SpecifierProbe>,
         additional_at_values: Arc<AdditionalAtValues>,
         refresh_generation: Option<String>,
+        config_selection_complete: bool,
+        mapping_discovery_complete: bool,
     },
 }
 
@@ -300,6 +308,12 @@ impl CoreCommandHost {
         build_identity: BuildIdentity,
         host_supports_kotlin_semantics: bool,
     ) -> Result<Self, CommandFailure> {
+        if !inputs.cached_session.context.root.is_absolute() {
+            return Err(unavailable(
+                McdevErrorCode::IncompleteProjectContext,
+                "owning project root is not absolute",
+            ));
+        }
         if inputs.cached_session.cache_hit {
             return Err(unavailable(
                 McdevErrorCode::IncompleteProjectContext,
@@ -324,6 +338,8 @@ impl CoreCommandHost {
                 specifier_supported: inputs.specifier_supported,
                 additional_at_values: inputs.additional_at_values,
                 refresh_generation: inputs.refresh_generation,
+                config_selection_complete: inputs.config_selection_complete,
+                mapping_discovery_complete: inputs.mapping_discovery_complete,
             },
             checked_class_index: inputs.class_index,
             checked_bytecode_index: inputs.bytecode_index,
@@ -385,9 +401,7 @@ impl CoreCommandHost {
                     format!("invalid session workspace root: {error}"),
                 )
             })?);
-        if requested != session_root
-            || normalize_path(&self.cached_session.context.root) != session_root
-        {
+        if requested != session_root {
             return Err(unavailable(
                 McdevErrorCode::IncompleteProjectContext,
                 "workspace root does not match the owned project session",
@@ -463,6 +477,65 @@ impl CoreCommandHost {
         Ok(())
     }
 
+    fn require_config_selection(&self) -> Result<(), CommandFailure> {
+        if !self.config_selection_complete() {
+            return Err(unavailable(
+                McdevErrorCode::IncompleteProjectContext,
+                "complete Mixin config candidates and source-set ownership are unavailable",
+            ));
+        }
+        Ok(())
+    }
+
+    fn config_selection_complete(&self) -> bool {
+        !matches!(
+            self.authority,
+            SessionAuthority::Evaluation {
+                config_selection_complete: false,
+                ..
+            }
+        )
+    }
+
+    fn mapping_discovery_complete(&self) -> bool {
+        match &self.authority {
+            SessionAuthority::Legacy { .. } => true,
+            SessionAuthority::Evaluation {
+                mapping_discovery_complete,
+                ..
+            } => *mapping_discovery_complete,
+        }
+    }
+
+    fn require_registered_sources_for_completion(
+        &self,
+        context: &McdevRequestContext,
+    ) -> Result<(), CommandFailure> {
+        if self.config_selection_complete() {
+            return Ok(());
+        }
+        let site = usize::try_from(context.position.line)
+            .ok()
+            .zip(usize::try_from(context.position.character).ok())
+            .and_then(|(line, character)| {
+                mcdev_core::position_to_offset(
+                    &context.buffer_text,
+                    mcdev_core::McTextPosition { line, character },
+                )
+            })
+            .and_then(|offset| {
+                AnnotationContextExtractor::extract_at_offset(&context.buffer_text, offset)
+            });
+        if site.is_some_and(|site| {
+            site.annotation == MixinAnnotation::Share
+                && site.slot == AnnotationSlot::Value
+                && site.attribute_name.as_deref() != Some("namespace")
+        }) {
+            self.require_config_selection()?;
+        }
+        Ok(())
+    }
+
     fn project_key(&self) -> Option<HostProjectKey> {
         match &self.authority {
             SessionAuthority::Legacy { session, .. } => Some(HostProjectKey {
@@ -475,7 +548,7 @@ impl CoreCommandHost {
 
     fn facade<'a>(&'a self, document_version: Option<i64>) -> HostMixinServiceFacade<'a> {
         let key = self.project_key();
-        let workspace = normalize_path(&self.cached_session.context.root);
+        let project_root = normalize_path(&self.cached_session.context.root);
         let mut facade = HostMixinServiceFacade::new(
             self.checked_class_index.as_ref(),
             self.checked_bytecode_index.as_ref(),
@@ -487,6 +560,9 @@ impl CoreCommandHost {
             facade = facade.with_expression_cache(self.expression_cache.clone(), key.clone());
         }
         facade = facade.with_registered_sources(self.source_provider.as_ref());
+        if self.config_selection_complete() {
+            facade = facade.with_registered_handler_sources(self.source_provider.as_ref());
+        }
         facade.project = key.clone();
         facade.project_session_version = self.cached_session.version;
         facade.document_version = document_version;
@@ -498,10 +574,10 @@ impl CoreCommandHost {
                     .ok()
                     .map(|path| normalize_path(&path))
                     .as_ref()
-                    != Some(&workspace)
+                    != Some(&project_root)
             }) {
                 return Err(HostSourceError::Failure(
-                    "workspace root does not match the owned project session".into(),
+                    "project root does not match the owned project session".into(),
                 ));
             }
             Ok(resolver_key.clone())
@@ -826,6 +902,7 @@ impl CommandHost for CoreCommandHost {
         options: &mcdev_core::mixin_completion::MixinCompletionOptions,
         cancellation: &dyn CancellationChecker,
     ) -> Result<Option<RuntimeCompletion>, CommandFailure> {
+        self.require_registered_sources_for_completion(context)?;
         cancellation
             .check_cancelled()
             .map_err(CommandFailure::Cancelled)?;
@@ -865,6 +942,7 @@ impl CommandHost for CoreCommandHost {
         project_version: u64,
         cancellation: &dyn CancellationChecker,
     ) -> Result<RuntimeCompletion, CommandFailure> {
+        self.require_registered_sources_for_completion(context)?;
         self.validate_project(project, &context.workspace_root)?;
         self.validate_semantic_capability(context)?;
         if project_version != self.cached_session.version {
@@ -935,8 +1013,15 @@ impl CommandHost for CoreCommandHost {
         cancellation
             .check_cancelled()
             .map_err(CommandFailure::Cancelled)?;
-        let service =
-            AwAtServiceFacade::new(self.checked_class_index.as_ref(), Some(&project.mappings));
+        mapping_coverage::guard(
+            self.mapping_discovery_complete(),
+            file_type,
+            &context.buffer_text,
+            Some((line, character)),
+        )?;
+        let mappings =
+            mapping_coverage::context(&project.mappings, self.mapping_discovery_complete());
+        let service = AwAtServiceFacade::new(self.checked_class_index.as_ref(), Some(&mappings));
         let result = catch_command(|| {
             service.complete(&AwAtFacadeRequest {
                 buffer_text: &context.buffer_text,
@@ -985,8 +1070,16 @@ impl CommandHost for CoreCommandHost {
                     "diagnostic character is negative",
                 )
             })?;
+            mapping_coverage::guard(
+                self.mapping_discovery_complete(),
+                file_type,
+                &context.buffer_text,
+                None,
+            )?;
+            let mappings =
+                mapping_coverage::context(&project.mappings, self.mapping_discovery_complete());
             let service =
-                AwAtServiceFacade::new(self.checked_class_index.as_ref(), Some(&project.mappings));
+                AwAtServiceFacade::new(self.checked_class_index.as_ref(), Some(&mappings));
             let diagnostics = catch_command(|| {
                 service.diagnose(&AwAtFacadeRequest {
                     buffer_text: &context.buffer_text,
@@ -998,6 +1091,9 @@ impl CommandHost for CoreCommandHost {
             })?;
             self.validate_workspace(&context.workspace_root)?;
             return Ok(diagnostics);
+        }
+        if !HostMixinFacade::is_kotlin_document(&context.document_uri) {
+            self.require_config_selection()?;
         }
         self.validate_semantic_capability(context)?;
         let facade = self.facade(context.document_version);
@@ -1052,8 +1148,16 @@ impl CommandHost for CoreCommandHost {
                     "definition character is negative",
                 )
             })?;
+            mapping_coverage::guard(
+                self.mapping_discovery_complete(),
+                file_type,
+                &context.buffer_text,
+                Some((line, character)),
+            )?;
+            let mappings =
+                mapping_coverage::context(&project.mappings, self.mapping_discovery_complete());
             let service =
-                AwAtServiceFacade::new(self.checked_class_index.as_ref(), Some(&project.mappings));
+                AwAtServiceFacade::new(self.checked_class_index.as_ref(), Some(&mappings));
             let targets = catch_command(|| {
                 service.definitions_at(&AwAtFacadeRequest {
                     buffer_text: &context.buffer_text,
@@ -1143,10 +1247,10 @@ impl CommandHost for CoreCommandHost {
                 )
             }
             SourceFamily::AwAt => {
-                let service = AwAtServiceFacade::new(
-                    self.checked_class_index.as_ref(),
-                    Some(&project.mappings),
-                );
+                let mappings =
+                    mapping_coverage::context(&project.mappings, self.mapping_discovery_complete());
+                let service =
+                    AwAtServiceFacade::new(self.checked_class_index.as_ref(), Some(&mappings));
                 catch_command(|| service.find_references(target, sources))?
             }
         };
@@ -1191,8 +1295,16 @@ impl CommandHost for CoreCommandHost {
                     "code action character is negative",
                 )
             })?;
+            mapping_coverage::guard(
+                self.mapping_discovery_complete(),
+                file_type,
+                &context.buffer_text,
+                None,
+            )?;
+            let mappings =
+                mapping_coverage::context(&project.mappings, self.mapping_discovery_complete());
             let service =
-                AwAtServiceFacade::new(self.checked_class_index.as_ref(), Some(&project.mappings));
+                AwAtServiceFacade::new(self.checked_class_index.as_ref(), Some(&mappings));
             let fixes = catch_command(|| {
                 service.code_actions(
                     &AwAtFacadeRequest {
@@ -1208,10 +1320,24 @@ impl CommandHost for CoreCommandHost {
             self.validate_workspace(&context.workspace_root)?;
             return Ok(fixes);
         }
+        if !HostMixinFacade::is_kotlin_document(&context.document_uri)
+            && !diagnostic_code
+                .is_some_and(MixinCodeActionService::is_config_independent_diagnostic)
+        {
+            self.require_config_selection()?;
+        }
         self.validate_semantic_capability(context)?;
         let facade = self.facade(context.document_version);
-        let request =
-            self.build_facade_request(&facade, context, range.start.line, range.start.character)?;
+        let request = facade
+            .build_code_action_request(
+                &context.buffer_text,
+                &context.document_uri,
+                range.start.line,
+                range.start.character,
+                diagnostic_code,
+                self.source_provider.as_ref(),
+            )
+            .map_err(map_facade_error)?;
         cancellation
             .check_cancelled()
             .map_err(CommandFailure::Cancelled)?;
@@ -1231,6 +1357,7 @@ impl CommandHost for CoreCommandHost {
         context: &McdevRequestContext,
     ) -> Result<Option<String>, CommandFailure> {
         self.validate_project(project, &context.workspace_root)?;
+        self.require_config_selection()?;
         let Some(config) = HostMixinFacade::selected_mixin_config(
             project,
             &context.buffer_text,
@@ -1270,29 +1397,34 @@ impl CommandHost for CoreCommandHost {
         config_content: Option<&str>,
     ) -> Result<Option<(String, McFix)>, CommandFailure> {
         self.validate_project(project, &context.workspace_root)?;
-        let result =
-            if AwAtBufferSupport::detect_file_type(&context.language_id, &context.document_uri)
-                .is_some()
-            {
-                let resolved = if matches!(fix, McFix::WorkspaceEditFix { .. }) {
-                    Some(fix.clone())
-                } else {
-                    let service = AwAtServiceFacade::new(
-                        self.checked_class_index.as_ref(),
-                        Some(&project.mappings),
-                    );
-                    catch_command(|| service.apply_fix(fix, &context.buffer_text))?
-                }
-                .ok_or_else(|| {
-                    unavailable(
-                        McdevErrorCode::IncompleteProjectContext,
-                        "the AW/AT core could not apply the selected fix to the current buffer",
-                    )
-                })?;
-                Some((context.buffer_text.clone(), resolved))
+        let result = if let Some(file_type) =
+            AwAtBufferSupport::detect_file_type(&context.language_id, &context.document_uri)
+        {
+            let resolved = if matches!(fix, McFix::WorkspaceEditFix { .. }) {
+                Some(fix.clone())
             } else {
-                self.resolve_java_fix(context, fix, config_content)?
-            };
+                mapping_coverage::guard(
+                    self.mapping_discovery_complete(),
+                    file_type,
+                    &context.buffer_text,
+                    None,
+                )?;
+                let mappings =
+                    mapping_coverage::context(&project.mappings, self.mapping_discovery_complete());
+                let service =
+                    AwAtServiceFacade::new(self.checked_class_index.as_ref(), Some(&mappings));
+                catch_command(|| service.apply_fix(fix, &context.buffer_text))?
+            }
+            .ok_or_else(|| {
+                unavailable(
+                    McdevErrorCode::IncompleteProjectContext,
+                    "the AW/AT core could not apply the selected fix to the current buffer",
+                )
+            })?;
+            Some((context.buffer_text.clone(), resolved))
+        } else {
+            self.resolve_java_fix(context, fix, config_content)?
+        };
         self.validate_workspace(&context.workspace_root)?;
         Ok(result)
     }

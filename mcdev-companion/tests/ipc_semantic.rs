@@ -458,8 +458,15 @@ fn evaluation_cancelled_between_fact_batches_stops_projection() {
 fn host_argument_range_outside_its_annotation_is_rejected() {
     let (source, mut wire) = fixture();
     wire["declarations"][0]["annotations"][0]["arguments"][0]["range"] = span(&source, "value");
-    let answer = parse(&provider(wire, Arc::new(Host::new())), &source, Some(7)).unwrap();
-    assert!(matches!(answer.fact, HostFact::Unavailable { .. }));
+    let answer = HostSemanticProvider::with_client(
+        serde_json::from_value(wire).unwrap(),
+        Arc::new(Host::new()),
+        "file:///project/雪Mixin.java".into(),
+        Some(7),
+    );
+    assert!(
+        matches!(answer, Err(FactsError::Protocol(reason)) if reason == "argument range is outside annotation")
+    );
 }
 
 #[test]

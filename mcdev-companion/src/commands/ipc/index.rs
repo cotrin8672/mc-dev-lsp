@@ -1,9 +1,11 @@
 //! JVM facts remain scoped to a single host-owned command evaluation.
+mod annotations;
+mod source;
 use crate::{
     host_facts::{
         bridge::FactReader,
         draft::{RawAbi, TypeJvm},
-        inputs::{CatalogEntry, ScopedInputs},
+        inputs::{CatalogEntry, Inventory, ScopedInputs, SourceEntry, SourceFacts, SourceSnapshot},
         FactsError,
     },
     provider_commands::CommandFacts,
@@ -26,7 +28,7 @@ use std::{
 };
 
 /// A reader's cached facts may only be used while its host evaluation is live.
-pub trait EvaluationFactReader: FactReader + Send + Sync {
+pub trait EvaluationFactReader: FactReader + Send + Sync + Clone {
     fn check_active(&self) -> Result<(), FactsError>;
 }
 
@@ -43,6 +45,8 @@ struct Cache {
     bytes: BTreeMap<String, RuntimeBytes>,
     selected_origins: BTreeMap<String, String>,
     host_types: BTreeMap<String, EditingView>,
+    source_types: BTreeMap<String, Option<EditingView>>,
+    source_names: Option<BTreeSet<String>>,
 }
 
 #[derive(Clone)]
@@ -68,6 +72,9 @@ pub struct EvaluationIndex<R: EvaluationFactReader = CommandFacts> {
     facts: R,
     cache: Mutex<Cache>,
     source: Option<Arc<dyn ProjectSourceQuery>>,
+    source_evaluation: Option<String>,
+    source_inputs: Option<source::CurrentSourceInputs>,
+    owned_output_origins: BTreeSet<String>,
 }
 
 /// A physical-only view. Its negative results say nothing about current source.
@@ -82,12 +89,41 @@ impl<R: EvaluationFactReader> EvaluationIndex<R> {
             facts,
             cache: Mutex::new(Cache::default()),
             source: None,
+            source_evaluation: None,
+            source_inputs: None,
+            owned_output_origins: BTreeSet::new(),
         }
     }
 
     /// The caller must supply source facts derived from the same host evaluation.
     pub fn with_source_query(mut self, source: Arc<dyn ProjectSourceQuery>) -> Self {
         self.source = Some(source);
+        self
+    }
+
+    /// Enable current authored queries only after sourceFacts and sourceLocation negotiation.
+    pub fn with_current_source_facts(mut self, evaluation: &str) -> Self {
+        self.source_evaluation = Some(evaluation.to_owned());
+        self
+    }
+
+    /// Reuse the evaluation owner's inventory; sibling source-set inputs must stay separate.
+    pub fn with_current_source_inventory(
+        mut self,
+        inventory: Inventory<SourceEntry>,
+        snapshots: Vec<Fact<SourceSnapshot>>,
+        facts: Option<Vec<SourceFacts>>,
+    ) -> Self {
+        self.source_inputs = Some(source::CurrentSourceInputs {
+            inventory,
+            snapshots,
+            facts,
+        });
+        self
+    }
+
+    pub fn with_owned_output_origins(mut self, origins: BTreeSet<String>) -> Self {
+        self.owned_output_origins = origins;
         self
     }
 
@@ -306,6 +342,9 @@ impl<R: EvaluationFactReader> EvaluationIndex<R> {
     }
 
     fn source_class(&self, owner: &str) -> Result<Option<ClassIndexEntry>, FactsError> {
+        if self.source.is_none() && self.source_evaluation.is_some() {
+            return self.current_source_class(owner);
+        }
         let source = self
             .source
             .as_ref()
@@ -324,11 +363,15 @@ impl<R: EvaluationFactReader> EvaluationIndex<R> {
 
     fn class_exists(&self, owner: &str) -> Result<Option<ClassIndexEntry>, FactsError> {
         self.facts.check_active()?;
-        if let Some(source) = &self.source {
+        if self.source.is_some() || self.source_evaluation.is_some() {
             if let Some(entry) = self.source_class(owner)? {
                 return Ok(Some(entry));
             }
-            if source.covers_project_dependencies() {
+            if self
+                .source
+                .as_ref()
+                .is_some_and(|source| source.covers_project_dependencies())
+            {
                 return Ok(None);
             }
         } else {
@@ -349,6 +392,9 @@ impl<R: EvaluationFactReader> EvaluationIndex<R> {
 
     fn methods(&self, owner: &str) -> Result<Vec<MethodIndexEntry>, FactsError> {
         if self.source_class(owner)?.is_some() {
+            if self.source.is_none() {
+                return self.current_source_members(owner, |view| view.methods.clone(), "methods");
+            }
             let source = self.source.as_ref().expect("source authority was checked");
             let answer = source
                 .get_methods(owner)
@@ -374,6 +420,9 @@ impl<R: EvaluationFactReader> EvaluationIndex<R> {
 
     fn fields(&self, owner: &str) -> Result<Vec<FieldIndexEntry>, FactsError> {
         if self.source_class(owner)?.is_some() {
+            if self.source.is_none() {
+                return self.current_source_members(owner, |view| view.fields.clone(), "fields");
+            }
             let source = self.source.as_ref().expect("source authority was checked");
             let answer = source
                 .get_fields(owner)
@@ -1041,6 +1090,9 @@ impl<R: EvaluationFactReader> ClassIndex for EvaluationIndex<R> {
             if limit == 0 {
                 return Ok(Vec::new());
             }
+            if self.source.is_none() && self.source_evaluation.is_some() {
+                return self.current_classes(prefix, limit);
+            }
             let source = self
                 .source
                 .as_ref()
@@ -1091,6 +1143,9 @@ impl<R: EvaluationFactReader> ClassIndex for EvaluationIndex<R> {
 
     fn find_class_by_fqn(&self, fqn: &str) -> Option<ClassIndexEntry> {
         self.query(|| {
+            if self.source.is_none() && self.source_evaluation.is_some() {
+                return self.current_class_by_fqn(fqn);
+            }
             let source = self
                 .source
                 .as_ref()

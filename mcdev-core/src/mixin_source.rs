@@ -2944,6 +2944,8 @@ pub struct MixinClassModel {
     pub members: Vec<MixinMemberModel>,
     pub injectors: Vec<InjectorModel>,
     pub resolved_mixin_extras_contexts: Vec<crate::extras_model::ResolvedMixinExtrasContext>,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub normalized_handler_source: Option<crate::extras_model::HostHandlerSource>,
     pub parse_source: ParseSource,
     pub confidence: ParseConfidence,
     pub warnings: Vec<String>,

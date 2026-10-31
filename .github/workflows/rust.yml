@@ -20,6 +20,11 @@ jobs:
         with:
           version: v0.11.5
           neovim: true
+      - name: Set up JDK for original fixtures
+        uses: actions/setup-java@v5
+        with:
+          distribution: temurin
+          java-version: '21'
       - name: Verify compact runner
         shell: pwsh
         run: ./scripts/test-rust-compact-runner.ps1

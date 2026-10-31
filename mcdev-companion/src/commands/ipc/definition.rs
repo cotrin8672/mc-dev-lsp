@@ -1,7 +1,11 @@
 //! Exact positive definition locations from the evaluation's own document.
 use super::index::EvaluationFactReader;
 use crate::{
-    host_facts::{draft::TypeJvm, inputs::read_split, FactsError},
+    host_facts::{
+        draft::{DeclaredMembers, TypeJvm},
+        inputs::{read_split, SourceLocation},
+        FactsError,
+    },
     wire::{
         AnnotationValue, Declaration, Evaluation, Fact, HandleKind, Member, Registry, TypeFact,
     },
@@ -244,6 +248,8 @@ pub struct CurrentDefinitions<R: EvaluationFactReader + Clone> {
     reader: R,
     owners: Mutex<BTreeMap<String, Owner>>,
     members: Mutex<BTreeMap<String, MemberInventory>>,
+    source_locations: bool,
+    selected_types: Mutex<BTreeMap<String, TypeFact>>,
 }
 
 impl<R: EvaluationFactReader + Clone> CurrentDefinitions<R> {
@@ -262,7 +268,14 @@ impl<R: EvaluationFactReader + Clone> CurrentDefinitions<R> {
             reader,
             owners: Mutex::new(BTreeMap::new()),
             members: Mutex::new(BTreeMap::new()),
+            source_locations: false,
+            selected_types: Mutex::new(BTreeMap::new()),
         })
+    }
+
+    pub fn with_source_locations(mut self, enabled: bool) -> Self {
+        self.source_locations = enabled;
+        self
     }
 
     fn read<T: DeserializeOwned>(&self, queries: &[Value]) -> Result<Vec<T>, FactsError> {
@@ -449,6 +462,9 @@ impl<R: EvaluationFactReader + Clone> CurrentDefinitions<R> {
         &self,
         target: &McDefinitionTarget,
     ) -> Result<ResolvedDefinition, FactsError> {
+        if self.source_locations {
+            return self.resolve_host_location(target);
+        }
         let owner = self.owner(&target.owner_internal_name)?;
         let declaration = match target.kind {
             MemberKind::Class => owner.declaration,
@@ -520,6 +536,207 @@ impl<R: EvaluationFactReader + Clone> CurrentDefinitions<R> {
             resolution_message: None,
         })
     }
+
+    fn selected_type(&self, target: &McDefinitionTarget) -> Result<TypeFact, FactsError> {
+        self.reader.check_active()?;
+        if let Some(ty) = self
+            .selected_types
+            .lock()
+            .map_err(|_| protocol("definition cache poisoned"))?
+            .get(&target.owner_internal_name)
+            .cloned()
+        {
+            return Ok(ty);
+        }
+        let name = target
+            .owner_fqn
+            .clone()
+            .unwrap_or_else(|| target.owner_internal_name.replace('/', "."));
+        let ty: Fact<TypeFact> = self
+            .read(&[json!({"op":"resolveType","name":name})])?
+            .pop()
+            .ok_or_else(|| protocol("missing target type fact"))?;
+        ty.validate().map_err(FactsError::Protocol)?;
+        let ty = match ty {
+            Fact::Found { value } => value,
+            _ => return Err(unknown("selected target type is unavailable")),
+        };
+        let mut registry = Registry::default();
+        registry
+            .register(&ty.id, HandleKind::Type)
+            .map_err(FactsError::Protocol)?;
+        if ty.qualified_name.is_empty() || ty.read_only {
+            return Err(protocol("invalid selected target type"));
+        }
+        let jvm: TypeJvm = self
+            .read(&[json!({"op":"typeJvm","target":ty.id})])?
+            .pop()
+            .ok_or_else(|| protocol("missing target JVM fact"))?;
+        jvm.binary_name.validate().map_err(FactsError::Protocol)?;
+        if !jvm.binary_name.found().is_some_and(|name| {
+            name.internal_name == target.owner_internal_name
+                && name.descriptor == format!("L{};", target.owner_internal_name)
+        }) {
+            return Err(unknown(
+                "selected target does not have the requested JVM identity",
+            ));
+        }
+        self.reader.check_active()?;
+        self.selected_types
+            .lock()
+            .map_err(|_| protocol("definition cache poisoned"))?
+            .insert(target.owner_internal_name.clone(), ty.clone());
+        Ok(ty)
+    }
+
+    fn resolve_host_location(
+        &self,
+        target: &McDefinitionTarget,
+    ) -> Result<ResolvedDefinition, FactsError> {
+        let ty = self.selected_type(target)?;
+        let token = match target.kind {
+            MemberKind::Class => ty.id,
+            MemberKind::Method | MemberKind::Field => {
+                let name = target
+                    .name
+                    .as_deref()
+                    .filter(|name| !name.is_empty())
+                    .ok_or_else(|| unknown("target member name is unavailable"))?;
+                let kind = if target.kind == MemberKind::Method {
+                    "method"
+                } else {
+                    "field"
+                };
+                let inventory: DeclaredMembers = self
+                    .read(&[json!({"op":"declaredMembers","target":ty.id})])?
+                    .pop()
+                    .ok_or_else(|| protocol("missing target member inventory"))?;
+                inventory
+                    .coverage
+                    .validate()
+                    .map_err(FactsError::Protocol)?;
+                if inventory.coverage.found().is_none() {
+                    return Err(unknown("target member inventory is incomplete"));
+                }
+                let mut matches = Vec::new();
+                let mut registry = Registry::default();
+                registry
+                    .register(&ty.id, HandleKind::Type)
+                    .map_err(FactsError::Protocol)?;
+                for item in inventory.members {
+                    let member = item.member;
+                    registry
+                        .register(&member.id, HandleKind::Member)
+                        .map_err(FactsError::Protocol)?;
+                    member.signature.validate().map_err(FactsError::Protocol)?;
+                    if member.name.is_empty()
+                        || !matches!(member.kind.as_str(), "method" | "field")
+                        || member.read_only
+                    {
+                        return Err(protocol("invalid selected target member"));
+                    }
+                    if let Some(signature) = member.signature.found() {
+                        registry
+                            .register(&signature.id, HandleKind::Signature)
+                            .map_err(FactsError::Protocol)?;
+                    }
+                    if member.kind != kind || member.name != name {
+                        continue;
+                    }
+                    if !item.mismatches.is_empty() {
+                        return Err(unknown("target member binding is not exact"));
+                    }
+                    let signature = member
+                        .signature
+                        .found()
+                        .ok_or_else(|| unknown("target overload signature is unavailable"))?;
+                    if signature.kind != member.kind {
+                        return Err(protocol("target member signature kind mismatch"));
+                    }
+                    if target
+                        .descriptor
+                        .as_deref()
+                        .filter(|value| !value.is_empty())
+                        .is_none_or(|expected| expected == signature.descriptor)
+                    {
+                        matches.push(member.id);
+                    }
+                }
+                let [token] = matches.as_slice() else {
+                    return Err(unknown("selected target has no unique matching member"));
+                };
+                token.clone()
+            }
+            _ => return Err(unknown("unsupported definition target kind")),
+        };
+        let location: Fact<SourceLocation> = self
+            .read(&[json!({"op":"sourceLocation","target":token})])?
+            .pop()
+            .ok_or_else(|| protocol("missing target source location"))?;
+        location.validate().map_err(FactsError::Protocol)?;
+        let Fact::Found { value: location } = location else {
+            return Err(unknown("selected target source location is unavailable"));
+        };
+        let range = checked_location_range(&location, &token)?;
+        let target_path = mcdev_core::project::uri_to_path(&location.document_uri)
+            .map_err(FactsError::Protocol)?;
+        let owner_path =
+            mcdev_core::project::uri_to_path(&self.document_uri).map_err(FactsError::Protocol)?;
+        if mcdev_core::project::normalize_path(&target_path)
+            == mcdev_core::project::normalize_path(&owner_path)
+        {
+            use sha2::{Digest, Sha256};
+            if location.source.sha256
+                != format!("{:x}", Sha256::digest(self.evaluation.source.as_bytes()))
+            {
+                return Err(FactsError::Stale(
+                    "target source digest disagrees with the evaluation".into(),
+                ));
+            }
+        }
+        self.reader.check_active()?;
+        Ok(ResolvedDefinition {
+            target: target.clone(),
+            document_uri: location.document_uri,
+            range,
+            resolution: DefinitionResolution::Source,
+            resolution_message: None,
+        })
+    }
+}
+
+pub(super) fn checked_location_range(
+    location: &SourceLocation,
+    target: &str,
+) -> Result<McTextRange, FactsError> {
+    let path =
+        mcdev_core::project::uri_to_path(&location.document_uri).map_err(FactsError::Protocol)?;
+    if location.target != target
+        || !location.document_uri.starts_with("file:")
+        || !path.is_absolute()
+        || location.range.start >= location.range.end
+        || location.source.identity.kind != "source"
+        || location.source.identity.revision.is_empty()
+        || location.source.identity.revision.len() > 256
+        || location.source.sha256.len() != 64
+        || !location
+            .source
+            .sha256
+            .bytes()
+            .all(|byte| byte.is_ascii_digit() || (b'a'..=b'f').contains(&byte))
+    {
+        return Err(protocol("invalid exact source location"));
+    }
+    Ok(McTextRange {
+        start: mcdev_core::model::McTextPosition {
+            line: location.range.start.line as usize,
+            character: location.range.start.character as usize,
+        },
+        end: mcdev_core::model::McTextPosition {
+            line: location.range.end.line as usize,
+            character: location.range.end.character as usize,
+        },
+    })
 }
 
 fn protocol(value: &str) -> FactsError {
@@ -632,6 +849,101 @@ mod tests {
             json!({"facts":[type_jvm()]}),
             json!({"facts":member_facts}),
         ]))))
+    }
+
+    fn remote_backend(
+        location: Value,
+        coverage: Value,
+        extra: Vec<Value>,
+    ) -> (CurrentDefinitions<Reader>, Reader) {
+        let mut members = vec![member()["value"].clone()];
+        members.extend(extra);
+        for member in &mut members {
+            member["visibility"] = found(json!("Private"));
+            member["synthetic"] = found(json!(false));
+            member["mismatches"] = json!([]);
+        }
+        let reader = Reader(Arc::new(Mutex::new(VecDeque::from(vec![
+            json!({"facts":[type_fact("selected:type")]}),
+            json!({"facts":[type_jvm()]}),
+            json!({"facts":[{"members":members,"coverage":coverage}]}),
+            json!({"facts":[location]}),
+        ]))));
+        let uri = mcdev_core::project::path_to_uri(
+            &std::env::temp_dir().join("mcdev-navigation/Owner.java"),
+        );
+        let backend = CurrentDefinitions::new(
+            evaluation("class Owner { void tick() {} }", false),
+            uri,
+            reader.clone(),
+        )
+        .unwrap()
+        .with_source_locations(true);
+        (backend, reader)
+    }
+
+    fn remote_location() -> Value {
+        found(
+            json!({"target":"member:1", "documentUri":mcdev_core::project::path_to_uri(
+            &std::env::temp_dir().join("mcdev-navigation/閉じたTarget.kt")),
+            "range":{"start":{"line":4,"character":17},"end":{"line":4,"character":21}},
+            "source":{"identity":{"kind":"source","revision":"314"},"sha256":"a".repeat(64)}}),
+        )
+    }
+
+    #[test]
+    fn negotiated_source_location_opens_an_unopened_target_with_exact_utf16_coordinates() {
+        let location = remote_location();
+        let expected_uri = location["value"]["documentUri"]
+            .as_str()
+            .unwrap()
+            .to_owned();
+        let (backend, reader) = remote_backend(location, found(Value::Null), vec![]);
+        let resolved = backend.checked_resolve(&target()).unwrap();
+        assert_eq!(resolved.document_uri, expected_uri);
+        assert_eq!(
+            resolved.range.start,
+            McTextPosition {
+                line: 4,
+                character: 17
+            }
+        );
+        assert_eq!(
+            resolved.range.end,
+            McTextPosition {
+                line: 4,
+                character: 21
+            }
+        );
+        assert_eq!(resolved.resolution, DefinitionResolution::Source);
+        assert!(reader.0.lock().unwrap().is_empty());
+    }
+
+    #[test]
+    fn a_foreign_location_token_or_unknown_binary_source_is_not_navigation_success() {
+        let mut foreign = remote_location();
+        foreign["value"]["target"] = json!("foreign:member");
+        for location in [foreign, unknown_fact()] {
+            let (backend, _) = remote_backend(location, found(Value::Null), vec![]);
+            assert!(backend.checked_resolve(&target()).is_err());
+        }
+    }
+
+    #[test]
+    fn unknown_overload_or_member_coverage_prevents_remote_member_selection() {
+        let mut overload = member()["value"].clone();
+        overload["id"] = json!("unknown:overload");
+        overload["signature"] = unknown_fact();
+        let (backend, _) = remote_backend(remote_location(), found(Value::Null), vec![overload]);
+        assert!(matches!(
+            backend.checked_resolve(&target()),
+            Err(FactsError::Unknown(_))
+        ));
+        let (backend, _) = remote_backend(remote_location(), unknown_fact(), vec![]);
+        assert!(matches!(
+            backend.checked_resolve(&target()),
+            Err(FactsError::Unknown(_))
+        ));
     }
 
     #[test]
@@ -798,15 +1110,9 @@ mod tests {
             content_range.start += 1;
         }
         let pos = offset_to_position(&eval.source, expr + 2).unwrap();
-        assert!(expression_definition(
-            &eval,
-            "file:///Owner.java",
-            pos.line,
-            pos.character,
-            reader
-        )
-        .unwrap()
-        .is_none());
+        assert!(matches!(expression_definition(
+            &eval, "file:///Owner.java", pos.line, pos.character, reader
+        ), Err(FactsError::Protocol(reason)) if reason == "plain string content does not match source"));
         let (mut eval, _reader, _, expr) = expression_fixture();
         let definition = eval.declarations[1].annotations.remove(0);
         eval.declarations[0].annotations.push(definition);

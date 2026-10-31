@@ -4,95 +4,12 @@ param(
 )
 
 $ErrorActionPreference = "Stop"
+. (Join-Path $PSScriptRoot 'e2e-workspace-common.ps1')
 
 $repoRoot = Split-Path -Parent $PSScriptRoot
-$workspaceRoot = Join-Path $repoRoot "build/e2e-workspace"
+$workspaceRoot = Assert-E2eBuildPath (Join-Path $repoRoot "build/e2e-workspace")
 $awAtFixtureRoot = "fixtures/fabric-aw-at"
-
-function Get-FixtureJar {
-    if ($script:FixtureJar) { return $script:FixtureJar }
-
-    $jarDir = Join-Path $repoRoot "mcdev-test-fixtures/build/libs"
-    $rootBuild = Get-Content -LiteralPath (Join-Path $repoRoot "build.gradle.kts") -Raw
-    if ($rootBuild -notmatch 'version\s*=\s*"([^"]+)"') {
-        throw "root project version not found"
-    }
-    $version = $Matches[1]
-    $sourceJar = Join-Path $jarDir "mcdev-test-fixtures-$version.jar"
-    if (Test-Path -LiteralPath $sourceJar) {
-        $script:FixtureJar = $sourceJar
-        return $sourceJar
-    }
-
-    Push-Location $repoRoot
-    try {
-        & gradle :mcdev-test-fixtures:jar 2>&1 | ForEach-Object { Write-Host $_ }
-        if ($LASTEXITCODE -ne 0) { throw "failed to build mcdev-test-fixtures jar" }
-    } finally {
-        Pop-Location
-    }
-
-    if (-not (Test-Path -LiteralPath $sourceJar)) {
-        throw "mcdev-test-fixtures jar not found: $sourceJar"
-    }
-    $script:FixtureJar = $sourceJar
-    return $sourceJar
-}
-
-function Copy-FixtureResource {
-    param(
-        [string]$ResourcePath,
-        [string]$Destination
-    )
-
-    $sourceJar = Get-FixtureJar
-
-    Add-Type -AssemblyName System.IO.Compression.FileSystem
-    $zip = [System.IO.Compression.ZipFile]::OpenRead($sourceJar)
-    try {
-        $entry = $zip.Entries | Where-Object { $_.FullName -eq $ResourcePath } | Select-Object -First 1
-        if (-not $entry) {
-            throw "fixture resource not found in jar: $ResourcePath"
-        }
-        $destinationParent = Split-Path -Parent $Destination
-        if ($destinationParent -and -not (Test-Path -LiteralPath $destinationParent)) {
-            New-Item -ItemType Directory -Path $destinationParent -Force | Out-Null
-        }
-        [System.IO.Compression.ZipFileExtensions]::ExtractToFile($entry, $Destination, $true)
-    } finally {
-        $zip.Dispose()
-    }
-}
-
-function Copy-FixtureTree {
-    param(
-        [string]$FixtureRoot,
-        [string]$DestinationRoot
-    )
-
-    $sourceJar = Get-FixtureJar
-
-    Add-Type -AssemblyName System.IO.Compression.FileSystem
-    $zip = [System.IO.Compression.ZipFile]::OpenRead($sourceJar)
-    try {
-        $prefix = "$FixtureRoot/"
-        foreach ($entry in $zip.Entries) {
-            if (-not $entry.FullName.StartsWith($prefix)) { continue }
-            $relative = $entry.FullName.Substring($prefix.Length).Replace('/', [IO.Path]::DirectorySeparatorChar)
-            if ([string]::IsNullOrWhiteSpace($relative)) { continue }
-            if ($relative.EndsWith([IO.Path]::DirectorySeparatorChar)) { continue }
-            if ($entry.FullName.EndsWith("/")) { continue }
-            $destination = Join-Path $DestinationRoot $relative
-            $destinationParent = Split-Path -Parent $destination
-            if ($destinationParent -and -not (Test-Path -LiteralPath $destinationParent)) {
-                New-Item -ItemType Directory -Path $destinationParent -Force | Out-Null
-            }
-            [System.IO.Compression.ZipFileExtensions]::ExtractToFile($entry, $destination, $true)
-        }
-    } finally {
-        $zip.Dispose()
-    }
-}
+$null = Resolve-E2eExecutable 'GRADLE_CMD'
 
 if (Test-Path -LiteralPath $workspaceRoot) {
     Remove-Item -LiteralPath $workspaceRoot -Recurse -Force
@@ -102,28 +19,18 @@ New-Item -ItemType Directory -Path $workspaceRoot -Force | Out-Null
 $fixtureRoot = "fixtures/$Fixture"
 Copy-FixtureTree -FixtureRoot $fixtureRoot -DestinationRoot $workspaceRoot
 
+$fixedDependencies = -not [string]::IsNullOrWhiteSpace($env:MCDEV_E2E_INPUTS_RECEIPT)
+if ($fixedDependencies) {
+    Copy-E2eFixedDependencies $env:MCDEV_E2E_INPUTS_RECEIPT $workspaceRoot
+} else {
+    Write-Host 'fixture dependencies: Maven coordinates (MCDEV_E2E_INPUTS_RECEIPT is unset)'
+}
+$mixinDependency = if ($fixedDependencies) { 'files("libs/mixin-0.8.7.jar")' }
+    else { '"org.spongepowered:mixin:0.8.7"' }
+$extrasDependency = if ($fixedDependencies) { 'files("libs/mixinextras-fabric-0.5.5.jar")' }
+    else { '"io.github.llamalad7:mixinextras-fabric:0.5.5"' }
+
 if ($Fixture -eq "fabric-mixinextras") {
-    $e2eBuildGradlePath = Join-Path $workspaceRoot "build.gradle"
-    $e2eBuildGradleContent = @'
-plugins {
-    id 'java'
-    id 'maven-publish'
-}
-
-repositories {
-    mavenCentral()
-    maven { url "https://repo.spongepowered.org/repository/maven-public/" }
-}
-
-dependencies {
-    // fabric-loom marker for mcdev platform detection; this fixture is imported
-    // by JDT LS without resolving the live Loom plugin.
-    compileOnly "org.spongepowered:mixin:0.8.7"
-    compileOnly "io.github.llamalad7:mixinextras-fabric:0.5.5"
-}
-'@
-    [System.IO.File]::WriteAllText($e2eBuildGradlePath, $e2eBuildGradleContent, [System.Text.UTF8Encoding]::new($false))
-
     $sharedMixinPath = Join-Path $workspaceRoot "src/main/java/com/example/mixin/MixinExtrasSharedExample.java"
     $sharedMixinContent = @'
 package com.example.mixin;
@@ -154,12 +61,11 @@ public abstract class MixinExtrasSharedExample {
     [System.IO.File]::WriteAllText($mixinsJsonPath, $mixinsJsonContent, [System.Text.UTF8Encoding]::new($false))
 }
 
-if ($Fixture -in @("multi-source-set", "forge-basic")) {
-    $platformMarker = if ($Fixture -eq "multi-source-set") { "fabric-loom" } else { "net.minecraftforge.gradle" }
-    $sourceSets = ""
-    $clientDependencies = ""
-    if ($Fixture -eq "multi-source-set") {
-        $sourceSets = @'
+$platformMarker = if ($Fixture -eq "forge-basic") { "net.minecraftforge.gradle" } else { "fabric-loom" }
+$sourceSets = ""
+$clientDependencies = ""
+if ($Fixture -eq "multi-source-set") {
+    $sourceSets = @'
 sourceSets {
     main {
         java.srcDirs = ["src/main/java"]
@@ -173,34 +79,47 @@ sourceSets {
     }
 }
 '@
-        $clientDependencies = @'
-    clientCompileOnly files("classpath")
-    clientCompileOnly "org.spongepowered:mixin:0.8.7"
-'@
-    }
+    $clientDependencies = @"
+    clientImplementation files("classpath")
+    clientCompileOnly $mixinDependency
+"@
+}
+$extraDependencies = if ($Fixture -eq 'fabric-mixinextras') {
+    '    compileOnly ' + $extrasDependency
+} else { '' }
+$repositories = if ($fixedDependencies) { '' } else { @'
+repositories {
+    mavenCentral()
+    maven { url "https://repo.spongepowered.org/repository/maven-public/" }
+}
+'@ }
 
-    $e2eBuildGradlePath = Join-Path $workspaceRoot "build.gradle"
-    $e2eBuildGradleContent = @"
+$e2eBuildGradlePath = Join-Path $workspaceRoot "build.gradle"
+$e2eBuildGradleContent = @"
 plugins {
     id 'java'
     id 'maven-publish'
 }
 
-// $platformMarker marker for mcdev platform detection; this fixture is imported
-// by JDT LS without resolving the live platform plugin.
-repositories {
-    mavenCentral()
-    maven { url "https://repo.spongepowered.org/repository/maven-public/" }
+// $platformMarker marker preserves the original fixture's platform selection.
+java {
+    sourceCompatibility = JavaVersion.VERSION_21
+    targetCompatibility = JavaVersion.VERSION_21
 }
+tasks.withType(JavaCompile).configureEach {
+    options.encoding = 'UTF-8'
+    options.compilerArgs = ['-proc:none']
+}
+$repositories
 
 $sourceSets
 dependencies {
-    compileOnly files("classpath")
-    compileOnly "org.spongepowered:mixin:0.8.7"
+    implementation files("classpath")
+    compileOnly $mixinDependency
+$extraDependencies
 $clientDependencies}
 "@
-    [System.IO.File]::WriteAllText($e2eBuildGradlePath, $e2eBuildGradleContent, [System.Text.UTF8Encoding]::new($false))
-}
+[System.IO.File]::WriteAllText($e2eBuildGradlePath, $e2eBuildGradleContent, [System.Text.UTF8Encoding]::new($false))
 
 $settingsGradlePath = Join-Path $workspaceRoot "settings.gradle"
 $settingsGradleContent = @'
@@ -208,9 +127,8 @@ rootProject.name = "mcdev-e2e-workspace"
 '@
 [System.IO.File]::WriteAllText($settingsGradlePath, $settingsGradleContent, [System.Text.UTF8Encoding]::new($false))
 
-$classResource = "fixtures/shared/classes/com/example/target/SimpleTarget.class"
-$classDestination = Join-Path $workspaceRoot "classpath/com/example/target/SimpleTarget.class"
-Copy-FixtureResource -ResourcePath $classResource -Destination $classDestination
+Copy-FixtureTargetClass -DestinationRoot (Join-Path $workspaceRoot 'classpath')
+Write-E2eGradleWrapper $workspaceRoot
 
 if ($Fixture -eq "fabric-basic") {
     $awAtResources = @(

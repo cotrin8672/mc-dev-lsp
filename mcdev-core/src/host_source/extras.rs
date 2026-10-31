@@ -248,7 +248,7 @@ fn local_array(node: &HostExpressionFact) -> Option<Vec<LocalSugarSpec>> {
     }
     Some(result)
 }
-fn local(annotation: &HostAnnotationFact) -> Option<LocalSugarSpec> {
+pub(super) fn local(annotation: &HostAnnotationFact) -> Option<LocalSugarSpec> {
     if !annotation.validity.is_usable() || !annotation.has_unique_members() {
         return None;
     }

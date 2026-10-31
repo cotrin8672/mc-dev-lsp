@@ -8,7 +8,7 @@ use crate::{
     host_facts::{
         bridge::ScopedFacts,
         draft::SupportedOps,
-        inputs::{InputOps, ScopedInputs},
+        inputs::{InputOp, InputOps, ScopedInputs},
         FactsError,
     },
     provider_commands::CommandFacts,
@@ -254,6 +254,8 @@ fn execute_inner(
     }
 
     let ops = InputOps::intersect(&initialization)?;
+    let source_facts_enabled = ops.supports(InputOp::SourceFacts);
+    let source_locations_enabled = ops.supports(InputOp::SourceLocation);
     let mut inputs = ScopedInputs::new(&validated.evaluation.evaluation, &ops, facts.clone())?;
     let project_ops = SupportedOps::intersect(&initialization)?;
     let mut registry = Registry::default();
@@ -265,15 +267,51 @@ fn execute_inner(
         &mut project_reader,
     )?
     .project_context()?;
-    let project = project::selected_project(
+    let selected_classpath = project_facts
+        .classpath
+        .found()
+        .map(|classpath| classpath.entries.clone())
+        .unwrap_or_default();
+    let project = project::selected_project_for_command(
         &mut inputs,
         project_facts,
         &validated.workspace_root,
         &validated.evaluation.evaluation,
+        &validated.decoded,
     )?;
     let project_complete = project.project_complete;
+    let config_complete = project.config_selection_complete;
+    let references_complete = project.references_complete;
     let inputs = Arc::new(Mutex::new(inputs));
-    let index = Arc::new(index::EvaluationIndex::new(inputs, facts.clone()));
+    let mut index = index::EvaluationIndex::new(inputs, facts.clone());
+    if source_facts_enabled && source_locations_enabled {
+        index = index
+            .with_current_source_facts(&validated.evaluation.evaluation)
+            .with_current_source_inventory(
+                project.owner_sources.inventory,
+                project.owner_sources.snapshots,
+                None,
+            )
+            .with_owned_output_origins(
+                selected_classpath
+                    .into_iter()
+                    .filter(|entry| {
+                        let path = mcdev_core::project::normalize_path(std::path::Path::new(
+                            &entry.display_path,
+                        ));
+                        project
+                            .cached_session
+                            .context
+                            .classpath
+                            .project_outputs
+                            .iter()
+                            .any(|output| mcdev_core::project::normalize_path(output) == path)
+                    })
+                    .map(|entry| entry.id)
+                    .collect(),
+            );
+    }
+    let index = Arc::new(index);
     let runtime_index = Arc::new(index.physical_view());
     let active_facts = facts.clone();
     let check_active = Arc::new(move || active_facts.check_active().map_err(source_error));
@@ -290,11 +328,14 @@ fn execute_inner(
     });
     let definition_evaluation = serde_json::from_value(params)
         .map_err(|error| FactsError::Protocol(format!("invalid definition evaluation: {error}")))?;
-    let definitions = Arc::new(definition::CurrentDefinitions::new(
-        definition_evaluation,
-        validated.document_uri.clone(),
-        facts.clone(),
-    )?);
+    let definitions = Arc::new(
+        definition::CurrentDefinitions::new(
+            definition_evaluation,
+            validated.document_uri.clone(),
+            facts.clone(),
+        )?
+        .with_source_locations(source_locations_enabled),
+    );
     let semantic = Arc::new(
         semantic::HostSemanticProvider::new(
             validated.evaluation,
@@ -302,8 +343,15 @@ fn execute_inner(
             validated.document_uri,
             validated.document_version,
         )?
-        .with_index(index.clone()),
+        .with_index(index.clone())
+        .with_source_facts(source_facts_enabled)
+        .with_project_sources(project.source_snapshots)?,
     );
+    let source_provider = Arc::new(semantic::RegisteredSourceProvider::new(
+        project.provider,
+        semantic.clone(),
+        source_locations_enabled,
+    ));
     let host = CoreCommandHost::with_evaluation(
         EvaluationCommandInputs {
             workspace_root_uri: validated.workspace_root,
@@ -316,9 +364,11 @@ fn execute_inner(
             specifier_supported,
             additional_at_values,
             refresh_generation: validated.refresh_generation,
+            config_selection_complete: config_complete,
+            mapping_discovery_complete: project.mapping_complete,
         },
         semantic,
-        project.provider,
+        source_provider,
         project.sources,
         BuildIdentity::current(),
         true,
@@ -336,7 +386,8 @@ fn execute_inner(
         .filter(|command| supports_command(command))
         .map(str::to_owned)
         .collect::<Vec<_>>();
-    let dispatcher = CommandDispatcher::for_evaluation(Arc::new(host), &commands, project_complete);
+    let dispatcher = CommandDispatcher::for_evaluation(Arc::new(host), &commands, project_complete)
+        .with_discovery_coverage(config_complete, references_complete);
     let envelope = dispatcher
         .execute_decoded(
             validated.decoded,

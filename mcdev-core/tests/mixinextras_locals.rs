@@ -163,6 +163,43 @@ fn validation_distinguishes_unknown_empty_occurrences_and_corrupt_extraction() {
         LocalCaptureValidationResult::Unavailable { .. }
     ));
 }
+
+#[test]
+fn normalized_local_validation_keeps_checked_handler_types_without_source_lookup() {
+    use mcdev_core::{host_source::HostFact, mixinextras_handler::HandlerSignatureService};
+    use sha2::{Digest, Sha256};
+    let source = "class Untyped {}";
+    let code = Code {
+        bytes: Some(vec![1]),
+    };
+    let mut parameter = parameter();
+    parameter.type_descriptor = Some("I".into());
+    let mut point = point(Some(BTreeSet::new()));
+    point.site.handler_method = Some(HandlerMethodDeclaration {
+        method_name: "handler".into(),
+        return_type_name: "not.Indexed".into(),
+        return_type_descriptor: Some("Lnot/Indexed;".into()),
+        parameters: vec![parameter.clone()],
+        ..Default::default()
+    });
+    let facts = HostHandlerSource {
+        document_uri: "file:///Untyped.java".into(),
+        sha256: format!("{:x}", Sha256::digest(source.as_bytes())),
+        qualified_name: "Untyped".into(),
+        targets: vec!["Missing".into()],
+        sites: HostFact::Known(vec![point.site.clone()]),
+        slice_selections: vec![],
+    };
+    let signature = HandlerSignatureService::new(&PanicIndex, Some(&code)).with_host_source(facts);
+    let results = LocalCaptureValidationService::new(&PanicIndex, &code)
+        .with_signature_service(signature)
+        .validate(source, &parameter, &[point])
+        .unwrap();
+    assert!(matches!(
+        &results[0],
+        LocalCaptureValidationResult::NotFound { .. }
+    ));
+}
 #[test]
 fn validation_non_local_sugar_does_not_resolve_unrelated_parameter_types() {
     let code = Code { bytes: None };

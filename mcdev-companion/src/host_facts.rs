@@ -1,5 +1,4 @@
-//! Generic host-fact adapters. `draft` is isolated pending host agreement; it is
-//! deliberately absent from the production semantic-v1 capability negotiation.
+//! Evaluation-scoped adapters for negotiated host facts and selected inputs.
 pub mod bridge;
 pub mod draft;
 pub mod inputs;

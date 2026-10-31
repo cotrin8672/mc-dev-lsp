@@ -48,6 +48,22 @@ fn project_member(source: &str, member: HostSemanticMember) -> MixinClassModel {
         },
     )
 }
+
+#[test]
+fn normalized_accessor_target_uses_decoded_constant_and_never_raw_expression_text() {
+    let mut accessor = annotation("Accessor", Some("org.spongepowered.asm.mixin.gen.Accessor"));
+    let mut target = string("value");
+    target.source_text = "\"va\" + \"lue\"".into();
+    accessor.members.push(("value".into(), target));
+    let model = project_member("getValue", method("getValue", vec![accessor.clone()]));
+    assert_eq!(
+        model.members[0].explicit_target_name.as_deref(),
+        Some("value")
+    );
+    accessor.members[0].1.kind = HostExpressionKind::Unresolved;
+    let model = project_member("getValue", method("getValue", vec![accessor]));
+    assert!(model.members[0].explicit_target_name.is_none());
+}
 #[test]
 fn typed_provider_failure_preserves_root_cause_instead_of_reflection_wrapper() {
     // Original InvocationTargetException -> IllegalStateException is an adapter

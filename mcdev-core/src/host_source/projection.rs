@@ -1,5 +1,8 @@
 use super::*;
-use crate::extras_model::ResolvedMixinExtrasContext;
+use crate::extras_model::{
+    HandlerParameterDeclaration, HandlerParameterSugarSpec, ResolvedMixinExtrasContext,
+    ShareSugarSpec,
+};
 use crate::mixin_source::*;
 use crate::{offset_to_position, McTextRange};
 use std::{collections::BTreeSet, ops::Range};
@@ -22,6 +25,119 @@ pub struct HostSemanticDocument {
     pub type_kind: JavaTypeKind,
     pub type_annotations: Vec<HostAnnotationFact>,
     pub members: Vec<HostSemanticMember>,
+}
+
+pub fn project_host_handler_parameter(
+    source: &str,
+    name: &str,
+    ty: &HostTypeFact,
+    range: &Range<usize>,
+    annotations: &[HostAnnotationFact],
+) -> HostFact<HandlerParameterDeclaration> {
+    let Some(descriptor) = ty.descriptor() else {
+        return HostFact::Unavailable {
+            reason: "handler parameter type is unavailable".into(),
+        };
+    };
+    let Some(jvm) = ty.jvm_type() else {
+        return HostFact::Unavailable {
+            reason: "handler parameter type is unavailable".into(),
+        };
+    };
+    if jvm == crate::descriptor::JvmType::VoidType {
+        return HostFact::Unavailable {
+            reason: "a handler parameter cannot have void type".into(),
+        };
+    }
+    let Some(range) = text_range(source, range) else {
+        return HostFact::Unavailable {
+            reason: "handler parameter source range is unavailable".into(),
+        };
+    };
+    let mut result = HandlerParameterDeclaration {
+        name: name.into(),
+        type_name: crate::descriptor::render(&jvm),
+        type_descriptor: Some(descriptor.clone()),
+        is_operation: descriptor == "Lcom/llamalad7/mixinextras/injector/wrapoperation/Operation;",
+        range: Some(range),
+        ..Default::default()
+    };
+    for annotation in annotations {
+        if !annotation.validity.is_usable() || !annotation.has_unique_members() {
+            return HostFact::Unavailable {
+                reason: "handler parameter annotation values are unavailable".into(),
+            };
+        }
+        let annotation_range = annotation
+            .source_range
+            .as_ref()
+            .and_then(|range| text_range(source, range));
+        let sugar = match annotation.qualified_name.as_deref() {
+            Some("com.llamalad7.mixinextras.sugar.Local") => match super::extras::local(annotation)
+            {
+                Some(local) => Some(HandlerParameterSugarSpec::Local(local)),
+                None => {
+                    return HostFact::Unavailable {
+                        reason: "Local parameter selectors are unavailable".into(),
+                    }
+                }
+            },
+            Some("com.llamalad7.mixinextras.sugar.Share") => {
+                let value = match annotation.member("value") {
+                    Some(value) => match value.constant_string() {
+                        Some(value) => Some(value),
+                        None => {
+                            return HostFact::Unavailable {
+                                reason: "Share value is unavailable".into(),
+                            }
+                        }
+                    },
+                    None => None,
+                };
+                let namespace = match annotation.member("namespace") {
+                    Some(value) => match value.constant_string() {
+                        Some(value) => Some(value),
+                        None => {
+                            return HostFact::Unavailable {
+                                reason: "Share namespace is unavailable".into(),
+                            }
+                        }
+                    },
+                    None => None,
+                };
+                Some(HandlerParameterSugarSpec::Share(ShareSugarSpec {
+                    value,
+                    namespace,
+                    namespace_specified: annotation
+                        .members
+                        .iter()
+                        .any(|(name, _)| name == "namespace"),
+                }))
+            }
+            Some("com.llamalad7.mixinextras.sugar.Cancellable") => {
+                Some(HandlerParameterSugarSpec::Cancellable)
+            }
+            Some("org.spongepowered.asm.mixin.injection.Coerce") => {
+                result.has_coerce = true;
+                if result.coerce_annotation_range.is_none() {
+                    result.coerce_annotation_range = annotation_range;
+                }
+                None
+            }
+            Some(_) => None,
+            None => {
+                return HostFact::Unavailable {
+                    reason: "handler parameter annotation identity is unavailable".into(),
+                }
+            }
+        };
+        if let Some(sugar) = sugar {
+            result.is_sugar = true;
+            result.sugar_spec = Some(sugar);
+            result.sugar_annotation_range = annotation_range;
+        }
+    }
+    HostFact::Known(result)
 }
 fn text_range(source: &str, range: &Range<usize>) -> Option<McTextRange> {
     if range.end < range.start {
@@ -252,7 +368,7 @@ pub fn project_host_semantic_document(
                 .members
                 .iter()
                 .find(|(k, _)| ["value", "targets", "target"].contains(&k.as_str()))
-                .map(|(_, n)| n.source_text.trim_matches('"').to_string())
+                .and_then(|(_, n)| n.constant_string())
         } else {
             Some(fact.name.clone())
         };

@@ -1,0 +1,15 @@
+{
+  "hostCommit": "392076bc5e364e02426450c574c1227db2c3be8f",
+  "contract": "docs/architecture/extension-ipc.md#filtered-workspace-files-root-files-v1",
+  "sourceSample": "C:/Users/gummy/.codex/ktlsp-runs/01a12550-7d56-71f2-8c34-8ab8c5fe5dda/root-files86/wire/actual-serializer-sample.json",
+  "sample": "actual-serializer-sample.json",
+  "sampleBytes": 1634,
+  "sampleSha256": "af49d91e7e42dada7314a953b710ebe2d998176b7ed00ee361b410db1c3a4c41",
+  "producerProof": "C:/Users/gummy/.codex/ktlsp-root-files86b/editor/artifacts/extension-ipc-proof.json",
+  "producerProofSha256": "83595df9a1c25649793344531594ae0232ee9a5be65483fc796fca4f25d79c37",
+  "phase": "fresh",
+  "objects": ["inventoryRoot", "descriptor", "snapshot"],
+  "extraction": "Unmodified objects from the accepted producer scenario; the sample contains no inventory page or coverage claim.",
+  "unitUse": "The regression assembles a private RootFileEntry with a unit-only default filter/local scope and passes the actual snapshot Fact through RootAssembly. It does not synthesize a captured Found(true) inventory page.",
+  "mcFeatureParityProved": false
+}

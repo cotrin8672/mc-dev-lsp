@@ -2058,5 +2058,28 @@ do
   helpers.assert_eq(completion.last_project_transport_error, before.transport_error, "snippet self-check restores the transport error")
   print("mcdev-nvim adapter suite continued after four shared CEM snippet self-checks")
 end
+do
+  local tracking = require("vim.lsp._changetracking")
+  local before = { window = vim.api.nvim_get_current_win(), buffer = vim.api.nvim_get_current_buf(),
+    cursor = vim.api.nvim_win_get_cursor(0), runtimepath = vim.o.runtimepath,
+    virtualedit = vim.o.virtualedit, completeopt = vim.o.completeopt,
+    dofile = dofile, writefile = vim.fn.writefile, flush = tracking.flush,
+    request = protocol.request, complete = completion.complete, record = _G.mcdev_record_assertion }
+  local readiness_cases = dofile(vim.fn.getcwd() .. "/mcdev-companion/tests/accepted_command_readiness_selfcheck.lua")
+  helpers.assert_eq(readiness_cases, 3, "all readiness mock cases returned to the adapter suite")
+  helpers.assert_eq(vim.api.nvim_get_current_win(), before.window, "readiness self-check preserves the caller window")
+  helpers.assert_eq(vim.api.nvim_get_current_buf(), before.buffer, "readiness self-check preserves the caller buffer")
+  helpers.assert_true(vim.deep_equal(vim.api.nvim_win_get_cursor(0), before.cursor), "readiness self-check preserves the caller cursor")
+  helpers.assert_eq(vim.o.runtimepath, before.runtimepath, "readiness self-check restores runtimepath")
+  helpers.assert_eq(vim.o.virtualedit, before.virtualedit, "readiness self-check preserves virtualedit")
+  helpers.assert_eq(vim.o.completeopt, before.completeopt, "readiness self-check preserves completeopt")
+  helpers.assert_eq(dofile, before.dofile, "readiness self-check restores trace-module loading")
+  helpers.assert_eq(vim.fn.writefile, before.writefile, "readiness self-check restores proof writing")
+  helpers.assert_eq(tracking.flush, before.flush, "readiness self-check restores LSP change tracking")
+  helpers.assert_eq(protocol.request, before.request, "readiness self-check restores protocol requests")
+  helpers.assert_eq(completion.complete, before.complete, "readiness self-check restores completions")
+  helpers.assert_eq(_G.mcdev_record_assertion, before.record, "readiness self-check restores assertion recording")
+  print("mcdev-nvim adapter suite continued after three readiness mock cases; no live CEM credit")
+end
 print("mcdev-nvim adapter tests passed")
 vim.cmd("qa!")

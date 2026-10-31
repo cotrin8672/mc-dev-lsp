@@ -31,14 +31,17 @@ impl<'a> MixinExtrasDiagnosticsService<'a> {
     }
     pub fn analyze(&self, request: &MixinExtrasDiagnosticRequest) -> Vec<McDiagnostic> {
         let source = &request.source;
-        let sites = HandlerSignatureService::find_annotation_sites(source);
+        let sites = self.signature_service.annotation_sites(source, false);
         let mut diagnostics = self.share_conflicts(
             source,
-            &HandlerSignatureService::find_sugar_handler_annotation_sites(source),
+            &self.signature_service.annotation_sites(source, true),
         );
         diagnostics.extend(self.definition_diagnostics(request));
         for site in sites {
-            let targets = site_targets(source, &site, self.class_index);
+            let targets = self
+                .signature_service
+                .source_targets(source)
+                .unwrap_or_else(|| site_targets(source, &site, self.class_index));
             let selected = select_resolved_mixin_extras_context(&site, &request.resolved_contexts);
             let context = selected.map(|r| &r.context);
             if site
@@ -114,12 +117,9 @@ impl<'a> MixinExtrasDiagnosticsService<'a> {
             let Some(handler) = site.handler_method.as_ref() else {
                 continue;
             };
-            let enriched = HandlerSignatureService::enrich_handler_types_with_reference_types(
-                handler,
-                self.class_index,
-                Some(source),
-                self.signature_service.reference_types,
-            );
+            let enriched = self
+                .signature_service
+                .enrich_declared_handler(handler, source);
             if matches!(
                 site.annotation,
                 MixinExtrasAnnotation::WrapOperation | MixinExtrasAnnotation::WrapMethod
@@ -169,7 +169,10 @@ impl<'a> MixinExtrasDiagnosticsService<'a> {
     fn definition_diagnostics(&self, request: &MixinExtrasDiagnosticRequest) -> Vec<McDiagnostic> {
         let resolver = ClassLiteralTypeNameResolver::for_source(&request.source, self.class_index);
         let mut result = vec![];
-        for site in HandlerSignatureService::find_sugar_handler_annotation_sites(&request.source) {
+        for site in self
+            .signature_service
+            .annotation_sites(&request.source, true)
+        {
             let owned;
             let context = if let Some(resolved) =
                 select_resolved_mixin_extras_context(&site, &request.resolved_contexts)
@@ -221,18 +224,25 @@ impl<'a> MixinExtrasDiagnosticsService<'a> {
         let imports = JavaTypeDescriptorResolver::imports_for(source);
         let mut claims: Vec<(String, Vec<(McTextRange, String)>)> = vec![];
         for site in sites {
-            let Some(scope) =
-                position_to_offset(source, site.annotation_range.start).and_then(|offset| {
-                    AnnotationContextExtractor::resolve_mixin_class_scope(source, offset)
-                })
-            else {
-                continue;
+            let (targets, owner_name) = if let Some(host) = &self.signature_service.host_source {
+                host.checked_sites(source)
+                    .unwrap_or_else(|error| std::panic::panic_any(error));
+                (host.targets.clone(), host.qualified_name.clone())
+            } else {
+                let Some(scope) =
+                    position_to_offset(source, site.annotation_range.start).and_then(|offset| {
+                        AnnotationContextExtractor::resolve_mixin_class_scope(source, offset)
+                    })
+                else {
+                    continue;
+                };
+                let targets = MixinTargetResolver::resolve_targets(
+                    &scope.raw_targets,
+                    self.class_index,
+                    Some(&imports),
+                );
+                (targets, scope.class_name)
             };
-            let targets = MixinTargetResolver::resolve_targets(
-                &scope.raw_targets,
-                self.class_index,
-                Some(&imports),
-            );
             let Some(target) = self
                 .signature_service
                 .resolve_target_method(&targets, &site.method_attribute)
@@ -242,12 +252,9 @@ impl<'a> MixinExtrasDiagnosticsService<'a> {
             let Some(handler) = site.handler_method.as_ref() else {
                 continue;
             };
-            let enriched = HandlerSignatureService::enrich_handler_types_with_reference_types(
-                handler,
-                self.class_index,
-                Some(source),
-                self.signature_service.reference_types,
-            );
+            let enriched = self
+                .signature_service
+                .enrich_declared_handler(handler, source);
             for owner in targets {
                 if self
                     .class_index
@@ -273,10 +280,10 @@ impl<'a> MixinExtrasDiagnosticsService<'a> {
                         };
                         namespace
                     } else {
-                        if scope.class_name.trim().is_empty() {
+                        if owner_name.trim().is_empty() {
                             continue;
                         }
-                        &scope.class_name
+                        &owner_name
                     };
                     let Some(descriptor) = parameter
                         .type_descriptor

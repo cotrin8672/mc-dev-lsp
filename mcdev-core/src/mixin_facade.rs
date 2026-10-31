@@ -1,5 +1,6 @@
 //! Shared Minecraft facade request/result facts, independent of a language host.
 use crate::{
+    host_source::HostAnswer,
     mixin_source::{AnnotationContext, MixinClassModel, ParseConfidence, ParseSource},
     McCompletionItem, McCompletionReplacementRange,
 };
@@ -98,6 +99,8 @@ pub struct MixinServiceFacade<'a> {
     pub expression_members: ExpressionMemberCompletionService<'a>,
     pub reference_types: Option<&'a dyn HandlerReferenceTypeResolver>,
     share_sources: Box<dyn Fn() -> Box<dyn Iterator<Item = String> + 'a> + 'a>,
+    normalized_share_sources:
+        Option<Box<dyn Fn() -> Box<dyn Iterator<Item = HostShareSource> + 'a> + 'a>>,
 }
 impl<'a> MixinServiceFacade<'a> {
     pub fn new(class_index: &'a dyn ClassIndex, bytecode_index: &'a dyn BytecodeIndex) -> Self {
@@ -108,6 +111,7 @@ impl<'a> MixinServiceFacade<'a> {
             expression_members: ExpressionMemberCompletionService::new(class_index, bytecode_index),
             reference_types: None,
             share_sources: Box::new(|| Box::new(std::iter::empty())),
+            normalized_share_sources: None,
         }
     }
     pub fn with_at_value_completion(mut self, service: AtValueCompletionService<'a>) -> Self {
@@ -121,6 +125,13 @@ impl<'a> MixinServiceFacade<'a> {
         self.share_sources = Box::new(provider);
         self
     }
+    pub fn with_normalized_share_sources(
+        mut self,
+        provider: impl Fn() -> Box<dyn Iterator<Item = HostShareSource> + 'a> + 'a,
+    ) -> Self {
+        self.normalized_share_sources = Some(Box::new(provider));
+        self
+    }
     pub fn with_reference_types(
         mut self,
         reference_types: &'a dyn HandlerReferenceTypeResolver,
@@ -132,16 +143,28 @@ impl<'a> MixinServiceFacade<'a> {
         self.expression_members.reachable_members_cache = cache;
         self
     }
-    fn handler(&self) -> HandlerSignatureService<'a> {
-        let handler = HandlerSignatureService::new(self.class_index, Some(self.bytecode_index));
+    fn handler(&self, request: &MixinFacadeRequest) -> HandlerSignatureService<'a> {
+        let mut handler = HandlerSignatureService::new(self.class_index, Some(self.bytecode_index));
         if let Some(reference_types) = self.reference_types {
-            handler.with_reference_types(reference_types)
-        } else {
-            handler
+            handler = handler.with_reference_types(reference_types);
         }
+        if let Some(source) = request
+            .semantic_model
+            .as_ref()
+            .and_then(|model| model.normalized_handler_source.as_ref())
+        {
+            if source.document_uri != request.document_uri {
+                std::panic::panic_any(HostSourceError::Failure(
+                    "normalized handler document identity is stale".into(),
+                ));
+            }
+            handler = handler.with_host_source(source.clone());
+        }
+        handler
     }
-    fn extras_actions(&self) -> MixinExtrasCodeActionService<'a> {
-        MixinExtrasCodeActionService::new(self.class_index).with_signature_service(self.handler())
+    fn extras_actions(&self, request: &MixinFacadeRequest) -> MixinExtrasCodeActionService<'a> {
+        MixinExtrasCodeActionService::new(self.class_index)
+            .with_signature_service(self.handler(request))
     }
     pub fn complete(
         &self,
@@ -294,7 +317,7 @@ impl<'a> MixinServiceFacade<'a> {
                     .map(|i| normalize_snippet(source, context, i))
                     .collect());
             }
-            return Ok(self.extras_actions().complete_handler(
+            return Ok(self.extras_actions(request).complete_handler(
                 source,
                 context.annotation_start_offset,
                 &self.resolve_targets(request, context),
@@ -305,7 +328,11 @@ impl<'a> MixinServiceFacade<'a> {
         if context.slot == AnnotationSlot::Attribute {
             let mut items = MixinAttributeCompletionService::complete(context, source);
             if context.annotation == MixinAnnotation::Local {
-                let sites = local_parameter_sites(source, context.value_end_offset);
+                let sites = local_parameter_sites(
+                    source,
+                    context.value_end_offset,
+                    self.handler(request).annotation_sites(source, true),
+                );
                 if sites
                     .iter()
                     .any(|(s, _)| s.annotation == MixinExtrasAnnotation::WrapMethod)
@@ -405,11 +432,18 @@ impl<'a> MixinServiceFacade<'a> {
                 if context.slot == AnnotationSlot::Value
                     && context.attribute_name.as_deref() != Some("namespace") =>
             {
-                ShareCompletionService::new(self.class_index).complete(
-                    source,
-                    context,
-                    (self.share_sources)(),
-                )
+                let service = ShareCompletionService::new(self.class_index)
+                    .with_host_source(self.handler(request).host_source);
+                match self
+                    .normalized_share_sources
+                    .as_ref()
+                    .filter(|_| service.has_host_source())
+                {
+                    Some(sources) => {
+                        service.complete_with_normalized_sources(source, context, sources())
+                    }
+                    None => service.complete(source, context, (self.share_sources)()),
+                }
             }
             MixinAnnotation::Expression | MixinAnnotation::Expressions
                 if context.slot == AnnotationSlot::Value =>
@@ -469,7 +503,11 @@ impl<'a> MixinServiceFacade<'a> {
         };
         MixinTargetResolver::resolve_targets(&raw, self.class_index, Some(&imports))
     }
-    fn targets_at(&self, source: &str, position: McTextPosition) -> Vec<String> {
+    fn targets_at(&self, request: &MixinFacadeRequest, position: McTextPosition) -> Vec<String> {
+        let source = &request.buffer_text;
+        if let Some(targets) = self.handler(request).source_targets(source) {
+            return targets;
+        }
         let imports = JavaTypeDescriptorResolver::imports_for(source);
         if !imports.is_kotlin {
             return MixinTargetResolver::resolve_targets_from_source(source, self.class_index);
@@ -483,9 +521,14 @@ impl<'a> MixinServiceFacade<'a> {
         })
     }
     pub fn diagnose(&self, request: &MixinFacadeRequest) -> FacadeResult<Vec<McDiagnostic>> {
-        core_call(|| self.diagnose_inner(request))
+        core_call(|| self.diagnose_inner(request, true))
     }
-    fn diagnose_inner(&self, request: &MixinFacadeRequest) -> FacadeResult<Vec<McDiagnostic>> {
+    // Only action-specific diagnostics may omit configuration; diagnose() always includes it.
+    fn diagnose_inner(
+        &self,
+        request: &MixinFacadeRequest,
+        include_config: bool,
+    ) -> FacadeResult<Vec<McDiagnostic>> {
         let source = &request.buffer_text;
         let mut diagnostics = MixinDiagnosticsService::new(self.class_index, self.bytecode_index)
             .analyze(&MixinDiagnosticRequest {
@@ -493,14 +536,18 @@ impl<'a> MixinServiceFacade<'a> {
                 document_uri: &request.document_uri,
                 mixin_class_name: request.mixin_class_name.as_deref(),
                 mixin_package: request.mixin_package.as_deref(),
-                mixin_config_content: request.mixin_config_content.as_deref(),
-                mixin_config_path: request.mixin_config_path.as_deref(),
+                mixin_config_content: include_config
+                    .then_some(request.mixin_config_content.as_deref())
+                    .flatten(),
+                mixin_config_path: include_config
+                    .then_some(request.mixin_config_path.as_deref())
+                    .flatten(),
                 semantic_model: request.semantic_model.as_ref(),
             });
         diagnostics.extend(self.analyze_members(request));
         diagnostics.extend(
             MixinExtrasDiagnosticsService::new(self.class_index, self.bytecode_index)
-                .with_signature_service(self.handler())
+                .with_signature_service(self.handler(request))
                 .analyze(&MixinExtrasDiagnosticRequest {
                     source: source.clone(),
                     document_uri: request.document_uri.clone(),
@@ -528,7 +575,11 @@ impl<'a> MixinServiceFacade<'a> {
             return Ok(vec![]);
         }
         let diagnostics: Vec<_> = self
-            .diagnose(request)?
+            .diagnose_inner(
+                request,
+                !diagnostic_code
+                    .is_some_and(MixinCodeActionService::is_config_independent_diagnostic),
+            )?
             .into_iter()
             .filter(|d| diagnostic_code.is_none_or(|code| code == d.code))
             .collect();
@@ -541,7 +592,7 @@ impl<'a> MixinServiceFacade<'a> {
             request.mixin_package.as_deref(),
             Some(self.class_index),
         );
-        let service = self.extras_actions();
+        let service = self.extras_actions(request);
         fixes.extend(service.fixes_for_diagnostics(
             &diagnostics,
             &request.document_uri,
@@ -567,7 +618,7 @@ impl<'a> MixinServiceFacade<'a> {
         let source = &request.buffer_text;
         let mut diagnostics = vec![];
         for declaration in self.shadow_declarations(request) {
-            let targets = self.targets_at(source, declaration.range.start);
+            let targets = self.targets_at(request, declaration.range.start);
             if targets.is_empty() {
                 continue;
             }
@@ -579,7 +630,7 @@ impl<'a> MixinServiceFacade<'a> {
             ));
         }
         for declaration in self.accessor_declarations(request) {
-            let targets = self.targets_at(source, declaration.range.start);
+            let targets = self.targets_at(request, declaration.range.start);
             if !targets.is_empty() {
                 diagnostics.extend(
                     AccessorService::new(self.class_index).validate(&targets, &declaration),
@@ -587,7 +638,7 @@ impl<'a> MixinServiceFacade<'a> {
             }
         }
         for declaration in self.invoker_declarations(request) {
-            let targets = self.targets_at(source, declaration.range.start);
+            let targets = self.targets_at(request, declaration.range.start);
             if !targets.is_empty() {
                 diagnostics
                     .extend(InvokerService::new(self.class_index).validate(&targets, &declaration));
@@ -694,8 +745,9 @@ impl<'a> MixinServiceFacade<'a> {
     fn diagnose_standard_sugar(&self, request: &MixinFacadeRequest) -> Vec<McDiagnostic> {
         let source = &request.buffer_text;
         let imports = JavaTypeDescriptorResolver::imports_for(source);
+        let service = self.handler(request);
         let mut diagnostics = vec![];
-        for site in HandlerSignatureService::find_sugar_handler_annotation_sites(source) {
+        for site in service.annotation_sites(source, true) {
             if !matches!(
                 site.annotation,
                 MixinExtrasAnnotation::Inject
@@ -710,31 +762,29 @@ impl<'a> MixinServiceFacade<'a> {
             let Some(handler) = &site.handler_method else {
                 continue;
             };
-            let Some(offset) = position_to_offset(source, site.annotation_range.start) else {
-                continue;
+            let targets = if let Some(targets) = service.source_targets(source) {
+                targets
+            } else {
+                let Some(offset) = position_to_offset(source, site.annotation_range.start) else {
+                    continue;
+                };
+                let Some(scope) =
+                    AnnotationContextExtractor::resolve_mixin_class_scope(source, offset)
+                else {
+                    continue;
+                };
+                MixinTargetResolver::resolve_targets(
+                    &scope.raw_targets,
+                    self.class_index,
+                    Some(&imports),
+                )
             };
-            let Some(scope) = AnnotationContextExtractor::resolve_mixin_class_scope(source, offset)
-            else {
-                continue;
-            };
-            let targets = MixinTargetResolver::resolve_targets(
-                &scope.raw_targets,
-                self.class_index,
-                Some(&imports),
-            );
             if targets.is_empty() {
                 continue;
             }
-            let enriched = HandlerSignatureService::enrich_handler_types_with_reference_types(
-                handler,
-                self.class_index,
-                Some(source),
-                self.reference_types,
-            );
-            let target = self
-                .handler()
-                .resolve_target_method(&targets, &site.method_attribute);
-            for issue in self.handler().validate_common_sugar_constraints(
+            let enriched = service.enrich_declared_handler(handler, source);
+            let target = service.resolve_target_method(&targets, &site.method_attribute);
+            for issue in service.validate_common_sugar_constraints(
                 &enriched,
                 target.as_ref(),
                 Some(site.annotation),
@@ -757,14 +807,14 @@ impl<'a> MixinServiceFacade<'a> {
     fn diagnose_locals(&self, request: &MixinFacadeRequest) -> FacadeResult<Vec<McDiagnostic>> {
         let source = &request.buffer_text;
         let mut diagnostics = vec![];
-        for site in HandlerSignatureService::find_sugar_handler_annotation_sites(source) {
+        for site in self.handler(request).annotation_sites(source, true) {
             if site.annotation == MixinExtrasAnnotation::WrapMethod {
                 continue;
             }
             let Some(handler) = &site.handler_method else {
                 continue;
             };
-            let targets = self.targets_at(source, site.annotation_range.start);
+            let targets = self.targets_at(request, site.annotation_range.start);
             if targets.is_empty() {
                 continue;
             }
@@ -950,7 +1000,12 @@ impl<'a> MixinServiceFacade<'a> {
         else {
             return Ok(vec![]);
         };
-        let matches = local_parameter_sites(&request.buffer_text, context.value_start_offset);
+        let matches = local_parameter_sites(
+            &request.buffer_text,
+            context.value_start_offset,
+            self.handler(request)
+                .annotation_sites(&request.buffer_text, true),
+        );
         if matches.is_empty()
             || matches
                 .iter()
@@ -982,7 +1037,7 @@ impl<'a> MixinServiceFacade<'a> {
         targets: &[String],
     ) -> FacadeResult<Vec<LocalCaptureValidationResult>> {
         let Some(method) = self
-            .handler()
+            .handler(request)
             .resolve_target_method(targets, &site.method_attribute)
         else {
             return Ok(vec![]);
@@ -1014,11 +1069,9 @@ impl<'a> MixinServiceFacade<'a> {
                 ),
             })
             .collect();
-        LocalCaptureValidationService::new(self.class_index, self.bytecode_index).validate(
-            &request.buffer_text,
-            parameter,
-            &points,
-        )
+        LocalCaptureValidationService::new(self.class_index, self.bytecode_index)
+            .with_signature_service(self.handler(request))
+            .validate(&request.buffer_text, parameter, &points)
     }
     fn expression_instruction_indices(
         &self,
@@ -1191,9 +1244,10 @@ fn dedup<T: PartialEq>(values: &mut Vec<T>) {
 fn local_parameter_sites(
     source: &str,
     offset: usize,
+    sites: Vec<MixinExtrasAnnotationSite>,
 ) -> Vec<(MixinExtrasAnnotationSite, HandlerParameterDeclaration)> {
     let mut out = vec![];
-    for site in HandlerSignatureService::find_sugar_handler_annotation_sites(source) {
+    for site in sites {
         let Some(handler) = &site.handler_method else {
             continue;
         };
@@ -1515,6 +1569,16 @@ pub struct HostMixinServiceFacade<'a> {
     pub share_sources: Box<
         dyn Fn(&str, &str, Option<&HostProjectKey>) -> Box<dyn Iterator<Item = String> + 'a> + 'a,
     >,
+    pub normalized_share_sources: Option<
+        Box<
+            dyn Fn(
+                    &str,
+                    &str,
+                    Option<&HostProjectKey>,
+                ) -> Box<dyn Iterator<Item = HostShareSource> + 'a>
+                + 'a,
+        >,
+    >,
     pub completion_override: Option<
         Box<
             dyn Fn(
@@ -1579,6 +1643,7 @@ impl<'a> HostMixinServiceFacade<'a> {
             specifier_supported: Box::new(|_, _| Ok(false)),
             additional_at_values: Box::new(|_, _| Ok(vec![])),
             share_sources: Box::new(|_, _, _| Box::new(std::iter::empty())),
+            normalized_share_sources: None,
             completion_override: None,
             core_override: None,
         }
@@ -1620,6 +1685,27 @@ impl<'a> HostMixinServiceFacade<'a> {
             ),
             None => Box::new(std::iter::empty()),
         });
+        self
+    }
+    pub fn with_registered_handler_sources(
+        mut self,
+        provider: &'a dyn HostMixinSourceProvider,
+    ) -> Self {
+        let context = self.context;
+        self.normalized_share_sources =
+            Some(Box::new(move |source, uri, _project| match context {
+                Some(context) => Box::new(
+                    HostMixinFacade::collect_registered_handler_sources(
+                        context, source, uri, provider,
+                    )
+                    .map(|answer| answer.unwrap_or_else(|error| std::panic::panic_any(error))),
+                ),
+                None => Box::new(std::iter::once_with(|| -> HostShareSource {
+                    std::panic::panic_any(HostFacadeError::Unavailable(
+                        "registered Share project context is unavailable".into(),
+                    ))
+                })),
+            }));
         self
     }
     pub fn semantic_environment(
@@ -1779,6 +1865,15 @@ impl<'a> HostMixinServiceFacade<'a> {
                     project.as_ref(),
                 )
             });
+        if let Some(sources) = &self.normalized_share_sources {
+            core = core.with_normalized_share_sources(|| {
+                sources(
+                    &request.buffer_text,
+                    &request.document_uri,
+                    project.as_ref(),
+                )
+            });
+        }
         if let Some(types) = self.reference_types {
             core = core.with_reference_types(types);
         }
@@ -1836,7 +1931,38 @@ impl<'a> HostMixinServiceFacade<'a> {
         character: i32,
         provider: &dyn HostMixinSourceProvider,
     ) -> HostFacadeResult<MixinFacadeRequest> {
-        let config = if let Some(context) = self.context {
+        self.build_request_inner(source, uri, line, character, provider, true)
+    }
+
+    pub fn build_code_action_request(
+        &self,
+        source: &str,
+        uri: &str,
+        line: i32,
+        character: i32,
+        code: Option<&str>,
+        provider: &dyn HostMixinSourceProvider,
+    ) -> HostFacadeResult<MixinFacadeRequest> {
+        self.build_request_inner(
+            source,
+            uri,
+            line,
+            character,
+            provider,
+            !code.is_some_and(MixinCodeActionService::is_config_independent_diagnostic),
+        )
+    }
+
+    fn build_request_inner(
+        &self,
+        source: &str,
+        uri: &str,
+        line: i32,
+        character: i32,
+        provider: &dyn HostMixinSourceProvider,
+        include_config: bool,
+    ) -> HostFacadeResult<MixinFacadeRequest> {
+        let config = if let Some(context) = self.context.filter(|_| include_config) {
             HostMixinFacade::selected_mixin_config(context, source, Some(uri), provider)?
         } else {
             None
@@ -1887,7 +2013,7 @@ impl<'a> HostMixinServiceFacade<'a> {
         provider: &dyn HostMixinSourceProvider,
     ) -> HostFacadeResult<Vec<McFix>> {
         self.code_actions(
-            &self.build_request(source, uri, line, character, provider)?,
+            &self.build_code_action_request(source, uri, line, character, code, provider)?,
             code,
         )
     }
@@ -1959,9 +2085,23 @@ pub enum RegisteredMixinSource {
     Current,
     Source(String),
 }
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub enum RegisteredHandlerSource {
+    Current,
+    Source(HostShareSource),
+}
 /// Host source and explicit resource reads are evaluated afresh. Missing host
 /// source may use a known source-root path; unavailable authority stays unknown.
 pub trait HostMixinSourceProvider: Send + Sync {
+    fn registered_handler_source(
+        &self,
+        _fqn: &str,
+        _current_path: Option<&std::path::Path>,
+    ) -> crate::host_source::HostSourceResult<RegisteredHandlerSource> {
+        Ok(crate::host_source::HostAnswer::unavailable(
+            "normalized registered handler sources are unavailable",
+        ))
+    }
     fn config(
         &self,
         path: &std::path::Path,
@@ -2066,49 +2206,9 @@ impl HostMixinFacade {
         let current_path = crate::project::uri_to_path(uri)
             .ok()
             .map(|p| crate::project::normalize_path(&p));
-        let configs = Self::mixin_config_refs(context, Some(uri));
-        let mut config_seen = BTreeSet::new();
         let mut fqn_seen = BTreeSet::new();
         let mut text_seen = BTreeSet::new();
-        let entries = configs
-            .into_iter()
-            .filter(move |c| config_seen.insert(crate::project::normalize_path(&c.path)))
-            .flat_map(move |config| {
-                let entries = match provider.config(&config.path) {
-                    Ok(crate::host_source::HostAnswer {
-                        fact: HostFact::Known(config),
-                        ..
-                    }) => {
-                        let package = config
-                            .package_name
-                            .as_deref()
-                            .map(str::trim)
-                            .filter(|p| !p.is_empty());
-                        config
-                            .mixins
-                            .iter()
-                            .chain(&config.client)
-                            .chain(&config.server)
-                            .chain(&config.common)
-                            .map(|name| name.trim())
-                            .filter(|name| !name.is_empty())
-                            .map(|name| {
-                                Ok(package.map_or_else(|| name.into(), |p| format!("{p}.{name}")))
-                            })
-                            .collect::<Vec<Result<String, HostFacadeError>>>()
-                    }
-                    Ok(crate::host_source::HostAnswer {
-                        fact: HostFact::Missing,
-                        ..
-                    }) => vec![],
-                    Ok(crate::host_source::HostAnswer {
-                        fact: HostFact::Unavailable { reason },
-                        ..
-                    }) => vec![Err(HostFacadeError::Unavailable(reason))],
-                    Err(e) => vec![Err(e.into())],
-                };
-                entries.into_iter()
-            });
+        let entries = Self::registered_mixin_names(context, uri, provider);
         Box::new(entries.filter_map(move |entry| {
             let fqn = match entry {
                 Ok(fqn) => fqn,
@@ -2156,8 +2256,8 @@ impl HostMixinFacade {
                                     selected = Some(Err(HostFacadeError::Unavailable(reason)));
                                     break 'roots;
                                 }
-                                Err(e) => {
-                                    selected = Some(Err(e.into()));
+                                Err(error) => {
+                                    selected = Some(Err(error.into()));
                                     break 'roots;
                                 }
                                 _ => {}
@@ -2171,10 +2271,123 @@ impl HostMixinFacade {
                 Some(Ok(text)) if !text.trim().is_empty() && text_seen.insert(text.clone()) => {
                     Some(Ok(text))
                 }
-                Some(Err(e)) => Some(Err(e)),
+                Some(Err(error)) => Some(Err(error)),
                 _ => None,
             }
         }))
+    }
+    fn registered_mixin_names<'a>(
+        context: &'a crate::project::ProjectContext,
+        uri: &str,
+        provider: &'a dyn HostMixinSourceProvider,
+    ) -> impl Iterator<Item = Result<String, HostFacadeError>> + 'a {
+        let mut config_seen = BTreeSet::new();
+        Self::mixin_config_refs(context, Some(uri))
+            .into_iter()
+            .filter(move |c| config_seen.insert(crate::project::normalize_path(&c.path)))
+            .flat_map(move |config| {
+                let entries = match provider.config(&config.path) {
+                    Ok(crate::host_source::HostAnswer {
+                        fact: HostFact::Known(config),
+                        ..
+                    }) => {
+                        let package = config
+                            .package_name
+                            .as_deref()
+                            .map(str::trim)
+                            .filter(|p| !p.is_empty());
+                        config
+                            .mixins
+                            .iter()
+                            .chain(&config.client)
+                            .chain(&config.server)
+                            .chain(&config.common)
+                            .map(|name| name.trim())
+                            .filter(|name| !name.is_empty())
+                            .map(|name| {
+                                Ok(package.map_or_else(|| name.into(), |p| format!("{p}.{name}")))
+                            })
+                            .collect::<Vec<Result<String, HostFacadeError>>>()
+                    }
+                    Ok(crate::host_source::HostAnswer {
+                        fact: HostFact::Missing,
+                        ..
+                    }) => vec![],
+                    Ok(crate::host_source::HostAnswer {
+                        fact: HostFact::Unavailable { reason },
+                        ..
+                    }) => vec![Err(HostFacadeError::Unavailable(reason))],
+                    Err(e) => vec![Err(e.into())],
+                };
+                entries.into_iter()
+            })
+    }
+    pub fn collect_registered_handler_sources<'a>(
+        context: &'a crate::project::ProjectContext,
+        source: &str,
+        uri: &str,
+        provider: &'a dyn HostMixinSourceProvider,
+    ) -> Box<dyn Iterator<Item = HostFacadeResult<HostShareSource>> + 'a> {
+        use sha2::{Digest, Sha256};
+        let current_path = crate::project::uri_to_path(uri)
+            .ok()
+            .map(|path| crate::project::normalize_path(&path));
+        let mut names = BTreeSet::new();
+        let mut seen = std::collections::BTreeMap::from([(
+            uri.to_owned(),
+            format!("{:x}", Sha256::digest(source.as_bytes())),
+        )]);
+        Box::new(
+            Self::registered_mixin_names(context, uri, provider).filter_map(move |name| {
+                let name = match name {
+                    Ok(name) => name,
+                    Err(error) => return Some(Err(error)),
+                };
+                if !names.insert(name.clone()) {
+                    return None;
+                }
+                let source =
+                    match provider.registered_handler_source(&name, current_path.as_deref()) {
+                        Ok(HostAnswer {
+                            fact: HostFact::Known(RegisteredHandlerSource::Current),
+                            ..
+                        }) => return None,
+                        Ok(HostAnswer {
+                            fact: HostFact::Known(RegisteredHandlerSource::Source(source)),
+                            ..
+                        }) => source,
+                        Ok(HostAnswer {
+                            fact: HostFact::Unavailable { reason },
+                            ..
+                        }) => return Some(Err(HostFacadeError::Unavailable(reason))),
+                        Ok(HostAnswer {
+                            fact: HostFact::Missing,
+                            ..
+                        }) => {
+                            return Some(Err(HostFacadeError::Unavailable(
+                                "registered handler source is missing".into(),
+                            )))
+                        }
+                        Err(error) => return Some(Err(error.into())),
+                    };
+                if let Err(error) = source.handlers.checked_sites(&source.text) {
+                    return Some(Err(error.into()));
+                }
+                match seen.get(&source.handlers.document_uri) {
+                    Some(sha) if sha == &source.handlers.sha256 => None,
+                    Some(_) => Some(Err(HostFacadeError::Unavailable(
+                        "registered Share source digest changed".into(),
+                    ))),
+                    None => {
+                        seen.insert(
+                            source.handlers.document_uri.clone(),
+                            source.handlers.sha256.clone(),
+                        );
+                        Some(Ok(source))
+                    }
+                }
+            }),
+        )
     }
 }
 fn source_class_name(source: &str) -> Option<String> {

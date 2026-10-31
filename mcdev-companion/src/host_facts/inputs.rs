@@ -9,6 +9,13 @@ use std::{
     sync::atomic::{AtomicU64, Ordering},
 };
 
+mod project;
+mod root_files;
+mod source;
+pub use project::*;
+pub use root_files::*;
+pub use source::*;
+
 const RESPONSE_BUDGET: &str = "extension response batch too large; split queries";
 const MAX_TOKEN: usize = 4096;
 const MAX_CLASS_BYTES: usize = 16 * 1024 * 1024;
@@ -18,6 +25,11 @@ static NEXT_SCOPE: AtomicU64 = AtomicU64::new(1);
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord)]
 pub enum InputOp {
+    RootFileInventory,
+    RootFileSnapshot,
+    SourceFacts,
+    SourceLocation,
+    ProjectInputs,
     SourceInventory,
     SourceSnapshot,
     ResourceInventory,
@@ -30,7 +42,12 @@ pub enum InputOp {
 }
 
 impl InputOp {
-    pub const ALL: [Self; 9] = [
+    pub const ALL: [Self; 14] = [
+        Self::RootFileInventory,
+        Self::RootFileSnapshot,
+        Self::SourceFacts,
+        Self::SourceLocation,
+        Self::ProjectInputs,
         Self::SourceInventory,
         Self::SourceSnapshot,
         Self::ResourceInventory,
@@ -44,6 +61,10 @@ impl InputOp {
 
     pub fn capability(self) -> &'static str {
         match self {
+            Self::RootFileInventory | Self::RootFileSnapshot => "root-files-v1",
+            Self::SourceFacts => "source-facts-v2",
+            Self::SourceLocation => "source-locations-v1",
+            Self::ProjectInputs => "project-inputs-v1",
             Self::SourceInventory | Self::SourceSnapshot => "source-snapshots-v1",
             Self::ResourceInventory | Self::ResourceLookup | Self::ResourceSnapshot => {
                 "owned-resources-v1"
@@ -55,6 +76,11 @@ impl InputOp {
 
     pub fn name(self) -> &'static str {
         match self {
+            Self::RootFileInventory => "rootFileInventory",
+            Self::RootFileSnapshot => "rootFileSnapshot",
+            Self::SourceFacts => "sourceFacts",
+            Self::SourceLocation => "sourceLocation",
+            Self::ProjectInputs => "projectInputs",
             Self::SourceInventory => "sourceInventory",
             Self::SourceSnapshot => "sourceSnapshot",
             Self::ResourceInventory => "resourceInventory",
@@ -141,6 +167,12 @@ pub struct SourceDescriptor {
     pub identity: InputIdentity,
     #[serde(default)]
     pub document_version: Option<i64>,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub owner_scope: Option<Fact<ProjectScope>>,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub memberships: Option<Fact<Vec<ProjectScope>>>,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub editable: Option<Fact<bool>>,
 }
 
 #[derive(Debug, Clone)]
@@ -180,6 +212,10 @@ pub struct ResourceDescriptor {
     #[serde(default)]
     pub document_version: Option<i64>,
     pub identity: InputIdentity,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub owner_scope: Option<Fact<ProjectScope>>,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub membership_scope: Option<ProjectScope>,
 }
 
 #[derive(Debug, Clone)]
@@ -564,6 +600,9 @@ pub struct ScopedInputs<R: FactReader> {
     resources: BTreeMap<String, ResourceDescriptor>,
     runtime_classes: BTreeMap<String, RuntimeDescriptor>,
     catalog_entries: BTreeMap<String, CatalogDescriptor>,
+    project_scopes: BTreeMap<String, SourceSetRecord>,
+    root_files: BTreeMap<String, RootFileEntry>,
+    root_domains: BTreeMap<String, (RootFileDomain, RootFileFilter)>,
 }
 
 impl<T: FactReader + ?Sized> FactReader for &mut T {
@@ -591,6 +630,9 @@ impl<R: FactReader> ScopedInputs<R> {
             resources: BTreeMap::new(),
             runtime_classes: BTreeMap::new(),
             catalog_entries: BTreeMap::new(),
+            project_scopes: BTreeMap::new(),
+            root_files: BTreeMap::new(),
+            root_domains: BTreeMap::new(),
         })
     }
 
@@ -610,21 +652,61 @@ impl<R: FactReader> ScopedInputs<R> {
     }
 
     pub fn source_inventory(&mut self) -> Result<Inventory<SourceEntry>, FactsError> {
+        self.source_inventory_scoped(None)
+    }
+
+    pub fn source_inventory_in(
+        &mut self,
+        scope: &ProjectSourceSet,
+    ) -> Result<Inventory<SourceEntry>, FactsError> {
+        self.checked_project_scope(scope)?;
+        self.source_inventory_scoped(Some(scope))
+    }
+
+    fn source_inventory_scoped(
+        &mut self,
+        scope: Option<&ProjectSourceSet>,
+    ) -> Result<Inventory<SourceEntry>, FactsError> {
         let mut entries = Vec::new();
         let mut after = None;
         let mut seen = BTreeSet::new();
         let mut issued = BTreeSet::new();
         loop {
-            let page: SourcePage = self.one(
-                InputOp::SourceInventory,
-                json!({"op":"sourceInventory","after":after}),
-            )?;
+            let mut query = json!({"op":"sourceInventory","after":after});
+            if let Some(scope) = scope {
+                query["scope"] = json!(scope.descriptor.id);
+            }
+            let page: SourcePage = self.one(InputOp::SourceInventory, query)?;
             check_coverage(&page.coverage, &page.next, Value::Null)?;
             if page.next.is_some() && page.sources.is_empty() {
                 return Err(protocol("nonterminal source page made no progress"));
             }
             for source in page.sources {
                 validate_source(&source)?;
+                if self.operations.supports(InputOp::ProjectInputs)
+                    && (source.owner_scope.is_none()
+                        || source.memberships.is_none()
+                        || source.editable.is_none())
+                {
+                    return Err(protocol("source lacks negotiated project ownership facts"));
+                }
+                if let Some(scope) = scope {
+                    if source
+                        .memberships
+                        .as_ref()
+                        .and_then(Fact::found)
+                        .is_some_and(|memberships| {
+                            !memberships.iter().any(|member| {
+                                member.id.as_deref() == Some(scope.descriptor.id.as_str())
+                                    && member.source_set == scope.descriptor.name
+                            })
+                        })
+                    {
+                        return Err(protocol(
+                            "source inventory membership differs from selected scope",
+                        ));
+                    }
+                }
                 if !issued.insert(source.id.clone()) {
                     return Err(protocol("duplicate source identity in inventory"));
                 }
@@ -681,15 +763,31 @@ impl<R: FactReader> ScopedInputs<R> {
     }
 
     pub fn resource_inventory(&mut self) -> Result<Inventory<ResourceEntry>, FactsError> {
+        self.resource_inventory_scoped(None)
+    }
+
+    pub fn resource_inventory_in(
+        &mut self,
+        scope: &ProjectSourceSet,
+    ) -> Result<Inventory<ResourceEntry>, FactsError> {
+        self.checked_project_scope(scope)?;
+        self.resource_inventory_scoped(Some(scope))
+    }
+
+    fn resource_inventory_scoped(
+        &mut self,
+        scope: Option<&ProjectSourceSet>,
+    ) -> Result<Inventory<ResourceEntry>, FactsError> {
         let mut entries = Vec::new();
         let mut after = None;
         let mut seen = BTreeSet::new();
         let mut issued = BTreeSet::new();
         loop {
-            let page: ResourcePage = self.one(
-                InputOp::ResourceInventory,
-                json!({"op":"resourceInventory","after":after}),
-            )?;
+            let mut query = json!({"op":"resourceInventory","after":after});
+            if let Some(scope) = scope {
+                query["scope"] = json!(scope.descriptor.id);
+            }
+            let page: ResourcePage = self.one(InputOp::ResourceInventory, query)?;
             check_coverage(&page.coverage, &page.next, json!(true))?;
             if page.next.is_some() && page.resources.is_empty() {
                 return Err(protocol("nonterminal resource page made no progress"));
@@ -698,6 +796,7 @@ impl<R: FactReader> ScopedInputs<R> {
                 if !issued.insert(descriptor.id.clone()) {
                     return Err(protocol("duplicate resource identity in inventory"));
                 }
+                self.validate_resource_scope(&descriptor, scope)?;
                 entries.push(self.resource_entry(descriptor)?);
             }
             after = next_cursor(page.next, &mut seen)?;
@@ -715,13 +814,34 @@ impl<R: FactReader> ScopedInputs<R> {
         relative_path: &str,
         association: Option<ResourceAssociation>,
     ) -> Result<Fact<Vec<ResourceEntry>>, FactsError> {
+        self.resource_lookup_scoped(relative_path, association, None)
+    }
+
+    pub fn resource_lookup_in(
+        &mut self,
+        relative_path: &str,
+        association: Option<ResourceAssociation>,
+        scope: &ProjectSourceSet,
+    ) -> Result<Fact<Vec<ResourceEntry>>, FactsError> {
+        self.checked_project_scope(scope)?;
+        self.resource_lookup_scoped(relative_path, association, Some(scope))
+    }
+
+    fn resource_lookup_scoped(
+        &mut self,
+        relative_path: &str,
+        association: Option<ResourceAssociation>,
+        scope: Option<&ProjectSourceSet>,
+    ) -> Result<Fact<Vec<ResourceEntry>>, FactsError> {
         if !valid_relative_path(relative_path) {
             return Err(protocol("invalid resource relative path"));
         }
-        let fact: Fact<Vec<ResourceDescriptor>> = self.one(
-            InputOp::ResourceLookup,
-            json!({"op":"resourceLookup","relativePath":relative_path,"association":association}),
-        )?;
+        let mut query =
+            json!({"op":"resourceLookup","relativePath":relative_path,"association":association});
+        if let Some(scope) = scope {
+            query["scope"] = json!(scope.descriptor.id);
+        }
+        let fact: Fact<Vec<ResourceDescriptor>> = self.one(InputOp::ResourceLookup, query)?;
         validate_fact(&fact)?;
         match fact {
             Fact::Found { value } => {
@@ -734,6 +854,9 @@ impl<R: FactReader> ScopedInputs<R> {
                     return Err(protocol(
                         "resource lookup returned different or empty matches",
                     ));
+                }
+                for entry in &value {
+                    self.validate_resource_scope(entry, scope)?;
                 }
                 Ok(Fact::Found {
                     value: value
@@ -757,6 +880,33 @@ impl<R: FactReader> ScopedInputs<R> {
             descriptor,
             scope: self.scope,
         })
+    }
+
+    fn validate_resource_scope(
+        &self,
+        resource: &ResourceDescriptor,
+        scope: Option<&ProjectSourceSet>,
+    ) -> Result<(), FactsError> {
+        if self.operations.supports(InputOp::ProjectInputs)
+            && (resource.owner_scope.is_none() || resource.membership_scope.is_none())
+        {
+            return Err(protocol(
+                "resource lacks negotiated ownership and membership facts",
+            ));
+        }
+        if let Some(scope) = scope {
+            // Resource membership has no token; only a consumer with projectContext can check its raw module.
+            if resource
+                .membership_scope
+                .as_ref()
+                .is_some_and(|membership| membership.source_set != scope.descriptor.name)
+            {
+                return Err(protocol(
+                    "resource inventory membership differs from selected scope",
+                ));
+            }
+        }
+        Ok(())
     }
 
     pub fn resource_snapshot(
@@ -1003,6 +1153,23 @@ impl<R: FactReader> ScopedInputs<R> {
 
 fn validate_source(source: &SourceDescriptor) -> Result<(), FactsError> {
     validate_fact(&source.document_uri)?;
+    if let Some(owner) = &source.owner_scope {
+        validate_fact(owner)?;
+        if let Some(owner) = owner.found() {
+            owner.validate()?;
+        }
+    }
+    if let Some(memberships) = &source.memberships {
+        validate_fact(memberships)?;
+        if let Some(memberships) = memberships.found() {
+            for scope in memberships {
+                scope.validate()?;
+            }
+        }
+    }
+    if let Some(editable) = &source.editable {
+        validate_fact(editable)?;
+    }
     if !valid_token(&source.id)
         || !valid_identity(&source.identity, "source")
         || !matches!(source.language_id.as_str(), "java" | "kotlin")
@@ -1014,6 +1181,15 @@ fn validate_source(source: &SourceDescriptor) -> Result<(), FactsError> {
 
 fn validate_resource(resource: &ResourceDescriptor) -> Result<(), FactsError> {
     validate_fact(&resource.document_uri)?;
+    if let Some(owner) = &resource.owner_scope {
+        validate_fact(owner)?;
+        if let Some(owner) = owner.found() {
+            owner.validate()?;
+        }
+    }
+    if let Some(membership) = &resource.membership_scope {
+        membership.validate()?;
+    }
     if !valid_token(&resource.id)
         || !valid_identity(&resource.identity, "resource")
         || !valid_relative_path(&resource.relative_path)

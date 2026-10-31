@@ -1,0 +1,43 @@
+{
+  "provenance": {
+    "proof": "C:\\Users\\gummy\\.codex\\ktlsp-root-files86b\\editor\\artifacts\\extension-ipc-proof.json",
+    "sha256": "83595df9a1c25649793344531594ae0232ee9a5be65483fc796fca4f25d79c37",
+    "phase": "fresh",
+    "note": "Unmodified objects extracted from the accepted fresh capture; no shortened inventory page is claimed."
+  },
+  "inventoryRoot": {
+    "uri": "file:///C%3A/Users/gummy/.codex/ktlsp-root-files86b/project",
+    "rootKind": "workspace",
+    "identity": "4:6",
+    "revision": "5"
+  },
+  "descriptor": {
+    "file": "4:9",
+    "uri": "file:///C%3A/Users/gummy/.codex/ktlsp-root-files86b/project/modules/editing/src/main/java/fixture/CLIENT-CONFIG.JSON",
+    "relativePath": "modules/editing/src/main/java/fixture/CLIENT-CONFIG.JSON"
+  },
+  "snapshot": {
+    "state": "found",
+    "value": {
+      "uri": "file:///C%3A/Users/gummy/.codex/ktlsp-root-files86b/project/modules/editing/src/main/java/fixture/CLIENT-CONFIG.JSON",
+      "relativePath": "modules/editing/src/main/java/fixture/CLIENT-CONFIG.JSON",
+      "root": {
+        "uri": "file:///C%3A/Users/gummy/.codex/ktlsp-root-files86b/project",
+        "rootKind": "workspace",
+        "identity": "4:6",
+        "revision": "5"
+      },
+      "size": 49,
+      "file": "4:9",
+      "next": null,
+      "text": "{\"scope\":\"java-client\",\"value\":\"overlay-更新\"}\n",
+      "offset": 0,
+      "identity": {
+        "kind": "rootFile",
+        "sha256": "93c36749ee4a40b8132e8715de31b7aafecfb176d31178fd3f597e5f591382c0",
+        "revision": "7"
+      },
+      "documentVersion": 4
+    }
+  }
+}

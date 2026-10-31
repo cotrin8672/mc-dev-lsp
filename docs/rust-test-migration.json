@@ -61996,7 +61996,7 @@
       "protocol": 40
     },
     "wholeMigrationVerified": false,
-    "remainingAcceptance": "Full replacement is incomplete. Complete host project/source provenance, source locations and compile-only annotations; guard configuration-dependent diagnostics against incomplete owner/shared selection; finish the ten pending/partial original editor/support files, current-code cross-platform CI and final legacy retirement. Typed unavailable responses and bounded fixture DTOs do not count as complete feature parity.",
+    "remainingAcceptance": "All 2604 original JUnit replacements and the stable native/editor pipeline pass. Resolve the actual host86 CEM preflight Stale and complete the original live editor workflows. Generic arguments, primitive class literals, floating-point literal values, current source hierarchy, dependency source navigation and extract-local remain explicit host knowledge gaps. Readonly snapshot binary names are a pending host slice. Fresh cross-platform CI and final legacy runtime retirement remain required. Earlier live/CI/package evidence retains its historical pins.",
     "independentSemanticV1Evidence": {
       "receipt": "mcdev-companion/tests/fixtures/semantic_v1/interop_receipt.json",
       "stockHostRevision": "f76a43fbeddf4fbdc69768fd0f7544e5a4a3610f",
@@ -62200,28 +62200,29 @@
     },
     "nativeWorkspace": {
       "status": "passed",
-      "logDirectory": "build/rust-test-logs/20261030-090919294",
-      "pipelineProof": "build/rust-test-logs/native-pipeline-proof-20261030-090912525",
+      "logDirectory": "build/rust-test-logs/20261101-003940474",
+      "pipelineProof": "build/rust-test-logs/native-pipeline-proof-20261101-003939212",
       "command": "cargo test --workspace --locked --all-targets -- --test-threads=1",
-      "passedFunctions": 1777,
+      "passedFunctions": 1871,
       "failed": 0,
       "ignored": 0,
       "filtered": 0,
-      "targets": 76,
-      "sourceInputFiles": 848,
-      "sourceFingerprint": "6466d3e5116c38b64a725bfabf8630e9351f0ffdc8781afb5e5366fc66ecb6ff",
+      "targets": 80,
+      "originalCaseLocatorsVerified": 2604,
+      "sourceInputFiles": 872,
+      "sourceFingerprint": "74eb3ef7ee4ddbc5f0d930c1c020056cd64d420f25f31f863f3d5579889792f3",
       "sourceInputsStable": true,
       "caseFiltersAbsent": true,
-      "testSeconds": 92.7,
+      "testSeconds": 89.3,
       "testDeadlineSeconds": 900,
       "doctestsPassed": true,
       "companionBuildPassed": true,
       "independentEditorSuitePassed": true,
-      "independentEditorLogs": "build/rust-test-logs/native-pipeline-proof-20261030-090912525/neovim",
+      "independentEditorLogs": "build/rust-test-logs/native-pipeline-proof-20261101-003939212/neovim",
       "noKtlspOrKtcoreDependency": true,
       "noGitDependency": true,
-      "binaryReceipt": "build/companion-artifacts/native-c5d5bbab4fb5/receipt.json",
-      "formattingEvidence": "build/rust-test-logs/20261030-090919294/fmt.stderr.log",
+      "binaryReceipt": "build/companion-artifacts/native-2c6793521ee4/receipt.json",
+      "formattingEvidence": "build/rust-test-logs/20261101-003940474/fmt.stderr.log",
       "countNote": "The linked prototype's 13 duplicate functions were retired with its exact source preserved; all 2604 original JUnit case replacements remain verified."
     },
     "nativeDistribution": {
@@ -62448,6 +62449,32 @@
         "noGitDependency": true,
         "binaryReceipt": "build/companion-artifacts/native-c5d5bbab4fb5/receipt.json",
         "formattingEvidence": "build/rust-test-logs/20261030-074249152/fmt.stderr.log",
+        "countNote": "The linked prototype's 13 duplicate functions were retired with its exact source preserved; all 2604 original JUnit case replacements remain verified."
+      },
+      {
+        "status": "passed",
+        "logDirectory": "build/rust-test-logs/20261030-090919294",
+        "pipelineProof": "build/rust-test-logs/native-pipeline-proof-20261030-090912525",
+        "command": "cargo test --workspace --locked --all-targets -- --test-threads=1",
+        "passedFunctions": 1777,
+        "failed": 0,
+        "ignored": 0,
+        "filtered": 0,
+        "targets": 76,
+        "sourceInputFiles": 848,
+        "sourceFingerprint": "6466d3e5116c38b64a725bfabf8630e9351f0ffdc8781afb5e5366fc66ecb6ff",
+        "sourceInputsStable": true,
+        "caseFiltersAbsent": true,
+        "testSeconds": 92.7,
+        "testDeadlineSeconds": 900,
+        "doctestsPassed": true,
+        "companionBuildPassed": true,
+        "independentEditorSuitePassed": true,
+        "independentEditorLogs": "build/rust-test-logs/native-pipeline-proof-20261030-090912525/neovim",
+        "noKtlspOrKtcoreDependency": true,
+        "noGitDependency": true,
+        "binaryReceipt": "build/companion-artifacts/native-c5d5bbab4fb5/receipt.json",
+        "formattingEvidence": "build/rust-test-logs/20261030-090919294/fmt.stderr.log",
         "countNote": "The linked prototype's 13 duplicate functions were retired with its exact source preserved; all 2604 original JUnit case replacements remain verified."
       }
     ],
@@ -62932,6 +62959,35 @@
         }
       ],
       "fullReplacementVerified": false
+    },
+    "resumedIntegration": {
+      "date": "2026-11-01",
+      "status": "native-verified-live-incomplete",
+      "hostPin": "392076bc5e364e02426450c574c1227db2c3be8f",
+      "hostReceipt": "build/host-artifacts/published-392076b-4d2bcbc10601/receipt.json",
+      "hostSerializerFixture": "mcdev-companion/tests/fixtures/host_inputs/root_files/actual-serializer-sample.json",
+      "nativePipeline": "build/rust-test-logs/native-pipeline-proof-20261101-003939212",
+      "optimizedPackage": {
+        "status": "passed",
+        "payloadFiles": 24,
+        "optionalCapabilities": 11,
+        "operationMaps": 9,
+        "logs": "build/rust-test-logs/native-release-20261101-004324420",
+        "archiveSha256": "fdddf559c9fc0118216d7b76870363aa088a6bb4e86e5dcc9754f0fb0f27296c"
+      },
+      "originalCemAttempt": {
+        "status": "failed-before-original-assertions",
+        "originalAssertions": 0,
+        "memberSetComparisonExecuted": false,
+        "fullMemberSetComparisonSkipped": false,
+        "errorCode": -32801,
+        "errorReason": "Stale",
+        "rootCause": "unknown; saved trace lacks command/read guard correlation",
+        "receipt": "build/rust-test-logs/cem-project-20261101-004634121-336c13de/receipt.json",
+        "legacyMemberOracle": "build/legacy-member-reference/20261031T144315699851Z/receipt.json",
+        "legacyOracleScope": "Observed compiled Kotlin core service; frozen-source build provenance is unproven."
+      },
+      "originalCheckoutProof": "build/original-checkout-final.json"
     }
   }
 }

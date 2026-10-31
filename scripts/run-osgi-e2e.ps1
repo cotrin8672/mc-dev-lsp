@@ -1,87 +1,37 @@
 $ErrorActionPreference = "Stop"
 
+. (Join-Path $PSScriptRoot 'e2e-workspace-common.ps1')
+
 $repoRoot = Split-Path -Parent $PSScriptRoot
 Push-Location $repoRoot
 try {
-    $gradleCmd = $env:GRADLE_CMD
-    if (-not $gradleCmd) {
-        $miseGradle = if ($env:LOCALAPPDATA) {
-            Join-Path $env:LOCALAPPDATA "mise/installs/gradle/9.5.1/gradle-9.5.1/bin/gradle.bat"
-        } else {
-            $null
-        }
-        if ($miseGradle -and (Test-Path -LiteralPath $miseGradle)) {
-            $gradleCmd = $miseGradle
-        } else {
-            $gradleCmd = "gradle"
-        }
-    }
+    $env:MCDEV_E2E_KTLSP = Resolve-E2eExecutable 'MCDEV_E2E_KTLSP'
+    $env:MCDEV_E2E_COMPANION = Resolve-E2eExecutable 'MCDEV_E2E_COMPANION'
+    $nvimCmd = Resolve-E2eExecutable 'NVIM_CMD'
+    $env:NVIM_CMD = $nvimCmd
+    $gradleCmd = Resolve-E2eExecutable 'GRADLE_CMD'
+    $env:GRADLE_CMD = $gradleCmd
 
-    if ($env:MCDEV_SKIP_BUNDLE_BUILD -ne "1") {
-        & $gradleCmd :mcdev-jdtls-extension:jar :mcdev-jdtls-extension:checkBundle
-        if ($LASTEXITCODE -ne 0) { throw "bundle build failed" }
-    }
-
-    $powershellCmd = if ($PSVersionTable.PSEdition -eq "Core") { "pwsh" } else { "powershell" }
-    if ($env:MCDEV_E2E_FIXTURE -eq "real-cem") {
+    $fixture = if ($env:MCDEV_E2E_FIXTURE) { $env:MCDEV_E2E_FIXTURE } else { "fabric-basic" }
+    if ($fixture -in @('real-cem', 'real-sodium', 'create-drill-definition-diagnostics')) {
         if (-not $env:MCDEV_E2E_WORKSPACE -or -not (Test-Path -LiteralPath $env:MCDEV_E2E_WORKSPACE -PathType Container)) {
-            throw "MCDEV_E2E_WORKSPACE must point to an existing CreateEnchantableMachinery checkout"
+            throw "MCDEV_E2E_WORKSPACE must point to an existing $fixture workspace"
         }
         $workspace = (Resolve-Path -LiteralPath $env:MCDEV_E2E_WORKSPACE).Path
     } else {
-        $fixture = if ($env:MCDEV_E2E_FIXTURE) { $env:MCDEV_E2E_FIXTURE } else { "fabric-basic" }
-        & $powershellCmd -NoProfile -ExecutionPolicy Bypass -File (Join-Path $PSScriptRoot "prepare-e2e-workspace.ps1") -Fixture $fixture
-        if ($LASTEXITCODE -ne 0) { throw "workspace preparation failed" }
+        & (Join-Path $PSScriptRoot "prepare-e2e-workspace.ps1") -Fixture $fixture
         $workspace = Join-Path $repoRoot "build/e2e-workspace"
     }
 
-    $bundleJar = Get-ChildItem -LiteralPath (Join-Path $repoRoot "mcdev-jdtls-extension/build/libs") `
-        -Filter "io.github.mcdev.jdtls-*.jar" |
-        Sort-Object LastWriteTime -Descending |
-        Select-Object -First 1 -ExpandProperty FullName
-    if (-not $bundleJar) { throw "bundle jar not found" }
-    $jdtlsCmd = $env:JDTLS_CMD
-    if (-not $jdtlsCmd) {
-        $masonJdtls = if ($env:LOCALAPPDATA) {
-            Join-Path $env:LOCALAPPDATA "nvim-data/mason/bin/jdtls.cmd"
-        } else {
-            $null
-        }
-        if ($masonJdtls -and (Test-Path -LiteralPath $masonJdtls)) {
-            $jdtlsCmd = $masonJdtls
-        } else {
-            $jdtlsCmd = "jdtls"
-        }
-    }
-
-    $env:MCDEV_BUNDLE_JAR = $bundleJar
     $env:MCDEV_E2E_WORKSPACE = $workspace
-    $env:JDTLS_CMD = $jdtlsCmd
-    if ($env:MCDEV_JDTLS_JAVA_HOME) {
-        $env:JAVA_HOME = $env:MCDEV_JDTLS_JAVA_HOME
-        $env:PATH = (Join-Path $env:MCDEV_JDTLS_JAVA_HOME "bin") + [IO.Path]::PathSeparator + $env:PATH
-    }
-
-    $nvimCmd = $env:NVIM_CMD
-    if (-not $nvimCmd) {
-        $miseNvim = if ($env:LOCALAPPDATA) {
-            Join-Path $env:LOCALAPPDATA "mise/installs/neovim/0.12.2/nvim-win64/bin/nvim.exe"
-        } else {
-            $null
-        }
-        if ($miseNvim -and (Test-Path -LiteralPath $miseNvim)) {
-            $nvimCmd = $miseNvim
-        } else {
-            $nvimCmd = "nvim"
-        }
-    }
+    $env:MCDEV_E2E_FIXTURE = $fixture
 
     & $nvimCmd --headless `
         -u (Join-Path $repoRoot "mcdev-nvim/tests/e2e/minimal_init.lua") `
         -c "luafile mcdev-nvim/tests/e2e/run_bundle_e2e.lua"
-    if ($LASTEXITCODE -ne 0) { throw "osgi e2e failed" }
+    if ($LASTEXITCODE -ne 0) { throw "native ktlsp companion e2e failed" }
 
-    Write-Host "osgi bundle e2e passed"
+    Write-Host "native ktlsp companion e2e passed"
 } finally {
     Pop-Location
 }

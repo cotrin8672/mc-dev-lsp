@@ -72,6 +72,112 @@ pub struct HandlerMethodDeclaration {
     pub is_static: bool,
     pub has_method_level_coerce: bool,
 }
+
+#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+pub struct HostHandlerSource {
+    pub document_uri: String,
+    pub sha256: String,
+    pub qualified_name: String,
+    pub targets: Vec<String>,
+    pub sites: crate::host_source::HostFact<Vec<MixinExtrasAnnotationSite>>,
+    #[serde(default, skip_serializing_if = "Vec::is_empty")]
+    pub slice_selections: Vec<HostSliceSelection>,
+}
+
+#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+pub struct HostShareSource {
+    pub text: String,
+    pub handlers: HostHandlerSource,
+}
+
+#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+pub struct HostSliceSelection {
+    pub site_index: usize,
+    pub slice: HostMethodSlice,
+}
+#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+pub struct HostMethodSlice {
+    pub id: String,
+    pub from: Option<HostSliceAt>,
+    pub to: Option<HostSliceAt>,
+    pub range: McTextRange,
+}
+#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+pub struct HostSliceAt {
+    pub value: String,
+    pub target: Option<String>,
+    pub args: Vec<String>,
+    pub id: Option<String>,
+    pub ordinal: Option<i32>,
+    pub shift: AtShiftSpec,
+    pub range: McTextRange,
+    pub target_range: Option<McTextRange>,
+    pub ordinal_range: Option<McTextRange>,
+}
+impl HostHandlerSource {
+    pub fn validate_source(&self, source: &str) -> Result<(), crate::host_source::HostSourceError> {
+        use crate::host_source::HostSourceError;
+        use sha2::{Digest, Sha256};
+        if self.sha256 != format!("{:x}", Sha256::digest(source.as_bytes())) {
+            return Err(HostSourceError::Failure(
+                "normalized handler source digest is stale".into(),
+            ));
+        }
+        Ok(())
+    }
+    pub fn checked_sites(
+        &self,
+        source: &str,
+    ) -> Result<&[MixinExtrasAnnotationSite], crate::host_source::HostSourceError> {
+        use crate::host_source::{HostFact, HostSourceError};
+        self.validate_source(source)?;
+        match &self.sites {
+            HostFact::Known(sites) => {
+                for handler in sites.iter().filter_map(|site| site.handler_method.as_ref()) {
+                    if handler.return_type_descriptor.is_none()
+                        || handler
+                            .parameters
+                            .iter()
+                            .any(|parameter| parameter.type_descriptor.is_none())
+                    {
+                        return Err(HostSourceError::Failure(
+                            "normalized handler type facts are unavailable".into(),
+                        ));
+                    }
+                    for parameter in &handler.parameters {
+                        if parameter.is_operation
+                            && parameter.operation_generic_descriptor.is_none()
+                        {
+                            return Err(HostSourceError::Failure(
+                                "Operation generic type facts are unavailable".into(),
+                            ));
+                        }
+                        if parameter.is_sugar
+                            && matches!(
+                                parameter.sugar_spec,
+                                Some(
+                                    HandlerParameterSugarSpec::Local(_)
+                                        | HandlerParameterSugarSpec::Share(_)
+                                )
+                            )
+                            && parameter.type_descriptor.as_deref()
+                                == Some("Lcom/llamalad7/mixinextras/sugar/ref/LocalRef;")
+                        {
+                            return Err(HostSourceError::Failure(
+                                "LocalRef generic value type facts are unavailable".into(),
+                            ));
+                        }
+                    }
+                }
+                Ok(sites)
+            }
+            HostFact::Unavailable { reason } => Err(HostSourceError::Failure(reason.clone())),
+            HostFact::Missing => Err(HostSourceError::Failure(
+                "normalized handler facts are unavailable".into(),
+            )),
+        }
+    }
+}
 #[derive(Debug, Clone, Copy, Default, PartialEq, Eq, Serialize, Deserialize)]
 pub enum AtShiftSpec {
     #[default]
