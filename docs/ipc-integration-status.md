@@ -17,12 +17,12 @@ The host has also published `root-files-v1` at
 Its accepted serializer sample has SHA-256
 `af49d91e7e42dada7314a953b710ebe2d998176b7ed00ee361b410db1c3a4c41`.
 This is the host's file-input proof, separate from MC command/editor acceptance.
-Readonly snapshot JVM names are the host's next bounded slice.
+Readonly snapshot JVM names are now published in the following release89 pin.
 
 ## Published contract
 
 The current integration pin is ktlsp
-[`392076bc5e364e02426450c574c1227db2c3be8f`](https://github.com/cotrin8672/ktlsp/blob/392076bc5e364e02426450c574c1227db2c3be8f/docs/architecture/extension-ipc.md).
+[`2e4671f085f199ea5bb970bbc2f9e15e2c07dff1`](https://github.com/cotrin8672/ktlsp/blob/2e4671f085f199ea5bb970bbc2f9e15e2c07dff1/docs/architecture/extension-ipc.md).
 It adds normalized authored facts, owning-project input records, exact source
 locations and typed binary declaration annotations to source snapshots, owned
 resources, selected runtime bytes, the physical JVM catalog and provider
@@ -30,10 +30,10 @@ commands. The companion negotiates capabilities and individual operations;
 binary annotations are selected by capability alone. Configured command IDs
 are intersected with the implemented domain routes.
 
-The copied release86 host has SHA-256
-`4d2bcbc10601628e59ea1640145cb3f8ddd2a13be8eaf1a73cf29b56919d2019`.
+The copied release89 host has SHA-256
+`fd64b18a57161e9b727880545120a8d1fc8b4aadaa1f2240fd5c90e7f0a0e0e1`.
 Its provenance is retained in
-`build/host-artifacts/published-392076b-4d2bcbc10601/receipt.json`.
+`build/host-artifacts/published-2e4671f-fd64b18a5716/receipt.json`.
 This identifies the integration input; upstream API tests do not prove MC
 feature or original editor parity. The acceptance results below retain their
 historical host and companion pins.
@@ -57,6 +57,40 @@ when that selection is unproven. Callable parameter facts are optional knowledge
 an omitted or unsupported list does not establish a zero-parameter callable.
 
 ## Follow-up acceptance checkpoints
+
+The latest native pipeline is
+`build/rust-test-logs/native-pipeline-proof-20261101-025824638/`: 1,875 functions,
+80 targets, all 2,604 original JUnit locators, doc/build checks and five editor
+entries pass in 116.8 seconds. Its 872 inputs retain fingerprint
+`2d7ec181ff68c15a878730b4f9af4fb41922e0427b4acde9a53da744144bb2fb`.
+The copied debug companion is
+`6c99f535a868c5bfd9f527e6829384a97737bad353007cd4f1f9a6d4fabae9e5`.
+Info/Dump/Reindex/Reload now skip unused compiler source inventory/body reads;
+their complete DTOs match the all-input baseline, and skipped source coverage
+stays Unknown(NotRequested). All 67 affected checks pass.
+
+The bounded readiness change also passes seven mock groups and the adapter
+entry. It preserves the first Stale, requires a genuinely new accepted
+evaluation/publication with the same instance/owner/SHA and unchanged editor
+version, then sends one separate outer request. A second Stale fails. It neither
+retries readFacts nor synthesizes a document change.
+
+Actual candidate88 runs still fail before original CEM assertions. D3
+(`cem-project-20261101-022439783-d5b5134f`) identifies sourceInventory/prepay
+Stale; D4 (`cem-project-20261101-024118400-adb6cf5b`) records a new accepted
+evaluation and both failed outer requests. D5
+(`cem-project-20261101-030230338-e662aa1e`) proves the unused source reads are
+gone, then fails after resourceInventory pages with host validation Stale.
+All paths above are under `build/rust-test-logs/`. Original assertion and golden
+comparison credit remains zero. The host is preparing a diagnostic that reports
+the first failed guard from the same validation; no admission rule is relaxed.
+
+Current-source metadata preserves the 2,604 cases, 17 ported / 3 partial / 7
+pending editor-file states and historical four-snippet/169-call proof. Its
+1,014-entry static census is not a complete helper-name census: the existing
+scanner misses names such as assert_not_nil. An optional broad metadata check
+hit its finite 60-second deadline and is recorded as failed, separately from
+the passing product/client checks. Full original editor parity remains false.
 
 The resumed pipeline in
 `build/rust-test-logs/native-pipeline-proof-20261101-003939212/` passes 1,871
@@ -83,6 +117,27 @@ comparison. Input hashes stayed stable and the host shut down cleanly. The
 saved trace cannot identify which guard returned Stale; the host task has been
 asked for bounded command/read diagnostics. No same-evaluation read retry or
 empty-success fallback has been added.
+
+A second diagnostic run uses the explicitly unpublished host88 candidate
+(`6037dc8d613ffddcd6e4d270c9c9e85cb6b850189b625d1d41bc1cb52e9c6444`)
+in `build/rust-test-logs/cem-project-20261101-020445745-1c42a509/`.
+Its bounded trace proves projectContext/projectInputs/sourceInventory succeeded
+and final host validation stayed valid. The child then rejected membership with
+`-32602`, exposed as outer `CommandFailed`. The adapter incorrectly equated the
+raw Gradle project path with a build-qualified semantic module. It now joins
+issued source-set tokens/project/name and checks semantic identities against
+each other, preserving membership/ownership and foreign compiler-view limits.
+All 65 affected tests pass. This fixes the observed consumer error; it does not
+identify the earlier release86 Stale or claim that CEM has passed yet.
+
+CI `880f8a7` verifies all original case locators on both platforms (Windows
+1,871 functions, Linux 1,870, 80 targets each). Linux's full job passes. Windows
+passes native/doc/build checks but fails the unchanged teardown unit at process
+snapshot acquisition. That unit now mocks subprocesses; the unchanged real
+process suite still observes PowerShell, owned descendants and unrelated-process
+survival. Focused unit/real-process checks and a fresh five-entry editor run
+pass. The original six unit assertions remain mapped; this backend adaptation
+is explicitly non-strict in the source-fidelity metadata.
 
 The member oracle directly executes the old compiled Kotlin builder, adapter and
 completion service twice with byte-identical results. Its 155 source files match
@@ -215,9 +270,12 @@ requirements have been checked with the host task:
   lowering and type-variable cases remain Unknown. Host parameter probes are
   separate from full product Sugar acceptance.
 - Foreign snapshot types remain read-only. Their `typeJvm` fields, including
-  `binaryName`, are `UnsupportedSource`. Registered Mixin class literals need an
-  exact binary name from that same source view; the child cannot construct nested
-  JVM names from qualified source names or substitute the evaluation-owner view.
+  `binaryName`, were `UnsupportedSource` before release89. That pin now supplies
+  only the binary name from the same readonly source view; flags, ABI, member
+  coverage and require authority remain unavailable. The producer's 36-check
+  foreign-name proof is separate from MC editor acceptance. The child still
+  cannot construct nested JVM names from qualified source names or substitute
+  the evaluation-owner view.
 - Typed `@AtCode` annotations are available for selected physical inputs,
   including compile-only inputs. Current source supertype/subtype relations are
   not public. A physical subtype scan alone does not certify the complete current

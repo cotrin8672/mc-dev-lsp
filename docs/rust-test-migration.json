@@ -61832,14 +61832,17 @@
       "sha256": "974AFABFA39A0E05542B1B1522E23116E9B9C1CE4A5298971786BB4F995D8F44",
       "status": "ported",
       "replacementTests": [
-        "mcdev-nvim/tests/e2e/teardown_test.lua"
+        "mcdev-nvim/tests/e2e/teardown_test.lua",
+        "mcdev-nvim/tests/e2e/teardown_process_test.lua"
       ],
       "evidence": [
         "build/nvim-test-logs/native-client-final-teardown-unit.stdout.log",
-        "build/nvim-test-logs/native-client-final-teardown-unit.result.json"
+        "build/nvim-test-logs/native-client-final-teardown-unit.result.json",
+        "build/nvim-test-logs/migration-current-20261101-014259296-teardown-unit.result.json",
+        "build/rust-test-logs/teardown-unit-isolation-20261101-012444729/receipt.json"
       ],
       "preparationEvidence": [],
-      "verificationNote": "passed",
+      "verificationNote": "The client-stop unit now mocks process discovery, cleanup and emergency self-kill; real PowerShell and process ownership remain in the unchanged dedicated process test. All six original assertion call texts are retained. The unchanged real-process observer passed in 25.8 seconds; the latest independent collection also passed.",
       "assertionMapping": "mcdev-nvim/tests/migration_inventory.json",
       "backendAdaptations": "mcdev-nvim/tests/explicit_deltas.json"
     },
@@ -61996,7 +61999,7 @@
       "protocol": 40
     },
     "wholeMigrationVerified": false,
-    "remainingAcceptance": "All 2604 original JUnit replacements and the stable native/editor pipeline pass. Resolve the actual host86 CEM preflight Stale and complete the original live editor workflows. Generic arguments, primitive class literals, floating-point literal values, current source hierarchy, dependency source navigation and extract-local remain explicit host knowledge gaps. Readonly snapshot binary names are a pending host slice. Fresh cross-platform CI and final legacy runtime retirement remain required. Earlier live/CI/package evidence retains its historical pins.",
+    "remainingAcceptance": "All 2604 original JUnit replacements and the latest 1875-function native/editor pipeline pass. CEM still fails host validation before original assertions, including after one observed-fresh outer retry; guard attribution is pending upstream. Finish original editor workflows, complete static helper census, generic type arguments, primitive class literals, floating literal facts, current source hierarchy, dependency source navigation, extract-local and final legacy retirement. Readonly snapshot binary names are published. Current cross-platform CI for the final fixes is pending; historical proofs retain their pins.",
     "independentSemanticV1Evidence": {
       "receipt": "mcdev-companion/tests/fixtures/semantic_v1/interop_receipt.json",
       "stockHostRevision": "f76a43fbeddf4fbdc69768fd0f7544e5a4a3610f",
@@ -62186,7 +62189,7 @@
         "partial": 3,
         "pending_host": 7
       },
-      "strictInputFidelity": true,
+      "strictInputFidelity": false,
       "runtimeRowAttribution": "Individual rows are not directly observed; actual site counts and explicitly labelled inference are separate.",
       "allOriginalEditorE2EVerified": false,
       "latestIndependentPipeline": "build/rust-test-logs/native-pipeline-proof-20261030-090912525",
@@ -62196,33 +62199,49 @@
         "canonicalLfSha256": "0702e4824e7b06e4ef1ac304c70a284e01231dafff38d0464f129e66dfe37f60",
         "originalAssertionSites": 0,
         "realHostReceipt": "build/rust-test-logs/host-commands-20261030-090521312/receipt.json"
+      },
+      "enforcedInputChecksPassed": true,
+      "strictFidelityNote": "Enforced input checks pass; backend-adapted state/assertions are explicitly non-strict and do not establish full E2E parity.",
+      "latestIndependentClientSuite": {
+        "prefix": "migration-current-20261101-014259296",
+        "finiteEntries": [
+          "build/nvim-test-logs/migration-current-20261101-014259296-syntax.result.json",
+          "build/nvim-test-logs/migration-current-20261101-014259296-adapters.result.json",
+          "build/nvim-test-logs/migration-current-20261101-014259296-helper.result.json",
+          "build/nvim-test-logs/migration-current-20261101-014259296-teardown-unit.result.json",
+          "build/nvim-test-logs/migration-current-20261101-014259296-teardown-process.result.json"
+        ],
+        "allPassed": true,
+        "allOriginalEditorE2EVerified": false,
+        "nativeAssertionCalls": 2977,
+        "receipt": "build/rust-test-logs/migration-current-20261101-014259296/receipt.json"
       }
     },
     "nativeWorkspace": {
       "status": "passed",
-      "logDirectory": "build/rust-test-logs/20261101-003940474",
-      "pipelineProof": "build/rust-test-logs/native-pipeline-proof-20261101-003939212",
+      "logDirectory": "build/rust-test-logs/20261101-025825853",
+      "pipelineProof": "build/rust-test-logs/native-pipeline-proof-20261101-025824638",
       "command": "cargo test --workspace --locked --all-targets -- --test-threads=1",
-      "passedFunctions": 1871,
+      "passedFunctions": 1875,
       "failed": 0,
       "ignored": 0,
       "filtered": 0,
       "targets": 80,
       "originalCaseLocatorsVerified": 2604,
       "sourceInputFiles": 872,
-      "sourceFingerprint": "74eb3ef7ee4ddbc5f0d930c1c020056cd64d420f25f31f863f3d5579889792f3",
+      "sourceFingerprint": "2d7ec181ff68c15a878730b4f9af4fb41922e0427b4acde9a53da744144bb2fb",
       "sourceInputsStable": true,
       "caseFiltersAbsent": true,
-      "testSeconds": 89.3,
+      "testSeconds": 75.3,
       "testDeadlineSeconds": 900,
       "doctestsPassed": true,
       "companionBuildPassed": true,
       "independentEditorSuitePassed": true,
-      "independentEditorLogs": "build/rust-test-logs/native-pipeline-proof-20261101-003939212/neovim",
+      "independentEditorLogs": "build/rust-test-logs/native-pipeline-proof-20261101-025824638/neovim",
       "noKtlspOrKtcoreDependency": true,
       "noGitDependency": true,
-      "binaryReceipt": "build/companion-artifacts/native-2c6793521ee4/receipt.json",
-      "formattingEvidence": "build/rust-test-logs/20261101-003940474/fmt.stderr.log",
+      "binaryReceipt": "build/companion-artifacts/native-6c99f535a868/receipt.json",
+      "formattingEvidence": "build/rust-test-logs/20261101-025825853/fmt.stderr.log",
       "countNote": "The linked prototype's 13 duplicate functions were retired with its exact source preserved; all 2604 original JUnit case replacements remain verified."
     },
     "nativeDistribution": {
@@ -62475,6 +62494,60 @@
         "noGitDependency": true,
         "binaryReceipt": "build/companion-artifacts/native-c5d5bbab4fb5/receipt.json",
         "formattingEvidence": "build/rust-test-logs/20261030-090919294/fmt.stderr.log",
+        "countNote": "The linked prototype's 13 duplicate functions were retired with its exact source preserved; all 2604 original JUnit case replacements remain verified."
+      },
+      {
+        "status": "passed",
+        "logDirectory": "build/rust-test-logs/20261101-003940474",
+        "pipelineProof": "build/rust-test-logs/native-pipeline-proof-20261101-003939212",
+        "command": "cargo test --workspace --locked --all-targets -- --test-threads=1",
+        "passedFunctions": 1871,
+        "failed": 0,
+        "ignored": 0,
+        "filtered": 0,
+        "targets": 80,
+        "originalCaseLocatorsVerified": 2604,
+        "sourceInputFiles": 872,
+        "sourceFingerprint": "74eb3ef7ee4ddbc5f0d930c1c020056cd64d420f25f31f863f3d5579889792f3",
+        "sourceInputsStable": true,
+        "caseFiltersAbsent": true,
+        "testSeconds": 89.3,
+        "testDeadlineSeconds": 900,
+        "doctestsPassed": true,
+        "companionBuildPassed": true,
+        "independentEditorSuitePassed": true,
+        "independentEditorLogs": "build/rust-test-logs/native-pipeline-proof-20261101-003939212/neovim",
+        "noKtlspOrKtcoreDependency": true,
+        "noGitDependency": true,
+        "binaryReceipt": "build/companion-artifacts/native-2c6793521ee4/receipt.json",
+        "formattingEvidence": "build/rust-test-logs/20261101-003940474/fmt.stderr.log",
+        "countNote": "The linked prototype's 13 duplicate functions were retired with its exact source preserved; all 2604 original JUnit case replacements remain verified."
+      },
+      {
+        "status": "passed",
+        "logDirectory": "build/rust-test-logs/20261101-021930375",
+        "pipelineProof": "build/rust-test-logs/native-pipeline-proof-20261101-021927502",
+        "command": "cargo test --workspace --locked --all-targets -- --test-threads=1",
+        "passedFunctions": 1873,
+        "failed": 0,
+        "ignored": 0,
+        "filtered": 0,
+        "targets": 80,
+        "originalCaseLocatorsVerified": 2604,
+        "sourceInputFiles": 872,
+        "sourceFingerprint": "7922122021dbb66ee0ed9da8fe906ce0454acb1fa6d59121ce16552c8a494419",
+        "sourceInputsStable": true,
+        "caseFiltersAbsent": true,
+        "testSeconds": 129.8,
+        "testDeadlineSeconds": 900,
+        "doctestsPassed": true,
+        "companionBuildPassed": true,
+        "independentEditorSuitePassed": true,
+        "independentEditorLogs": "build/rust-test-logs/native-pipeline-proof-20261101-021927502/neovim",
+        "noKtlspOrKtcoreDependency": true,
+        "noGitDependency": true,
+        "binaryReceipt": "build/companion-artifacts/native-3dcb6aeba5a1/receipt.json",
+        "formattingEvidence": "build/rust-test-logs/20261101-021930375/fmt.stderr.log",
         "countNote": "The linked prototype's 13 duplicate functions were retired with its exact source preserved; all 2604 original JUnit case replacements remain verified."
       }
     ],
@@ -62963,17 +63036,15 @@
     "resumedIntegration": {
       "date": "2026-11-01",
       "status": "native-verified-live-incomplete",
-      "hostPin": "392076bc5e364e02426450c574c1227db2c3be8f",
-      "hostReceipt": "build/host-artifacts/published-392076b-4d2bcbc10601/receipt.json",
+      "hostPin": "2e4671f085f199ea5bb970bbc2f9e15e2c07dff1",
+      "hostReceipt": "build/host-artifacts/published-2e4671f-fd64b18a5716/receipt.json",
       "hostSerializerFixture": "mcdev-companion/tests/fixtures/host_inputs/root_files/actual-serializer-sample.json",
-      "nativePipeline": "build/rust-test-logs/native-pipeline-proof-20261101-003939212",
+      "nativePipeline": "build/rust-test-logs/native-pipeline-proof-20261101-025824638",
       "optimizedPackage": {
-        "status": "passed",
+        "status": "passed-prior-to-metadata-read-optimization",
         "payloadFiles": 24,
-        "optionalCapabilities": 11,
-        "operationMaps": 9,
-        "logs": "build/rust-test-logs/native-release-20261101-004324420",
-        "archiveSha256": "fdddf559c9fc0118216d7b76870363aa088a6bb4e86e5dcc9754f0fb0f27296c"
+        "logs": "build/rust-test-logs/native-release-20261101-022932747",
+        "archiveSha256": "9aae6e45a510981f4ad4c5d03ffb19364774c2241c41badefce29290a4db5968"
       },
       "originalCemAttempt": {
         "status": "failed-before-original-assertions",
@@ -62987,7 +63058,108 @@
         "legacyMemberOracle": "build/legacy-member-reference/20261031T144315699851Z/receipt.json",
         "legacyOracleScope": "Observed compiled Kotlin core service; frozen-source build provenance is unproven."
       },
-      "originalCheckoutProof": "build/original-checkout-final.json"
+      "originalCheckoutProof": "build/original-checkout-final.json",
+      "diagnosticCandidateReceipt": "build/host-artifacts/candidate88-6037dc8d613f/receipt.json",
+      "cemAttempts": [
+        {
+          "receipt": "build/rust-test-logs/cem-project-20261101-004634121-336c13de/receipt.json",
+          "originalAssertions": 0,
+          "originalMemberComparisonExecuted": false,
+          "errors": [
+            {
+              "code": -32801,
+              "data": {
+                "providerCommandReason": "Stale"
+              },
+              "message": "Content modified"
+            }
+          ],
+          "observedFreshAccepted": false,
+          "cleanShutdown": true
+        },
+        {
+          "receipt": "build/rust-test-logs/cem-project-20261101-020445745-1c42a509/receipt.json",
+          "originalAssertions": 0,
+          "originalMemberComparisonExecuted": false,
+          "errors": [
+            {
+              "message": "Internal error",
+              "code": -32603,
+              "data": {
+                "providerCommandReason": "CommandFailed"
+              }
+            }
+          ],
+          "observedFreshAccepted": false,
+          "cleanShutdown": true
+        },
+        {
+          "receipt": "build/rust-test-logs/cem-project-20261101-022439783-d5b5134f/receipt.json",
+          "originalAssertions": 0,
+          "originalMemberComparisonExecuted": false,
+          "errors": [
+            {
+              "data": {
+                "providerCommandReason": "Stale"
+              },
+              "message": "Content modified",
+              "code": -32801
+            }
+          ],
+          "observedFreshAccepted": false,
+          "cleanShutdown": true
+        },
+        {
+          "receipt": "build/rust-test-logs/cem-project-20261101-024118400-adb6cf5b/receipt.json",
+          "originalAssertions": 0,
+          "originalMemberComparisonExecuted": false,
+          "errors": [
+            {
+              "code": -32801,
+              "message": "Content modified",
+              "data": {
+                "providerCommandReason": "Stale"
+              }
+            },
+            {
+              "code": -32801,
+              "message": "Content modified",
+              "data": {
+                "providerCommandReason": "Stale"
+              }
+            }
+          ],
+          "observedFreshAccepted": true,
+          "cleanShutdown": true
+        },
+        {
+          "receipt": "build/rust-test-logs/cem-project-20261101-030230338-e662aa1e/receipt.json",
+          "originalAssertions": 0,
+          "originalMemberComparisonExecuted": false,
+          "errors": [
+            {
+              "code": -32801,
+              "data": {
+                "providerCommandReason": "Stale"
+              },
+              "message": "Content modified"
+            },
+            {
+              "code": -32801,
+              "data": {
+                "providerCommandReason": "Stale"
+              },
+              "message": "Content modified"
+            }
+          ],
+          "observedFreshAccepted": true,
+          "cleanShutdown": true
+        }
+      ],
+      "sourceMembershipNamespaceFix": "Raw Gradle project paths and semantic module identities are separate; issued token/project/name joins and semantic identity consistency remain enforced.",
+      "metadataSourceCapture": "Info/Dump/Reindex/Reload skip compiler source inventories and bodies; unrequested source coverage remains Unknown. Full DTO equivalence and 67 affected checks pass.",
+      "readinessRecovery": "One distinct outer request only after observed new accepted evaluation/publication with same provider instance/owner/SHA and unchanged editor version; original errors retained. Seven mock groups pass. D4 and D5 fail again and are not retried.",
+      "staticHelperCensusLimitation": "Existing 1014-entry census omits multi-underscore helper names such as assert_not_nil; complete static-census acceptance is pending."
     }
   }
 }

@@ -86,6 +86,8 @@ struct RootReader {
     stale_domain: Option<&'static str>,
     root_override: Option<PathBuf>,
     reads: Arc<Mutex<Vec<String>>>,
+    compiler_reads: Arc<Mutex<Vec<String>>>,
+    forbid_compiler_sources: bool,
 }
 
 fn operations() -> InputOps {
@@ -130,12 +132,39 @@ impl RootReader {
             stale_domain: None,
             root_override: None,
             reads: Arc::new(Mutex::new(vec![])),
+            compiler_reads: Arc::new(Mutex::new(vec![])),
+            forbid_compiler_sources: false,
         }
+    }
+
+    fn metadata_only(mut self) -> Self {
+        self.base.0.drain(2..6);
+        self.forbid_compiler_sources = true;
+        self
     }
 }
 
 impl FactReader for RootReader {
     fn read_facts(&mut self, evaluation: &str, queries: &[Value]) -> Result<Value, FactsError> {
+        for query in queries {
+            let op = query["op"].as_str().unwrap();
+            if self.forbid_compiler_sources {
+                assert!(
+                    matches!(
+                        op,
+                        "projectInputs"
+                            | "resourceInventory"
+                            | "resourceSnapshot"
+                            | "rootFileInventory"
+                            | "rootFileSnapshot"
+                    ),
+                    "metadata command made an unnecessary readFacts request: {op}"
+                );
+            }
+            if matches!(op, "sourceInventory" | "sourceSnapshot") {
+                self.compiler_reads.lock().unwrap().push(op.into());
+            }
+        }
         if queries
             .first()
             .and_then(|query| query["op"].as_str())
@@ -346,7 +375,7 @@ fn command_discovery_does_not_read_unrelated_root_domains() {
             "java",
             &[],
         );
-        let mut reader = RootReader::new(&workspace);
+        let mut reader = RootReader::new(&workspace).metadata_only();
         reader.stale_domain = Some("references");
         let selected = project_for_command(reader, &command).unwrap();
         assert!(
@@ -686,13 +715,14 @@ fn a_different_attested_workspace_root_is_not_accepted_as_the_requested_root() {
     );
 }
 
-#[test]
-fn full_context_commands_use_attested_root_data_without_inventing_type_or_code_authority() {
+fn metadata_dispatcher(
+    workspace: &Path,
+    selected: SelectedProject,
+    refresh_generation: Option<&str>,
+) -> crate::commands::CommandDispatcher<crate::commands::CoreCommandHost> {
     use crate::commands::{
         BuildIdentity, CommandDispatcher, CoreCommandHost, EvaluationCommandInputs,
     };
-    let workspace = unique_root();
-    let selected = project(RootReader::new(&workspace)).unwrap();
     let facts = Arc::new(NoSemanticReads);
     let host = CoreCommandHost::with_evaluation(
         EvaluationCommandInputs {
@@ -712,7 +742,7 @@ fn full_context_commands_use_attested_root_data_without_inventing_type_or_code_a
             check_active: Arc::new(|| Ok(())),
             specifier_supported: Arc::new(|| panic!("context DTO queried specifiers")),
             additional_at_values: Arc::new(|| panic!("context DTO queried annotations")),
-            refresh_generation: Some("129".into()),
+            refresh_generation: refresh_generation.map(str::to_owned),
             config_selection_complete: selected.config_selection_complete,
             mapping_discovery_complete: selected.mapping_complete,
         },
@@ -734,17 +764,32 @@ fn full_context_commands_use_attested_root_data_without_inventing_type_or_code_a
         "mcdev.reindex".into(),
         "mcdev.reloadProjectContext".into(),
     ];
-    let dispatcher =
-        CommandDispatcher::for_evaluation(Arc::new(host), &commands, selected.project_complete)
-            .with_discovery_coverage(
-                selected.config_selection_complete,
-                selected.references_complete,
-            );
+    CommandDispatcher::for_evaluation(Arc::new(host), &commands, selected.project_complete)
+        .with_discovery_coverage(
+            selected.config_selection_complete,
+            selected.references_complete,
+        )
+}
+
+#[test]
+fn full_context_commands_use_attested_root_data_without_inventing_type_or_code_authority() {
+    let workspace = unique_root();
+    let dispatcher = metadata_dispatcher(
+        &workspace,
+        project(RootReader::new(&workspace)).unwrap(),
+        Some("129"),
+    );
+    let commands = [
+        "mcdev.info",
+        "mcdev.dumpContext",
+        "mcdev.reindex",
+        "mcdev.reloadProjectContext",
+    ];
     let payload = json!({"context":{"protocolVersion":1,"workspaceRoot":path_to_uri(&workspace),
         "documentUri":path_to_uri(&workspace.join("module/src/main/java/Patch.java")),"languageId":"java",
         "position":{"line":0,"character":0},"bufferText":"package fixture; class Patch {}","documentVersion":7,
         "bufferTextFallbackUsed":false,"client":{"name":"root-fixture","version":"1"}}});
-    for command in &commands {
+    for command in commands {
         let response = dispatcher.execute(command, &[payload.clone()]).unwrap();
         assert!(response.error.is_none(), "{command}: {:?}", response.error);
         let result = response.result.unwrap();
@@ -765,5 +810,106 @@ fn full_context_commands_use_attested_root_data_without_inventing_type_or_code_a
             assert_eq!(result["indexState"], "ready");
             assert_eq!(result["classpathEntries"], 4);
         }
+    }
+}
+
+#[test]
+fn metadata_commands_skip_compiler_capture_without_changing_dtos_or_refresh_authority() {
+    use mcdev_core::expression_engine::NO_CANCELLATION;
+    let workspace = unique_root();
+    for generation in [None, Some("129")] {
+        let baseline = metadata_dispatcher(
+            &workspace,
+            project(RootReader::new(&workspace)).unwrap(),
+            generation,
+        );
+        for name in [
+            "mcdev.info",
+            "mcdev.dumpContext",
+            "mcdev.reindex",
+            "mcdev.reloadProjectContext",
+        ] {
+            let request = command(
+                &workspace,
+                name,
+                "package fixture; class Patch {}",
+                "module/src/main/java/Patch.java",
+                "java",
+                &[],
+            );
+            let reader = RootReader::new(&workspace).metadata_only();
+            let reads = reader.compiler_reads.clone();
+            let selected = project_for_command(reader, &request).unwrap();
+            assert!(
+                selected.source_snapshots.is_empty() && selected.owner_sources.snapshots.is_empty()
+            );
+            assert!(selected.owner_sources.inventory.entries.is_empty());
+            assert!(
+                matches!(selected.owner_sources.inventory.coverage,Fact::Unknown {ref reasons}
+                if reasons[0]["code"]=="NotRequested")
+            );
+            assert!(matches!(selected.sources, HostFact::Unavailable { .. }));
+            assert!(matches!(
+                selected
+                    .provider
+                    .read_source_file(&workspace.join("module/src/main/java/Patch.java"))
+                    .unwrap()
+                    .fact,
+                HostFact::Unavailable { .. }
+            ));
+            assert!(
+                selected.project_complete
+                    && selected.config_selection_complete
+                    && selected.mapping_complete
+            );
+            assert_eq!(selected.cached_session.context.source_sets.len(), 2);
+            assert!(reads.lock().unwrap().is_empty());
+            let optimized = metadata_dispatcher(&workspace, selected, generation);
+            let before = baseline
+                .execute_decoded(request.clone(), false, &NO_CANCELLATION)
+                .unwrap();
+            let after = optimized
+                .execute_decoded(request, false, &NO_CANCELLATION)
+                .unwrap();
+            assert_eq!(
+                serde_json::to_value(after).unwrap(),
+                serde_json::to_value(before).unwrap(),
+                "{name}, generation={generation:?}"
+            );
+        }
+    }
+}
+
+#[test]
+fn non_metadata_commands_keep_all_compiler_inventory_and_snapshot_reads() {
+    let workspace = unique_root();
+    for name in ["mcdev.completion", "mcdev.references"] {
+        let request = command(
+            &workspace,
+            name,
+            "class Patch {}",
+            "module/src/main/java/Patch.java",
+            "java",
+            &[],
+        );
+        let reader = RootReader::new(&workspace);
+        let reads = reader.compiler_reads.clone();
+        let selected = project_for_command(reader, &request).unwrap();
+        assert_eq!(
+            *reads.lock().unwrap(),
+            [
+                "sourceInventory",
+                "sourceSnapshot",
+                "sourceInventory",
+                "sourceSnapshot"
+            ]
+        );
+        assert_eq!(selected.source_snapshots.len(), 2);
+        assert_eq!(selected.owner_sources.snapshots.len(), 1);
+        assert_eq!(selected.owner_sources.inventory.entries.len(), 1);
+        assert_eq!(
+            selected.owner_sources.inventory.coverage.found(),
+            Some(&Value::Null)
+        );
     }
 }

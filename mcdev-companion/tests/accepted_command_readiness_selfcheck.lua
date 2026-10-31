@@ -1,6 +1,6 @@
 -- This mock checks synchronization/provenance only; it credits no original CEM assertion.
 local repo = vim.fn.getcwd()
-local saved = { dofile = dofile, writefile = vim.fn.writefile,
+local saved = { dofile = dofile, writefile = vim.fn.writefile, wait = vim.wait, hrtime = vim.uv.hrtime,
   window = vim.api.nvim_get_current_win(), buffer = vim.api.nvim_get_current_buf(),
   cursor = vim.api.nvim_win_get_cursor(0), runtimepath = vim.o.runtimepath,
   virtualedit = vim.o.virtualedit, completeopt = vim.o.completeopt, record = _G.mcdev_record_assertion }
@@ -21,19 +21,42 @@ local ok, failure = xpcall(function()
   vim.api.nvim_buf_set_lines(bufnr, 0, -1, false, { '// 😀', 'class Owner {}' })
   vim.api.nvim_set_current_buf(bufnr)
   local files, waits, flushes = {}, {}, 0
-  local instance, version, mark, unavailable, origin_ok, helper_only = 37, 17, 0, 0, true, false
-  local owner_key = vim.fs.normalize(path)
-  if vim.fn.has('win32') == 1 then owner_key = owner_key:lower() end
+  local instance, version, serial, unavailable, origin_ok, helper_only = 37, 17, 0, 0, true, false
+  local clock, scheduled, replies, info_requests, on_info_request = 0, {}, {}, 0, nil
+  local function owner_key_for(owner)
+    if owner:match('^file:') then owner = vim.uri_to_fname(owner) end
+    owner = vim.fs.normalize(owner)
+    return vim.fn.has('win32') == 1 and owner:lower() or owner
+  end
+  local owner_key = owner_key_for(path)
+  local function schedule(delay, callback)
+    scheduled[#scheduled + 1] = { at = clock + delay, callback = callback }
+  end
+  vim.uv.hrtime = function() return clock * 1e6 end
+  vim.wait = function(timeout, predicate, interval)
+    local deadline = clock + timeout
+    while true do
+      for index = #scheduled, 1, -1 do
+        if scheduled[index].at <= clock then table.remove(scheduled, index).callback() end
+      end
+      if predicate() then return true end
+      if clock >= deadline then return false end
+      clock = math.min(deadline, clock + (interval or 10))
+    end
+  end
   local actual_trace = {
-    owner_key = function() return owner_key end,
+    owner_key = owner_key_for,
     start = function()
-      return {
-        mark = function() mark = mark + 1; return mark end,
-        wait_for = function(_, expected, after, _, options)
+      return { events = {},
+        mark = function(self) return #self.events end,
+        wait_for = function(self, expected, after, _, options)
           waits[#waits + 1] = { expected = vim.deepcopy(expected), after = after, instance = options.required_instance }
           if options.required_instance and options.required_instance ~= instance then return false, {} end
-          return true, { [owner_key] = { provider = 'mcdev.mixin', instance = instance,
-            evaluation = tostring(mark + 900), owner = path, source_sha256 = expected[owner_key], publication_revision = 500 } }
+          serial = serial + 1
+          local event = { provider = 'mcdev.mixin', instance = instance,
+            evaluation = tostring(serial + 900), owner = path, source_sha256 = expected[owner_key], publication_revision = serial + 500 }
+          self.events[#self.events + 1] = event
+          return true, { [owner_key] = event }
         end,
         close = function() end,
       }
@@ -46,9 +69,16 @@ local ok, failure = xpcall(function()
     return { documentUri = vim.uri_from_bufnr(buffer), bufferText = vim.lsp._buf_get_full_text(buffer),
       documentVersion = version, position = convert.to_lsp_position(buffer, position) }
   end
-  function protocol.request(command, _, callback)
+  function protocol.request(command, payload, callback)
     local err, result
-    if command == protocol.commands.info and unavailable > 0 then
+    local reply
+    if command == protocol.commands.info then
+      info_requests = info_requests + 1
+      if on_info_request then on_info_request(info_requests, payload) end
+      reply = table.remove(replies, 1)
+    end
+    if reply then err, result = reply.error, reply.result
+    elseif command == protocol.commands.info and unavailable > 0 then
       unavailable = unavailable - 1
       err = { code = -32002, data = { providerCommandReason = 'CommandUnavailable' } }
     else result = { result = command == protocol.commands.completion and { items = vim.deepcopy(raw_items) } or { lines = {} } } end
@@ -66,6 +96,8 @@ local ok, failure = xpcall(function()
     end, buffer)
   end
   local function start()
+    clock, scheduled, replies, info_requests, on_info_request = 0, {}, {}, 0, nil
+    unavailable, origin_ok, helper_only, version = 0, true, false, 17
     local state = readiness.start({ trace = 'mock.trace', proof = 'mock-proof.json', timeout = 1 })
     states[#states + 1] = state
     state:attach(client, protocol, completion, { exited = false })
@@ -78,6 +110,14 @@ local ok, failure = xpcall(function()
   local function close(state)
     state:close()
     vim.api.nvim_del_autocmd(state.leave_autocmd)
+  end
+  local stale = { code = -32801, message = 'evaluation is Stale', data = { stage = 'prepay-input' } }
+  local function fresh_after_request(state, mutate, delay)
+    local event = vim.deepcopy(state.records[#state.records].accepted)
+    event.evaluation = tostring(tonumber(event.evaluation) + 1)
+    event.publication_revision = event.publication_revision + 1
+    if mutate then mutate(event, state.records[#state.records].accepted) end
+    schedule(delay or 40, function() state.acceptance.events[#state.acceptance.events + 1] = event end)
   end
   _G.dofile = function(file)
     if file:match('/accepted_trace%.lua$') then return actual_trace end
@@ -126,6 +166,79 @@ local ok, failure = xpcall(function()
   origin_ok = false
   assert(not pcall(state.preflight, state, bufnr), 'a helper/loopback origin cannot establish provider readiness')
   close(state)
+
+  state = start()
+  replies = { { error = vim.deepcopy(stale) } }
+  local initial_flushes = flushes
+  on_info_request = function(index) if index == 1 then fresh_after_request(state) end end
+  state:preflight(bufnr)
+  local retry = state.proof.preflightRetry
+  assert(info_requests == 2 and #state.proof.preflight == 2 and clock == 40)
+  assert(vim.deep_equal(retry.initialError, stale) and vim.deep_equal(state.proof.preflight[1].error, stale))
+  assert(retry.observedFreshAccepted and retry.before.evaluation ~= retry.after.evaluation
+    and retry.before.publication_revision ~= retry.after.publication_revision)
+  assert(retry.before.instance == retry.after.instance and retry.documentVersion == version)
+  assert(retry.before.source_sha256 == retry.after.source_sha256 and retry.sourceSha256 == retry.after.source_sha256)
+  assert(owner_key_for(retry.before.owner) == owner_key_for(retry.after.owner))
+  assert(retry.beforeCommandIndex == 1 and retry.afterCommandIndex == 2)
+  assert(state.proof.preflight[2].freshAcceptedRetry and state.proof.preflight[2].ready)
+  assert(state.records[2].accepted.evaluation == retry.after.evaluation and flushes == initial_flushes + 1,
+    'fresh retry uses the observed acceptance without synthesizing or flushing a document change')
+  assert(#files['mock-proof.json.frames.jsonl'] == 2)
+  local first_frame = vim.json.decode(files['mock-proof.json.frames.jsonl'][1])
+  local second_frame = vim.json.decode(files['mock-proof.json.frames.jsonl'][2])
+  local saved_proof = vim.json.decode(files['mock-proof.json'][1])
+  assert(first_frame.error.code == -32801 and first_frame.commandIndex == 1 and first_frame.authentic)
+  assert(second_frame.result.result and second_frame.commandIndex == 2 and second_frame.authentic)
+  assert(saved_proof.preflightRetry.initialError.code == -32801 and saved_proof.preflight[1].error.code == -32801)
+  assert(not state.failure and #state.proof.originalAssertions == 0 and not state.proof.scopePassed)
+  close(state)
+
+  -- Each rejected observation consumes only mock time and must never cause a second RPC.
+  local rejected = {
+    { name = 'same evaluation', mutate = function(event, before) event.evaluation = before.evaluation end },
+    { name = 'same publication', mutate = function(event, before) event.publication_revision = before.publication_revision end },
+    { name = 'different instance', mutate = function(event) event.instance = 99 end },
+    { name = 'different owner', mutate = function(event) event.owner = path .. '.other' end },
+    { name = 'different hash', mutate = function(event) event.source_sha256 = string.rep('0', 64) end },
+    { name = 'no new acceptance', absent = true },
+    { name = 'different editor version', version = true },
+  }
+  for _, variant in ipairs(rejected) do
+    state = start()
+    replies = { { error = vim.deepcopy(stale) } }
+    on_info_request = function()
+      if not variant.absent then fresh_after_request(state, variant.mutate) end
+      if variant.version then schedule(20, function() version = version + 1 end) end
+    end
+    assert(not pcall(state.preflight, state, bufnr), variant.name .. ' must fail closed')
+    assert(info_requests == 1 and #state.proof.commands == 1, variant.name .. ' cannot cause a resend')
+    assert(not state.proof.preflightRetry.observedFreshAccepted and state.proof.preflightRetry.after == nil)
+    assert(state.proof.preflightRetry.initialError.code == -32801 and #state.proof.preflight == 1)
+    assert(clock <= 60000)
+    close(state)
+  end
+
+  state = start()
+  replies = { { error = vim.deepcopy(stale) }, { error = vim.deepcopy(stale) } }
+  on_info_request = function(index) if index == 1 then fresh_after_request(state) end end
+  assert(not pcall(state.preflight, state, bufnr), 'the second Stale must fail without another fresh retry')
+  assert(info_requests == 2 and #state.proof.preflight == 2 and #state.proof.commands == 2)
+  assert(state.proof.preflightRetry.initialError.code == -32801 and state.proof.preflight[2].error.code == -32801)
+  assert(state.proof.preflightRetry.afterCommandIndex == 2 and state.failure:find('Stale again', 1, true))
+  close(state)
+
+  for _, err in ipairs({ { code = -32800, message = 'Cancelled' }, { code = -32602, message = 'Protocol' },
+    { code = -32055, message = 'unrelated RPC error' },
+    { code = -32002, data = { providerCommandReason = 'DifferentReason' } } }) do
+    state = start()
+    replies = { { error = vim.deepcopy(err) } }
+    on_info_request = function() fresh_after_request(state) end
+    assert(not pcall(state.preflight, state, bufnr), 'a non-Stale RPC error must fail immediately')
+    assert(info_requests == 1 and #state.proof.preflight == 1 and state.proof.preflightRetry == nil and clock == 0)
+    assert(state.proof.preflight[1].error.code == err.code)
+    close(state)
+  end
   assert(flushes > 0 and #waits > 0)
   assert(vim.fn.filereadable('mock-proof.json') == 0, 'mock output cannot become live-host evidence')
 end, debug.traceback)
@@ -134,6 +247,7 @@ for _, state in ipairs(states) do
   pcall(vim.api.nvim_del_autocmd, state.leave_autocmd)
 end
 _G.dofile, vim.fn.writefile, _G.mcdev_record_assertion = saved.dofile, saved.writefile, saved.record
+vim.wait, vim.uv.hrtime = saved.wait, saved.hrtime
 if tracking then tracking.flush = saved.flush end
 if saved.product_protocol then saved.product_protocol.request = saved.request end
 if saved.product_completion then saved.product_completion.complete = saved.complete end
@@ -143,5 +257,5 @@ vim.api.nvim_win_set_buf(saved.window, saved.buffer)
 if bufnr and vim.api.nvim_buf_is_valid(bufnr) then vim.api.nvim_buf_delete(bufnr, { force = true }) end
 vim.api.nvim_win_set_cursor(saved.window, saved.cursor)
 if not ok then error(failure) end
-print('CEM readiness source hash, edits, provider instance, retry and fallback provenance selfcheck passed; no live scenario credit')
-return 3
+print('CEM readiness seven mock case groups passed, including one fresh accepted retry and strict error limits; no live scenario credit')
+return 7

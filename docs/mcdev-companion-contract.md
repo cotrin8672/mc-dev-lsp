@@ -13,7 +13,7 @@ The original semantic-v1 stock-host checkpoint was
 `dev/external-extension/{src/bin/ipc-child.rs,ipc-manifest.json,ipc-probes.lua,README.md}`
 contains the separate process/editor fixture. Host revisions must be pinned
 alongside this experimental contract. Current command/input integration uses
-[`392076b`](https://github.com/cotrin8672/ktlsp/blob/392076bc5e364e02426450c574c1227db2c3be8f/docs/architecture/extension-ipc.md).
+[`2e4671f`](https://github.com/cotrin8672/ktlsp/blob/2e4671f085f199ea5bb970bbc2f9e15e2c07dff1/docs/architecture/extension-ipc.md).
 The exact verified scope and remaining gaps are recorded in
 [the integration checkpoint](ipc-integration-status.md); the historical traces
 below retain their original artifact pins.

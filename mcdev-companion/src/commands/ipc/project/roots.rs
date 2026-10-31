@@ -16,32 +16,38 @@ pub(crate) struct DiscoveryNeeds {
     resources: bool,
     mappings: bool,
     references: bool,
+    pub(super) compiler_sources: bool,
 }
 impl DiscoveryNeeds {
     pub const ALL: Self = Self {
         resources: true,
         mappings: true,
         references: true,
+        compiler_sources: true,
     };
     const NONE: Self = Self {
         resources: false,
         mappings: false,
         references: false,
+        compiler_sources: true,
     };
     const RESOURCES: Self = Self {
         resources: true,
         mappings: false,
         references: false,
+        compiler_sources: true,
     };
     const MAPPINGS: Self = Self {
         resources: false,
         mappings: true,
         references: false,
+        compiler_sources: true,
     };
     const CONTEXT: Self = Self {
         resources: true,
         mappings: true,
         references: false,
+        compiler_sources: false,
     };
 
     pub fn for_command(command: &DecodedCommand) -> Self {

@@ -68,15 +68,15 @@ function M.start(options)
   function state:attach(client, protocol, completion, exit_state)
     self.client, self.protocol, self.completion, self.exit_state = client, protocol, completion, exit_state
     self.original_request, self.original_complete = protocol.request, completion.complete
-    protocol.request = function(command, payload, callback, bufnr)
-      bufnr = (not bufnr or bufnr == 0) and vim.api.nvim_get_current_buf() or bufnr
-      local accepted = self:await(bufnr)
+    self.dispatch = function(command, payload, callback, bufnr, accepted)
       local context = protocol.context(bufnr, { 1, 0 })
       local record = { command = command, bufnr = bufnr, context = context,
-        sourceSha256 = vim.fn.sha256(context.bufferText), accepted = accepted, payload = vim.deepcopy(payload) }
-      local summary = { command = command, documentUri = context.documentUri,
+        sourceSha256 = vim.fn.sha256(context.bufferText), accepted = accepted, payload = vim.deepcopy(payload),
+        index = #self.records + 1, acceptanceMark = self.acceptance:mark() }
+      local summary = { command = command, commandIndex = record.index, documentUri = context.documentUri,
         sourceSha256 = record.sourceSha256, documentVersion = context.documentVersion,
-        providerInstance = accepted.instance, acceptedEvaluation = accepted.evaluation, replied = false }
+        providerInstance = accepted.instance, acceptedEvaluation = accepted.evaluation,
+        acceptedPublication = accepted.publication_revision, acceptedTraceMark = record.acceptanceMark, replied = false }
       self.records[#self.records + 1], self.proof.commands[#self.proof.commands + 1] = record, summary
       return self.original_request(command, payload, function(result, err, origin)
         record.result, record.error, record.replied = result, err, true
@@ -88,13 +88,17 @@ function M.start(options)
         summary.error = err and tostring(type(err) == 'table' and (err.message or err.code) or err) or nil
         summary.envelopeError = type(result) == 'table' and result.error or nil
         summary.resultSha256 = result and vim.fn.sha256(vim.json.encode(result)) or nil
-        vim.fn.writefile({ vim.json.encode({ command = command, context = context,
+        vim.fn.writefile({ vim.json.encode({ command = command, commandIndex = record.index, context = context,
           payload = record.payload, accepted = accepted, result = result, error = err,
           origin = summary.origin, authentic = record.authentic }) }, frames, 'a')
         if not authentic then self.failure = 'command response did not come from the dispatched native provider' end
         self:save()
-        if callback then callback(result, err, origin) end
+        if callback then callback(result, err, origin, record) end
       end, bufnr)
+    end
+    protocol.request = function(command, payload, callback, bufnr)
+      bufnr = (not bufnr or bufnr == 0) and vim.api.nvim_get_current_buf() or bufnr
+      return self.dispatch(command, payload, callback, bufnr, self:await(bufnr))
     end
     completion.complete = function(callback, bufnr, position, opts)
       bufnr = bufnr or vim.api.nvim_get_current_buf()
@@ -138,17 +142,38 @@ function M.start(options)
   end
   function state:preflight(bufnr)
     local started, backoff = vim.uv.hrtime(), 100
-    while (vim.uv.hrtime() - started) / 1e6 < 60000 do
+    local stale_retry, fresh_dispatch
+    local function remaining_ms()
+      return math.max(0, 60000 - (vim.uv.hrtime() - started) / 1e6)
+    end
+    local function same_context(record)
+      local current = self.protocol.context(bufnr, { 1, 0 })
+      return current.documentUri == record.context.documentUri
+        and current.documentVersion == record.context.documentVersion
+        and vim.fn.sha256(current.bufferText) == record.sourceSha256
+    end
+    while remaining_ms() > 0 do
       local attempt = { replied = false }
       self.proof.preflight[#self.proof.preflight + 1] = attempt
-      local origin
-      local cancel = self.protocol.request(self.protocol.commands.info,
-        { context = self.protocol.context(bufnr, { 1, 0 }) }, function(result, err, response_origin)
-          attempt.result, attempt.error, attempt.replied = result, err, true
-          origin = response_origin
-        end, bufnr)
-      local remaining = math.max(0, 60000 - (vim.uv.hrtime() - started) / 1e6)
-      local replied = vim.wait(math.min(5000, remaining), function() return attempt.replied end, 25)
+      local origin, dispatched
+      local function receive(result, err, response_origin, record)
+        attempt.result, attempt.error, attempt.replied = result, err, true
+        origin, dispatched = response_origin, record
+        attempt.accepted, attempt.documentVersion, attempt.commandIndex =
+          vim.deepcopy(record.accepted), record.context.documentVersion, record.index
+        if attempt.freshAcceptedRetry then stale_retry.afterCommandIndex = record.index end
+      end
+      local payload = { context = self.protocol.context(bufnr, { 1, 0 }) }
+      local cancel
+      if fresh_dispatch then
+        if not same_context(fresh_dispatch.before) then self:fail('editor context changed before the fresh readiness retry') end
+        attempt.freshAcceptedRetry = true
+        cancel = self.dispatch(self.protocol.commands.info, payload, receive, bufnr, fresh_dispatch.accepted)
+        fresh_dispatch = nil
+      else
+        cancel = self.protocol.request(self.protocol.commands.info, payload, receive, bufnr)
+      end
+      local replied = vim.wait(math.min(5000, remaining_ms()), function() return attempt.replied end, 25)
       if not replied then cancel(); self:fail('provider readiness request timed out') end
       if not origin or origin.client ~= self.client or origin.route ~= 'ktlsp.providerCommand'
         or origin.provider ~= 'mcdev.mixin' or origin.command ~= self.protocol.commands.info then
@@ -157,7 +182,40 @@ function M.start(options)
       local err = attempt.error
       local unavailable = type(err) == 'table' and err.code == -32002
         and type(err.data) == 'table' and err.data.providerCommandReason == 'CommandUnavailable'
-      if not unavailable then
+      if type(err) == 'table' and err.code == -32801 then
+        if stale_retry then self:fail('provider readiness became Stale again after its one fresh retry') end
+        if type(dispatched.context.documentVersion) ~= 'number' then self:fail('Stale readiness has no known editor version') end
+        stale_retry = { initialError = vim.deepcopy(err), before = vim.deepcopy(dispatched.accepted),
+          documentUri = dispatched.context.documentUri, sourceSha256 = dispatched.sourceSha256,
+          documentVersion = dispatched.context.documentVersion, beforeCommandIndex = dispatched.index,
+          traceAfter = dispatched.acceptanceMark, observedFreshAccepted = false }
+        self.proof.preflightRetry = stale_retry
+        attempt.retry = 'StaleAwaitFreshAccepted'
+        self:save()
+        local fresh, changed
+        local owner = acceptance_module.owner_key(vim.uri_to_fname(dispatched.context.documentUri))
+        local ready = vim.wait(remaining_ms(), function()
+          assert(not self.acceptance.failure, self.acceptance.failure)
+          if not same_context(dispatched) then changed = true; return true end
+          for index = dispatched.acceptanceMark + 1, #self.acceptance.events do
+            local event = self.acceptance.events[index]
+            if event.instance == dispatched.accepted.instance and event.instance == self.instance
+              and acceptance_module.owner_key(event.owner) == owner and event.source_sha256 == dispatched.sourceSha256
+              and event.evaluation ~= dispatched.accepted.evaluation
+              and event.publication_revision ~= dispatched.accepted.publication_revision then
+              fresh = event
+              return true
+            end
+          end
+          return false
+        end, 20)
+        if changed then self:fail('editor context changed while waiting for fresh accepted readiness') end
+        if not ready or not fresh then self:fail('Stale readiness had no fresh accepted evaluation within its deadline') end
+        stale_retry.after, stale_retry.observedFreshAccepted = vim.deepcopy(fresh), true
+        self.proof.acceptances[#self.proof.acceptances + 1] = vim.deepcopy(fresh)
+        fresh_dispatch = { before = dispatched, accepted = fresh }
+        self:save()
+      elseif not unavailable then
         if err or type(attempt.result) ~= 'table' then self:fail('provider readiness RPC failed') end
         local envelope_error = attempt.result.error
         if envelope_error and (type(envelope_error) ~= 'table' or type(envelope_error.code) ~= 'string'
@@ -170,11 +228,11 @@ function M.start(options)
         attempt.ready = true
         self:save()
         return
+      else
+        attempt.retry = 'CommandUnavailable'
+        vim.wait(math.min(backoff, remaining_ms()), function() return false end, 25)
+        backoff = math.min(backoff * 2, 1000)
       end
-      attempt.retry = 'CommandUnavailable'
-      remaining = math.max(0, 60000 - (vim.uv.hrtime() - started) / 1e6)
-      vim.wait(math.min(backoff, remaining), function() return false end, 25)
-      backoff = math.min(backoff * 2, 1000)
     end
     self:fail('provider readiness exceeded its 60s deadline')
   end

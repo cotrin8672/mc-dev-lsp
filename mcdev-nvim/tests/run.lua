@@ -2066,7 +2066,7 @@ do
     dofile = dofile, writefile = vim.fn.writefile, flush = tracking.flush,
     request = protocol.request, complete = completion.complete, record = _G.mcdev_record_assertion }
   local readiness_cases = dofile(vim.fn.getcwd() .. "/mcdev-companion/tests/accepted_command_readiness_selfcheck.lua")
-  helpers.assert_eq(readiness_cases, 3, "all readiness mock cases returned to the adapter suite")
+  helpers.assert_eq(readiness_cases, 7, "all readiness mock cases returned to the adapter suite")
   helpers.assert_eq(vim.api.nvim_get_current_win(), before.window, "readiness self-check preserves the caller window")
   helpers.assert_eq(vim.api.nvim_get_current_buf(), before.buffer, "readiness self-check preserves the caller buffer")
   helpers.assert_true(vim.deep_equal(vim.api.nvim_win_get_cursor(0), before.cursor), "readiness self-check preserves the caller cursor")
@@ -2079,7 +2079,7 @@ do
   helpers.assert_eq(protocol.request, before.request, "readiness self-check restores protocol requests")
   helpers.assert_eq(completion.complete, before.complete, "readiness self-check restores completions")
   helpers.assert_eq(_G.mcdev_record_assertion, before.record, "readiness self-check restores assertion recording")
-  print("mcdev-nvim adapter suite continued after three readiness mock cases; no live CEM credit")
+  print("mcdev-nvim adapter suite continued after seven readiness mock case groups; no live CEM credit")
 end
 print("mcdev-nvim adapter tests passed")
 vim.cmd("qa!")

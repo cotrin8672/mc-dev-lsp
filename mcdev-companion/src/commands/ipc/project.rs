@@ -7,9 +7,9 @@ use crate::{
         bridge::FactReader,
         draft,
         inputs::{
-            ClasspathRole, Inventory, ProjectInputRecord, ProjectInputs, ProjectSourceSet,
-            ResourceAssociation, ResourceEntry, RootRole, ScopedInputs, SourceEntry,
-            SourceSnapshot,
+            ClasspathRole, Inventory, ProjectInputRecord, ProjectInputs, ProjectScope,
+            ProjectSourceSet, ResourceAssociation, ResourceEntry, RootRole, ScopedInputs,
+            SourceEntry, SourceSnapshot,
         },
         FactsError,
     },
@@ -239,6 +239,27 @@ struct OwnedModel {
     complete: bool,
     inventory_complete: bool,
     plugin_classes: Vec<String>,
+}
+
+fn bind_compiler_scope(
+    semantic_module: &mut Option<String>,
+    membership: &ProjectScope,
+    issued: &ProjectSourceSet,
+    kind: &str,
+) -> Result<(), FactsError> {
+    if membership.source_set != issued.descriptor.name
+        || semantic_module
+            .as_ref()
+            .is_some_and(|module| module != &membership.module)
+    {
+        return Err(FactsError::Protocol(format!(
+            "{kind} differs from authoritative project scope: expectedToken={:?} actualToken={:?} expectedSourceSet={:?} actualSourceSet={:?} expectedSemanticModule={:?} actualModule={:?}",
+            issued.descriptor.id, membership.id, issued.descriptor.name, membership.source_set,
+            semantic_module, membership.module,
+        )));
+    }
+    semantic_module.get_or_insert_with(|| membership.module.clone());
+    Ok(())
 }
 
 fn absolute_path(path: &str) -> Result<PathBuf, FactsError> {
@@ -571,9 +592,24 @@ fn selected_project_inner<R: FactReader>(
     );
     let mut provider = SnapshotProvider::default();
     let mut source_snapshots = vec![];
-    let mut owner_sources = None;
+    let mut owner_sources = if needs.compiler_sources {
+        None
+    } else {
+        Some(CapturedSources {
+            inventory: Inventory {
+                entries: vec![],
+                coverage: Fact::Unknown {
+                    reasons: vec![serde_json::json!({"code":"NotRequested",
+                        "detail":"metadata command does not request compiler source capture"})],
+                },
+            },
+            snapshots: vec![],
+        })
+    };
     let mut source_paths = BTreeSet::new();
-    for project_scope in &scopes {
+    // projectContext.module is a Gradle path; issued memberships use semantic module identities.
+    let mut compiler_module = None;
+    for project_scope in scopes.iter().filter(|_| needs.compiler_sources) {
         let inventory = match project_scope {
             Some(scope) => inputs.source_inventory_in(scope)?,
             None => inputs.source_inventory()?,
@@ -596,24 +632,31 @@ fn selected_project_inner<R: FactReader>(
             for source in &inventory.entries {
                 for member in source
                     .descriptor
-                    .memberships
+                    .owner_scope
                     .as_ref()
                     .and_then(Fact::found)
                     .into_iter()
-                    .flatten()
+                    .chain(
+                        source
+                            .descriptor
+                            .memberships
+                            .as_ref()
+                            .and_then(Fact::found)
+                            .into_iter()
+                            .flatten(),
+                    )
                 {
                     if let Some(issued) = model
                         .scopes
                         .iter()
                         .find(|issued| member.id.as_deref() == Some(issued.descriptor.id.as_str()))
                     {
-                        if member.module != scope.module
-                            || member.source_set != issued.descriptor.name
-                        {
-                            return Err(FactsError::Protocol(
-                                "source membership differs from authoritative project scope".into(),
-                            ));
-                        }
+                        bind_compiler_scope(
+                            &mut compiler_module,
+                            member,
+                            issued,
+                            "source membership",
+                        )?;
                     }
                 }
             }
@@ -680,16 +723,15 @@ fn selected_project_inner<R: FactReader>(
             }
         }
         for entry in resources.entries {
-            if owned_model.is_some()
-                && entry
-                    .descriptor
-                    .membership_scope
-                    .as_ref()
-                    .is_some_and(|membership| membership.module != scope.module)
+            if let (Some(issued), Some(membership)) =
+                (project_scope, entry.descriptor.membership_scope.as_ref())
             {
-                return Err(FactsError::Protocol(
-                    "resource membership differs from authoritative project scope".into(),
-                ));
+                bind_compiler_scope(
+                    &mut compiler_module,
+                    membership,
+                    issued,
+                    "resource membership",
+                )?;
             }
             if required_resource(&entry, &root)? {
                 entries.push(entry);
@@ -1359,7 +1401,7 @@ mod tests {
     }
 
     #[test]
-    fn scoped_membership_must_match_the_raw_module_from_project_context() {
+    fn scoped_membership_must_match_the_bound_semantic_project_scope() {
         for source_membership in [false, true] {
             let root = unique_root();
             let mut replies = model_replies(&root, &[]);
@@ -1376,6 +1418,173 @@ mod tests {
                 matches!(selected_project(&mut inputs, owning_metadata(&root), &root.to_string_lossy(), "eval-1"),
                 Err(FactsError::Protocol(message)) if message.contains("authoritative project scope"))
             );
+        }
+    }
+
+    fn semantic_module_replies(root: &Path, shared_owner: Value) -> VecDeque<Value> {
+        fn set_modules(value: &mut Value) {
+            match value {
+                Value::Object(values) => {
+                    for (key, value) in values {
+                        if key == "module" {
+                            *value = json!("gradle::included|:demo");
+                        } else {
+                            set_modules(value);
+                        }
+                    }
+                }
+                Value::Array(values) => values.iter_mut().for_each(set_modules),
+                _ => {}
+            }
+        }
+        let mut replies = model_replies(root, &[]);
+        for reply in &mut replies {
+            set_modules(reply);
+        }
+        replies[0]["facts"][0]["records"][0]["buildIdentity"] = found(json!(":included"));
+        let path = root.join("src/shared/java/Shared.java");
+        let text = "package fixture; class Shared {}";
+        let shared = json!({"id":"shared-source","displayPath":path,
+            "documentUri":found(json!(path_to_uri(&path))),"languageId":"java",
+            "identity":{"kind":"source","revision":"23"},"ownerScope":shared_owner,
+            "memberships":found(json!([
+                {"module":"gradle::included|:demo","sourceSet":"main","id":"scope-main"},
+                {"module":"gradle::included|:demo","sourceSet":"client","id":"scope-client"}])),
+            "editable":{"state":"unknown","reasons":[{"code":"MissingFacts"}]}});
+        let mut snapshot = shared.clone();
+        snapshot["text"] = json!(text);
+        snapshot["sha256"] = json!(sha(text.as_bytes()));
+        for (inventory, snapshots) in [(2, 3), (4, 5)] {
+            replies[inventory]["facts"][0]["sources"]
+                .as_array_mut()
+                .unwrap()
+                .push(shared.clone());
+            replies[snapshots]["facts"]
+                .as_array_mut()
+                .unwrap()
+                .push(found(snapshot.clone()));
+        }
+        replies
+    }
+
+    #[test]
+    fn gradle_project_path_and_semantic_module_keep_shared_memberships_and_resource_ownership_separate(
+    ) {
+        for shared_owner in [
+            json!({"state":"unknown","reasons":[{"code":"MissingFacts"}]}),
+            found(json!({"module":"gradle::other-build|:library","sourceSet":"main","id":null})),
+        ] {
+            let root = unique_root();
+            let mut inputs = ScopedInputs::new(
+                "eval-1",
+                &project_operations(),
+                Reader(semantic_module_replies(&root, shared_owner.clone())),
+            )
+            .unwrap();
+            // The published encoder emits Gradle's raw project path in projectContext.scope.module.
+            let selected = selected_project(
+                &mut inputs,
+                metadata(&root),
+                &root.to_string_lossy(),
+                "eval-1",
+            )
+            .unwrap();
+            assert_eq!(selected.cached_session.context.project_id, ":demo");
+            assert_eq!(selected.cached_session.context.source_sets.len(), 2);
+            assert_eq!(selected.source_snapshots.len(), 3);
+            assert_eq!(selected.owner_sources.inventory.entries.len(), 2);
+            let shared = selected
+                .source_snapshots
+                .iter()
+                .find(|(entry, _)| entry.descriptor.id == "shared-source")
+                .unwrap();
+            assert_eq!(
+                shared.0.descriptor.owner_scope.as_ref().unwrap(),
+                &serde_json::from_value::<Fact<ProjectScope>>(shared_owner).unwrap()
+            );
+            assert_eq!(
+                shared
+                    .0
+                    .descriptor
+                    .memberships
+                    .as_ref()
+                    .and_then(Fact::found)
+                    .unwrap()
+                    .len(),
+                2
+            );
+            assert!(matches!(
+                shared.0.descriptor.editable,
+                Some(Fact::Unknown { .. })
+            ));
+            let root_client = root.join("src/client/resources/client.mixins.json");
+            assert!(selected
+                .cached_session
+                .context
+                .mixin_configs
+                .iter()
+                .any(|config| config.path == root_client));
+            let config = mcdev_core::mixin_facade::HostMixinFacade::selected_mixin_config(
+                &selected.cached_session.context,
+                "package fixture; class Patch {}",
+                Some(&path_to_uri(&root.join("src/main/java/Patch.java"))),
+                selected.provider.as_ref(),
+            )
+            .unwrap()
+            .unwrap();
+            assert_eq!(config.path, root.join("mixins.shared.json"));
+        }
+    }
+
+    #[test]
+    fn semantic_module_bindings_reject_conflicting_sibling_modules_and_scope_names() {
+        for invalid in ["source-module", "source-name", "resource-module"] {
+            let root = unique_root();
+            let mut replies = semantic_module_replies(
+                &root,
+                json!({"state":"unknown","reasons":[{"code":"MissingFacts"}]}),
+            );
+            match invalid {
+                "source-module" => {
+                    replies[4]["facts"][0]["sources"][0]["ownerScope"]["value"]["module"] =
+                        json!("gradle::foreign|:demo");
+                }
+                "source-name" => {
+                    replies[2]["facts"][0]["sources"][0]["memberships"]["value"].as_array_mut().unwrap()
+                        .push(json!({"module":"gradle::included|:demo","sourceSet":"main","id":"scope-client"}));
+                }
+                "resource-module" => {
+                    replies[7]["facts"][0]["resources"][0]["membershipScope"]["module"] =
+                        json!("gradle::foreign|:demo");
+                }
+                _ => unreachable!(),
+            }
+            let mut inputs =
+                ScopedInputs::new("eval-1", &project_operations(), Reader(replies)).unwrap();
+            let error = match selected_project(
+                &mut inputs,
+                metadata(&root),
+                &root.to_string_lossy(),
+                "eval-1",
+            ) {
+                Err(FactsError::Protocol(message)) => message,
+                _ => panic!("{invalid} must fail as a protocol inconsistency"),
+            };
+            assert!(error.contains("authoritative project scope"), "{error}");
+            assert!(error.contains("expectedToken=\"scope-client\""), "{error}");
+            assert!(
+                error.contains("expectedSemanticModule=Some(\"gradle::included|:demo\")"),
+                "{error}"
+            );
+            assert!(
+                error.contains(if invalid == "source-name" {
+                    "actualSourceSet=\"main\""
+                } else {
+                    "actualModule=\"gradle::foreign|:demo\""
+                }),
+                "{error}"
+            );
+            assert!(!error.contains("class Patch"));
         }
     }
 

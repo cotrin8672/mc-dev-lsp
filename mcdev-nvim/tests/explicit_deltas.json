@@ -1,5 +1,305 @@
 [
   {
+    "legacyAssertionId": "mcdev-nvim/tests/e2e/cem_project_e2e.lua::assert@672",
+    "oldCall": "h.helpers.assert_true(snippet_done,'CEM annotation template did not finalize')",
+    "newAssertionIds": [
+      "mcdev-nvim/tests/e2e/cem_feature_snippets.lua::assert@75"
+    ],
+    "newAssertions": [
+      {
+        "line": 75,
+        "call": "h.helpers.assert_true(snippet_done,'CEM annotation template did not finalize')",
+        "path": "mcdev-nvim/tests/e2e/cem_feature_snippets.lua"
+      }
+    ],
+    "mapping": "reviewed exact source relocation",
+    "reason": "The original snippet assertions and five-row preserved-source input loop moved to the shared CEM helper. Member, Shadow and Blink workflows remain in the original file.",
+    "equivalentObservation": "Observe the replacement assertion site(s) mcdev-nvim/tests/e2e/cem_feature_snippets.lua::assert@75 and preserve the original input/result relationship for mcdev-nvim/tests/e2e/cem_project_e2e.lua::assert@672.",
+    "nativeStatus": "partial live scope; The four original feature-snippet scenarios now use actual provider responses and native snippet expansion with exact edits/imports, full buffers, tabstops, unsaved state and unchanged disk. Method/field selection, Shadow and Blink routing/cache assertions remain unverified; mocks do not count as live original coverage.",
+    "evidence": "build/nvim-test-logs/migration-current-20261101-014259296-syntax",
+    "scope": "Exact call text correspondence; runtime counters are from this finite client suite. Live host scope is recorded separately."
+  },
+  {
+    "legacyAssertionId": "mcdev-nvim/tests/e2e/cem_project_e2e.lua::assert@675",
+    "oldCall": "h.helpers.assert_eq(snippet.insertTextFormat,vim.lsp.protocol.InsertTextFormat.Snippet)",
+    "newAssertionIds": [
+      "mcdev-nvim/tests/e2e/cem_feature_snippets.lua::assert@78"
+    ],
+    "newAssertions": [
+      {
+        "line": 78,
+        "call": "h.helpers.assert_eq(snippet.insertTextFormat,vim.lsp.protocol.InsertTextFormat.Snippet)",
+        "path": "mcdev-nvim/tests/e2e/cem_feature_snippets.lua"
+      }
+    ],
+    "mapping": "reviewed exact source relocation",
+    "reason": "The original snippet assertions and five-row preserved-source input loop moved to the shared CEM helper. Member, Shadow and Blink workflows remain in the original file.",
+    "equivalentObservation": "Observe the replacement assertion site(s) mcdev-nvim/tests/e2e/cem_feature_snippets.lua::assert@78 and preserve the original input/result relationship for mcdev-nvim/tests/e2e/cem_project_e2e.lua::assert@675.",
+    "nativeStatus": "partial live scope; The four original feature-snippet scenarios now use actual provider responses and native snippet expansion with exact edits/imports, full buffers, tabstops, unsaved state and unchanged disk. Method/field selection, Shadow and Blink routing/cache assertions remain unverified; mocks do not count as live original coverage.",
+    "evidence": "build/nvim-test-logs/migration-current-20261101-014259296-syntax",
+    "scope": "Exact call text correspondence; runtime counters are from this finite client suite. Live host scope is recorded separately."
+  },
+  {
+    "legacyAssertionId": "mcdev-nvim/tests/e2e/cem_project_e2e.lua::assert@687",
+    "oldCall": "h.helpers.assert_true(expanded_text:find('@Inject(method = \"\", at = @At(\"\"))',1,true) ~= nil,\n      'native snippet expansion must create the complete Inject annotation: ' .. expanded_text)",
+    "newAssertionIds": [
+      "mcdev-nvim/tests/e2e/cem_feature_snippets.lua::assert@91"
+    ],
+    "newAssertions": [
+      {
+        "line": 91,
+        "call": "h.helpers.assert_true(expanded_text:find('@Inject(method = \"\", at = @At(\"\"))',1,true) ~= nil,\n    'native snippet expansion must create the complete Inject annotation: ' .. expanded_text)",
+        "path": "mcdev-nvim/tests/e2e/cem_feature_snippets.lua"
+      }
+    ],
+    "mapping": "reviewed exact source relocation",
+    "reason": "The original snippet assertions and five-row preserved-source input loop moved to the shared CEM helper. Member, Shadow and Blink workflows remain in the original file.",
+    "equivalentObservation": "Observe the replacement assertion site(s) mcdev-nvim/tests/e2e/cem_feature_snippets.lua::assert@91 and preserve the original input/result relationship for mcdev-nvim/tests/e2e/cem_project_e2e.lua::assert@687.",
+    "nativeStatus": "partial live scope; The four original feature-snippet scenarios now use actual provider responses and native snippet expansion with exact edits/imports, full buffers, tabstops, unsaved state and unchanged disk. Method/field selection, Shadow and Blink routing/cache assertions remain unverified; mocks do not count as live original coverage.",
+    "evidence": "build/nvim-test-logs/migration-current-20261101-014259296-syntax",
+    "scope": "Exact call text correspondence; runtime counters are from this finite client suite. Live host scope is recorded separately."
+  },
+  {
+    "legacyAssertionId": "mcdev-nvim/tests/e2e/cem_project_e2e.lua::assert@689",
+    "oldCall": "h.helpers.assert_true(expanded_text:find('import org.spongepowered.asm.mixin.injection.At;',1,true) ~= nil)",
+    "newAssertionIds": [
+      "mcdev-nvim/tests/e2e/cem_feature_snippets.lua::assert@93"
+    ],
+    "newAssertions": [
+      {
+        "line": 93,
+        "call": "h.helpers.assert_true(expanded_text:find('import org.spongepowered.asm.mixin.injection.At;',1,true) ~= nil)",
+        "path": "mcdev-nvim/tests/e2e/cem_feature_snippets.lua"
+      }
+    ],
+    "mapping": "reviewed exact source relocation",
+    "reason": "The original snippet assertions and five-row preserved-source input loop moved to the shared CEM helper. Member, Shadow and Blink workflows remain in the original file.",
+    "equivalentObservation": "Observe the replacement assertion site(s) mcdev-nvim/tests/e2e/cem_feature_snippets.lua::assert@93 and preserve the original input/result relationship for mcdev-nvim/tests/e2e/cem_project_e2e.lua::assert@689.",
+    "nativeStatus": "partial live scope; The four original feature-snippet scenarios now use actual provider responses and native snippet expansion with exact edits/imports, full buffers, tabstops, unsaved state and unchanged disk. Method/field selection, Shadow and Blink routing/cache assertions remain unverified; mocks do not count as live original coverage.",
+    "evidence": "build/nvim-test-logs/migration-current-20261101-014259296-syntax",
+    "scope": "Exact call text correspondence; runtime counters are from this finite client suite. Live host scope is recorded separately."
+  },
+  {
+    "legacyAssertionId": "mcdev-nvim/tests/e2e/cem_project_e2e.lua::assert@715",
+    "oldCall": "h.helpers.assert_true(finished, description .. ' completion did not finalize')",
+    "newAssertionIds": [
+      "mcdev-nvim/tests/e2e/cem_feature_snippets.lua::assert@121"
+    ],
+    "newAssertions": [
+      {
+        "line": 121,
+        "call": "h.helpers.assert_true(finished, description .. ' completion did not finalize')",
+        "path": "mcdev-nvim/tests/e2e/cem_feature_snippets.lua"
+      }
+    ],
+    "mapping": "reviewed exact source relocation",
+    "reason": "The original snippet assertions and five-row preserved-source input loop moved to the shared CEM helper. Member, Shadow and Blink workflows remain in the original file.",
+    "equivalentObservation": "Observe the replacement assertion site(s) mcdev-nvim/tests/e2e/cem_feature_snippets.lua::assert@121 and preserve the original input/result relationship for mcdev-nvim/tests/e2e/cem_project_e2e.lua::assert@715.",
+    "nativeStatus": "partial live scope; The four original feature-snippet scenarios now use actual provider responses and native snippet expansion with exact edits/imports, full buffers, tabstops, unsaved state and unchanged disk. Method/field selection, Shadow and Blink routing/cache assertions remain unverified; mocks do not count as live original coverage.",
+    "evidence": "build/nvim-test-logs/migration-current-20261101-014259296-syntax",
+    "scope": "Exact call text correspondence; runtime counters are from this finite client suite. Live host scope is recorded separately."
+  },
+  {
+    "legacyAssertionId": "mcdev-nvim/tests/e2e/cem_project_e2e.lua::assert@716",
+    "oldCall": "h.helpers.assert_nil(completion.last_error, description .. ' returned an error')",
+    "newAssertionIds": [
+      "mcdev-nvim/tests/e2e/cem_feature_snippets.lua::assert@122"
+    ],
+    "newAssertions": [
+      {
+        "line": 122,
+        "call": "h.helpers.assert_nil(completion.last_error, description .. ' returned an error')",
+        "path": "mcdev-nvim/tests/e2e/cem_feature_snippets.lua"
+      }
+    ],
+    "mapping": "reviewed exact source relocation",
+    "reason": "The original snippet assertions and five-row preserved-source input loop moved to the shared CEM helper. Member, Shadow and Blink workflows remain in the original file.",
+    "equivalentObservation": "Observe the replacement assertion site(s) mcdev-nvim/tests/e2e/cem_feature_snippets.lua::assert@122 and preserve the original input/result relationship for mcdev-nvim/tests/e2e/cem_project_e2e.lua::assert@716.",
+    "nativeStatus": "partial live scope; The four original feature-snippet scenarios now use actual provider responses and native snippet expansion with exact edits/imports, full buffers, tabstops, unsaved state and unchanged disk. Method/field selection, Shadow and Blink routing/cache assertions remain unverified; mocks do not count as live original coverage.",
+    "evidence": "build/nvim-test-logs/migration-current-20261101-014259296-syntax",
+    "scope": "Exact call text correspondence; runtime counters are from this finite client suite. Live host scope is recorded separately."
+  },
+  {
+    "legacyAssertionId": "mcdev-nvim/tests/e2e/cem_project_e2e.lua::assert@717",
+    "oldCall": "h.helpers.assert_nil(completion.last_project_transport_error, description .. ' project transport failed')",
+    "newAssertionIds": [
+      "mcdev-nvim/tests/e2e/cem_feature_snippets.lua::assert@123"
+    ],
+    "newAssertions": [
+      {
+        "line": 123,
+        "call": "h.helpers.assert_nil(completion.last_project_transport_error, description .. ' project transport failed')",
+        "path": "mcdev-nvim/tests/e2e/cem_feature_snippets.lua"
+      }
+    ],
+    "mapping": "reviewed exact source relocation",
+    "reason": "The original snippet assertions and five-row preserved-source input loop moved to the shared CEM helper. Member, Shadow and Blink workflows remain in the original file.",
+    "equivalentObservation": "Observe the replacement assertion site(s) mcdev-nvim/tests/e2e/cem_feature_snippets.lua::assert@123 and preserve the original input/result relationship for mcdev-nvim/tests/e2e/cem_project_e2e.lua::assert@717.",
+    "nativeStatus": "partial live scope; The four original feature-snippet scenarios now use actual provider responses and native snippet expansion with exact edits/imports, full buffers, tabstops, unsaved state and unchanged disk. Method/field selection, Shadow and Blink routing/cache assertions remain unverified; mocks do not count as live original coverage.",
+    "evidence": "build/nvim-test-logs/migration-current-20261101-014259296-syntax",
+    "scope": "Exact call text correspondence; runtime counters are from this finite client suite. Live host scope is recorded separately."
+  },
+  {
+    "legacyAssertionId": "mcdev-nvim/tests/e2e/cem_project_e2e.lua::assert@723",
+    "oldCall": "h.helpers.assert_eq(snippet.insertTextFormat, vim.lsp.protocol.InsertTextFormat.Snippet,\n        description .. ' must be a native snippet')",
+    "newAssertionIds": [
+      "mcdev-nvim/tests/e2e/cem_feature_snippets.lua::assert@129"
+    ],
+    "newAssertions": [
+      {
+        "line": 129,
+        "call": "h.helpers.assert_eq(snippet.insertTextFormat, vim.lsp.protocol.InsertTextFormat.Snippet,\n      description .. ' must be a native snippet')",
+        "path": "mcdev-nvim/tests/e2e/cem_feature_snippets.lua"
+      }
+    ],
+    "mapping": "reviewed exact source relocation",
+    "reason": "The original snippet assertions and five-row preserved-source input loop moved to the shared CEM helper. Member, Shadow and Blink workflows remain in the original file.",
+    "equivalentObservation": "Observe the replacement assertion site(s) mcdev-nvim/tests/e2e/cem_feature_snippets.lua::assert@129 and preserve the original input/result relationship for mcdev-nvim/tests/e2e/cem_project_e2e.lua::assert@723.",
+    "nativeStatus": "partial live scope; The four original feature-snippet scenarios now use actual provider responses and native snippet expansion with exact edits/imports, full buffers, tabstops, unsaved state and unchanged disk. Method/field selection, Shadow and Blink routing/cache assertions remain unverified; mocks do not count as live original coverage.",
+    "evidence": "build/nvim-test-logs/migration-current-20261101-014259296-syntax",
+    "scope": "Exact call text correspondence; runtime counters are from this finite client suite. Live host scope is recorded separately."
+  },
+  {
+    "legacyAssertionId": "mcdev-nvim/tests/e2e/cem_project_e2e.lua::assert@725",
+    "oldCall": "h.helpers.assert_eq(snippet.data and snippet.data.source, 'mixin.annotation',\n        description .. ' must come from the annotation snippet provider')",
+    "newAssertionIds": [
+      "mcdev-nvim/tests/e2e/cem_feature_snippets.lua::assert@131"
+    ],
+    "newAssertions": [
+      {
+        "line": 131,
+        "call": "h.helpers.assert_eq(snippet.data and snippet.data.source, 'mixin.annotation',\n      description .. ' must come from the annotation snippet provider')",
+        "path": "mcdev-nvim/tests/e2e/cem_feature_snippets.lua"
+      }
+    ],
+    "mapping": "reviewed exact source relocation",
+    "reason": "The original snippet assertions and five-row preserved-source input loop moved to the shared CEM helper. Member, Shadow and Blink workflows remain in the original file.",
+    "equivalentObservation": "Observe the replacement assertion site(s) mcdev-nvim/tests/e2e/cem_feature_snippets.lua::assert@131 and preserve the original input/result relationship for mcdev-nvim/tests/e2e/cem_project_e2e.lua::assert@725.",
+    "nativeStatus": "partial live scope; The four original feature-snippet scenarios now use actual provider responses and native snippet expansion with exact edits/imports, full buffers, tabstops, unsaved state and unchanged disk. Method/field selection, Shadow and Blink routing/cache assertions remain unverified; mocks do not count as live original coverage.",
+    "evidence": "build/nvim-test-logs/migration-current-20261101-014259296-syntax",
+    "scope": "Exact call text correspondence; runtime counters are from this finite client suite. Live host scope is recorded separately."
+  },
+  {
+    "legacyAssertionId": "mcdev-nvim/tests/e2e/cem_project_e2e.lua::assert@737",
+    "oldCall": "h.helpers.assert_true(ok, description .. ' native snippet expansion failed: ' .. tostring(err))",
+    "newAssertionIds": [
+      "mcdev-nvim/tests/e2e/cem_feature_snippets.lua::assert@144"
+    ],
+    "newAssertions": [
+      {
+        "line": 144,
+        "call": "h.helpers.assert_true(ok, description .. ' native snippet expansion failed: ' .. tostring(err))",
+        "path": "mcdev-nvim/tests/e2e/cem_feature_snippets.lua"
+      }
+    ],
+    "mapping": "reviewed exact source relocation",
+    "reason": "The original snippet assertions and five-row preserved-source input loop moved to the shared CEM helper. Member, Shadow and Blink workflows remain in the original file.",
+    "equivalentObservation": "Observe the replacement assertion site(s) mcdev-nvim/tests/e2e/cem_feature_snippets.lua::assert@144 and preserve the original input/result relationship for mcdev-nvim/tests/e2e/cem_project_e2e.lua::assert@737.",
+    "nativeStatus": "partial live scope; The four original feature-snippet scenarios now use actual provider responses and native snippet expansion with exact edits/imports, full buffers, tabstops, unsaved state and unchanged disk. Method/field selection, Shadow and Blink routing/cache assertions remain unverified; mocks do not count as live original coverage.",
+    "evidence": "build/nvim-test-logs/migration-current-20261101-014259296-syntax",
+    "scope": "Exact call text correspondence; runtime counters are from this finite client suite. Live host scope is recorded separately."
+  },
+  {
+    "legacyAssertionId": "mcdev-nvim/tests/e2e/cem_project_e2e.lua::assert@738",
+    "oldCall": "h.helpers.assert_true(type(vim.snippet.active) == 'function' and vim.snippet.active({direction = 1}),\n        description .. ' must enter a native snippet tabstop')",
+    "newAssertionIds": [
+      "mcdev-nvim/tests/e2e/cem_feature_snippets.lua::assert@145"
+    ],
+    "newAssertions": [
+      {
+        "line": 145,
+        "call": "h.helpers.assert_true(type(vim.snippet.active) == 'function' and vim.snippet.active({direction = 1}),\n      description .. ' must enter a native snippet tabstop')",
+        "path": "mcdev-nvim/tests/e2e/cem_feature_snippets.lua"
+      }
+    ],
+    "mapping": "reviewed exact source relocation",
+    "reason": "The original snippet assertions and five-row preserved-source input loop moved to the shared CEM helper. Member, Shadow and Blink workflows remain in the original file.",
+    "equivalentObservation": "Observe the replacement assertion site(s) mcdev-nvim/tests/e2e/cem_feature_snippets.lua::assert@145 and preserve the original input/result relationship for mcdev-nvim/tests/e2e/cem_project_e2e.lua::assert@738.",
+    "nativeStatus": "partial live scope; The four original feature-snippet scenarios now use actual provider responses and native snippet expansion with exact edits/imports, full buffers, tabstops, unsaved state and unchanged disk. Method/field selection, Shadow and Blink routing/cache assertions remain unverified; mocks do not count as live original coverage.",
+    "evidence": "build/nvim-test-logs/migration-current-20261101-014259296-syntax",
+    "scope": "Exact call text correspondence; runtime counters are from this finite client suite. Live host scope is recorded separately."
+  },
+  {
+    "legacyAssertionId": "mcdev-nvim/tests/e2e/cem_project_e2e.lua::assert@743",
+    "oldCall": "h.helpers.assert_true(expanded:find(expected_text, 1, true) ~= nil,\n        description .. ' default expansion mismatch: ' .. expanded)",
+    "newAssertionIds": [
+      "mcdev-nvim/tests/e2e/cem_feature_snippets.lua::assert@150"
+    ],
+    "newAssertions": [
+      {
+        "line": 150,
+        "call": "h.helpers.assert_true(expanded:find(expected_text, 1, true) ~= nil,\n      description .. ' default expansion mismatch: ' .. expanded)",
+        "path": "mcdev-nvim/tests/e2e/cem_feature_snippets.lua"
+      }
+    ],
+    "mapping": "reviewed exact source relocation",
+    "reason": "The original snippet assertions and five-row preserved-source input loop moved to the shared CEM helper. Member, Shadow and Blink workflows remain in the original file.",
+    "equivalentObservation": "Observe the replacement assertion site(s) mcdev-nvim/tests/e2e/cem_feature_snippets.lua::assert@150 and preserve the original input/result relationship for mcdev-nvim/tests/e2e/cem_project_e2e.lua::assert@743.",
+    "nativeStatus": "partial live scope; The four original feature-snippet scenarios now use actual provider responses and native snippet expansion with exact edits/imports, full buffers, tabstops, unsaved state and unchanged disk. Method/field selection, Shadow and Blink routing/cache assertions remain unverified; mocks do not count as live original coverage.",
+    "evidence": "build/nvim-test-logs/migration-current-20261101-014259296-syntax",
+    "scope": "Exact call text correspondence; runtime counters are from this finite client suite. Live host scope is recorded separately."
+  },
+  {
+    "legacyAssertionId": "mcdev-nvim/tests/e2e/cem_project_e2e.lua::assert@746",
+    "oldCall": "h.helpers.assert_true(expanded:find(import_name, 1, true) ~= nil,\n          description .. ' missing required import ' .. import_name)",
+    "newAssertionIds": [
+      "mcdev-nvim/tests/e2e/cem_feature_snippets.lua::assert@153"
+    ],
+    "newAssertions": [
+      {
+        "line": 153,
+        "call": "h.helpers.assert_true(expanded:find(import_name, 1, true) ~= nil,\n        description .. ' missing required import ' .. import_name)",
+        "path": "mcdev-nvim/tests/e2e/cem_feature_snippets.lua"
+      }
+    ],
+    "mapping": "reviewed exact source relocation",
+    "reason": "The original snippet assertions and five-row preserved-source input loop moved to the shared CEM helper. Member, Shadow and Blink workflows remain in the original file.",
+    "equivalentObservation": "Observe the replacement assertion site(s) mcdev-nvim/tests/e2e/cem_feature_snippets.lua::assert@153 and preserve the original input/result relationship for mcdev-nvim/tests/e2e/cem_project_e2e.lua::assert@746.",
+    "nativeStatus": "partial live scope; The four original feature-snippet scenarios now use actual provider responses and native snippet expansion with exact edits/imports, full buffers, tabstops, unsaved state and unchanged disk. Method/field selection, Shadow and Blink routing/cache assertions remain unverified; mocks do not count as live original coverage.",
+    "evidence": "build/nvim-test-logs/migration-current-20261101-014259296-syntax",
+    "scope": "Exact call text correspondence; runtime counters are from this finite client suite. Live host scope is recorded separately."
+  },
+  {
+    "legacyAssertionId": "mcdev-nvim/tests/e2e/cem_project_e2e.lua::assert@756",
+    "oldCall": "h.helpers.assert_true(expanded:find(preserved, 1, true) ~= nil,\n          description .. ' did not preserve ' .. preserved)",
+    "newAssertionIds": [
+      "mcdev-nvim/tests/e2e/cem_feature_snippets.lua::assert@163"
+    ],
+    "newAssertions": [
+      {
+        "line": 163,
+        "call": "h.helpers.assert_true(expanded:find(preserved, 1, true) ~= nil,\n        description .. ' did not preserve ' .. preserved)",
+        "path": "mcdev-nvim/tests/e2e/cem_feature_snippets.lua"
+      }
+    ],
+    "mapping": "reviewed exact source relocation",
+    "reason": "The original snippet assertions and five-row preserved-source input loop moved to the shared CEM helper. Member, Shadow and Blink workflows remain in the original file.",
+    "equivalentObservation": "Observe the replacement assertion site(s) mcdev-nvim/tests/e2e/cem_feature_snippets.lua::assert@163 and preserve the original input/result relationship for mcdev-nvim/tests/e2e/cem_project_e2e.lua::assert@756.",
+    "nativeStatus": "partial live scope; The four original feature-snippet scenarios now use actual provider responses and native snippet expansion with exact edits/imports, full buffers, tabstops, unsaved state and unchanged disk. Method/field selection, Shadow and Blink routing/cache assertions remain unverified; mocks do not count as live original coverage.",
+    "evidence": "build/nvim-test-logs/migration-current-20261101-014259296-syntax",
+    "scope": "Exact call text correspondence; runtime counters are from this finite client suite. Live host scope is recorded separately."
+  },
+  {
+    "legacyAssertionId": "mcdev-nvim/tests/e2e/cem_project_e2e.lua::assert@760",
+    "oldCall": "h.helpers.assert_eq(table.concat(vim.fn.readfile(h.mixin_file), '\\n'), disk_source,\n        description .. ' must not modify the project source on disk')",
+    "newAssertionIds": [
+      "mcdev-nvim/tests/e2e/cem_feature_snippets.lua::assert@168"
+    ],
+    "newAssertions": [
+      {
+        "line": 168,
+        "call": "h.helpers.assert_eq(table.concat(vim.fn.readfile(h.mixin_file), '\\n'), disk_source,\n      description .. ' must not modify the project source on disk')",
+        "path": "mcdev-nvim/tests/e2e/cem_feature_snippets.lua"
+      }
+    ],
+    "mapping": "reviewed exact source relocation",
+    "reason": "The original snippet assertions and five-row preserved-source input loop moved to the shared CEM helper. Member, Shadow and Blink workflows remain in the original file.",
+    "equivalentObservation": "Observe the replacement assertion site(s) mcdev-nvim/tests/e2e/cem_feature_snippets.lua::assert@168 and preserve the original input/result relationship for mcdev-nvim/tests/e2e/cem_project_e2e.lua::assert@760.",
+    "nativeStatus": "partial live scope; The four original feature-snippet scenarios now use actual provider responses and native snippet expansion with exact edits/imports, full buffers, tabstops, unsaved state and unchanged disk. Method/field selection, Shadow and Blink routing/cache assertions remain unverified; mocks do not count as live original coverage.",
+    "evidence": "build/nvim-test-logs/migration-current-20261101-014259296-syntax",
+    "scope": "Exact call text correspondence; runtime counters are from this finite client suite. Live host scope is recorded separately."
+  },
+  {
     "legacyAssertionId": "mcdev-nvim/tests/e2e/create_drill_definition_diagnostics_e2e.lua::assert@56",
     "oldCall": "helpers.assert_true(started, method .. \" request did not start\")",
     "newAssertionIds": [
@@ -275,25 +575,25 @@
     "reason": "Native executable availability/artifact identity replaces a JVM extension artifact and JDT launcher.",
     "equivalentObservation": "Pending real indexed editor/MC host observation: execute the original input against the native host and compare the original expected result; this record does not claim a client-only pass.",
     "nativeStatus": "pending real host E2E",
-    "evidence": "build/nvim-test-logs/native-client-final-syntax"
+    "evidence": "build/nvim-test-logs/migration-current-20261101-014259296-syntax"
   },
   {
     "legacyAssertionId": "mcdev-nvim/tests/e2e/jdtls_bundle_e2e.lua::assert@40",
     "oldCall": "helpers.assert_true(vim.fn.filereadable(bundle_jar) == 1, \"bundle jar must exist: \" .. bundle_jar)",
     "newAssertionIds": [
-      "mcdev-nvim/tests/e2e/jdtls_bundle_e2e.lua::assert@31"
+      "mcdev-nvim/tests/e2e/jdtls_bundle_e2e.lua::assert@30"
     ],
     "newAssertions": [
       {
-        "line": 31,
+        "line": 30,
         "call": "helpers.assert_true(vim.fn.executable(ktlsp_cmd) == 1, \"ktlsp executable must exist: \" .. ktlsp_cmd)"
       }
     ],
-    "mapping": "explicit replacement-hunk assertion mapping",
+    "mapping": "replacement-hunk observer candidate; equivalence requires the recorded scope",
     "reason": "Native executable availability/artifact identity replaces a JVM extension artifact and JDT launcher.",
-    "equivalentObservation": "Observe the replacement assertion site(s) mcdev-nvim/tests/e2e/jdtls_bundle_e2e.lua::assert@31 and preserve the original input/result relationship for mcdev-nvim/tests/e2e/jdtls_bundle_e2e.lua::assert@40.",
+    "equivalentObservation": "Observe the replacement assertion site(s) mcdev-nvim/tests/e2e/jdtls_bundle_e2e.lua::assert@30 and preserve the original input/result relationship for mcdev-nvim/tests/e2e/jdtls_bundle_e2e.lua::assert@40.",
     "nativeStatus": "pending real host E2E",
-    "evidence": "build/nvim-test-logs/native-client-final-syntax"
+    "evidence": "build/nvim-test-logs/migration-current-20261101-014259296-syntax"
   },
   {
     "legacyAssertionId": "mcdev-nvim/tests/e2e/jdtls_bundle_e2e.lua::assert@126",
@@ -304,25 +604,36 @@
     "reason": "This original editor-host operation remains pending real MC host observation; no client-only equivalent is claimed as an E2E pass.",
     "equivalentObservation": "Pending real indexed editor/MC host observation: execute the original input against the native host and compare the original expected result; this record does not claim a client-only pass.",
     "nativeStatus": "pending real host E2E",
-    "evidence": "build/nvim-test-logs/native-client-final-syntax"
+    "evidence": "build/nvim-test-logs/migration-current-20261101-014259296-syntax"
+  },
+  {
+    "legacyAssertionId": "mcdev-nvim/tests/e2e/jdtls_bundle_e2e.lua::assert@262",
+    "oldCall": "helpers.assert_true(completed, method .. \" timed out\")",
+    "newAssertionIds": [],
+    "newAssertions": [],
+    "mapping": "explicit host-pending assertion with required observer",
+    "reason": "This original editor-host operation remains pending real MC host observation; no client-only equivalent is claimed as an E2E pass.",
+    "equivalentObservation": "Pending real indexed editor/MC host observation: execute the original input against the native host and compare the original expected result; this record does not claim a client-only pass.",
+    "nativeStatus": "pending real host E2E",
+    "evidence": "build/nvim-test-logs/migration-current-20261101-014259296-syntax"
   },
   {
     "legacyAssertionId": "mcdev-nvim/tests/e2e/jdtls_bundle_e2e.lua::assert@321",
     "oldCall": "helpers.assert_eq(\n    vim.v.shell_error,\n    0,\n    \"javac failed for \" .. source_path .. \": \" .. table.concat(output or {}, \"\\n\")\n  )",
     "newAssertionIds": [
-      "mcdev-nvim/tests/e2e/jdtls_bundle_e2e.lua::assert@233"
+      "mcdev-nvim/tests/e2e/jdtls_bundle_e2e.lua::assert@225"
     ],
     "newAssertions": [
       {
-        "line": 233,
+        "line": 225,
         "call": "helpers.assert_eq(settled and result.code or 124, 0, \"Gradle compile failed for \" .. source_path .. \"; logs \" .. prefix)"
       }
     ],
-    "mapping": "explicit replacement-hunk assertion mapping",
+    "mapping": "replacement-hunk observer candidate; equivalence requires the recorded scope",
     "reason": "This original editor-host operation remains pending real MC host observation; no client-only equivalent is claimed as an E2E pass.",
-    "equivalentObservation": "Observe the replacement assertion site(s) mcdev-nvim/tests/e2e/jdtls_bundle_e2e.lua::assert@233 and preserve the original input/result relationship for mcdev-nvim/tests/e2e/jdtls_bundle_e2e.lua::assert@321.",
+    "equivalentObservation": "Observe the replacement assertion site(s) mcdev-nvim/tests/e2e/jdtls_bundle_e2e.lua::assert@225 and preserve the original input/result relationship for mcdev-nvim/tests/e2e/jdtls_bundle_e2e.lua::assert@321.",
     "nativeStatus": "pending real host E2E",
-    "evidence": "build/nvim-test-logs/native-client-final-syntax"
+    "evidence": "build/nvim-test-logs/migration-current-20261101-014259296-syntax"
   },
   {
     "legacyAssertionId": "mcdev-nvim/tests/e2e/jdtls_bundle_e2e.lua::assert@430",
@@ -333,7 +644,7 @@
     "reason": "Host-neutral client naming or typed native metadata; original semantic effect and routing/cancellation assertion retained. Unavailable real host operations stay pending.",
     "equivalentObservation": "Pending real indexed editor/MC host observation: execute the original input against the native host and compare the original expected result; this record does not claim a client-only pass.",
     "nativeStatus": "pending real host E2E",
-    "evidence": "build/nvim-test-logs/native-client-final-syntax"
+    "evidence": "build/nvim-test-logs/migration-current-20261101-014259296-syntax"
   },
   {
     "legacyAssertionId": "mcdev-nvim/tests/e2e/jdtls_bundle_e2e.lua::assert@432",
@@ -344,7 +655,7 @@
     "reason": "Host-neutral client naming or typed native metadata; original semantic effect and routing/cancellation assertion retained. Unavailable real host operations stay pending.",
     "equivalentObservation": "Pending real indexed editor/MC host observation: execute the original input against the native host and compare the original expected result; this record does not claim a client-only pass.",
     "nativeStatus": "pending real host E2E",
-    "evidence": "build/nvim-test-logs/native-client-final-syntax"
+    "evidence": "build/nvim-test-logs/migration-current-20261101-014259296-syntax"
   },
   {
     "legacyAssertionId": "mcdev-nvim/tests/e2e/jdtls_bundle_e2e.lua::assert@440",
@@ -355,7 +666,7 @@
     "reason": "This original editor-host operation remains pending real MC host observation; no client-only equivalent is claimed as an E2E pass.",
     "equivalentObservation": "Pending real indexed editor/MC host observation: execute the original input against the native host and compare the original expected result; this record does not claim a client-only pass.",
     "nativeStatus": "pending real host E2E",
-    "evidence": "build/nvim-test-logs/native-client-final-syntax"
+    "evidence": "build/nvim-test-logs/migration-current-20261101-014259296-syntax"
   },
   {
     "legacyAssertionId": "mcdev-nvim/tests/e2e/jdtls_bundle_e2e.lua::assert@441",
@@ -366,7 +677,7 @@
     "reason": "This original editor-host operation remains pending real MC host observation; no client-only equivalent is claimed as an E2E pass.",
     "equivalentObservation": "Pending real indexed editor/MC host observation: execute the original input against the native host and compare the original expected result; this record does not claim a client-only pass.",
     "nativeStatus": "pending real host E2E",
-    "evidence": "build/nvim-test-logs/native-client-final-syntax"
+    "evidence": "build/nvim-test-logs/migration-current-20261101-014259296-syntax"
   },
   {
     "legacyAssertionId": "mcdev-nvim/tests/e2e/jdtls_bundle_e2e.lua::assert@442",
@@ -377,7 +688,7 @@
     "reason": "This original editor-host operation remains pending real MC host observation; no client-only equivalent is claimed as an E2E pass.",
     "equivalentObservation": "Pending real indexed editor/MC host observation: execute the original input against the native host and compare the original expected result; this record does not claim a client-only pass.",
     "nativeStatus": "pending real host E2E",
-    "evidence": "build/nvim-test-logs/native-client-final-syntax"
+    "evidence": "build/nvim-test-logs/migration-current-20261101-014259296-syntax"
   },
   {
     "legacyAssertionId": "mcdev-nvim/tests/e2e/jdtls_bundle_e2e.lua::assert@443",
@@ -388,7 +699,7 @@
     "reason": "This original editor-host operation remains pending real MC host observation; no client-only equivalent is claimed as an E2E pass.",
     "equivalentObservation": "Pending real indexed editor/MC host observation: execute the original input against the native host and compare the original expected result; this record does not claim a client-only pass.",
     "nativeStatus": "pending real host E2E",
-    "evidence": "build/nvim-test-logs/native-client-final-syntax"
+    "evidence": "build/nvim-test-logs/migration-current-20261101-014259296-syntax"
   },
   {
     "legacyAssertionId": "mcdev-nvim/tests/e2e/jdtls_bundle_e2e.lua::assert@456",
@@ -399,7 +710,7 @@
     "reason": "This original editor-host operation remains pending real MC host observation; no client-only equivalent is claimed as an E2E pass.",
     "equivalentObservation": "Pending real indexed editor/MC host observation: execute the original input against the native host and compare the original expected result; this record does not claim a client-only pass.",
     "nativeStatus": "pending real host E2E",
-    "evidence": "build/nvim-test-logs/native-client-final-syntax"
+    "evidence": "build/nvim-test-logs/migration-current-20261101-014259296-syntax"
   },
   {
     "legacyAssertionId": "mcdev-nvim/tests/e2e/jdtls_bundle_e2e.lua::assert@458",
@@ -410,7 +721,7 @@
     "reason": "This original editor-host operation remains pending real MC host observation; no client-only equivalent is claimed as an E2E pass.",
     "equivalentObservation": "Pending real indexed editor/MC host observation: execute the original input against the native host and compare the original expected result; this record does not claim a client-only pass.",
     "nativeStatus": "pending real host E2E",
-    "evidence": "build/nvim-test-logs/native-client-final-syntax"
+    "evidence": "build/nvim-test-logs/migration-current-20261101-014259296-syntax"
   },
   {
     "legacyAssertionId": "mcdev-nvim/tests/e2e/jdtls_bundle_e2e.lua::assert@459",
@@ -421,7 +732,7 @@
     "reason": "This original editor-host operation remains pending real MC host observation; no client-only equivalent is claimed as an E2E pass.",
     "equivalentObservation": "Pending real indexed editor/MC host observation: execute the original input against the native host and compare the original expected result; this record does not claim a client-only pass.",
     "nativeStatus": "pending real host E2E",
-    "evidence": "build/nvim-test-logs/native-client-final-syntax"
+    "evidence": "build/nvim-test-logs/migration-current-20261101-014259296-syntax"
   },
   {
     "legacyAssertionId": "mcdev-nvim/tests/e2e/jdtls_bundle_e2e.lua::assert@466",
@@ -432,7 +743,7 @@
     "reason": "This original editor-host operation remains pending real MC host observation; no client-only equivalent is claimed as an E2E pass.",
     "equivalentObservation": "Pending real indexed editor/MC host observation: execute the original input against the native host and compare the original expected result; this record does not claim a client-only pass.",
     "nativeStatus": "pending real host E2E",
-    "evidence": "build/nvim-test-logs/native-client-final-syntax"
+    "evidence": "build/nvim-test-logs/migration-current-20261101-014259296-syntax"
   },
   {
     "legacyAssertionId": "mcdev-nvim/tests/e2e/jdtls_bundle_e2e.lua::assert@467",
@@ -443,7 +754,7 @@
     "reason": "Use HOST_NORMALIZED, HIGH confidence and an authoritative projectSessionVersion; never claim JDT object use.",
     "equivalentObservation": "Pending real indexed editor/MC host observation: execute the original input against the native host and compare the original expected result; this record does not claim a client-only pass.",
     "nativeStatus": "pending real host E2E",
-    "evidence": "build/nvim-test-logs/native-client-final-syntax"
+    "evidence": "build/nvim-test-logs/migration-current-20261101-014259296-syntax"
   },
   {
     "legacyAssertionId": "mcdev-nvim/tests/e2e/jdtls_bundle_e2e.lua::assert@472",
@@ -454,7 +765,7 @@
     "reason": "This original editor-host operation remains pending real MC host observation; no client-only equivalent is claimed as an E2E pass.",
     "equivalentObservation": "Pending real indexed editor/MC host observation: execute the original input against the native host and compare the original expected result; this record does not claim a client-only pass.",
     "nativeStatus": "pending real host E2E",
-    "evidence": "build/nvim-test-logs/native-client-final-syntax"
+    "evidence": "build/nvim-test-logs/migration-current-20261101-014259296-syntax"
   },
   {
     "legacyAssertionId": "mcdev-nvim/tests/e2e/jdtls_bundle_e2e.lua::assert@474",
@@ -465,7 +776,7 @@
     "reason": "This original editor-host operation remains pending real MC host observation; no client-only equivalent is claimed as an E2E pass.",
     "equivalentObservation": "Pending real indexed editor/MC host observation: execute the original input against the native host and compare the original expected result; this record does not claim a client-only pass.",
     "nativeStatus": "pending real host E2E",
-    "evidence": "build/nvim-test-logs/native-client-final-syntax"
+    "evidence": "build/nvim-test-logs/migration-current-20261101-014259296-syntax"
   },
   {
     "legacyAssertionId": "mcdev-nvim/tests/e2e/jdtls_bundle_e2e.lua::assert@476",
@@ -476,7 +787,7 @@
     "reason": "This original editor-host operation remains pending real MC host observation; no client-only equivalent is claimed as an E2E pass.",
     "equivalentObservation": "Pending real indexed editor/MC host observation: execute the original input against the native host and compare the original expected result; this record does not claim a client-only pass.",
     "nativeStatus": "pending real host E2E",
-    "evidence": "build/nvim-test-logs/native-client-final-syntax"
+    "evidence": "build/nvim-test-logs/migration-current-20261101-014259296-syntax"
   },
   {
     "legacyAssertionId": "mcdev-nvim/tests/e2e/jdtls_bundle_e2e.lua::assert@477",
@@ -487,7 +798,7 @@
     "reason": "This original editor-host operation remains pending real MC host observation; no client-only equivalent is claimed as an E2E pass.",
     "equivalentObservation": "Pending real indexed editor/MC host observation: execute the original input against the native host and compare the original expected result; this record does not claim a client-only pass.",
     "nativeStatus": "pending real host E2E",
-    "evidence": "build/nvim-test-logs/native-client-final-syntax"
+    "evidence": "build/nvim-test-logs/migration-current-20261101-014259296-syntax"
   },
   {
     "legacyAssertionId": "mcdev-nvim/tests/e2e/jdtls_bundle_e2e.lua::assert@478",
@@ -498,7 +809,7 @@
     "reason": "This original editor-host operation remains pending real MC host observation; no client-only equivalent is claimed as an E2E pass.",
     "equivalentObservation": "Pending real indexed editor/MC host observation: execute the original input against the native host and compare the original expected result; this record does not claim a client-only pass.",
     "nativeStatus": "pending real host E2E",
-    "evidence": "build/nvim-test-logs/native-client-final-syntax"
+    "evidence": "build/nvim-test-logs/migration-current-20261101-014259296-syntax"
   },
   {
     "legacyAssertionId": "mcdev-nvim/tests/e2e/jdtls_bundle_e2e.lua::assert@485",
@@ -509,7 +820,7 @@
     "reason": "This original editor-host operation remains pending real MC host observation; no client-only equivalent is claimed as an E2E pass.",
     "equivalentObservation": "Pending real indexed editor/MC host observation: execute the original input against the native host and compare the original expected result; this record does not claim a client-only pass.",
     "nativeStatus": "pending real host E2E",
-    "evidence": "build/nvim-test-logs/native-client-final-syntax"
+    "evidence": "build/nvim-test-logs/migration-current-20261101-014259296-syntax"
   },
   {
     "legacyAssertionId": "mcdev-nvim/tests/e2e/jdtls_bundle_e2e.lua::assert@513",
@@ -520,7 +831,7 @@
     "reason": "This original editor-host operation remains pending real MC host observation; no client-only equivalent is claimed as an E2E pass.",
     "equivalentObservation": "Pending real indexed editor/MC host observation: execute the original input against the native host and compare the original expected result; this record does not claim a client-only pass.",
     "nativeStatus": "pending real host E2E",
-    "evidence": "build/nvim-test-logs/native-client-final-syntax"
+    "evidence": "build/nvim-test-logs/migration-current-20261101-014259296-syntax"
   },
   {
     "legacyAssertionId": "mcdev-nvim/tests/e2e/jdtls_bundle_e2e.lua::assert@514",
@@ -531,7 +842,7 @@
     "reason": "This original editor-host operation remains pending real MC host observation; no client-only equivalent is claimed as an E2E pass.",
     "equivalentObservation": "Pending real indexed editor/MC host observation: execute the original input against the native host and compare the original expected result; this record does not claim a client-only pass.",
     "nativeStatus": "pending real host E2E",
-    "evidence": "build/nvim-test-logs/native-client-final-syntax"
+    "evidence": "build/nvim-test-logs/migration-current-20261101-014259296-syntax"
   },
   {
     "legacyAssertionId": "mcdev-nvim/tests/e2e/jdtls_bundle_e2e.lua::assert@518",
@@ -542,7 +853,7 @@
     "reason": "This original editor-host operation remains pending real MC host observation; no client-only equivalent is claimed as an E2E pass.",
     "equivalentObservation": "Pending real indexed editor/MC host observation: execute the original input against the native host and compare the original expected result; this record does not claim a client-only pass.",
     "nativeStatus": "pending real host E2E",
-    "evidence": "build/nvim-test-logs/native-client-final-syntax"
+    "evidence": "build/nvim-test-logs/migration-current-20261101-014259296-syntax"
   },
   {
     "legacyAssertionId": "mcdev-nvim/tests/e2e/jdtls_bundle_e2e.lua::assert@525",
@@ -553,7 +864,7 @@
     "reason": "This original editor-host operation remains pending real MC host observation; no client-only equivalent is claimed as an E2E pass.",
     "equivalentObservation": "Pending real indexed editor/MC host observation: execute the original input against the native host and compare the original expected result; this record does not claim a client-only pass.",
     "nativeStatus": "pending real host E2E",
-    "evidence": "build/nvim-test-logs/native-client-final-syntax"
+    "evidence": "build/nvim-test-logs/migration-current-20261101-014259296-syntax"
   },
   {
     "legacyAssertionId": "mcdev-nvim/tests/e2e/jdtls_bundle_e2e.lua::assert@526",
@@ -564,7 +875,7 @@
     "reason": "Existing generic selected-source file URI/read replaces JDT virtual classfile source; same declaration identity/text/range remains required.",
     "equivalentObservation": "Pending real indexed editor/MC host observation: execute the original input against the native host and compare the original expected result; this record does not claim a client-only pass.",
     "nativeStatus": "pending real host E2E",
-    "evidence": "build/nvim-test-logs/native-client-final-syntax"
+    "evidence": "build/nvim-test-logs/migration-current-20261101-014259296-syntax"
   },
   {
     "legacyAssertionId": "mcdev-nvim/tests/e2e/jdtls_bundle_e2e.lua::assert@527",
@@ -575,7 +886,7 @@
     "reason": "This original editor-host operation remains pending real MC host observation; no client-only equivalent is claimed as an E2E pass.",
     "equivalentObservation": "Pending real indexed editor/MC host observation: execute the original input against the native host and compare the original expected result; this record does not claim a client-only pass.",
     "nativeStatus": "pending real host E2E",
-    "evidence": "build/nvim-test-logs/native-client-final-syntax"
+    "evidence": "build/nvim-test-logs/migration-current-20261101-014259296-syntax"
   },
   {
     "legacyAssertionId": "mcdev-nvim/tests/e2e/jdtls_bundle_e2e.lua::assert@531",
@@ -586,7 +897,7 @@
     "reason": "This original editor-host operation remains pending real MC host observation; no client-only equivalent is claimed as an E2E pass.",
     "equivalentObservation": "Pending real indexed editor/MC host observation: execute the original input against the native host and compare the original expected result; this record does not claim a client-only pass.",
     "nativeStatus": "pending real host E2E",
-    "evidence": "build/nvim-test-logs/native-client-final-syntax"
+    "evidence": "build/nvim-test-logs/migration-current-20261101-014259296-syntax"
   },
   {
     "legacyAssertionId": "mcdev-nvim/tests/e2e/jdtls_bundle_e2e.lua::assert@558",
@@ -597,7 +908,7 @@
     "reason": "This original editor-host operation remains pending real MC host observation; no client-only equivalent is claimed as an E2E pass.",
     "equivalentObservation": "Pending real indexed editor/MC host observation: execute the original input against the native host and compare the original expected result; this record does not claim a client-only pass.",
     "nativeStatus": "pending real host E2E",
-    "evidence": "build/nvim-test-logs/native-client-final-syntax"
+    "evidence": "build/nvim-test-logs/migration-current-20261101-014259296-syntax"
   },
   {
     "legacyAssertionId": "mcdev-nvim/tests/e2e/jdtls_bundle_e2e.lua::assert@560",
@@ -608,7 +919,7 @@
     "reason": "Host-neutral client naming or typed native metadata; original semantic effect and routing/cancellation assertion retained. Unavailable real host operations stay pending.",
     "equivalentObservation": "Pending real indexed editor/MC host observation: execute the original input against the native host and compare the original expected result; this record does not claim a client-only pass.",
     "nativeStatus": "pending real host E2E",
-    "evidence": "build/nvim-test-logs/native-client-final-syntax"
+    "evidence": "build/nvim-test-logs/migration-current-20261101-014259296-syntax"
   },
   {
     "legacyAssertionId": "mcdev-nvim/tests/e2e/jdtls_bundle_e2e.lua::assert@561",
@@ -619,7 +930,7 @@
     "reason": "This original editor-host operation remains pending real MC host observation; no client-only equivalent is claimed as an E2E pass.",
     "equivalentObservation": "Pending real indexed editor/MC host observation: execute the original input against the native host and compare the original expected result; this record does not claim a client-only pass.",
     "nativeStatus": "pending real host E2E",
-    "evidence": "build/nvim-test-logs/native-client-final-syntax"
+    "evidence": "build/nvim-test-logs/migration-current-20261101-014259296-syntax"
   },
   {
     "legacyAssertionId": "mcdev-nvim/tests/e2e/jdtls_bundle_e2e.lua::assert@703",
@@ -633,11 +944,11 @@
         "call": "helpers.assert_eq(debug.parseSource, \"HOST_NORMALIZED\")"
       }
     ],
-    "mapping": "explicit replacement-hunk assertion mapping",
+    "mapping": "replacement-hunk observer candidate; equivalence requires the recorded scope",
     "reason": "Use HOST_NORMALIZED, HIGH confidence and an authoritative projectSessionVersion; never claim JDT object use.",
     "equivalentObservation": "Observe the replacement assertion site(s) mcdev-nvim/tests/e2e/jdtls_bundle_e2e.lua::assert@454 and preserve the original input/result relationship for mcdev-nvim/tests/e2e/jdtls_bundle_e2e.lua::assert@703.",
     "nativeStatus": "pending real host E2E",
-    "evidence": "build/nvim-test-logs/native-client-final-syntax"
+    "evidence": "build/nvim-test-logs/migration-current-20261101-014259296-syntax"
   },
   {
     "legacyAssertionId": "mcdev-nvim/tests/e2e/jdtls_bundle_e2e.lua::assert@704",
@@ -651,11 +962,11 @@
         "call": "helpers.assert_eq(debug.parseConfidence, \"HIGH\")"
       }
     ],
-    "mapping": "explicit replacement-hunk assertion mapping",
+    "mapping": "replacement-hunk observer candidate; equivalence requires the recorded scope",
     "reason": "Use HOST_NORMALIZED, HIGH confidence and an authoritative projectSessionVersion; never claim JDT object use.",
     "equivalentObservation": "Observe the replacement assertion site(s) mcdev-nvim/tests/e2e/jdtls_bundle_e2e.lua::assert@455 and preserve the original input/result relationship for mcdev-nvim/tests/e2e/jdtls_bundle_e2e.lua::assert@704.",
     "nativeStatus": "pending real host E2E",
-    "evidence": "build/nvim-test-logs/native-client-final-syntax"
+    "evidence": "build/nvim-test-logs/migration-current-20261101-014259296-syntax"
   },
   {
     "legacyAssertionId": "mcdev-nvim/tests/e2e/jdtls_bundle_e2e.lua::assert@705",
@@ -669,11 +980,11 @@
         "call": "helpers.assert_eq(debug.parseConfidence, \"HIGH\")"
       }
     ],
-    "mapping": "explicit replacement-hunk assertion mapping",
+    "mapping": "replacement-hunk observer candidate; equivalence requires the recorded scope",
     "reason": "Use HOST_NORMALIZED, HIGH confidence and an authoritative projectSessionVersion; never claim JDT object use.",
     "equivalentObservation": "Observe the replacement assertion site(s) mcdev-nvim/tests/e2e/jdtls_bundle_e2e.lua::assert@455 and preserve the original input/result relationship for mcdev-nvim/tests/e2e/jdtls_bundle_e2e.lua::assert@705.",
     "nativeStatus": "pending real host E2E",
-    "evidence": "build/nvim-test-logs/native-client-final-syntax"
+    "evidence": "build/nvim-test-logs/migration-current-20261101-014259296-syntax"
   },
   {
     "legacyAssertionId": "mcdev-nvim/tests/e2e/jdtls_bundle_e2e.lua::assert@706",
@@ -687,11 +998,11 @@
         "call": "helpers.assert_true((debug.bindingResolvedCount or 0) > 0, \"completion debug should resolve host bindings\")"
       }
     ],
-    "mapping": "explicit replacement-hunk assertion mapping",
+    "mapping": "replacement-hunk observer candidate; equivalence requires the recorded scope",
     "reason": "Host-neutral client naming or typed native metadata; original semantic effect and routing/cancellation assertion retained. Unavailable real host operations stay pending.",
     "equivalentObservation": "Observe the replacement assertion site(s) mcdev-nvim/tests/e2e/jdtls_bundle_e2e.lua::assert@457 and preserve the original input/result relationship for mcdev-nvim/tests/e2e/jdtls_bundle_e2e.lua::assert@706.",
     "nativeStatus": "pending real host E2E",
-    "evidence": "build/nvim-test-logs/native-client-final-syntax"
+    "evidence": "build/nvim-test-logs/migration-current-20261101-014259296-syntax"
   },
   {
     "legacyAssertionId": "mcdev-nvim/tests/e2e/jdtls_bundle_e2e.lua::assert@756",
@@ -705,11 +1016,11 @@
         "call": "helpers.assert_eq(client_debug.parseSource, \"HOST_NORMALIZED\")"
       }
     ],
-    "mapping": "explicit replacement-hunk assertion mapping",
+    "mapping": "replacement-hunk observer candidate; equivalence requires the recorded scope",
     "reason": "Use HOST_NORMALIZED, HIGH confidence and an authoritative projectSessionVersion; never claim JDT object use.",
     "equivalentObservation": "Observe the replacement assertion site(s) mcdev-nvim/tests/e2e/jdtls_bundle_e2e.lua::assert@507 and preserve the original input/result relationship for mcdev-nvim/tests/e2e/jdtls_bundle_e2e.lua::assert@756.",
     "nativeStatus": "pending real host E2E",
-    "evidence": "build/nvim-test-logs/native-client-final-syntax"
+    "evidence": "build/nvim-test-logs/migration-current-20261101-014259296-syntax"
   },
   {
     "legacyAssertionId": "mcdev-nvim/tests/e2e/jdtls_bundle_e2e.lua::assert@757",
@@ -723,11 +1034,11 @@
         "call": "helpers.assert_eq(client_debug.parseConfidence, \"HIGH\")"
       }
     ],
-    "mapping": "explicit replacement-hunk assertion mapping",
+    "mapping": "replacement-hunk observer candidate; equivalence requires the recorded scope",
     "reason": "Use HOST_NORMALIZED, HIGH confidence and an authoritative projectSessionVersion; never claim JDT object use.",
     "equivalentObservation": "Observe the replacement assertion site(s) mcdev-nvim/tests/e2e/jdtls_bundle_e2e.lua::assert@508 and preserve the original input/result relationship for mcdev-nvim/tests/e2e/jdtls_bundle_e2e.lua::assert@757.",
     "nativeStatus": "pending real host E2E",
-    "evidence": "build/nvim-test-logs/native-client-final-syntax"
+    "evidence": "build/nvim-test-logs/migration-current-20261101-014259296-syntax"
   },
   {
     "legacyAssertionId": "mcdev-nvim/tests/e2e/jdtls_bundle_e2e.lua::assert@758",
@@ -741,11 +1052,11 @@
         "call": "helpers.assert_eq(client_debug.parseConfidence, \"HIGH\")"
       }
     ],
-    "mapping": "explicit replacement-hunk assertion mapping",
+    "mapping": "replacement-hunk observer candidate; equivalence requires the recorded scope",
     "reason": "Use HOST_NORMALIZED, HIGH confidence and an authoritative projectSessionVersion; never claim JDT object use.",
     "equivalentObservation": "Observe the replacement assertion site(s) mcdev-nvim/tests/e2e/jdtls_bundle_e2e.lua::assert@508 and preserve the original input/result relationship for mcdev-nvim/tests/e2e/jdtls_bundle_e2e.lua::assert@758.",
     "nativeStatus": "pending real host E2E",
-    "evidence": "build/nvim-test-logs/native-client-final-syntax"
+    "evidence": "build/nvim-test-logs/migration-current-20261101-014259296-syntax"
   },
   {
     "legacyAssertionId": "mcdev-nvim/tests/e2e/jdtls_bundle_e2e.lua::assert@773",
@@ -759,11 +1070,11 @@
         "call": "helpers.assert_true(health_output:find(\"parseConfidence: HIGH\", 1, true) ~= nil, health_output)"
       }
     ],
-    "mapping": "explicit replacement-hunk assertion mapping",
+    "mapping": "replacement-hunk observer candidate; equivalence requires the recorded scope",
     "reason": "Use HOST_NORMALIZED, HIGH confidence and an authoritative projectSessionVersion; never claim JDT object use.",
     "equivalentObservation": "Observe the replacement assertion site(s) mcdev-nvim/tests/e2e/jdtls_bundle_e2e.lua::assert@524 and preserve the original input/result relationship for mcdev-nvim/tests/e2e/jdtls_bundle_e2e.lua::assert@773.",
     "nativeStatus": "pending real host E2E",
-    "evidence": "build/nvim-test-logs/native-client-final-syntax"
+    "evidence": "build/nvim-test-logs/migration-current-20261101-014259296-syntax"
   },
   {
     "legacyAssertionId": "mcdev-nvim/tests/e2e/jdtls_bundle_e2e.lua::assert@780",
@@ -777,11 +1088,11 @@
         "call": "helpers.assert_true(debug_completion_output:find(\"parse source: HOST_NORMALIZED\", 1, true) ~= nil, debug_completion_output)"
       }
     ],
-    "mapping": "explicit replacement-hunk assertion mapping",
+    "mapping": "replacement-hunk observer candidate; equivalence requires the recorded scope",
     "reason": "Use HOST_NORMALIZED, HIGH confidence and an authoritative projectSessionVersion; never claim JDT object use.",
     "equivalentObservation": "Observe the replacement assertion site(s) mcdev-nvim/tests/e2e/jdtls_bundle_e2e.lua::assert@531 and preserve the original input/result relationship for mcdev-nvim/tests/e2e/jdtls_bundle_e2e.lua::assert@780.",
     "nativeStatus": "pending real host E2E",
-    "evidence": "build/nvim-test-logs/native-client-final-syntax"
+    "evidence": "build/nvim-test-logs/migration-current-20261101-014259296-syntax"
   },
   {
     "legacyAssertionId": "mcdev-nvim/tests/e2e/jdtls_bundle_e2e.lua::assert@858",
@@ -795,11 +1106,11 @@
         "call": "helpers.assert_eq(inject_debug.parseSource, \"HOST_NORMALIZED\")"
       }
     ],
-    "mapping": "explicit replacement-hunk assertion mapping",
+    "mapping": "replacement-hunk observer candidate; equivalence requires the recorded scope",
     "reason": "Use HOST_NORMALIZED, HIGH confidence and an authoritative projectSessionVersion; never claim JDT object use.",
     "equivalentObservation": "Observe the replacement assertion site(s) mcdev-nvim/tests/e2e/jdtls_bundle_e2e.lua::assert@609 and preserve the original input/result relationship for mcdev-nvim/tests/e2e/jdtls_bundle_e2e.lua::assert@858.",
     "nativeStatus": "pending real host E2E",
-    "evidence": "build/nvim-test-logs/native-client-final-syntax"
+    "evidence": "build/nvim-test-logs/migration-current-20261101-014259296-syntax"
   },
   {
     "legacyAssertionId": "mcdev-nvim/tests/e2e/jdtls_bundle_e2e.lua::assert@859",
@@ -813,11 +1124,11 @@
         "call": "helpers.assert_eq(inject_debug.parseConfidence, \"HIGH\")"
       }
     ],
-    "mapping": "explicit replacement-hunk assertion mapping",
+    "mapping": "replacement-hunk observer candidate; equivalence requires the recorded scope",
     "reason": "Use HOST_NORMALIZED, HIGH confidence and an authoritative projectSessionVersion; never claim JDT object use.",
     "equivalentObservation": "Observe the replacement assertion site(s) mcdev-nvim/tests/e2e/jdtls_bundle_e2e.lua::assert@610 and preserve the original input/result relationship for mcdev-nvim/tests/e2e/jdtls_bundle_e2e.lua::assert@859.",
     "nativeStatus": "pending real host E2E",
-    "evidence": "build/nvim-test-logs/native-client-final-syntax"
+    "evidence": "build/nvim-test-logs/migration-current-20261101-014259296-syntax"
   },
   {
     "legacyAssertionId": "mcdev-nvim/tests/e2e/jdtls_bundle_e2e.lua::assert@860",
@@ -831,11 +1142,11 @@
         "call": "helpers.assert_eq(inject_debug.parseConfidence, \"HIGH\")"
       }
     ],
-    "mapping": "explicit replacement-hunk assertion mapping",
+    "mapping": "replacement-hunk observer candidate; equivalence requires the recorded scope",
     "reason": "Use HOST_NORMALIZED, HIGH confidence and an authoritative projectSessionVersion; never claim JDT object use.",
     "equivalentObservation": "Observe the replacement assertion site(s) mcdev-nvim/tests/e2e/jdtls_bundle_e2e.lua::assert@610 and preserve the original input/result relationship for mcdev-nvim/tests/e2e/jdtls_bundle_e2e.lua::assert@860.",
     "nativeStatus": "pending real host E2E",
-    "evidence": "build/nvim-test-logs/native-client-final-syntax"
+    "evidence": "build/nvim-test-logs/migration-current-20261101-014259296-syntax"
   },
   {
     "legacyAssertionId": "mcdev-nvim/tests/e2e/jdtls_bundle_e2e.lua::assert@861",
@@ -849,11 +1160,11 @@
         "call": "helpers.assert_true((inject_debug.bindingResolvedCount or 0) > 0, \"inject completion debug should resolve host bindings\")"
       }
     ],
-    "mapping": "explicit replacement-hunk assertion mapping",
+    "mapping": "replacement-hunk observer candidate; equivalence requires the recorded scope",
     "reason": "Host-neutral client naming or typed native metadata; original semantic effect and routing/cancellation assertion retained. Unavailable real host operations stay pending.",
     "equivalentObservation": "Observe the replacement assertion site(s) mcdev-nvim/tests/e2e/jdtls_bundle_e2e.lua::assert@612 and preserve the original input/result relationship for mcdev-nvim/tests/e2e/jdtls_bundle_e2e.lua::assert@861.",
     "nativeStatus": "pending real host E2E",
-    "evidence": "build/nvim-test-logs/native-client-final-syntax"
+    "evidence": "build/nvim-test-logs/migration-current-20261101-014259296-syntax"
   },
   {
     "legacyAssertionId": "mcdev-nvim/tests/e2e/jdtls_bundle_e2e.lua::assert@921",
@@ -867,11 +1178,11 @@
         "call": "helpers.assert_eq(mixin_class_debug.parseSource, \"HOST_NORMALIZED\")"
       }
     ],
-    "mapping": "explicit replacement-hunk assertion mapping",
+    "mapping": "replacement-hunk observer candidate; equivalence requires the recorded scope",
     "reason": "Use HOST_NORMALIZED, HIGH confidence and an authoritative projectSessionVersion; never claim JDT object use.",
     "equivalentObservation": "Observe the replacement assertion site(s) mcdev-nvim/tests/e2e/jdtls_bundle_e2e.lua::assert@672 and preserve the original input/result relationship for mcdev-nvim/tests/e2e/jdtls_bundle_e2e.lua::assert@921.",
     "nativeStatus": "pending real host E2E",
-    "evidence": "build/nvim-test-logs/native-client-final-syntax"
+    "evidence": "build/nvim-test-logs/migration-current-20261101-014259296-syntax"
   },
   {
     "legacyAssertionId": "mcdev-nvim/tests/e2e/jdtls_bundle_e2e.lua::assert@922",
@@ -885,11 +1196,11 @@
         "call": "helpers.assert_eq(mixin_class_debug.parseConfidence, \"HIGH\")"
       }
     ],
-    "mapping": "explicit replacement-hunk assertion mapping",
+    "mapping": "replacement-hunk observer candidate; equivalence requires the recorded scope",
     "reason": "Use HOST_NORMALIZED, HIGH confidence and an authoritative projectSessionVersion; never claim JDT object use.",
     "equivalentObservation": "Observe the replacement assertion site(s) mcdev-nvim/tests/e2e/jdtls_bundle_e2e.lua::assert@674 and preserve the original input/result relationship for mcdev-nvim/tests/e2e/jdtls_bundle_e2e.lua::assert@922.",
     "nativeStatus": "pending real host E2E",
-    "evidence": "build/nvim-test-logs/native-client-final-syntax"
+    "evidence": "build/nvim-test-logs/migration-current-20261101-014259296-syntax"
   },
   {
     "legacyAssertionId": "mcdev-nvim/tests/e2e/jdtls_bundle_e2e.lua::assert@923",
@@ -903,11 +1214,11 @@
         "call": "helpers.assert_eq(mixin_class_debug.parseConfidence, \"HIGH\")"
       }
     ],
-    "mapping": "explicit replacement-hunk assertion mapping",
+    "mapping": "replacement-hunk observer candidate; equivalence requires the recorded scope",
     "reason": "Use HOST_NORMALIZED, HIGH confidence and an authoritative projectSessionVersion; never claim JDT object use.",
     "equivalentObservation": "Observe the replacement assertion site(s) mcdev-nvim/tests/e2e/jdtls_bundle_e2e.lua::assert@674 and preserve the original input/result relationship for mcdev-nvim/tests/e2e/jdtls_bundle_e2e.lua::assert@923.",
     "nativeStatus": "pending real host E2E",
-    "evidence": "build/nvim-test-logs/native-client-final-syntax"
+    "evidence": "build/nvim-test-logs/migration-current-20261101-014259296-syntax"
   },
   {
     "legacyAssertionId": "mcdev-nvim/tests/e2e/jdtls_bundle_e2e.lua::assert@966",
@@ -921,11 +1232,11 @@
         "call": "helpers.assert_eq(source_only_inject_debug.parseSource, \"HOST_NORMALIZED\")"
       }
     ],
-    "mapping": "explicit replacement-hunk assertion mapping",
+    "mapping": "replacement-hunk observer candidate; equivalence requires the recorded scope",
     "reason": "Use HOST_NORMALIZED, HIGH confidence and an authoritative projectSessionVersion; never claim JDT object use.",
     "equivalentObservation": "Observe the replacement assertion site(s) mcdev-nvim/tests/e2e/jdtls_bundle_e2e.lua::assert@717 and preserve the original input/result relationship for mcdev-nvim/tests/e2e/jdtls_bundle_e2e.lua::assert@966.",
     "nativeStatus": "pending real host E2E",
-    "evidence": "build/nvim-test-logs/native-client-final-syntax"
+    "evidence": "build/nvim-test-logs/migration-current-20261101-014259296-syntax"
   },
   {
     "legacyAssertionId": "mcdev-nvim/tests/e2e/jdtls_bundle_e2e.lua::assert@967",
@@ -939,11 +1250,11 @@
         "call": "helpers.assert_eq(source_only_inject_debug.parseConfidence, \"HIGH\")"
       }
     ],
-    "mapping": "explicit replacement-hunk assertion mapping",
+    "mapping": "replacement-hunk observer candidate; equivalence requires the recorded scope",
     "reason": "Use HOST_NORMALIZED, HIGH confidence and an authoritative projectSessionVersion; never claim JDT object use.",
     "equivalentObservation": "Observe the replacement assertion site(s) mcdev-nvim/tests/e2e/jdtls_bundle_e2e.lua::assert@719 and preserve the original input/result relationship for mcdev-nvim/tests/e2e/jdtls_bundle_e2e.lua::assert@967.",
     "nativeStatus": "pending real host E2E",
-    "evidence": "build/nvim-test-logs/native-client-final-syntax"
+    "evidence": "build/nvim-test-logs/migration-current-20261101-014259296-syntax"
   },
   {
     "legacyAssertionId": "mcdev-nvim/tests/e2e/jdtls_bundle_e2e.lua::assert@968",
@@ -957,11 +1268,11 @@
         "call": "helpers.assert_eq(source_only_inject_debug.parseConfidence, \"HIGH\")"
       }
     ],
-    "mapping": "explicit replacement-hunk assertion mapping",
+    "mapping": "replacement-hunk observer candidate; equivalence requires the recorded scope",
     "reason": "Use HOST_NORMALIZED, HIGH confidence and an authoritative projectSessionVersion; never claim JDT object use.",
     "equivalentObservation": "Observe the replacement assertion site(s) mcdev-nvim/tests/e2e/jdtls_bundle_e2e.lua::assert@719 and preserve the original input/result relationship for mcdev-nvim/tests/e2e/jdtls_bundle_e2e.lua::assert@968.",
     "nativeStatus": "pending real host E2E",
-    "evidence": "build/nvim-test-logs/native-client-final-syntax"
+    "evidence": "build/nvim-test-logs/migration-current-20261101-014259296-syntax"
   },
   {
     "legacyAssertionId": "mcdev-nvim/tests/e2e/jdtls_bundle_e2e.lua::assert@1011",
@@ -975,11 +1286,11 @@
         "call": "helpers.assert_eq(invoker_debug.parseSource, \"HOST_NORMALIZED\")"
       }
     ],
-    "mapping": "explicit replacement-hunk assertion mapping",
+    "mapping": "replacement-hunk observer candidate; equivalence requires the recorded scope",
     "reason": "Use HOST_NORMALIZED, HIGH confidence and an authoritative projectSessionVersion; never claim JDT object use.",
     "equivalentObservation": "Observe the replacement assertion site(s) mcdev-nvim/tests/e2e/jdtls_bundle_e2e.lua::assert@762 and preserve the original input/result relationship for mcdev-nvim/tests/e2e/jdtls_bundle_e2e.lua::assert@1011.",
     "nativeStatus": "pending real host E2E",
-    "evidence": "build/nvim-test-logs/native-client-final-syntax"
+    "evidence": "build/nvim-test-logs/migration-current-20261101-014259296-syntax"
   },
   {
     "legacyAssertionId": "mcdev-nvim/tests/e2e/jdtls_bundle_e2e.lua::assert@1012",
@@ -993,11 +1304,11 @@
         "call": "helpers.assert_eq(invoker_debug.parseConfidence, \"HIGH\")"
       }
     ],
-    "mapping": "explicit replacement-hunk assertion mapping",
+    "mapping": "replacement-hunk observer candidate; equivalence requires the recorded scope",
     "reason": "Use HOST_NORMALIZED, HIGH confidence and an authoritative projectSessionVersion; never claim JDT object use.",
     "equivalentObservation": "Observe the replacement assertion site(s) mcdev-nvim/tests/e2e/jdtls_bundle_e2e.lua::assert@763 and preserve the original input/result relationship for mcdev-nvim/tests/e2e/jdtls_bundle_e2e.lua::assert@1012.",
     "nativeStatus": "pending real host E2E",
-    "evidence": "build/nvim-test-logs/native-client-final-syntax"
+    "evidence": "build/nvim-test-logs/migration-current-20261101-014259296-syntax"
   },
   {
     "legacyAssertionId": "mcdev-nvim/tests/e2e/jdtls_bundle_e2e.lua::assert@1013",
@@ -1011,11 +1322,11 @@
         "call": "helpers.assert_eq(invoker_debug.parseConfidence, \"HIGH\")"
       }
     ],
-    "mapping": "explicit replacement-hunk assertion mapping",
+    "mapping": "replacement-hunk observer candidate; equivalence requires the recorded scope",
     "reason": "Use HOST_NORMALIZED, HIGH confidence and an authoritative projectSessionVersion; never claim JDT object use.",
     "equivalentObservation": "Observe the replacement assertion site(s) mcdev-nvim/tests/e2e/jdtls_bundle_e2e.lua::assert@763 and preserve the original input/result relationship for mcdev-nvim/tests/e2e/jdtls_bundle_e2e.lua::assert@1013.",
     "nativeStatus": "pending real host E2E",
-    "evidence": "build/nvim-test-logs/native-client-final-syntax"
+    "evidence": "build/nvim-test-logs/migration-current-20261101-014259296-syntax"
   },
   {
     "legacyAssertionId": "mcdev-nvim/tests/e2e/jdtls_bundle_e2e.lua::assert@1014",
@@ -1029,11 +1340,11 @@
         "call": "helpers.assert_true((invoker_debug.bindingResolvedCount or 0) > 0, \"invoker completion debug should resolve host bindings\")"
       }
     ],
-    "mapping": "explicit replacement-hunk assertion mapping",
+    "mapping": "replacement-hunk observer candidate; equivalence requires the recorded scope",
     "reason": "Host-neutral client naming or typed native metadata; original semantic effect and routing/cancellation assertion retained. Unavailable real host operations stay pending.",
     "equivalentObservation": "Observe the replacement assertion site(s) mcdev-nvim/tests/e2e/jdtls_bundle_e2e.lua::assert@765 and preserve the original input/result relationship for mcdev-nvim/tests/e2e/jdtls_bundle_e2e.lua::assert@1014.",
     "nativeStatus": "pending real host E2E",
-    "evidence": "build/nvim-test-logs/native-client-final-syntax"
+    "evidence": "build/nvim-test-logs/migration-current-20261101-014259296-syntax"
   },
   {
     "legacyAssertionId": "mcdev-nvim/tests/e2e/jdtls_bundle_e2e.lua::assert@1151",
@@ -1047,11 +1358,11 @@
         "call": "helpers.assert_eq(share_debug.parseSource, \"HOST_NORMALIZED\")"
       }
     ],
-    "mapping": "explicit replacement-hunk assertion mapping",
+    "mapping": "replacement-hunk observer candidate; equivalence requires the recorded scope",
     "reason": "Use HOST_NORMALIZED, HIGH confidence and an authoritative projectSessionVersion; never claim JDT object use.",
     "equivalentObservation": "Observe the replacement assertion site(s) mcdev-nvim/tests/e2e/jdtls_bundle_e2e.lua::assert@902 and preserve the original input/result relationship for mcdev-nvim/tests/e2e/jdtls_bundle_e2e.lua::assert@1151.",
     "nativeStatus": "pending real host E2E",
-    "evidence": "build/nvim-test-logs/native-client-final-syntax"
+    "evidence": "build/nvim-test-logs/migration-current-20261101-014259296-syntax"
   },
   {
     "legacyAssertionId": "mcdev-nvim/tests/e2e/jdtls_bundle_e2e.lua::assert@1152",
@@ -1065,11 +1376,11 @@
         "call": "helpers.assert_eq(share_debug.parseConfidence, \"HIGH\")"
       }
     ],
-    "mapping": "explicit replacement-hunk assertion mapping",
+    "mapping": "replacement-hunk observer candidate; equivalence requires the recorded scope",
     "reason": "Use HOST_NORMALIZED, HIGH confidence and an authoritative projectSessionVersion; never claim JDT object use.",
     "equivalentObservation": "Observe the replacement assertion site(s) mcdev-nvim/tests/e2e/jdtls_bundle_e2e.lua::assert@903 and preserve the original input/result relationship for mcdev-nvim/tests/e2e/jdtls_bundle_e2e.lua::assert@1152.",
     "nativeStatus": "pending real host E2E",
-    "evidence": "build/nvim-test-logs/native-client-final-syntax"
+    "evidence": "build/nvim-test-logs/migration-current-20261101-014259296-syntax"
   },
   {
     "legacyAssertionId": "mcdev-nvim/tests/e2e/jdtls_bundle_e2e.lua::assert@1153",
@@ -1083,11 +1394,11 @@
         "call": "helpers.assert_eq(share_debug.parseConfidence, \"HIGH\")"
       }
     ],
-    "mapping": "explicit replacement-hunk assertion mapping",
+    "mapping": "replacement-hunk observer candidate; equivalence requires the recorded scope",
     "reason": "Use HOST_NORMALIZED, HIGH confidence and an authoritative projectSessionVersion; never claim JDT object use.",
     "equivalentObservation": "Observe the replacement assertion site(s) mcdev-nvim/tests/e2e/jdtls_bundle_e2e.lua::assert@903 and preserve the original input/result relationship for mcdev-nvim/tests/e2e/jdtls_bundle_e2e.lua::assert@1153.",
     "nativeStatus": "pending real host E2E",
-    "evidence": "build/nvim-test-logs/native-client-final-syntax"
+    "evidence": "build/nvim-test-logs/migration-current-20261101-014259296-syntax"
   },
   {
     "legacyAssertionId": "mcdev-nvim/tests/e2e/jdtls_bundle_e2e.lua::assert@1230",
@@ -1101,11 +1412,11 @@
         "call": "helpers.assert_eq(method_debug.parseSource, \"HOST_NORMALIZED\")"
       }
     ],
-    "mapping": "explicit replacement-hunk assertion mapping",
+    "mapping": "replacement-hunk observer candidate; equivalence requires the recorded scope",
     "reason": "Use HOST_NORMALIZED, HIGH confidence and an authoritative projectSessionVersion; never claim JDT object use.",
     "equivalentObservation": "Observe the replacement assertion site(s) mcdev-nvim/tests/e2e/jdtls_bundle_e2e.lua::assert@981 and preserve the original input/result relationship for mcdev-nvim/tests/e2e/jdtls_bundle_e2e.lua::assert@1230.",
     "nativeStatus": "pending real host E2E",
-    "evidence": "build/nvim-test-logs/native-client-final-syntax"
+    "evidence": "build/nvim-test-logs/migration-current-20261101-014259296-syntax"
   },
   {
     "legacyAssertionId": "mcdev-nvim/tests/e2e/jdtls_bundle_e2e.lua::assert@1231",
@@ -1119,11 +1430,11 @@
         "call": "helpers.assert_eq(method_debug.parseConfidence, \"HIGH\")"
       }
     ],
-    "mapping": "explicit replacement-hunk assertion mapping",
+    "mapping": "replacement-hunk observer candidate; equivalence requires the recorded scope",
     "reason": "Use HOST_NORMALIZED, HIGH confidence and an authoritative projectSessionVersion; never claim JDT object use.",
     "equivalentObservation": "Observe the replacement assertion site(s) mcdev-nvim/tests/e2e/jdtls_bundle_e2e.lua::assert@982 and preserve the original input/result relationship for mcdev-nvim/tests/e2e/jdtls_bundle_e2e.lua::assert@1231.",
     "nativeStatus": "pending real host E2E",
-    "evidence": "build/nvim-test-logs/native-client-final-syntax"
+    "evidence": "build/nvim-test-logs/migration-current-20261101-014259296-syntax"
   },
   {
     "legacyAssertionId": "mcdev-nvim/tests/e2e/jdtls_bundle_e2e.lua::assert@1232",
@@ -1137,11 +1448,11 @@
         "call": "helpers.assert_eq(method_debug.parseConfidence, \"HIGH\")"
       }
     ],
-    "mapping": "explicit replacement-hunk assertion mapping",
+    "mapping": "replacement-hunk observer candidate; equivalence requires the recorded scope",
     "reason": "Use HOST_NORMALIZED, HIGH confidence and an authoritative projectSessionVersion; never claim JDT object use.",
     "equivalentObservation": "Observe the replacement assertion site(s) mcdev-nvim/tests/e2e/jdtls_bundle_e2e.lua::assert@982 and preserve the original input/result relationship for mcdev-nvim/tests/e2e/jdtls_bundle_e2e.lua::assert@1232.",
     "nativeStatus": "pending real host E2E",
-    "evidence": "build/nvim-test-logs/native-client-final-syntax"
+    "evidence": "build/nvim-test-logs/migration-current-20261101-014259296-syntax"
   },
   {
     "legacyAssertionId": "mcdev-nvim/tests/e2e/jdtls_loom_e2e.lua::assert@11",
@@ -1155,11 +1466,29 @@
         "call": "helpers.assert_true(vim.fn.executable(ktlsp_cmd) == 1, \"ktlsp executable must exist: \" .. ktlsp_cmd)"
       }
     ],
-    "mapping": "explicit replacement-hunk assertion mapping",
+    "mapping": "replacement-hunk observer candidate; equivalence requires the recorded scope",
     "reason": "Native executable availability/artifact identity replaces a JVM extension artifact and JDT launcher.",
     "equivalentObservation": "Observe the replacement assertion site(s) mcdev-nvim/tests/e2e/jdtls_loom_e2e.lua::assert@12 and preserve the original input/result relationship for mcdev-nvim/tests/e2e/jdtls_loom_e2e.lua::assert@11.",
     "nativeStatus": "pending real host E2E",
-    "evidence": "build/nvim-test-logs/native-client-final-syntax"
+    "evidence": "build/nvim-test-logs/migration-current-20261101-014259296-syntax"
+  },
+  {
+    "legacyAssertionId": "mcdev-nvim/tests/e2e/jdtls_loom_e2e.lua::assert@89",
+    "oldCall": "helpers.assert_true(completed, method .. \" timed out\")",
+    "newAssertionIds": [
+      "mcdev-nvim/tests/e2e/jdtls_loom_e2e.lua::assert@66"
+    ],
+    "newAssertions": [
+      {
+        "line": 66,
+        "call": "helpers.assert_true(settled, command .. \" timed out\")"
+      }
+    ],
+    "mapping": "replacement-hunk observer candidate; equivalence requires the recorded scope",
+    "reason": "This original editor-host operation remains pending real MC host observation; no client-only equivalent is claimed as an E2E pass.",
+    "equivalentObservation": "Observe the replacement assertion site(s) mcdev-nvim/tests/e2e/jdtls_loom_e2e.lua::assert@66 and preserve the original input/result relationship for mcdev-nvim/tests/e2e/jdtls_loom_e2e.lua::assert@89.",
+    "nativeStatus": "pending real host E2E",
+    "evidence": "build/nvim-test-logs/migration-current-20261101-014259296-syntax"
   },
   {
     "legacyAssertionId": "mcdev-nvim/tests/e2e/real_project_e2e.lua::assert@76",
@@ -1268,6 +1597,126 @@
     "equivalentObservation": "Observe the replacement assertion site(s) mcdev-nvim/tests/e2e/teardown_process_test.lua::assert@151 and preserve the original input/result relationship for mcdev-nvim/tests/e2e/teardown_process_test.lua::assert@147.",
     "nativeStatus": "passed",
     "evidence": "build/nvim-test-logs/native-client-final-teardown-process"
+  },
+  {
+    "legacyAssertionId": "mcdev-nvim/tests/e2e/teardown_test.lua::assert@25",
+    "oldCall": "assert(loadfile(\"mcdev-nvim/tests/e2e/run_bundle_e2e.lua\"))",
+    "newAssertionIds": [
+      "mcdev-nvim/tests/e2e/teardown_test.lua::assert@60"
+    ],
+    "newAssertions": [
+      {
+        "line": 60,
+        "call": "assert(loadfile(\"mcdev-nvim/tests/e2e/run_bundle_e2e.lua\"))",
+        "path": "mcdev-nvim/tests/e2e/teardown_test.lua"
+      }
+    ],
+    "mapping": "reviewed exact source relocation",
+    "reason": "The client-stop unit now mocks process discovery, cleanup and emergency self-kill; real PowerShell and process ownership remain in the unchanged dedicated process test.",
+    "equivalentObservation": "Observe the replacement assertion site(s) mcdev-nvim/tests/e2e/teardown_test.lua::assert@60 and preserve the original input/result relationship for mcdev-nvim/tests/e2e/teardown_test.lua::assert@25.",
+    "nativeStatus": "passed",
+    "evidence": "build/nvim-test-logs/migration-current-20261101-014259296-teardown-unit",
+    "scope": "Exact call text correspondence; runtime counters are from this finite client suite. Live host scope is recorded separately."
+  },
+  {
+    "legacyAssertionId": "mcdev-nvim/tests/e2e/teardown_test.lua::assert@30",
+    "oldCall": "assert(ok, err)",
+    "newAssertionIds": [
+      "mcdev-nvim/tests/e2e/teardown_test.lua::assert@66"
+    ],
+    "newAssertions": [
+      {
+        "line": 66,
+        "call": "assert(ok, err)",
+        "path": "mcdev-nvim/tests/e2e/teardown_test.lua"
+      }
+    ],
+    "mapping": "reviewed exact source relocation",
+    "reason": "The client-stop unit now mocks process discovery, cleanup and emergency self-kill; real PowerShell and process ownership remain in the unchanged dedicated process test.",
+    "equivalentObservation": "Observe the replacement assertion site(s) mcdev-nvim/tests/e2e/teardown_test.lua::assert@66 and preserve the original input/result relationship for mcdev-nvim/tests/e2e/teardown_test.lua::assert@30.",
+    "nativeStatus": "passed",
+    "evidence": "build/nvim-test-logs/migration-current-20261101-014259296-teardown-unit",
+    "scope": "Exact call text correspondence; runtime counters are from this finite client suite. Live host scope is recorded separately."
+  },
+  {
+    "legacyAssertionId": "mcdev-nvim/tests/e2e/teardown_test.lua::assert@31",
+    "oldCall": "assert(stops[1] == false and stops[2] == true, \"deadline must escalate graceful stop to force\")",
+    "newAssertionIds": [
+      "mcdev-nvim/tests/e2e/teardown_test.lua::assert@79"
+    ],
+    "newAssertions": [
+      {
+        "line": 79,
+        "call": "assert(stops[1] == false and stops[2] == true, \"deadline must escalate graceful stop to force\")",
+        "path": "mcdev-nvim/tests/e2e/teardown_test.lua"
+      }
+    ],
+    "mapping": "reviewed exact source relocation",
+    "reason": "The client-stop unit now mocks process discovery, cleanup and emergency self-kill; real PowerShell and process ownership remain in the unchanged dedicated process test.",
+    "equivalentObservation": "Observe the replacement assertion site(s) mcdev-nvim/tests/e2e/teardown_test.lua::assert@79 and preserve the original input/result relationship for mcdev-nvim/tests/e2e/teardown_test.lua::assert@31.",
+    "nativeStatus": "passed",
+    "evidence": "build/nvim-test-logs/migration-current-20261101-014259296-teardown-unit",
+    "scope": "Exact call text correspondence; runtime counters are from this finite client suite. Live host scope is recorded separately."
+  },
+  {
+    "legacyAssertionId": "mcdev-nvim/tests/e2e/teardown_test.lua::assert@32",
+    "oldCall": "assert(commands[1] == \"cquit 1\", \"shutdown timeout must fail the test\")",
+    "newAssertionIds": [
+      "mcdev-nvim/tests/e2e/teardown_test.lua::assert@80"
+    ],
+    "newAssertions": [
+      {
+        "line": 80,
+        "call": "assert(commands[1] == \"cquit 1\", \"shutdown timeout must fail the test\")",
+        "path": "mcdev-nvim/tests/e2e/teardown_test.lua"
+      }
+    ],
+    "mapping": "reviewed exact source relocation",
+    "reason": "The client-stop unit now mocks process discovery, cleanup and emergency self-kill; real PowerShell and process ownership remain in the unchanged dedicated process test.",
+    "equivalentObservation": "Observe the replacement assertion site(s) mcdev-nvim/tests/e2e/teardown_test.lua::assert@80 and preserve the original input/result relationship for mcdev-nvim/tests/e2e/teardown_test.lua::assert@32.",
+    "nativeStatus": "passed",
+    "evidence": "build/nvim-test-logs/migration-current-20261101-014259296-teardown-unit",
+    "scope": "Exact call text correspondence; runtime counters are from this finite client suite. Live host scope is recorded separately."
+  },
+  {
+    "legacyAssertionId": "mcdev-nvim/tests/e2e/teardown_test.lua::assert@33",
+    "oldCall": "assert(table.concat(errors):find(\"graceful shutdown exceeded\", 1, true), \"timeout must be reported\")",
+    "newAssertionIds": [
+      "mcdev-nvim/tests/e2e/teardown_test.lua::assert@81"
+    ],
+    "newAssertions": [
+      {
+        "line": 81,
+        "call": "assert(table.concat(errors):find(\"graceful shutdown exceeded\", 1, true), \"timeout must be reported\")",
+        "path": "mcdev-nvim/tests/e2e/teardown_test.lua"
+      }
+    ],
+    "mapping": "reviewed exact source relocation",
+    "reason": "The client-stop unit now mocks process discovery, cleanup and emergency self-kill; real PowerShell and process ownership remain in the unchanged dedicated process test.",
+    "equivalentObservation": "Observe the replacement assertion site(s) mcdev-nvim/tests/e2e/teardown_test.lua::assert@81 and preserve the original input/result relationship for mcdev-nvim/tests/e2e/teardown_test.lua::assert@33.",
+    "nativeStatus": "passed",
+    "evidence": "build/nvim-test-logs/migration-current-20261101-014259296-teardown-unit",
+    "scope": "Exact call text correspondence; runtime counters are from this finite client suite. Live host scope is recorded separately."
+  },
+  {
+    "legacyAssertionId": "mcdev-nvim/tests/e2e/teardown_test.lua::assert@35",
+    "oldCall": "assert(cleanup and cleanup.code == 0, \"generated cleanup program failed: \" .. vim.inspect(cleanup))",
+    "newAssertionIds": [
+      "mcdev-nvim/tests/e2e/teardown_test.lua::assert@86"
+    ],
+    "newAssertions": [
+      {
+        "line": 86,
+        "call": "assert(cleanup and cleanup.code == 0, \"generated cleanup program failed: \" .. vim.inspect(cleanup))",
+        "path": "mcdev-nvim/tests/e2e/teardown_test.lua"
+      }
+    ],
+    "mapping": "reviewed exact source relocation",
+    "reason": "The client-stop unit now mocks process discovery, cleanup and emergency self-kill; real PowerShell and process ownership remain in the unchanged dedicated process test.",
+    "equivalentObservation": "Observe the replacement assertion site(s) mcdev-nvim/tests/e2e/teardown_test.lua::assert@86 and preserve the original input/result relationship for mcdev-nvim/tests/e2e/teardown_test.lua::assert@35.",
+    "nativeStatus": "passed",
+    "evidence": "build/nvim-test-logs/migration-current-20261101-014259296-teardown-unit",
+    "scope": "Exact call text correspondence; runtime counters are from this finite client suite. Live host scope is recorded separately."
   },
   {
     "legacyAssertionId": "mcdev-nvim/tests/jdtls_workspace.lua::assert@42",
@@ -1821,11 +2270,11 @@
         "call": "helpers.assert_eq(ktlsp_helper.extend_config(client_config), client_config)"
       }
     ],
-    "mapping": "explicit replacement-hunk assertion mapping",
+    "mapping": "replacement-hunk observer candidate; equivalence requires the recorded scope",
     "reason": "Authorized removal of JVM/JAR/Mason/-data workflow; observe explicit argv, idempotent provider merge and workspace isolation instead.",
     "equivalentObservation": "Observe the replacement assertion site(s) mcdev-nvim/tests/run.lua::assert@31 and preserve the original input/result relationship for mcdev-nvim/tests/run.lua::assert@33.",
     "nativeStatus": "passed",
-    "evidence": "build/nvim-test-logs/native-client-final-adapters"
+    "evidence": "build/nvim-test-logs/migration-current-20261101-014259296-adapters"
   },
   {
     "legacyAssertionId": "mcdev-nvim/tests/run.lua::assert@48",
@@ -1839,11 +2288,11 @@
         "call": "helpers.assert_eq(ktlsp_helper.extend_config(client_config), client_config)"
       }
     ],
-    "mapping": "explicit replacement-hunk assertion mapping",
+    "mapping": "replacement-hunk observer candidate; equivalence requires the recorded scope",
     "reason": "Authorized removal of JVM/JAR/Mason/-data workflow; observe explicit argv, idempotent provider merge and workspace isolation instead.",
     "equivalentObservation": "Observe the replacement assertion site(s) mcdev-nvim/tests/run.lua::assert@31 and preserve the original input/result relationship for mcdev-nvim/tests/run.lua::assert@48.",
     "nativeStatus": "passed",
-    "evidence": "build/nvim-test-logs/native-client-final-adapters"
+    "evidence": "build/nvim-test-logs/migration-current-20261101-014259296-adapters"
   },
   {
     "legacyAssertionId": "mcdev-nvim/tests/run.lua::assert@55",
@@ -1857,11 +2306,11 @@
         "call": "helpers.assert_eq(ktlsp_helper.extend_config(client_config), client_config)"
       }
     ],
-    "mapping": "explicit replacement-hunk assertion mapping",
+    "mapping": "replacement-hunk observer candidate; equivalence requires the recorded scope",
     "reason": "Authorized removal of JVM/JAR/Mason/-data workflow; observe explicit argv, idempotent provider merge and workspace isolation instead.",
     "equivalentObservation": "Observe the replacement assertion site(s) mcdev-nvim/tests/run.lua::assert@31 and preserve the original input/result relationship for mcdev-nvim/tests/run.lua::assert@55.",
     "nativeStatus": "passed",
-    "evidence": "build/nvim-test-logs/native-client-final-adapters"
+    "evidence": "build/nvim-test-logs/migration-current-20261101-014259296-adapters"
   },
   {
     "legacyAssertionId": "mcdev-nvim/tests/run.lua::assert@56",
@@ -1875,11 +2324,11 @@
         "call": "helpers.assert_eq(client_config.init_options.existing, true)"
       }
     ],
-    "mapping": "explicit replacement-hunk assertion mapping",
+    "mapping": "replacement-hunk observer candidate; equivalence requires the recorded scope",
     "reason": "Authorized removal of JVM/JAR/Mason/-data workflow; observe explicit argv, idempotent provider merge and workspace isolation instead.",
     "equivalentObservation": "Observe the replacement assertion site(s) mcdev-nvim/tests/run.lua::assert@32 and preserve the original input/result relationship for mcdev-nvim/tests/run.lua::assert@56.",
     "nativeStatus": "passed",
-    "evidence": "build/nvim-test-logs/native-client-final-adapters"
+    "evidence": "build/nvim-test-logs/migration-current-20261101-014259296-adapters"
   },
   {
     "legacyAssertionId": "mcdev-nvim/tests/run.lua::assert@57",
@@ -1893,11 +2342,11 @@
         "call": "helpers.assert_eq(client_config.init_options.existing, true)"
       }
     ],
-    "mapping": "explicit replacement-hunk assertion mapping",
+    "mapping": "replacement-hunk observer candidate; equivalence requires the recorded scope",
     "reason": "Authorized removal of JVM/JAR/Mason/-data workflow; observe explicit argv, idempotent provider merge and workspace isolation instead.",
     "equivalentObservation": "Observe the replacement assertion site(s) mcdev-nvim/tests/run.lua::assert@32 and preserve the original input/result relationship for mcdev-nvim/tests/run.lua::assert@57.",
     "nativeStatus": "passed",
-    "evidence": "build/nvim-test-logs/native-client-final-adapters"
+    "evidence": "build/nvim-test-logs/migration-current-20261101-014259296-adapters"
   },
   {
     "legacyAssertionId": "mcdev-nvim/tests/run.lua::assert@59",
@@ -1911,11 +2360,11 @@
         "call": "helpers.assert_eq(client_config.init_options.existing, true)"
       }
     ],
-    "mapping": "explicit replacement-hunk assertion mapping",
+    "mapping": "replacement-hunk observer candidate; equivalence requires the recorded scope",
     "reason": "Authorized removal of JVM/JAR/Mason/-data workflow; observe explicit argv, idempotent provider merge and workspace isolation instead.",
     "equivalentObservation": "Observe the replacement assertion site(s) mcdev-nvim/tests/run.lua::assert@32 and preserve the original input/result relationship for mcdev-nvim/tests/run.lua::assert@59.",
     "nativeStatus": "passed",
-    "evidence": "build/nvim-test-logs/native-client-final-adapters"
+    "evidence": "build/nvim-test-logs/migration-current-20261101-014259296-adapters"
   },
   {
     "legacyAssertionId": "mcdev-nvim/tests/run.lua::assert@67",
@@ -1929,11 +2378,11 @@
         "call": "helpers.assert_eq(ktlsp_helper.start_or_attach({ root_dir = \"/project\", cmd = { vim.v.progpath },\n  init_options = { existing = true } }), 42)"
       }
     ],
-    "mapping": "explicit replacement-hunk assertion mapping",
+    "mapping": "replacement-hunk observer candidate; equivalence requires the recorded scope",
     "reason": "Authorized removal of JVM/JAR/Mason/-data workflow; observe explicit argv, idempotent provider merge and workspace isolation instead.",
     "equivalentObservation": "Observe the replacement assertion site(s) mcdev-nvim/tests/run.lua::assert@41 and preserve the original input/result relationship for mcdev-nvim/tests/run.lua::assert@67.",
     "nativeStatus": "passed",
-    "evidence": "build/nvim-test-logs/native-client-final-adapters"
+    "evidence": "build/nvim-test-logs/migration-current-20261101-014259296-adapters"
   },
   {
     "legacyAssertionId": "mcdev-nvim/tests/run.lua::assert@74",
@@ -1947,11 +2396,11 @@
         "call": "helpers.assert_eq(started_config.init_options.existing, true)"
       }
     ],
-    "mapping": "explicit replacement-hunk assertion mapping",
+    "mapping": "replacement-hunk observer candidate; equivalence requires the recorded scope",
     "reason": "Authorized removal of JVM/JAR/Mason/-data workflow; observe explicit argv, idempotent provider merge and workspace isolation instead.",
     "equivalentObservation": "Observe the replacement assertion site(s) mcdev-nvim/tests/run.lua::assert@43 and preserve the original input/result relationship for mcdev-nvim/tests/run.lua::assert@74.",
     "nativeStatus": "passed",
-    "evidence": "build/nvim-test-logs/native-client-final-adapters"
+    "evidence": "build/nvim-test-logs/migration-current-20261101-014259296-adapters"
   },
   {
     "legacyAssertionId": "mcdev-nvim/tests/run.lua::assert@75",
@@ -1965,11 +2414,11 @@
         "call": "helpers.assert_eq(started_config.init_options.existing, true)"
       }
     ],
-    "mapping": "explicit replacement-hunk assertion mapping",
+    "mapping": "replacement-hunk observer candidate; equivalence requires the recorded scope",
     "reason": "Authorized removal of JVM/JAR/Mason/-data workflow; observe explicit argv, idempotent provider merge and workspace isolation instead.",
     "equivalentObservation": "Observe the replacement assertion site(s) mcdev-nvim/tests/run.lua::assert@43 and preserve the original input/result relationship for mcdev-nvim/tests/run.lua::assert@75.",
     "nativeStatus": "passed",
-    "evidence": "build/nvim-test-logs/native-client-final-adapters"
+    "evidence": "build/nvim-test-logs/migration-current-20261101-014259296-adapters"
   },
   {
     "legacyAssertionId": "mcdev-nvim/tests/run.lua::assert@85",
@@ -1980,7 +2429,7 @@
     "reason": "Authorized removal of JVM/JAR/Mason/-data workflow; observe explicit argv, idempotent provider merge and workspace isolation instead.",
     "equivalentObservation": "No direct replacement assertion exists; the native host must expose the original observable result through the scoped command/session contract before this case can pass.",
     "nativeStatus": "passed",
-    "evidence": "build/nvim-test-logs/native-client-final-adapters"
+    "evidence": "build/nvim-test-logs/migration-current-20261101-014259296-adapters"
   },
   {
     "legacyAssertionId": "mcdev-nvim/tests/run.lua::assert@150",
@@ -1994,11 +2443,11 @@
         "call": "helpers.assert_eq(notify_message, \"mcdev: no active ktlsp client for this buffer\")"
       }
     ],
-    "mapping": "explicit replacement-hunk assertion mapping",
+    "mapping": "replacement-hunk observer candidate; equivalence requires the recorded scope",
     "reason": "Host-neutral client naming or typed native metadata; original semantic effect and routing/cancellation assertion retained. Unavailable real host operations stay pending.",
     "equivalentObservation": "Observe the replacement assertion site(s) mcdev-nvim/tests/run.lua::assert@107 and preserve the original input/result relationship for mcdev-nvim/tests/run.lua::assert@150.",
     "nativeStatus": "passed",
-    "evidence": "build/nvim-test-logs/native-client-final-adapters"
+    "evidence": "build/nvim-test-logs/migration-current-20261101-014259296-adapters"
   },
   {
     "legacyAssertionId": "mcdev-nvim/tests/run.lua::assert@158",
@@ -2012,11 +2461,11 @@
         "call": "helpers.assert_eq(callback_error, \"mcdev: no active ktlsp client for this buffer\")"
       }
     ],
-    "mapping": "explicit replacement-hunk assertion mapping",
+    "mapping": "replacement-hunk observer candidate; equivalence requires the recorded scope",
     "reason": "Host-neutral client naming or typed native metadata; original semantic effect and routing/cancellation assertion retained. Unavailable real host operations stay pending.",
     "equivalentObservation": "Observe the replacement assertion site(s) mcdev-nvim/tests/run.lua::assert@115 and preserve the original input/result relationship for mcdev-nvim/tests/run.lua::assert@158.",
     "nativeStatus": "passed",
-    "evidence": "build/nvim-test-logs/native-client-final-adapters"
+    "evidence": "build/nvim-test-logs/migration-current-20261101-014259296-adapters"
   },
   {
     "legacyAssertionId": "mcdev-nvim/tests/run.lua::assert@634",
@@ -2030,11 +2479,11 @@
         "call": "helpers.assert_eq(completion.last_error, \"mcdev: failed to start ktlsp request\")"
       }
     ],
-    "mapping": "explicit replacement-hunk assertion mapping",
+    "mapping": "replacement-hunk observer candidate; equivalence requires the recorded scope",
     "reason": "Host-neutral client naming or typed native metadata; original semantic effect and routing/cancellation assertion retained. Unavailable real host operations stay pending.",
     "equivalentObservation": "Observe the replacement assertion site(s) mcdev-nvim/tests/run.lua::assert@593 and preserve the original input/result relationship for mcdev-nvim/tests/run.lua::assert@634.",
     "nativeStatus": "passed",
-    "evidence": "build/nvim-test-logs/native-client-final-adapters"
+    "evidence": "build/nvim-test-logs/migration-current-20261101-014259296-adapters"
   },
   {
     "legacyAssertionId": "mcdev-nvim/tests/run.lua::assert@1458",
@@ -2048,11 +2497,11 @@
         "call": "helpers.assert_eq(protocol.active_ktlsp_client(bufnr), fallback_client)"
       }
     ],
-    "mapping": "explicit replacement-hunk assertion mapping",
+    "mapping": "replacement-hunk observer candidate; equivalence requires the recorded scope",
     "reason": "Host-neutral client naming or typed native metadata; original semantic effect and routing/cancellation assertion retained. Unavailable real host operations stay pending.",
     "equivalentObservation": "Observe the replacement assertion site(s) mcdev-nvim/tests/run.lua::assert@1420 and preserve the original input/result relationship for mcdev-nvim/tests/run.lua::assert@1458.",
     "nativeStatus": "passed",
-    "evidence": "build/nvim-test-logs/native-client-final-adapters"
+    "evidence": "build/nvim-test-logs/migration-current-20261101-014259296-adapters"
   },
   {
     "legacyAssertionId": "mcdev-nvim/tests/run.lua::assert@1738",
@@ -2066,11 +2515,11 @@
         "call": "helpers.assert_eq(nav_error, \"mcdev: no active ktlsp client for this buffer\")"
       }
     ],
-    "mapping": "explicit replacement-hunk assertion mapping",
+    "mapping": "replacement-hunk observer candidate; equivalence requires the recorded scope",
     "reason": "Host-neutral client naming or typed native metadata; original semantic effect and routing/cancellation assertion retained. Unavailable real host operations stay pending.",
     "equivalentObservation": "Observe the replacement assertion site(s) mcdev-nvim/tests/run.lua::assert@1701 and preserve the original input/result relationship for mcdev-nvim/tests/run.lua::assert@1738.",
     "nativeStatus": "passed",
-    "evidence": "build/nvim-test-logs/native-client-final-adapters"
+    "evidence": "build/nvim-test-logs/migration-current-20261101-014259296-adapters"
   },
   {
     "legacyAssertionId": "mcdev-nvim/tests/run.lua::assert@1910",
@@ -2084,10 +2533,10 @@
         "call": "helpers.assert_true(health_message:find(\"parseConfidence: HIGH\", 1, true) ~= nil, health_message)"
       }
     ],
-    "mapping": "explicit replacement-hunk assertion mapping",
+    "mapping": "replacement-hunk observer candidate; equivalence requires the recorded scope",
     "reason": "Use HOST_NORMALIZED, HIGH confidence and an authoritative projectSessionVersion; never claim JDT object use.",
     "equivalentObservation": "Observe the replacement assertion site(s) mcdev-nvim/tests/run.lua::assert@1874 and preserve the original input/result relationship for mcdev-nvim/tests/run.lua::assert@1910.",
     "nativeStatus": "passed",
-    "evidence": "build/nvim-test-logs/native-client-final-adapters"
+    "evidence": "build/nvim-test-logs/migration-current-20261101-014259296-adapters"
   }
 ]
