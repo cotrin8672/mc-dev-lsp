@@ -5,6 +5,7 @@ param(
     [Parameter(Mandatory = $true)][ValidatePattern('^[0-9a-fA-F]{64}$')][string] $HostSha256,
     [Parameter(Mandatory = $true)][string] $CompanionBinary,
     [Parameter(Mandatory = $true)][ValidatePattern('^[0-9a-fA-F]{64}$')][string] $CompanionSha256,
+    [string] $CompanionBuildReceipt,
     [string] $NvimBinary = 'nvim',
     [string] $GradleBinary = 'gradle',
     # Cold indexing, two Gradle model refreshes, and restart each have finite phase budgets.
@@ -32,6 +33,25 @@ try {
     $companionPath = (Resolve-Path -LiteralPath $CompanionBinary).Path
     if ((Get-FileHash -LiteralPath $hostPath -Algorithm SHA256).Hash -ne $HostSha256) { throw 'Stock host checksum mismatch' }
     if ((Get-FileHash -LiteralPath $companionPath -Algorithm SHA256).Hash -ne $CompanionSha256) { throw 'Companion checksum mismatch' }
+    if ([string]::IsNullOrWhiteSpace($CompanionBuildReceipt)) {
+        $CompanionBuildReceipt = Join-Path (Split-Path -Parent $companionPath) 'receipt.json'
+    }
+    $buildReceiptPath = (Resolve-Path -LiteralPath $CompanionBuildReceipt -ErrorAction Stop).Path
+    $buildReceipt = Get-Content -LiteralPath $buildReceiptPath -Raw | ConvertFrom-Json
+    if ([string]$buildReceipt.sha256 -ne $CompanionSha256.ToLowerInvariant()) { throw 'Build receipt is not bound to the pinned companion SHA-256' }
+    foreach ($field in @('commit', 'buildTime', 'version')) {
+        if ($null -eq $buildReceipt.buildIdentity -or
+            $buildReceipt.buildIdentity.$field -isnot [string] -or [string]::IsNullOrWhiteSpace($buildReceipt.buildIdentity.$field)) {
+            throw "Independent build receipt must record buildIdentity.$field from the build recipe; Info output cannot generate its own oracle"
+        }
+    }
+    $buildInputPath = Join-Path $logs 'command-build-input.json'
+    [ordered]@{
+        artifactPath = $companionPath; artifactSha256 = $CompanionSha256.ToLowerInvariant()
+        commit = $buildReceipt.buildIdentity.commit; buildTime = $buildReceipt.buildIdentity.buildTime
+        version = $buildReceipt.buildIdentity.version; runStartedAtUnixMs = [DateTimeOffset]::UtcNow.ToUnixTimeMilliseconds()
+        receiptSha256 = (Get-FileHash -LiteralPath $buildReceiptPath -Algorithm SHA256).Hash.ToLowerInvariant()
+    } | ConvertTo-Json | Set-Content -LiteralPath $buildInputPath -Encoding utf8NoBOM
     $editorPath = (Get-Command $NvimBinary -ErrorAction Stop).Source
     $gradlePath = (Get-Command $GradleBinary -ErrorAction Stop).Source
     if (-not [IO.Path]::IsPathRooted($editorPath) -or -not [IO.Path]::IsPathRooted($gradlePath)) { throw 'Editor/Gradle paths must resolve absolutely' }
@@ -94,6 +114,7 @@ try {
     $env:MCDEV_COMMAND_COMPANION = $companionPath
     $env:MCDEV_COMMAND_PROJECT = $project
     $env:MCDEV_COMMAND_ARTIFACTS = $logs
+    $env:MCDEV_COMMAND_BUILD_INPUT = $buildInputPath
     $env:KTLSP_CACHE_DIR = Join-Path $logs 'host-cache'
     $env:XDG_CONFIG_HOME = Join-Path $logs 'editor-config'
     $env:XDG_DATA_HOME = Join-Path $logs 'editor-data'
@@ -119,6 +140,8 @@ try {
         $PSCommandPath, (Join-Path $PSScriptRoot 'run-rust-tests-compact.ps1'),
         (Join-Path $repo 'Cargo.toml'), (Join-Path $repo 'Cargo.lock'),
         (Join-Path $repo 'mcdev-companion/Cargo.toml'),
+        $buildReceiptPath, $buildInputPath,
+        (Join-Path $repo 'mcdev-companion/tests/fixtures/host_commands/original-success.json'),
         (Join-Path $repo 'mcdev-companion/tests/support/accepted_trace.lua'))
     $before = @(Get-FileHash -LiteralPath $inputs -Algorithm SHA256)
     $startupHash = ($before | Where-Object { $_.Path -eq $startup }).Hash.ToLowerInvariant()
@@ -142,6 +165,7 @@ try {
     $targetClass = Join-Path $project 'build/classes/java/main/fixture/Target.class'
     if (Test-Path -LiteralPath $targetClass) { Copy-Item -LiteralPath $targetClass -Destination $fixtureArchive }
     $env:MCDEV_COMMAND_GRADLE_BUILD_OK = if ($gradle.ExitCode -eq 0 -and -not $gradle.TimedOut) { '1' } else { '0' }
+    if ($env:MCDEV_COMMAND_GRADLE_BUILD_OK -ne '1') { throw 'Isolated fixture build failed; editor/host was not started' }
     $editorRun = Invoke-RustCheck -Name editor -Command $editorPath -Arguments @(
         '--headless', '-u', $startup, '-i', 'NONE', '-l', $editor
     ) -Directory $repo -LogDirectory $logs -TimeoutSeconds $EditorTimeoutSeconds
@@ -160,6 +184,9 @@ try {
             verified = [bool]($stable -and $proof -and $proof.startup -and $proof.startup.verified)
         }
         requestedDomainCommands = 11; fullMcCapabilitiesVerified = $false
+        all11CommandsVerified = [bool]($proof -and $proof.all11CommandsVerified)
+        independentBuildReceipt = $buildReceiptPath
+        buildInput = $buildReceipt.buildIdentity
         sdkSourceFixture = 'reduced Object.java; selected runtime SDK remains host-owned'
         fixtureBuild = 'Java-only Gradle project with an isolated Gradle user directory'
     } | ConvertTo-Json -Depth 100 | Set-Content -Encoding utf8 (Join-Path $logs 'receipt.json')

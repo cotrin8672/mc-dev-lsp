@@ -115,7 +115,7 @@ fn negotiate(params: &Value) -> Result<(Value, BTreeSet<String>), String> {
             &["runtimeClass", "classBytes"][..],
         ),
         ("jvm-catalog-v1", &["jvmCatalog", "jvmClass"][..]),
-        ("source-facts-v2", &["sourceFacts"][..]),
+        ("source-facts-v2", &["sourceFacts", "annotationSites"][..]),
         ("source-locations-v1", &["sourceLocation"][..]),
         ("project-inputs-v1", &["projectInputs"][..]),
         (
@@ -773,6 +773,28 @@ mod tests {
             json!(["semantic-v1", "binary-annotations-v1"])
         );
         assert!(reply.get("supportedOps").is_none());
+    }
+
+    #[test]
+    fn annotation_sites_negotiate_independently_and_require_both_capability_and_operation() {
+        let mut params = json!({"protocol":{"major":1,"minor":0},"provider":"mcdev",
+            "capabilities":["semantic-v1","source-facts-v2"],
+            "supportedOps":{"source-facts-v2":["annotationSites","future"]}});
+        let (reply, _) = negotiate(&params).unwrap();
+        assert_eq!(
+            reply["supportedOps"]["source-facts-v2"],
+            json!(["annotationSites"])
+        );
+        params["supportedOps"]["source-facts-v2"] = json!(["sourceFacts"]);
+        assert_eq!(
+            negotiate(&params).unwrap().0["supportedOps"]["source-facts-v2"],
+            json!(["sourceFacts"])
+        );
+        params["capabilities"] = json!(["semantic-v1"]);
+        assert!(negotiate(&params).unwrap().0.get("supportedOps").is_none());
+        params["capabilities"] = json!(["semantic-v1", "source-facts-v2"]);
+        params.as_object_mut().unwrap().remove("supportedOps");
+        assert!(negotiate(&params).unwrap().0.get("supportedOps").is_none());
     }
 
     fn incoming(value: Value) -> Incoming {

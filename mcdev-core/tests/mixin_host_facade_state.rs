@@ -130,6 +130,109 @@ fn request() -> MixinFacadeRequest {
         ..Default::default()
     }
 }
+
+fn selector_request(parse_source: ParseSource, registered: bool) -> MixinFacadeRequest {
+    let mut request = request();
+    let mut model = MixinSemanticModelParser::parse(&request.buffer_text, &request.document_uri);
+    assert_eq!(model.injectors.len(), 1);
+    model.parse_source = parse_source;
+    model.targets[0].internal_name = "game/Target".into();
+    if registered {
+        model.injectors[0].handler_method_descriptor = Some("()V".into());
+    } else {
+        model.injectors.clear();
+    }
+    request.semantic_model = Some(model);
+    request
+}
+
+#[test]
+fn normalized_selector_completion_never_promotes_an_unregistered_same_spelling_injector() {
+    let facts = Facts::new();
+    // The host resolved this spelling to a non-official type, so its normalized
+    // injector inventory is empty even though the source-only scanner guesses Inject.
+    let request = selector_request(ParseSource::HostNormalized, false);
+    let raw = AnnotationContextExtractor::extract_at_offset(
+        &request.buffer_text,
+        request.character as usize,
+    )
+    .unwrap();
+    assert_eq!(raw.annotation, MixinAnnotation::Inject);
+    assert!(SemanticCompletionContextExtractor::extract(
+        &request.buffer_text,
+        0,
+        request.character as usize,
+        request.semantic_model.as_ref(),
+    )
+    .is_none());
+    let result = MixinServiceFacade::new(&facts, &facts)
+        .complete_with_debug(
+            &request,
+            &MixinCompletionOptions::default(),
+            "mcdev.completion",
+            "java",
+        )
+        .unwrap();
+    assert!(result.items.is_empty());
+    assert!(!result.debug.semantic_context_found);
+    assert!(!result.debug.fallback_annotation_context_used);
+}
+
+#[test]
+fn normalized_selector_completion_keeps_the_registered_trusted_injector() {
+    let facts = Facts::new();
+    let request = selector_request(ParseSource::HostNormalized, true);
+    let context = SemanticCompletionContextExtractor::extract(
+        &request.buffer_text,
+        0,
+        request.character as usize,
+        request.semantic_model.as_ref(),
+    )
+    .unwrap();
+    assert!(
+        matches!(context, MixinCompletionContext::InjectMethod { injector, .. }
+        if injector.handler_method_descriptor.as_deref() == Some("()V"))
+    );
+    let result = MixinServiceFacade::new(&facts, &facts)
+        .complete_with_debug(
+            &request,
+            &MixinCompletionOptions::default(),
+            "mcdev.completion",
+            "java",
+        )
+        .unwrap();
+    assert_eq!(result.items[0].insert_text, "tick");
+    assert!(result.debug.semantic_context_found);
+    assert!(!result.debug.fallback_annotation_context_used);
+}
+
+#[test]
+fn handwritten_selector_completion_retains_its_partial_injector_fallback() {
+    let facts = Facts::new();
+    let request = selector_request(ParseSource::HandWrittenFallback, false);
+    let context = SemanticCompletionContextExtractor::extract(
+        &request.buffer_text,
+        0,
+        request.character as usize,
+        request.semantic_model.as_ref(),
+    )
+    .unwrap();
+    assert!(
+        matches!(context, MixinCompletionContext::InjectMethod { injector, .. }
+        if injector.handler_method_descriptor.is_none())
+    );
+    let result = MixinServiceFacade::new(&facts, &facts)
+        .complete_with_debug(
+            &request,
+            &MixinCompletionOptions::default(),
+            "mcdev.completion",
+            "java",
+        )
+        .unwrap();
+    assert_eq!(result.items[0].insert_text, "tick");
+    assert!(result.debug.semantic_context_found);
+}
+
 #[test]
 fn public_host_pipeline_validates_negative_reads_and_all_generation_dimensions() {
     let facts = Facts::new();

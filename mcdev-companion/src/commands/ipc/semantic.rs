@@ -2,6 +2,7 @@
 //!
 //! Values and opaque identities in this module are owned by the evaluation;
 //! nothing here caches or re-resolves a source name as a JVM binary name.
+mod annotation_sites;
 mod parameters;
 mod registered;
 pub use registered::RegisteredSourceProvider;
@@ -68,6 +69,8 @@ pub struct HostSemanticProvider {
     document_version: Option<i64>,
     index: Option<Arc<super::index::EvaluationIndex>>,
     source_facts_v2: bool,
+    annotation_sites: bool,
+    annotation_completion_position: Option<mcdev_core::McTextPosition>,
     project_sources: BTreeMap<std::path::PathBuf, (SourceEntry, SourceSnapshot)>,
 }
 
@@ -101,6 +104,8 @@ impl HostSemanticProvider {
             document_version,
             index: None,
             source_facts_v2: false,
+            annotation_sites: false,
+            annotation_completion_position: None,
             project_sources: BTreeMap::new(),
         })
     }
@@ -112,6 +117,18 @@ impl HostSemanticProvider {
 
     pub fn with_source_facts(mut self, enabled: bool) -> Self {
         self.source_facts_v2 = enabled;
+        self
+    }
+
+    /// A partial inventory can serve only the exact current completion position.
+    /// Other commands retain typed unavailability instead of inferring absence.
+    pub fn with_annotation_sites(
+        mut self,
+        enabled: bool,
+        completion_position: Option<mcdev_core::McTextPosition>,
+    ) -> Self {
+        self.annotation_sites = enabled;
+        self.annotation_completion_position = completion_position;
         self
     }
 
@@ -228,6 +245,7 @@ impl HostSemanticProvider {
         };
         let mut registry = Registry::default();
         e.validate(&mut registry).map_err(FactsError::Protocol)?;
+        let mut sites = self.read_annotation_sites(source, uri, selected, &mut registry)?;
         let imports = JavaTypeDescriptorResolver::imports_for_uri(&e.source, uri);
         let all_annotations = e
             .declarations
@@ -243,6 +261,11 @@ impl HostSemanticProvider {
                         .flat_map(|parameter| &parameter.annotations),
                 )
             })
+            .chain(
+                sites
+                    .iter()
+                    .flat_map(|sites| sites.facts.annotations.iter().map(|site| &site.annotation)),
+            )
             .collect::<Vec<_>>();
         let supplied = all_annotations
             .iter()
@@ -259,19 +282,27 @@ impl HostSemanticProvider {
             .map(|argument| (argument.range.start, argument.range.end))
             .collect::<Vec<_>>();
         // Nested annotation sites belong to an outer argument, not the declaration list.
-        if annotations_with_imports(&e.source, &imports)
+        let missing_annotation = annotations_with_imports(&e.source, &imports)
             .iter()
             .any(|site| {
                 !supplied.contains(&(site.start, site.end))
                     && !nested_arguments
                         .iter()
                         .any(|(start, end)| *start <= site.start && site.end <= *end)
-            })
+            });
+        if missing_annotation
+            && sites
+                .as_ref()
+                .is_none_or(|sites| sites.facts.coverage.found().is_some())
         {
             return Err(FactsError::Unknown(
                 "host annotation inventory is incomplete".into(),
             ));
         }
+        let partial_annotations = missing_annotation
+            || sites
+                .as_ref()
+                .is_some_and(|sites| sites.facts.coverage.found().is_none());
 
         let mut annotation_refs = BTreeSet::new();
         for annotation in e
@@ -294,8 +325,28 @@ impl HostSemanticProvider {
                 }
             }
         }
+        for site in sites.iter().flat_map(|sites| &sites.facts.annotations) {
+            collect_annotation_refs(&site.annotation, &mut annotation_refs);
+        }
+        if sites.is_some() {
+            for annotation in &all_annotations {
+                for argument in &annotation.arguments {
+                    annotation_sites::collect_value_refs(argument, &mut annotation_refs);
+                }
+            }
+        }
         let source_context = selected.map(|entry| &entry.descriptor);
         let identities = self.resolve_refs(&annotation_refs, &mut registry, source_context)?;
+        if let Some(sites) = &mut sites {
+            sites.reconcile(
+                source,
+                uri,
+                &e.declarations,
+                self.source_facts_v2,
+                &mut registry,
+                &identities,
+            )?;
+        }
         let mut owners = Vec::new();
         for declaration in &e.declarations {
             for annotation in &declaration.annotations {
@@ -308,6 +359,13 @@ impl HostSemanticProvider {
             }
         }
         if owners.is_empty() && self.source_facts_v2 {
+            if partial_annotations
+                || sites.is_some() && self.annotation_completion_position.is_some()
+            {
+                return Err(FactsError::Unknown(
+                    "annotation coverage does not establish a current Mixin owner".into(),
+                ));
+            }
             let model = mcdev_core::mixin_source::MixinClassModel {
                 source_uri: uri.to_owned(),
                 parse_source: ParseSource::HostNormalized,
@@ -340,6 +398,24 @@ impl HostSemanticProvider {
             }));
         }
         let (owner, mixin) = owners[0];
+        let selector_completions = sites
+            .as_ref()
+            .map(|sites| {
+                self.project_annotation_selectors(
+                    sites,
+                    owner,
+                    &identities,
+                    source,
+                    selected.is_none(),
+                )
+            })
+            .transpose()?;
+        if partial_annotations {
+            self.require_local_annotation_completion(
+                selector_completions.as_ref(),
+                selected.is_none(),
+            )?;
+        }
         let owner_fact: Fact<TypeFact> = self
             .read(&[json!({"op":"declarationType","declaration":owner.id})])?
             .pop()
@@ -515,7 +591,7 @@ impl HostSemanticProvider {
                             normalized_injectors.push(convert_injector(
                                 annotation,
                                 kind,
-                                &signature.descriptor,
+                                Some(&signature.descriptor),
                                 &identities,
                                 source,
                             )?);
@@ -696,6 +772,7 @@ impl HostSemanticProvider {
         };
         let mut model = project_host_semantic_document(source, uri, &document);
         model.targets = targets;
+        model.host_selector_completions = selector_completions;
         model.members.retain(|member| {
             expected_members.contains(&(
                 member.java_name.clone(),
@@ -776,6 +853,15 @@ impl HostSemanticProvider {
             for member in &mut model.members {
                 member.parse_source = ParseSource::HostNormalized;
                 member.confidence = ParseConfidence::High;
+            }
+            if partial_annotations {
+                model.confidence = ParseConfidence::Medium;
+                model.warnings.push("Annotation coverage is unavailable; only the current positive selector completion is authorized".into());
+                if let Some(handler) = &mut model.normalized_handler_source {
+                    handler.sites = HostFact::Unavailable {
+                        reason: "annotation inventory coverage is unavailable".into(),
+                    };
+                }
             }
             self.facts.check_active()?;
             return Ok(HostSemanticModel {
@@ -1139,7 +1225,7 @@ fn normalized_strings<'a>(
 fn convert_injector(
     annotation: &Annotation,
     kind: MixinAnnotation,
-    descriptor: &str,
+    descriptor: Option<&str>,
     identities: &BTreeMap<String, Fact<TypeFact>>,
     source: &str,
 ) -> Result<InjectorModel, FactsError> {
@@ -1241,7 +1327,7 @@ fn convert_injector(
             .ok_or_else(|| FactsError::Protocol("invalid injector annotation kind".into()))?,
         method_selectors,
         at_selectors: ats,
-        handler_method_descriptor: Some(descriptor.into()),
+        handler_method_descriptor: descriptor.map(str::to_owned),
         range: text_range(source, &annotation.range)?,
     })
 }

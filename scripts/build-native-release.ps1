@@ -206,7 +206,7 @@ try {
             'runtime-class-bytes-v1' = @('runtimeClass', 'classBytes')
             'jvm-catalog-v1' = @('jvmCatalog', 'jvmClass')
             'source-locations-v1' = @('sourceLocation')
-            'source-facts-v2' = @('sourceFacts')
+            'source-facts-v2' = @('sourceFacts', 'annotationSites')
             'project-inputs-v1' = @('projectInputs')
             'root-files-v1' = @('rootFileInventory', 'rootFileSnapshot')
         }

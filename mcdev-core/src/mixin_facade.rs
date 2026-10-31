@@ -224,6 +224,15 @@ impl<'a> MixinServiceFacade<'a> {
                 .and_then(|offset| {
                     AnnotationContextExtractor::extract_at_offset(&effective.buffer_text, offset)
                 })
+                .filter(|context| {
+                    // A normalized inventory must positively identify this injector.
+                    !(context.slot == AnnotationSlot::Method
+                        && context.annotation.is_injector()
+                        && effective.semantic_model.as_ref().is_some_and(|model| {
+                            model.parse_source == ParseSource::HostNormalized
+                                || model.host_selector_completions.is_some()
+                        }))
+                })
         } else {
             None
         };

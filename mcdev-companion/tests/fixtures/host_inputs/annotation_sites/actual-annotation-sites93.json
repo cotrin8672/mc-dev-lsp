@@ -1,0 +1,344 @@
+{
+  "provenance": {
+    "proof": "C:\\Users\\gummy\\.codex\\ktlsp-annotation-sites93\\editor\\artifacts\\extension-ipc-proof.json",
+    "proofSha256": "adc9d13314749b903c370c2564b8ffe8fd00ffcaa2569b53f76bcdf9338a42a2",
+    "hostSha256": "46ae70429778a834951ce0c191b08b334863441a82bf20c3394f8075fabfed4e",
+    "childSha256": "2f0d52eacc8b84f0776b24cfd99353c2773217fc46b5e817a40b3c0ecf3f57e3",
+    "accepted": {
+      "evaluation": "6",
+      "publication_revision": 2,
+      "provider": "fixture.ipc-shadow",
+      "instance": 2,
+      "owner": "C:/Users/gummy/.codex/ktlsp-annotation-sites93/project/modules/editing/src/main/java/fixture/CaseMixin.java",
+      "source_sha256": "8ef8973e54131e667c5ee9b2f9d5180aa3a819fc3cdfff961d0fccbf28bb2dcc"
+    }
+  },
+  "initial": {
+    "evaluation": "5",
+    "inventory": {
+      "annotations": [
+        {
+          "arguments": [
+            {
+              "range": {
+                "start": 80,
+                "end": 84
+              },
+              "name": "value",
+              "value": {
+                "value": {
+                  "contentRange": {
+                    "start": 81,
+                    "end": 83
+                  },
+                  "value": "is",
+                  "kind": "string"
+                },
+                "state": "found"
+              }
+            }
+          ],
+          "range": {
+            "start": 66,
+            "end": 85
+          },
+          "nameRange": {
+            "start": 67,
+            "end": 73
+          },
+          "useSiteTarget": null,
+          "owner": null,
+          "typeRef": "5:1"
+        }
+      ],
+      "source": {
+        "identity": {
+          "kind": "source",
+          "revision": "32"
+        },
+        "documentUri": {
+          "value": "file:///C%3A/Users/gummy/.codex/ktlsp-annotation-sites93/project/modules/editing/src/main/java/fixture/CaseMixin.java",
+          "state": "found"
+        },
+        "sha256": "28f19cfa03117b565551a22269a89ff77dfe079bfbd44c0ffbeb53ee245478f5"
+      },
+      "coverage": {
+        "reasons": [
+          {
+            "code": "UnsupportedSource"
+          }
+        ],
+        "state": "unknown"
+      }
+    },
+    "declarations": [
+      {
+        "fullRange": {
+          "start": 37,
+          "end": 87
+        },
+        "nameRange": {
+          "start": 50,
+          "end": 59
+        },
+        "bodyRange": {
+          "start": 60,
+          "end": 87
+        },
+        "headerRange": {
+          "start": 37,
+          "end": 60
+        },
+        "parameters": {
+          "reasons": [
+            {
+              "code": "UnsupportedSource"
+            }
+          ],
+          "state": "unknown"
+        },
+        "id": "5:0",
+        "annotations": [],
+        "modifiers": {
+          "final": {
+            "value": false,
+            "state": "found"
+          },
+          "static": {
+            "value": false,
+            "state": "found"
+          },
+          "visibility": {
+            "value": "Public",
+            "state": "found"
+          },
+          "abstract": {
+            "value": false,
+            "state": "found"
+          }
+        },
+        "sourceKind": "Class",
+        "range": {
+          "start": 50,
+          "end": 59
+        },
+        "owner": null,
+        "name": "CaseMixin"
+      }
+    ],
+    "resolved": {
+      "value": {
+        "id": "5:2",
+        "qualifiedName": "refs.Marker",
+        "package": "refs"
+      },
+      "state": "found"
+    }
+  },
+  "stale": {
+    "error": "{\"code\":-32801,\"message\":\"Stale\"}",
+    "evaluation": "5"
+  },
+  "edited": {
+    "evaluation": "6",
+    "inventory": {
+      "annotations": [
+        {
+          "arguments": [
+            {
+              "range": {
+                "start": 80,
+                "end": 84
+              },
+              "name": "value",
+              "value": {
+                "value": {
+                  "contentRange": {
+                    "start": 81,
+                    "end": 83
+                  },
+                  "value": "is",
+                  "kind": "string"
+                },
+                "state": "found"
+              }
+            }
+          ],
+          "range": {
+            "start": 66,
+            "end": 85
+          },
+          "nameRange": {
+            "start": 67,
+            "end": 73
+          },
+          "useSiteTarget": null,
+          "owner": "6:1",
+          "typeRef": "6:3"
+        }
+      ],
+      "source": {
+        "identity": {
+          "kind": "source",
+          "revision": "50"
+        },
+        "documentUri": {
+          "value": "file:///C%3A/Users/gummy/.codex/ktlsp-annotation-sites93/project/modules/editing/src/main/java/fixture/CaseMixin.java",
+          "state": "found"
+        },
+        "sha256": "8ef8973e54131e667c5ee9b2f9d5180aa3a819fc3cdfff961d0fccbf28bb2dcc"
+      },
+      "coverage": {
+        "value": null,
+        "state": "found"
+      }
+    },
+    "declarations": [
+      {
+        "fullRange": {
+          "start": 37,
+          "end": 117
+        },
+        "nameRange": {
+          "start": 50,
+          "end": 59
+        },
+        "bodyRange": {
+          "start": 60,
+          "end": 117
+        },
+        "headerRange": {
+          "start": 37,
+          "end": 60
+        },
+        "parameters": {
+          "reasons": [
+            {
+              "code": "UnsupportedSource"
+            }
+          ],
+          "state": "unknown"
+        },
+        "id": "6:0",
+        "annotations": [],
+        "modifiers": {
+          "final": {
+            "value": false,
+            "state": "found"
+          },
+          "static": {
+            "value": false,
+            "state": "found"
+          },
+          "visibility": {
+            "value": "Public",
+            "state": "found"
+          },
+          "abstract": {
+            "value": false,
+            "state": "found"
+          }
+        },
+        "sourceKind": "Class",
+        "range": {
+          "start": 50,
+          "end": 59
+        },
+        "owner": null,
+        "name": "CaseMixin"
+      },
+      {
+        "fullRange": {
+          "start": 66,
+          "end": 115
+        },
+        "nameRange": {
+          "start": 102,
+          "end": 110
+        },
+        "bodyRange": {
+          "start": 113,
+          "end": 115
+        },
+        "headerRange": {
+          "start": 66,
+          "end": 113
+        },
+        "parameters": {
+          "value": [],
+          "state": "found"
+        },
+        "id": "6:1",
+        "annotations": [
+          {
+            "arguments": [
+              {
+                "range": {
+                  "start": 80,
+                  "end": 84
+                },
+                "name": "value",
+                "value": {
+                  "value": {
+                    "contentRange": {
+                      "start": 81,
+                      "end": 83
+                    },
+                    "value": "is",
+                    "kind": "string"
+                  },
+                  "state": "found"
+                }
+              }
+            ],
+            "range": {
+              "start": 66,
+              "end": 85
+            },
+            "nameRange": {
+              "start": 67,
+              "end": 73
+            },
+            "useSiteTarget": null,
+            "typeRef": "6:4"
+          }
+        ],
+        "modifiers": {
+          "final": {
+            "value": false,
+            "state": "found"
+          },
+          "static": {
+            "value": false,
+            "state": "found"
+          },
+          "visibility": {
+            "value": "Public",
+            "state": "found"
+          },
+          "abstract": {
+            "value": false,
+            "state": "found"
+          }
+        },
+        "sourceKind": "Function",
+        "range": {
+          "start": 102,
+          "end": 110
+        },
+        "owner": "6:0",
+        "name": "injected"
+      }
+    ],
+    "resolved": {
+      "value": {
+        "id": "6:5",
+        "qualifiedName": "refs.Marker",
+        "package": "refs"
+      },
+      "state": "found"
+    }
+  },
+  "beforeSha256": "28f19cfa03117b565551a22269a89ff77dfe079bfbd44c0ffbeb53ee245478f5",
+  "afterSha256": "8ef8973e54131e667c5ee9b2f9d5180aa3a819fc3cdfff961d0fccbf28bb2dcc"
+}

@@ -9,9 +9,11 @@ use std::{
     sync::atomic::{AtomicU64, Ordering},
 };
 
+mod annotation_sites;
 mod project;
 mod root_files;
 mod source;
+pub use annotation_sites::*;
 pub use project::*;
 pub use root_files::*;
 pub use source::*;
@@ -28,6 +30,7 @@ pub enum InputOp {
     RootFileInventory,
     RootFileSnapshot,
     SourceFacts,
+    AnnotationSites,
     SourceLocation,
     ProjectInputs,
     SourceInventory,
@@ -42,10 +45,11 @@ pub enum InputOp {
 }
 
 impl InputOp {
-    pub const ALL: [Self; 14] = [
+    pub const ALL: [Self; 15] = [
         Self::RootFileInventory,
         Self::RootFileSnapshot,
         Self::SourceFacts,
+        Self::AnnotationSites,
         Self::SourceLocation,
         Self::ProjectInputs,
         Self::SourceInventory,
@@ -62,7 +66,7 @@ impl InputOp {
     pub fn capability(self) -> &'static str {
         match self {
             Self::RootFileInventory | Self::RootFileSnapshot => "root-files-v1",
-            Self::SourceFacts => "source-facts-v2",
+            Self::SourceFacts | Self::AnnotationSites => "source-facts-v2",
             Self::SourceLocation => "source-locations-v1",
             Self::ProjectInputs => "project-inputs-v1",
             Self::SourceInventory | Self::SourceSnapshot => "source-snapshots-v1",
@@ -79,6 +83,7 @@ impl InputOp {
             Self::RootFileInventory => "rootFileInventory",
             Self::RootFileSnapshot => "rootFileSnapshot",
             Self::SourceFacts => "sourceFacts",
+            Self::AnnotationSites => "annotationSites",
             Self::SourceLocation => "sourceLocation",
             Self::ProjectInputs => "projectInputs",
             Self::SourceInventory => "sourceInventory",

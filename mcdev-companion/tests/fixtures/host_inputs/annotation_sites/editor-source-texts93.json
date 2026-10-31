@@ -1,0 +1,23 @@
+{
+  "role": "Decoded source bytes from original rpc.send records, matched to unmodified producer sample SHA; no synthetic host answer",
+  "sourceLog": "C:/Users/gummy/.codex/ktlsp-annotation-sites93/editor/xdg-state/nvim-data/lsp.log",
+  "sourceLogSha256": "1fb246461ab1cede0840f3ffff64ccbc737e686ab0c3f4af5f3c3d2070dd82b9",
+  "initial": {
+    "documentUri": "file:///C:/Users/gummy/.codex/ktlsp-annotation-sites93/project/modules/editing/src/main/java/fixture/CaseMixin.java",
+    "documentVersion": 3,
+    "source": "package fixture;\nimport refs.Marker;\npublic class CaseMixin {\n    @Marker(value=\"is\")\n}\n",
+    "bytes": 88,
+    "sha256": "28f19cfa03117b565551a22269a89ff77dfe079bfbd44c0ffbeb53ee245478f5",
+    "rawLogLine": "[DEBUG][2026-11-01 05:09:56] ...pps\\neovim\\0.12.5\\share\\nvim\\runtime/lua/vim/lsp/log.lua:150\t\"rpc.send\"\t{ jsonrpc = \"2.0\", method = \"textDocument/didChange\", params = { contentChanges = { { text = 'package fixture;\\nimport refs.Marker;\\npublic class CaseMixin {\\n    @Marker(value=\"is\")\\n}\\n' } }, textDocument = { uri = \"file:///C:/Users/gummy/.codex/ktlsp-annotation-sites93/project/modules/editing/src/main/java/fixture/CaseMixin.java\", version = 3 } } }",
+    "rawLogLineNumber": 61
+  },
+  "edited": {
+    "documentUri": "file:///C:/Users/gummy/.codex/ktlsp-annotation-sites93/project/modules/editing/src/main/java/fixture/CaseMixin.java",
+    "documentVersion": 4,
+    "source": "package fixture;\nimport refs.Marker;\npublic class CaseMixin {\n    @Marker(value=\"is\")\n    public void injected() {}\n}\n",
+    "bytes": 118,
+    "sha256": "8ef8973e54131e667c5ee9b2f9d5180aa3a819fc3cdfff961d0fccbf28bb2dcc",
+    "rawLogLine": "[DEBUG][2026-11-01 05:09:56] ...pps\\neovim\\0.12.5\\share\\nvim\\runtime/lua/vim/lsp/log.lua:150\t\"rpc.send\"\t{ jsonrpc = \"2.0\", method = \"textDocument/didChange\", params = { contentChanges = { { text = 'package fixture;\\nimport refs.Marker;\\npublic class CaseMixin {\\n    @Marker(value=\"is\")\\n    public void injected() {}\\n}\\n' } }, textDocument = { uri = \"file:///C:/Users/gummy/.codex/ktlsp-annotation-sites93/project/modules/editing/src/main/java/fixture/CaseMixin.java\", version = 4 } } }",
+    "rawLogLineNumber": 81
+  }
+}

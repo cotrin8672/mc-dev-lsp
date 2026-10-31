@@ -255,6 +255,16 @@ fn execute_inner(
 
     let ops = InputOps::intersect(&initialization)?;
     let source_facts_enabled = ops.supports(InputOp::SourceFacts);
+    let annotation_sites_enabled = ops.supports(InputOp::AnnotationSites);
+    let annotation_completion_position =
+        if let DecodedCommand::Completion(request) = &validated.decoded {
+            usize::try_from(request.context.position.line)
+                .ok()
+                .zip(usize::try_from(request.context.position.character).ok())
+                .map(|(line, character)| mcdev_core::McTextPosition { line, character })
+        } else {
+            None
+        };
     let source_locations_enabled = ops.supports(InputOp::SourceLocation);
     let mut inputs = ScopedInputs::new(&validated.evaluation.evaluation, &ops, facts.clone())?;
     let project_ops = SupportedOps::intersect(&initialization)?;
@@ -345,6 +355,7 @@ fn execute_inner(
         )?
         .with_index(index.clone())
         .with_source_facts(source_facts_enabled)
+        .with_annotation_sites(annotation_sites_enabled, annotation_completion_position)
         .with_project_sources(project.source_snapshots)?,
     );
     let source_provider = Arc::new(semantic::RegisteredSourceProvider::new(

@@ -20,11 +20,13 @@ This is the host's file-input proof, separate from MC command/editor acceptance.
 Readonly snapshot JVM names are published from release89. Release92 separates
 semantic-index dependencies from metadata and rejects old resolved type handles
 after index changes, preserving the source/model/provider validation guards.
+Release93 adds independently negotiated written annotation sites, including
+annotations whose declaration has not yet been written.
 
 ## Published contract
 
 The current integration pin is ktlsp
-[`ab759c9c55bbb4e492fad96dce73ec8be2a4231f`](https://github.com/cotrin8672/ktlsp/blob/ab759c9c55bbb4e492fad96dce73ec8be2a4231f/docs/architecture/extension-ipc.md).
+[`ddba88af8c4dfc2b5c67397b465ea01c98129069`](https://github.com/cotrin8672/ktlsp/blob/ddba88af8c4dfc2b5c67397b465ea01c98129069/docs/architecture/extension-ipc.md).
 It adds normalized authored facts, owning-project input records, exact source
 locations and typed binary declaration annotations to source snapshots, owned
 resources, selected runtime bytes, the physical JVM catalog and provider
@@ -32,10 +34,10 @@ commands. The companion negotiates capabilities and individual operations;
 binary annotations are selected by capability alone. Configured command IDs
 are intersected with the implemented domain routes.
 
-The copied release92 host has SHA-256
-`177b38509f7a5d97035b6fc5120e4dc8b58a0f4ef2724553ad4511e2fdb9b5bd`.
+The copied release93 host has SHA-256
+`46ae70429778a834951ce0c191b08b334863441a82bf20c3394f8075fabfed4e`.
 Its provenance is retained in
-`build/host-artifacts/published-ab759c9-177b38509f7a/receipt.json`.
+`build/host-artifacts/published-ddba88a-46ae70429778/receipt.json`.
 This identifies the integration input; upstream API tests do not prove MC
 feature or original editor parity. The acceptance results below retain their
 historical host and companion pins.
@@ -132,14 +134,28 @@ before resolving annotation types. The exact unchanged 254-byte CRLF input is
 saved as `build/live-fixture-inputs/d7-orphan-inject-crlf.java`, SHA-256
 `7bd1004fdea0383b51e973c48f3a2e5162e359b9abc08eab559920e98e8df5a8`,
 document version 3, command evaluation 11. Its accepted provider evaluation is
-9, publication 8. The host task is adding generic `annotationSites` facts for
-this incomplete-edit state. The agreed operation is independently negotiated
+9, publication 8. Release93 publishes generic `annotationSites` facts for
+this incomplete-edit state. The operation is independently negotiated
 under `source-facts-v2`, retaining the existing `sourceFacts` shape. It returns
 source URI/revision/SHA, written annotation sites and a coverage fact. A positive
 site may support its specific completion even when syntax recovery makes total
 coverage Unknown; that does not establish missing sites or diagnostic absence.
-Host publication, the consumer connection and live verification are pending. D7
-shuts down cleanly. The 85-row member oracle comparison is still not reached.
+D7 shuts down cleanly. The 85-row member oracle comparison is still not reached.
+
+The consumer connection passes 82 affected Rust tests and actual debug-binary
+operation negotiation. The host's unmodified serializer fixture has SHA-256
+`fa2007364b01b5cfc877085e0c7297cc0513bfcdaa17f3243ee5564a7183eb1a`.
+It records positive ownerless sites with Unknown coverage, then an owned site
+after an unsaved edit. Owner Declaration tokens are reused only within the
+same evaluation/source view; ordinary and read-only snapshot provenance remain
+distinct. TypeRef tokens may be reissued, so their positive same-view resolved
+identities are compared. The sample captures only the inventory reference's
+type resolution; it does not prove the declaration alias's resolution. That
+pair remains a live MC check. Its percent-encoded Windows drive URI also exposed
+a consumer string-comparison mismatch, now corrected using normalized file
+paths while retaining exact source SHA/revision checks. Raw fixture conformance
+and the URI regressions pass. The new full native pipeline and original CEM
+rerun are pending.
 
 Current-source metadata preserves the 2,604 cases, 17 ported / 3 partial / 7
 pending editor-file states and historical four-snippet/169-call proof. Its

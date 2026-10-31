@@ -2891,6 +2891,13 @@ pub struct InjectorModel {
     pub handler_method_descriptor: Option<String>,
     pub range: McTextRange,
 }
+/// Positive annotation sites used only by completion. These do not declare a
+/// method, and annotation coverage may remain unavailable after syntax recovery.
+#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+pub struct HostSelectorCompletions {
+    pub injectors: Vec<InjectorModel>,
+    pub coverage: crate::host_source::HostFact<()>,
+}
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize, Deserialize)]
 pub enum InjectorKind {
     Inject,
@@ -2944,6 +2951,8 @@ pub struct MixinClassModel {
     pub members: Vec<MixinMemberModel>,
     pub injectors: Vec<InjectorModel>,
     pub resolved_mixin_extras_contexts: Vec<crate::extras_model::ResolvedMixinExtrasContext>,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub host_selector_completions: Option<HostSelectorCompletions>,
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub normalized_handler_source: Option<crate::extras_model::HostHandlerSource>,
     pub parse_source: ParseSource,
@@ -3953,10 +3962,20 @@ impl SemanticCompletionContextExtractor {
                 injector: model
                     .injectors
                     .iter()
+                    .chain(
+                        model
+                            .host_selector_completions
+                            .iter()
+                            .flat_map(|sites| &sites.injectors),
+                    )
                     .find(|i| contains(i.range))
                     .cloned()
                     .or_else(|| {
-                        if model.targets.is_empty() || !c.annotation.is_injector() {
+                        if model.parse_source == ParseSource::HostNormalized
+                            || model.host_selector_completions.is_some()
+                            || model.targets.is_empty()
+                            || !c.annotation.is_injector()
+                        {
                             return None;
                         }
                         let before = &source[c.annotation_start_offset..offset];

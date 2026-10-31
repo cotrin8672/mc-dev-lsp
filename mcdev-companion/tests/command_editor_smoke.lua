@@ -15,10 +15,6 @@ local command_ids = {
   'mcdev.hover', 'mcdev.references', 'mcdev.codeAction', 'mcdev.reindex',
   'mcdev.reloadProjectContext', 'mcdev.dumpContext', 'mcdev.info',
 }
-local incomplete_ids = {
-  'mcdev.references', 'mcdev.codeAction', 'mcdev.reindex',
-  'mcdev.reloadProjectContext', 'mcdev.dumpContext', 'mcdev.info',
-}
 local proof = {
   checks = 0, assertions = {}, matrix = {}, requests = {}, frames = {},
   indexing = {}, shutdown = {}, hostPids = {}, childProcesses = {},
@@ -28,6 +24,7 @@ local proof = {
 local client, buffers, exited = nil, {}, nil
 local host_system, host_debug = vim.system, vim.lsp.log.debug
 local cancel_id, cancel_wire
+local positive
 local paths = {
   owner = project .. '/src/main/java/fixture/Owner.java',
   patch = project .. '/src/main/java/fixture/Patch.java',
@@ -153,6 +150,7 @@ local function request(label, command, payload, bufnr)
   local complete, value, problem = false, nil, nil
   local deadline = (command == 'mcdev.reindex' or command == 'mcdev.reloadProjectContext') and 120000 or 25000
   local request_record = { case = label, command = command, payload = vim.deepcopy(payload), attempts = 1, deadlineMs = deadline }
+  if positive and positive.enabled then request_record.traceStart = positive.trace_mark() end
   proof.requests[#proof.requests + 1] = request_record
   local cancel = protocol.request(command, payload, function(result, err)
     complete, value, problem = true, result, err
@@ -160,6 +158,7 @@ local function request(label, command, payload, bufnr)
   end, bufnr)
   local done = vim.wait(deadline, function() return complete end, 10)
   request_record.completed = done
+  if positive and positive.enabled then request_record.traceEnd = positive.trace_mark() end
   if not done then
     request_record.timedOut = true
     local cancelled, cancel_error = pcall(function() cancel() end)
@@ -168,13 +167,292 @@ local function request(label, command, payload, bufnr)
   end
   save()
   check_phase(label .. ' received one response', done, request_record)
-  return value, problem
+  return value, problem, request_record
 end
 local function domain_payload(bufnr, position)
   return { context = protocol.context(bufnr, position) }
 end
 local function exact(label, actual, expected)
   check(label, vim.deep_equal(actual, expected), { actual = actual, expected = expected })
+end
+-- Fixed DTOs come only from the repeated old Kotlin artifact. Dynamic model lines
+-- follow the frozen original InfoService, with independently checked fixture paths.
+positive = { trace = { path = nil, offset = 0, partial = '', events = {} } }
+function positive.shape(label, value, required, optional)
+  check(label .. ' is an object', type(value) == 'table' and value ~= vim.NIL, value)
+  local allowed = {}
+  for _, key in ipairs(required) do
+    allowed[key] = true
+    check(label .. '.' .. key .. ' is present', value[key] ~= nil and value[key] ~= vim.NIL, value)
+  end
+  for _, key in ipairs(optional or {}) do allowed[key] = true end
+  for key in pairs(value) do check(label .. ' has no unexpected field ' .. tostring(key), allowed[key] == true, value) end
+end
+function positive.path(value)
+  assert(type(value) == 'string', 'path must be a string')
+  if value:match('^file:') then value = vim.uri_to_fname(value) end
+  value = vim.fs.normalize(value):gsub('^//%?/', ''):gsub('/+$', '')
+  return vim.fn.has('win32') == 1 and value:lower() or value
+end
+function positive.read(path)
+  local file = assert(io.open(path, 'rb'))
+  local value = assert(file:read('*a')); file:close(); return value
+end
+function positive.path_set(label, values, expected)
+  check(label .. ' is a list', type(values) == 'table' and vim.islist(values), values)
+  local paths, seen = {}, {}
+  for _, path in ipairs(values) do
+    check(label .. ' contains absolute paths', type(path) == 'string' and (path:match('^%a:[/\\]') or path:match('^/')) ~= nil, path)
+    local key = positive.path(path)
+    check(label .. ' has no duplicate path', not seen[key], path)
+    seen[key] = true; paths[#paths + 1] = key
+  end
+  table.sort(paths)
+  if expected then
+    local wanted = {}; for _, path in ipairs(expected) do wanted[#wanted + 1] = positive.path(path) end
+    table.sort(wanted); exact(label .. ' is the exact expected set', paths, wanted)
+  end
+  return seen
+end
+function positive.envelope(label, value, capabilities)
+  positive.shape(label, value, { 'protocolVersion', 'serverVersion', 'capabilities', 'result' })
+  exact(label .. ' protocol', value.protocolVersion, 1)
+  exact(label .. ' server', value.serverVersion, '0.1.0')
+  local caps = vim.deepcopy(capabilities); table.sort(caps)
+  exact(label .. ' capability set', value.capabilities, caps)
+  return value.result
+end
+function positive.load()
+  local path = repo .. '/mcdev-companion/tests/fixtures/host_commands/original-success.json'
+  positive.oracle = vim.json.decode(positive.read(path))
+  exact('old oracle is independent of Rust output', positive.oracle.provenance.rustOutputUsed, false)
+  exact('old oracle retains its build provenance limit', positive.oracle.provenance.compiledFromFrozenBaselineProven, false)
+  exact('old oracle does not claim full JDT routing', positive.oracle.provenance.fullJdtRouteProven, false)
+  local build = assert(vim.env.MCDEV_COMMAND_BUILD_INPUT, 'pinned build identity evidence is required')
+  positive.build = vim.json.decode(positive.read(build))
+  positive.shape('build input', positive.build, { 'artifactPath', 'artifactSha256', 'commit', 'buildTime', 'version', 'runStartedAtUnixMs', 'receiptSha256' })
+  exact('build input names the pinned real companion', positive.path(positive.build.artifactPath), positive.path(companion))
+  for _, key in ipairs({ 'commit', 'buildTime', 'version' }) do
+    check('build input records ' .. key, type(positive.build[key]) == 'string' and #positive.build[key] > 0, positive.build)
+  end
+  proof.positiveOracle = { path = path, sha256 = vim.fn.sha256(positive.read(path)), provenance = vim.deepcopy(positive.oracle.provenance) }
+  proof.buildInput = vim.deepcopy(positive.build)
+  positive.enabled = true
+end
+function positive.oracle_result(name)
+  local result = vim.deepcopy(positive.oracle[name])
+  local root = vim.uri_from_fname(project):gsub('/+$', '')
+  local function expand(value)
+    assert(value:sub(1, #'${WORKSPACE_URI}') == '${WORKSPACE_URI}')
+    return root .. value:sub(#'${WORKSPACE_URI}' + 1)
+  end
+  if name == 'references' then
+    for _, location in ipairs(result.locations) do location.documentUri = expand(location.documentUri) end
+  else
+    for _, action in ipairs(result.actions) do
+      action.metadata.configPath = expand(action.metadata.configPath)
+      for _, edit in ipairs(action.edits) do edit.documentUri = expand(edit.documentUri) end
+    end
+  end
+  return result
+end
+function positive.references(value)
+  positive.envelope('positive references', value, { 'references' })
+  local function locations(result)
+    positive.shape('references result', result, { 'locations' })
+    local output, seen = {}, {}
+    for _, item in ipairs(result.locations) do
+      positive.shape('reference location', item, { 'documentUri', 'range', 'metadata', 'resolution' })
+      check('reference URI is a file URI', item.documentUri:match('^file:') ~= nil, item)
+      local copy = vim.deepcopy(item); copy.documentUri = positive.path(copy.documentUri)
+      local key = copy.documentUri .. ':' .. vim.json.encode(copy.range)
+      check('positive reference location has no duplicate', not seen[key], item); seen[key] = true
+      output[#output + 1] = copy
+    end
+    table.sort(output, function(a, b) return a.documentUri < b.documentUri end)
+    return output
+  end
+  exact('all original reference URIs/ranges/metadata/resolutions', locations(value.result), locations(positive.oracle_result('references')))
+end
+function positive.lines(model, version)
+  local mappings, cp = model.mappings, model.classpath
+  local available = vim.deepcopy(mappings.availableNamespaces)
+  local rank = { named = 1, intermediary = 2, official = 3, srg = 4, mcp = 5 }
+  table.sort(available, function(a, b) return rank[a] < rank[b] end)
+  local function count(name, n) return name .. (n == 0 and ': none' or n == 1 and ': 1 file' or ': ' .. n .. ' files') end
+  return {
+    'Project: ' .. model.projectId, 'Root: ' .. model.root, 'Platform: Unknown',
+    #available == 0 and 'Mappings: none' or ('Mappings: ' .. mappings.sourceNamespace .. ' <-> ' .. mappings.runtimeNamespace .. (#available >= 2 and ' loaded' or ' partial')),
+    #available == 0 and 'Mapping source: none (no supported mapping files discovered)' or 'Mapping source: provided',
+    'Source namespace: ' .. mappings.sourceNamespace, 'Runtime namespace: ' .. mappings.runtimeNamespace,
+    'Minecraft jar: none', count('Mixin config', #model.mixinConfigs),
+    'Mixin config search: ' .. table.concat(model.mixinConfigs, ', '),
+    count('Access Widener', #model.accessWideners), count('Access Transformer', #model.accessTransformers),
+    'Classpath entries: ' .. cp.entryCount,
+    ('Classpath source: project outputs=%d, dependencies=%d, minecraft=%d'):format(#cp.projectOutputs, #cp.dependencyJars, #cp.minecraftJars),
+    'Source sets: ' .. #model.sourceSets, 'Class index: ready', 'Bytecode index: ready',
+    #available == 0 and 'Mapping namespaces: none (searched project mapping files and known Gradle mapping caches)' or 'Mapping namespaces: ' .. table.concat(available, ', '),
+    'Protocol: 1', 'Extension: ' .. version,
+  }
+end
+function positive.dump(value, configs)
+  local data = positive.envelope('positive dump', value, { 'dumpContext', 'info' })
+  positive.shape('dump result', data, { 'lines', 'projectId', 'root', 'platform', 'mappings', 'classpath', 'sourceSets', 'mixinConfigs', 'accessWideners', 'accessTransformers', 'minecraftJars', 'indexState' })
+  check('project id is a nonempty opaque owning-model id', type(data.projectId) == 'string' and #data.projectId > 0, data.projectId)
+  exact('dump belongs to the isolated root', positive.path(data.root), positive.path(project))
+  exact('Java-only fixture platform', data.platform, 'unknown')
+  exact('accepted index is ready', data.indexState, 'ready')
+  positive.path_set('selected mixin configs', data.mixinConfigs, configs)
+  positive.path_set('selected AW files', data.accessWideners, { paths.aw })
+  positive.path_set('selected AT files', data.accessTransformers, {})
+  positive.path_set('selected Minecraft jars', data.minecraftJars, {})
+  local mappings = data.mappings
+  positive.shape('mapping DTO', mappings, { 'sourceNamespace', 'runtimeNamespace', 'availableNamespaces' }, { 'awNamespace', 'atNamespace' })
+  local namespaces = { named = true, intermediary = true, official = true, srg = true, mcp = true }
+  for _, key in ipairs({ 'sourceNamespace', 'runtimeNamespace', 'awNamespace', 'atNamespace' }) do
+    check('known optional/required mapping namespace ' .. key, mappings[key] == nil or namespaces[mappings[key]] == true, mappings)
+  end
+  local available, seen = {}, {}
+  for _, name in ipairs(mappings.availableNamespaces) do
+    check('available namespaces are known and unique', namespaces[name] and not seen[name], mappings)
+    seen[name] = true; available[#available + 1] = name
+  end
+  table.sort(available); exact('available namespace DTO is canonical', mappings.availableNamespaces, available)
+  local cp = data.classpath
+  positive.shape('classpath DTO', cp, { 'entryCount', 'projectOutputs', 'dependencyJars', 'minecraftJars', 'generatedOutputs', 'capturedAt' })
+  local total, outputs = 0, {}
+  for _, key in ipairs({ 'projectOutputs', 'dependencyJars', 'minecraftJars', 'generatedOutputs' }) do
+    local set = positive.path_set('classpath ' .. key, cp[key])
+    total = total + #cp[key]
+    if key == 'projectOutputs' or key == 'generatedOutputs' then for path in pairs(set) do outputs[path] = true end end
+    if key == 'dependencyJars' then for _, path in ipairs(cp[key]) do
+      local stat = vim.uv.fs_stat(path); check('selected dependency is a real file', stat and stat.type == 'file', path)
+    end end
+  end
+  exact('classpath count follows the actual reported inventory', cp.entryCount, total)
+  check('real project class output is selected', outputs[positive.path(project .. '/build/classes/java/main')] == true, cp)
+  check('exact fixture Target.class exists in selected output', vim.uv.fs_stat(project .. '/build/classes/java/main/fixture/Target.class') ~= nil, cp)
+  exact('Java-only fixture has no Minecraft classpath', cp.minecraftJars, {})
+  check('capture time is real nonzero millisecond metadata', type(cp.capturedAt) == 'number' and cp.capturedAt % 1 == 0
+    and cp.capturedAt >= positive.build.runStartedAtUnixMs and cp.capturedAt <= vim.fn.localtime() * 1000 + 999, cp)
+  local main, names = nil, {}
+  check('source sets are a nonempty list', type(data.sourceSets) == 'table' and vim.islist(data.sourceSets) and #data.sourceSets > 0, data.sourceSets)
+  for _, set in ipairs(data.sourceSets) do
+    positive.shape('source-set DTO', set, { 'name', 'sourceDirectories', 'resourceDirectories' }, { 'outputDirectory' })
+    check('source-set name is nonempty and unique', type(set.name) == 'string' and #set.name > 0 and not names[set.name], set)
+    names[set.name] = true
+    local sources = positive.path_set('source directories', set.sourceDirectories)
+    local resources = positive.path_set('resource directories', set.resourceDirectories)
+    for _, list in ipairs({ set.sourceDirectories, set.resourceDirectories }) do for _, path in ipairs(list) do
+      check('fixture source/resource root belongs to the isolated project', positive.path(path):sub(1, #positive.path(project) + 1) == positive.path(project) .. '/', path)
+    end end
+    if set.outputDirectory ~= nil then check('source-set output is in selected outputs', outputs[positive.path(set.outputDirectory)] == true, set) end
+    if sources[positive.path(project .. '/src/main/java')] then
+      check('main source set selects actual resources', resources[positive.path(project .. '/src/main/resources')] == true, set)
+      check('main source set has selected output', set.outputDirectory ~= nil, set); main = set
+    end
+  end
+  check('actual main source/resource set is present', main ~= nil, data.sourceSets)
+  exact('all original project info lines in dump', data.lines, positive.lines(data, '0.1.0'))
+  return data
+end
+function positive.info(value, model)
+  local data = positive.envelope('positive info', value, { 'info', 'completion', 'diagnostics', 'hover', 'definition', 'references', 'codeAction', 'reindex', 'projectContext' })
+  positive.shape('info result', data, { 'lines', 'buildCommit', 'buildTime', 'version', 'jarLocation', 'registeredCommands' })
+  exact('Info commit matches pinned build receipt', data.buildCommit, positive.build.commit)
+  exact('Info time matches pinned build receipt', data.buildTime, positive.build.buildTime)
+  exact('Info version matches pinned build receipt', data.version, positive.build.version)
+  exact('Info artifact is the real companion executable', positive.path(data.jarLocation), positive.path(positive.build.artifactPath))
+  check('Info artifact exists', vim.uv.fs_stat(data.jarLocation) ~= nil, data.jarLocation)
+  exact('exact original negotiated command registry', data.registeredCommands, positive.oracle.registeredCommands)
+  local allowed, seen = {}, {}; for _, id in ipairs(command_ids) do allowed[id] = true end
+  for _, id in ipairs(data.registeredCommands) do check('registry is implemented, negotiated and unique', allowed[id] and not seen[id], data); seen[id] = true end
+  exact('registry has all 11 commands', #data.registeredCommands, 11)
+  local lines = positive.lines(model, positive.build.version)
+  vim.list_extend(lines, { 'Extension loaded: true', 'Extension build commit: ' .. positive.build.commit,
+    'Extension build time: ' .. positive.build.buildTime, 'Extension jar location: ' .. data.jarLocation, 'Registered commands:' })
+  for _, id in ipairs(positive.oracle.registeredCommands) do lines[#lines + 1] = '  - ' .. id end
+  exact('every Info line matches original format and current project model', data.lines, lines)
+  return data
+end
+function positive.trace_mark()
+  local state, path = positive.trace, vim.env.KTLSP_TRACE
+  if state.path ~= path then state.path, state.offset, state.partial, state.events = path, 0, '', {} end
+  local file = assert(io.open(path, 'rb')); assert(file:seek('set', state.offset))
+  local chunk = file:read('*a') or ''; file:close(); state.offset = state.offset + #chunk
+  check('trace stays within the finite evidence budget', state.offset <= 128 * 1024 * 1024, state.offset)
+  local data, consumed = state.partial .. chunk, 0
+  for line, next_byte in data:gmatch('([^\n]*)\n()') do
+    consumed = next_byte - 1
+    if line:match('%S') then
+      local event = vim.json.decode(line)
+      if event.name == 'extension.ipc.command_state' or event.name == 'workspace.refresh_requested'
+        or event.name == 'workspace.accepted_finish' or event.name == 'workspace.project_scan'
+        or event.name == 'deps.index_workspace' or event.name == 'extension.ipc.read_facts' then
+        state.events[#state.events + 1] = event
+      end
+    end
+  end
+  state.partial = data:sub(consumed + 1)
+  return #state.events
+end
+function positive.ready(record, refresh)
+  local events, selected, selected_index = positive.trace.events, nil, nil
+  for index = record.traceStart + 1, record.traceEnd do
+    local event, args = events[index], events[index].args
+    if event.name == 'extension.ipc.command_state' and args.dispatch == true and args.stage == 'child-response'
+      and args.provider == provider and args.command == record.command
+      and positive.path(args.owner) == positive.path(record.payload.context.documentUri) then
+      check('one dispatched command state matches this response', selected == nil, { selected, event }); selected, selected_index = event, index
+    end
+  end
+  check('response has real host command-state evidence', selected ~= nil, record)
+  local state = selected.args
+  check('host command has an evaluation and worker identity', state.evaluation ~= nil and state.evaluation ~= vim.NIL
+    and state.instance ~= nil and state.instance ~= vim.NIL, state)
+  check('host command has an exact current document revision', type(state.expected_document_revision) == 'string'
+    and #state.expected_document_revision > 0 and type(state.current_document_revision) == 'number'
+    and state.current_document_revision % 1 == 0 and state.current_document_revision <= 9007199254740991
+    and state.expected_document_revision == tostring(state.current_document_revision), state)
+  exact('host command source hash matches current request', state.source_sha256, vim.fn.sha256(record.payload.context.bufferText))
+  exact('host command version matches current request', state.expected_document_version, record.payload.context.documentVersion)
+  exact('host command version is still current', state.current_document_version, record.payload.context.documentVersion)
+  exact('host command evaluation is current', state.evaluation_current, true)
+  check('host dispatch has no error', state.error == nil or state.error == vim.NIL, state)
+  check('analysis generation is an exact observable token', type(state.analysis_generation) == 'number' and state.analysis_generation % 1 == 0 and state.analysis_generation <= 9007199254740991, state)
+  local generation, accepted, indexed, scanned, requested = tostring(state.analysis_generation), nil, nil, nil, nil
+  local accepted_index, indexed_index, scanned_index, requested_index
+  local operations = {}
+  for index = 1, selected_index do
+    local event = events[index]
+    local args = event.args
+    if event.name == 'extension.ipc.read_facts' and tostring(args.evaluation) == tostring(state.evaluation)
+      and args.instance == state.instance and args.command == true and args.ok == true then
+      for _, op in ipairs(args.ops or {}) do operations[op] = true end
+    end
+    if args.generation ~= nil and tostring(args.generation) == generation
+      and (args.root == nil or positive.path(args.root) == positive.path(project)) then
+      if event.name == 'workspace.accepted_finish' then accepted, accepted_index = event, index end
+      if event.name == 'deps.index_workspace' then indexed, indexed_index = event, index end
+      if event.name == 'workspace.project_scan' then scanned, scanned_index = event, index end
+      if event.name == 'workspace.refresh_requested' and index > record.traceStart then requested, requested_index = event, index end
+    end
+  end
+  check('authoritative generation completed project/library/SDK indexing', accepted and indexed and scanned
+    and accepted.args.failed == 0 and accepted.args.classpathComplete == true and indexed.args.failed == 0
+    and indexed.args.jdkComplete == true and scanned.args.files > 0, { accepted = accepted, indexed = indexed, scanned = scanned })
+  check('completed model evidence precedes the command result', scanned_index < accepted_index
+    and accepted_index <= indexed_index and indexed_index < selected_index, { scanned_index, accepted_index, indexed_index, selected_index })
+  check('command actually read selected project inputs and root inventory', operations.projectInputs == true and operations.rootFileInventory == true, operations)
+  if refresh then
+    check('this command requested a fresh real refresh generation', requested ~= nil and scanned.args.forcedModel == true, { requested, scanned })
+    check('refresh request precedes that generation completion', requested_index < scanned_index, { requested_index, scanned_index })
+    check('host supplied the completed refreshGeneration, independently visible in command trace',
+      type(state.refresh_generation) == 'string' and #state.refresh_generation > 0, state)
+    exact('refreshGeneration is associated with that completed host generation', state.refresh_generation, generation)
+  end
+  record.authority = { command = selected, accepted = accepted, indexed = indexed, scanned = scanned, requested = requested, factOps = operations }
+  return generation
 end
 local function no_measurements(response)
   local copy = vim.deepcopy(response)
@@ -251,15 +529,6 @@ local function expected_definition()
     }} },
   }
 end
-local function expected_incomplete()
-  return {
-    protocolVersion = 1, serverVersion = '0.1.0', capabilities = {},
-    error = {
-      code = 'INCOMPLETE_PROJECT_CONTEXT',
-      message = 'complete project source-set and resource inventory is unavailable', details = {},
-    },
-  }
-end
 local function absolute_cursor(bufnr, row, token)
   local line = vim.api.nvim_buf_get_lines(bufnr, row - 1, row, false)[1]
   return { row, assert(line:find(token, 1, true)) - 1 + #token }
@@ -283,9 +552,49 @@ local function raw_outer(command, bufnr, payload, version)
     }, arguments = { payload },
   }} }
 end
+local function positive_request(label, command, payload, refresh)
+  local value, err, record = request(label, command, payload, buffers.patch)
+  check(label .. ' transport succeeded', err == nil, err)
+  local frame = proof.frames[#proof.frames]
+  local outer = frame and frame.params and frame.params.arguments and frame.params.arguments[1]
+  check(label .. ' uses the actual provider route', frame and frame.params.command == 'ktlsp.providerCommand'
+    and outer and outer.provider == provider and outer.command == command, frame)
+  if refresh then exact(label .. ' requests host refresh', outer.refreshProject, true) end
+  exact(label .. ' is the actual received envelope', frame.result, value)
+  positive.ready(record, refresh)
+  return value, record
+end
+local function project_snapshot(label, configs)
+  local dump, dump_record = positive_request(label .. ' dump', 'mcdev.dumpContext', domain_payload(buffers.patch, { 1, 0 }))
+  local model = positive.dump(dump, configs)
+  local info, info_record = positive_request(label .. ' info', 'mcdev.info', domain_payload(buffers.patch, { 1, 0 }))
+  positive.info(info, model)
+  exact(label .. ' project projections share the accepted generation', info_record.authority.command.args.analysis_generation,
+    dump_record.authority.command.args.analysis_generation)
+  proof.projectSnapshots = proof.projectSnapshots or {}
+  local snapshot = { label = label, dump = vim.deepcopy(dump), info = vim.deepcopy(info),
+    dumpAuthority = dump_record.authority, infoAuthority = info_record.authority }
+  proof.projectSnapshots[#proof.projectSnapshots + 1] = snapshot
+  return snapshot
+end
+local function fixture_change(path, content, kind)
+  check('refresh mutation stays in the isolated resource fixture', positive.path(path):sub(1, #positive.path(project) + 1) == positive.path(project) .. '/', path)
+  local before = vim.uv.fs_stat(path) and vim.fn.sha256(positive.read(path)) or vim.NIL
+  if content then
+    local file = assert(io.open(path, 'wb')); assert(file:write(content)); assert(file:close())
+  else assert(os.remove(path)) end
+  check('resource watch notification was sent', client:notify('workspace/didChangeWatchedFiles',
+    { changes = {{ uri = vim.uri_from_fname(path), type = kind }} }), path)
+  proof.refreshFixtureChanges = proof.refreshFixtureChanges or {}
+  proof.refreshFixtureChanges[#proof.refreshFixtureChanges + 1] = {
+    documentUri = vim.uri_from_fname(path), kind = kind, beforeSha256 = before,
+    afterSha256 = content and vim.fn.sha256(positive.read(path)) or vim.NIL, at = vim.uv.hrtime(),
+  }
+end
 
 local completion
 local ok, failure = xpcall(function()
+  positive.load()
   vim.system = function(cmd, opts, callback)
     if type(cmd) ~= 'table' or cmd[1] ~= binary then return host_system(cmd, opts, callback) end
     local number = #proof.hostPids + 1
@@ -398,19 +707,76 @@ local ok, failure = xpcall(function()
     check('host rejects stale version', response and response.err and response.err.code == -32801, response or err)
     return response
   end)
-  for _, command in ipairs(incomplete_ids) do
-    run_case('typed incomplete project result: ' .. command, nil, function()
-      local pos = command == 'mcdev.references' and absolute_cursor(buffers.patch, 1, 'Target') or { 1, 0 }
-      local value, err = request('incomplete ' .. command, command, domain_payload(buffers.patch, pos), buffers.patch)
-      check('incomplete command transport succeeded', err == nil, err)
-      exact('complete typed incomplete envelope ' .. command, value, expected_incomplete())
-      if command == 'mcdev.reindex' or command == 'mcdev.reloadProjectContext' then
-        local outer = proof.frames[#proof.frames].params.arguments[1]
-        check(command .. ' requested a real host refresh', outer.refreshProject == true, outer)
-      end
-      return value
-    end)
-  end
+  run_case('restore exact oracle Java inputs before positive commands', nil, function()
+    local floor = acceptance:mark()
+    vim.api.nvim_buf_set_lines(buffers.owner, 0, -1, false, vim.fn.readfile(paths.owner))
+    vim.bo[buffers.owner].modified = false
+    flush(); await_accepted(buffers.owner, floor)
+    proof.oracleBuffers = {}
+    for _, key in ipairs({ 'owner', 'patch', 'target', 'expression' }) do
+      local relative = key == 'expression' and 'src/main/java/fixture/ExampleMixin.java'
+        or 'src/main/java/fixture/' .. ({ owner = 'Owner', patch = 'Patch', target = 'Target' })[key] .. '.java'
+      local hash = vim.fn.sha256(full_text(buffers[key]))
+      exact('current oracle buffer SHA ' .. key, hash, positive.oracle.inputSha256[relative])
+      proof.oracleBuffers[key] = { documentUri = uri(buffers[key]), sourceSha256 = hash,
+        documentVersion = vim.lsp.util.buf_versions[buffers[key]] }
+    end
+    return proof.oracleBuffers
+  end)
+  run_case('full positive references DTO', 'mcdev.references', function()
+    local payload = domain_payload(buffers.patch, absolute_cursor(buffers.patch, 1, 'Target'))
+    exact('positive reference cursor matches original capture', payload.context.position, positive.oracle.requests.references.position)
+    local value = positive_request('positive references', 'mcdev.references', payload)
+    positive.references(value)
+    return value
+  end)
+  local baseline
+  run_case('full positive dumpContext DTO', 'mcdev.dumpContext', function()
+    local value, record = positive_request('baseline dump', 'mcdev.dumpContext', domain_payload(buffers.patch, { 1, 0 }))
+    positive.dump(value, { project .. '/src/main/resources/fixture.mixins.json' })
+    baseline = { label = 'baseline', dump = vim.deepcopy(value), dumpAuthority = record.authority }
+    proof.projectSnapshots = { baseline }
+    return baseline.dump
+  end)
+  run_case('full positive info DTO', 'mcdev.info', function()
+    check('baseline model exists for full Info comparison', baseline ~= nil, baseline)
+    local value, record = positive_request('baseline info', 'mcdev.info', domain_payload(buffers.patch, { 1, 0 }))
+    positive.info(value, baseline.dump.result)
+    exact('baseline project projections share the accepted generation', record.authority.command.args.analysis_generation,
+      baseline.dumpAuthority.command.args.analysis_generation)
+    baseline.info, baseline.infoAuthority = vim.deepcopy(value), record.authority
+    return baseline.info
+  end)
+  run_case('full positive Mixin registration code action DTO', 'mcdev.codeAction', function()
+    local config = project .. '/src/main/resources/fixture.mixins.json'
+    exact('config has the exact original oracle input', positive.read(config), positive.oracle.configBefore)
+    local start = positive.oracle.requests.codeAction.range.start
+    local payload = domain_payload(buffers.patch, { start.line + 1, start.character })
+    payload.range = vim.deepcopy(positive.oracle.requests.codeAction.range)
+    payload.diagnosticCodes = vim.deepcopy(positive.oracle.requests.codeAction.diagnosticCodes)
+    local value = positive_request('positive registration fix', 'mcdev.codeAction', payload)
+    positive.envelope('positive registration fix', value, { 'codeAction' })
+    exact('full original quickfix DTO and UTF-16 edits', value.result, positive.oracle_result('codeAction'))
+    local bufnr = vim.fn.bufadd(config); vim.fn.bufload(bufnr)
+    check('config edit probe does not change host resource authority', not vim.lsp.buf_is_attached(bufnr, client.id), bufnr)
+    local before = full_text(bufnr)
+    local passed, applied = xpcall(function()
+      local changes = {}
+      for _, workspace in ipairs(value.result.actions[1].edits) do changes[workspace.documentUri] = vim.deepcopy(workspace.edits) end
+      vim.lsp.util.apply_workspace_edit({ changes = changes }, 'utf-16')
+      exact('real editor applies original insertion without reformatting', full_text(bufnr), positive.oracle.configAfter)
+      exact('edited config retains package and lists Patch once', vim.json.decode(full_text(bufnr)), { package = 'fixture', mixins = { 'Patch' } })
+      exact('workspace edit leaves disk input unchanged', positive.read(config), positive.oracle.configBefore)
+      proof.appliedConfig = { documentUri = vim.uri_from_bufnr(bufnr), text = full_text(bufnr),
+        sourceSha256 = vim.fn.sha256(full_text(bufnr)), diskUnchanged = true, modified = vim.bo[bufnr].modified }
+      return proof.appliedConfig
+    end, debug.traceback)
+    vim.api.nvim_buf_set_lines(bufnr, 0, -1, false, vim.split(before, '\n', { plain = true }))
+    vim.bo[bufnr].modified = false
+    if not passed then error(applied) end
+    exact('config scratch buffer is restored exactly', full_text(bufnr), positive.oracle.configBefore)
+    return { response = value, applied = applied }
+  end)
   run_case('full AW header empty references DTO', 'mcdev.references', function()
     exact('AW header has no reference target', full_text(buffers.aw), 'accessWidener v2 named\n')
     check('AW buffer is attached to the real host', vim.lsp.buf_is_attached(buffers.aw, client.id), nil)
@@ -544,6 +910,58 @@ local ok, failure = xpcall(function()
     if not passed then error(result) end
     return result
   end)
+  local extra_a = project .. '/src/main/resources/reindex-proof.mixins.json'
+  local extra_b = project .. '/src/main/resources/reload-proof.mixins.json'
+  local reindexed
+  run_case('observable positive reindex refresh', 'mcdev.reindex', function()
+    check('baseline snapshot exists before refresh', baseline ~= nil, baseline)
+    check('new reindex config path is not preexisting', vim.uv.fs_stat(extra_a) == nil, extra_a)
+    fixture_change(extra_a, '{"package":"fixture","mixins":[]}', 1)
+    local value, record = positive_request('reindex after adding config', 'mcdev.reindex', domain_payload(buffers.patch, { 1, 0 }), true)
+    local result = positive.envelope('positive reindex', value, { 'reindex' })
+    positive.shape('reindex result', result, { 'status', 'indexState', 'classpathEntries' })
+    exact('reindex original status', result.status, 'reindex complete')
+    reindexed = project_snapshot('after reindex', { project .. '/src/main/resources/fixture.mixins.json', extra_a })
+    exact('post-reindex model belongs to the completed refresh generation', reindexed.dumpAuthority.command.args.analysis_generation,
+      record.authority.command.args.analysis_generation)
+    exact('real config discovery changed 1 to 2', { #baseline.dump.result.mixinConfigs, #reindexed.dump.result.mixinConfigs }, { 1, 2 })
+    exact('reindex state equals accepted post-refresh dump', result.indexState, reindexed.dump.result.indexState)
+    exact('reindex count equals actual post-refresh inventory', result.classpathEntries, reindexed.dump.result.classpath.entryCount)
+    check('fresh refresh generation differs from baseline token', tostring(record.authority.command.args.analysis_generation)
+      ~= tostring(baseline.dumpAuthority.command.args.analysis_generation), record.authority)
+    proof.reindexEffect = { before = baseline, after = reindexed, refresh = value, authority = record.authority }
+    return proof.reindexEffect
+  end)
+  run_case('observable positive reloadProjectContext refresh', 'mcdev.reloadProjectContext', function()
+    check('reindex snapshot exists before distinct reload mutation', reindexed ~= nil, reindexed)
+    check('new reload config path is not preexisting', vim.uv.fs_stat(extra_b) == nil, extra_b)
+    fixture_change(extra_a, nil, 3)
+    fixture_change(extra_b, '{"package":"fixture","mixins":[]}', 1)
+    local value, record = positive_request('reload after replacing config', 'mcdev.reloadProjectContext', domain_payload(buffers.patch, { 1, 0 }), true)
+    local result = positive.envelope('positive reload', value, { 'reloadProjectContext', 'dumpContext', 'info', 'reindex' })
+    positive.shape('reload result', result, { 'status', 'indexState', 'classpathEntries', 'lines' })
+    exact('reload original status', result.status, 'project context reloaded')
+    local reloaded = project_snapshot('after reload', { project .. '/src/main/resources/fixture.mixins.json', extra_b })
+    exact('post-reload model belongs to the completed refresh generation', reloaded.dumpAuthority.command.args.analysis_generation,
+      record.authority.command.args.analysis_generation)
+    exact('reload state equals accepted post-refresh dump', result.indexState, reloaded.dump.result.indexState)
+    exact('reload count equals actual post-refresh inventory', result.classpathEntries, reloaded.dump.result.classpath.entryCount)
+    exact('every reload project info line matches the accepted post-refresh model', result.lines, reloaded.dump.result.lines)
+    check('reload issued a distinct refresh token', tostring(record.authority.command.args.analysis_generation)
+      ~= tostring(reindexed.dumpAuthority.command.args.analysis_generation), record.authority)
+    proof.reloadEffect = { before = reindexed, after = reloaded, refresh = value, authority = record.authority }
+    return proof.reloadEffect
+  end)
+  run_case('restore isolated refresh fixtures and lifecycle input', nil, function()
+    -- All exact project/config baseline cases ran before these reversible probes.
+    for _, path in ipairs({ extra_a, extra_b }) do if vim.uv.fs_stat(path) then fixture_change(path, nil, 3) end end
+    check('both temporary configs were removed', vim.uv.fs_stat(extra_a) == nil and vim.uv.fs_stat(extra_b) == nil, { extra_a, extra_b })
+    local floor = acceptance:mark()
+    vim.api.nvim_buf_set_lines(buffers.owner, 3, 4, false, { '// 未保存' })
+    vim.api.nvim_buf_set_lines(buffers.owner, 6, 7, false, { '    /* 😀 */ @Inject(meth)' })
+    flush()
+    return await_accepted(buffers.owner, floor)
+  end)
   run_case('cancel command through real host', nil, function()
     flush()
     local params = raw_outer('mcdev.diagnostics', buffers.patch,
@@ -610,14 +1028,27 @@ local required = {
   ['full AW header empty references DTO'] = true, ['full Kotlin empty code action DTO'] = true,
   ['real MixinExtras definition navigation'] = true,
   ['original E2E startup support'] = true,
+  ['restore exact oracle Java inputs before positive commands'] = true,
+  ['full positive references DTO'] = true,
+  ['full positive Mixin registration code action DTO'] = true,
+  ['full positive dumpContext DTO'] = true,
+  ['full positive info DTO'] = true,
+  ['observable positive reindex refresh'] = true,
+  ['observable positive reloadProjectContext refresh'] = true,
+  ['restore isolated refresh fixtures and lifecycle input'] = true,
 }
-for _, command in ipairs(incomplete_ids) do
-  required['typed incomplete project result: ' .. command] = true
-end
+local proven_commands = {}
 for _, row in ipairs(proof.matrix) do
-  if row.status == 'passed' then required[row.case] = nil end
+  if row.status == 'passed' then
+    required[row.case] = nil
+    if row.command and row.featureProved then proven_commands[row.command] = true end
+  end
 end
-proof.scopePassed = ok and not proof.indexingIncomplete and next(required) == nil
+local all_commands = true
+for _, id in ipairs(command_ids) do if not proven_commands[id] then all_commands = false end end
+proof.provenCommands = proven_commands
+proof.all11CommandsVerified = all_commands and next(required) == nil
+proof.scopePassed = ok and not proof.indexingIncomplete and proof.all11CommandsVerified
 proof.missingRequired = required
 save()
 if not proof.scopePassed then

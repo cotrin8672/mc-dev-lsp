@@ -1,3 +1,6 @@
 # Golden data and original fixtures retain their exact bytes across platforms.
 mcdev-*/tests/fixtures/** -text
 mcdev-companion/tests/fixtures/host_inputs/root_files/actual-serializer-sample.json -text whitespace=blank-at-eol,blank-at-eof,space-before-tab,cr-at-eol
+mcdev-companion/tests/fixtures/host_inputs/annotation_sites/d7-orphan-inject-crlf.java -text whitespace=blank-at-eol,blank-at-eof,space-before-tab,cr-at-eol
+mcdev-companion/tests/fixtures/host_inputs/annotation_sites/*.json -text whitespace=blank-at-eol,blank-at-eof,space-before-tab,cr-at-eol
+mcdev-companion/tests/fixtures/host_commands/original-success.json -text whitespace=blank-at-eol,blank-at-eof,space-before-tab,cr-at-eol

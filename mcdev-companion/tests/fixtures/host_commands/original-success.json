@@ -1,0 +1,171 @@
+{
+  "schemaVersion": 1,
+  "provenance": {
+    "producer": "original compiled Kotlin core services and original DTO converters, two identical runs",
+    "receipt": "build/legacy-command-reference/isolated-fixture-20261101/receipt.json",
+    "receiptSha256": "8a758d119003ce461a1f92278a0d4da420c5f26fba391487ceea788fadbbb693",
+    "referencesSha256": "0bcce64c7bd2a2ca4e7233097ff1818a0194094513bcb8f3f7378bfb49f4bb25",
+    "referencesOmitNullSha256": "3037afff771adc00294f02ecbaaa496303bc97c72ad63549b606ba4905b95ee7",
+    "codeActionSha256": "79d87df5839be264aed0f701c9bb9b8fa7db66a44d67d70b4d303c44a3080bc3",
+    "originalArtifactSha256": "8d83b727a8ffc41ca7484f4b14acd27b4a1f8fc2c2672f9298dd225e592fed00",
+    "originalCoreArtifactSha256": "7ce7283f4ae946651f345666de8844a7fd037f601c655e7da4ae5a34876b1732",
+    "coreSourcesEqual": 155,
+    "coreClassesEqual": 698,
+    "compiledFromFrozenBaselineProven": false,
+    "fullJdtRouteProven": false,
+    "sourceOnlyTargetWithoutCompiledClassProven": false,
+    "rustOutputUsed": false,
+    "referenceOrderContract": "compare full location set with duplicates rejected; no JDT walk-order assertion",
+    "infoSource": "build/migration-baseline/current-20261023/mcdev-core/src/main/kotlin/io/github/mcdev/core/project/InfoService.kt",
+    "infoSourceSha256": "85f438f42cb2a18040c730cfe994a9393a7c9ebdc85004591bd07cd3e0ff2473",
+    "registrySource": "build/migration-baseline/current-20261023/mcdev-jdtls-extension/src/main/kotlin/io/github/mcdev/jdtls/command/McdevCommandRegistry.kt",
+    "registrySourceSha256": "1c9714996a2f2c13d9afeef488c6dcf0978ff6974ce95fbce97543cb55d37a96",
+    "protocolSource": "build/migration-baseline/current-20261023/mcdev-protocol/src/main/kotlin/io/github/mcdev/protocol/McdevProtocol.kt",
+    "protocolSourceSha256": "692eca41c2f7465f4b903d1797ccaed02d11c000ffc599debb8bbd4028614809"
+  },
+  "envelope": {
+    "protocolVersion": 1,
+    "serverVersion": "0.1.0"
+  },
+  "inputSha256": {
+    "src/main/java/org/spongepowered/asm/mixin/Mixin.java": "7c129876558d65de1c86b064f902b4245d97f554e212b180f1ccb9cb32f84924",
+    "src/main/java/org/spongepowered/asm/mixin/injection/Inject.java": "2db0b96ffa7167689f752f99263c4deece6554bf48db8d2aad87702dd4b55b3a",
+    "src/main/java/org/spongepowered/asm/mixin/injection/At.java": "c07f0be9b8fa5a0c12021ff60e198ed4f2d5173e8cb94e909b35967b2b742fcf",
+    "src/main/java/com/llamalad7/mixinextras/expression/Definition.java": "3fabaf92940e3a69bd0530a143066b5e172b9d5664a399604622f29ee4777d02",
+    "src/main/java/com/llamalad7/mixinextras/expression/Expression.java": "6f761308103f3e1dfebeebfeb87f7e72d41c46ce16bd7a71d59242546dc474a8",
+    "src/main/java/com/llamalad7/mixinextras/injector/ModifyExpressionValue.java": "bc5bc3306e9b1aa3263ad56bf5e2aa069a344aca7ae281c3eef1934be773ebf0",
+    "src/main/java/fixture/Target.java": "a82d04296ad3feefefc376fc8dc668faa01c6b9a5204fb2ca59b2b90bd3fc5b9",
+    "src/main/java/fixture/Patch.java": "319311f745487d3f70b17906ea718b313b854929de0cb18bb8798a91a4f8e88e",
+    "src/main/java/fixture/ExampleMixin.java": "31eb6d81cad47d02227e2d08e333d06d59646f5835e8eade9637fedc503b7b68",
+    "src/main/resources/fixture.mixins.json": "d3d6ce2601e2dc3dd39afbfbcbe5296529831d8e8dae0fa207f3fab7e441241a",
+    "src/main/resources/access.aw": "7a5836c88f1a53c9d57d37769e47c6223e24dd57bf82af3932f37834a554c9c0",
+    "src/main/java/fixture/Owner.java": "381d1d252cb7f36844a5d5c47587598d2996efad9007f8370472da6adbac8923"
+  },
+  "references": {
+    "locations": [
+      {
+        "documentUri": "${WORKSPACE_URI}/src/main/java/fixture/Patch.java",
+        "range": {
+          "start": {
+            "line": 0,
+            "character": 59
+          },
+          "end": {
+            "line": 0,
+            "character": 79
+          }
+        },
+        "metadata": {
+          "source": "mixin.class"
+        },
+        "resolution": "SOURCE"
+      },
+      {
+        "documentUri": "${WORKSPACE_URI}/src/main/java/fixture/ExampleMixin.java",
+        "range": {
+          "start": {
+            "line": 6,
+            "character": 0
+          },
+          "end": {
+            "line": 6,
+            "character": 20
+          }
+        },
+        "metadata": {
+          "source": "mixin.class"
+        },
+        "resolution": "SOURCE"
+      },
+      {
+        "documentUri": "${WORKSPACE_URI}/src/main/java/fixture/Owner.java",
+        "range": {
+          "start": {
+            "line": 4,
+            "character": 0
+          },
+          "end": {
+            "line": 4,
+            "character": 20
+          }
+        },
+        "metadata": {
+          "source": "mixin.class"
+        },
+        "resolution": "SOURCE"
+      }
+    ]
+  },
+  "codeAction": {
+    "actions": [
+      {
+        "title": "Add 'Patch' to mixin config",
+        "kind": "quickfix.mixin.config",
+        "edits": [
+          {
+            "documentUri": "${WORKSPACE_URI}/src/main/resources/fixture.mixins.json",
+            "edits": [
+              {
+                "range": {
+                  "start": {
+                    "line": 0,
+                    "character": 31
+                  },
+                  "end": {
+                    "line": 0,
+                    "character": 31
+                  }
+                },
+                "newText": "\"Patch\""
+              }
+            ]
+          }
+        ],
+        "metadata": {
+          "mixinClass": "Patch",
+          "configPath": "${WORKSPACE_URI}/src/main/resources/fixture.mixins.json",
+          "mixinPackage": "fixture"
+        }
+      }
+    ]
+  },
+  "requests": {
+    "codeAction": {
+      "diagnosticCodes": [
+        "MIXIN_CLASS_NOT_LISTED_IN_CONFIG"
+      ],
+      "range": {
+        "start": {
+          "line": 0,
+          "character": 80
+        },
+        "end": {
+          "line": 0,
+          "character": 91
+        }
+      }
+    },
+    "references": {
+      "utf16Offset": 72,
+      "position": {
+        "line": 0,
+        "character": 72
+      }
+    }
+  },
+  "configBefore": "{\"package\":\"fixture\",\"mixins\":[]}",
+  "configAfter": "{\"package\":\"fixture\",\"mixins\":[\"Patch\"]}",
+  "registeredCommands": [
+    "mcdev.completion",
+    "mcdev.diagnostics",
+    "mcdev.context",
+    "mcdev.info",
+    "mcdev.reindex",
+    "mcdev.reloadProjectContext",
+    "mcdev.dumpContext",
+    "mcdev.definition",
+    "mcdev.references",
+    "mcdev.hover",
+    "mcdev.codeAction"
+  ]
+}

@@ -5,6 +5,7 @@ h.assert_true(vim.deep_equal(manifest.capabilities, { "semantic-v1" }), "require
 h.assert_eq(#manifest.optionalCapabilities, 11)
 h.assert_eq(vim.tbl_count(manifest.supportedOps), 9)
 h.assert_true(vim.deep_equal(manifest.supportedOps["root-files-v1"], { "rootFileInventory", "rootFileSnapshot" }), "root file operations match the contract")
+h.assert_true(vim.deep_equal(manifest.supportedOps["source-facts-v2"], { "sourceFacts", "annotationSites" }), "source fact operations select annotation sites independently")
 h.assert_nil(manifest.supportedOps["binary-annotations-v1"], "binary annotations select a representation without an operation")
 
 local function negotiate(params)
@@ -47,6 +48,13 @@ local annotations = negotiate({
 })
 h.assert_true(vim.deep_equal(annotations.capabilities, { "semantic-v1", "binary-annotations-v1" }), "binary annotations negotiate without supportedOps")
 h.assert_nil(annotations.supportedOps)
+
+local sites = negotiate({
+  protocol = { major = 1, minor = 0 }, provider = "mcdev",
+  capabilities = { "semantic-v1", "source-facts-v2" },
+  supportedOps = { ["source-facts-v2"] = { "annotationSites" } },
+})
+h.assert_true(vim.deep_equal(sites.supportedOps["source-facts-v2"], { "annotationSites" }), "annotation sites do not require sourceFacts")
 
 local expected = vim.list_extend(vim.deepcopy(manifest.capabilities), manifest.optionalCapabilities)
 params.capabilities = vim.list_extend(vim.deepcopy(expected), { "future-capability-v1" })

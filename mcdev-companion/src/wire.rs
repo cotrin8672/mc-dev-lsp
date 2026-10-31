@@ -47,7 +47,7 @@ impl ByteRange {
             .ok_or_else(|| "invalid UTF-8 source range".into())
     }
 }
-#[derive(Debug, Clone, Serialize, Deserialize)]
+#[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
 #[serde(rename_all = "camelCase")]
 pub struct Annotation {
     pub type_ref: String,
@@ -57,13 +57,13 @@ pub struct Annotation {
     pub name_range: Option<ByteRange>,
     pub arguments: Vec<Argument>,
 }
-#[derive(Debug, Clone, Serialize, Deserialize)]
+#[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
 pub struct Argument {
     pub name: Option<String>,
     pub range: ByteRange,
     pub value: Fact<AnnotationValue>,
 }
-#[derive(Debug, Clone, Serialize, Deserialize)]
+#[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
 #[serde(
     tag = "kind",
     rename_all = "camelCase",
@@ -406,7 +406,7 @@ fn validate_parameters(
     Ok(())
 }
 
-fn validate_annotation(
+pub(crate) fn validate_annotation(
     annotation: &Annotation,
     source: &str,
     registry: &mut Registry,

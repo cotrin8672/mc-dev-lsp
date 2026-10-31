@@ -1,0 +1,28 @@
+{
+  "artifact": "actual-annotation-sites93.json",
+  "bytes": 8601,
+  "sha256": "fa2007364b01b5cfc877085e0c7297cc0513bfcdaa17f3243ee5564a7183eb1a",
+  "encoding": "unmodified UTF-8 JSON with CRLF",
+  "capture": "host93 producer/Generic DTO proof; not MC domain or original CEM acceptance",
+  "publicPin": "ddba88af8c4dfc2b5c67397b465ea01c98129069",
+  "publicPinStatus": "peer confirmed origin match; host93 runtime serializer seal unchanged, subsequent changes only cfg(test) mask expectation and docs",
+  "publishedHost": "build/host-artifacts/published-ddba88a-46ae70429778/ktlsp.exe",
+  "upstreamSample": "C:/Users/gummy/.codex/ktlsp-runs/01a12550-7d56-71f2-8c34-8ab8c5fe5dda/annotation-sites93/editor93/actual-annotation-sites.json",
+  "mainVerifiedCopy": "build/host-artifacts/candidate93-46ae70429778/actual-annotation-sites.json",
+  "producerProofSha256": "adc9d13314749b903c370c2564b8ffe8fd00ffcaa2569b53f76bcdf9338a42a2",
+  "hostSha256": "46ae70429778a834951ce0c191b08b334863441a82bf20c3394f8075fabfed4e",
+  "probeChildSha256": "2f0d52eacc8b84f0776b24cfd99353c2773217fc46b5e817a40b3c0ecf3f57e3",
+  "sourceTexts": {
+    "origin": "editor-source-texts93.json: exact textDocument/didChange rpc.send log records from the producer Neovim log (lines 61 and 81), decoded source bytes hash-matched to the unmodified sample; original raw log lines retained",
+    "probeSourceSha256": "4f3809f0879f543889677a869838e29a2d32cc35bfd89a35284c43aa26a586c2",
+    "initialBytes": 88,
+    "initialSha256": "28f19cfa03117b565551a22269a89ff77dfe079bfbd44c0ffbeb53ee245478f5",
+    "editedBytes": 118,
+    "editedSha256": "8ef8973e54131e667c5ee9b2f9d5180aa3a819fc3cdfff961d0fccbf28bb2dcc"
+  },
+  "limits": [
+    "The producer resolved refs.Marker, which is not an official Mixin injector.",
+    "The edited sample contains site TypeRef 6:3 and declaration TypeRef 6:4 but captures only the 6:3 resolution. No positive answer for 6:4 is manufactured.",
+    "Positive pairwise TypeRef alias reconciliation is covered by independent unit data and remains subject to main's real MC/CEM acceptance."
+  ]
+}
