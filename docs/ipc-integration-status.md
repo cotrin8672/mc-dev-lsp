@@ -17,13 +17,14 @@ The host has also published `root-files-v1` at
 Its accepted serializer sample has SHA-256
 `af49d91e7e42dada7314a953b710ebe2d998176b7ed00ee361b410db1c3a4c41`.
 This is the host's file-input proof, separate from MC command/editor acceptance.
-Readonly snapshot JVM names are published from release89. The current release90
-pin adds bounded attribution of the first failed guard without relaxing it.
+Readonly snapshot JVM names are published from release89. Release92 separates
+semantic-index dependencies from metadata and rejects old resolved type handles
+after index changes, preserving the source/model/provider validation guards.
 
 ## Published contract
 
 The current integration pin is ktlsp
-[`64cbb25e8d6a7c632d0e283edbf98865909e0f7d`](https://github.com/cotrin8672/ktlsp/blob/64cbb25e8d6a7c632d0e283edbf98865909e0f7d/docs/architecture/extension-ipc.md).
+[`ab759c9c55bbb4e492fad96dce73ec8be2a4231f`](https://github.com/cotrin8672/ktlsp/blob/ab759c9c55bbb4e492fad96dce73ec8be2a4231f/docs/architecture/extension-ipc.md).
 It adds normalized authored facts, owning-project input records, exact source
 locations and typed binary declaration annotations to source snapshots, owned
 resources, selected runtime bytes, the physical JVM catalog and provider
@@ -31,10 +32,10 @@ commands. The companion negotiates capabilities and individual operations;
 binary annotations are selected by capability alone. Configured command IDs
 are intersected with the implemented domain routes.
 
-The copied release90 host has SHA-256
-`e2d769e1f6280df29ca27c589414335b5679e7442fa1cf9bf9e5fc57c7080d40`.
+The copied release92 host has SHA-256
+`177b38509f7a5d97035b6fc5120e4dc8b58a0f4ef2724553ad4511e2fdb9b5bd`.
 Its provenance is retained in
-`build/host-artifacts/published-64cbb25-e2d769e1f628/receipt.json`.
+`build/host-artifacts/published-ab759c9-177b38509f7a/receipt.json`.
 This identifies the integration input; upstream API tests do not prove MC
 feature or original editor parity. The acceptance results below retain their
 historical host and companion pins.
@@ -58,6 +59,19 @@ when that selection is unproven. Callable parameter facts are optional knowledge
 an omitted or unsupported list does not establish a zero-parameter callable.
 
 ## Follow-up acceptance checkpoints
+
+CI for the assertion-census commit `6e9e206` also passes on Windows and Linux:
+https://github.com/cotrin8672/mc-dev-lsp/actions/runs/41229469984.
+Downloaded logs verify the same 2,604 original locators and all five editor
+entries; Windows has 1,875 functions and Linux has 1,874 across 80 targets.
+The independent proofs are
+`build/rust-test-logs/ci-6e9e206/{native-cases-proof,packages-proof}.json`.
+Both archives also verify all 24 payload sizes/hashes, with no extra regular
+files. Their archive SHA-256 values are
+`dfbe2dfe997d4c53fccf0db530e8fbeceac37975cdb159878e641f03d7f25cb5`
+(Windows) and `d82e639b0f79151d1a5694171c0f2e9daec8c79f0e9cf341e533a8f210925802`
+(Linux). The following archive record belongs to the preceding functional
+commit `7e338e4`.
 
 The full Windows/Linux CI for `7e338e4` passes:
 https://github.com/cotrin8672/mc-dev-lsp/actions/runs/41228019825.
@@ -95,26 +109,63 @@ Stale; D4 (`cem-project-20261101-024118400-adb6cf5b`) records a new accepted
 evaluation and both failed outer requests. D5
 (`cem-project-20261101-030230338-e662aa1e`) proves the unused source reads are
 gone, then fails after resourceInventory pages with host validation Stale.
-All paths above are under `build/rust-test-logs/`. Original assertion and golden
-comparison credit remains zero. The host is preparing a diagnostic that reports
-the first failed guard from the same validation; no admission rule is relaxed.
+All paths above are under `build/rust-test-logs/`. Those attempts execute no
+original assertions or golden comparisons. The following diagnostic isolates
+the first failed guard without relaxing admission.
 
 Release90 D6 (`cem-project-20261101-031413365-96dd433e`) identifies that guard:
 the first command failure is model generation 30 to 31, evaluation 8, directly
 after index-changed invalidation. The fresh command evaluation 11 fails model
-31 to 32. Source SHA/version and provider instance stay unchanged. The upstream
-fix is separating project/resource dependencies from semantic-index updates,
-while retaining real model/source/host-input and semantic lookup invalidation.
+31 to 32. Source SHA/version and provider instance stay unchanged. Release92
+separates project/resource dependencies from semantic-index updates while
+retaining real model/source/host-input and semantic lookup invalidation.
 This run still credits zero original assertions or member comparisons.
+
+Release92 D7 (`cem-project-20261101-035520000-7b79286b`) passes Info on its first
+request, with no command validation failures, child errors or readiness retry.
+It reaches two original assertion-helper calls and one completion request.
+That request fails with typed `INCOMPLETE_PROJECT_CONTEXT`: the full
+`sourceFacts` declaration/parameter annotations do not cover the written,
+ownerless `@Inject(method = "is")` before a method has been declared. The
+sourceFacts read succeeds; the consumer rejects missing annotation coverage
+before resolving annotation types. The exact unchanged 254-byte CRLF input is
+saved as `build/live-fixture-inputs/d7-orphan-inject-crlf.java`, SHA-256
+`7bd1004fdea0383b51e973c48f3a2e5162e359b9abc08eab559920e98e8df5a8`,
+document version 3, command evaluation 11. Its accepted provider evaluation is
+9, publication 8. The host task is adding generic `annotationSites` facts for
+this incomplete-edit state. The agreed operation is independently negotiated
+under `source-facts-v2`, retaining the existing `sourceFacts` shape. It returns
+source URI/revision/SHA, written annotation sites and a coverage fact. A positive
+site may support its specific completion even when syntax recovery makes total
+coverage Unknown; that does not establish missing sites or diagnostic absence.
+Host publication, the consumer connection and live verification are pending. D7
+shuts down cleanly. The 85-row member oracle comparison is still not reached.
 
 Current-source metadata preserves the 2,604 cases, 17 ported / 3 partial / 7
 pending editor-file states and historical four-snippet/169-call proof. Its
 scanner has now been corrected to include repeated-underscore helper names.
 Its census retains all 1,014 previous IDs and adds 183 frozen sites, with zero
 ID collisions and no remaining lexer omissions (1,197 total). All additions
-remain pending/unknown with no runtime or test-case credit. An optional broad metadata check
+remain pending for semantic parity with no added test-case or full-E2E credit.
+All 183 now have static correspondence; 57 have qualified recorded helper
+invocations and 126 lack such direct observation. These counts do not certify
+original input rows or semantic parity. Historical invocation collections remain
+unchanged, with the new adapter collection recorded separately.
+The original Kotlin Drill/Placement branch has now been restored with both
+unchanged inputs and all 32 assertions, alongside physical Mixin 0.8.7 / Fabric
+MixinExtras 0.5.5 prerequisites and the mandatory Info `jarLocation` field.
+Fidelity, syntax and negative mock checks pass; real Drill and generated-source
+compilation remain unverified. An optional broad metadata check
 hit its finite 60-second deadline and is recorded as failed, separately from
 the passing product/client checks. Full original editor parity remains false.
+
+The standard native fixture matrix now requires
+`pwsh -NoProfile -File scripts/run-osgi-e2e-matrix.ps1 -InputsReceipt <receipt.json>`
+or `MCDEV_E2E_INPUTS_RECEIPT`. It validates the copied physical Mixin 0.8.7 and
+Fabric MixinExtras 0.5.5 inputs before generated-source compilation. Missing
+receipt data fails at launcher setup. The existing compact-runner support
+suite passes after its routing mocks were updated to forward that prerequisite;
+mock routing is separate from physical JAR or generated-source compile proof.
 
 The resumed pipeline in
 `build/rust-test-logs/native-pipeline-proof-20261101-003939212/` passes 1,871

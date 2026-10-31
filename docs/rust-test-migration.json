@@ -62201,7 +62201,7 @@
         "realHostReceipt": "build/rust-test-logs/host-commands-20261030-090521312/receipt.json"
       },
       "enforcedInputChecksPassed": false,
-      "strictFidelityNote": "Existing scoped results remain historical evidence. Current strict assertion correspondence is pending for the newly catalogued sites; no additional runtime pass or full E2E parity is claimed.",
+      "strictFidelityNote": "All 183 restored sites have known static counterparts or explicit backend adaptations. Invocation observation remains unknown for 126 sites; all original semantic/full E2E parity remains pending. Prior evidence/source pins are preserved.",
       "latestIndependentClientSuite": {
         "prefix": "migration-current-20261101-014259296",
         "finiteEntries": [
@@ -62232,6 +62232,244 @@
         "selfcheckEvidence": "build/rust-test-logs/assertion-census-20261101-031657307/selfcheck-result.json",
         "saveCheckEvidence": "build/rust-test-logs/assertion-census-20261101-031657307/receipt.json",
         "observationPolicy": "All added sites remain pending/unknown. Historical native collections and live MC slices retain their original scope; helper calls and assertions they invoke are separate static sites."
+      },
+      "restoredAssertionCorrespondence": {
+        "restoredFrozenSites": 183,
+        "staticMappedSites": 183,
+        "staticUnmappedSites": 0,
+        "sitesWithRecordedInvocations": 57,
+        "sitesWithoutDirectInvocationObservation": 126,
+        "mappedSitesWithoutDirectInvocationObservation": 126,
+        "protectedOldIDs": 1014,
+        "protectedOldExactMappings": 571,
+        "newTestCases": 0,
+        "newRuntimePassesCredited": 0,
+        "crossFileMappings": 14,
+        "wholeOriginalEditorE2EVerified": false,
+        "sourceHashes": {
+          "mcdev-nvim/tests/cmp_positions.lua": {
+            "baselineSha256": "486e396534891845051fb86af570a243e232d4a5bcf20ace9f19c9948a11157b",
+            "currentSha256": "f4ef77963d1c384ad47f7fe705a8ad526f58aa515cd290b3580fd950cad82fb9",
+            "collectionBeforeSha256": "f4ef77963d1c384ad47f7fe705a8ad526f58aa515cd290b3580fd950cad82fb9",
+            "collectionAfterSha256": "f4ef77963d1c384ad47f7fe705a8ad526f58aa515cd290b3580fd950cad82fb9"
+          },
+          "mcdev-nvim/tests/cmp_routing.lua": {
+            "baselineSha256": "ead095eab5720af3472b9f089c3a0f91f37e1e1b154eab5a1d7c8a5aab7d43dd",
+            "currentSha256": "7603f131b03279775b73e0491e483fbe01c8f1fc86fe37f8fa25a6163ff91f96",
+            "collectionBeforeSha256": "7603f131b03279775b73e0491e483fbe01c8f1fc86fe37f8fa25a6163ff91f96",
+            "collectionAfterSha256": "7603f131b03279775b73e0491e483fbe01c8f1fc86fe37f8fa25a6163ff91f96"
+          },
+          "mcdev-nvim/tests/completion_readiness.lua": {
+            "baselineSha256": "84686e9f70aacf9458d63fc4c8d1eebb534196102aaf62afdc5749288a4ea624",
+            "currentSha256": "5dbd67c1c67d84c1140a22574e4fa5ca1e0af09b05162f6cb959f3179e019c96",
+            "collectionBeforeSha256": "5dbd67c1c67d84c1140a22574e4fa5ca1e0af09b05162f6cb959f3179e019c96",
+            "collectionAfterSha256": "5dbd67c1c67d84c1140a22574e4fa5ca1e0af09b05162f6cb959f3179e019c96"
+          },
+          "mcdev-nvim/tests/e2e/cem_project_e2e.lua": {
+            "baselineSha256": "fe8112c28527c27ffc8aa4366945c0fd784b4f15921271e05014cb0858bc3151",
+            "currentSha256": "04db4a22faa4972ea545726553620effecf0e9f191682411dc2673f4807800b2",
+            "collectionBeforeSha256": "04db4a22faa4972ea545726553620effecf0e9f191682411dc2673f4807800b2",
+            "collectionAfterSha256": "04db4a22faa4972ea545726553620effecf0e9f191682411dc2673f4807800b2"
+          },
+          "mcdev-nvim/tests/e2e/create_drill_definition_diagnostics_e2e.lua": {
+            "baselineSha256": "b44736c8ffe57d20d2aa876e2f43dcbb5e78abe8aeeeaaf2b7d9790776800c76",
+            "currentSha256": "76b3827a5499759074d8d01355c9c69edf1839ab5e29eb97ee24a8afabb10453",
+            "collectionBeforeSha256": "76b3827a5499759074d8d01355c9c69edf1839ab5e29eb97ee24a8afabb10453",
+            "collectionAfterSha256": "76b3827a5499759074d8d01355c9c69edf1839ab5e29eb97ee24a8afabb10453"
+          },
+          "mcdev-nvim/tests/e2e/expression_e2e.lua": {
+            "baselineSha256": "f30e05b660c3d7fcb974313db62c833cf5b94fcd9f737e3d3fe9b6c07117fc7e",
+            "currentSha256": "f0fa5a88d1d20c9df8e3e8d7d7351a8f25091099ca44e4d85b7ec5dc9fd2b1ed",
+            "collectionBeforeSha256": "f0fa5a88d1d20c9df8e3e8d7d7351a8f25091099ca44e4d85b7ec5dc9fd2b1ed",
+            "collectionAfterSha256": "f0fa5a88d1d20c9df8e3e8d7d7351a8f25091099ca44e4d85b7ec5dc9fd2b1ed"
+          },
+          "mcdev-nvim/tests/e2e/jdt_action_aliases_e2e.lua": {
+            "baselineSha256": "b75dd6fca4df29c9f2ee5f26738e17d7d488d5a125596ec4bf198aadc2234007",
+            "currentSha256": "2f66d1cf1103945c41b443cbc2eeb164e936011e2cb5b1d2331100e3c463de3c",
+            "collectionBeforeSha256": "2f66d1cf1103945c41b443cbc2eeb164e936011e2cb5b1d2331100e3c463de3c",
+            "collectionAfterSha256": "2f66d1cf1103945c41b443cbc2eeb164e936011e2cb5b1d2331100e3c463de3c"
+          },
+          "mcdev-nvim/tests/e2e/jdtls_bundle_e2e.lua": {
+            "baselineSha256": "2828fb70aacc0b61a4b8f79e28666cc15f16b2ded01d6cbc1ad9264aeb52f73d",
+            "currentSha256": "89d30e6945af2db81cc2b640106eee989057a76e64f2ba966c2ffcca2af9eb77",
+            "collectionBeforeSha256": "89d30e6945af2db81cc2b640106eee989057a76e64f2ba966c2ffcca2af9eb77",
+            "collectionAfterSha256": "89d30e6945af2db81cc2b640106eee989057a76e64f2ba966c2ffcca2af9eb77"
+          },
+          "mcdev-nvim/tests/e2e/jdtls_loom_e2e.lua": {
+            "baselineSha256": "d7fa8af0ceb37809a0279e027b8d7b965062f7d9a84abc42b0c9da3fc13eab92",
+            "currentSha256": "cc9d05b1f0ba7f6c98f57e87dacab4109b0d26be09145e38b13a9e31e6b3fd53",
+            "collectionBeforeSha256": "cc9d05b1f0ba7f6c98f57e87dacab4109b0d26be09145e38b13a9e31e6b3fd53",
+            "collectionAfterSha256": "cc9d05b1f0ba7f6c98f57e87dacab4109b0d26be09145e38b13a9e31e6b3fd53"
+          },
+          "mcdev-nvim/tests/e2e/placement_offset_completion_e2e.lua": {
+            "baselineSha256": "833e38c3b2b9359f05aafa4e29c64f03c6e0e811819a0d095fb473dd5d66eca9",
+            "currentSha256": "6cea1d722b104672dd0e06df2e602b6ac997eaaca87f6ee634eadbaba5ab9386",
+            "collectionBeforeSha256": "6cea1d722b104672dd0e06df2e602b6ac997eaaca87f6ee634eadbaba5ab9386",
+            "collectionAfterSha256": "6cea1d722b104672dd0e06df2e602b6ac997eaaca87f6ee634eadbaba5ab9386"
+          },
+          "mcdev-nvim/tests/e2e/real_project_e2e.lua": {
+            "baselineSha256": "74019e444df6c29c432c00d74d6a75be9d16745a9560631bbdc64f842590f8c8",
+            "currentSha256": "3cce7756a3f6201aaa6fc3420185a842b438b0ae63d8feedd07e70a23b8bbf35",
+            "collectionBeforeSha256": "3cce7756a3f6201aaa6fc3420185a842b438b0ae63d8feedd07e70a23b8bbf35",
+            "collectionAfterSha256": "3cce7756a3f6201aaa6fc3420185a842b438b0ae63d8feedd07e70a23b8bbf35"
+          },
+          "mcdev-nvim/tests/e2e/sugar_e2e.lua": {
+            "baselineSha256": "c6033e5da638f956cec1d0131602d5f3e3262f3b1acf33f2056d0bcdd624173b",
+            "currentSha256": "567f3f32aa22ce3729395a9763adf7661c844608b73b102be50cc67b762ef516",
+            "collectionBeforeSha256": "567f3f32aa22ce3729395a9763adf7661c844608b73b102be50cc67b762ef516",
+            "collectionAfterSha256": "567f3f32aa22ce3729395a9763adf7661c844608b73b102be50cc67b762ef516"
+          },
+          "mcdev-nvim/tests/lsp_regressions.lua": {
+            "baselineSha256": "70e12b9c5c73b68ef87ea4252e2f722fa551eaf7e3ae440679981f3793caeccd",
+            "currentSha256": "7ca7c3d24161eeafb728e28a88949e0d9e8768b5d90d5ce617597b0a9e0a7165",
+            "collectionBeforeSha256": "7ca7c3d24161eeafb728e28a88949e0d9e8768b5d90d5ce617597b0a9e0a7165",
+            "collectionAfterSha256": "7ca7c3d24161eeafb728e28a88949e0d9e8768b5d90d5ce617597b0a9e0a7165"
+          },
+          "mcdev-nvim/tests/run.lua": {
+            "baselineSha256": "8c68ddcf628623947f6540758fd4211720eae65ca42d226bfa6a81da3956be0b",
+            "currentSha256": "b4cab991cc5f94fa40e9c21069e53f7ab9bd5d2baf361c30c535a5c6dfb45329",
+            "collectionBeforeSha256": "e04fe6bfc1c4e668e74d97fbecc407361fd1dbc3853e504078f1f51aac441333",
+            "collectionAfterSha256": "e04fe6bfc1c4e668e74d97fbecc407361fd1dbc3853e504078f1f51aac441333"
+          }
+        },
+        "proofCollection": "migration-current-20261101-014259296",
+        "evidence": "build/rust-test-logs/restored-26-static-20261101-042411888/metadata-receipt.json",
+        "proofConditions": "Same-file complete call identity and unique current assertion ID. Invocation credit additionally requires exact path:line:helper, raw successful finite-entry counter, identical before/after/current source SHA and pinned recorder SHA. Counts remain a subset of the preserved 2,977-call collection; old 1,521 calls and CEM 169 calls are not reassigned. Current run.lua observations use the separate successful 90s adapter collection with identical archived/before/after/current entry, recorder and related-module SHA; the original mismatched collection is not reassigned. The remaining 26 are now reviewed static counterpart/explicit-adapter mappings under additionalStaticSourcePins; no new invocation credit is assigned from static/mock checks or the historical CEM169 run.",
+        "byFile": {
+          "mcdev-nvim/tests/cmp_positions.lua": {
+            "restoredSites": 1,
+            "staticMapped": 1,
+            "staticUnmapped": 0,
+            "withRecordedSiteInvocations": 1,
+            "invocationUnknown": 0
+          },
+          "mcdev-nvim/tests/cmp_routing.lua": {
+            "restoredSites": 5,
+            "staticMapped": 5,
+            "staticUnmapped": 0,
+            "withRecordedSiteInvocations": 5,
+            "invocationUnknown": 0
+          },
+          "mcdev-nvim/tests/completion_readiness.lua": {
+            "restoredSites": 1,
+            "staticMapped": 1,
+            "staticUnmapped": 0,
+            "withRecordedSiteInvocations": 1,
+            "invocationUnknown": 0
+          },
+          "mcdev-nvim/tests/e2e/cem_project_e2e.lua": {
+            "restoredSites": 23,
+            "staticMapped": 23,
+            "staticUnmapped": 0,
+            "withRecordedSiteInvocations": 0,
+            "invocationUnknown": 23
+          },
+          "mcdev-nvim/tests/e2e/create_drill_definition_diagnostics_e2e.lua": {
+            "restoredSites": 3,
+            "staticMapped": 3,
+            "staticUnmapped": 0,
+            "withRecordedSiteInvocations": 0,
+            "invocationUnknown": 3
+          },
+          "mcdev-nvim/tests/e2e/expression_e2e.lua": {
+            "restoredSites": 3,
+            "staticMapped": 3,
+            "staticUnmapped": 0,
+            "withRecordedSiteInvocations": 0,
+            "invocationUnknown": 3
+          },
+          "mcdev-nvim/tests/e2e/jdt_action_aliases_e2e.lua": {
+            "restoredSites": 3,
+            "staticMapped": 3,
+            "staticUnmapped": 0,
+            "withRecordedSiteInvocations": 0,
+            "invocationUnknown": 3
+          },
+          "mcdev-nvim/tests/e2e/jdtls_bundle_e2e.lua": {
+            "restoredSites": 49,
+            "staticMapped": 49,
+            "staticUnmapped": 0,
+            "withRecordedSiteInvocations": 0,
+            "invocationUnknown": 49
+          },
+          "mcdev-nvim/tests/e2e/jdtls_loom_e2e.lua": {
+            "restoredSites": 6,
+            "staticMapped": 6,
+            "staticUnmapped": 0,
+            "withRecordedSiteInvocations": 0,
+            "invocationUnknown": 6
+          },
+          "mcdev-nvim/tests/e2e/placement_offset_completion_e2e.lua": {
+            "restoredSites": 24,
+            "staticMapped": 24,
+            "staticUnmapped": 0,
+            "withRecordedSiteInvocations": 0,
+            "invocationUnknown": 24
+          },
+          "mcdev-nvim/tests/e2e/real_project_e2e.lua": {
+            "restoredSites": 4,
+            "staticMapped": 4,
+            "staticUnmapped": 0,
+            "withRecordedSiteInvocations": 0,
+            "invocationUnknown": 4
+          },
+          "mcdev-nvim/tests/e2e/sugar_e2e.lua": {
+            "restoredSites": 5,
+            "staticMapped": 5,
+            "staticUnmapped": 0,
+            "withRecordedSiteInvocations": 0,
+            "invocationUnknown": 5
+          },
+          "mcdev-nvim/tests/lsp_regressions.lua": {
+            "restoredSites": 5,
+            "staticMapped": 5,
+            "staticUnmapped": 0,
+            "withRecordedSiteInvocations": 1,
+            "invocationUnknown": 4
+          },
+          "mcdev-nvim/tests/run.lua": {
+            "restoredSites": 51,
+            "staticMapped": 51,
+            "staticUnmapped": 0,
+            "withRecordedSiteInvocations": 49,
+            "invocationUnknown": 2
+          }
+        },
+        "previousEvidence": "build/rust-test-logs/restored-run-invocations-20261101-035325557/metadata-receipt.json",
+        "additionalInvocationCollection": "restored-run-invocations-20261101-035325557",
+        "proofCollections": [
+          "migration-current-20261101-014259296",
+          "restored-run-invocations-20261101-035325557"
+        ],
+        "protectedPriorSameFileMappings": 157,
+        "sameInputStaticContractMappings": 171,
+        "explicitBackendAdaptationSites": 12,
+        "additionalStaticSourcePins": {
+          "mcdev-nvim/tests/e2e/cem_feature_snippets.lua": "d61d68c085e02dfde3f49647eb8495a6c3517d50b2ee8b66419a3337ba932772",
+          "mcdev-nvim/tests/e2e/fixed_compile_dependencies.lua": "0f1158daf53c7ac0084b2e5f7b85695ddbf4094c56b50221022e9b75b1dd6fce",
+          "mcdev-nvim/tests/e2e/jdt_action_aliases_e2e.lua": "2f66d1cf1103945c41b443cbc2eeb164e936011e2cb5b1d2331100e3c463de3c",
+          "mcdev-nvim/tests/e2e/jdtls_bundle_e2e.lua": "e3c9397b1f14832ae4c93173fa8fd8010010c405e29a47d21b9a88fbf1a75c11",
+          "mcdev-nvim/tests/e2e/jdtls_loom_e2e.lua": "cc9d05b1f0ba7f6c98f57e87dacab4109b0d26be09145e38b13a9e31e6b3fd53",
+          "mcdev-nvim/tests/e2e/kotlin_drill_e2e.lua": "ab9592d5f91326920f5335a0bddbf61db67a332b8acd8ab51c7fd37054e42c05",
+          "mcdev-nvim/tests/e2e/real_project_e2e.lua": "3cce7756a3f6201aaa6fc3420185a842b438b0ae63d8feedd07e70a23b8bbf35"
+        },
+        "staticRestorationReports": {
+          "build/restored-26-correspondence-audit.txt": "15b00001d1599df12c77b682cbb52a9a1f8aea7792667398c23b8864a5ab75b1",
+          "build/kotlin-e2e-restoration-correspondence.txt": "72a3d20719b5db4e5ac84b5ccd9f1a52291a8d30d4e8e948c874039cd56dd105",
+          "build/kotlin-debug-matrix-done.txt": "4f0a072985d39ee834da7d089e398910801899edde629f84fd895ffbd41dac6c"
+        },
+        "staticRestorationProofConditions": "Existing 157 same-file mappings and 57 invocation records retain their original source pins. Newly resolved 26 sites use these separate frozen current-source pins: 5 same-input CEM helper extractions, 12 explicit native backend/artifact adaptations, and 9 restored physical-JAR/Kotlin conditions. The Info jarLocation literal plus native-artifact identity is retained. Mapping knowledge is separate from execution knowledge.",
+        "relatedKotlinDebugAdapter": "Indexed useIt/useItemOn, placeInW/placeInWorld and target completions require HOST_NORMALIZED; the actual-core HE/HEAD no-index route requires HAND_WRITTEN_FALLBACK. All require usedCompilationUnit=false, with no either-label acceptance. Frozen466 is explicitly a debug-provenance adapter in the owning report; its existing ID/object is unchanged here. Original Kotlin inputs, edits and DTO conditions remain. Owner mock/static/core-route checks do not establish original editor-site invocation, real Drill or full E2E execution.",
+        "restoredKotlinInputLiteralSha256": [
+          "05acb4a3e7af51ff1ee65b1f6255619a3bade2ee276d4705b0c18e3849c9f3e9",
+          "7fe37dd100f025fcd7a5755aa8a9314b83a1b2ca5842f596a180cc2510a8a96f"
+        ],
+        "newStaticMappingCategories": {
+          "sameInputCemExtractions": 5,
+          "explicitBackendAdaptations": 12,
+          "restoredPhysicalJarPrerequisites": 2,
+          "restoredKotlinSites": 7
+        }
       }
     },
     "nativeWorkspace": {

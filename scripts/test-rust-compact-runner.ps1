@@ -118,6 +118,12 @@ try {
             throw "Native $fixture launcher changed the original editor entry point"
         }
     }
+    # Routing-only receipt: both fixture preparation and editor execution are mocked here.
+    # This file is not a physical dependency receipt or evidence that any JAR compiled.
+    $mockRoutingReceipt = Join-Path $nativeRepo 'mock routing receipt.json'
+    '{"scope":"launcher routing mock only","physicalCompileEvidence":false}' |
+        Set-Content -LiteralPath $mockRoutingReceipt -Encoding utf8
+    $env:MCDEV_E2E_INPUTS_RECEIPT = $mockRoutingReceipt
     foreach ($launcher in @('run-osgi-e2e-matrix.ps1', 'run-osgi-loom-e2e.ps1')) {
         $caseLogs = Join-Path $logs $launcher
         $null = New-Item -ItemType Directory -Force -Path $caseLogs
@@ -136,7 +142,8 @@ try {
         }
         foreach ($entry in $proof) {
             if ($entry.host -ne $fakeHost -or $entry.companion -ne $fakeCompanion -or
-                $entry.editor -ne $fakeEditor -or $entry.gradle -ne $fakeGradle) {
+                $entry.editor -ne $fakeEditor -or $entry.gradle -ne $fakeGradle -or
+                $entry.inputsReceipt -ne $mockRoutingReceipt) {
                 throw "Explicit native binaries were lost: $launcher"
             }
         }
@@ -157,6 +164,7 @@ try {
             throw "Missing native host must fail before launching: $launcher"
         }
     }
+    Remove-Item Env:MCDEV_E2E_INPUTS_RECEIPT
 
     # Substitute only fixed input paths in this disposable launcher copy; no MC semantics are tested here.
     $drillLauncher = Join-Path $nativeScripts 'run-drill-definition-diagnostics-e2e.ps1'

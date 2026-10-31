@@ -16,9 +16,12 @@ and five independent editor entries. The optimized Windows package verifies all
 24 payloads. The first complete original CEM attempt against published host86
 stopped at its initial `mcdev.info` preflight with typed `Stale`, before any
 original assertion or member-golden comparison. Diagnostic runs identified and
-corrected a consumer module-namespace mismatch; a genuinely fresh accepted
-evaluation still fails host validation. These remain failed live attempts;
-full replacement is not verified. Current evidence and unresolved host
+corrected a consumer module-namespace mismatch. Published host92 then passes
+Info on its first attempt and reaches the original completion input, where
+missing ownerless annotation facts return typed incomplete context. The host
+task is adding that fact operation. Two original helper invocations are observed;
+the 85-row legacy member comparison is not reached. Full replacement is not
+verified. Current evidence and unresolved host
 facts are linked above; the dated records below retain their historical pins.
 
 ## Authoritative baseline

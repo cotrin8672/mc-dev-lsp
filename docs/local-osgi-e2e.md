@@ -1,5 +1,15 @@
 # Local OSGi Bundle E2E
 
+This is the historical JDT LS guide for the original branch. On
+`codex/ktlsp-rust`, the retained launcher names start the standalone native
+companion through ktlsp. Follow [the current native integration guide](ipc-integration-status.md)
+and supply an explicit verified dependency receipt to the matrix:
+`pwsh -NoProfile -File scripts/run-osgi-e2e-matrix.ps1 -InputsReceipt <receipt.json>`.
+The existing `MCDEV_E2E_INPUTS_RECEIPT` environment variable is also supported.
+Both select the physical Mixin 0.8.7 and Fabric MixinExtras 0.5.5 inputs; missing
+receipt data fails before fixture launch. The JDT setup below applies only to
+the original branch.
+
 This guide verifies that the mcdev JDT LS extension bundle loads in a real `jdtls` process and answers `workspace/executeCommand` requests from Neovim.
 
 ## Prerequisites

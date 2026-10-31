@@ -192,6 +192,9 @@ end
 
 local compile_sequence = 0
 local function compile_single_java_source(source_path)
+  dofile(vim.fn.getcwd() .. "/mcdev-nvim/tests/e2e/fixed_compile_dependencies.lua")({
+    helpers = helpers, workspace = workspace,
+  })
   -- This is the real mod project's toolchain, never a Java LSP/helper process.
   local normalized = vim.fs.normalize(vim.fn.fnamemodify(source_path, ":p"))
   local project_root = vim.fs.normalize(vim.fn.fnamemodify(workspace, ":p")):gsub("/+$", "")
@@ -311,6 +314,11 @@ if fixture == "create-drill-definition-diagnostics" then
     mcdev_command = mcdev_command,
     log_step = log_step,
   })
+  dofile(vim.fn.getcwd() .. "/mcdev-nvim/tests/e2e/kotlin_drill_e2e.lua")({
+    helpers = helpers, workspace = workspace, workspace_root_uri = workspace_root_uri,
+    client_id = client_id, with_buffer = with_buffer, mcdev_command = mcdev_command,
+    find_line_and_character = find_line_and_character, log_step = log_step,
+  })
   return
 end
 
@@ -403,7 +411,10 @@ with_buffer(mixin_file, "java", nil, function(bufnr)
   helpers.assert_true(#info_lines > 0, "mcdev.info returned no lines")
   helpers.assert_not_nil(info_result.result.buildCommit, "mcdev.info should include extension build commit")
   helpers.assert_not_nil(info_result.result.buildTime, "mcdev.info should include extension build time")
-  helpers.assert_not_nil(info_result.result.executableLocation or info_result.result.jarLocation, "mcdev.info should include native executable location")
+  helpers.assert_not_nil(info_result.result.jarLocation, "mcdev.info should include extension jar location")
+  helpers.assert_eq(vim.uv.fs_realpath(info_result.result.jarLocation),
+    assert(vim.uv.fs_realpath(vim.fn.exepath(companion_cmd)), "selected native companion must resolve"),
+    "mcdev.info jarLocation must identify the selected native companion artifact")
   helpers.assert_true(
     vim.tbl_contains(info_result.result.registeredCommands or {}, "mcdev.completion"),
     "mcdev.info should include registered mcdev.completion command"
