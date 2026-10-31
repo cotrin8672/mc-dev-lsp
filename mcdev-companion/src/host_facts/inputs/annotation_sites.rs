@@ -194,7 +194,13 @@ impl AnnotationSites {
             match known.get(&key) {
                 Some((previous, owner)) => {
                     if site.owner.as_deref() != *owner
-                        || !compatible_annotation(previous, annotation, detailed, types)?
+                        || !compatible_annotation(previous, annotation, detailed, types).map_err(|error| {
+                            alias_context(error, "annotation", json!({
+                                "knownOwner":owner,"siteOwner":site.owner,
+                                "knownRange":previous.range,"siteRange":annotation.range,
+                                "sourceIdentity":self.source.identity,"sourceSha256":self.source.sha256
+                            }))
+                        })?
                     {
                         return Err(protocol(
                             "annotation site disagrees with its declared, parameter or nested site",
@@ -343,7 +349,14 @@ fn compatible_annotation(
                 .as_ref()
                 .is_some_and(|range| Some(range) != next.name_range.as_ref())
         }
-        || !compatible_reference(&previous.type_ref, &next.type_ref, types)?
+        || !compatible_reference(&previous.type_ref, &next.type_ref, types).map_err(|error| {
+            alias_context(
+                error,
+                "field",
+                json!({"kind":"annotationType",
+                "knownRange":previous.range,"siteRange":next.range}),
+            )
+        })?
     {
         return Ok(false);
     }
@@ -366,15 +379,18 @@ fn compatible_reference(
     let Some(types) = types else {
         return Ok(false);
     };
-    let resolved = |reference: &str| {
-        types.get(reference).and_then(Fact::found).ok_or_else(|| {
-            FactsError::Unknown(
-                "annotation reference alias has no positive same-view identity".into(),
-            )
-        })
+    let (Some(a), Some(b)) = (
+        types.get(a).and_then(Fact::found),
+        types.get(b).and_then(Fact::found),
+    ) else {
+        return Err(FactsError::Unknown(format!(
+            "{ALIAS_DIAGNOSTIC}{}",
+            json!({
+                "collectedReferenceCount":types.len(),
+                "known":reference_observation(a,types.get(a)),"site":reference_observation(b,types.get(b))
+            })
+        )));
     };
-    let a = resolved(a)?;
-    let b = resolved(b)?;
     if a.qualified_name.is_empty() || b.qualified_name.is_empty() {
         return Err(protocol("annotation type identity is empty"));
     }
@@ -396,6 +412,77 @@ fn compatible_reference(
     })
 }
 
+const ALIAS_DIAGNOSTIC: &str =
+    "annotation reference alias has no positive same-view identity; annotationAlias=";
+
+fn diagnostic_text(value: &str) -> String {
+    let mut end = value.len().min(256);
+    while !value.is_char_boundary(end) {
+        end -= 1;
+    }
+    if end == value.len() {
+        value.to_owned()
+    } else {
+        format!("{}…", &value[..end])
+    }
+}
+
+fn reference_observation(reference: &str, fact: Option<&Fact<TypeFact>>) -> Value {
+    let mut result = json!({"reference":reference,"collected":fact.is_some()});
+    match fact {
+        None => result["state"] = json!("notCollected"),
+        Some(Fact::DefinitelyAbsent) => result["state"] = json!("definitelyAbsent"),
+        Some(Fact::Unknown { reasons }) => {
+            result["state"] = json!("unknown");
+            result["reasonCount"] = json!(reasons.len());
+            result["reasonCodes"] = json!(reasons
+                .iter()
+                .take(8)
+                .map(|reason| diagnostic_text(reason["code"].as_str().unwrap_or("<missing-code>")))
+                .collect::<Vec<_>>());
+            result["reasonCodesTruncated"] = json!(
+                reasons.len() > 8
+                    || reasons
+                        .iter()
+                        .take(8)
+                        .any(|r| r["code"].as_str().is_some_and(|code| code.len() > 256))
+            );
+            // Preserve a correlation digest, never dump arbitrary reason payload/source text.
+            result["reasonPayloadSha256"] = json!(format!(
+                "{:x}",
+                Sha256::digest(json!(reasons).to_string().as_bytes())
+            ));
+        }
+        Some(Fact::Found { value }) => {
+            result["state"] = json!("found");
+            result["qualifiedName"] = json!(diagnostic_text(&value.qualified_name));
+            result["typeId"] = json!(diagnostic_text(&value.id));
+            result["readOnly"] = json!(value.read_only);
+            if let Some(source) = &value.context_source {
+                result["source"] = json!({"kind":diagnostic_text(&source.identity.kind),
+                    "revision":diagnostic_text(&source.identity.revision),"languageId":diagnostic_text(&source.language_id),
+                    "documentUri":source.document_uri.found().map(|uri|diagnostic_text(uri))});
+            }
+        }
+    }
+    result
+}
+
+fn alias_context(error: FactsError, key: &str, value: Value) -> FactsError {
+    if let FactsError::Unknown(message) = &error {
+        if let Some(raw) = message.strip_prefix(ALIAS_DIAGNOSTIC) {
+            if let Ok(Value::Object(mut diagnostic)) = serde_json::from_str::<Value>(raw) {
+                diagnostic.insert(key.to_owned(), value);
+                return FactsError::Unknown(format!(
+                    "{ALIAS_DIAGNOSTIC}{}",
+                    Value::Object(diagnostic)
+                ));
+            }
+        }
+    }
+    error
+}
+
 fn compatible_argument(
     a: &Argument,
     b: &Argument,
@@ -409,28 +496,45 @@ fn compatible_argument(
         (Fact::Unknown { .. }, _) if !detailed => true,
         (
             Fact::Found {
-                value: AnnotationValue::Class { type_ref: a },
+                value: AnnotationValue::Class { type_ref: a_ref },
             },
             Fact::Found {
-                value: AnnotationValue::Class { type_ref: b },
+                value: AnnotationValue::Class { type_ref: b_ref },
             },
-        ) => compatible_reference(a, b, types)?,
+        ) => compatible_reference(a_ref, b_ref, types).map_err(|error| {
+            alias_context(
+                error,
+                "field",
+                json!({"kind":"classLiteral",
+                "knownRange":a.range,"siteRange":b.range}),
+            )
+        })?,
         (
             Fact::Found {
                 value:
                     AnnotationValue::Enum {
-                        type_ref: a,
+                        type_ref: a_ref,
                         name: an,
                     },
             },
             Fact::Found {
                 value:
                     AnnotationValue::Enum {
-                        type_ref: b,
+                        type_ref: b_ref,
                         name: bn,
                     },
             },
-        ) => an == bn && compatible_reference(a, b, types)?,
+        ) => {
+            an == bn
+                && compatible_reference(a_ref, b_ref, types).map_err(|error| {
+                    alias_context(
+                        error,
+                        "field",
+                        json!({"kind":"enumType",
+                "knownRange":a.range,"siteRange":b.range}),
+                    )
+                })?
+        }
         (
             Fact::Found {
                 value: AnnotationValue::Annotation { annotation: a },

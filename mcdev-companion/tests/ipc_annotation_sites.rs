@@ -40,6 +40,7 @@ struct Host {
     queries: Mutex<Vec<Value>>,
     custom_inject: bool,
     unknown_inject: bool,
+    unknown_item_alias: bool,
     foreign_ref: bool,
     failure: Option<FactsError>,
 }
@@ -84,6 +85,7 @@ impl Host {
             queries: Mutex::new(Vec::new()),
             custom_inject: false,
             unknown_inject: false,
+            unknown_item_alias: false,
             foreign_ref: false,
             failure: None,
         }
@@ -103,6 +105,7 @@ impl SemanticFactClient for Host {
                 let reference=query["reference"].as_str().unwrap();
                 let original=reference.strip_suffix("-alias").unwrap_or(reference);
                 if original=="ref-inject" && self.unknown_inject {return Ok(unknown());}
+                if reference=="ref-item-alias" && self.unknown_item_alias {return Ok(unknown());}
                 let name=match original {
                     "ref-mixin"=>"org.spongepowered.asm.mixin.Mixin",
                     "ref-item"=>"net.minecraft.world.item.Item",
@@ -514,4 +517,36 @@ fn equivalent_current_owner_uri_spelling_keeps_only_the_authorized_local_complet
         1
     );
     assert!(model.model.members.is_empty() && model.model.injectors.is_empty());
+}
+
+#[test]
+fn nonpositive_class_literal_alias_reports_the_collected_pair_states_and_ranges() {
+    let mut host = Host::new();
+    host.unknown_item_alias = true;
+    let result = parse(&provider(Arc::new(host), true, Some(position()))).unwrap();
+    let HostFact::Unavailable { reason } = result.fact else {
+        panic!("nonpositive alias must remain unavailable")
+    };
+    let diagnostic: Value =
+        serde_json::from_str(reason.split_once("; annotationAlias=").unwrap().1).unwrap();
+    assert_eq!(diagnostic["collectedReferenceCount"], 5);
+    assert_eq!(diagnostic["known"]["reference"], "ref-item");
+    assert_eq!(diagnostic["known"]["state"], "found");
+    assert_eq!(
+        diagnostic["known"]["qualifiedName"],
+        "net.minecraft.world.item.Item"
+    );
+    assert_eq!(diagnostic["site"]["reference"], "ref-item-alias");
+    assert_eq!(diagnostic["site"]["collected"], true);
+    assert_eq!(diagnostic["site"]["state"], "unknown");
+    assert_eq!(diagnostic["site"]["reasonCodes"][0], "IncompleteSource");
+    assert_eq!(diagnostic["field"]["kind"], "classLiteral");
+    assert_eq!(diagnostic["field"]["knownRange"], span("Item.class"));
+    assert_eq!(diagnostic["field"]["siteRange"], span("Item.class"));
+    assert_eq!(diagnostic["annotation"]["knownOwner"], "class");
+    assert_eq!(diagnostic["annotation"]["siteOwner"], "class");
+    assert_eq!(
+        diagnostic["annotation"]["sourceSha256"],
+        "7bd1004fdea0383b51e973c48f3a2e5162e359b9abc08eab559920e98e8df5a8"
+    );
 }

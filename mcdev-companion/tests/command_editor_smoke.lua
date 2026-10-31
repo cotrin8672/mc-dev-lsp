@@ -438,9 +438,11 @@ function positive.ready(record, refresh)
       if event.name == 'workspace.refresh_requested' and index > record.traceStart then requested, requested_index = event, index end
     end
   end
+  -- files counts newly installed source batches; unchanged sources can all be reused.
   check('authoritative generation completed project/library/SDK indexing', accepted and indexed and scanned
     and accepted.args.failed == 0 and accepted.args.classpathComplete == true and indexed.args.failed == 0
-    and indexed.args.jdkComplete == true and scanned.args.files > 0, { accepted = accepted, indexed = indexed, scanned = scanned })
+    and indexed.args.jdkComplete == true and type(scanned.args.files) == 'number'
+    and scanned.args.files % 1 == 0 and scanned.args.files >= 0, { accepted = accepted, indexed = indexed, scanned = scanned })
   check('completed model evidence precedes the command result', scanned_index < accepted_index
     and accepted_index <= indexed_index and indexed_index < selected_index, { scanned_index, accepted_index, indexed_index, selected_index })
   check('command actually read selected project inputs and root inventory', operations.projectInputs == true and operations.rootFileInventory == true, operations)

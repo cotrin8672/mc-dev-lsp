@@ -10,6 +10,10 @@ return function(h)
   local protocol = require("mcdev.protocol")
   local kotlin_file = workspace .. "/src/main/kotlin/io/github/cotrin8672/cem/mixin/KotlinRequestMixin.kt"
   h.with_buffer(kotlin_file, "kotlin", nil, function(kotlin_buf)
+    -- Preserve the original unsaved LF bytes when entered from a DOS Java buffer.
+    vim.bo[kotlin_buf].fileformat = "unix"
+    vim.bo[kotlin_buf].endofline = false
+    vim.bo[kotlin_buf].fixendofline = false
     local kotlin_uri = vim.uri_from_bufnr(kotlin_buf)
 
     local function kotlin_text()

@@ -154,8 +154,26 @@ type resolution; it does not prove the declaration alias's resolution. That
 pair remains a live MC check. Its percent-encoded Windows drive URI also exposed
 a consumer string-comparison mismatch, now corrected using normalized file
 paths while retaining exact source SHA/revision checks. Raw fixture conformance
-and the URI regressions pass. The new full native pipeline and original CEM
-rerun are pending.
+and the URI regressions pass.
+
+The next pipeline (`native-pipeline-proof-20261101-053417973`) passes 1,899
+Rust functions across 82 targets, all 2,604 original locators, doc tests and the
+build. It fails the Neovim adapter because the restored Kotlin fixture inherits
+DOS line endings. Its raw failure is retained. Explicit fixture bytes and the
+routing mock were corrected; all five editor entries then pass separately in
+`build/nvim-test-logs/native-recovered-20261101-0554.*`. This is a recorded
+pipeline failure plus a repair, not an exit-zero full-pipeline claim.
+
+Release93 D8 (`cem-project-20261101-053417446-bc112188`) reaches the same
+254-byte completion. Its first Info fails a root-file guard, then the bounded
+fresh preflight succeeds. Completion evaluation 13 reads sourceFacts,
+annotationSites and five resolveTypeRef facts without transport failure, then
+returns typed incomplete context because an annotation reference alias lacks a
+positive identity. The original two helper invocations are observed; the
+85-row comparison is not reached. Shutdown exits zero. A bounded diagnostic now
+distinguishes missing collection, Unknown and DefinitelyAbsent and records the
+pair/ranges without dumping source text; its 22 affected tests pass. The exact
+nonpositive host fact remains unmeasured until the next diagnostic run.
 
 Current-source metadata preserves the 2,604 cases, 17 ported / 3 partial / 7
 pending editor-file states and historical four-snippet/169-call proof. Its

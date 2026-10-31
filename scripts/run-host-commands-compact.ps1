@@ -37,14 +37,34 @@ try {
         $CompanionBuildReceipt = Join-Path (Split-Path -Parent $companionPath) 'receipt.json'
     }
     $buildReceiptPath = (Resolve-Path -LiteralPath $CompanionBuildReceipt -ErrorAction Stop).Path
-    $buildReceipt = Get-Content -LiteralPath $buildReceiptPath -Raw | ConvertFrom-Json
-    if ([string]$buildReceipt.sha256 -ne $CompanionSha256.ToLowerInvariant()) { throw 'Build receipt is not bound to the pinned companion SHA-256' }
-    foreach ($field in @('commit', 'buildTime', 'version')) {
-        if ($null -eq $buildReceipt.buildIdentity -or
-            $buildReceipt.buildIdentity.$field -isnot [string] -or [string]::IsNullOrWhiteSpace($buildReceipt.buildIdentity.$field)) {
-            throw "Independent build receipt must record buildIdentity.$field from the build recipe; Info output cannot generate its own oracle"
+    # ConvertFrom-Json can coerce ISO strings into DateTime. Inspect JSON kinds
+    # directly so compile inputs retain their exact values on PowerShell 7.0+.
+    $receiptJson = [System.Text.Json.JsonDocument]::Parse([IO.File]::ReadAllText($buildReceiptPath))
+    try {
+        $receiptRoot = $receiptJson.RootElement
+        $shaElement = [System.Text.Json.JsonElement]::new()
+        if ($receiptRoot.ValueKind -ne [System.Text.Json.JsonValueKind]::Object -or
+            -not $receiptRoot.TryGetProperty('sha256', [ref]$shaElement) -or
+            $shaElement.ValueKind -ne [System.Text.Json.JsonValueKind]::String -or
+            $shaElement.GetString() -ne $CompanionSha256.ToLowerInvariant()) {
+            throw 'Build receipt is not bound to the pinned companion SHA-256'
         }
-    }
+        $identityElement = [System.Text.Json.JsonElement]::new()
+        if (-not $receiptRoot.TryGetProperty('buildIdentity', [ref]$identityElement) -or
+            $identityElement.ValueKind -ne [System.Text.Json.JsonValueKind]::Object) {
+            throw 'Independent build receipt must record a buildIdentity object from the build recipe'
+        }
+        $buildReceipt = @{ sha256 = $shaElement.GetString(); buildIdentity = [ordered]@{} }
+        foreach ($field in @('commit', 'buildTime', 'version')) {
+            $valueElement = [System.Text.Json.JsonElement]::new()
+            if (-not $identityElement.TryGetProperty($field, [ref]$valueElement) -or
+                $valueElement.ValueKind -ne [System.Text.Json.JsonValueKind]::String -or
+                [string]::IsNullOrWhiteSpace($valueElement.GetString())) {
+                throw "Independent build receipt must record buildIdentity.$field from the build recipe; Info output cannot generate its own oracle"
+            }
+            $buildReceipt.buildIdentity[$field] = $valueElement.GetString()
+        }
+    } finally { $receiptJson.Dispose() }
     $buildInputPath = Join-Path $logs 'command-build-input.json'
     [ordered]@{
         artifactPath = $companionPath; artifactSha256 = $CompanionSha256.ToLowerInvariant()

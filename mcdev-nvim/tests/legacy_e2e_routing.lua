@@ -31,7 +31,7 @@ document("src/main/java/io/github/cotrin8672/cem/mixin/PlacementOffsetMixin.java
 local loom_bufnr = document("src/main/java/com/example/mixin/ExampleMixin.java")
 local mapped_bufnr = document("mapped-sources/com/example/target/SimpleTarget.java")
 local decoy_bufnr = document("other/Decoy.java")
-local client, foreign, expected_bufnr, captured, quit
+local client, foreign, expected_bufnr, captured, kotlin_handoff, quit
 local calls, events, cancelled = {}, {}, 0
 local response_error, stalled = nil, false
 local provider = true
@@ -126,10 +126,21 @@ local ok, failure = xpcall(function()
       or path == repo .. "/mcdev-nvim/tests/e2e/placement_offset_completion_e2e.lua" then
       return function(helpers) captured = helpers end
     end
+    if path == repo .. "/mcdev-nvim/tests/e2e/kotlin_drill_e2e.lua" then
+      return function(helpers) kotlin_handoff = helpers end
+    end
     return saved.dofile(path)
   end
   saved.dofile(repo .. "/mcdev-nvim/tests/e2e/jdtls_bundle_e2e.lua")
   h.assert_not_nil(captured, "bundle harness must hand its routed helpers to the original scenarios")
+  h.assert_not_nil(kotlin_handoff, "bundle routing must retain the Kotlin scenario handoff")
+  h.assert_eq(kotlin_handoff.workspace, root)
+  h.assert_eq(kotlin_handoff.workspace_root_uri, vim.uri_from_fname(root))
+  h.assert_eq(kotlin_handoff.client_id, client.id)
+  h.assert_eq(kotlin_handoff.with_buffer, captured.with_buffer)
+  h.assert_eq(kotlin_handoff.mcdev_command, captured.mcdev_command)
+  h.assert_true(type(kotlin_handoff.find_line_and_character) == "function")
+  h.assert_eq(#calls, 0, "routing mocks hand off scenarios; their contents are checked separately")
   expected_bufnr = bundle_bufnr
   captured.with_buffer(vim.api.nvim_buf_get_name(bundle_bufnr), "java", nil, function(bufnr)
     vim.api.nvim_set_current_buf(decoy_bufnr)

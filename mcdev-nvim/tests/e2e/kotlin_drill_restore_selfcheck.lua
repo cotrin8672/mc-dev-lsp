@@ -16,8 +16,11 @@ local function kotlin_case(failure)
   local protocol = {}
   protocol.active_ktlsp_client = function() return { id = 42 } end
   protocol.context = function(buf, position)
+    helpers.assert_eq(vim.bo[buf].fileformat, "unix")
+    helpers.assert_eq(vim.bo[buf].endofline, false)
+    helpers.assert_eq(vim.bo[buf].fixendofline, false)
     return { documentUri = vim.uri_from_bufnr(buf), languageId = vim.bo[buf].filetype,
-      workspaceRoot = workspace_uri, bufferText = table.concat(vim.api.nvim_buf_get_lines(buf, 0, -1, false), "\n"),
+      workspaceRoot = workspace_uri, bufferText = vim.lsp._buf_get_full_text(buf),
       position = { line = position[1] - 1, character = position[2] } }
   end
   protocol.build_completion_payload = function(buf, position)
@@ -32,6 +35,9 @@ local function kotlin_case(failure)
       vim.api.nvim_buf_set_name(bufnr, file)
       vim.api.nvim_set_current_buf(bufnr)
       vim.bo[bufnr].filetype = filetype
+      vim.bo[bufnr].fileformat = "dos"
+      vim.bo[bufnr].endofline = true
+      vim.bo[bufnr].fixendofline = true
       callback(bufnr)
     end,
     find_line_and_character = function(lines, marker)

@@ -637,3 +637,89 @@ fn actual_serializer93_keeps_source_ranges_canonical_owner_and_unmeasured_alias_
         sample["afterSha256"]
     );
 }
+
+#[test]
+fn nonpositive_alias_diagnostic_distinguishes_lookup_and_fact_states_without_dumping_payloads() {
+    use mcdev_companion::wire::TypeFact;
+    use std::collections::BTreeMap;
+    let (text, declarations, mut wire) = fixture();
+    wire["annotations"][1]["typeRef"] = json!("alias-outer");
+    let sites: AnnotationSites = serde_json::from_value(wire).unwrap();
+    let known: TypeFact =
+        serde_json::from_value(json!({"id":"known-type","qualifiedName":"demo.Outer"})).unwrap();
+    let reasons=(0..64).map(|index|json!({"code":format!("MissingFacts{index}"),"source":"DO_NOT_DUMP_SOURCE".repeat(1000)})).collect::<Vec<_>>();
+    for (fact, state) in [
+        (None, "notCollected"),
+        (Some(Fact::DefinitelyAbsent), "definitelyAbsent"),
+        (
+            Some(Fact::Unknown {
+                reasons: reasons.clone(),
+            }),
+            "unknown",
+        ),
+    ] {
+        let mut types = BTreeMap::from([(
+            "ref-outer".into(),
+            Fact::Found {
+                value: known.clone(),
+            },
+        )]);
+        if let Some(fact) = fact {
+            types.insert("alias-outer".into(), fact);
+        }
+        let error = sites
+            .validate_with_types(
+                &text,
+                "file:///project/Patch.java",
+                None,
+                &declarations,
+                true,
+                &mut registry(&text, &declarations),
+                &types,
+            )
+            .unwrap_err();
+        let FactsError::Unknown(message) = error else {
+            panic!("alias failure lost its typed Unknown")
+        };
+        assert!(
+            message.starts_with("annotation reference alias has no positive same-view identity")
+        );
+        assert!(
+            message.len() < 8192
+                && !message.contains("DO_NOT_DUMP_SOURCE")
+                && !message.contains(&text)
+        );
+        let diagnostic: Value =
+            serde_json::from_str(message.split_once("; annotationAlias=").unwrap().1).unwrap();
+        assert_eq!(diagnostic["known"]["reference"], "ref-outer");
+        assert_eq!(diagnostic["known"]["state"], "found");
+        assert_eq!(diagnostic["known"]["qualifiedName"], "demo.Outer");
+        assert_eq!(diagnostic["site"]["reference"], "alias-outer");
+        assert_eq!(diagnostic["site"]["state"], state);
+        assert!(diagnostic["site"].get("qualifiedName").is_none());
+        assert_eq!(diagnostic["field"]["kind"], "annotationType");
+        assert_eq!(
+            diagnostic["field"]["knownRange"],
+            span(&text, "@Outer(value=@Inner)")
+        );
+        assert_eq!(diagnostic["annotation"]["knownOwner"], "method");
+        assert_eq!(diagnostic["annotation"]["siteOwner"], "method");
+        assert_eq!(diagnostic["annotation"]["sourceSha256"], digest(&text));
+        if state == "unknown" {
+            assert_eq!(diagnostic["site"]["reasonCodes"][0], "MissingFacts0");
+            assert_eq!(diagnostic["site"]["reasonCount"], 64);
+            assert_eq!(
+                diagnostic["site"]["reasonCodes"].as_array().unwrap().len(),
+                8
+            );
+            assert_eq!(diagnostic["site"]["reasonCodesTruncated"], true);
+            assert_eq!(
+                diagnostic["site"]["reasonPayloadSha256"]
+                    .as_str()
+                    .unwrap()
+                    .len(),
+                64
+            );
+        }
+    }
+}
