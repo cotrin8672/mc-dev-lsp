@@ -6,10 +6,10 @@ thin Neovim client. Building the companion does not build or link ktlsp.
 
 This is the `codex/ktlsp-rust` replacement branch. The original JDT LS checkout
 and its uncommitted work remain on `main`. Full replacement is still in
-progress: all 2,604 original JUnit cases have native replacements, but the full
-MC command surface and original editor workflows are not yet connected to the
-host. See the [migration record](docs/rust-migration.md) for verified scope and
-remaining work.
+progress: all 2,604 original JUnit cases have native replacements and all eleven
+commands have positive live fixture coverage. Complete original MC/Kotlin editor
+workflows still need host facts and acceptance. See the
+[migration record](docs/rust-migration.md) for verified scope and remaining work.
 
 The companion uses the published host operations for project/class facts,
 source snapshots, owned resources, runtime class bytes, the JVM catalog and

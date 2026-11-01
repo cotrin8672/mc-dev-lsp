@@ -10,18 +10,18 @@ Kotlin subprocess can count as a completed Rust port. The current published-host
 connection work and concrete input differences are tracked in
 [the IPC integration checkpoint](ipc-integration-status.md).
 
-The 2026-11-01 resumed checkpoint passes 1,875 native functions across 80
+The 2026-11-01 resumed checkpoint passes 1,904 native functions across 83
 targets and verifies all 2,604 original case locators, doc tests, the executable
-and five independent editor entries. The optimized Windows package verifies all
-24 payloads. The first complete original CEM attempt against published host86
-stopped at its initial `mcdev.info` preflight with typed `Stale`, before any
-original assertion or member-golden comparison. Diagnostic runs identified and
-corrected a consumer module-namespace mismatch. Published host92 then passes
-Info on its first attempt and reaches the original completion input, where
-missing ownerless annotation facts return typed incomplete context. The host
-task is adding that fact operation. Two original helper invocations are observed;
-the 85-row legacy member comparison is not reached. Full replacement is not
-verified. Current evidence and unresolved host
+and five independent editor entries. Published host93 and the fixed companion
+also pass 1,065 checks across 25 live cases, including positive results for all
+eleven command IDs, applied source/config edits and refresh/lifecycle behavior.
+Original CEM acceptance remains incomplete: written annotation sites are now
+connected, but both issued aliases for the original orphan `@Mixin` annotation
+return `Unknown(MissingSource)` in the same current host view. Two original
+helper invocations and one completion request are observed; the 85-row legacy
+member comparison is not reached. The host task is fixing dependency stub
+identity and lazy class loading. Full replacement is not verified.
+Current evidence and unresolved host
 facts are linked above; the dated records below retain their historical pins.
 
 ## Authoritative baseline
@@ -78,8 +78,8 @@ implementation was requested from the ktlsp task; at goal start it was not prese
 | MixinExtras diagnostics/actions | All 133 assigned legacy cases pass; 249 final public API outputs and exact callback traces checked | Facade callers are verified separately; full host/editor integration remains pending |
 | Full Facade and caller assertions | All 189 remaining original cases pass, with whole final API results, direct native assertions and state/authority checks | Complete host project/source semantics and original editor workflows remain incomplete |
 | Protocol | Protocol models/decoder/converters cover all 40 assigned legacy cases | All eleven command routes are connected; typed unavailable results do not establish complete live success behavior |
-| Command handlers and transports | All 127 exact legacy cases pass; concrete `CoreCommandHost` also reaches real core completion, diagnostics and applied config edits with checked fact/error propagation | Remaining command composition paths need direct proof; all 11 commands still need the live host capability bridge |
-| Neovim client | Original 27 files and 1,014 assertion sites inventoried; Kotlin inputs restored byte-for-byte; independent suite passes 1,521 assertion calls | Sixteen files have complete native coverage, two have partial real-host coverage and nine await host capabilities |
+| Command handlers and transports | All 127 exact legacy cases pass; published host93 also passes positive results for all eleven command IDs in the isolated fixture, including exact references/config edits and observable refresh | Complete original MC workflows and all semantic feature variants remain required |
+| Neovim client | Original 27 files and 1,197 assertion sites inventoried; all 183 restored sites have static correspondences; original Kotlin inputs/assertions restored | Seventeen files have native coverage, three are partial and seven await real-host coverage; static mappings and helper invocations are not semantic parity |
 | Independent process and host integration | Separate MC executable built without ktlsp/ktcore linkage; whole native workspace passes; latest stock host/MC/Neovim passes 112 checks and 29 first-attempt RPCs | This proves the semantic-v1 Mixin/Shadow slice; further MC capabilities and full editor parity remain pending |
 | Packaging/docs/legacy removal | Windows/Linux CI and optimized packages pass at `c1f0fd4`; both archives have 24 verified payloads; version 0.7.7 comes from Cargo and no linked host Git dependency remains | The new IPC working tree, full product wiring and final legacy runtime retirement remain pending |
 

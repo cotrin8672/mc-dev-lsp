@@ -89,12 +89,43 @@ Archive SHA-256 values are
 (Linux). These checks do not certify the unpassed live CEM workflow.
 
 The latest native pipeline is
-`build/rust-test-logs/native-pipeline-proof-20261101-025824638/`: 1,875 functions,
-80 targets, all 2,604 original JUnit locators, doc/build checks and five editor
-entries pass in 116.8 seconds. Its 872 inputs retain fingerprint
-`2d7ec181ff68c15a878730b4f9af4fb41922e0427b4acde9a53da744144bb2fb`.
+`build/rust-test-logs/native-pipeline-proof-20261101-111850867/`: 1,904 functions,
+83 targets, all 2,604 original JUnit locators, doc/build checks and five editor
+entries pass in 213.3 seconds. Its 887 inputs retain fingerprint
+`2eb5b9a90a075238c5e99ce68f86c58046893d19c64c1795cbe9a02b16fa637e`.
 The copied debug companion is
-`6c99f535a868c5bfd9f527e6829384a97737bad353007cd4f1f9a6d4fabae9e5`.
+`8a42be20a9beda8bf4521a0c6e1cec8c022ede5752e07fc129577feb431f0bbb`,
+built from `fe21397858fb40ef83d8714f77160f74b2afbed3` with independently
+recorded commit/time/version inputs. This successful full run follows the
+preserved `native-pipeline-proof-20261101-053417973` failure: Rust passed there,
+but the restored Kotlin editor fixture inherited DOS line endings. The fixture
+now explicitly preserves its original LF/no-final-newline unsaved bytes.
+
+Published host93 and this companion also pass all eleven command IDs in the
+isolated Java fixture: 1,065 assertions and 25 cases, input hashes stable,
+both host/child shutdowns clean. Evidence is
+`build/rust-test-logs/host-commands-20261101-111850957/receipt.json`.
+Positive references retain the exact three old-core locations without equivalent
+Windows URI duplicates; the original config-registration edit is applied.
+Info/Dump use full DTO checks and independent executable build identity.
+Reindex/reload prove actual config changes, including a valid cached zero-file
+project scan. Unicode, source navigation, stale/cancel/disable/re-enable/restart
+checks remain enabled. The prior failed command receipt is preserved under
+`build/host-command-source-0c69d6b/build/rust-test-logs/host-commands-20261101-055214773/`.
+This establishes positive command routing in that fixture, not complete original
+Minecraft/Kotlin editor parity.
+
+Original CEM D9 remains failed at its first completion. Evidence is
+`build/cem-diagnostic-source-faeecb9/build/rust-test-logs/cem-project-20261101-060502760-d1a95c4b/`.
+The unchanged 254-byte CRLF source has SHA-256
+`7bd1004fdea0383b51e973c48f3a2e5162e359b9abc08eab559920e98e8df5a8`.
+In current command 12, `sourceFacts` reference `12:33` and `annotationSites`
+reference `12:35`, both owned by `12:0`, were actually resolved and both returned
+`Unknown(MissingSource)` for annotationType bytes 177..195. Neither result
+provided a positive FQN; the import spelling does not establish identity.
+The host task is fixing dependency stub identity/lazy loading. The original
+85-member comparison has not run; its input and expected members remain fixed.
+
 Info/Dump/Reindex/Reload now skip unused compiler source inventory/body reads;
 their complete DTOs match the all-input baseline, and skipped source coverage
 stays Unknown(NotRequested). All 67 affected checks pass.

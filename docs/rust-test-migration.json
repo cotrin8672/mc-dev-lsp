@@ -61999,7 +61999,7 @@
       "protocol": 40
     },
     "wholeMigrationVerified": false,
-    "remainingAcceptance": "All 2604 original JUnit replacements pass on Windows and Linux; native/editor/package CI7e338e4 passes. Complete original CEM/editor acceptance after upstream model-generation invalidation fix, 183 restored original Lua site correspondences, generic type arguments, primitive class literals, floating literal facts, source hierarchy, dependency navigation, extract-local and legacy retirement. Full replacement remains unverified.",
+    "remainingAcceptance": "All 2604 original JUnit case replacements, the stable current native/editor pipeline, and all eleven positive command routes in an isolated Java fixture pass. The complete original CEM workflow still stops at the initial orphan annotation type with host Unknown(MissingSource), before the 85-member comparison. Original Kotlin/Create/Drill/Sodium editor and source-attachment workflows, generic type arguments, primitive class literals, floating literal facts, current source hierarchy, dependency navigation, extract-local and final legacy retirement remain unverified or incomplete. Fresh cross-platform CI and optimized packages are required for the current annotationSites/URI changes. Static correspondence of 1197 Lua sites is not live semantic parity.",
     "independentSemanticV1Evidence": {
       "receipt": "mcdev-companion/tests/fixtures/semantic_v1/interop_receipt.json",
       "stockHostRevision": "f76a43fbeddf4fbdc69768fd0f7544e5a4a3610f",
@@ -62474,29 +62474,29 @@
     },
     "nativeWorkspace": {
       "status": "passed",
-      "logDirectory": "build/rust-test-logs/20261101-025825853",
-      "pipelineProof": "build/rust-test-logs/native-pipeline-proof-20261101-025824638",
+      "logDirectory": "build/rust-test-logs/20261101-111900052",
+      "pipelineProof": "build/rust-test-logs/native-pipeline-proof-20261101-111850867",
       "command": "cargo test --workspace --locked --all-targets -- --test-threads=1",
-      "passedFunctions": 1875,
+      "passedFunctions": 1904,
       "failed": 0,
       "ignored": 0,
       "filtered": 0,
-      "targets": 80,
+      "targets": 83,
       "originalCaseLocatorsVerified": 2604,
-      "sourceInputFiles": 872,
-      "sourceFingerprint": "2d7ec181ff68c15a878730b4f9af4fb41922e0427b4acde9a53da744144bb2fb",
+      "sourceInputFiles": 887,
+      "sourceFingerprint": "2eb5b9a90a075238c5e99ce68f86c58046893d19c64c1795cbe9a02b16fa637e",
       "sourceInputsStable": true,
       "caseFiltersAbsent": true,
-      "testSeconds": 75.3,
+      "testSeconds": 171.3,
       "testDeadlineSeconds": 900,
       "doctestsPassed": true,
       "companionBuildPassed": true,
       "independentEditorSuitePassed": true,
-      "independentEditorLogs": "build/rust-test-logs/native-pipeline-proof-20261101-025824638/neovim",
+      "independentEditorLogs": "build/rust-test-logs/native-pipeline-proof-20261101-111850867/neovim",
       "noKtlspOrKtcoreDependency": true,
       "noGitDependency": true,
-      "binaryReceipt": "build/companion-artifacts/native-6c99f535a868/receipt.json",
-      "formattingEvidence": "build/rust-test-logs/20261101-025825853/fmt.stderr.log",
+      "binaryReceipt": "build/companion-artifacts/native-8a42be20a9be/receipt.json",
+      "formattingEvidence": "build/rust-test-logs/20261101-111900052/fmt.stderr.log",
       "countNote": "The linked prototype's 13 duplicate functions were retired with its exact source preserved; all 2604 original JUnit case replacements remain verified."
     },
     "nativeDistribution": {
@@ -62803,6 +62803,33 @@
         "noGitDependency": true,
         "binaryReceipt": "build/companion-artifacts/native-3dcb6aeba5a1/receipt.json",
         "formattingEvidence": "build/rust-test-logs/20261101-021930375/fmt.stderr.log",
+        "countNote": "The linked prototype's 13 duplicate functions were retired with its exact source preserved; all 2604 original JUnit case replacements remain verified."
+      },
+      {
+        "status": "passed",
+        "logDirectory": "build/rust-test-logs/20261101-025825853",
+        "pipelineProof": "build/rust-test-logs/native-pipeline-proof-20261101-025824638",
+        "command": "cargo test --workspace --locked --all-targets -- --test-threads=1",
+        "passedFunctions": 1875,
+        "failed": 0,
+        "ignored": 0,
+        "filtered": 0,
+        "targets": 80,
+        "originalCaseLocatorsVerified": 2604,
+        "sourceInputFiles": 872,
+        "sourceFingerprint": "2d7ec181ff68c15a878730b4f9af4fb41922e0427b4acde9a53da744144bb2fb",
+        "sourceInputsStable": true,
+        "caseFiltersAbsent": true,
+        "testSeconds": 75.3,
+        "testDeadlineSeconds": 900,
+        "doctestsPassed": true,
+        "companionBuildPassed": true,
+        "independentEditorSuitePassed": true,
+        "independentEditorLogs": "build/rust-test-logs/native-pipeline-proof-20261101-025824638/neovim",
+        "noKtlspOrKtcoreDependency": true,
+        "noGitDependency": true,
+        "binaryReceipt": "build/companion-artifacts/native-6c99f535a868/receipt.json",
+        "formattingEvidence": "build/rust-test-logs/20261101-025825853/fmt.stderr.log",
         "countNote": "The linked prototype's 13 duplicate functions were retired with its exact source preserved; all 2604 original JUnit case replacements remain verified."
       }
     ],
@@ -63146,30 +63173,46 @@
     },
     "liveProviderCommands": {
       "status": "passed",
-      "receipt": "build/rust-test-logs/host-commands-20261030-090521312/receipt.json",
-      "receiptSha256": "a44aef17f542f0bb5a57e225cd2261145cd24331b6416cb50c4d309860f2ae60",
-      "hostRevision": "ea8be671ed4a876a5d5514fb63daa043e953c08f",
-      "hostSha256": "1c08c7769a0fd810a6c8b28f98aefd042dd4f1dda35ca9aa99c7727988d8bf07",
-      "companionSha256": "c5d5bbab4fb5438096c23356c501d303f89ed89393ccdbfdb3a3c7bd3a3ddeba",
-      "checks": 101,
-      "matrixRows": 23,
+      "receipt": "build/rust-test-logs/host-commands-20261101-111850957/receipt.json",
+      "receiptSha256": "e2f9adb1d3cd42881867ce67c42709f14d3e3cf1ec49c46c726486e80604ba23",
+      "hostRevision": "ddba88af8c4dfc2b5c67397b465ea01c98129069",
+      "hostSha256": "46ae70429778a834951ce0c191b08b334863441a82bf20c3394f8075fabfed4e",
+      "companionRevision": "fe21397858fb40ef83d8714f77160f74b2afbed3",
+      "companionSha256": "8a42be20a9beda8bf4521a0c6e1cec8c022ede5752e07fc129577feb431f0bbb",
+      "checks": 1065,
+      "matrixRows": 25,
       "allRowsPassed": true,
-      "editorSeconds": 114.0,
+      "positiveCommandIds": [
+        "mcdev.codeAction",
+        "mcdev.completion",
+        "mcdev.context",
+        "mcdev.definition",
+        "mcdev.diagnostics",
+        "mcdev.dumpContext",
+        "mcdev.hover",
+        "mcdev.info",
+        "mcdev.references",
+        "mcdev.reindex",
+        "mcdev.reloadProjectContext"
+      ],
+      "all11CommandsVerified": true,
+      "editorSeconds": 169.2,
       "editorDeadlineSeconds": 600,
       "inputHashesStable": true,
+      "sourceInputHashes": "build/rust-test-logs/host-commands-20261101-111850957/proof-inputs.before.json",
+      "independentBuildReceipt": "build/rust-test-logs/host-commands-20261101-111850957/independent-build-receipt.json",
+      "independentBuildReceiptSha256": "3bd8989ea5787ad5677d542e4c0318d52c3a13707a26952403489c33e73e0b04",
+      "originalPositiveOracle": "mcdev-companion/tests/fixtures/host_commands/original-success.json",
+      "originalPositiveOracleSha256": "38b8cb1d48cd021c545ed88a5b284fc67d3be7a82c243695cddcbe7d7cc219e0",
       "completeReplacementVerified": false,
-      "scope": "Five bounded complete command DTO fixtures; Kotlin empty actions and AW-header empty references; six exact typed incomplete responses; real refresh, source navigation, lifecycle and original startup support. Not complete Minecraft command or original editor parity.",
+      "fullMcCapabilitiesVerified": false,
+      "scope": "All eleven command IDs produce checked positive full DTOs or observed refresh effects in one isolated Java fixture. Exact original compiled-core references/config-edit oracle, actual build identity, Unicode, stale/cancel/disable/re-enable/restart and applied source/config edits are checked. This is not full original CEM/Kotlin/editor parity.",
       "earlierFailures": [
         {
-          "receipt": "build/rust-test-logs/host-commands-20261030-074817274/receipt.json",
-          "cause": "Gradle mise shim rejected untrusted configuration; used installed Gradle executable directly."
-        },
-        {
-          "receipt": "build/rust-test-logs/host-commands-20261030-074943018/receipt.json",
-          "cause": "Harness proceeded before cold indexing completed and abandoned refresh requests after 25 seconds; fixed bounded phase deadlines and cancellation."
+          "receipt": "build/host-command-source-0c69d6b/build/rust-test-logs/host-commands-20261101-055214773/receipt.json",
+          "cause": "Equivalent Windows file URI spellings duplicated references; reindex harness rejected a valid cached zero-file scan and prevented the reload assertion. The native URI identity and readiness predicate were corrected; original oracle unchanged."
         }
-      ],
-      "sourceInputHashes": "build/rust-test-logs/host-commands-20261030-090521312/proof-inputs.before.json"
+      ]
     },
     "liveRuntimeByteReader": {
       "status": "passed",
@@ -63246,6 +63289,33 @@
             "cause": "Harness proceeded before cold indexing completed and abandoned refresh requests after 25 seconds; fixed bounded phase deadlines and cancellation."
           }
         ]
+      },
+      {
+        "status": "passed",
+        "receipt": "build/rust-test-logs/host-commands-20261030-090521312/receipt.json",
+        "receiptSha256": "a44aef17f542f0bb5a57e225cd2261145cd24331b6416cb50c4d309860f2ae60",
+        "hostRevision": "ea8be671ed4a876a5d5514fb63daa043e953c08f",
+        "hostSha256": "1c08c7769a0fd810a6c8b28f98aefd042dd4f1dda35ca9aa99c7727988d8bf07",
+        "companionSha256": "c5d5bbab4fb5438096c23356c501d303f89ed89393ccdbfdb3a3c7bd3a3ddeba",
+        "checks": 101,
+        "matrixRows": 23,
+        "allRowsPassed": true,
+        "editorSeconds": 114.0,
+        "editorDeadlineSeconds": 600,
+        "inputHashesStable": true,
+        "completeReplacementVerified": false,
+        "scope": "Five bounded complete command DTO fixtures; Kotlin empty actions and AW-header empty references; six exact typed incomplete responses; real refresh, source navigation, lifecycle and original startup support. Not complete Minecraft command or original editor parity.",
+        "earlierFailures": [
+          {
+            "receipt": "build/rust-test-logs/host-commands-20261030-074817274/receipt.json",
+            "cause": "Gradle mise shim rejected untrusted configuration; used installed Gradle executable directly."
+          },
+          {
+            "receipt": "build/rust-test-logs/host-commands-20261030-074943018/receipt.json",
+            "cause": "Harness proceeded before cold indexing completed and abandoned refresh requests after 25 seconds; fixed bounded phase deadlines and cancellation."
+          }
+        ],
+        "sourceInputHashes": "build/rust-test-logs/host-commands-20261030-090521312/proof-inputs.before.json"
       }
     ],
     "liveCemFeatureSnippets": {
@@ -63290,11 +63360,11 @@
     },
     "resumedIntegration": {
       "date": "2026-11-01",
-      "status": "native-verified-live-incomplete",
-      "hostPin": "64cbb25e8d6a7c632d0e283edbf98865909e0f7d",
-      "hostReceipt": "build/host-artifacts/published-64cbb25-e2d769e1f628/receipt.json",
+      "status": "native-and-eleven-command-fixture-verified-cem-incomplete",
+      "hostPin": "ddba88af8c4dfc2b5c67397b465ea01c98129069",
+      "hostReceipt": "build/host-artifacts/published-ddba88a-46ae70429778/receipt.json",
       "hostSerializerFixture": "mcdev-companion/tests/fixtures/host_inputs/root_files/actual-serializer-sample.json",
-      "nativePipeline": "build/rust-test-logs/native-pipeline-proof-20261101-025824638",
+      "nativePipeline": "build/rust-test-logs/native-pipeline-proof-20261101-111850867",
       "optimizedPackage": {
         "status": "passed-on-both-platforms",
         "payloadFilesPerPlatform": 24,
@@ -63438,6 +63508,45 @@
         "freshCurrent": 32,
         "originalAssertions": 0,
         "scope": "Attribution only; full CEM remains failed."
+      },
+      "liveElevenCommandAcceptance": "build/rust-test-logs/host-commands-20261101-111850957/receipt.json",
+      "annotationSitesConsumer": {
+        "status": "connected-positive-site-completion-and-coverage-checked",
+        "supportedOps": [
+          "sourceFacts",
+          "annotationSites"
+        ],
+        "fixture": "mcdev-companion/tests/fixtures/host_inputs/annotation_sites/actual-annotation-sites93.json",
+        "fixtureSha256": "fa2007364b01b5cfc877085e0c7297cc0513bfcdaa17f3243ee5564a7183eb1a",
+        "scope": "Actual producer serializer and source bytes retained. Same-view issued owners/ranges, positive FQN alias agreement, current source digest and coverage are enforced. The sample resolves only the inventory alias, so it does not certify both alias resolutions or official MC acceptance."
+      },
+      "latestOriginalCemAttempt": {
+        "status": "failed-at-first-original-completion-with-missing-source",
+        "receipt": "build/cem-diagnostic-source-faeecb9/build/rust-test-logs/cem-project-20261101-060502760-d1a95c4b/receipt.json",
+        "receiptSha256": "5b36340bd53ce532bcfe846abe9ef12e954091c73300f5c6ea4eaaef8b3b5d91",
+        "hostRevision": "ddba88af8c4dfc2b5c67397b465ea01c98129069",
+        "companionRevision": "faeecb91243609df8ccec1728f7ebd923e7c2f47",
+        "sourceBytes": 254,
+        "sourceSha256": "7bd1004fdea0383b51e973c48f3a2e5162e359b9abc08eab559920e98e8df5a8",
+        "documentVersion": 3,
+        "observedOriginalHelperInvocations": 2,
+        "observedOriginalCompletionRequests": 1,
+        "originalMemberComparisonExecuted": false,
+        "originalExpectedMembers": 85,
+        "sourceFactsAlias": "12:33",
+        "annotationSitesAlias": "12:35",
+        "owner": "12:0",
+        "field": "annotationType",
+        "rangeUtf8": {
+          "start": 177,
+          "end": 195
+        },
+        "bothAliasesActuallyRequested": true,
+        "bothResults": "Unknown(MissingSource)",
+        "returnedPositiveQualifiedName": null,
+        "commandCurrent": true,
+        "inputHashesStable": true,
+        "scope": "Fixed original CRLF input and old member oracle. Both issued aliases were resolved in the same accepted command/view; missing dependency source remains a host issue. No source-spelling or copied-binary fallback, no member comparison credit."
       }
     }
   }
