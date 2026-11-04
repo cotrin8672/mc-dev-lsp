@@ -133,6 +133,156 @@ impl SemanticFactClient for Host {
         Ok(json!({"facts":facts}))
     }
 }
+
+const OWNED_SOURCE: &str = "package io.github.cotrin8672.cem.mixin;\nimport net.minecraft.world.item.Item;\nimport org.spongepowered.asm.mixin.Mixin;\nimport org.spongepowered.asm.mixin.injection.Inject;\n@Mixin(Item.class)\npublic class ItemMixin {\n    @Inject(method = \"\")\n    private void mcdev$handler() {}\n}\n";
+const OWNED_URI: &str = "file:///project/OwnedItemMixin.java";
+
+struct OwnedHost {
+    declarations: Value,
+    sites: Value,
+    queries: Mutex<Vec<Value>>,
+}
+
+impl OwnedHost {
+    fn new() -> Self {
+        let span = |text: &str| {
+            let start = OWNED_SOURCE.find(text).unwrap();
+            json!({"start":start,"end":start+text.len()})
+        };
+        let annotation = |text: &str, name: &str, reference: &str, args: Value| {
+            let start = OWNED_SOURCE.find(text).unwrap() + text.find(name).unwrap();
+            json!({"typeRef":reference,"useSiteTarget":null,"range":span(text),
+                "nameRange":{"start":start,"end":start+name.len()},"arguments":args})
+        };
+        let mixin = annotation(
+            "@Mixin(Item.class)",
+            "Mixin",
+            "ref-mixin",
+            json!([{"name":null,"range":span("Item.class"),
+                "value":found(json!({"kind":"class","typeRef":"ref-item"}))}]),
+        );
+        let empty_selector = OWNED_SOURCE.find("method = \"\"").unwrap() + "method = \"".len();
+        let inject = annotation(
+            "@Inject(method = \"\")",
+            "Inject",
+            "ref-inject",
+            json!([{"name":"method","range":span("\"\""),
+            "value":found(json!({"kind":"string","value":"","contentRange":{
+                "start":empty_selector,"end":empty_selector,
+            }}))}]),
+        );
+        let class_start = OWNED_SOURCE.find("@Mixin").unwrap();
+        let class_body = OWNED_SOURCE.find('{').unwrap();
+        let class_end = OWNED_SOURCE.rfind('}').unwrap() + 1;
+        let class_declaration = json!({"id":"class","owner":null,"name":"ItemMixin",
+            "range":span("ItemMixin"),"annotations":[mixin.clone()],"sourceKind":"Class",
+            "fullRange":{"start":class_start,"end":class_end},
+            "headerRange":{"start":class_start,"end":class_body},
+            "bodyRange":{"start":class_body,"end":class_end},"nameRange":span("ItemMixin"),
+            "modifiers":{"visibility":found(json!("Public")),"static":found(json!(false)),
+                "final":found(json!(false)),"abstract":found(json!(false))}});
+        let handler_start = OWNED_SOURCE.find("@Inject").unwrap();
+        let handler_name = OWNED_SOURCE.find("mcdev$handler").unwrap();
+        let handler_body = OWNED_SOURCE[handler_name..].find('{').unwrap() + handler_name;
+        let handler_end = OWNED_SOURCE[handler_body..].find('}').unwrap() + handler_body + 1;
+        let mut handler = inject.clone();
+        handler["owner"] = Value::Null;
+        let handler_declaration = json!({"id":"handler","owner":"class","name":"mcdev$handler",
+            "range":{"start":handler_name,"end":handler_name+"mcdev$handler".len()},
+            "annotations":[handler],"sourceKind":"Function",
+            "fullRange":{"start":handler_start,"end":handler_end},
+            "headerRange":{"start":handler_start,"end":handler_body},
+            "bodyRange":{"start":handler_body,"end":handler_end},
+            "nameRange":{"start":handler_name,"end":handler_name+"mcdev$handler".len()},
+            "modifiers":{"visibility":found(json!("Private")),"static":found(json!(false)),
+                "final":found(json!(false)),"abstract":found(json!(false))}});
+        let mut site_mixin = mixin;
+        site_mixin["owner"] = json!("class");
+        let mut site_inject = inject;
+        site_inject["owner"] = json!("handler");
+        let sites = json!({"source":{"documentUri":found(json!(OWNED_URI)),
+                "identity":{"kind":"source","revision":"owned-1"},
+                "sha256":format!("{:x}",Sha256::digest(OWNED_SOURCE.as_bytes()))},
+            "annotations":[site_mixin,site_inject],"coverage":unknown()});
+        Self {
+            declarations: json!([class_declaration, handler_declaration]),
+            sites,
+            queries: Mutex::new(Vec::new()),
+        }
+    }
+}
+
+impl SemanticFactClient for OwnedHost {
+    fn check_active(&self) -> Result<(), FactsError> {
+        Ok(())
+    }
+
+    fn read_facts(&self, evaluation: &str, queries: &[Value]) -> Result<Value, FactsError> {
+        assert_eq!(evaluation, "owned-view");
+        self.queries.lock().unwrap().extend_from_slice(queries);
+        let facts = queries.iter().map(|query| -> Result<Value, FactsError> {
+            Ok(match query["op"].as_str().unwrap() {
+                "sourceFacts" => json!({"declarations":self.declarations}),
+                "annotationSites" => self.sites.clone(),
+                "resolveTypeRef" => {
+                    let reference = query["reference"].as_str().unwrap();
+                    let qualified = match reference {
+                        "ref-mixin" => "org.spongepowered.asm.mixin.Mixin",
+                        "ref-item" => "net.minecraft.world.item.Item",
+                        "ref-inject" => "org.spongepowered.asm.mixin.injection.Inject",
+                        other => panic!("unexpected reference {other}"),
+                    };
+                    found(json!({"id":format!("type-{reference}"),"qualifiedName":qualified,"package":"fixture"}))
+                }
+                "declarationType" => found(json!({"id":"owner-type",
+                    "qualifiedName":"io.github.cotrin8672.cem.mixin.ItemMixin",
+                    "package":"io.github.cotrin8672.cem.mixin"})),
+                "declarationMember" => {
+                    assert_eq!(query["declaration"], "handler");
+                    found(json!({"id":"member-handler","name":"mcdev$handler","kind":"method",
+                        "signature":found(json!({"id":"signature-handler","kind":"method","descriptor":"()V"})),
+                        "dispatch":found(json!("instance")),"visibility":found(json!("Private")),
+                        "synthetic":found(json!(false)),"mismatches":[]}))
+                }
+                "typeJvm" => {
+                    assert_eq!(query["target"], "type-ref-item");
+                    let unknown = unknown();
+                    json!({"binaryName":found(json!({"internalName":"net/minecraft/world/item/Item",
+                        "descriptor":"Lnet/minecraft/world/item/Item;"})),
+                        "classFlags":unknown,"declaredMembers":{"members":[],"coverage":unknown},
+                        "abi":unknown,"jvmAbiCoverage":unknown})
+                }
+                op => panic!("unexpected operation {op}"),
+            })
+        }).collect::<Result<Vec<_>,_>>()?;
+        Ok(json!({"facts":facts}))
+    }
+}
+
+fn owned_position() -> mcdev_core::McTextPosition {
+    offset_to_position(
+        OWNED_SOURCE,
+        OWNED_SOURCE.find("method = \"\"").unwrap() + "method = \"".len(),
+    )
+    .unwrap()
+}
+
+fn owned_provider(
+    host: Arc<OwnedHost>,
+    completion_position: Option<mcdev_core::McTextPosition>,
+) -> HostSemanticProvider {
+    HostSemanticProvider::with_client(
+        serde_json::from_value::<Evaluation>(json!({"evaluation":"owned-view",
+            "owner":OWNED_URI,"source":OWNED_SOURCE,"configuration":{},"declarations":[]}))
+        .unwrap(),
+        host,
+        OWNED_URI.into(),
+        Some(3),
+    )
+    .unwrap()
+    .with_source_facts(true)
+    .with_annotation_sites(true, completion_position)
+}
 fn position() -> McTextPosition {
     offset_to_position(SOURCE, SOURCE.find("\"is\"").unwrap() + 3).unwrap()
 }
@@ -204,6 +354,76 @@ impl BytecodeIndex for Index {
     }
     fn get_return_ordinal_count(&self, _: &str, _: &str, _: Option<&str>) -> usize {
         panic!("selector completion must not read Code")
+    }
+}
+
+#[test]
+fn owned_injector_keeps_local_selector_completion_under_unknown_coverage() {
+    let host = Arc::new(OwnedHost::new());
+    let provider = owned_provider(host.clone(), Some(owned_position()));
+    let p = owned_position();
+    let answer = provider
+        .parse(&HostSemanticRequest {
+            source: OWNED_SOURCE,
+            source_uri: OWNED_URI,
+            document_version: Some(3),
+            environment: &HostSemanticEnvironment::default(),
+            project: None,
+        })
+        .unwrap();
+    let HostFact::Known(result) = answer.fact else {
+        panic!("owned local site was lost: {:?}", answer.fact)
+    };
+    assert_eq!(result.model.injectors.len(), 1);
+    assert_eq!(result.model.injectors[0].method_selectors[0].value, "");
+    assert_eq!(result.model.confidence, ParseConfidence::Medium);
+    assert!(matches!(
+        result
+            .model
+            .host_selector_completions
+            .as_ref()
+            .unwrap()
+            .coverage,
+        HostFact::Unavailable { .. }
+    ));
+    let response = MixinServiceFacade::new(&Index, &Index)
+        .complete(
+            &MixinFacadeRequest {
+                buffer_text: OWNED_SOURCE.into(),
+                document_uri: OWNED_URI.into(),
+                line: p.line as i32,
+                character: p.character as i32,
+                semantic_model: Some(result.model),
+                ..Default::default()
+            },
+            &MixinCompletionOptions::default(),
+        )
+        .unwrap();
+    assert!(response.iter().any(|item| item.insert_text == "isEdible"));
+    assert!(host
+        .queries
+        .lock()
+        .unwrap()
+        .iter()
+        .any(|query| query["op"] == "declarationMember"));
+
+    for completion_position in [
+        None,
+        Some(McTextPosition {
+            line: 0,
+            character: 0,
+        }),
+    ] {
+        let answer = owned_provider(host.clone(), completion_position)
+            .parse(&HostSemanticRequest {
+                source: OWNED_SOURCE,
+                source_uri: OWNED_URI,
+                document_version: Some(3),
+                environment: &HostSemanticEnvironment::default(),
+                project: None,
+            })
+            .unwrap();
+        assert!(matches!(answer.fact, HostFact::Unavailable { .. }));
     }
 }
 

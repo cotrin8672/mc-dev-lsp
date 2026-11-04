@@ -10,19 +10,25 @@ Kotlin subprocess can count as a completed Rust port. The current published-host
 connection work and concrete input differences are tracked in
 [the IPC integration checkpoint](ipc-integration-status.md).
 
-The 2026-11-05 checkpoint passes 1,904 native functions across 83
+The latest 2026-11-05 full check passes 1,905 native functions across 83
 targets and verifies all 2,604 original case locators, doc tests, the executable
 and five independent editor entries. Published host93 and the fixed companion
 also pass 1,065 checks across 25 live cases, including positive results for all
 eleven command IDs, applied source/config edits and refresh/lifecycle behavior.
-Original CEM acceptance remains incomplete. Host94 fixes dependency stub loading,
-but its first original completion returns `Stale` when the host namespace changes
-from 1 to 2 during input preparation. Source bytes, document version and provider
-remain unchanged. Two original helper invocations and one completion request are
-observed; the 85-row legacy member comparison is not reached. The host task is
-fixing this command boundary without changing client retry or original expected
-values. Original AW diagnostics also remain incomplete because physical JVM
-catalog coverage is Unknown. Full replacement is not verified.
+Original CEM's first completion and exact 85-member owner/name/descriptor sets
+pass on candidate101. Published host102 also passes all 385 original Blink
+aggregate assertions and 105 assertions for the four native snippets in separate
+pinned runs. The original live Blink cache case also refetches from zero to 23
+exact BlockItem candidates after backspace. The Rust consumer now permits an exact owned injector selector from
+positive facts while preserving Unknown whole annotation coverage. The installed
+Blink v2 uses Neovim 0.12.5 and publishes its list context after provider responses;
+the harness uses the existing 30s completion budget for that context.
+
+The original Drill/Create workflow now has all five dependency artifacts
+recovered at their original pinned hashes, but definition of useItemOn returns
+authored member unavailable before the 32 original Kotlin assertions. Original
+AW/AT catalog coverage and the remaining host facts are still incomplete.
+Full replacement is not verified.
 Current evidence and unresolved host
 facts are linked above; the dated records below retain their historical pins.
 

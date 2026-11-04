@@ -157,21 +157,68 @@ impl HostSemanticProvider {
     pub(super) fn require_local_annotation_completion(
         &self,
         selectors: Option<&HostSelectorCompletions>,
+        owned_selector: bool,
         current_owner: bool,
     ) -> Result<(), FactsError> {
         if current_owner
-            && self.annotation_completion_position.is_some_and(|position| {
-                selectors.is_some_and(|sites| {
-                    sites.injectors.iter().any(|injector| {
-                        injector.method_selectors.iter().any(|selector| {
-                            selector.range.start <= position && position <= selector.range.end
+            && (owned_selector
+                || self.annotation_completion_position.is_some_and(|position| {
+                    selectors.is_some_and(|sites| {
+                        sites.injectors.iter().any(|injector| {
+                            injector.method_selectors.iter().any(|selector| {
+                                selector.range.start <= position && position <= selector.range.end
+                            })
                         })
                     })
-                })
-            })
+                }))
         {
             return Ok(());
         }
         Err(FactsError::Unknown("annotation inventory coverage is unavailable for this operation or completion position".into()))
+    }
+
+    /// An authored member annotation is positive local evidence even when the
+    /// flat inventory cannot certify every annotation in the recovered buffer.
+    pub(super) fn owned_selector_at_position(
+        &self,
+        declarations: &[Declaration],
+        owner: &Declaration,
+        identities: &BTreeMap<String, Fact<TypeFact>>,
+        source: &str,
+    ) -> Result<bool, FactsError> {
+        let Some(position) = self.annotation_completion_position else {
+            return Ok(false);
+        };
+        let Some(position) = position_to_offset(source, position) else {
+            return Ok(false);
+        };
+        for declaration in declarations
+            .iter()
+            .filter(|declaration| declaration.owner.as_deref() == Some(owner.id.as_str()))
+        {
+            for annotation in &declaration.annotations {
+                if !(annotation.range.start <= position && position <= annotation.range.end) {
+                    continue;
+                }
+                let ty = require_type(identities, &annotation.type_ref)?;
+                let Some(_) = MixinAnnotation::from_official_fqn(&ty.qualified_name)
+                    .filter(|kind| kind.is_injector())
+                else {
+                    continue;
+                };
+                let Some(argument) = annotation_argument(annotation, "method")? else {
+                    continue;
+                };
+                let mut selectors = Vec::new();
+                normalized_strings(argument, &mut selectors)?;
+                if selectors
+                    .iter()
+                    .any(|(_, range)| range.start <= position && position <= range.end)
+                {
+                    return Ok(true);
+                }
+            }
+        }
+        Ok(false)
     }
 }

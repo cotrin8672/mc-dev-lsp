@@ -61999,7 +61999,7 @@
       "protocol": 40
     },
     "wholeMigrationVerified": false,
-    "remainingAcceptance": "All 2604 original JUnit replacements and the current stable native/editor pipeline pass. All eleven positive command IDs and both-platform optimized packages pass at their pinned historical inputs. Original CEM on published host94 still fails its first completion with namespace Stale 1 to 2 despite unchanged source/version; its 85-member comparison is not reached. The host task is fixing preparation/command admission without changing client retry or original expected values. Original AW catalog coverage is Unknown(MissingFacts); its producer cause is not yet measured. Generic arguments, primitive class literals, floating literals, current source hierarchy, dependency navigation, extract-local, complete original editor workflows and final legacy retirement remain incomplete. Whole replacement remains unverified.",
+    "remainingAcceptance": "All 2604 original JUnit replacements remain in the stable native corpus. The current full check passes1905 functions/83 targets and all five independent editor entries. Original CEM first7 and exact85 passed on candidate101; published102 passes385 original aggregate assertions and105 four-snippet assertions in separate pinned runs. The original live Blink cache case also passes authentic0-to23 results and the exact original BlockItem set on published102/MCe0cf. These are separate component proofs, not a unified original-suite replay. Original Drill/Create stops at useItemOn definition with authored member unavailable before all32 original Kotlin assertions. Original AW catalog coverage remains Unknown(MissingFacts). Generic arguments, primitive class literals, floating literals, current source hierarchy, dependency navigation, extract-local, complete original editor workflows and final legacy retirement remain incomplete. Whole replacement remains unverified.",
     "independentSemanticV1Evidence": {
       "receipt": "mcdev-companion/tests/fixtures/semantic_v1/interop_receipt.json",
       "stockHostRevision": "f76a43fbeddf4fbdc69768fd0f7544e5a4a3610f",
@@ -63462,9 +63462,9 @@
     },
     "resumedIntegration": {
       "date": "2026-11-05",
-      "status": "native-verified-host-namespace-command-boundary-blocked",
-      "hostPin": "14de74d18b236a90d391670d9d566ec93855e4a5",
-      "hostReceipt": "build/host-artifacts/candidate94-95c334f642d5/copy-receipt.json",
+      "status": "original-cem-components-pass-in-separate-pinned-runs; original-drill-definition-blocked",
+      "hostPin": "2d10e716b47cc35f07807237b437f4b4e146bdaf",
+      "hostReceipt": "build/host-artifacts/candidate102-d31c9e623a6b/main-ready.json",
       "hostSerializerFixture": "mcdev-companion/tests/fixtures/host_inputs/root_files/actual-serializer-sample.json",
       "nativePipeline": "build/rust-test-logs/native-pipeline-proof-20261105-011949083",
       "optimizedPackage": {
@@ -63630,38 +63630,19 @@
         "scope": "Actual producer serializer and source bytes retained. Same-view issued owners/ranges, positive FQN alias agreement, current source digest and coverage are enforced. The sample resolves only the inventory alias, so it does not certify both alias resolutions or official MC acceptance."
       },
       "latestOriginalCemAttempt": {
-        "status": "failed-at-first-original-completion-with-namespace-stale",
-        "receipt": "build/cem-host94-source-9e30558-20261105/build/rust-test-logs/cem-project-20261105-011644904-ad911c67/receipt.json",
-        "receiptSha256": "fce265df0a55fa6766e80f4b606281fd728d201c9967e5a278a1f91cf04b0462",
-        "editorProof": "build/cem-host94-source-9e30558-20261105/build/rust-test-logs/cem-project-20261105-011644904-ad911c67/editor-proof.json",
-        "hostRevision": "14de74d18b236a90d391670d9d566ec93855e4a5",
-        "hostSha256": "95c334f642d5a77b293818763004b91565ec04f81caa2174717624e486681d17",
-        "companionRevision": "fe21397858fb40ef83d8714f77160f74b2afbed3",
+        "status": "first-completion-and-exact85-pass; full-original-run-failed-Blink-context",
+        "receipt": "build/host-artifacts/candidate101-bfa638a35cd9/mc-cem-acceptance.json",
+        "hostSha256": "bfa638a35cd93a24d482bc042dff280dac63be3df76d3576e353336b0d14af22",
         "companionSha256": "8a42be20a9beda8bf4521a0c6e1cec8c022ede5752e07fc129577feb431f0bbb",
-        "fixedTestSourceCommit": "9e30558a80e9b624020d5bee902ae242343fee3e",
-        "sourceBytes": 254,
-        "sourceSha256": "7bd1004fdea0383b51e973c48f3a2e5162e359b9abc08eab559920e98e8df5a8",
-        "documentVersion": 3,
-        "sourceDocumentRevision": 2,
-        "observedOriginalHelperInvocations": 2,
-        "observedOriginalCompletionRequests": 1,
-        "originalMemberComparisonExecuted": false,
-        "originalExpectedMembers": 85,
-        "errorCode": -32801,
-        "errorReason": "Stale",
-        "firstFailedGuard": "namespace",
-        "expectedNamespace": 1,
-        "currentNamespace": 2,
-        "acceptedEvaluation": "11",
-        "acceptedPublication": 11,
-        "commandEvaluation": 13,
-        "providerInstance": 2,
-        "sourceAndDocumentUnchanged": true,
-        "providerCurrent": true,
-        "inputHashesStable": true,
-        "cleanShutdown": true,
-        "editorSeconds": 93.9,
-        "scope": "Only host binary changed from the fixed test-source/MC inputs. Old view rejects correctly; useful first completion and original85-member comparison remain unverified. Client retry and expected values were not changed."
+        "firstSourceSha256": "7bd1004fdea0383b51e973c48f3a2e5162e359b9abc08eab559920e98e8df5a8",
+        "firstItems": 7,
+        "firstElapsedMs": 4899.6849,
+        "exactOriginalMemberRows": 85,
+        "exactOwnerNameDescriptorSetsPassed": true,
+        "fullOriginalCemPassed": false,
+        "originalFullRunFailure": "...zy\\blink.cmp/lua/blink/cmp/sources/lib/provider/list.lua:116: attempt to index field 'pos' (a nil value)",
+        "oracleLimitation": "Original compiled Kotlin-core reference, exact85 comparisons passed; compiled-from-frozen-source/fullJDT route provenance remains unproven.",
+        "receiptSha256": "daa786e9d43609c5ef3cd6304ad2cd3da409bd2cf86880956dc6c1ab7e4781ab"
       },
       "crossPlatformCIHistory": [
         {
@@ -63741,9 +63722,43 @@
           "commandCurrent": true,
           "inputHashesStable": true,
           "scope": "Fixed original CRLF input and old member oracle. Both issued aliases were resolved in the same accepted command/view; missing dependency source remains a host issue. No source-spelling or copied-binary fallback, no member comparison credit."
+        },
+        {
+          "status": "failed-at-first-original-completion-with-namespace-stale",
+          "receipt": "build/cem-host94-source-9e30558-20261105/build/rust-test-logs/cem-project-20261105-011644904-ad911c67/receipt.json",
+          "receiptSha256": "fce265df0a55fa6766e80f4b606281fd728d201c9967e5a278a1f91cf04b0462",
+          "editorProof": "build/cem-host94-source-9e30558-20261105/build/rust-test-logs/cem-project-20261105-011644904-ad911c67/editor-proof.json",
+          "hostRevision": "14de74d18b236a90d391670d9d566ec93855e4a5",
+          "hostSha256": "95c334f642d5a77b293818763004b91565ec04f81caa2174717624e486681d17",
+          "companionRevision": "fe21397858fb40ef83d8714f77160f74b2afbed3",
+          "companionSha256": "8a42be20a9beda8bf4521a0c6e1cec8c022ede5752e07fc129577feb431f0bbb",
+          "fixedTestSourceCommit": "9e30558a80e9b624020d5bee902ae242343fee3e",
+          "sourceBytes": 254,
+          "sourceSha256": "7bd1004fdea0383b51e973c48f3a2e5162e359b9abc08eab559920e98e8df5a8",
+          "documentVersion": 3,
+          "sourceDocumentRevision": 2,
+          "observedOriginalHelperInvocations": 2,
+          "observedOriginalCompletionRequests": 1,
+          "originalMemberComparisonExecuted": false,
+          "originalExpectedMembers": 85,
+          "errorCode": -32801,
+          "errorReason": "Stale",
+          "firstFailedGuard": "namespace",
+          "expectedNamespace": 1,
+          "currentNamespace": 2,
+          "acceptedEvaluation": "11",
+          "acceptedPublication": 11,
+          "commandEvaluation": 13,
+          "providerInstance": 2,
+          "sourceAndDocumentUnchanged": true,
+          "providerCurrent": true,
+          "inputHashesStable": true,
+          "cleanShutdown": true,
+          "editorSeconds": 93.9,
+          "scope": "Only host binary changed from the fixed test-source/MC inputs. Old view rejects correctly; useful first completion and original85-member comparison remain unverified. Client retry and expected values were not changed."
         }
       ],
-      "previousHostPin": "ddba88af8c4dfc2b5c67397b465ea01c98129069",
+      "previousHostPin": "14de74d18b236a90d391670d9d566ec93855e4a5",
       "host94": {
         "publicCommit": "14de74d18b236a90d391670d9d566ec93855e4a5",
         "copyReceipt": "build/host-artifacts/candidate94-95c334f642d5/copy-receipt.json",
@@ -63776,7 +63791,94 @@
         "fullFeaturePass": false,
         "sourceInputsStable": true,
         "scope": "A separate startup Stale; the prior measured JVM catalog MissingFacts remains recorded in originalAwAtAttempt. This run does not identify its producer problem."
-      }
+      },
+      "publishedHostPinHistory": [
+        "ddba88af8c4dfc2b5c67397b465ea01c98129069",
+        "14de74d18b236a90d391670d9d566ec93855e4a5"
+      ],
+      "host102": {
+        "commit": "2d10e716b47cc35f07807237b437f4b4e146bdaf",
+        "binarySha256": "d31c9e623a6b51256257300514556ebe5fa07aaa08d23841af2834f545cba833",
+        "bytes": 25329664,
+        "copyReceipt": {
+          "path": "build/host-artifacts/candidate102-d31c9e623a6b/copy-receipt.json",
+          "sha256": "75e024404b3445def2889a5d2da4ff038d3c6e1714a40e8a1f00586b5123e46c"
+        },
+        "scope": "Immutable published input, independent origin branch and binary checks; no inference of whole MC parity."
+      },
+      "originalUiAcceptance102": {
+        "receipt": {
+          "path": "build/host-artifacts/candidate102-d31c9e623a6b/mc-original-ui-acceptance.json",
+          "sha256": "8b8ef6bbabb5cbb3f063b9d01dcfcf3575550431c399d080851f8f632aa855fd"
+        },
+        "hostSha256": "d31c9e623a6b51256257300514556ebe5fa07aaa08d23841af2834f545cba833",
+        "companionSha256": "8a42be20a9beda8bf4521a0c6e1cec8c022ede5752e07fc129577feb431f0bbb",
+        "neovim": "0.12.5",
+        "originalFourSnippetsPassed": true,
+        "originalSnippetAssertions": 105,
+        "originalSnippetModuleSha256": "469269294633f1a4f4f8b83e2e0a2c005a09bf5973948d34dd7d847128726b07",
+        "aggregatePassed": false,
+        "aggregateCorrelation": {
+          "path": "build/cem-blink-remaining-source-9e30558-20261105-v2/build/rust-test-logs/cem-project-20261105-041237179-edcd1066/aggregate-boundary-correlation.json",
+          "sha256": "1f1e2d5d8256c37ef4bbcda1358a08990e1f610981257a822ccb465f2d7485bc"
+        },
+        "scope": "Separate cases; no replay of first7/member85. Zero final callbacks still had one authentic native command returning typed partial annotation unavailability."
+      },
+      "originalAggregateAfterOwnedSelectorFix": {
+        "receipt": {
+          "path": "build/host-artifacts/candidate102-d31c9e623a6b/mc-aggregate-acceptance.json",
+          "sha256": "7c763d8726c685cc83e3aa89417f864bef54dd7fb7ee3d00e310fb00f86a1b69"
+        },
+        "passed": true,
+        "originalAssertionInvocations": 385,
+        "originalFunctionalInputsAndAssertionsUnchanged": true,
+        "listContextWaitAdaptationMs": {
+          "before": 5000,
+          "after": 30000
+        }
+      },
+      "ownedSelectorConsumerFix": {
+        "receipt": {
+          "path": "build/host-artifacts/candidate102-d31c9e623a6b/mc-owned-selector-acceptance.json",
+          "sha256": "d8ddb9257de23c349f720fd00348c2bd7a1a1ee4c0219f4f8dae9f6e0e45ec0c"
+        },
+        "partialCoverageRemainsUnknown": true,
+        "scope": "Only exact current owned official injector selector; diagnostics/noncompletion/other-document authority unchanged",
+        "affectedCasesPassed": 11,
+        "liveActualItemSet": 62,
+        "liveExactOriginalItemSetPassed": true
+      },
+      "latestNativeCheck": {
+        "path": "build/rust-test-logs/20261105-043702365/native-summary.json",
+        "sha256": "c687124d7d5b8667d047ea54c1da7e7de047cdb0c5a1b89b6b6610fa6ab58e75"
+      },
+      "originalDrillKotlinAttempt": {
+        "path": "build/rust-test-logs/kotlin-drill-native-20261105/recovery-and-run-receipt.json",
+        "sha256": "e80d41a00623fd88e1106dfe53c4fcc3fbc93cb55a95e404256e58c0bfbdb8db"
+      },
+      "readinessWaitBudget": {
+        "perReplyMsBefore": 5000,
+        "overallBudgetMs": 60000,
+        "newRetries": 0,
+        "delayed6sSingleRequestPassed": true,
+        "neverReplyCancelledAt60sOnce": true,
+        "selfcheck": "build/rust-test-logs/readiness-helper-selfcheck-20261105-v2/summary.json"
+      },
+      "lastUpdated": "2026-11-05",
+      "originalLiveProviderCache102": {
+        "receipt": {
+          "path": "build/host-artifacts/candidate102-d31c9e623a6b/mc-live-cache-acceptance.json",
+          "sha256": "a5c288edbc811367b51d454a6a896aef720f8ba2bc0496ee089ea3154aec4939"
+        },
+        "passed": true,
+        "nativeItemCounts": [
+          0,
+          23
+        ],
+        "exactOriginalBlockItemSetPassed": true,
+        "originalInputsAndAssertionsUnchanged": true
+      },
+      "originalCemComponentsScope": "First7/exact85/Shadow on candidate101 MC8a42; four snippets on published102 MC8a42; live cache and385 aggregate assertions on published102 MCe0cf. Functional inputs and expectations retained; compatible Neovim0.12.5, canonical Context pos, startup60s and list-context30s budgets are explicit. This is component coverage, not one unified original-suite replay or whole-project replacement."
     }
   }
 }

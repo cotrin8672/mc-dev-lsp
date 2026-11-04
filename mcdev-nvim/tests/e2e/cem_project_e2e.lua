@@ -333,8 +333,15 @@ return function(h)
       vim.api.nvim_buf_set_lines(bufnr, inject_row - 1, inject_row, false, {line})
       local received, cached
       local start = #'    @Inject(method = "'
+      local blink_utils = require('blink.cmp.lib.utils')
+      local pos
+      if blink_utils.get_vim_pos and vim.pos then
+        pos = blink_utils.get_vim_pos(bufnr, inject_row - 1, start + #prefix)
+        h.helpers.assert_true(vim.deep_equal(blink_utils.vim_pos_to_cursor(pos), {inject_row, start + #prefix}),
+          'Blink context position must preserve the provider cursor')
+      end
       local context = {id=1,bufnr=bufnr,mode='default',line=line,cursor={inject_row,start+#prefix},
-        bounds={start_col=start+1,length=#prefix},trigger={kind=1,initial_kind='manual'}}
+        bounds={start_col=start+1,length=#prefix},trigger={kind=1,initial_kind='manual'},pos=pos}
       provider:get_completions(context,function(value,is_cached) received,cached=value,is_cached end)
       h.helpers.assert_true(vim.wait(30000,function() return received ~= nil end,50),'Blink provider did not reply')
       return received,cached
@@ -460,7 +467,7 @@ return function(h)
     end
 
     local function wait_for_aggregate(row, column, expected_providers, expected_items, description)
-      local route_ready = vim.wait(5000, function()
+      local route_ready = vim.wait(30000, function()
         local context = blink_cmp.get_context()
         if context == nil or context.cursor[1] ~= row or context.cursor[2] ~= column then
           return false

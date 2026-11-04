@@ -23,6 +23,7 @@ local ok, failure = xpcall(function()
   local files, waits, flushes = {}, {}, 0
   local instance, version, serial, unavailable, origin_ok, helper_only, language = 37, 17, 0, 0, true, false, 'java'
   local clock, scheduled, replies, info_requests, on_info_request = 0, {}, {}, 0, nil
+  local info_delay, never_info, info_cancels = 0, false, 0
   local function owner_key_for(owner)
     if owner:match('^file:') then owner = vim.uri_to_fname(owner) end
     owner = vim.fs.normalize(owner)
@@ -82,9 +83,18 @@ local ok, failure = xpcall(function()
       unavailable = unavailable - 1
       err = { code = -32002, data = { providerCommandReason = 'CommandUnavailable' } }
     else result = { result = command == protocol.commands.completion and { items = vim.deepcopy(raw_items) } or { lines = {} } } end
-    callback(result, err, { client = client, client_id = client.id,
-      route = origin_ok and 'ktlsp.providerCommand' or 'loopback', provider = 'mcdev.mixin', command = command })
-    return function() end
+    local function deliver()
+      callback(result, err, { client = client, client_id = client.id,
+        route = origin_ok and 'ktlsp.providerCommand' or 'loopback', provider = 'mcdev.mixin', command = command })
+    end
+    if command == protocol.commands.info and never_info then
+      return function() info_cancels = info_cancels + 1 end
+    elseif command == protocol.commands.info and info_delay > 0 then
+      schedule(info_delay, deliver)
+    else
+      deliver()
+    end
+    return function() if command == protocol.commands.info then info_cancels = info_cancels + 1 end end
   end
   local completion = { to_lsp_item = product_completion.to_lsp_item, item_key = product_completion.item_key }
   function completion.complete(callback, buffer, position)
@@ -97,6 +107,7 @@ local ok, failure = xpcall(function()
   end
   local function start(fixture)
     clock, scheduled, replies, info_requests, on_info_request = 0, {}, {}, 0, nil
+    info_delay, never_info, info_cancels = 0, false, 0
     unavailable, origin_ok, helper_only, version = 0, true, false, 17
     language = fixture == 'fabric-aw-at' and 'accesswidener' or 'java'
     local state = readiness.start({ trace = 'mock.trace', proof = 'mock-proof.json', timeout = 1, fixture = fixture })
@@ -154,6 +165,20 @@ local ok, failure = xpcall(function()
   instance = 99
   assert(not pcall(state.await, state, bufnr), 'a different provider instance cannot satisfy the current owner')
   instance = 37
+  close(state)
+
+  state = start()
+  info_delay = 6000
+  state:preflight(bufnr)
+  assert(info_requests == 1 and info_cancels == 0 and clock == 6000,
+    'a readiness response after five seconds must still complete within the sixty-second budget')
+  close(state)
+
+  state = start()
+  never_info = true
+  assert(not pcall(state.preflight, state, bufnr), 'a readiness request with no reply must time out')
+  assert(info_requests == 1 and info_cancels == 1 and clock == 60000,
+    'a readiness request with no reply must cancel once at the sixty-second deadline')
   close(state)
 
   state = start()

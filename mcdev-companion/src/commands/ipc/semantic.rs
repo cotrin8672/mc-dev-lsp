@@ -34,7 +34,7 @@ use mcdev_core::{
         MixinAnnotation, MixinMemberAnnotationKind, MixinMemberDeclarationParser, MixinTargetRef,
         ParseConfidence, ParseSource,
     },
-    offset_to_position, McTextRange,
+    offset_to_position, position_to_offset, McTextRange,
 };
 use serde::de::DeserializeOwned;
 use serde_json::{json, Value};
@@ -410,9 +410,21 @@ impl HostSemanticProvider {
                 )
             })
             .transpose()?;
+        let owned_selector = if partial_annotations && selected.is_none() {
+            sites
+                .as_ref()
+                .map(|_| {
+                    self.owned_selector_at_position(&e.declarations, owner, &identities, source)
+                })
+                .transpose()?
+                .unwrap_or(false)
+        } else {
+            false
+        };
         if partial_annotations {
             self.require_local_annotation_completion(
                 selector_completions.as_ref(),
+                owned_selector,
                 selected.is_none(),
             )?;
         }

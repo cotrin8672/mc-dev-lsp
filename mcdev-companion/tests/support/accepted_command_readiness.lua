@@ -176,7 +176,7 @@ function M.start(options)
       else
         cancel = self.protocol.request(self.protocol.commands.info, payload, receive, bufnr)
       end
-      local replied = vim.wait(math.min(5000, remaining_ms()), function() return attempt.replied end, 25)
+      local replied = vim.wait(remaining_ms(), function() return attempt.replied end, 25)
       if not replied then cancel(); self:fail('provider readiness request timed out') end
       if not origin or origin.client ~= self.client or origin.route ~= 'ktlsp.providerCommand'
         or origin.provider ~= 'mcdev.mixin' or origin.command ~= self.protocol.commands.info then

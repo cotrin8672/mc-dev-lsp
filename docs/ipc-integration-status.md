@@ -23,13 +23,13 @@ after index changes, preserving the source/model/provider validation guards.
 Release93 adds independently negotiated written annotation sites, including
 annotations whose declaration has not yet been written.
 Release94 loads selected dependency class stubs for nominal identity while
-retaining Unknown authored-source coverage. Its original MC completion attempt
-still fails at a namespace preparation/admission boundary.
+retaining Unknown authored-source coverage. Its original namespace failure is retained below; later acceptance now includes
+candidate101 and published host102.
 
 ## Published contract
 
 The current integration pin is ktlsp
-[`14de74d18b236a90d391670d9d566ec93855e4a5`](https://github.com/cotrin8672/ktlsp/blob/14de74d18b236a90d391670d9d566ec93855e4a5/docs/architecture/extension-ipc.md).
+[`2d10e716b47cc35f07807237b437f4b4e146bdaf`](https://github.com/cotrin8672/ktlsp/blob/2d10e716b47cc35f07807237b437f4b4e146bdaf/docs/architecture/extension-ipc.md).
 It adds normalized authored facts, owning-project input records, exact source
 locations and typed binary declaration annotations to source snapshots, owned
 resources, selected runtime bytes, the physical JVM catalog and provider
@@ -37,16 +37,12 @@ commands. The companion negotiates capabilities and individual operations;
 binary annotations are selected by capability alone. Configured command IDs
 are intersected with the implemented domain routes.
 
-The copied release94 host has SHA-256
-`95c334f642d5a77b293818763004b91565ec04f81caa2174717624e486681d17`.
-Its provenance is retained in
-`build/host-artifacts/candidate94-95c334f642d5/copy-receipt.json`.
-The candidate-labelled folder preserves the artifact's original identity;
-publication did not change its 25,292,800 bytes. The producer passes 23 focused
-checks and 414 source guards; those are separate from MC acceptance.
-This identifies the integration input; upstream API tests do not prove MC
-feature or original editor parity. The acceptance results below retain their
-historical host and companion pins.
+The copied published release102 host has SHA-256
+d31c9e623a6b51256257300514556ebe5fa07aaa08d23841af2834f545cba833
+and 25,329,664 bytes. Its branch commit was checked independently against origin;
+the copy receipt is build/host-artifacts/candidate102-d31c9e623a6b/copy-receipt.json.
+The producer's completed Wire/Rust checks remain separate from MC acceptance.
+The historical host94, companion and failed receipts below retain their pins.
 
 The host's evaluation lifetime, accumulated reads and final validation govern
 these inputs. They do not provide the earlier prototype's eight generation
@@ -67,6 +63,53 @@ when that selection is unproven. Callable parameter facts are optional knowledge
 an omitted or unsupported list does not establish a zero-parameter callable.
 
 ## Follow-up acceptance checkpoints
+
+### 2026-11-05 original CEM and Drill acceptance
+
+The current native check passes 1,905 functions across 83 targets, doc tests,
+the executable build and all five independent editor entries. The receipt is
+build/rust-test-logs/20261105-043702365/native-summary.json.
+
+Original CEM component proofs are separate rather than a claimed single-suite
+pass. Candidate101 with MC8a42 passes the original orphan first completion
+(7 items) and exact Item62/BlockItem23 owner/name/descriptor sets. The original
+compiled Kotlin-core oracle remains the reference; frozen-source compilation
+provenance is still unproven. Its full run failed at the handbuilt Blink context,
+and that failure remains in build/host-artifacts/candidate101-bfa638a35cd9/mc-cem-acceptance.json.
+
+On published102, the unchanged four-snippet module passes 105 assertions,
+including exact expanded buffers/import edits, native tabstops and unsaved/disk
+state. MC8a42 is fixed for that proof. The later owned-selector consumer fix is
+MC e0cf1a831dd72557832ea2fc27f34f7417c74739a4b69d4d4abda6a73a81f33d:
+an owned official injector can use positive local selector facts even when
+annotation inventory coverage stays Unknown. Diagnostics, other documents and
+positions outside that selector retain unavailability. All 11 affected checks
+pass. The original aggregate response returns the exact Item62 set, and all
+385 original aggregate functional assertions pass. These are recorded in
+build/host-artifacts/candidate102-d31c9e623a6b/mc-aggregate-acceptance.json.
+
+The original provider-cache case also passes live against the same published102
+and MCe0cf: two authentic native requests return0 then23, backspace refetches
+instead of reusing the empty narrow result, and the full BlockItem set matches
+the original reference. The receipt is
+build/host-artifacts/candidate102-d31c9e623a6b/mc-live-cache-acceptance.json.
+
+The UI environment changed from pinned Neovim0.11.5 to existing0.12.5 because
+installed Blink v2 requires0.12+. The handbuilt provider context now includes
+canonical pos. Blink get_context exposes the displayed list, so its route-context
+wait uses the existing30s completion budget instead of5s. No provider retry was
+added. Startup Info similarly uses its existing overall60s budget instead of an
+inner5s cap, with single-request6s success and60s cancellation checks.
+
+The original Drill/Create inputs were recovered from the declared Maven
+repositories at all five original SHA1 pins, with SHA256 receipts and unchanged
+source copies. One48.6s native run reaches10 original assertions and3 authentic
+command replies, then stops at useItemOn definition with
+INCOMPLETE_PROJECT_CONTEXT: authored member is unavailable. All32 original
+Kotlin assertions remain unreached. The failure and clean shutdown are retained
+in build/rust-test-logs/kotlin-drill-native-20261105/recovery-and-run-receipt.json.
+Neither these component proofs nor the producer's Wire checks establish complete
+original editor parity.
 
 The annotation-site/URI runtime at `9e30558a80e9b624020d5bee902ae242343fee3e`
 passes [Windows/Linux CI](https://github.com/cotrin8672/mc-dev-lsp/actions/runs/41265135658).
