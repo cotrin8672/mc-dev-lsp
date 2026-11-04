@@ -2066,7 +2066,7 @@ do
     dofile = dofile, writefile = vim.fn.writefile, flush = tracking.flush,
     request = protocol.request, complete = completion.complete, record = _G.mcdev_record_assertion }
   local readiness_cases = dofile(vim.fn.getcwd() .. "/mcdev-companion/tests/accepted_command_readiness_selfcheck.lua")
-  helpers.assert_eq(readiness_cases, 7, "all readiness mock cases returned to the adapter suite")
+  helpers.assert_eq(readiness_cases, 8, "all readiness mock cases returned to the adapter suite")
   helpers.assert_eq(vim.api.nvim_get_current_win(), before.window, "readiness self-check preserves the caller window")
   helpers.assert_eq(vim.api.nvim_get_current_buf(), before.buffer, "readiness self-check preserves the caller buffer")
   helpers.assert_true(vim.deep_equal(vim.api.nvim_win_get_cursor(0), before.cursor), "readiness self-check preserves the caller cursor")

@@ -110,6 +110,7 @@ struct HostState {
     classes: Vec<Class>,
     requests: Vec<Vec<Value>>,
     catalog_unknown: bool,
+    catalog_problems: Vec<String>,
     abi_unknown: BTreeSet<String>,
     fail_op: Option<(String, FactsError)>,
     close_on_op: Option<String>,
@@ -180,7 +181,7 @@ impl FactReader for Host {
                     let next = (end < candidates.len()).then(|| format!("page:{end}"));
                     json!({"view":"selectedPhysicalJvmInputs","classes":classes,"next":next,
                         "coverage":if next.is_none() && !state.catalog_unknown {found(Value::Null)} else {unknown()},
-                        "problems":[],"sourceCurrent":unknown()})
+                        "problems":state.catalog_problems,"sourceCurrent":unknown()})
                 }
                 "jvmClass" => {
                     let key = query["entry"].as_str().unwrap();
@@ -486,12 +487,25 @@ fn physical_catalog_needs_complete_coverage_and_explicit_duplicate_origin() {
     ));
 
     let host = Host::new(vec![new]);
-    host.state.lock().unwrap().catalog_unknown = true;
+    {
+        let mut state = host.state.lock().unwrap();
+        state.catalog_unknown = true;
+        state.catalog_problems = vec![
+            "dependency-source-missing".into(),
+            "😀".repeat(4096),
+            "late-problem".into(),
+            "another-problem".into(),
+            "fifth-problem-must-not-be-included".into(),
+        ];
+    }
     let index = make_index(&host);
-    assert!(matches!(
-        index.raw_abi("demo/Shared"),
-        Err(FactsError::Unknown(_))
-    ));
+    let Err(FactsError::Unknown(message)) = index.raw_abi("demo/Shared") else {
+        panic!("incomplete JVM catalog must remain an Unknown fact");
+    };
+    assert!(message.contains("dependency-source-missing"));
+    assert!(message.contains("…truncated"));
+    assert!(!message.contains("fifth-problem-must-not-be-included"));
+    assert!(message.len() <= 2048);
     assert!(matches!(failure(|| { index.find_classes("Shared", 20); }),
         CommandFailure::Unavailable(error) if error.code == McdevErrorCode::IncompleteProjectContext));
 }

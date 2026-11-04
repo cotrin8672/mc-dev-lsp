@@ -183,7 +183,13 @@ impl<R: EvaluationFactReader> EvaluationIndex<R> {
         let catalog = self.with_inputs(|inputs| inputs.jvm_catalog(prefix))?;
         match catalog.coverage {
             Fact::Found { value: Value::Null } => (),
-            Fact::Unknown { reasons } => return Err(unknown_fact("JVM catalog coverage", reasons)),
+            Fact::Unknown { reasons } => {
+                return Err(unknown_catalog_fact(
+                    "JVM catalog coverage",
+                    reasons,
+                    &catalog.problems,
+                ))
+            }
             _ => return Err(protocol("JVM catalog has invalid terminal coverage")),
         }
         self.facts.check_active()?;
@@ -1049,6 +1055,47 @@ fn protocol(message: impl Into<String>) -> FactsError {
 fn unknown(message: impl Into<String>) -> FactsError {
     FactsError::Unknown(message.into())
 }
+
+const MAX_CATALOG_DIAGNOSTIC_BYTES: usize = 2048;
+const MAX_CATALOG_PROBLEM_COUNT: usize = 4;
+const MAX_CATALOG_PROBLEM_BYTES: usize = 256;
+
+fn truncate_utf8(value: &str, max_bytes: usize) -> String {
+    if value.len() <= max_bytes {
+        return value.to_owned();
+    }
+    let suffix = "…";
+    let mut end = max_bytes.saturating_sub(suffix.len());
+    while end > 0 && !value.is_char_boundary(end) {
+        end -= 1;
+    }
+    let mut truncated = value[..end].to_owned();
+    truncated.push_str(suffix);
+    truncated
+}
+
+fn unknown_catalog_fact(label: &str, reasons: Vec<Value>, problems: &[String]) -> FactsError {
+    let reasons = truncate_utf8(&format!("{reasons:?}"), 512);
+    let mut message = format!("{label} unavailable: reasons={reasons}");
+    if !problems.is_empty() {
+        message.push_str("; producerProblems=[");
+        let mut problem_truncated = false;
+        for (index, problem) in problems.iter().take(MAX_CATALOG_PROBLEM_COUNT).enumerate() {
+            if index > 0 {
+                message.push_str(", ");
+            }
+            let bounded = truncate_utf8(problem, MAX_CATALOG_PROBLEM_BYTES);
+            problem_truncated |= bounded.len() != problem.len();
+            message.push_str(&format!("{bounded:?}"));
+        }
+        if problems.len() > MAX_CATALOG_PROBLEM_COUNT || problem_truncated {
+            message.push_str(", …truncated");
+        }
+        message.push(']');
+    }
+    unknown(truncate_utf8(&message, MAX_CATALOG_DIAGNOSTIC_BYTES))
+}
+
 fn unknown_fact(label: &str, reasons: Vec<Value>) -> FactsError {
     unknown(format!("{label} unavailable: {reasons:?}"))
 }

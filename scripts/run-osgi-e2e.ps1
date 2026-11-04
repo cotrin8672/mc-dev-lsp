@@ -3,6 +3,10 @@ $ErrorActionPreference = "Stop"
 . (Join-Path $PSScriptRoot 'e2e-workspace-common.ps1')
 
 $repoRoot = Split-Path -Parent $PSScriptRoot
+$readinessEnvironment = @{}
+foreach ($name in @('MCDEV_E2E_ACCEPTANCE_PROOF', 'KTLSP_TRACE')) {
+    $readinessEnvironment[$name] = [Environment]::GetEnvironmentVariable($name, 'Process')
+}
 Push-Location $repoRoot
 try {
     $env:MCDEV_E2E_KTLSP = Resolve-E2eExecutable 'MCDEV_E2E_KTLSP'
@@ -25,6 +29,15 @@ try {
 
     $env:MCDEV_E2E_WORKSPACE = $workspace
     $env:MCDEV_E2E_FIXTURE = $fixture
+    $proofDirectory = Assert-E2eBuildPath (Join-Path $repoRoot ('build/e2e-proofs/' + $fixture + '-' + [guid]::NewGuid().ToString('N')))
+    $null = New-Item -ItemType Directory -Force -Path $proofDirectory
+    if ([string]::IsNullOrWhiteSpace($env:MCDEV_E2E_ACCEPTANCE_PROOF)) {
+        $env:MCDEV_E2E_ACCEPTANCE_PROOF = Join-Path $proofDirectory 'editor-proof.json'
+    }
+    if ([string]::IsNullOrWhiteSpace($env:KTLSP_TRACE)) {
+        $env:KTLSP_TRACE = Join-Path $proofDirectory 'host.trace.jsonl'
+    }
+    Write-Host ('editor acceptance proof: ' + $env:MCDEV_E2E_ACCEPTANCE_PROOF)
 
     & $nvimCmd --headless `
         -u (Join-Path $repoRoot "mcdev-nvim/tests/e2e/minimal_init.lua") `
@@ -33,5 +46,8 @@ try {
 
     Write-Host "native ktlsp companion e2e passed"
 } finally {
+    foreach ($name in $readinessEnvironment.Keys) {
+        [Environment]::SetEnvironmentVariable($name, $readinessEnvironment[$name], 'Process')
+    }
     Pop-Location
 }

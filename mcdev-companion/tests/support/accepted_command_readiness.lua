@@ -6,7 +6,7 @@ function M.start(options)
   local state = {
     acceptance = acceptance_module.start(assert(options.trace), 'mcdev.mixin'),
     tracked = {}, records = {}, timeout = options.timeout or 60000,
-    proof = { mode = 'real-host', provider = 'mcdev.mixin', scopePassed = false,
+    proof = { mode = 'real-host', provider = 'mcdev.mixin', fixture = options.fixture or 'real-cem', scopePassed = false,
       indexing = { project = false, libraries = false }, acceptances = {}, commands = {},
       completions = {}, preflight = {}, originalAssertions = {}, shutdown = {} },
   }
@@ -53,6 +53,9 @@ function M.start(options)
     local owner = acceptance_module.owner_key(vim.uri_to_fname(vim.uri_from_bufnr(bufnr)))
     local expected = { [owner] = vim.fn.sha256(text) }
     require('vim.lsp._changetracking').flush(self.client)
+    local language = self.protocol.context(bufnr, { 1, 0 }).languageId
+    -- AW/AT commands validate their document in the host; they have no authored-source publication.
+    if self.proof.fixture ~= 'real-cem' and language and language ~= 'java' and language ~= 'kotlin' then return nil end
     local ok, group = self.acceptance:wait_for(expected, self.tracked[bufnr].after,
       self.timeout, { required_instance = self.instance })
     if not ok then self:fail('host did not accept the exact current owner/source hash before the command') end
@@ -75,8 +78,8 @@ function M.start(options)
         index = #self.records + 1, acceptanceMark = self.acceptance:mark() }
       local summary = { command = command, commandIndex = record.index, documentUri = context.documentUri,
         sourceSha256 = record.sourceSha256, documentVersion = context.documentVersion,
-        providerInstance = accepted.instance, acceptedEvaluation = accepted.evaluation,
-        acceptedPublication = accepted.publication_revision, acceptedTraceMark = record.acceptanceMark, replied = false }
+        providerInstance = accepted and accepted.instance, acceptedEvaluation = accepted and accepted.evaluation,
+        acceptedPublication = accepted and accepted.publication_revision, acceptedTraceMark = record.acceptanceMark, replied = false }
       self.records[#self.records + 1], self.proof.commands[#self.proof.commands + 1] = record, summary
       return self.original_request(command, payload, function(result, err, origin)
         record.result, record.error, record.replied = result, err, true
@@ -183,6 +186,7 @@ function M.start(options)
       local unavailable = type(err) == 'table' and err.code == -32002
         and type(err.data) == 'table' and err.data.providerCommandReason == 'CommandUnavailable'
       if type(err) == 'table' and err.code == -32801 then
+        if not dispatched.accepted then self:fail('command-only readiness became Stale without a source publication to renew it') end
         if stale_retry then self:fail('provider readiness became Stale again after its one fresh retry') end
         if type(dispatched.context.documentVersion) ~= 'number' then self:fail('Stale readiness has no known editor version') end
         stale_retry = { initialError = vim.deepcopy(err), before = vim.deepcopy(dispatched.accepted),
@@ -248,19 +252,27 @@ function M.start(options)
     local original_record = _G.mcdev_record_assertion
     _G.mcdev_record_assertion = function(kind, caller)
       local source = caller and (caller.source or ''):gsub('^@', ''):gsub('\\', '/') or ''
-      if source:match('/cem_project_e2e%.lua$') or source:match('/cem_feature_snippets%.lua$') then
+      local cem_source = source:match('/cem_project_e2e%.lua$') or source:match('/cem_feature_snippets%.lua$')
+      if (self.proof.fixture == 'real-cem' and cem_source)
+        or (self.proof.fixture ~= 'real-cem' and source:match('/mcdev%-nvim/tests/e2e/[^/]+%.lua$')) then
         self.proof.originalAssertions[#self.proof.originalAssertions + 1] = { kind = kind, source = source, line = caller.currentline }
       end
       if original_record then original_record(kind, caller) end
     end
-    self.proof.originalCemInvoked = true
+    self.proof.originalFixtureInvoked = self.proof.fixture
+    if self.proof.fixture == 'real-cem' then self.proof.originalCemInvoked = true end
     local ok, failure = xpcall(callback, debug.traceback)
     _G.mcdev_record_assertion = original_record
     if not ok then self.failure = tostring(failure) end
-    self.proof.scopePassed = ok and self.failure == nil and #self.proof.completions > 0
+    local actual_reply = false
+    for _, record in ipairs(self.records) do
+      if record.replied and record.authentic then actual_reply = true; break end
+    end
+    self.proof.scopePassed = ok and self.failure == nil and actual_reply
+      and (self.proof.fixture ~= 'real-cem' or #self.proof.completions > 0)
       and #self.proof.originalAssertions > 0
     self:close()
-    if not self.proof.scopePassed then error(self.failure or 'original CEM proof did not complete', 0) end
+    if not self.proof.scopePassed then error(self.failure or ('original ' .. self.proof.fixture .. ' proof did not complete'), 0) end
   end
   state.leave_autocmd = vim.api.nvim_create_autocmd('VimLeavePre', { once = true, callback = function()
     state:close()

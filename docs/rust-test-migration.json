@@ -61999,7 +61999,7 @@
       "protocol": 40
     },
     "wholeMigrationVerified": false,
-    "remainingAcceptance": "All 2604 original JUnit case replacements, the stable current native/editor pipeline, and all eleven positive command routes in an isolated Java fixture pass. The complete original CEM workflow still stops at the initial orphan annotation type with host Unknown(MissingSource), before the 85-member comparison. Original Kotlin/Create/Drill/Sodium editor and source-attachment workflows, generic type arguments, primitive class literals, floating literal facts, current source hierarchy, dependency navigation, extract-local and final legacy retirement remain unverified or incomplete. Fresh cross-platform CI and optimized packages are required for the current annotationSites/URI changes. Static correspondence of 1197 Lua sites is not live semantic parity.",
+    "remainingAcceptance": "All 2604 original JUnit case replacements, the stable current native/editor pipeline, and all eleven positive command routes in an isolated Java fixture pass. The complete original CEM workflow still stops at the initial orphan annotation type with host Unknown(MissingSource), before the 85-member comparison. Original Kotlin/Create/Drill/Sodium editor and source-attachment workflows, generic type arguments, primitive class literals, floating literal facts, current source hierarchy, dependency navigation, extract-local and final legacy retirement remain unverified or incomplete. Cross-platform CI and optimized packages pass for the published annotationSites/URI runtime at 9e30558. Standalone original editor readiness changes are still being validated separately. Static correspondence of 1197 Lua sites is not live semantic parity.",
     "independentSemanticV1Evidence": {
       "receipt": "mcdev-companion/tests/fixtures/semantic_v1/interop_receipt.json",
       "stockHostRevision": "f76a43fbeddf4fbdc69768fd0f7544e5a4a3610f",
@@ -62500,14 +62500,16 @@
       "countNote": "The linked prototype's 13 duplicate functions were retired with its exact source preserved; all 2604 original JUnit case replacements remain verified."
     },
     "nativeDistribution": {
-      "status": "windows-native-package-and-optional-negotiation-verified",
+      "status": "windows-and-linux-native-packages-verified",
+      "sourceCommit": "9e30558a80e9b624020d5bee902ae242343fee3e",
       "releaseVersion": "0.7.7",
       "companionPackageVersion": "0.7.7",
-      "archive": "build/release/native/mcdev-companion-0.7.7-windows-x86_64.zip",
-      "archiveSha256": "8af213217c9e4d57fea09855f0f1009ba3c7244c12e1812cb5e71122d7fb8858",
-      "binarySha256": "e135ff521b873f376c5d77806f1c9e70c991ae23458607c5193aa293199b91c1",
+      "archive": "build/release/native-9e30558/mcdev-companion-0.7.7-windows-x86_64.zip",
+      "archiveSha256": "3c0e07ca9c91cc7fde0d3bb538f3ab818ffe9a4b2d95f3feedb3625b47d0f930",
+      "binarySha256": "3c5c4087a6313b0c490a0cb3905d8ada9266f28191cff1482129cabda37e161f",
+      "binaryReceipt": "build/companion-artifacts/release-3c5c4087a631/receipt.json",
       "manifestFilesVerified": 24,
-      "packageLog": "build/rust-test-logs/native-release-20261030-075035279/summary.txt",
+      "packageLog": "build/rust-test-logs/native-release-20261101-112521916/summary.txt",
       "requiredCapabilities": [
         "semantic-v1"
       ],
@@ -62517,7 +62519,12 @@
         "owned-resources-v1",
         "runtime-class-bytes-v1",
         "jvm-catalog-v1",
-        "provider-commands-v1"
+        "provider-commands-v1",
+        "source-locations-v1",
+        "source-facts-v2",
+        "project-inputs-v1",
+        "binary-annotations-v1",
+        "root-files-v1"
       ],
       "supportedOps": {
         "project-class-facts-v1": [
@@ -62540,14 +62547,29 @@
         "jvm-catalog-v1": [
           "jvmCatalog",
           "jvmClass"
+        ],
+        "source-locations-v1": [
+          "sourceLocation"
+        ],
+        "source-facts-v2": [
+          "sourceFacts",
+          "annotationSites"
+        ],
+        "project-inputs-v1": [
+          "projectInputs"
+        ],
+        "root-files-v1": [
+          "rootFileInventory",
+          "rootFileSnapshot"
         ]
       },
       "optimizedStdioSmoke": true,
       "optimizedCapabilityNegotiationSmoke": true,
       "realEditorEvidence": null,
-      "relatedDebugBinaryHostEvidence": "build/rust-test-logs/host-commands-20261030-081019715/receipt.json",
-      "linuxExecutionVerified": false,
-      "githubWorkflowExecuted": false,
+      "relatedDebugBinaryHostEvidence": "build/rust-test-logs/host-commands-20261101-111850957/receipt.json",
+      "linuxExecutionVerified": true,
+      "githubWorkflowExecuted": true,
+      "crossPlatformPackagesProof": "build/rust-test-logs/ci-9e30558/packages-proof.json",
       "releasePublished": false,
       "fullMcCapabilitiesVerified": false,
       "versionAuthority": "Cargo workspace version 0.7.7"
@@ -63051,6 +63073,59 @@
           "rawDirectory": "build/ci-runs/40886521996",
           "scope": "Native library/process and independent editor tests plus optimized native packages; full live MC command wiring remains incomplete."
         }
+      },
+      {
+        "status": "windows-native-package-and-optional-negotiation-verified",
+        "releaseVersion": "0.7.7",
+        "companionPackageVersion": "0.7.7",
+        "archive": "build/release/native/mcdev-companion-0.7.7-windows-x86_64.zip",
+        "archiveSha256": "8af213217c9e4d57fea09855f0f1009ba3c7244c12e1812cb5e71122d7fb8858",
+        "binarySha256": "e135ff521b873f376c5d77806f1c9e70c991ae23458607c5193aa293199b91c1",
+        "manifestFilesVerified": 24,
+        "packageLog": "build/rust-test-logs/native-release-20261030-075035279/summary.txt",
+        "requiredCapabilities": [
+          "semantic-v1"
+        ],
+        "optionalCapabilities": [
+          "project-class-facts-v1",
+          "source-snapshots-v1",
+          "owned-resources-v1",
+          "runtime-class-bytes-v1",
+          "jvm-catalog-v1",
+          "provider-commands-v1"
+        ],
+        "supportedOps": {
+          "project-class-facts-v1": [
+            "projectContext",
+            "typeJvm"
+          ],
+          "source-snapshots-v1": [
+            "sourceInventory",
+            "sourceSnapshot"
+          ],
+          "owned-resources-v1": [
+            "resourceInventory",
+            "resourceLookup",
+            "resourceSnapshot"
+          ],
+          "runtime-class-bytes-v1": [
+            "runtimeClass",
+            "classBytes"
+          ],
+          "jvm-catalog-v1": [
+            "jvmCatalog",
+            "jvmClass"
+          ]
+        },
+        "optimizedStdioSmoke": true,
+        "optimizedCapabilityNegotiationSmoke": true,
+        "realEditorEvidence": null,
+        "relatedDebugBinaryHostEvidence": "build/rust-test-logs/host-commands-20261030-081019715/receipt.json",
+        "linuxExecutionVerified": false,
+        "githubWorkflowExecuted": false,
+        "releasePublished": false,
+        "fullMcCapabilitiesVerified": false,
+        "versionAuthority": "Cargo workspace version 0.7.7"
       }
     ],
     "linkedPrototypeRetirement": {
@@ -63367,8 +63442,10 @@
       "nativePipeline": "build/rust-test-logs/native-pipeline-proof-20261101-111850867",
       "optimizedPackage": {
         "status": "passed-on-both-platforms",
+        "commit": "9e30558a80e9b624020d5bee902ae242343fee3e",
         "payloadFilesPerPlatform": 24,
-        "proof": "build/rust-test-logs/ci-7e338e4/packages-proof.json"
+        "proof": "build/rust-test-logs/ci-9e30558/packages-proof.json",
+        "localWindowsProof": "build/release/native-9e30558/package-proof.json"
       },
       "originalCemAttempt": {
         "status": "failed-before-original-assertions",
@@ -63486,15 +63563,20 @@
       "staticHelperCensusLimitation": "Scanner omission fixed: 1197 original sites, existing 1014 IDs and 571 exact mappings preserved; 183 additions pending/unknown, runtime credit zero.",
       "crossPlatformCI": {
         "status": "passed",
-        "commit": "7e338e40bb1a92e4ef8deb31130fda305dacfee2",
-        "url": "https://github.com/cotrin8672/mc-dev-lsp/actions/runs/41228019825",
-        "nativeProof": "build/rust-test-logs/ci-7e338e4/native-cases-proof.json",
-        "packagesProof": "build/rust-test-logs/ci-7e338e4/packages-proof.json",
-        "windowsFunctions": 1875,
-        "linuxFunctions": 1874,
-        "targets": 80,
+        "commit": "9e30558a80e9b624020d5bee902ae242343fee3e",
+        "url": "https://github.com/cotrin8672/mc-dev-lsp/actions/runs/41265135658",
+        "nativeProof": "build/rust-test-logs/ci-9e30558/native-cases-proof.json",
+        "packagesProof": "build/rust-test-logs/ci-9e30558/packages-proof.json",
+        "windowsFunctions": 1904,
+        "linuxFunctions": 1903,
+        "targets": 83,
         "originalCaseLocatorsPerPlatform": 2604,
-        "editorEntriesPerPlatform": 5
+        "editorEntriesPerPlatform": 5,
+        "sourceFactsOps": [
+          "sourceFacts",
+          "annotationSites"
+        ],
+        "scope": "Pinned published runtime and editor tests at 9e30558; later standalone E2E readiness changes retain separate focused evidence until their own CI."
       },
       "hostGuardAttribution": {
         "receipt": "build/rust-test-logs/cem-project-20261101-031413365-96dd433e/receipt.json",
@@ -63547,6 +63629,56 @@
         "commandCurrent": true,
         "inputHashesStable": true,
         "scope": "Fixed original CRLF input and old member oracle. Both issued aliases were resolved in the same accepted command/view; missing dependency source remains a host issue. No source-spelling or copied-binary fallback, no member comparison credit."
+      },
+      "crossPlatformCIHistory": [
+        {
+          "status": "passed",
+          "commit": "7e338e40bb1a92e4ef8deb31130fda305dacfee2",
+          "url": "https://github.com/cotrin8672/mc-dev-lsp/actions/runs/41228019825",
+          "nativeProof": "build/rust-test-logs/ci-7e338e4/native-cases-proof.json",
+          "packagesProof": "build/rust-test-logs/ci-7e338e4/packages-proof.json",
+          "windowsFunctions": 1875,
+          "linuxFunctions": 1874,
+          "targets": 80,
+          "originalCaseLocatorsPerPlatform": 2604,
+          "editorEntriesPerPlatform": 5
+        }
+      ],
+      "originalEditorReadiness": {
+        "status": "focused-tests-passed-original-feature-acceptance-separate",
+        "fullEditorSuitePrefix": "build/nvim-test-logs/generic-readiness-repaired-20261101-1138",
+        "finalAffectedAdapterResult": "build/nvim-test-logs/command-owner-readiness-20261101-1143.result.json",
+        "launcherValidation": "build/rust-test-logs/readiness-runner-validation-20261101/summary.json",
+        "mockCaseGroups": 8,
+        "policy": "Java/Kotlin require exact accepted owner/source/instance and keep the one fresh Stale retry. AW/AT use authentic host-validated current command owners without inventing an authored-source publication; command-only Stale fails without retry.",
+        "originalCemCompletionGatePreserved": true,
+        "scope": "Preparation and provenance only. Mock assertions create no original semantic pass credit. The earlier nil recording-hook test failure is preserved in generic-readiness-20261101-1135-adapters.stderr.log and was repaired before the successful runs."
+      },
+      "originalAwAtAttempt": {
+        "status": "failed-after-original-aw-directive-completion",
+        "receipt": "build/rust-test-logs/original-aw-at-command-owner-20261101-114051806/receipt.json",
+        "receiptSha256": "668de5c930856227fef646062f0d9185708e991011c58fbc5de5a2c83b3bc94e",
+        "editorProof": "build/rust-test-logs/original-aw-at-command-owner-20261101-114051806/editor-proof.json",
+        "hostRevision": "ddba88af8c4dfc2b5c67397b465ea01c98129069",
+        "hostSha256": "46ae70429778a834951ce0c191b08b334863441a82bf20c3394f8075fabfed4e",
+        "companionSha256": "8a42be20a9beda8bf4521a0c6e1cec8c022ede5752e07fc129577feb431f0bbb",
+        "sourceFingerprint": "718d6dd898b47cf5d2ea998dd4f18cf6b88c2065f4494506a19689fde340194a",
+        "sourceInputsStable": true,
+        "authenticCommandReplies": 3,
+        "commandIds": [
+          "mcdev.info",
+          "mcdev.completion",
+          "mcdev.diagnostics"
+        ],
+        "observedOriginalAssertionInvocations": 7,
+        "allObservedAssertionsPassed": false,
+        "awDirectiveCompletionMatched": true,
+        "expectedDiagnostic": "AW_UNRESOLVED_CLASS",
+        "actualDiagnosticError": "INCOMPLETE_PROJECT_CONTEXT: JVM catalog coverage unavailable: MissingFacts",
+        "atWorkflowExecuted": false,
+        "authoredSourceAcceptancesClaimed": 0,
+        "cleanShutdown": true,
+        "scope": "Original input and expectations unchanged. Indexing and preparation pass; catalog Unknown is retained instead of inventing absence. No full AW/AT file or loop-row parity is credited."
       }
     }
   }

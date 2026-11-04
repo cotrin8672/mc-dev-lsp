@@ -62,6 +62,21 @@ an omitted or unsupported list does not establish a zero-parameter callable.
 
 ## Follow-up acceptance checkpoints
 
+The annotation-site/URI runtime at `9e30558a80e9b624020d5bee902ae242343fee3e`
+passes [Windows/Linux CI](https://github.com/cotrin8672/mc-dev-lsp/actions/runs/41265135658).
+Downloaded logs independently verify 1,904 Windows / 1,903 Linux functions across
+83 targets, all 2,604 original case locators per platform and all five editor
+entries. Both optimized archives verify all 24 payload sizes/hashes, no extra
+regular files and the independent `sourceFacts`/`annotationSites` operations.
+The proofs are `build/rust-test-logs/ci-9e30558/{native-cases-proof,packages-proof}.json`.
+Archive SHA-256 values are
+`55dae0f1764fcb94ca883dc297703afa830dc3723f542e6706022720d08e3386`
+(Windows) and `2b2bf29aaaef62b58506824daf4836ac596f1df1ef71fc5a153e7ba0a3bd17d9`
+(Linux). The independently built local Windows archive also verifies 24 payloads
+and both optimized smoke tests; its SHA-256 is
+`3c0e07ca9c91cc7fde0d3bb538f3ab818ffe9a4b2d95f3feedb3625b47d0f930`.
+These pins precede the standalone original E2E readiness changes described below.
+
 CI for the assertion-census commit `6e9e206` also passes on Windows and Linux:
 https://github.com/cotrin8672/mc-dev-lsp/actions/runs/41229469984.
 Downloaded logs verify the same 2,604 original locators and all five editor
@@ -114,6 +129,24 @@ checks remain enabled. The prior failed command receipt is preserved under
 `build/host-command-source-0c69d6b/build/rust-test-logs/host-commands-20261101-055214773/`.
 This establishes positive command routing in that fixture, not complete original
 Minecraft/Kotlin editor parity.
+
+The standalone original E2E launcher now reuses the bounded readiness/provenance
+helper. Java/Kotlin still require the exact accepted source and provider instance;
+the original CEM completion/evidence gates remain intact. AW/AT have no authored
+source publication, so they use an authentic command-owner readiness reply and
+fail immediately on Stale. Eight mock groups, the affected adapter entry and
+the launcher receipt checks pass. Mock results credit no original feature parity.
+
+The original `fabric-aw-at` attempt is preserved in
+`build/rust-test-logs/original-aw-at-command-owner-20261101-114051806/`.
+With proper readiness it receives three authentic Info/completion/diagnostics
+replies and passes the original AW directive completion checks. Its missing-class
+diagnostic then returns typed `INCOMPLETE_PROJECT_CONTEXT`, because the selected
+physical JVM catalog has Unknown coverage (`MissingFacts`). Seven original
+assertion invocations are recorded, including the failing expectation; AT is not
+reached. Input hashes stay stable and shutdown is clean. This is not a cold
+provider-start failure or full AW/AT parity; the host catalog reason is being
+isolated without converting Unknown to class absence.
 
 Original CEM D9 remains failed at its first completion. Evidence is
 `build/cem-diagnostic-source-faeecb9/build/rust-test-logs/cem-project-20261101-060502760-d1a95c4b/`.

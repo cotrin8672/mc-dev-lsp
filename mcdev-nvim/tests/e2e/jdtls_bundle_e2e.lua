@@ -33,11 +33,13 @@ log_step("environment validated")
 
 local readiness
 if vim.env.MCDEV_E2E_ACCEPTANCE_PROOF and vim.env.MCDEV_E2E_ACCEPTANCE_PROOF ~= "" then
-  helpers.assert_eq(fixture, "real-cem", "the isolated acceptance proof runs the original CEM suite")
-  vim.opt.runtimepath:append(assert(vim.env.MCDEV_E2E_BLINK_LIB_RTP, "Blink library runtime is required"))
+  if fixture == "real-cem" then
+    vim.opt.runtimepath:append(assert(vim.env.MCDEV_E2E_BLINK_LIB_RTP, "Blink library runtime is required"))
+  end
   readiness = dofile(vim.fn.getcwd() .. "/mcdev-companion/tests/support/accepted_command_readiness.lua").start({
     trace = assert(vim.env.KTLSP_TRACE, "a fresh KTLSP_TRACE is required"),
     proof = vim.env.MCDEV_E2E_ACCEPTANCE_PROOF,
+    fixture = fixture,
   })
 end
 
@@ -275,13 +277,14 @@ end
 
 log_step("bundle provided through init_options.bundles")
 
+local function run_scenarios()
 if fixture == "real-cem" then
   local function run_cem()
     dofile(vim.fn.getcwd() .. "/mcdev-nvim/tests/e2e/cem_project_e2e.lua")({
       helpers = helpers, with_buffer = with_buffer, mixin_file = mixin_file, log_step = log_step,
     })
   end
-  if readiness then readiness:run(run_cem) else run_cem() end
+  run_cem()
   return
 end
 
@@ -1503,3 +1506,6 @@ end
 
 print("mcdev osgi bundle e2e passed for " .. fixture)
 log_step("passed")
+end
+
+if readiness then readiness:run(run_scenarios) else run_scenarios() end

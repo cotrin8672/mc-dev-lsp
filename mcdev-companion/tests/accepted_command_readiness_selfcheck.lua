@@ -21,7 +21,7 @@ local ok, failure = xpcall(function()
   vim.api.nvim_buf_set_lines(bufnr, 0, -1, false, { '// 😀', 'class Owner {}' })
   vim.api.nvim_set_current_buf(bufnr)
   local files, waits, flushes = {}, {}, 0
-  local instance, version, serial, unavailable, origin_ok, helper_only = 37, 17, 0, 0, true, false
+  local instance, version, serial, unavailable, origin_ok, helper_only, language = 37, 17, 0, 0, true, false, 'java'
   local clock, scheduled, replies, info_requests, on_info_request = 0, {}, {}, 0, nil
   local function owner_key_for(owner)
     if owner:match('^file:') then owner = vim.uri_to_fname(owner) end
@@ -67,7 +67,7 @@ local ok, failure = xpcall(function()
   local protocol = { commands = { completion = 'mcdev.completion', info = 'mcdev.info' } }
   function protocol.context(buffer, position)
     return { documentUri = vim.uri_from_bufnr(buffer), bufferText = vim.lsp._buf_get_full_text(buffer),
-      documentVersion = version, position = convert.to_lsp_position(buffer, position) }
+      documentVersion = version, languageId = language, position = convert.to_lsp_position(buffer, position) }
   end
   function protocol.request(command, payload, callback)
     local err, result
@@ -95,10 +95,11 @@ local ok, failure = xpcall(function()
       callback({ items = items, isIncomplete = false })
     end, buffer)
   end
-  local function start()
+  local function start(fixture)
     clock, scheduled, replies, info_requests, on_info_request = 0, {}, {}, 0, nil
     unavailable, origin_ok, helper_only, version = 0, true, false, 17
-    local state = readiness.start({ trace = 'mock.trace', proof = 'mock-proof.json', timeout = 1 })
+    language = fixture == 'fabric-aw-at' and 'accesswidener' or 'java'
+    local state = readiness.start({ trace = 'mock.trace', proof = 'mock-proof.json', timeout = 1, fixture = fixture })
     states[#states + 1] = state
     state:attach(client, protocol, completion, { exited = false })
     state:log_message('ktlsp indexed 1 project files')
@@ -239,6 +240,37 @@ local ok, failure = xpcall(function()
     assert(state.proof.preflight[1].error.code == err.code)
     close(state)
   end
+  -- Direct AW/AT commands need the same acceptance gate, without CEM completion credit.
+  local outer_record = _G.mcdev_record_assertion
+  _G.mcdev_record_assertion = function() end
+  state = start('fabric-aw-at')
+  state:run(function()
+    _G.mcdev_record_assertion('assert_nil', { source = '@' .. repo .. '/mcdev-nvim/tests/e2e/jdtls_bundle_e2e.lua', currentline = 1 })
+    protocol.request(protocol.commands.completion, { context = protocol.context(bufnr, { 1, 0 }) }, function() end, bufnr)
+  end)
+  assert(state.proof.scopePassed and state.proof.originalFixtureInvoked == 'fabric-aw-at')
+  assert(not state.proof.originalCemInvoked and #state.proof.completions == 0 and #state.proof.originalAssertions == 1)
+  assert(#state.proof.acceptances == 0 and state.records[1].accepted == nil and state.records[1].authentic,
+    'command-only documents must not fabricate authored-source acceptance')
+  close(state)
+  state = start('fabric-aw-at')
+  replies = { { error = vim.deepcopy(stale) } }
+  assert(not pcall(state.preflight, state, bufnr) and info_requests == 1,
+    'a command-only Stale cannot manufacture a fresh source acceptance or retry')
+  close(state)
+  for _, variant in ipairs({ { fixture = 'fabric-aw-at', reply = false }, { fixture = 'real-cem', reply = true } }) do
+    state = start(variant.fixture)
+    assert(not pcall(state.run, state, function()
+      local file = variant.fixture == 'real-cem' and 'cem_project_e2e.lua' or 'jdtls_bundle_e2e.lua'
+      _G.mcdev_record_assertion('assert_nil', { source = '@' .. repo .. '/mcdev-nvim/tests/e2e/' .. file, currentline = 1 })
+      if variant.reply then
+        protocol.request(protocol.commands.completion, { context = protocol.context(bufnr, { 1, 0 }) }, function() end, bufnr)
+      end
+    end), 'a fixture needs an authentic reply, and CEM still needs its actual completion proof')
+    assert(not state.proof.scopePassed)
+    close(state)
+  end
+  _G.mcdev_record_assertion = outer_record
   assert(flushes > 0 and #waits > 0)
   assert(vim.fn.filereadable('mock-proof.json') == 0, 'mock output cannot become live-host evidence')
 end, debug.traceback)
@@ -257,5 +289,5 @@ vim.api.nvim_win_set_buf(saved.window, saved.buffer)
 if bufnr and vim.api.nvim_buf_is_valid(bufnr) then vim.api.nvim_buf_delete(bufnr, { force = true }) end
 vim.api.nvim_win_set_cursor(saved.window, saved.cursor)
 if not ok then error(failure) end
-print('CEM readiness seven mock case groups passed, including one fresh accepted retry and strict error limits; no live scenario credit')
-return 7
+print('Editor readiness eight mock case groups passed, including direct AW/AT commands and unchanged CEM proof gates; no live scenario credit')
+return 8
