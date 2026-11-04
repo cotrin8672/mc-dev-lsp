@@ -73,6 +73,66 @@ scenario mapping and explicit empty-prefix correction are preserved in
 `mcdev-companion/tests/fixtures/semantic_v1/linked-retirement.json`. Host IPC
 implementation was requested from the ktlsp task; at goal start it was not present.
 
+### Responsibility decision, 2026-11-05
+
+The MC and ktlsp tasks compared both implementations and agreed to keep the
+existing mixed pipeline. The existing Rust parser handles the Kotlin/MC syntax
+that the legacy extension handled. ktlsp supplies the source view, project scope
+and semantic facts needed by the requested operation. Source parsing and a
+compiler-authoritative type/member claim are separate responsibilities.
+
+| Option | Concrete difference | Decision |
+| --- | --- | --- |
+| Replace the Kotlin command/model route with a parser-based route | Reconnect capability checks, model routing, host type queries and source/project guarantees | Keep the current entry point instead |
+| Retain every normalized-argument and exact authored-JVM-member prerequisite | Extend host Kotlin member/signature support even for legacy operations that only need source syntax and a resolved external target | Require each fact only where the operation uses it |
+| Keep the mixed pipeline and connect the existing Kotlin parser inside the semantic provider | Reuse source validation and host queries; build the supported MC syntax model without inventing compiler facts | Selected |
+
+The comparison uses the frozen `current-20261023` baseline, including its dirty
+Kotlin additions, and MC runtime revision `b0d102c`. The six compared legacy
+implementation files match the protected original checkout byte for byte.
+The old JDTLS facade selects the core parser directly for Kotlin; Java uses
+JDT AST parsing and binding/constant APIs. The Rust projection already calls
+`MixinSemanticModelParser` before applying host facts. Native coverage includes
+direct Kotlin parser tests and eight parser observations from six original
+Kotlin model cases; parser development and parser absence are not reasons for
+choosing a host-only implementation.
+
+The implementation boundary is:
+
+- ktlsp owns accepted unsaved source snapshots, URI/version/revision/SHA,
+  project and compiler scope, opaque identities, type resolution, real candidate
+  members and JVM facts. Existing TypeRefs take precedence when available.
+  Names extracted by MC are query inputs, never manufactured host identities.
+- MC owns Minecraft/Lapis interpretation, selectors, annotation syntax and
+  supported framework projections. Its existing Kotlin parser handles aliases,
+  class literals, arrays, nested annotations and source ranges. Syntax-derived
+  results keep their provenance; they do not become `HostNormalized` or a host
+  JVM-member fact merely because parsing succeeded.
+- Kotlin source-level operations must not all require an exact JVM identity for
+  the source handler. An operation that actually needs an unresolved binding or
+  ABI remains unavailable. Host `Unknown` stays `Unknown`; source/model/provider
+  checks and rules against unsupported absence claims remain in force.
+
+The main MC change belongs in `HostSemanticProvider::build`, inside the existing
+`parse` owner/foreign-snapshot and active-view checks. Its eager argument scan
+and `declarationMember` requirements must follow the operation's actual needs.
+Keep Java normalization, the command entry point and the existing projection,
+source provider and class-index interfaces. Add focused IPC coverage for Kotlin
+syntax with incomplete unused facts, necessary unresolved facts, stale source,
+ambiguous types and provenance before running the original Kotlin editor case.
+Original inputs, expected results and case accounting remain the acceptance
+criteria.
+
+This Kotlin connection currently requires no new host operation. If an original
+case exposes a necessary occurrence or fact that existing APIs cannot supply,
+request that specific generic fact. This is not a blanket cancellation of other
+independently demonstrated host gaps. The Java library-body `Stale` fix remains
+an independent host bug fix. Raw Kotlin DTO capture is diagnostic evidence,
+not a prerequisite for this responsibility decision or the MC implementation.
+
+This records an agreed design, not a completed Kotlin integration. The earlier
+native/CI results cover the existing runtime; full replacement remains unverified.
+
 ## Work and acceptance record
 
 | Area | Current state | Required evidence |
