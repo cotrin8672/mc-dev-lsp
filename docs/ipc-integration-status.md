@@ -22,11 +22,14 @@ semantic-index dependencies from metadata and rejects old resolved type handles
 after index changes, preserving the source/model/provider validation guards.
 Release93 adds independently negotiated written annotation sites, including
 annotations whose declaration has not yet been written.
+Release94 loads selected dependency class stubs for nominal identity while
+retaining Unknown authored-source coverage. Its original MC completion attempt
+still fails at a namespace preparation/admission boundary.
 
 ## Published contract
 
 The current integration pin is ktlsp
-[`ddba88af8c4dfc2b5c67397b465ea01c98129069`](https://github.com/cotrin8672/ktlsp/blob/ddba88af8c4dfc2b5c67397b465ea01c98129069/docs/architecture/extension-ipc.md).
+[`14de74d18b236a90d391670d9d566ec93855e4a5`](https://github.com/cotrin8672/ktlsp/blob/14de74d18b236a90d391670d9d566ec93855e4a5/docs/architecture/extension-ipc.md).
 It adds normalized authored facts, owning-project input records, exact source
 locations and typed binary declaration annotations to source snapshots, owned
 resources, selected runtime bytes, the physical JVM catalog and provider
@@ -34,10 +37,13 @@ commands. The companion negotiates capabilities and individual operations;
 binary annotations are selected by capability alone. Configured command IDs
 are intersected with the implemented domain routes.
 
-The copied release93 host has SHA-256
-`46ae70429778a834951ce0c191b08b334863441a82bf20c3394f8075fabfed4e`.
+The copied release94 host has SHA-256
+`95c334f642d5a77b293818763004b91565ec04f81caa2174717624e486681d17`.
 Its provenance is retained in
-`build/host-artifacts/published-ddba88a-46ae70429778/receipt.json`.
+`build/host-artifacts/candidate94-95c334f642d5/copy-receipt.json`.
+The candidate-labelled folder preserves the artifact's original identity;
+publication did not change its 25,292,800 bytes. The producer passes 23 focused
+checks and 414 source guards; those are separate from MC acceptance.
 This identifies the integration input; upstream API tests do not prove MC
 feature or original editor parity. The acceptance results below retain their
 historical host and companion pins.
@@ -104,19 +110,19 @@ Archive SHA-256 values are
 (Linux). These checks do not certify the unpassed live CEM workflow.
 
 The latest native pipeline is
-`build/rust-test-logs/native-pipeline-proof-20261101-111850867/`: 1,904 functions,
+`build/rust-test-logs/native-pipeline-proof-20261105-011949083/`: 1,904 functions,
 83 targets, all 2,604 original JUnit locators, doc/build checks and five editor
-entries pass in 213.3 seconds. Its 887 inputs retain fingerprint
-`2eb5b9a90a075238c5e99ce68f86c58046893d19c64c1795cbe9a02b16fa637e`.
+entries pass in 126.8 seconds. Its 887 inputs retain fingerprint
+`464facb88f7da0d65a8407d740d87ed28ff5b16481b373a3fd6435b3bdf6274d`.
 The copied debug companion is
-`8a42be20a9beda8bf4521a0c6e1cec8c022ede5752e07fc129577feb431f0bbb`,
-built from `fe21397858fb40ef83d8714f77160f74b2afbed3` with independently
+`23e3aedc79810b20e6c9715afc296ebf530251d7820ca12bcb1d8b29168f534c`,
+built from `6e66d6f47c4f34fb05a7d77eaf8f64d670479e96` with independently
 recorded commit/time/version inputs. This successful full run follows the
 preserved `native-pipeline-proof-20261101-053417973` failure: Rust passed there,
 but the restored Kotlin editor fixture inherited DOS line endings. The fixture
 now explicitly preserves its original LF/no-final-newline unsaved bytes.
 
-Published host93 and this companion also pass all eleven command IDs in the
+The earlier published host93 and companion `8a42be20a9be` pass all eleven command IDs in the
 isolated Java fixture: 1,065 assertions and 25 cases, input hashes stable,
 both host/child shutdowns clean. Evidence is
 `build/rust-test-logs/host-commands-20261101-111850957/receipt.json`.
@@ -145,10 +151,27 @@ diagnostic then returns typed `INCOMPLETE_PROJECT_CONTEXT`, because the selected
 physical JVM catalog has Unknown coverage (`MissingFacts`). Seven original
 assertion invocations are recorded, including the failing expectation; AT is not
 reached. Input hashes stay stable and shutdown is clean. This is not a cold
-provider-start failure or full AW/AT parity; the host catalog reason is being
-isolated without converting Unknown to class absence.
+provider-start failure or full AW/AT parity. The companion now retains bounded
+producer problems in the typed catalog error (four items, 256 bytes each,
+2,048 bytes overall), with a multibyte regression. A later diagnostic attempt in
+`build/rust-test-logs/original-aw-at-catalog-reason-20261105-011949050/` stops at an
+Info Stale before the catalog read, so its producer problem remains unmeasured.
+Unknown is not converted to class absence.
 
-Original CEM D9 remains failed at its first completion. Evidence is
+Original CEM D10 against host94 fails at its first completion. Its source and
+old 85-member oracle remain fixed. Evidence is
+`build/cem-host94-source-9e30558-20261105/build/rust-test-logs/cem-project-20261105-011644904-ad911c67/`.
+The 254 bytes/SHA-256 `7bd1004fdea0383b51e973c48f3a2e5162e359b9abc08eab559920e98e8df5a8`
+and document version 3 are unchanged. Prior semantic acceptance is evaluation
+11/publication 11/instance 2; actual completion evaluation 13 fails the namespace
+guard (expected 1/current 2). Document revision 2, version 3, source digest and
+provider remain current. Result: `-32801 ContentModified`, two original helper
+invocations, one completion/items zero, no 85-member comparison, 93.9 seconds,
+input hashes stable and clean shutdown. The host task is fixing input preparation
+and command admission while retaining old-view rejection. Neither a client retry
+nor a changed original expected value is used to claim acceptance.
+
+Earlier host93 CEM D9 also failed at its first completion. Evidence is
 `build/cem-diagnostic-source-faeecb9/build/rust-test-logs/cem-project-20261101-060502760-d1a95c4b/`.
 The unchanged 254-byte CRLF source has SHA-256
 `7bd1004fdea0383b51e973c48f3a2e5162e359b9abc08eab559920e98e8df5a8`.

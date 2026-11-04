@@ -10,17 +10,19 @@ Kotlin subprocess can count as a completed Rust port. The current published-host
 connection work and concrete input differences are tracked in
 [the IPC integration checkpoint](ipc-integration-status.md).
 
-The 2026-11-01 resumed checkpoint passes 1,904 native functions across 83
+The 2026-11-05 checkpoint passes 1,904 native functions across 83
 targets and verifies all 2,604 original case locators, doc tests, the executable
 and five independent editor entries. Published host93 and the fixed companion
 also pass 1,065 checks across 25 live cases, including positive results for all
 eleven command IDs, applied source/config edits and refresh/lifecycle behavior.
-Original CEM acceptance remains incomplete: written annotation sites are now
-connected, but both issued aliases for the original orphan `@Mixin` annotation
-return `Unknown(MissingSource)` in the same current host view. Two original
-helper invocations and one completion request are observed; the 85-row legacy
-member comparison is not reached. The host task is fixing dependency stub
-identity and lazy class loading. Full replacement is not verified.
+Original CEM acceptance remains incomplete. Host94 fixes dependency stub loading,
+but its first original completion returns `Stale` when the host namespace changes
+from 1 to 2 during input preparation. Source bytes, document version and provider
+remain unchanged. Two original helper invocations and one completion request are
+observed; the 85-row legacy member comparison is not reached. The host task is
+fixing this command boundary without changing client retry or original expected
+values. Original AW diagnostics also remain incomplete because physical JVM
+catalog coverage is Unknown. Full replacement is not verified.
 Current evidence and unresolved host
 facts are linked above; the dated records below retain their historical pins.
 
