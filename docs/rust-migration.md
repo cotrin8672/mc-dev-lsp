@@ -10,7 +10,7 @@ Kotlin subprocess can count as a completed Rust port. The current published-host
 connection work and concrete input differences are tracked in
 [the IPC integration checkpoint](ipc-integration-status.md).
 
-The latest 2026-11-05 full check passes 1,905 native functions across 83
+The latest 2026-11-05 full check passes 1,906 native functions across 83
 targets and verifies all 2,604 original case locators, doc tests, the executable
 and five independent editor entries. Published host93 and the fixed companion
 also pass 1,065 checks across 25 live cases, including positive results for all
@@ -24,10 +24,19 @@ positive facts while preserving Unknown whole annotation coverage. The installed
 Blink v2 uses Neovim 0.12.5 and publishes its list context after provider responses;
 the harness uses the existing 30s completion budget for that context.
 
-The original Drill/Create workflow now has all five dependency artifacts
-recovered at their original pinned hashes, but definition of useItemOn returns
-authored member unavailable before the 32 original Kotlin assertions. Original
-AW/AT catalog coverage and the remaining host facts are still incomplete.
+The original Drill/Create workflow now has its five original dependency archives
+and a separate profile with the exact NeoForge merged jar and declared Kotlin
+source root. A consumer bug read resources even when the command did not need
+them: 56 inventory queries and four snapshot queries exhausted the 64-batch
+budget before member normalization. The fix honors the existing discovery flag
+without increasing limits or merging discovery domains.
+
+With this fix, host103 reaches a library-preparation deadline; host105 reaches
+typeJvm, then returns Stale. Neither run observes the original handler/member
+DTO. Kotlin with unmodified genuine upstream Lapis annotation source gets beyond
+the old alias error, then stops at annotation argument unavailable after eight
+assertions. Original source/expected assertions and prior failures are retained.
+Original AW/AT coverage and other host facts remain incomplete.
 Full replacement is not verified.
 Current evidence and unresolved host
 facts are linked above; the dated records below retain their historical pins.

@@ -87,6 +87,7 @@ struct RootReader {
     root_override: Option<PathBuf>,
     reads: Arc<Mutex<Vec<String>>>,
     compiler_reads: Arc<Mutex<Vec<String>>>,
+    resource_reads: Arc<Mutex<Vec<String>>>,
     forbid_compiler_sources: bool,
 }
 
@@ -133,6 +134,7 @@ impl RootReader {
             root_override: None,
             reads: Arc::new(Mutex::new(vec![])),
             compiler_reads: Arc::new(Mutex::new(vec![])),
+            resource_reads: Arc::new(Mutex::new(vec![])),
             forbid_compiler_sources: false,
         }
     }
@@ -163,6 +165,9 @@ impl FactReader for RootReader {
             }
             if matches!(op, "sourceInventory" | "sourceSnapshot") {
                 self.compiler_reads.lock().unwrap().push(op.into());
+            }
+            if matches!(op, "resourceInventory" | "resourceSnapshot") {
+                self.resource_reads.lock().unwrap().push(op.into());
             }
         }
         if queries
@@ -405,6 +410,23 @@ fn command_discovery_does_not_read_unrelated_root_domains() {
         .unwrap()
         .iter()
         .any(|path| path.ends_with(".json") || path.ends_with(".java")));
+}
+
+#[test]
+fn ordinary_completion_does_not_read_selected_resources() {
+    let workspace = unique_root();
+    let request = command(
+        &workspace,
+        "mcdev.completion",
+        "class Patch {}",
+        "module/src/main/java/Patch.java",
+        "java",
+        &[],
+    );
+    let reader = RootReader::new(&workspace);
+    let resource_reads = reader.resource_reads.clone();
+    project_for_command(reader, &request).unwrap();
+    assert!(resource_reads.lock().unwrap().is_empty());
 }
 
 #[test]

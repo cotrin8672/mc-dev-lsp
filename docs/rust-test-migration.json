@@ -61999,7 +61999,7 @@
       "protocol": 40
     },
     "wholeMigrationVerified": false,
-    "remainingAcceptance": "All 2604 original JUnit replacements remain in the stable native corpus. The current full check passes1905 functions/83 targets and all five independent editor entries. Original CEM first7 and exact85 passed on candidate101; published102 passes385 original aggregate assertions and105 four-snippet assertions in separate pinned runs. The original live Blink cache case also passes authentic0-to23 results and the exact original BlockItem set on published102/MCe0cf. These are separate component proofs, not a unified original-suite replay. Original Drill/Create stops at useItemOn definition with authored member unavailable before all32 original Kotlin assertions. Original AW catalog coverage remains Unknown(MissingFacts). Generic arguments, primitive class literals, floating literals, current source hierarchy, dependency navigation, extract-local, complete original editor workflows and final legacy retirement remain incomplete. Whole replacement remains unverified.",
+    "remainingAcceptance": "All2604 original JUnit replacements remain in the stable native corpus. Current full verification passes1906 functions/83targets, docs/build and all5 editor entries. Historical CEM first7/exact85, Shadow, four snippets, aggregate and live cache component proofs are preserved without replay. The local selected-resource query bug is fixed with original64-batch limits unchanged. Corrected Minecraft/Kotlin-root Java profile on host103 reaches a preparation deadline; host105 reaches typeJvm then Stale. No actual original handler/member Found is claimed. Kotlin with genuine upstream marker source reaches annotation argument unavailable after8 assertions. Remaining source-ABI/fact support, original editor workflows and final legacy retirement are incomplete. Whole replacement remains unverified.",
     "independentSemanticV1Evidence": {
       "receipt": "mcdev-companion/tests/fixtures/semantic_v1/interop_receipt.json",
       "stockHostRevision": "f76a43fbeddf4fbdc69768fd0f7544e5a4a3610f",
@@ -63462,9 +63462,9 @@
     },
     "resumedIntegration": {
       "date": "2026-11-05",
-      "status": "original-cem-components-pass-in-separate-pinned-runs; original-drill-definition-blocked",
-      "hostPin": "2d10e716b47cc35f07807237b437f4b4e146bdaf",
-      "hostReceipt": "build/host-artifacts/candidate102-d31c9e623a6b/main-ready.json",
+      "status": "source-resource-quota-fixed; original-drill-stale-on-host105; original-kotlin-annotation-argument-unavailable",
+      "hostPin": "a0be6aa14b27be02835ddfaad4189ca99763d90d",
+      "hostReceipt": "build/host-artifacts/candidate105-3c26a5208d64/main-ready.json",
       "hostSerializerFixture": "mcdev-companion/tests/fixtures/host_inputs/root_files/actual-serializer-sample.json",
       "nativePipeline": "build/rust-test-logs/native-pipeline-proof-20261105-011949083",
       "optimizedPackage": {
@@ -63758,7 +63758,7 @@
           "scope": "Only host binary changed from the fixed test-source/MC inputs. Old view rejects correctly; useful first completion and original85-member comparison remain unverified. Client retry and expected values were not changed."
         }
       ],
-      "previousHostPin": "14de74d18b236a90d391670d9d566ec93855e4a5",
+      "previousHostPin": "2d10e716b47cc35f07807237b437f4b4e146bdaf",
       "host94": {
         "publicCommit": "14de74d18b236a90d391670d9d566ec93855e4a5",
         "copyReceipt": "build/host-artifacts/candidate94-95c334f642d5/copy-receipt.json",
@@ -63794,7 +63794,8 @@
       },
       "publishedHostPinHistory": [
         "ddba88af8c4dfc2b5c67397b465ea01c98129069",
-        "14de74d18b236a90d391670d9d566ec93855e4a5"
+        "14de74d18b236a90d391670d9d566ec93855e4a5",
+        "2d10e716b47cc35f07807237b437f4b4e146bdaf"
       ],
       "host102": {
         "commit": "2d10e716b47cc35f07807237b437f4b4e146bdaf",
@@ -63849,8 +63850,8 @@
         "liveExactOriginalItemSetPassed": true
       },
       "latestNativeCheck": {
-        "path": "build/rust-test-logs/20261105-043702365/native-summary.json",
-        "sha256": "c687124d7d5b8667d047ea54c1da7e7de047cdb0c5a1b89b6b6610fa6ab58e75"
+        "path": "build/rust-test-logs/resource-needs-full-20261105-064212278/native-summary.json",
+        "sha256": "da2369f3d48aa53f874abced98133263d382799b5b9640deb1df64987bfac0aa"
       },
       "originalDrillKotlinAttempt": {
         "path": "build/rust-test-logs/kotlin-drill-native-20261105/recovery-and-run-receipt.json",
@@ -63878,7 +63879,88 @@
         "exactOriginalBlockItemSetPassed": true,
         "originalInputsAndAssertionsUnchanged": true
       },
-      "originalCemComponentsScope": "First7/exact85/Shadow on candidate101 MC8a42; four snippets on published102 MC8a42; live cache and385 aggregate assertions on published102 MCe0cf. Functional inputs and expectations retained; compatible Neovim0.12.5, canonical Context pos, startup60s and list-context30s budgets are explicit. This is component coverage, not one unified original-suite replay or whole-project replacement."
+      "originalCemComponentsScope": "First7/exact85/Shadow on candidate101 MC8a42; four snippets on published102 MC8a42; live cache and385 aggregate assertions on published102 MCe0cf. Functional inputs and expectations retained; compatible Neovim0.12.5, canonical Context pos, startup60s and list-context30s budgets are explicit. This is component coverage, not one unified original-suite replay or whole-project replacement.",
+      "host103": {
+        "publicCommit": "ff81e4aea45c8cd203153f219dc3017468749b93",
+        "binarySha256": "2e52f2d0e5edf57766569d7011c5230a4e879e8514445e87770e9e6af719b9fb",
+        "bytes": 25330688,
+        "copyReceipt": {
+          "path": "build/host-artifacts/candidate103-2e52f2d0e5ed/copy-receipt.json",
+          "sha256": "c4ca44f9af080aeee88609e837dd9f9772a882e56de566d8778f2a2900a3cc3b"
+        },
+        "scope": "Producer Java parameterized-reference erasure proof; original handler acceptance is separate."
+      },
+      "host105": {
+        "publicCommit": "a0be6aa14b27be02835ddfaad4189ca99763d90d",
+        "binarySha256": "3c26a5208d64ea85209f2c5b9650b43992769cdaa64bdbd986439c0dfa03c4f5",
+        "bytes": 25348096,
+        "copyReceipt": {
+          "path": "build/host-artifacts/candidate105-3c26a5208d64/copy-receipt.json",
+          "sha256": "4a548a7ce9fc9e29b28766699a27381e85dff7bcfb622c55d8fa6627865bb511"
+        },
+        "scope": "Per-prepare-batch sharing of identical LibrarySource archive checks; limits, guards and init6528 unchanged."
+      },
+      "resourceDiscoveryQuotaFix": {
+        "scope": "Honor existing DiscoveryNeeds.resources for selected-resource reads; avoid empty snapshot query. Required-resource paths and domain coverage guards remain unchanged.",
+        "regression": "commands::ipc::project::root_tests::ordinary_completion_does_not_read_selected_resources",
+        "observedFailure": {
+          "path": "build/rust-test-logs/java-kotlin-resource-budget-correlation-20261105.json",
+          "sha256": "8411f544a8debc543b2da745965fa52dc89ddf495043f30bb9ac2b4626361987"
+        },
+        "successfulBatchesBeforeFailure": 64,
+        "successfulQueriesBeforeFailure": 68,
+        "unneededInventoryQueries": 56,
+        "unneededSnapshotQueries": 4,
+        "limitsIncreased": false,
+        "discoveryDomainsMerged": false,
+        "artifact": {
+          "path": "build/companion-artifacts/native-resources-25c14e1a618c/receipt.json",
+          "sha256": "32f261ebe02a9adef7e93ac833c7fc1a444ba8669cf5c919e427c466f19cbd13"
+        },
+        "fullVerification": {
+          "path": "build/rust-test-logs/resource-needs-full-20261105-064212278/native-summary.json",
+          "sha256": "da2369f3d48aa53f874abced98133263d382799b5b9640deb1df64987bfac0aa"
+        },
+        "initialFullFailure": "build/rust-test-logs/20261105-055852555/summary.txt",
+        "initialFullFailureScope": "Stale native query-plan assertion; diagnostic result assertions unchanged.",
+        "formatFailureRetained": "build/rust-test-logs/20261105-063142214/summary.txt"
+      },
+      "originalDrillAfterQuotaFix": {
+        "host103": {
+          "path": "build/rust-test-logs/java-quota25c-native-20261105/recovery-and-run-receipt.json",
+          "sha256": "41db0088e15f436cfe267c78156347410870c4a58fc1570396443d46101f802b"
+        },
+        "host103Outcome": "Evaluation deadline exceeded after library source preparation; no declarationMember or normalized member DTO observed.",
+        "host105": {
+          "path": "build/rust-test-logs/java-host105-native-20261105/recovery-and-run-receipt.json",
+          "sha256": "2db6480243750801cc0377b16267d2c005bee205a9b2d79558578906639a7c1c"
+        },
+        "host105Outcome": "Stale after typeJvm and source preparation; no declarationMember or normalized member DTO observed.",
+        "originalSourceSha256": "3aba08000f98a981834162eac5ef4eeda00e15aee616539981c98acaf081302d",
+        "observedAssertions": 9,
+        "passedBeforeFailure": 8,
+        "handlerFoundClaimed": false,
+        "inputChange": "Separate declared-Kotlin-root profile adds exact original NeoForge merged jar as a file dependency; original5archives and2Java files retained. Minecraft jar none in Info is a role classification, not absence of that dependency.",
+        "oldFailuresPreserved": true
+      },
+      "originalKotlinAfterQuotaFix": {
+        "markerAbsent": {
+          "path": "build/rust-test-logs/kotlin-quota25c-native-20261105/recovery-and-run-receipt.json",
+          "sha256": "d8e737b4afb054cab546cb68a28e93a82e8cccf88d28433e7011d73900288996"
+        },
+        "markerAbsentOutcome": "KMixin known/site annotation type references both Unknown(unsupportedType); no positive same-view identity.",
+        "genuineMarkerSource": {
+          "path": "build/rust-test-logs/kotlin-lapis-marker-corrected-native-20261105/recovery-and-run-receipt.json",
+          "sha256": "016c81127705c05da06de8969cbb6fbab731bfed0579b6953bfd14f02bd51d1a"
+        },
+        "markerSourceCommit": "0d39065f51452f409ae7cb676aa296d1cbb882be",
+        "markerSourceSha256": "fbaccd05efe459baa32680c4a5ece3463fe73472a1a693a5497cdc0a0b163308",
+        "markerSourceOutcome": "Old alias error no longer occurs; declarationType reached, then annotation argument unavailable. No normalized type DTO or real compiled Lapis runtime parity claimed.",
+        "observedAssertions": 9,
+        "passedBeforeFailure": 8,
+        "originalKotlinInputOrAssertionsChanged": false,
+        "oldFailuresPreserved": true
+      }
     }
   }
 }

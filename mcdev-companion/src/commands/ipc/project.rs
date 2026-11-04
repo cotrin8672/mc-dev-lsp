@@ -696,7 +696,7 @@ fn selected_project_inner<R: FactReader>(
     }
     let mut resources_complete = true;
     let mut entries = Vec::new();
-    for project_scope in &scopes {
+    for project_scope in scopes.iter().filter(|_| needs.resources) {
         let resources = match project_scope {
             Some(scope) => inputs.resource_inventory_in(scope)?,
             None => inputs.resource_inventory()?,
@@ -738,7 +738,11 @@ fn selected_project_inner<R: FactReader>(
             }
         }
     }
-    let contents = inputs.resource_snapshots(&entries)?;
+    let contents = if entries.is_empty() {
+        Vec::new()
+    } else {
+        inputs.resource_snapshots(&entries)?
+    };
     if contents.len() != entries.len() {
         return Err(FactsError::Protocol(
             "resource snapshot cardinality mismatch".into(),

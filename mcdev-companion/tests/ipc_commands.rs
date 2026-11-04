@@ -299,15 +299,7 @@ fn unknown_sdk_does_not_block_sdk_free_awat_diagnostics() {
             }).collect();
             server.send(json!({"jsonrpc":"2.0","id":request["id"],"result":{"facts":values}}));
         };
-        assert_eq!(
-            observed,
-            [
-                "projectContext",
-                "sourceInventory",
-                "resourceInventory",
-                "resourceSnapshot"
-            ]
-        );
+        assert_eq!(observed, ["projectContext", "sourceInventory"]);
         if has_class {
             assert_eq!(
                 result["result"]["error"]["code"],

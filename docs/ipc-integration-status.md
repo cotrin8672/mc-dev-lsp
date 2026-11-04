@@ -29,7 +29,7 @@ candidate101 and published host102.
 ## Published contract
 
 The current integration pin is ktlsp
-[`2d10e716b47cc35f07807237b437f4b4e146bdaf`](https://github.com/cotrin8672/ktlsp/blob/2d10e716b47cc35f07807237b437f4b4e146bdaf/docs/architecture/extension-ipc.md).
+[`a0be6aa14b27be02835ddfaad4189ca99763d90d`](https://github.com/cotrin8672/ktlsp/blob/a0be6aa14b27be02835ddfaad4189ca99763d90d/docs/architecture/extension-ipc.md).
 It adds normalized authored facts, owning-project input records, exact source
 locations and typed binary declaration annotations to source snapshots, owned
 resources, selected runtime bytes, the physical JVM catalog and provider
@@ -37,12 +37,13 @@ commands. The companion negotiates capabilities and individual operations;
 binary annotations are selected by capability alone. Configured command IDs
 are intersected with the implemented domain routes.
 
-The copied published release102 host has SHA-256
-d31c9e623a6b51256257300514556ebe5fa07aaa08d23841af2834f545cba833
-and 25,329,664 bytes. Its branch commit was checked independently against origin;
-the copy receipt is build/host-artifacts/candidate102-d31c9e623a6b/copy-receipt.json.
-The producer's completed Wire/Rust checks remain separate from MC acceptance.
-The historical host94, companion and failed receipts below retain their pins.
+The copied published release105 host has SHA-256
+3c26a5208d64ea85209f2c5b9650b43992769cdaa64bdbd986439c0dfa03c4f5
+and 25,348,096 bytes. Its commit was checked independently against origin.
+The copy receipt is build/host-artifacts/candidate105-3c26a5208d64/copy-receipt.json.
+Release103 adds Java nominal parameterized-reference erasure;105 shares archive
+checks only within one source-preparation batch. Neither adds opcodes or relaxes
+quota/deadline/readguards. Historical102/103 artifacts and receipts remain pinned.
 
 The host's evaluation lifetime, accumulated reads and final validation govern
 these inputs. They do not provide the earlier prototype's eight generation
@@ -64,9 +65,54 @@ an omitted or unsupported list does not establish a zero-parameter callable.
 
 ## Follow-up acceptance checkpoints
 
+### Resource quota fix and host103/105 follow-up
+
+The current full local check passes 1,906 functions/83 targets, docs/build and
+all five independent editor entries. Full logs and summary are under
+build/rust-test-logs/resource-needs-full-20261105-064212278/.
+The original2,604 ledger case rows are unchanged.
+
+Both original Java/103 and Kotlin/102 corrected profiles exhausted64 successful
+read-facts batches (68 queries) before the next batch. The selected-resource
+loop ignored the existing command discovery flag, reading56 inventories and4
+resource snapshots unnecessarily. The consumer now honors that flag and avoids
+an empty snapshot request. Resource-required paths, scope checks and Unknown
+coverage remain intact. The native SDK-free diagnostic test retains its result
+assertions while its operation plan drops the two unnecessary reads. Previous
+test/format failures are retained alongside the successful full run.
+
+The frozen MC25c14e1a618c45b6176a4676bf41d213a190ffc2575ebf6d17762e73be7c8800
+uses the same original Java/Kotlin cases in isolated corrected profiles.
+The added NeoForge file dependency has SHA256
+fc3c376175026bacfabcd1f7feaea70981fcd36cc3765f6b7b7c7f0186095b54.
+Info labels it a dependency rather than a Minecraft-role jar; its presence was
+verified independently. Java source remains3aba0800.../2,197bytes.
+
+Host103 now reaches11 successful fact batches, including21 type-reference
+queries, declarationType and typeJvm. Library source preparation then exceeds
+the evaluation deadline; original handler Found is not observed.
+Host105's one original Java run lasts56.8s, passes8 assertions, then returns
+Stale after typeJvm. Definition evaluation44 has source-capture prepared counts
+and microseconds8/12,429,345,0/424,8/4,611,298. Candidate source lists are not proof
+of which8 identities were selected. Preparation evidence does not certify
+declarationMember/handler or the erased descriptor. Receipts are
+build/rust-test-logs/java-quota25c-native-20261105/recovery-and-run-receipt.json and
+build/rust-test-logs/java-host105-native-20261105/recovery-and-run-receipt.json.
+
+Kotlin's marker-absent profile returns Unknown(unsupportedType) for both
+annotation references at the exact KMixin range. A separate profile supplies the
+unmodified official Lapis annotation source from commit
+0d39065f51452f409ae7cb676aa296d1cbb882be, SHA256
+fbaccd05efe459baa32680c4a5ece3463fe73472a1a693a5497cdc0a0b163308.
+That run reaches declarationType and then annotation argument unavailable after
+8 assertions. The original unsaved Kotlin source/expectations remain unchanged;
+the official marker requires side, which the original unfinished source omits.
+No normalized type DTO or real compiled Lapis plugin/runtime parity is claimed.
+See build/rust-test-logs/kotlin-lapis-marker-corrected-native-20261105/recovery-and-run-receipt.json.
+
 ### 2026-11-05 original CEM and Drill acceptance
 
-The current native check passes 1,905 functions across 83 targets, doc tests,
+The earlier native check passed 1,905 functions across 83 targets, doc tests,
 the executable build and all five independent editor entries. The receipt is
 build/rust-test-logs/20261105-043702365/native-summary.json.
 

@@ -13,7 +13,7 @@ use mcdev_protocol::DecodedCommand;
 
 #[derive(Clone, Copy)]
 pub(crate) struct DiscoveryNeeds {
-    resources: bool,
+    pub(super) resources: bool,
     mappings: bool,
     references: bool,
     pub(super) compiler_sources: bool,
