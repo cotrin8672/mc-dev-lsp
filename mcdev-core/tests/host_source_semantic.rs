@@ -209,6 +209,58 @@ fn mixin_targets_use_string_constant_instead_of_string_expression_binding() {
         ["pkg/Target"]
     );
 }
+
+#[test]
+fn normalized_inject_only_mixin_counts_positive_target_binding_without_members() {
+    let source = "@Mixin(Target.class)\nabstract class ExampleMixin {\n    @Inject(method = \"draw\")\n    private void hook() {}\n}";
+    let mut mixin = annotation("Mixin", Some("org.spongepowered.asm.mixin.Mixin"));
+    mixin.members.push((
+        "value".into(),
+        expression(
+            HostExpressionKind::TypeLiteral(HostTypeFact::Class {
+                internal_name: "fixture/Target".into(),
+            }),
+            "Target.class",
+        ),
+    ));
+    let model = project_host_semantic_document(
+        source,
+        "file:///ExampleMixin.java",
+        &HostSemanticDocument {
+            type_annotations: vec![mixin],
+            members: vec![],
+            ..Default::default()
+        },
+    );
+    assert_eq!(model.targets.len(), 1);
+    assert!(model.members.is_empty());
+    assert_eq!(model.debug_info.binding_resolved_count, 1);
+}
+
+#[test]
+fn normalized_string_or_unresolved_target_does_not_promote_binding_count() {
+    for target in [
+        string("fixture.Target"),
+        expression(
+            HostExpressionKind::TypeLiteral(HostTypeFact::Recovered),
+            "Target.class",
+        ),
+    ] {
+        let mut mixin = annotation("Mixin", Some("org.spongepowered.asm.mixin.Mixin"));
+        mixin.members.push(("value".into(), target));
+        let model = project_host_semantic_document(
+            "@Mixin(Target.class) abstract class ExampleMixin {}",
+            "file:///ExampleMixin.java",
+            &HostSemanticDocument {
+                type_annotations: vec![mixin],
+                ..Default::default()
+            },
+        );
+        assert_eq!(model.targets.len(), 1);
+        assert_eq!(model.debug_info.binding_resolved_count, 0);
+    }
+}
+
 #[test]
 fn recovered_target_binding_uses_explicit_import_and_later_resolved_binding() {
     let source = "import net.minecraft.client.gui.Gui;";

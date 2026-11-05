@@ -45,6 +45,43 @@ fn context(source: &str, needle: &str, chars: usize) -> AnnotationContext {
 }
 
 #[test]
+fn kotlin_wrap_operation_placement_source_model_with_target_lookup_is_panic_free() {
+    let source = r#"package io.github.cotrin8672.cem.mixin
+import net.createmod.catnip.placement.PlacementOffset as PlacementTarget
+import io.github.diskria.lapis.annotations.KMixin
+import com.llamalad7.mixinextras.injector.wrapoperation.WrapOperation
+import com.llamalad7.mixinextras.injector.wrapoperation.Operation
+import java.lang.Void
+import net.minecraft.core.BlockPos
+import net.minecraft.world.entity.LivingEntity
+import net.minecraft.world.item.ItemStack
+import net.minecraft.world.level.Level
+import net.minecraft.world.level.block.Block
+import net.minecraft.world.level.block.state.BlockState
+import org.spongepowered.asm.mixin.injection.At
+@KMixin(target = PlacementTarget::class)
+class KotlinPlacementMixin {
+    @WrapOperation(method = ["placeInW"], at = At(value = "INVOKE", target = "Lnet/minecraft/world/level/block/Block;setPl", remap = true), remap = false)
+    fun PlacementTarget.onPlaced(instance: Block, level: Level, pos: BlockPos, state: BlockState, placer: LivingEntity, stack: ItemStack, original: Operation<Void>) {}
+}
+"#;
+    let index = Index(vec!["net/createmod/catnip/placement/PlacementOffset"]);
+    let model =
+        MixinSemanticModelParser::parse_with_lookup(source, "file:///Placement.kt", Some(&index));
+    assert_eq!(model.injectors.len(), 1);
+    let imports = JavaTypeDescriptorResolver::imports_for_uri(source, "file:///Placement.kt");
+    let target = MixinTargetResolver::resolve_target(
+        &model.targets[0].internal_name,
+        &index,
+        Some(&imports),
+    );
+    assert_eq!(
+        target.as_deref(),
+        Some("net/createmod/catnip/placement/PlacementOffset")
+    );
+}
+
+#[test]
 fn imports_aliases_ambiguity_crlf_and_comments() {
     let src="// import bad.Fake\r\npackage patches\r\nimport game.Target as Game\r\nimport first.Duplicate\r\nimport second.Duplicate\r\nimport game.*\r\nclass Patch";
     let i = JavaTypeDescriptorResolver::imports_for(src);

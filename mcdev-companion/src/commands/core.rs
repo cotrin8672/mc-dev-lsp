@@ -1482,19 +1482,23 @@ fn catch_facade<T>(call: impl FnOnce() -> Result<T, HostFacadeError>) -> Result<
 }
 
 fn panic_failure(payload: Box<dyn Any + Send>) -> CommandFailure {
+    typed_panic_failure(&*payload)
+        .unwrap_or_else(|| CommandFailure::Runtime("core command panicked".into()))
+}
+
+pub(super) fn typed_panic_failure(payload: &(dyn Any + Send)) -> Option<CommandFailure> {
     if let Some(error) = payload.downcast_ref::<CommandFailure>() {
-        return error.clone();
+        return Some(error.clone());
     }
     if let Some(error) = payload.downcast_ref::<HostSourceError>() {
-        return map_source_error(error.clone());
+        return Some(map_source_error(error.clone()));
     }
     if let Some(error) = payload.downcast_ref::<HostFacadeError>() {
-        return map_facade_error(error.clone());
+        return Some(map_facade_error(error.clone()));
     }
-    if let Some(error) = payload.downcast_ref::<Cancellation>() {
-        return CommandFailure::Cancelled(error.clone());
-    }
-    CommandFailure::Runtime("core command panicked".into())
+    payload
+        .downcast_ref::<Cancellation>()
+        .map(|error| CommandFailure::Cancelled(error.clone()))
 }
 
 pub(super) fn convert_definition(

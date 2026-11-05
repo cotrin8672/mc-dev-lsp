@@ -26,7 +26,10 @@ use mcdev_protocol::{
 };
 use serde_json::Value;
 use sha2::{Digest, Sha256};
-use std::sync::{Arc, Mutex};
+use std::{
+    panic::{catch_unwind, resume_unwind, AssertUnwindSafe},
+    sync::{Arc, Mutex},
+};
 
 use super::{
     BuildIdentity, CommandDispatcher, CommandFailure, CoreCommandHost, EvaluationCommandInputs,
@@ -209,6 +212,14 @@ fn source_error(error: FactsError) -> HostSourceError {
     error.core()
 }
 
+fn command_failure(error: CommandFailure) -> FactsError {
+    match error {
+        CommandFailure::Cancelled(error) => FactsError::Cancelled(error.to_string()),
+        CommandFailure::Unavailable(error) => FactsError::Unknown(error.message),
+        CommandFailure::Runtime(error) => FactsError::Protocol(error),
+    }
+}
+
 struct CommandCancellation(CommandFacts);
 impl CancellationChecker for CommandCancellation {
     fn check_cancelled(&self) -> Result<(), Cancellation> {
@@ -246,11 +257,7 @@ fn execute_inner(
     }
     if let DecodedCommand::Completion(request) = &validated.decoded {
         if let Some(response) =
-            crate::completion_lines::complete_no_index(request).map_err(|error| match error {
-                CommandFailure::Cancelled(error) => FactsError::Cancelled(error.to_string()),
-                CommandFailure::Unavailable(error) => FactsError::Unknown(error.message),
-                CommandFailure::Runtime(error) => FactsError::Protocol(error),
-            })?
+            crate::completion_lines::complete_no_index(request).map_err(command_failure)?
         {
             facts.check_active()?;
             return encode_envelope(&response, Some(Command::Completion));
@@ -413,11 +420,7 @@ fn execute_inner(
         BuildIdentity::current(),
         true,
     )
-    .map_err(|error| match error {
-        CommandFailure::Cancelled(error) => FactsError::Cancelled(error.to_string()),
-        CommandFailure::Unavailable(error) => FactsError::Unknown(error.message),
-        CommandFailure::Runtime(error) => FactsError::Protocol(error),
-    })?;
+    .map_err(command_failure)?;
     let commands = initialization["commands"]
         .as_array()
         .into_iter()
@@ -435,11 +438,7 @@ fn execute_inner(
             false,
             &CommandCancellation(facts.clone()),
         )
-        .map_err(|error| match error {
-            CommandFailure::Cancelled(error) => FactsError::Cancelled(error.to_string()),
-            CommandFailure::Unavailable(error) => FactsError::Unknown(error.message),
-            CommandFailure::Runtime(error) => FactsError::Protocol(error),
-        })?;
+        .map_err(command_failure)?;
     facts.check_active()?;
     encode_envelope(&envelope, Some(command))
 }
@@ -450,12 +449,25 @@ pub fn execute(
     initialization: Value,
     facts: CommandFacts,
 ) -> Result<Value, FactsError> {
-    match execute_inner(params, initialization, facts) {
+    let result = catch_ipc_execution(|| execute_inner(params, initialization, facts));
+    match result {
         Err(
             error @ (FactsError::Cancelled(_) | FactsError::Stale(_) | FactsError::Protocol(_)),
         ) => Err(error),
         Err(error) => domain_failure(error.protocol()),
         success => success,
+    }
+}
+
+fn catch_ipc_execution(
+    call: impl FnOnce() -> Result<Value, FactsError>,
+) -> Result<Value, FactsError> {
+    match catch_unwind(AssertUnwindSafe(call)) {
+        Ok(result) => result,
+        Err(payload) => match super::core::typed_panic_failure(&*payload) {
+            Some(error) => Err(command_failure(error)),
+            None => resume_unwind(payload),
+        },
     }
 }
 
@@ -543,6 +555,32 @@ mod tests {
         assert!(matches!(
             requests.try_recv(),
             Err(std::sync::mpsc::TryRecvError::Empty | std::sync::mpsc::TryRecvError::Disconnected)
+        ));
+    }
+
+    #[test]
+    fn ipc_boundary_maps_typed_setup_failure_and_preserves_cancellation() {
+        let result = catch_ipc_execution(|| {
+            std::panic::panic_any(CommandFailure::Unavailable(McdevError {
+                code: mcdev_protocol::McdevErrorCode::IncompleteProjectContext,
+                message: "target member inventory is incomplete".into(),
+                details: Default::default(),
+            }))
+        });
+        assert!(matches!(
+            result,
+            Err(FactsError::Unknown(message))
+                if message == "target member inventory is incomplete"
+        ));
+
+        let result = catch_ipc_execution(|| {
+            std::panic::panic_any(CommandFailure::Cancelled(Cancellation(Arc::new(
+                std::io::Error::other("evaluation is closed"),
+            ))))
+        });
+        assert!(matches!(
+            result,
+            Err(FactsError::Cancelled(message)) if message.contains("evaluation is closed")
         ));
     }
 

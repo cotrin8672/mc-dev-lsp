@@ -268,6 +268,35 @@ pub fn collect_host_extras_contexts(
     }
     collected
 }
+
+fn resolved_type_literal_bindings(expression: &HostExpressionFact) -> usize {
+    if !expression.validity.is_usable() {
+        return 0;
+    }
+    match &expression.kind {
+        HostExpressionKind::TypeLiteral(HostTypeFact::Class { .. })
+            if expression.type_literal_descriptor().is_some() =>
+        {
+            1
+        }
+        HostExpressionKind::Array(values) => values
+            .iter()
+            .flatten()
+            .map(resolved_type_literal_bindings)
+            .sum(),
+        _ => 0,
+    }
+}
+
+fn resolved_mixin_target_bindings(annotation: &HostAnnotationFact) -> usize {
+    annotation
+        .members
+        .iter()
+        .filter(|(name, _)| matches!(name.as_str(), "value" | "target" | "targets"))
+        .map(|(_, expression)| resolved_type_literal_bindings(expression))
+        .sum()
+}
+
 /// Merge a host normalized document with the existing MC source/domain parser.
 /// No compilation unit, SDK/classpath scanner or second language parser is built.
 pub fn project_host_semantic_document(
@@ -282,12 +311,16 @@ pub fn project_host_semantic_document(
     model.package_name = document.package_name.clone();
     model.qualified_name = document.qualified_name.clone();
     model.type_kind = document.type_kind;
-    let targets: Vec<_> = document
+    let mut target_binding_resolved = 0;
+    let mut targets = Vec::new();
+    for annotation in document
         .type_annotations
         .iter()
         .filter(|a| host_mixin_annotation(a, &imports) == Some(MixinAnnotation::Mixin))
-        .flat_map(|a| host_mixin_targets(source, a, &imports))
-        .collect();
+    {
+        target_binding_resolved += resolved_mixin_target_bindings(annotation);
+        targets.extend(host_mixin_targets(source, annotation, &imports));
+    }
     if !targets.is_empty() {
         model.targets = targets;
     }
@@ -414,7 +447,7 @@ pub fn project_host_semantic_document(
     }
     model.debug_info = SemanticParseDebugInfo {
         parse_source: ParseSource::HostNormalized,
-        binding_resolved_count: resolved,
+        binding_resolved_count: resolved + target_binding_resolved,
         binding_failed_count: failed,
         ..Default::default()
     };

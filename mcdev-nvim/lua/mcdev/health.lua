@@ -170,7 +170,7 @@ function M.health(bufnr)
     local lines = base_lines(bufnr)
     vim.list_extend(lines, {
       "repo current commit: " .. repo_commit,
-      "companion build commit: " .. tostring(info.buildCommit or "unknown"),
+      "extension build commit: " .. tostring(info.buildCommit or "unknown"),
       "backend build commit: " .. tostring(info.buildCommit or "unknown"),
       "backend build time: " .. tostring(info.buildTime or "unknown"),
       "backend executable: " .. tostring(info.executableLocation or info.jarLocation or "unknown"),

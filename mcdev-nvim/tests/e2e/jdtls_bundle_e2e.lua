@@ -543,10 +543,22 @@ with_buffer(mixin_file, "java", nil, function(bufnr)
   end, 60000)
   vim.fn.writefile(vim.split(debug_completion_output, "\n", { plain = true }), debug_completion_log)
   helpers.assert_true(debug_completion_output:find("parse source: HOST_NORMALIZED", 1, true) ~= nil, debug_completion_output)
+  helpers.assert_true(debug_completion_output:find("parse confidence: HIGH", 1, true) ~= nil, debug_completion_output)
+  -- Native Rust has no JDT model objects; require the same semantic guarantees from this response instead.
   helpers.assert_true(
-    debug_completion_output:find("used compilation unit/project: true/true", 1, true) ~= nil,
+    debug_completion_output:find("used compilation unit/project: false/false", 1, true) ~= nil,
     debug_completion_output
   )
+  helpers.assert_true(
+    debug_completion_output:find("binding resolved/failed: [1-9][0-9]*/0") ~= nil,
+    debug_completion_output
+  )
+  helpers.assert_true(
+    debug_completion_output:find("semantic context found: true", 1, true) ~= nil,
+    debug_completion_output
+  )
+  local project_session_version = tonumber(debug_completion_output:match("projectSessionVersion = ([1-9][0-9]*)"))
+  helpers.assert_true(project_session_version ~= nil and project_session_version > 0, debug_completion_output)
   helpers.assert_true(
     debug_completion_output:find("fallback annotation context used: false", 1, true) ~= nil,
     debug_completion_output

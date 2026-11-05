@@ -10,7 +10,7 @@ Kotlin subprocess can count as a completed Rust port. The current published-host
 connection work and concrete input differences are tracked in
 [the IPC integration checkpoint](ipc-integration-status.md).
 
-The latest 2026-11-05 full check passes 1,928 native functions across 83
+The latest 2026-11-05 full check passes 1,935 native functions across 83
 targets and verifies all 2,604 original case locators, doc tests, the executable
 and five independent editor entries. Published host93 and the fixed companion
 also pass 1,065 checks across 25 live cases, including positive results for all
@@ -31,28 +31,38 @@ require every normalized annotation argument or the source handler's exact JVM
 identity. The original marker-absent Kotlin case now completes its first two
 source-parser completions without changing its inputs or expected results.
 
-Host108 supplies the narrowly required dependency-source provenance operation.
-Complete root-file discovery now avoids the discarded classpath resource sweep;
-the latest original Java and Kotlin runs both issue zero resource inventories.
-Those runs still fail: Java sees an unchanged-source semantic-index Stale, while
-Kotlin reaches MC's own 64-batch guard. The current local fixes reuse only
-validated positive type facts within one evaluation and retry only a read-only
-definition once on the exact host Stale error, provided its client, provider and
-document context remain unchanged. The guards and limits are unchanged.
-The 1,928-function full check and five editor entries pass. The previous real-host
-runs verify Java's fresh-request definition and Kotlin completion, diagnostics,
-hover and definition. Both then stop at the same local wire mismatch: the
-definition resolution is serialized as `SOURCE` instead of legacy `source`.
-Java passes 12 of 13 observed assertions; Kotlin passes 84 of 85. This is a
-consumer serialization fix, with original assertions unchanged. The IPC boundary
-now uses the actual validated command to select typed navigation envelopes and
-the existing protocol adapter, preserving uppercase internal API values and
-lowercase wire values. An earlier attempt selected by advertised capabilities
-and incorrectly parsed info as a definition; its real preflight failure is
-retained. All 135 legacy command replays and info/IPC regressions pass; new frozen
-MCe4a3 original-entry runs are in progress. Original AW/AT
-and remaining complete editor workflows are still unverified. Full replacement
-is not verified; dated records retain historical failures and their exact pins.
+Host110 includes dependency-source provenance, native Java extract-local and
+initial workspace-symbol readiness. Evaluation-local positive type reuse, a
+guarded fresh definition retry and command-selected wire encoding have removed
+the earlier local quota/Stale/serialization failures without changing limits.
+The selected original Java entry now passes all 53 observed assertions, including
+the native extract-local WorkspaceEdit and original clean lifecycle teardown.
+It does not cover the separate Placement entry.
+
+The latest full proof is
+`build/rust-test-logs/20261105-162550220/native-summary.json`: 1,935 functions,
+83 targets, all 2,604 original case locators and 2,748 replacement references,
+docs/build and five editor entries. Typed failures raised during IPC setup now
+retain their domain error; unexpected worker panic diagnostics remain bounded.
+Mixin binding counts include positively resolved type-literal targets.
+
+One original test observation was specific to actual JDT CompilationUnit and
+JavaProject objects. Its native port checks their truthful absence together with
+positive host-normalized bindings, high confidence, a project revision and no
+fallback in the same response. The mapping is recorded in
+`build/jdtls-native-semantic-mapping-20261105.json`; behavioral expectations and
+the protected original checkout are preserved. The health build-commit label is
+also restored. Affected editor tests pass after these two later Lua changes.
+
+Full Fabric acceptance is running. Loom reaches accepted command readiness but
+fails definition on an annotation alias without positive same-view identity;
+that concrete failure is under local investigation. Kotlin Placement exposes a
+verified producer gap connecting an already selected binary type to existing
+`typeJvm` ABI facts. Real Sodium inputs are materialized, but host110 cancels
+its own Gradle import on generated-script watcher events; the host task is
+fixing that existing path. Original AW/AT and remaining complete editor workflows
+are still unverified. Full replacement is not verified; dated records retain
+historical failures and their exact pins.
 
 ## Authoritative baseline
 

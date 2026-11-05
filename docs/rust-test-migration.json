@@ -63462,9 +63462,9 @@
     },
     "resumedIntegration": {
       "date": "2026-11-05",
-      "status": "native1928-and-editor5-passed; actual-command-wire-routing-fixed; original-e4a3-pair-and-full-fabric-basic-pending",
-      "hostPin": "5d5059a5868d6e2a3f249d9acbc0b8c4899396cb",
-      "hostReceipt": "build/host-artifacts/candidate108-e12eb95f8b0e/main-ready.json",
+      "status": "native1935-and-editor5-passed; selected-original-Java-and-native-extract-local-passed; full-editor-acceptance-incomplete",
+      "hostPin": "46c96783757398f4120940bb5a2c756df801ce16",
+      "hostReceipt": "build/host-artifacts/candidate110-be4265a0e307/copy-receipt.json",
       "hostSerializerFixture": "mcdev-companion/tests/fixtures/host_inputs/root_files/actual-serializer-sample.json",
       "nativePipeline": "build/rust-test-logs/native-pipeline-proof-20261105-011949083",
       "optimizedPackage": {
@@ -64739,6 +64739,69 @@
         "hostApiGuardsQuotaDeadlineChanged": false,
         "originalPairPassed": false,
         "ciStatus": "pending source push",
+        "wholeMigrationVerified": false
+      },
+      "nativeBindingBoundaryCheckpoint": {
+        "date": "2026-11-05",
+        "nativeFunctions": 1935,
+        "nativeTargets": 83,
+        "editorEntries": 5,
+        "originalCaseLocators": 2604,
+        "replacementReferences": 2748,
+        "fullCheck": {
+          "path": "build/rust-test-logs/20261105-162550220/native-summary.json",
+          "sha256": "189530dc717fec0204e78d8f38faaeff78046b5bc3109a39bceeda196d9875c5"
+        },
+        "binarySha256": "6bc773849f0eeabb6c9e766fdf88b0591558ad26847d1890dd835a5231acdd10",
+        "sourcePatchSha256": "508b9f0844d498072d5e5fa95c49a3072d9363c732375b496204b53950d68756",
+        "changes": [
+          "Count positively resolved Mixin type-literal bindings",
+          "Preserve typed failures across outer IPC setup and execution",
+          "Bound unexpected worker panic diagnostics",
+          "Restore extension build-commit health label",
+          "Port one JDT object observation to stronger actual native fact assertions"
+        ],
+        "nativeObservationMapping": "build/jdtls-native-semantic-mapping-20261105.json",
+        "laterLuaChanges": "Affected editor checks passed; two Lua changes follow the full Rust check.",
+        "selectedOriginalJava": {
+          "status": "passed",
+          "assertionRecords": 53,
+          "nativeExtractLocalApplied": true,
+          "originalLifecycleTeardown": true,
+          "placementCovered": false,
+          "receipt": "build/rust-test-logs/host110-mc6bc7-java-lifecycle-20261105/recovery-and-run-receipt.json",
+          "sha256": "3faee7cba1e0430d2daa1350d5e5703c4bc1153d798099b1d0b56fa9ccd589af"
+        },
+        "fullFabric": "running with the explicitly mapped native observation",
+        "loom": {
+          "status": "failed-after-positive-readiness",
+          "reason": "annotation reference alias has no positive same-view identity",
+          "logs": "C:/tmp/mc-e110-6bc7-loom-ready2",
+          "ownedProcessesRemaining": 0
+        },
+        "ponder": {
+          "status": "existing producer typeJvm selected-binary ABI gap; host task implementing",
+          "rawDtos": "build/ponder-facts-capture-20261105/raw-selected-facts.json",
+          "sha256": "df416b30cc57e8c9957774ecb63ae850bc52b59a14d6f2c8edf6921ae255da8f",
+          "evidenceSha256": "78718502c9725ffccd77920341c34ef075dfcfd08e9731fda88c81e911bf1135",
+          "authorityChecksRelaxed": false
+        },
+        "sodium": {
+          "materialization": "passed",
+          "materializationReceipt": "build/real-sodium-profile-20261105/materialization-final-receipt.json",
+          "materializationSha256": "c5932b122bc9b7a8e5f16e82e471adec2a599cc7538f3ebb5d39f6b079aa27a1",
+          "originalEntry": "failed-indexing-readiness",
+          "cause": "31 Gradle imports cancelled by generated init-script watcher events",
+          "hostFix": "112 in progress"
+        },
+        "previousPublishedCi": {
+          "commit": "9e93f7a1c29b8b304a426e39d8a663364f708a81",
+          "run": 41978109198,
+          "windowsFunctions": 1928,
+          "linuxFunctions": 1927,
+          "summary": "build/rust-test-logs/ci-9e93f7a/ci-summary.json",
+          "sha256": "1f17559ef0baca1cd69dfea98349d0bd7fdbf1499153d44f069b9d99daaf5c89"
+        },
         "wholeMigrationVerified": false
       }
     }

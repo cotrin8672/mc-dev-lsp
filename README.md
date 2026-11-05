@@ -8,14 +8,17 @@ This is the `codex/ktlsp-rust` replacement branch. The original JDT LS checkout
 and its uncommitted work remain on `main`. Full replacement is still in
 progress: all 2,604 original JUnit cases have native replacements and all eleven
 commands have positive live fixture coverage. Complete original MC/Kotlin editor
-workflows still need host facts and acceptance. See the
+workflows remain under acceptance, including local integration fixes. See the
 [migration record](docs/rust-migration.md) for verified scope and remaining work.
 
 The companion uses the published host operations for project/class facts,
 source snapshots, owned resources, runtime class bytes, the JVM catalog and
-provider commands. All eleven command IDs have evaluation routes; complete
-project-wide results still need host facts that are not published. Missing
-facts return typed unavailable results. The bounded Mixin/Shadow editor proof
+provider commands. All eleven command IDs have evaluation routes. MC keeps its
+existing Kotlin/Minecraft parser; ktlsp supplies accepted source, project scope
+and resolved type/member/JVM facts. The current Kotlin connection needs no
+additional host operation, and dependency-source provenance is published in
+host108. A specific missing fact still returns a typed unavailable result. The
+bounded Mixin/Shadow editor proof
 and provider-command proof have separate scopes; see the
 [integration checkpoint](docs/ipc-integration-status.md). Neither proves full
 Minecraft editor parity.

@@ -7,6 +7,7 @@ use crate::{
 };
 use serde_json::{json, Value};
 use std::{
+    any::Any,
     collections::{BTreeSet, VecDeque},
     io::{self, BufRead, Write},
     sync::{
@@ -23,6 +24,7 @@ const MAX_CONTINUATIONS: usize = 256;
 const MAX_STREAM_BYTES: usize = 64 * 1024 * 1024;
 const MAX_COMMAND_RESULT: usize = 512 * 1024;
 const MAX_COMMAND_WORKERS: usize = 8;
+const MAX_WORKER_PANIC_MESSAGE_CHARS: usize = 512;
 
 #[derive(Debug)]
 pub(crate) enum Failure {
@@ -72,6 +74,28 @@ impl Drop for CommandWorker {
     fn drop(&mut self) {
         self.0.fetch_sub(1, Ordering::AcqRel);
     }
+}
+
+fn worker_panic_failure(payload: Box<dyn Any + Send>) -> FactsError {
+    let message = payload
+        .downcast_ref::<String>()
+        .map(String::as_str)
+        .or_else(|| payload.downcast_ref::<&str>().copied())
+        .map(|message| {
+            message
+                .chars()
+                .take(MAX_WORKER_PANIC_MESSAGE_CHARS)
+                .map(|character| {
+                    if character.is_control() {
+                        ' '
+                    } else {
+                        character
+                    }
+                })
+                .collect::<String>()
+        })
+        .unwrap_or_else(|| "non-string panic payload".into());
+    FactsError::Protocol(format!("command worker panicked: {message}"))
 }
 
 /// The reader owns stdin; the bounded channel keeps cancellation observable during host reads.
@@ -416,7 +440,7 @@ impl<W: Write> Server<W> {
             let result = std::panic::catch_unwind(std::panic::AssertUnwindSafe(|| {
                 handler(params, initialization, worker_facts.clone())
             }))
-            .unwrap_or_else(|_| Err(FactsError::Protocol("command worker panicked".into())));
+            .unwrap_or_else(|payload| Err(worker_panic_failure(payload)));
             worker_facts.finished(result);
         });
         if let Err(error) = started {
@@ -843,6 +867,70 @@ mod tests {
             command_workers: Arc::new(AtomicUsize::new(0)),
         }
     }
+
+    fn panic_command_params() -> Value {
+        json!({
+            "evaluation":"e1",
+            "owner":"/workspace/A.java",
+            "source":"class A",
+            "configuration":{},
+            "declarations":[],
+            "context":{},
+            "command":"mcdev.completion",
+            "arguments":[]
+        })
+    }
+
+    fn panicking_command_result(handler: Arc<CommandHandler>) -> Value {
+        let (_sender, receiver) = mpsc::sync_channel(1);
+        let mut server = test_server(receiver);
+        server.commands.insert("mcdev.completion".into());
+        server.command_handler = handler;
+        server
+            .execute_command(json!("e1"), panic_command_params())
+            .unwrap();
+        read_frame(&mut std::io::Cursor::new(&server.output))
+            .unwrap()
+            .unwrap()
+    }
+
+    #[test]
+    fn command_worker_panic_keeps_string_payload() {
+        let response = panicking_command_result(Arc::new(|_, _, _| {
+            std::panic::panic_any(String::from("selected type invariant failed"))
+        }));
+        assert_eq!(response["error"]["code"], -32602);
+        assert_eq!(
+            response["error"]["message"],
+            "command worker panicked: selected type invariant failed"
+        );
+    }
+
+    #[test]
+    fn command_worker_panic_bounds_long_string_payload() {
+        let response = panicking_command_result(Arc::new(|_, _, _| {
+            std::panic::panic_any("x".repeat(MAX_WORKER_PANIC_MESSAGE_CHARS + 32))
+        }));
+        let message = response["error"]["message"].as_str().unwrap();
+        assert_eq!(
+            message,
+            format!(
+                "command worker panicked: {}",
+                "x".repeat(MAX_WORKER_PANIC_MESSAGE_CHARS)
+            )
+        );
+    }
+
+    #[test]
+    fn command_worker_panic_uses_fallback_for_non_string_payload() {
+        let response = panicking_command_result(Arc::new(|_, _, _| std::panic::panic_any(42_u32)));
+        assert_eq!(response["error"]["code"], -32602);
+        assert_eq!(
+            response["error"]["message"],
+            "command worker panicked: non-string panic payload"
+        );
+    }
+
     #[test]
     fn optional_scoped_reader_uses_existing_cancel_and_late_reply_router() {
         use crate::{

@@ -29,7 +29,7 @@ candidate101 and published host102.
 ## Published contract
 
 The current integration pin is ktlsp
-[`5d5059a5868d6e2a3f249d9acbc0b8c4899396cb`](https://github.com/cotrin8672/ktlsp/blob/5d5059a5868d6e2a3f249d9acbc0b8c4899396cb/docs/architecture/extension-ipc.md).
+[`46c96783757398f4120940bb5a2c756df801ce16`](https://github.com/cotrin8672/ktlsp/blob/46c96783757398f4120940bb5a2c756df801ce16/docs/architecture/extension-ipc.md).
 It adds normalized authored facts, owning-project input records, exact source
 locations and typed binary declaration annotations to source snapshots, owned
 resources, selected runtime bytes, the physical JVM catalog and provider
@@ -37,11 +37,13 @@ commands. The companion negotiates capabilities and individual operations;
 binary annotations are selected by capability alone. Configured command IDs
 are intersected with the implemented domain routes.
 
-The copied published release108 host has SHA-256
-e12eb95f8b0ef3cf42e6e5f0897fbbf42dcdea9d1b86364efc11f1d414612d54
-and 25,431,552 bytes. Its code commit is the independently checked public pin
+The copied published release110 host has SHA-256
+be4265a0e3079ba7cb0ddd71b914b5a98e2a67ce4d7f7c6da774f31cf70a2504
+and 25,497,088 bytes. Its code commit is the independently checked public pin
 above, published on `codex/java-kotlin-analysis`.
-The copy receipt is build/host-artifacts/candidate108-e12eb95f8b0e/copy-receipt.json.
+The copy receipt is build/host-artifacts/candidate110-be4265a0e307/copy-receipt.json.
+Release109 adds standard Java extract-local edits;110 waits for the initial
+local source publication for workspace symbols. Both use existing LSP paths.
 Release103 adds Java nominal parameterized-reference erasure;105 shares archive
 checks only within one source-preparation batch. Neither adds opcodes or relaxes
 quota/deadline/readguards. Release106 retains already-indexed library bodies
@@ -74,6 +76,62 @@ when that selection is unproven. Callable parameter facts are optional knowledge
 an omitted or unsupported list does not establish a zero-parameter callable.
 
 ## Follow-up acceptance checkpoints
+
+### Native binding/error boundary and original editor acceptance
+
+The stable full local check passes1,935 functions/83 targets, docs/build, all
+2,604 original case locators,2,748 replacement references and five editor entries.
+Summary: `build/rust-test-logs/20261105-162550220/native-summary.json`, SHA256
+`189530dc717fec0204e78d8f38faaeff78046b5bc3109a39bceeda196d9875c5`.
+Frozen MC SHA256 is
+`6bc773849f0eeabb6c9e766fdf88b0591558ad26847d1890dd835a5231acdd10`;
+tested source patch SHA256 is
+`508b9f0844d498072d5e5fa95c49a3072d9363c732375b496204b53950d68756`.
+The previous published CI41978109198 tests commit9e93f7a with1,928 Windows and
+1,927 Linux functions; it does not establish CI success for these newer changes.
+
+MC now counts positively resolved Mixin type-literal bindings. Its outer IPC
+execution boundary preserves typed domain failures raised before dispatch;
+unknown panics still produce bounded worker diagnostics. The exact Kotlin
+Placement parser regression passes: parsing was not the escaped panic's cause.
+The health report restores `extension build commit:`. A native port of one
+JDT-object observation checks actual host facts instead of inventing JDT objects;
+`build/jdtls-native-semantic-mapping-20261105.json` records the correspondence.
+Affected editor checks pass after the label/test changes; the Rust full check
+above precedes those two Lua-only changes.
+
+With host110 and frozen MC6bc, the selected original Java entry passes all53
+observed assertions, native extract-local edit application and original clean
+shutdown. Receipt:
+`build/rust-test-logs/host110-mc6bc7-java-lifecycle-20261105/recovery-and-run-receipt.json`
+(SHA256 `3faee7cba1e0430d2daa1350d5e5703c4bc1153d798099b1d0b56fa9ccd589af`).
+The previous selected launcher bypassed original lifecycle teardown; its timeout
+was a harness failure after successful semantic assertions. Both original and
+corrected receipts remain. The separate Placement entry is not covered.
+
+The full Fabric entry is running with the native observation port. Loom's
+readiness-adapted entry reaches indexed/project/library readiness and accepted
+`mcdev.definition`, then fails `INCOMPLETE_PROJECT_CONTEXT`: annotation reference
+alias has no positive same-view identity. Its single actual run and proof are in
+`C:/tmp/mc-e110-6bc7-loom-ready2`; owned processes remaining:0.
+
+Kotlin Placement's captured wire DTOs establish a normal Type75:21 with Found
+binary name but MissingFacts ABI/class flags/coverage. The selected physical
+Ponder catalog entry has the same opaque input origin; physical uniqueness alone
+does not grant semantic authority. The host task is connecting verified selected
+binary inputs to the existing `typeJvm` operation, preserving scope/origin/epoch
+guards. Raw DTOs: `build/ponder-facts-capture-20261105/raw-selected-facts.json`,
+SHA256 `df416b30cc57e8c9957774ecb63ae850bc52b59a14d6f2c8edf6921ae255da8f`.
+The corrected evidence JSON preserves its original separately.
+
+Real Sodium is materialized (receipt
+`build/real-sodium-profile-20261105/materialization-final-receipt.json`, SHA256
+`c5932b122bc9b7a8e5f16e82e471adec2a599cc7538f3ebb5d39f6b079aa27a1`).
+Its original entry fails indexing readiness:31 Gradle imports self-cancel on
+generated `gradle-home/.tmp/.../ktlsp-classpath.init.gradle.kts` watcher events.
+The host task reproduced that cancellation chain and is fixing watcher scope.
+No dependency download, larger deadline or new API is required. Full editor
+replacement remains unverified while these concrete original workflows fail.
 
 ### Command-aware navigation response encoding
 
