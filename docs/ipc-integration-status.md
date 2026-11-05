@@ -75,6 +75,35 @@ an omitted or unsupported list does not establish a zero-parameter callable.
 
 ## Follow-up acceptance checkpoints
 
+### Command-aware navigation response encoding
+
+MC9eb6 exposes a second local serialization regression: info advertises
+definition/reference capabilities, so capability-based response selection tries
+to deserialize it as a definition and fails with `missing field locations`.
+The single original Java run stops at common preflight (evaluation20,
+child-32602, outer-32603/CommandFailed); Kotlin is correctly not repeated.
+The owned tree is stopped at180 seconds with zero remaining processes. Its
+receipt is `build/rust-test-logs/host108-mc9eb6-java-20261105/recovery-and-run-receipt.json`.
+The successful native/package CI for that commit does not establish live
+command acceptance.
+
+The corrected encoder selects by the validated `Command`, never the advertised
+capability set. Info and other responses retain their generic shape; only actual
+definition/reference commands use the typed protocol adapter. Focused checks
+pass135 legacy replays,14 core commands,8 IPC command tests and5 IPC unit tests,
+including info advertising both navigation capabilities. The stable complete
+check passes1,928 functions/83 targets, docs/build, all2,604 case locators and
+five editor entries. Full summary:
+`build/rust-test-logs/20261105-145737264/native-summary.json`.
+Frozen MC SHA256:
+`e4a362c372645f17244347b11af29be3d42f6046e82e86e4bd3429cbf8550e1a`.
+The original Java/Kotlin entries have a new unchanged180-second run each.
+The build-only launcher now propagates an uncaught Lua error as exit1; a
+controlled throw exits in2.8 seconds instead of waiting for the deadline. The
+original test bodies/assertions and product runtime are byte-identical. A
+separate original full fabric-basic entry is being prepared with existing fixed
+inputs; it is not another old component-only acceptance replay.
+
 ### Navigation JSON contract correction
 
 The complete check first rejected applying protocol serialization inside the

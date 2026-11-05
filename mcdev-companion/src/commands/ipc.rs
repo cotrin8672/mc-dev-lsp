@@ -171,10 +171,13 @@ fn validated_command(
     }))
 }
 
-fn encode_envelope(value: &McdevResponseEnvelope<Value>) -> Result<Value, FactsError> {
-    let encoded = if value.capabilities.contains("definition") {
+fn encode_envelope(
+    value: &McdevResponseEnvelope<Value>,
+    command: Option<Command>,
+) -> Result<Value, FactsError> {
+    let encoded = if command == Some(Command::Definition) {
         encode_navigation_envelope::<McdevDefinitionResponse>(value)
-    } else if value.capabilities.contains("references") {
+    } else if command == Some(Command::References) {
         encode_navigation_envelope::<McdevReferencesResponse>(value)
     } else {
         ProtocolPayloadDecoder
@@ -199,7 +202,7 @@ where
 }
 
 fn domain_failure(error: McdevError) -> Result<Value, FactsError> {
-    encode_envelope(&McdevResponseEnvelope::failure(error))
+    encode_envelope(&McdevResponseEnvelope::failure(error), None)
 }
 
 fn source_error(error: FactsError) -> HostSourceError {
@@ -227,15 +230,18 @@ fn execute_inner(
     };
     let protocol_version = validated.decoded.context().protocol_version;
     if protocol_version != mcdev_protocol::PROTOCOL_VERSION {
-        return encode_envelope(&mcdev_protocol::protocol_mismatch(protocol_version));
+        return encode_envelope(&mcdev_protocol::protocol_mismatch(protocol_version), None);
     }
     if let DecodedCommand::CodeAction(request) = &validated.decoded {
         if super::runtime::is_kotlin(&request.context) {
             facts.check_active()?;
-            return encode_envelope(&McdevResponseEnvelope::success(
-                serde_json::json!({"actions": []}),
-                ["codeAction".to_owned()],
-            ));
+            return encode_envelope(
+                &McdevResponseEnvelope::success(
+                    serde_json::json!({"actions": []}),
+                    ["codeAction".to_owned()],
+                ),
+                Some(Command::CodeAction),
+            );
         }
     }
     if let DecodedCommand::Completion(request) = &validated.decoded {
@@ -247,7 +253,7 @@ fn execute_inner(
             })?
         {
             facts.check_active()?;
-            return encode_envelope(&response);
+            return encode_envelope(&response, Some(Command::Completion));
         }
     }
     if let DecodedCommand::Definition(request) = &validated.decoded {
@@ -266,10 +272,10 @@ fn execute_inner(
                     FactsError::Protocol(format!("invalid definition response: {error}"))
                 })?;
                 facts.check_active()?;
-                return encode_envelope(&McdevResponseEnvelope::success(
-                    result,
-                    ["definition".to_owned()],
-                ));
+                return encode_envelope(
+                    &McdevResponseEnvelope::success(result, ["definition".to_owned()]),
+                    Some(Command::Definition),
+                );
             }
         }
     }
@@ -422,6 +428,7 @@ fn execute_inner(
         .collect::<Vec<_>>();
     let dispatcher = CommandDispatcher::for_evaluation(Arc::new(host), &commands, project_complete)
         .with_discovery_coverage(config_complete, references_complete);
+    let command = validated.decoded.command();
     let envelope = dispatcher
         .execute_decoded(
             validated.decoded,
@@ -434,7 +441,7 @@ fn execute_inner(
             CommandFailure::Runtime(error) => FactsError::Protocol(error),
         })?;
     facts.check_active()?;
-    encode_envelope(&envelope)
+    encode_envelope(&envelope, Some(command))
 }
 
 /// Preserve the domain error envelope while propagating transport cancellation/staleness.
@@ -551,12 +558,31 @@ mod tests {
                 }),
                 [capability.to_owned()],
             );
-            let encoded = encode_envelope(&envelope).unwrap();
+            let command = if capability == "definition" {
+                Command::Definition
+            } else {
+                Command::References
+            };
+            let encoded = encode_envelope(&envelope, Some(command)).unwrap();
             assert_eq!(encoded["result"]["locations"][0]["resolution"], "source");
             assert_eq!(
                 encoded["result"]["locations"][1]["resolution"],
                 "unresolved"
             );
         }
+    }
+
+    #[test]
+    fn info_capabilities_do_not_select_navigation_wire_shape() {
+        let envelope = McdevResponseEnvelope::success(
+            json!({"lines": []}),
+            [
+                "info".to_owned(),
+                "definition".to_owned(),
+                "references".to_owned(),
+            ],
+        );
+        let encoded = encode_envelope(&envelope, Some(Command::Info)).unwrap();
+        assert_eq!(encoded["result"]["lines"], json!([]));
     }
 }

@@ -63462,7 +63462,7 @@
     },
     "resumedIntegration": {
       "date": "2026-11-05",
-      "status": "native1927-and-editor5-passed; internal-API-and-external-navigation-wire-contract-corrected; original-host108-new-pair-in-progress",
+      "status": "native1928-and-editor5-passed; actual-command-wire-routing-fixed; original-e4a3-pair-and-full-fabric-basic-pending",
       "hostPin": "5d5059a5868d6e2a3f249d9acbc0b8c4899396cb",
       "hostReceipt": "build/host-artifacts/candidate108-e12eb95f8b0e/main-ready.json",
       "hostSerializerFixture": "mcdev-companion/tests/fixtures/host_inputs/root_files/actual-serializer-sample.json",
@@ -64659,8 +64659,86 @@
           "sha256": "dae17727ada1696cc0b6984a550b8fedbae1a1321f19b84ad72874a79adc38c3"
         },
         "originalPairPassed": false,
-        "ciStatus": "pending source push",
+        "ciStatus": "passed native/editor/package; live info regression observed separately",
         "hostApiGuardQuotaDeadlineChanged": false,
+        "wholeMigrationVerified": false,
+        "ci": {
+          "status": "passed",
+          "commit": "26a55d693636048aa9d1b94dcc20b2beb3e53059",
+          "url": "https://github.com/cotrin8672/mc-dev-lsp/actions/runs/41975752604",
+          "proof": {
+            "path": "build/rust-test-logs/ci-26a55d6/ci-summary.json",
+            "sha256": "123980d17b608f52be129e62cfc3d41e19d55f17ebdc14c72f45036aee6c7a2f"
+          },
+          "windowsFunctions": 1927,
+          "linuxFunctions": 1926
+        }
+      },
+      "originalHost108Mc9eb6": {
+        "javaReceipt": {
+          "path": "build/rust-test-logs/host108-mc9eb6-java-20261105/recovery-and-run-receipt.json",
+          "sha256": "8754a094a2ffe84aad145b0046fb32e722fdfca08780b55fde1c284278e399cd"
+        },
+        "failure": "Common mcdev.info preflight: invalid command response: missing field locations",
+        "childCode": -32602,
+        "outerCode": -32603,
+        "providerCommandReason": "CommandFailed",
+        "evaluation": 20,
+        "observedOriginalAssertions": 3,
+        "semanticAssertionsReached": false,
+        "kotlinRun": false,
+        "kotlinSkipReason": "Common preflight failure; no duplicate run",
+        "outerDeadlineSeconds": 180,
+        "ownedProcessesRemaining": 0,
+        "newHostRequirement": false,
+        "fullOriginalEntryPassed": false
+      },
+      "commandAwareWireSerialization": {
+        "status": "implemented; full native/editor passed; new original Java/Kotlin pair running; original full fabric-basic preparation running",
+        "fullCheck": {
+          "path": "build/rust-test-logs/20261105-145737264/native-summary.json",
+          "sha256": "1d3eb1aaa727d59ac698de44e95dafaf515dff12868500e9d7cafafc139ca13c"
+        },
+        "nativeFunctions": 1928,
+        "nativeTargets": 83,
+        "editorEntries": 5,
+        "originalCaseLocators": 2604,
+        "replacementReferences": 2748,
+        "focusedChecks": {
+          "legacyCommands": 135,
+          "coreCommands": 14,
+          "ipcCommands": 8,
+          "ipcUnit": 5
+        },
+        "testedFiles": [
+          {
+            "path": "mcdev-companion/src/commands/ipc.rs",
+            "sha256": "9f17f78b9068876eb9abc0d58ccbbd8870fc9ee30b1e050621bd445ac0ced9cb"
+          }
+        ],
+        "artifact": {
+          "path": "build/companion-artifacts/native-navigation-command-e4a362c37264/receipt.json",
+          "sha256": "d6444dabf839211ac432cd351c65cd9f9b97acaea8fc638a4bdacd39fd02fc1c"
+        },
+        "binarySha256": "e4a362c372645f17244347b11af29be3d42f6046e82e86e4bd3429cbf8550e1a",
+        "sourcePatchSha256": "7cced4cb7bdbbafafafa39a86f2417dcc5d385783d0e4ae40db71de7c0332bb7",
+        "encoderSelection": "Actual validated Command; advertised capability names never select the response DTO.",
+        "selection": {
+          "path": "build/navigation-command-routing-acceptance-20261105/selection-manifest.json",
+          "sha256": "9b9962d08149dfef200a1ce84fdf3c63088b55f73cd7c09019c98beb8cb165dd"
+        },
+        "launcher": "Same selected original dofile wrapped in pcall; cquit1 propagates uncaught terminal errors; no test body/assertion changes.",
+        "controlledFailure": {
+          "path": "build/navigation-command-routing-acceptance-20261105/build/controlled-lua-throw-logs/summary.txt",
+          "sha256": "9c562fc0b9a99eefa1f3cc845fbe18fdd7f989557fdbd1b44d0b98a161c97e3c"
+        },
+        "controlledFailureExitCode": 1,
+        "controlledFailureTimedOut": false,
+        "controlledFailureSeconds": 2.8,
+        "originalSourceAssertionsChanged": false,
+        "hostApiGuardsQuotaDeadlineChanged": false,
+        "originalPairPassed": false,
+        "ciStatus": "pending source push",
         "wholeMigrationVerified": false
       }
     }

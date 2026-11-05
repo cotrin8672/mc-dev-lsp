@@ -10,7 +10,7 @@ Kotlin subprocess can count as a completed Rust port. The current published-host
 connection work and concrete input differences are tracked in
 [the IPC integration checkpoint](ipc-integration-status.md).
 
-The latest 2026-11-05 full check passes 1,927 native functions across 83
+The latest 2026-11-05 full check passes 1,928 native functions across 83
 targets and verifies all 2,604 original case locators, doc tests, the executable
 and five independent editor entries. Published host93 and the fixed companion
 also pass 1,065 checks across 25 live cases, including positive results for all
@@ -39,15 +39,18 @@ Kotlin reaches MC's own 64-batch guard. The current local fixes reuse only
 validated positive type facts within one evaluation and retry only a read-only
 definition once on the exact host Stale error, provided its client, provider and
 document context remain unchanged. The guards and limits are unchanged.
-The 1,927-function full check and five editor entries pass. The previous real-host
+The 1,928-function full check and five editor entries pass. The previous real-host
 runs verify Java's fresh-request definition and Kotlin completion, diagnostics,
 hover and definition. Both then stop at the same local wire mismatch: the
 definition resolution is serialized as `SOURCE` instead of legacy `source`.
 Java passes 12 of 13 observed assertions; Kotlin passes 84 of 85. This is a
 consumer serialization fix, with original assertions unchanged. The IPC boundary
-now uses typed navigation envelopes and the existing protocol adapter, preserving
-uppercase internal API values and lowercase wire values. All 135 legacy command
-replays pass; new frozen MC9eb6 original-entry runs are in progress. Original AW/AT
+now uses the actual validated command to select typed navigation envelopes and
+the existing protocol adapter, preserving uppercase internal API values and
+lowercase wire values. An earlier attempt selected by advertised capabilities
+and incorrectly parsed info as a definition; its real preflight failure is
+retained. All 135 legacy command replays and info/IPC regressions pass; new frozen
+MCe4a3 original-entry runs are in progress. Original AW/AT
 and remaining complete editor workflows are still unverified. Full replacement
 is not verified; dated records retain historical failures and their exact pins.
 
