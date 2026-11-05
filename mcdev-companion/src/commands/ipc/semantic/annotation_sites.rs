@@ -27,6 +27,43 @@ pub(super) fn collect_value_refs(argument: &Argument, refs: &mut BTreeSet<String
 }
 
 impl SiteFacts {
+    /// A recovered declaration can omit a complete annotation list while the
+    /// host still supplies a positive, source-scoped `@Mixin` site.  Use that
+    /// site only when one class header contains it; otherwise ownership stays
+    /// unavailable rather than being inferred from spelling or coverage.
+    pub(super) fn current_mixin_owner<'a>(
+        &self,
+        declarations: &'a [Declaration],
+        identities: &BTreeMap<String, Fact<TypeFact>>,
+    ) -> Option<(&'a Declaration, &Annotation)> {
+        let mut owner = None;
+        for annotation in &self.ownerless {
+            let Some(identity) = identities.get(&annotation.type_ref).and_then(Fact::found) else {
+                continue;
+            };
+            if MixinAnnotation::from_official_fqn(&identity.qualified_name)
+                != Some(MixinAnnotation::Mixin)
+            {
+                continue;
+            }
+            let candidates = declarations
+                .iter()
+                .filter(|declaration| {
+                    declaration.source_kind.as_deref() == Some("Class")
+                        && declaration
+                            .header_range
+                            .as_ref()
+                            .is_some_and(|header| contains(header, &annotation.range))
+                })
+                .collect::<Vec<_>>();
+            if candidates.len() != 1 || owner.is_some() {
+                return None;
+            }
+            owner = Some((candidates[0], annotation));
+        }
+        owner
+    }
+
     pub(super) fn allow_source_kotlin_fallback(
         &self,
         source: &str,

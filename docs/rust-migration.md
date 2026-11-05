@@ -10,7 +10,7 @@ Kotlin subprocess can count as a completed Rust port. The current published-host
 connection work and concrete input differences are tracked in
 [the IPC integration checkpoint](ipc-integration-status.md).
 
-The latest 2026-11-05 full check passes 1,935 native functions across 83
+The latest 2026-11-05 full check passes 1,937 native functions across 83
 targets and verifies all 2,604 original case locators, doc tests, the executable
 and five independent editor entries. Published host93 and the fixed companion
 also pass 1,065 checks across 25 live cases, including positive results for all
@@ -40,11 +40,20 @@ the native extract-local WorkspaceEdit and original clean lifecycle teardown.
 It does not cover the separate Placement entry.
 
 The latest full proof is
-`build/rust-test-logs/20261105-162550220/native-summary.json`: 1,935 functions,
+`build/rust-test-logs/20261105-180933757/native-summary.json`: 1,937 functions,
 83 targets, all 2,604 original case locators and 2,748 replacement references,
 docs/build and five editor entries. Typed failures raised during IPC setup now
 retain their domain error; unexpected worker panic diagnostics remain bounded.
-Mixin binding counts include positively resolved type-literal targets.
+Mixin binding counts include positively resolved type-literal targets. A
+recovered declaration may omit `@Mixin` while accepted annotation sites retain
+its positive official identity. The current owner can now use that site only
+inside one matching Class header; outside or ambiguous headers remain Unknown.
+This fixes the first Fabric failure at65 original assertions. A new whole
+Fabric run verifies the correction; its result is pending.
+Published CI41996124186 verifies the preceding checkpoint on Windows (1,935 functions)
+and Linux (1,934), including all original case locators, editor checks, both
+24-file optimized packages and their stdio smoke checks. CI for the later
+owner-site correction is pending.
 
 One original test observation was specific to actual JDT CompilationUnit and
 JavaProject objects. Its native port checks their truthful absence together with
@@ -54,15 +63,27 @@ fallback in the same response. The mapping is recorded in
 the protected original checkout are preserved. The health build-commit label is
 also restored. Affected editor tests pass after these two later Lua changes.
 
-Full Fabric acceptance is running. Loom reaches accepted command readiness but
+Full Fabric acceptance is running with its previously verified JDK setting.
+An intervening run selected a different, uncached JDK source archive and stopped
+before command readiness. Loom reaches accepted command readiness but
 fails definition on an annotation alias without positive same-view identity;
-that concrete failure is under local investigation. Kotlin Placement exposes a
+its binary-only annotation TypeRefs are Unknown. Whether the pending host binary
+hydration correction also fixes this resolution path requires an actual run.
+Kotlin Placement exposes a
 verified producer gap connecting an already selected binary type to existing
 `typeJvm` ABI facts. Real Sodium inputs are materialized, but host110 cancels
 its own Gradle import on generated-script watcher events; the host task is
 fixing that existing path. Original AW/AT and remaining complete editor workflows
 are still unverified. Full replacement is not verified; dated records retain
 historical failures and their exact pins.
+
+The finite original whole-editor gates are `fabric-basic`, `fabric-mixinextras`
+(including expression and sugar), `fabric-aw-at`, `multi-source-set`,
+`forge-basic`, standalone Loom, the Java/Placement/Kotlin Create chain,
+`real-sodium` and `real-cem`. Component proofs do not replace these whole entries.
+Java's selected entry has passed; the remaining gates still require complete
+success receipts. No additional functional entry was found in the original
+27-file editor/support inventory.
 
 ## Authoritative baseline
 
@@ -187,6 +208,10 @@ source-member navigation and reuses complete root-file discovery for workspace
 resources without changing their scope or completeness requirements.
 
 ## Work and acceptance record
+
+The table retains the native-domain implementation checkpoints. Current host
+pins, actual editor results and remaining whole-entry gates are recorded above
+and in [the integration checkpoint](ipc-integration-status.md).
 
 | Area | Current state | Required evidence |
 | --- | --- | --- |

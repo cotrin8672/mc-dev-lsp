@@ -77,6 +77,30 @@ an omitted or unsupported list does not establish a zero-parameter callable.
 
 ## Follow-up acceptance checkpoints
 
+### Recovered current Mixin owner from accepted annotation sites
+
+The Fabric Corretto run reaches65 original assertions before partial `@Inject`
+input makes declaration annotations omit `@Mixin`. The accepted annotation-site
+inventory still contains its positive official type identity and exact range.
+MC now recovers the current owner only when that source-scoped site lies inside
+one Class header. Unknown/foreign identities, stale footprints, outside headers
+and multiple matching headers do not gain authority. Thirteen focused annotation
+site tests pass, including positive recovery and a two-case rejection table.
+
+The stable full check passes1,937 functions/83 targets, all2,604 case locators
+and2,748 references, docs/build and five editor entries. Summary:
+`build/rust-test-logs/20261105-180933757/native-summary.json`, SHA256
+`7648a0bc224b876c07d8e9ff920f32ca56a397afb225f38d163e8f52b9280247`.
+Frozen MC SHA256:
+`05f950ec78d9956fb3f3e5a5200ce68cab3a781aa07035b91acfcadb5a2908ef`
+(18,109,440 bytes); source patch:
+`eea7771a8944a11b58261ae5065eb5804ffb537e4c8eafb9a95e373241ca7ba3`.
+Full source snapshots are equal and editor logs are retained within this run.
+One new full Fabric entry uses that binary and the same verified host110/JDK
+configuration. The original remaining fixture matrix, CEM, Extras expression/
+sugar and Create full chain have prepared immutable launch manifests; preparation
+is not acceptance. The host's combined112/113 build remains pending.
+
 ### Native binding/error boundary and original editor acceptance
 
 The stable full local check passes1,935 functions/83 targets, docs/build, all
@@ -87,8 +111,11 @@ Frozen MC SHA256 is
 `6bc773849f0eeabb6c9e766fdf88b0591558ad26847d1890dd835a5231acdd10`;
 tested source patch SHA256 is
 `508b9f0844d498072d5e5fa95c49a3072d9363c732375b496204b53950d68756`.
-The previous published CI41978109198 tests commit9e93f7a with1,928 Windows and
-1,927 Linux functions; it does not establish CI success for these newer changes.
+Published CI41996124186 tests commit0c990cf with1,935 Windows and1,934 Linux
+functions/83 targets, all original locators, five editor entries per platform,
+24-file optimized packages and stdio smoke checks. Its downloaded-artifact proof
+is `build/rust-test-logs/ci-0c990cf/ci-summary.json`, SHA256
+`3b951c3f57155dbbefc272973895904f0fdccd1a2cde7d9497bf5908372f75b3`.
 
 MC now counts positively resolved Mixin type-literal bindings. Its outer IPC
 execution boundary preserves typed domain failures raised before dispatch;
@@ -109,11 +136,26 @@ The previous selected launcher bypassed original lifecycle teardown; its timeout
 was a harness failure after successful semantic assertions. Both original and
 corrected receipts remain. The separate Placement entry is not covered.
 
-The full Fabric entry is running with the native observation port. Loom's
+The full Fabric native-port attempt stops before commands: its unintended JDK
+change selects an uncached source archive, whose indexing never completes.
+Fixture/source/classpath/library inputs match the previous run; watcher
+cancellation is absent. A single corrected run restores the previously verified
+Corretto21.0.7 configuration. It finishes indexing and reaches65 original
+assertions in30.4 seconds. Health/native fact checks pass; `@Inject` debug context
+then fails because annotation coverage does not establish the current Mixin
+owner. This local prerequisite is under investigation; AW/AT and later deep
+scenarios are not reached. Receipt:
+`build/fabric-basic-acceptance-20261105-e110-native-port-corretto/acceptance-receipt.json`.
+Earlier readiness evidence:
+`build/fabric-basic-acceptance-20261105-e110-native-port/readiness-failure-evidence.json`.
+Loom's
 readiness-adapted entry reaches indexed/project/library readiness and accepted
 `mcdev.definition`, then fails `INCOMPLETE_PROJECT_CONTEXT`: annotation reference
 alias has no positive same-view identity. Its single actual run and proof are in
-`C:/tmp/mc-e110-6bc7-loom-ready2`; owned processes remaining:0.
+`C:/tmp/mc-e110-6bc7-loom-ready2`; owned processes remaining:0. Its Mixin/Inject
+TypeRefs are Unknown for binary-only annotation inputs. The host correction
+connects selected ABI to already resolved ordinary types; improvement of this
+separate TypeRef resolution path remains unproven. MC identity checks are unchanged.
 
 Kotlin Placement's captured wire DTOs establish a normal Type75:21 with Found
 binary name but MissingFacts ABI/class flags/coverage. The selected physical

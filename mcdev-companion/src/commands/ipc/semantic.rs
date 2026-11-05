@@ -391,6 +391,13 @@ impl HostSemanticProvider {
                 }
             }
         }
+        if owners.is_empty() && self.source_facts_v2 && selected.is_none() {
+            if let Some(sites) = sites.as_ref() {
+                if let Some(owner) = sites.current_mixin_owner(&e.declarations, &identities) {
+                    owners.push(owner);
+                }
+            }
+        }
         if owners.is_empty() && self.source_facts_v2 {
             if partial_annotations
                 || sites.is_some() && self.annotation_completion_position.is_some()

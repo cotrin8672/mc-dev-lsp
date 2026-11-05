@@ -481,6 +481,53 @@ fn exact_d7_positive_site_completes_under_unknown_coverage_without_a_handler_or_
 }
 
 #[test]
+fn recovered_class_annotation_uses_one_scoped_mixin_site_as_current_owner() {
+    let mut host = Host::new();
+    host.declarations[0]["annotations"] = json!([]);
+    host.sites["annotations"][0]["owner"] = Value::Null;
+    host.sites["annotations"][0]["arguments"][0]["value"]["value"]["typeRef"] = json!("ref-item");
+    let result = parse(&provider(Arc::new(host), true, Some(position()))).unwrap();
+    let HostFact::Known(result) = result.fact else {
+        panic!("positive current Mixin site did not recover the class owner")
+    };
+    let selectors = result.model.host_selector_completions.unwrap();
+    assert_eq!(selectors.injectors.len(), 1);
+    assert_eq!(selectors.injectors[0].method_selectors[0].value, "is");
+    assert!(matches!(selectors.coverage, HostFact::Unavailable { .. }));
+}
+
+#[test]
+fn ownerless_mixin_recovery_requires_one_matching_class_header() {
+    for ambiguous in [false, true] {
+        let mut host = Host::new();
+        host.declarations[0]["annotations"] = json!([]);
+        host.declarations[0]["headerRange"] = if ambiguous {
+            host.declarations[0]["headerRange"].clone()
+        } else {
+            span("ItemMixin")
+        };
+        host.sites["annotations"][0]["owner"] = Value::Null;
+        host.sites["annotations"][0]["arguments"][0]["value"]["value"]["typeRef"] =
+            json!("ref-item");
+        if ambiguous {
+            let mut duplicate = host.declarations[0].clone();
+            duplicate["id"] = json!("class-duplicate");
+            host.declarations.as_array_mut().unwrap().push(duplicate);
+        }
+        let host = Arc::new(host);
+        let answer = parse(&provider(host.clone(), true, Some(position()))).unwrap();
+        assert!(
+            matches!(answer.fact, HostFact::Unavailable { ref reason } if reason.contains("current Mixin owner")),
+            "ambiguous={ambiguous}: {answer:?}"
+        );
+        let queries = host.queries.lock().unwrap();
+        assert!(!queries
+            .iter()
+            .any(|query| matches!(query["op"].as_str(), Some("declarationType" | "typeJvm"))));
+    }
+}
+
+#[test]
 fn complete_coverage_can_supply_the_same_selector_without_declaration_ownership() {
     let mut host = Host::new();
     host.sites["coverage"] = found(Value::Null);
