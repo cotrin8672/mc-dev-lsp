@@ -27,6 +27,124 @@ pub(super) fn collect_value_refs(argument: &Argument, refs: &mut BTreeSet<String
 }
 
 impl SiteFacts {
+    /// Recover only a current Java annotation completion when the host cannot
+    /// produce a declaration header for the unfinished buffer.  The site,
+    /// target identity, lexical owner and cursor context all remain required.
+    pub(super) fn supports_partial_java_completion(
+        &self,
+        source: &str,
+        imports: &JavaSourceImports,
+        position: McTextPosition,
+        identities: &BTreeMap<String, Fact<TypeFact>>,
+        index: &dyn mcdev_core::model::ClassIndex,
+    ) -> bool {
+        if self.facts.coverage.found().is_some() || imports.is_kotlin {
+            return false;
+        }
+        let Some(offset) = position_to_offset(source, position) else {
+            return false;
+        };
+        let Some(context) = AnnotationContextExtractor::extract_at_offset(source, offset) else {
+            return false;
+        };
+        if context.is_kotlin {
+            return false;
+        }
+        let Some(scope) = AnnotationContextExtractor::resolve_mixin_class_scope(source, offset)
+        else {
+            return false;
+        };
+        if scope.raw_targets.len() != 1 {
+            return false;
+        }
+        let lexical_mixins = annotations_with_imports(source, imports)
+            .into_iter()
+            .filter(|site| site.annotation == MixinAnnotation::Mixin)
+            .collect::<Vec<_>>();
+        if lexical_mixins.len() != 1 {
+            return false;
+        }
+        let mixin_sites = self
+            .ownerless
+            .iter()
+            .filter(|annotation| {
+                identities
+                    .get(&annotation.type_ref)
+                    .and_then(Fact::found)
+                    .is_some_and(|ty| {
+                        MixinAnnotation::from_official_fqn(&ty.qualified_name)
+                            == Some(MixinAnnotation::Mixin)
+                    })
+            })
+            .collect::<Vec<_>>();
+        let [mixin] = mixin_sites.as_slice() else {
+            return false;
+        };
+        let lexical_mixin = &lexical_mixins[0];
+        if mixin.range
+            != (ByteRange {
+                start: lexical_mixin.start,
+                end: lexical_mixin.end,
+            })
+        {
+            return false;
+        }
+        let Some(mixin_type) = identities.get(&mixin.type_ref).and_then(Fact::found) else {
+            return false;
+        };
+        if mixin_type.read_only
+            || mixin_type.context_source.is_some()
+            || MixinAnnotation::from_official_fqn(&mixin_type.qualified_name)
+                != Some(MixinAnnotation::Mixin)
+        {
+            return false;
+        }
+        let [argument] = mixin.arguments.as_slice() else {
+            return false;
+        };
+        let Fact::Found {
+            value: AnnotationValue::Class { type_ref },
+        } = &argument.value
+        else {
+            return false;
+        };
+        let Some(target_type) = identities.get(type_ref).and_then(Fact::found) else {
+            return false;
+        };
+        if target_type.read_only || target_type.context_source.is_some() {
+            return false;
+        }
+        let Some(target_entry) = index.find_class_by_fqn(&target_type.qualified_name) else {
+            return false;
+        };
+        let values = mcdev_core::mixin_source::annotation_values_with_imports(
+            source,
+            lexical_mixin,
+            "value",
+            imports,
+        );
+        let [value] = values.as_slice() else {
+            return false;
+        };
+        if value.start != argument.range.start || value.end != argument.range.end {
+            return false;
+        }
+        let raw = value
+            .decoded
+            .as_ref()
+            .map_or(value.value.as_str(), |decoded| decoded.value.as_str())
+            .trim_end_matches(".class")
+            .trim_end_matches("::class");
+        if scope.raw_targets[0] != raw {
+            return false;
+        }
+        let Some(source_target) = MixinTargetResolver::resolve_target(raw, index, Some(imports))
+        else {
+            return false;
+        };
+        source_target == target_entry.internal_name
+    }
+
     /// A recovered declaration can omit a complete annotation list while the
     /// host still supplies a positive, source-scoped `@Mixin` site.  Use that
     /// site only when one class header contains it; otherwise ownership stays
@@ -279,5 +397,222 @@ impl HostSemanticProvider {
             }
         }
         Ok(false)
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use crate::host_facts::inputs::InputIdentity;
+    use mcdev_core::mixin_source::AnnotationSlot;
+    use mcdev_core::model::{ClassIndex, ClassIndexEntry, FieldIndexEntry, MethodIndexEntry};
+    use serde_json::json;
+    use sha2::{Digest, Sha256};
+
+    const SOURCE: &str = "package com.example.mixin;\r\n\r\nimport com.example.target.SimpleTarget;\r\nimport org.spongepowered.asm.mixin.Mixin;\r\nimport org.spongepowered.asm.mixin.injection.At;\r\nimport org.spongepowered.asm.mixin.injection.Inject;\r\nimport org.spongepowered.asm.mixin.injection.callback.CallbackInfo;\r\n\r\n@Mixin(SimpleTarget.class)\r\npublic abstract class ExampleMixin {\r\n    @Inject(method = \"\r\n    private void mcdev$onDraw(CallbackInfo ci) {}\r\n}\r\n";
+    const URI: &str = "file:///C:/Users/gummy/build/e2e-workspace/src/main/java/com/example/mixin/ExampleMixin.java";
+
+    struct Index {
+        target: bool,
+    }
+
+    impl ClassIndex for Index {
+        fn find_classes(&self, _: &str, _: usize) -> Vec<ClassIndexEntry> {
+            Vec::new()
+        }
+
+        fn find_class(&self, internal_name: &str) -> Option<ClassIndexEntry> {
+            (self.target && internal_name == "com/example/target/SimpleTarget").then(|| {
+                ClassIndexEntry {
+                    internal_name: internal_name.into(),
+                    simple_name: "SimpleTarget".into(),
+                    package_name: "com.example.target".into(),
+                }
+            })
+        }
+
+        fn find_class_by_fqn(&self, fqn: &str) -> Option<ClassIndexEntry> {
+            (self.target && fqn == "com.example.target.SimpleTarget").then(|| ClassIndexEntry {
+                internal_name: "com/example/target/SimpleTarget".into(),
+                simple_name: "SimpleTarget".into(),
+                package_name: "com.example.target".into(),
+            })
+        }
+
+        fn get_methods(&self, _: &str) -> Vec<MethodIndexEntry> {
+            Vec::new()
+        }
+
+        fn get_fields(&self, _: &str) -> Vec<FieldIndexEntry> {
+            Vec::new()
+        }
+    }
+
+    fn found(value: Value) -> Value {
+        json!({"state":"found","value":value})
+    }
+
+    fn span(text: &str, needle: &str) -> Value {
+        let start = text.find(needle).unwrap();
+        json!({"start":start,"end":start + needle.len()})
+    }
+
+    fn site() -> (AnnotationSites, Annotation) {
+        let mixin = json!({
+            "owner": null,
+            "typeRef": "52:6",
+            "useSiteTarget": null,
+            "range": span(SOURCE, "@Mixin(SimpleTarget.class)"),
+            "nameRange": {"start": SOURCE.find("Mixin").unwrap(), "end": SOURCE.find("Mixin").unwrap() + 5},
+            "arguments": [{
+                "name": null,
+                "range": span(SOURCE, "SimpleTarget.class"),
+                "value": found(json!({"kind":"class","typeRef":"52:7"}))
+            }]
+        });
+        let sites = serde_json::from_value(json!({
+            "source": {
+                "documentUri": found(json!(URI)),
+                "identity": {"kind":"source","revision":"660"},
+                "sha256": format!("{:x}", Sha256::digest(SOURCE.as_bytes()))
+            },
+            "annotations": [mixin.clone()],
+            "coverage": {"state":"unknown","reasons":[{"code":"UnsupportedSource"}]}
+        }))
+        .unwrap();
+        (sites, serde_json::from_value(mixin).unwrap())
+    }
+
+    fn type_fact(id: &str, qualified_name: &str) -> Fact<TypeFact> {
+        Fact::Found {
+            value: TypeFact {
+                id: id.into(),
+                qualified_name: qualified_name.into(),
+                package: qualified_name
+                    .rsplit_once('.')
+                    .map_or_else(String::new, |(p, _)| p.into()),
+                read_only: false,
+                context_source: None,
+            },
+        }
+    }
+
+    fn candidate() -> (SiteFacts, BTreeMap<String, Fact<TypeFact>>, McTextPosition) {
+        let (facts, mixin) = site();
+        let mut identities = BTreeMap::new();
+        identities.insert(
+            "52:6".into(),
+            type_fact("mixin", "org.spongepowered.asm.mixin.Mixin"),
+        );
+        identities.insert(
+            "52:7".into(),
+            type_fact("target", "com.example.target.SimpleTarget"),
+        );
+        let position = offset_to_position(
+            SOURCE,
+            SOURCE.find("method = \"").unwrap() + "method = \"".len(),
+        )
+        .unwrap();
+        (
+            SiteFacts {
+                facts,
+                ownerless: vec![mixin],
+            },
+            identities,
+            position,
+        )
+    }
+
+    #[test]
+    fn exact_fabric_partial_source_wire_requires_positive_site_target_index_and_cursor() {
+        let at_source = SOURCE.replacen(
+            "    @Inject(method = \"\r\n",
+            "    @Inject(method = \"draw\", at = @At(target = \"\r\n",
+            1,
+        );
+        let at_cursor = at_source.find("target = \"").unwrap() + "target = \"".len();
+        let at_context = AnnotationContextExtractor::extract_at_offset(&at_source, at_cursor)
+            .expect("core parser recognizes unfinished @At(target=...)");
+        assert_eq!(at_context.annotation, MixinAnnotation::At);
+        assert_eq!(at_context.slot, AnnotationSlot::Target);
+
+        let (sites, identities, position) = candidate();
+        let imports = JavaTypeDescriptorResolver::imports_for_uri(SOURCE, URI);
+        assert!(sites.supports_partial_java_completion(
+            SOURCE,
+            &imports,
+            position,
+            &identities,
+            &Index { target: true },
+        ));
+
+        let mut unresolved = identities.clone();
+        unresolved.insert("52:7".into(), Fact::Unknown { reasons: vec![] });
+        assert!(!sites.supports_partial_java_completion(
+            SOURCE,
+            &imports,
+            position,
+            &unresolved,
+            &Index { target: true },
+        ));
+
+        assert!(!sites.supports_partial_java_completion(
+            SOURCE,
+            &imports,
+            position,
+            &identities,
+            &Index { target: false },
+        ));
+        assert!(!sites.supports_partial_java_completion(
+            SOURCE,
+            &imports,
+            McTextPosition {
+                line: 0,
+                character: 0
+            },
+            &identities,
+            &Index { target: true },
+        ));
+
+        let (foreign_facts, foreign_mixin) = site();
+        let mut foreign_identities = identities;
+        foreign_identities.insert(
+            "52:6".into(),
+            Fact::Found {
+                value: TypeFact {
+                    id: "foreign-mixin".into(),
+                    qualified_name: "org.spongepowered.asm.mixin.Mixin".into(),
+                    package: "org.spongepowered.asm.mixin".into(),
+                    read_only: true,
+                    context_source: Some(SourceDescriptor {
+                        id: "foreign-source".into(),
+                        display_path: "/foreign/ExampleMixin.java".into(),
+                        document_uri: Fact::Found {
+                            value: "file:///foreign/ExampleMixin.java".into(),
+                        },
+                        language_id: "java".into(),
+                        identity: InputIdentity {
+                            kind: "source".into(),
+                            revision: "foreign".into(),
+                        },
+                        document_version: None,
+                        owner_scope: None,
+                        memberships: None,
+                        editable: None,
+                    }),
+                },
+            },
+        );
+        assert!(!SiteFacts {
+            facts: foreign_facts,
+            ownerless: vec![foreign_mixin]
+        }
+        .supports_partial_java_completion(
+            SOURCE,
+            &imports,
+            position,
+            &foreign_identities,
+            &Index { target: true },
+        ));
     }
 }

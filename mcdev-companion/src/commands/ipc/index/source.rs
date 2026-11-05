@@ -24,6 +24,143 @@ mod tests {
     fn unknown_fact() -> Value {
         json!({"state":"unknown","reasons":[{"code":"MissingFacts"}]})
     }
+
+    fn captured_simple_target_editing() -> Value {
+        // Actual host113 source response, simpletarget-jvm-facts.json SHA-256
+        // 88817b2d4440eddef451cbb23863c7ae0a2f7df46e04e4cf5eea5ab6e0a6959e.
+        let rows = [
+            (
+                "29:43", "counter", "field", "29:44", "I", "instance", "Private",
+            ),
+            (
+                "29:45",
+                "draw",
+                "method",
+                "29:46",
+                "(Ljava/lang/String;FF)V",
+                "instance",
+                "Public",
+            ),
+            (
+                "29:47", "touch", "method", "29:48", "()V", "instance", "Public",
+            ),
+            (
+                "29:49", "draw", "method", "29:50", "(I)V", "instance", "Public",
+            ),
+            (
+                "29:51", "compute", "method", "29:52", "()I", "instance", "Public",
+            ),
+            (
+                "29:53",
+                "staticMethod",
+                "method",
+                "29:54",
+                "()V",
+                "static",
+                "Public",
+            ),
+        ];
+        let members = rows
+            .into_iter()
+            .map(
+                |(id, name, kind, signature, descriptor, dispatch, visibility)| {
+                    json!({"id":id,"name":name,"kind":kind,
+                "signature":found(json!({"id":signature,"kind":kind,"descriptor":descriptor})),
+                "dispatch":found(json!(dispatch)),"visibility":found(json!(visibility)),
+                "synthetic":found(json!(false)),"mismatches":[]})
+                },
+            )
+            .collect::<Vec<_>>();
+        json!({"binaryName":found(json!({"internalName":"com/example/target/SimpleTarget",
+                "descriptor":"Lcom/example/target/SimpleTarget;"})),
+            "classFlags":unknown_fact(),"abi":unknown_fact(),"jvmAbiCoverage":unknown_fact(),
+            "declaredMembers":{"coverage":{"state":"unknown","reasons":[{"code":"IncompleteTarget"}]},"members":members}})
+    }
+
+    #[test]
+    fn unknown_source_coverage_retains_all_captured_positive_members() {
+        let observed: TypeJvm = serde_json::from_value(captured_simple_target_editing()).unwrap();
+        let view = editing_view(&observed).unwrap();
+        let methods = view.methods.unwrap();
+        assert_eq!(
+            methods
+                .iter()
+                .map(|m| (m.name.as_str(), m.descriptor.as_str(), m.is_static))
+                .collect::<Vec<_>>(),
+            [
+                ("draw", "(Ljava/lang/String;FF)V", false),
+                ("touch", "()V", false),
+                ("draw", "(I)V", false),
+                ("compute", "()I", false),
+                ("staticMethod", "()V", true),
+            ]
+        );
+        let fields = view.fields.unwrap();
+        assert_eq!(fields.len(), 1);
+        assert_eq!(
+            (
+                &*fields[0].name,
+                &*fields[0].descriptor,
+                fields[0].is_static
+            ),
+            ("counter", "I", false)
+        );
+        assert!(matches!(
+            observed.declared_members.coverage,
+            Fact::Unknown { .. }
+        ));
+        assert!(matches!(observed.jvm_abi_coverage, Fact::Unknown { .. }));
+        assert!(matches!(observed.abi, Fact::Unknown { .. }));
+    }
+
+    #[test]
+    fn unknown_source_member_rows_do_not_erase_positive_siblings_in_either_order() {
+        let expected =
+            editing_view(&serde_json::from_value(captured_simple_target_editing()).unwrap())
+                .unwrap();
+        for kind in ["method", "field"] {
+            for first in [true, false] {
+                let mut value = captured_simple_target_editing();
+                let unknown = json!({"id":"unknown:member","name":"unknown","kind":kind,
+                    "signature":unknown_fact(),"dispatch":found(json!("instance")),
+                    "visibility":unknown_fact(),"synthetic":unknown_fact(),"mismatches":[]});
+                let members = value["declaredMembers"]["members"].as_array_mut().unwrap();
+                if first {
+                    members.insert(0, unknown);
+                } else {
+                    members.push(unknown);
+                }
+                let view = editing_view(&serde_json::from_value(value).unwrap()).unwrap();
+                assert_eq!(view.methods, expected.methods);
+                assert_eq!(view.fields, expected.fields);
+            }
+        }
+    }
+
+    #[test]
+    fn source_enumeration_with_zero_positive_evidence_stays_unknown() {
+        let mut value = captured_simple_target_editing();
+        value["declaredMembers"]["members"] = json!([]);
+        let view = editing_view(&serde_json::from_value(value.clone()).unwrap()).unwrap();
+        assert!(view.methods.is_none());
+        assert!(view.fields.is_none());
+        value["declaredMembers"]["coverage"] = found(Value::Null);
+        let view = editing_view(&serde_json::from_value(value.clone()).unwrap()).unwrap();
+        assert_eq!(view.methods, Some(vec![]));
+        assert_eq!(view.fields, Some(vec![]));
+        for kind in ["method", "field"] {
+            value["declaredMembers"]["members"]
+                .as_array_mut()
+                .unwrap()
+                .push(json!({
+                "id":format!("unknown:{kind}"),"name":"unknown","kind":kind,
+                "signature":unknown_fact(),"dispatch":unknown_fact(),
+                "visibility":unknown_fact(),"synthetic":unknown_fact(),"mismatches":[]}));
+        }
+        let view = editing_view(&serde_json::from_value(value).unwrap()).unwrap();
+        assert!(view.methods.is_none());
+        assert!(view.fields.is_none());
+    }
     fn abi() -> Value {
         json!({"identity":{"originId":"compile:dep","internalName":"demo/Dep","contentSha256":"a".repeat(64)},
         "majorVersion":61,"minorVersion":0,"accessFlags":33,"superName":"java/lang/Object","interfaces":[],

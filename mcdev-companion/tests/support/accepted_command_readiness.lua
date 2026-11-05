@@ -7,7 +7,7 @@ function M.start(options)
     acceptance = acceptance_module.start(assert(options.trace), 'mcdev.mixin'),
     tracked = {}, records = {}, timeout = options.timeout or 60000,
     proof = { mode = 'real-host', provider = 'mcdev.mixin', fixture = options.fixture or 'real-cem', scopePassed = false,
-      indexing = { project = false, libraries = false }, acceptances = {}, commands = {},
+      indexing = { project = false, libraries = false, projectReady = false, wholeIndexReady = false }, acceptances = {}, commands = {},
       completions = {}, preflight = {}, originalAssertions = {}, shutdown = {} },
   }
   local frames = options.proof .. '.frames.jsonl'
@@ -25,14 +25,17 @@ function M.start(options)
   function state:log_message(message)
     if message:match('^ktlsp indexed %d+ project files') then self.proof.indexing.project = true end
     if message:match('^ktlsp indexed %d+ library files') then self.proof.indexing.libraries = true end
+    self.proof.indexing.wholeIndexReady = self.proof.indexing.project and self.proof.indexing.libraries
   end
   function state:wait_indexed()
-    local ready = vim.wait(180000, function()
-      return self.proof.indexing.project and self.proof.indexing.libraries
+    local project_ready = vim.wait(180000, function()
+      return self.proof.indexing.project
     end, 25)
-    self.proof.indexing.ready = ready
+    self.proof.indexing.projectReady = project_ready
+    self.proof.indexing.wholeIndexReady = self.proof.indexing.project and self.proof.indexing.libraries
+    self.proof.indexing.ready = project_ready
     self:save()
-    if not ready then self:fail('host indexing did not finish within 180s') end
+    if not project_ready then self:fail('host project indexing did not finish within 180s') end
   end
   function state:track(bufnr)
     if self.tracked[bufnr] then return end

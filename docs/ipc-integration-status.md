@@ -29,7 +29,7 @@ candidate101 and published host102.
 ## Published contract
 
 The current integration pin is ktlsp
-[`b04f13bba142d40c764622252aa4b9a328099710`](https://github.com/cotrin8672/ktlsp/blob/b04f13bba142d40c764622252aa4b9a328099710/docs/architecture/extension-ipc.md).
+[`8ea5de1b65acbf396474f1ac2b225f7da2d9ca8f`](https://github.com/cotrin8672/ktlsp/blob/8ea5de1b65acbf396474f1ac2b225f7da2d9ca8f/docs/architecture/extension-ipc.md).
 It adds normalized authored facts, owning-project input records, exact source
 locations and typed binary declaration annotations to source snapshots, owned
 resources, selected runtime bytes, the physical JVM catalog and provider
@@ -37,15 +37,20 @@ commands. The companion negotiates capabilities and individual operations;
 binary annotations are selected by capability alone. Configured command IDs
 are intersected with the implemented domain routes.
 
-The copied published release113 host has SHA-256
-04ce9199ce8c2cce7f9bb642942623c63b98ebb166b4ef0817aa916e580442f9
-and 25,593,344 bytes. Its code commit is the independently checked public pin
+The copied published release115 host has SHA-256
+814daeb5dd260ae7ad32370dc8308e0d9f5071ba26ba484868ff8e6deaa2982d
+and 25,599,488 bytes. Its code commit is the independently checked public pin
 above, published on `codex/java-kotlin-analysis`.
-The copy receipt is build/host-artifacts/candidate113-04ce9199ce8c/copy-receipt.json.
+The copy receipt is build/host-artifacts/candidate115-814daeb5dd26/copy-receipt.json.
 Release109 adds standard Java extract-local edits;110 waits for the initial
 local source publication for workspace symbols. Both use existing LSP paths.
 Release112 filters operational Gradle watcher events;113 connects checked
 selected binary ABI to normal stub types without adding source authority.
+Release114 records selected Maven archive fingerprints before notifications;
+115 includes selected class directories in nominal binary inputs. Its current
+directory slice handles top-level Java classes; nested owner grouping remains
+unsupported. Source/unsaved shadows and physical content/membership guards stay
+in force, without granting source authority to bytecode.
 Release103 adds Java nominal parameterized-reference erasure;105 shares archive
 checks only within one source-preparation batch. Neither adds opcodes or relaxes
 quota/deadline/readguards. Release106 retains already-indexed library bodies
@@ -78,6 +83,40 @@ when that selection is unproven. Callable parameter facts are optional knowledge
 an omitted or unsupported list does not establish a zero-parameter callable.
 
 ## Follow-up acceptance checkpoints
+
+### Original source-query and startup behavior restored
+
+The original JDT source query returns individually resolved members with
+`mapNotNull`, retaining positive rows when another declaration is incomplete.
+The Rust adapter now does the same instead of discarding every positive member
+when whole-class coverage is Unknown. Fact/handle/descriptor/source-view checks
+remain, and zero positive evidence is not converted into a complete empty list.
+No host source-completeness API was added; the proposed extra producer work was
+cancelled.
+
+Java partial annotation input now reuses the existing source parser and scoped
+target index when accepted annotation facts establish its Mixin/target identities.
+The same existing source-only injector path handles invalid Java handler syntax,
+such as the original Extras fixture's `void original` parameter, which cannot
+have a valid JVM member signature. Source fallback remains explicitly Low
+confidence; it is not labelled as fully normalized compiler semantics.
+
+The native test harness had additionally required every background library to
+finish indexing. The protected original waits for client initialization. The
+extra library gate is removed: project import and existing accepted-command
+preflight still gate execution, with the same180s bound and original functional
+assertions. Actual library completion and whole-index readiness remain recorded.
+
+The stable full check passes1,941 functions/83 targets, all2,604 original locators
+and2,748 references, docs/build and five editor entries. Summary:
+`build/rust-test-logs/20261105-194547668/native-summary.json`, SHA256
+`6e24b28439d267358cca2ad984cb342fd16bed81ea6c7297867bf901d7d86d88`.
+Frozen MC SHA256:
+`989771639978d2da8942cdafedc6400fef97e42812329ea8ec5ebe835f93e96b`
+(18,121,728 bytes); tested source patch SHA256:
+`9c789e0a8fa7098a433ddad22a9cee3cf2750165e567d9fc72a7f77063224336`.
+The seven outstanding original whole entries are being checked once against
+this binary and published host115. This checkpoint does not claim their success.
 
 ### Actual whole-entry results on published host113
 

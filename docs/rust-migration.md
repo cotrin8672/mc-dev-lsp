@@ -10,7 +10,7 @@ Kotlin subprocess can count as a completed Rust port. The current published-host
 connection work and concrete input differences are tracked in
 [the IPC integration checkpoint](ipc-integration-status.md).
 
-The latest 2026-11-05 full check passes 1,937 native functions across 83
+The latest 2026-11-05 full check passes 1,941 native functions across 83
 targets and verifies all 2,604 original case locators, doc tests, the executable
 and five independent editor entries. Published host93 and the fixed companion
 also pass 1,065 checks across 25 live cases, including positive results for all
@@ -40,7 +40,7 @@ the native extract-local WorkspaceEdit and original clean lifecycle teardown.
 It does not cover the separate Placement entry.
 
 The latest full proof is
-`build/rust-test-logs/20261105-180933757/native-summary.json`: 1,937 functions,
+`build/rust-test-logs/20261105-194547668/native-summary.json`: 1,941 functions,
 83 targets, all 2,604 original case locators and 2,748 replacement references,
 docs/build and five editor entries. Typed failures raised during IPC setup now
 retain their domain error; unexpected worker panic diagnostics remain bounded.

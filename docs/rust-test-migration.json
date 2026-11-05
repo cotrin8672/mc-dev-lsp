@@ -63464,8 +63464,8 @@
     "resumedIntegration": {
       "date": "2026-11-05",
       "status": "native-and-distribution-CI-passed; original-Create-and-CEM-whole-entries-passed; seven-whole-editor-gates-incomplete",
-      "hostPin": "b04f13bba142d40c764622252aa4b9a328099710",
-      "hostReceipt": "build/host-artifacts/candidate113-04ce9199ce8c/copy-receipt.json",
+      "hostPin": "8ea5de1b65acbf396474f1ac2b225f7da2d9ca8f",
+      "hostReceipt": "build/host-artifacts/candidate115-814daeb5dd26/copy-receipt.json",
       "hostSerializerFixture": "mcdev-companion/tests/fixtures/host_inputs/root_files/actual-serializer-sample.json",
       "nativePipeline": "build/rust-test-logs/native-pipeline-proof-20261105-011949083",
       "optimizedPackage": {
@@ -64877,37 +64877,27 @@
         }
       ],
       "currentNative": {
-        "functions": 1937,
+        "functions": 1941,
         "targets": 83,
         "editorEntries": 5,
         "originalCases": 2604,
         "replacementReferences": 2748,
-        "summary": "build/rust-test-logs/20261105-180933757/native-summary.json",
-        "sha256": "7648a0bc224b876c07d8e9ff920f32ca56a397afb225f38d163e8f52b9280247",
-        "binary": "build/companion-artifacts/native-owner-site-05f950ec78d9/mcdev-companion.exe",
-        "binarySha256": "05f950ec78d9956fb3f3e5a5200ce68cab3a781aa07035b91acfcadb5a2908ef",
-        "binaryBytes": 18109440,
-        "sourcePatchSha256": "eea7771a8944a11b58261ae5065eb5804ffb537e4c8eafb9a95e373241ca7ba3",
+        "summary": "build/rust-test-logs/20261105-194547668/native-summary.json",
+        "sha256": "6e24b28439d267358cca2ad984cb342fd16bed81ea6c7297867bf901d7d86d88",
+        "binary": "build/companion-artifacts/native-minimal-adapter-989771639978/mcdev-companion.exe",
+        "binarySha256": "989771639978d2da8942cdafedc6400fef97e42812329ea8ec5ebe835f93e96b",
+        "binaryBytes": 18121728,
+        "sourcePatchSha256": "9c789e0a8fa7098a433ddad22a9cee3cf2750165e567d9fc72a7f77063224336",
         "sourceInputsStable": true,
-        "sourceFingerprint": "237532b063f7178726e97f879f57b14081f3f79a2c9462eb00b89e4fa867717e",
-        "focusedAnnotationSiteTests": 13,
-        "currentOwnerRecovery": "Positive official source-scoped Mixin site inside one Class header; unknown/foreign/stale/outside/ambiguous rejected",
-        "fabricWholeRun": "failed at65 assertions with same current-owner coverage error; actual failing DTO capture in progress, synthetic recovery alone did not fix production",
-        "ci": {
-          "status": "passed",
-          "commit": "3debf0da339389507533189eb6e0c6ead91be86c",
-          "run": 42001106053,
-          "windowsFunctions": 1937,
-          "linuxFunctions": 1936,
-          "targetsPerPlatform": 83,
-          "originalCases": 2604,
-          "replacementReferences": 2748,
-          "editorEntriesPerPlatform": 5,
-          "payloadFilesPerPlatform": 24,
-          "optimizedStdioSmokePassed": true,
-          "summary": "build/rust-test-logs/ci-3debf0d/ci-summary.json",
-          "sha256": "cebbd4bc5b2cb17ed3a9212b8c26c35488d560ca4a90e8fc76e6e01ffc965f83"
-        },
+        "sourceFingerprint": "c2337af271a574e77f359eedba4512a90feb4ffed527383da9678b4969104aeb",
+        "compatibilityCorrections": [
+          "Retain validated positive source members with the original mapNotNull behavior",
+          "Reuse existing source-only injector parser for Java invalid/partial syntax without own-handler JVM identities",
+          "Remove the added all-library startup gate absent from original JDT tests; retain project and accepted-command readiness"
+        ],
+        "cancelledExtraFoundationWork": "host116 source closed-set coverage certification",
+        "wholeEntries": "seven remaining entries running once on host115/currentMC; Create and CEM retain scoped whole-entry passes",
+        "ci": "pending current source push",
         "wholeMigrationVerified": false
       },
       "latestOriginalWholeEntries": {
@@ -64998,8 +64988,29 @@
         "sodium": {
           "status": "whole-entry-incomplete",
           "qualifiedHostProbe": "model/source installation accepted and generated init script notifications no longer trigger refresh; library readiness and shutdown still fail",
-          "hostDiagnosis": "selected cached Maven JAR change starts another refresh; saved-trace diagnosis pending"
+          "hostDiagnosis": "selected cached Maven JAR change starts another refresh; saved-trace diagnosis pending",
+          "host114WholeAttempt": {
+            "status": "failed-before-commands",
+            "project": true,
+            "libraries": false,
+            "originalAssertions": 0,
+            "ownedProcessesAfter": 0,
+            "receipt": "build/rust-test-logs/real-sodium-whole-entry-e114-mc05f-20261105/recovery-and-run-receipt.json",
+            "sha256": "95a0ceed4c90e8b8439d40c791cd6872911173018fc7237642a182416c07bd86",
+            "savedTraceDiagnosis": "No refreshloop; dependency indexing still progressed at188s. Added all-library gate was stricter than original startup behavior."
+          }
         }
+      },
+      "previousPublishedCi": {
+        "commit": "7119ff7836eb29bde253ea1ea5ffe79e430ff5b0",
+        "run": 42005256293,
+        "summary": "build/rust-test-logs/ci-7119ff7/ci-summary.json",
+        "sha256": "15ba21a6450d29a11f3c0e3fb67c8d5f7e329e928f887e54e133701d23efbc15",
+        "windows": 1937,
+        "linux": 1936,
+        "allOriginalCasesPassed": true,
+        "editorEntries": 5,
+        "verifiedPackageFilesPerPlatform": 24
       }
     }
   }

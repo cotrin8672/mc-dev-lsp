@@ -29,13 +29,13 @@ use mcdev_core::{
         HostSourceResult, HostTypeFact, SemanticAvailability,
     },
     mixin_source::{
-        annotations_with_imports, parse_member_declaration, AtSelectorModel, InjectorKind,
-        InjectorModel, JavaModifier, JavaSourceImports, JavaTypeDescriptorResolver, JavaTypeKind,
-        MethodSelector, MixinAnnotation, MixinMemberAnnotationKind, MixinMemberDeclarationParser,
-        MixinSemanticModelParser, MixinTargetRef, MixinTargetResolver, ParseConfidence,
-        ParseSource, SemanticParseDebugInfo,
+        annotations_with_imports, parse_member_declaration, AnnotationContextExtractor,
+        AtSelectorModel, InjectorKind, InjectorModel, JavaModifier, JavaSourceImports,
+        JavaTypeDescriptorResolver, JavaTypeKind, MethodSelector, MixinAnnotation,
+        MixinMemberAnnotationKind, MixinMemberDeclarationParser, MixinSemanticModelParser,
+        MixinTargetRef, MixinTargetResolver, ParseConfidence, ParseSource, SemanticParseDebugInfo,
     },
-    offset_to_position, position_to_offset, McTextRange,
+    offset_to_position, position_to_offset, McTextPosition, McTextRange,
 };
 use serde::de::DeserializeOwned;
 use serde_json::{json, Value};
@@ -368,7 +368,7 @@ impl HostSemanticProvider {
                     .map(|sites| sites.facts.annotations.as_slice()),
             )
         {
-            return self.source_kotlin_injector_model(source, uri, started);
+            return self.source_injector_model(source, uri, started);
         }
         if let Some(sites) = &mut sites {
             sites.reconcile(
@@ -379,6 +379,25 @@ impl HostSemanticProvider {
                 &mut registry,
                 &identities,
             )?;
+        }
+        if self.source_facts_v2
+            && selected.is_none()
+            && !imports.is_kotlin
+            && e.declarations.is_empty()
+            && partial_annotations
+            && self.annotation_completion_position.is_some()
+        {
+            if let (Some(sites), Some(index)) = (sites.as_ref(), self.class_index.as_deref()) {
+                if sites.supports_partial_java_completion(
+                    source,
+                    &imports,
+                    self.annotation_completion_position.unwrap(),
+                    &identities,
+                    index,
+                ) {
+                    return self.source_injector_model(source, uri, started);
+                }
+            }
         }
         let mut owners = Vec::new();
         for declaration in &e.declarations {
@@ -481,7 +500,7 @@ impl HostSemanticProvider {
                 })
             })
             .collect::<Vec<_>>();
-        let source_only_kotlin = source_only_kotlin_injectors(&relevant, &identities);
+        let source_only_injectors = source_only_injectors(&relevant, &identities);
         let owner_fact: Fact<TypeFact> = self
             .read(&[json!({"op":"declarationType","declaration":owner.id})])?
             .pop()
@@ -568,11 +587,10 @@ impl HostSemanticProvider {
             validate_source_injector_member(&fact, declaration, source_context, &mut registry)?;
             if self.source_facts_v2
                 && selected.is_none()
-                && imports.is_kotlin
-                && source_only_kotlin
+                && source_only_injectors
                 && source_injector_member_binding_incomplete(&fact)?
             {
-                return self.source_kotlin_injector_model(source, uri, started);
+                return self.source_injector_model(source, uri, started);
             }
             let item = require_fact(fact, "authored member")?;
             let member = &item.member;
@@ -997,20 +1015,21 @@ impl HostSemanticProvider {
         Ok(result)
     }
 
-    fn source_kotlin_injector_model(
+    fn source_injector_model(
         &self,
         source: &str,
         uri: &str,
         started: std::time::Instant,
     ) -> Result<HostSemanticModel, FactsError> {
-        let index = self.class_index.as_deref().ok_or_else(|| {
-            FactsError::Unknown("Kotlin Mixin target index is unavailable".into())
-        })?;
+        let index = self
+            .class_index
+            .as_deref()
+            .ok_or_else(|| FactsError::Unknown("Mixin target index is unavailable".into()))?;
         let imports = JavaTypeDescriptorResolver::imports_for_uri(source, uri);
         let mut model = MixinSemanticModelParser::parse_with_lookup(source, uri, Some(index));
         if model.targets.is_empty() {
             return Err(FactsError::Unknown(
-                "Kotlin Mixin target syntax is unavailable".into(),
+                "Mixin target syntax is unavailable".into(),
             ));
         }
         model.targets = model
@@ -1024,8 +1043,7 @@ impl HostSemanticProvider {
                 )
                 .ok_or_else(|| {
                     FactsError::Unknown(
-                        "Kotlin Mixin target is unresolved or ambiguous in the selected project"
-                            .into(),
+                        "Mixin target is unresolved or ambiguous in the selected project".into(),
                     )
                 })?;
                 Ok(MixinTargetRef {
@@ -1034,8 +1052,7 @@ impl HostSemanticProvider {
                 })
             })
             .collect::<Result<Vec<_>, FactsError>>()?;
-        let reason =
-            "Kotlin source syntax model used; handler JVM declaration facts are not required";
+        let reason = "source syntax model used; handler JVM declaration facts are not required";
         model.parse_source = ParseSource::HandWrittenFallback;
         model.confidence = ParseConfidence::Low;
         model.warnings.push(reason.into());
@@ -1358,7 +1375,7 @@ fn kotlin_annotation_argument_type_binding_matches(
     }
 }
 
-fn source_only_kotlin_injectors(
+fn source_only_injectors(
     declarations: &[&Declaration],
     identities: &BTreeMap<String, Fact<TypeFact>>,
 ) -> bool {
@@ -2264,7 +2281,7 @@ class DrillMixin {
     }
 
     #[test]
-    fn source_only_kotlin_injectors_accepts_wrap_operation() {
+    fn source_only_injectors_accepts_wrap_operation() {
         let declaration = Declaration {
             id: "method-declaration".into(),
             owner: Some("class-declaration".into()),
@@ -2299,7 +2316,7 @@ class DrillMixin {
                 },
             },
         );
-        assert!(source_only_kotlin_injectors(&[&declaration], &identities));
+        assert!(source_only_injectors(&[&declaration], &identities));
     }
 
     #[test]
@@ -2338,7 +2355,7 @@ class DrillMixin {
                 matches!(
                     &answer,
                     HostFact::Unavailable { reason }
-                        if reason.contains("Kotlin Mixin target")
+                        if reason.contains("Mixin target")
                 ),
                 "unexpected answer: {answer:?}"
             );

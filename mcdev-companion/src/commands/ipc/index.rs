@@ -1196,8 +1196,13 @@ fn editing_view(observed: &TypeJvm) -> Result<EditingView, FactsError> {
                     })
                     .transpose()?;
                 if signature.is_none() || dispatch.is_none() || !editing.mismatches.is_empty() {
-                    methods = None;
-                } else if let Some(values) = &mut methods {
+                    // Legacy source queries retain resolved siblings with mapNotNull.
+                    // Without any positive row, incomplete input stays unavailable.
+                    if methods.as_ref().is_some_and(Vec::is_empty) {
+                        methods = None;
+                    }
+                } else {
+                    let values = methods.get_or_insert_with(Vec::new);
                     let signature = signature.expect("signature was checked");
                     let parsed = parsed.expect("descriptor was checked");
                     values.push(MethodIndexEntry {
@@ -1221,8 +1226,11 @@ fn editing_view(observed: &TypeJvm) -> Result<EditingView, FactsError> {
                     })
                     .transpose()?;
                 if signature.is_none() || dispatch.is_none() || !editing.mismatches.is_empty() {
-                    fields = None;
-                } else if let Some(values) = &mut fields {
+                    if fields.as_ref().is_some_and(Vec::is_empty) {
+                        fields = None;
+                    }
+                } else {
+                    let values = fields.get_or_insert_with(Vec::new);
                     let signature = signature.expect("signature was checked");
                     let parsed = parsed.expect("descriptor was checked");
                     values.push(FieldIndexEntry {
