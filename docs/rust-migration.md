@@ -155,13 +155,13 @@ all identities and runtime ABI coverage agree. Exact source member locations ret
 their separate checks. Unknown source provenance cannot justify a new runtime
 fallback. This does not add Kotlin annotation normalization, compiler recipe
 features or a second MC parser. Host release108 publishes the operation and its
-actual serializer samples. The MC consumer passes 1,923 native functions/83
+actual serializer samples. The MC consumer passes 1,922 native functions/83
 targets and five editor entries, including the unchanged actual serializer
 samples and real runtime class bytes. Original live editor acceptance remains
 pending. Live evidence already confirms two Kotlin source-parser completions;
 the follow-up removes an unnecessary complete-inventory prerequisite from exact
-source-member navigation and batches resource inventory pages without changing
-their scope or completeness requirements.
+source-member navigation and reuses complete root-file discovery for workspace
+resources without changing their scope or completeness requirements.
 
 ## Work and acceptance record
 

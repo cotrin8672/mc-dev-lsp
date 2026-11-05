@@ -694,11 +694,45 @@ fn selected_project_inner<R: FactReader>(
             }
         }
     }
+    // A complete root-file scan covers the same workspace-relative config and
+    // mapping paths retained by `required_resource`.  Owned project inputs
+    // already provide the source/resource roots, so use that scan before
+    // requesting the much larger per-scope resource inventory.  Keep the
+    // inventory fallback for legacy/no-model evaluations and incomplete roots.
+    let mut root_discovery_needs = needs;
+    if owned_model.is_some() && needs.resources {
+        // `required_resource` also retains mapping files; capture that domain
+        // even for commands whose public mapping domain is not requested.
+        root_discovery_needs.mappings = true;
+    }
+    let mut root_inputs = if let Some(model) = &owned_model {
+        Some(roots::discover(
+            inputs,
+            workspace_root,
+            &model.source_sets,
+            root_discovery_needs,
+        )?)
+    } else {
+        None
+    };
+    let use_root_resources = needs.resources
+        && root_inputs
+            .as_ref()
+            .is_some_and(|root| root.resources.complete && root.mappings.complete);
+    if !needs.mappings {
+        if let Some(root) = root_inputs.as_mut() {
+            root.mappings.complete = false;
+        }
+    }
+
     let mut resources_complete = true;
     let mut entries = Vec::new();
-    if needs.resources {
-        let inventories = inputs.resource_inventories(&scopes)?;
-        for (project_scope, resources) in scopes.iter().copied().zip(inventories) {
+    if needs.resources && !use_root_resources {
+        for project_scope in scopes.iter() {
+            let resources = match project_scope {
+                Some(scope) => inputs.resource_inventory_in(scope)?,
+                None => inputs.resource_inventory()?,
+            };
             if owned_model.is_none() {
                 coverage(
                     resources.coverage,
@@ -792,7 +826,10 @@ fn selected_project_inner<R: FactReader>(
         || vec![selected_source_set],
         |model| model.source_sets.clone(),
     );
-    let root_inputs = roots::discover(inputs, workspace_root, &source_sets, needs)?;
+    let root_inputs = match root_inputs {
+        Some(root_inputs) => root_inputs,
+        None => roots::discover(inputs, workspace_root, &source_sets, needs)?,
+    };
     if let Some(workspace) = &root_inputs.workspace {
         root = workspace.clone();
     }
@@ -1029,7 +1066,6 @@ mod tests {
     use sha2::{Digest, Sha256};
     use std::{
         collections::VecDeque,
-        sync::{Arc, Mutex},
         time::{SystemTime, UNIX_EPOCH},
     };
 
@@ -1047,20 +1083,6 @@ mod tests {
         }
     }
 
-    struct RecordingReader {
-        responses: VecDeque<Value>,
-        requests: Arc<Mutex<Vec<Vec<Value>>>>,
-    }
-
-    impl FactReader for RecordingReader {
-        fn read_facts(&mut self, evaluation: &str, queries: &[Value]) -> Result<Value, FactsError> {
-            assert_eq!(evaluation, "eval-1");
-            self.requests.lock().unwrap().push(queries.to_vec());
-            self.responses
-                .pop_front()
-                .ok_or_else(|| FactsError::Protocol("unexpected host read".into()))
-        }
-    }
     pub(super) fn found(value: Value) -> Value {
         json!({"state":"found","value":value})
     }
@@ -1263,97 +1285,14 @@ mod tests {
             ));
             bodies.push(chunk(text));
         }
-        replies.push(json!({"facts":[
-            {"resources":main_resources,"next":null,"coverage":found(json!(true))},
-            {"resources":[
-                resource("client-config", "client.mixins.json", "source", &client_path, "client", Some("client")),
-                resource("client-aw", "demo.aw", "source", &aw_path, "client", Some("client"))],
-                "next":null,"coverage":found(json!(true))}
-        ]}));
+        replies.push(json!({"facts":[{"resources":main_resources,"next":null,"coverage":found(json!(true))}]}));
+        replies.push(json!({"facts":[{"resources":[
+            resource("client-config", "client.mixins.json", "source", &client_path, "client", Some("client")),
+            resource("client-aw", "demo.aw", "source", &aw_path, "client", Some("client"))],
+            "next":null,"coverage":found(json!(true))}]}));
         bodies.extend([chunk(empty), chunk("accessWidener v2 named\n")]);
         replies.push(json!({"facts":bodies}));
         replies.into()
-    }
-
-    #[test]
-    fn resource_inventory_batches_pages_per_scope_and_preserves_contents() {
-        let root = unique_root();
-        let records = project_records(&root);
-        let project_page_1 = json!({"facts":[{"records":records[..2],
-            "next":"project-page-2", "coverage":{"state":"unknown",
-                "reasons":[{"code":"IncompleteModel"}]}}]});
-        let project_page_2 = json!({"facts":[{"records":records[2..],
-            "next":null, "coverage":found(json!({
-                "domain":crate::host_facts::inputs::PROJECT_INPUTS_DOMAIN}))}]});
-        let scoped_resource = |scope: &str, id: &str| {
-            let path = root.join(format!("src/{scope}/resources/{id}.json"));
-            let mut value = descriptor(id, &format!("{scope}/{id}.json"), "source", &path);
-            let membership = json!({"module":"gradle::|:demo","sourceSet":scope});
-            value["membershipScope"] = membership.clone();
-            value["ownerScope"] = found(membership);
-            value
-        };
-        let page = |scope: &str, id: &str, next: Option<&str>, complete: bool| {
-            json!({"resources":[scoped_resource(scope, id)],"next":next,
-            "coverage":if complete {found(json!(true))} else {
-                json!({"state":"unknown","reasons":[{"code":"Paged"}]})
-            }})
-        };
-        let requests = Arc::new(Mutex::new(Vec::new()));
-        let reader = RecordingReader {
-            responses: VecDeque::from([
-                project_page_1,
-                project_page_2,
-                json!({"facts":[
-                    page("main", "main-page-1", Some("main-page-2"), false),
-                    page("client", "client-page-1", Some("client-page-2"), false),
-                ]}),
-                json!({"facts":[
-                    page("main", "main-page-2", None, true),
-                    page("client", "client-page-2", None, true),
-                ]}),
-            ]),
-            requests: requests.clone(),
-        };
-        let operations = project_operations();
-        let mut inputs = ScopedInputs::new("eval-1", &operations, reader).unwrap();
-        let model = inputs.project_inputs().unwrap();
-        let scopes = model.source_sets.iter().map(Some).collect::<Vec<_>>();
-        let inventories = inputs.resource_inventories(&scopes).unwrap();
-
-        assert_eq!(inventories.len(), 2);
-        assert_eq!(
-            inventories
-                .iter()
-                .map(|inventory| inventory
-                    .entries
-                    .iter()
-                    .map(|entry| entry.descriptor.id.as_str())
-                    .collect::<Vec<_>>())
-                .collect::<Vec<_>>(),
-            vec![
-                vec!["main-page-1", "main-page-2"],
-                vec!["client-page-1", "client-page-2"],
-            ]
-        );
-        assert!(inventories.iter().all(|inventory| matches!(
-            &inventory.coverage,
-            Fact::Found { value } if *value == json!(true)
-        )));
-
-        let requests = requests.lock().unwrap();
-        assert_eq!(
-            requests.iter().map(Vec::len).collect::<Vec<_>>(),
-            [1, 1, 2, 2]
-        );
-        assert_eq!(requests[2][0]["scope"], "scope-main");
-        assert_eq!(requests[2][1]["scope"], "scope-client");
-        assert_eq!(requests[2][0]["after"], Value::Null);
-        assert_eq!(requests[2][1]["after"], Value::Null);
-        assert_eq!(requests[3][0]["scope"], "scope-main");
-        assert_eq!(requests[3][1]["scope"], "scope-client");
-        assert_eq!(requests[3][0]["after"], "main-page-2");
-        assert_eq!(requests[3][1]["after"], "client-page-2");
     }
 
     pub(super) fn owning_metadata(root: &Path) -> draft::ProjectContext {
@@ -1656,7 +1595,7 @@ mod tests {
                         .push(json!({"module":"gradle::included|:demo","sourceSet":"main","id":"scope-client"}));
                 }
                 "resource-module" => {
-                    replies[6]["facts"][1]["resources"][0]["membershipScope"]["module"] =
+                    replies[7]["facts"][0]["resources"][0]["membershipScope"]["module"] =
                         json!("gradle::foreign|:demo");
                 }
                 _ => unreachable!(),

@@ -276,6 +276,44 @@ The old trace's 56 resource queries do not establish 56 independent scopes or a
 seven-batch replacement; pagination and response splitting determine the actual
 reduction. Original live acceptance on this follow-up artifact is in progress.
 
+Commit `105d506` passes [CI run41963759001](https://github.com/cotrin8672/mc-dev-lsp/actions/runs/41963759001):
+1,923 Windows/1,922 Linux functions, 83 targets per platform and both editor and
+package checks. Complete downloaded logs are in `build/rust-test-logs/ci-105d506/`.
+
+The MC14b live Java run nevertheless fails in the common `mcdev.info` preflight.
+Two-query resource pages exceed the host frame size: 21 rejected batches are
+split into single requests and still consume the 64-batch evaluation budget.
+The observed 64 batches contain 43 successes and 21 failures, with 85 queries.
+The outer 180-second deadline stops the owned process tree; no owned process
+remains. Three early original assertions pass; subsequent Java assertions and
+the Kotlin run are unreached. Receipt:
+`build/rust-test-logs/host108-mc14b147-java-20261105/recovery-and-run-receipt.json`.
+
+Batching large pages alone is insufficient. The next consumer change compares
+the already supported root-file resource/mapping filters with `required_resource`:
+that consumer retains only workspace files and discards classpath/outside-root
+resources. A complete equivalent root discovery can avoid the discarded input
+volume. Scope, ownership, Unknown and original discovery/DTO behavior must stay
+intact; an unsupported or partial root operation cannot certify absence. No new
+host resource operation, larger quota or longer deadline is requested.
+
+The root-discovery follow-up implements that selection: an owned model and
+complete resource/mapping root domains are required before bypassing selected
+resource inventories. It retains the same workspace files and the model's
+source/resource roots. Unsupported, Unknown, partial/problem or incomplete
+mapping roots keep the original sequential inventory fallback. The oversized
+wave implementation and its one dedicated test were removed; original case
+rows and assertions are unchanged.
+
+The full local check passes 1,922 functions/83 targets, docs/build and five editor
+entries in `build/rust-test-logs/20261105-131440505/native-summary.json`.
+The complete-root regression observes zero resourceInventory/resourceSnapshot
+requests while preserving the original context DTO. The frozen MC is
+`build/companion-artifacts/native-root-discovery-cf91e472a5ab/`, SHA256
+cf91e472a5ab8335627f5b9a44d757f28f5cc9a39839ba73e9f7b29f3c2f6377.
+Its original live Java/Kotlin checks are in progress; the earlier failures are
+retained independently.
+
 ### 2026-11-05 original CEM and Drill acceptance
 
 The earlier native check passed 1,905 functions across 83 targets, doc tests,

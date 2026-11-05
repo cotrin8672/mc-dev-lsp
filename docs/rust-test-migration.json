@@ -63462,7 +63462,7 @@
     },
     "resumedIntegration": {
       "date": "2026-11-05",
-      "status": "parser-and-target-origin-bridge-implemented; exact-member-and-resource-pagination-followup-native1923-passed; live-original-cases-in-progress",
+      "status": "root-files-resource-selection-implemented; native1922-passed; original-live-Java-Kotlin-checks-in-progress",
       "hostPin": "5d5059a5868d6e2a3f249d9acbc0b8c4899396cb",
       "hostReceipt": "build/host-artifacts/candidate108-e12eb95f8b0e/main-ready.json",
       "hostSerializerFixture": "mcdev-companion/tests/fixtures/host_inputs/root_files/actual-serializer-sample.json",
@@ -63850,8 +63850,8 @@
         "liveExactOriginalItemSetPassed": true
       },
       "latestNativeCheck": {
-        "path": "build/rust-test-logs/20261105-123902323/native-summary.json",
-        "sha256": "669df3cf53800a944e093f961b411372a403899e58bfbbccd7b741b9a37fbbf5"
+        "path": "build/rust-test-logs/20261105-131440505/native-summary.json",
+        "sha256": "618ae5470dad56144306b3fd2834c2e59f74a86eaf3000a4aaef70794816ef46"
       },
       "originalDrillKotlinAttempt": {
         "path": "build/rust-test-logs/kotlin-drill-native-20261105/recovery-and-run-receipt.json",
@@ -63994,6 +63994,10 @@
         {
           "path": "build/rust-test-logs/20261105-113117544/native-summary.json",
           "sha256": "a3576103b01489cf28bb588d5ee6c064a45a6aa2d12fb63203e12b47b1fd729d"
+        },
+        {
+          "path": "build/rust-test-logs/20261105-123902323/native-summary.json",
+          "sha256": "669df3cf53800a944e093f961b411372a403899e58bfbbccd7b741b9a37fbbf5"
         }
       ],
       "kotlinSourceParserConnection": {
@@ -64334,6 +64338,83 @@
         "postChangeLiveBatchReductionVerified": false,
         "newHostApiOrQuotaIncrease": false,
         "originalAssertionsChanged": false,
+        "wholeMigrationVerified": false,
+        "ci": {
+          "commit": "105d506727fa4b5703f1de18f627d3bdacfdaade",
+          "status": "passed",
+          "url": "https://github.com/cotrin8672/mc-dev-lsp/actions/runs/41963759001",
+          "proof": {
+            "path": "build/rust-test-logs/ci-105d506/ci-summary.json",
+            "sha256": "0ce1d63c397387dfa708d5a66168800672ae6942d45f11c094cce33998505b3c"
+          },
+          "windowsFunctions": 1923,
+          "linuxFunctions": 1922,
+          "targetsPerPlatform": 83,
+          "originalLiveAcceptanceClaimed": false
+        }
+      },
+      "originalDrillHost108Mc14b": {
+        "receipt": {
+          "path": "build/rust-test-logs/host108-mc14b147-java-20261105/recovery-and-run-receipt.json",
+          "sha256": "54153ffa8d51a1bd3985353e5982d18db3020def128f1a84350e9899c8049637"
+        },
+        "companionSha256": "14b147b27efb290f5bceb1b1f95ff4c0e361b3759f0bdfcbcf00b97eacdd2f71",
+        "hostSha256": "e12eb95f8b0ef3cf42e6e5f0897fbbf42dcdea9d1b86364efc11f1d414612d54",
+        "phase": "common mcdev.info preflight",
+        "outerTimedOut": true,
+        "outerTimeoutSeconds": 180,
+        "ownedRootPid": 60424,
+        "ownedProcessesRemaining": 0,
+        "observedAssertions": 3,
+        "passedAssertions": 3,
+        "failedAssertions": 0,
+        "semanticAssertionsReached": false,
+        "kotlinRunExecuted": false,
+        "evaluation": 26,
+        "providerInstance": 2,
+        "childError": {
+          "code": -32602,
+          "message": "evaluation batch limit"
+        },
+        "readFactsBatches": 64,
+        "successfulBatches": 43,
+        "failedBatches": 21,
+        "queries": 85,
+        "resourceInventorySingleBatches": 41,
+        "resourceInventoryPairBatches": 21,
+        "pairFailure": "extension response batch too large; split queries",
+        "fullOriginalEntryPassed": false,
+        "sameArtifactRerun": false,
+        "followup": "Reuse existing complete equivalent root-file discovery rather than enumerating classpath resources later discarded by required_resource. Preserve fallback/Unknown/scope/DTO semantics; no host API/quota/deadline increase."
+      },
+      "rootFilesResourceBypass": {
+        "status": "implemented; full local checks passed; original live verification pending",
+        "fullCheck": {
+          "path": "build/rust-test-logs/20261105-131440505/native-summary.json",
+          "sha256": "618ae5470dad56144306b3fd2834c2e59f74a86eaf3000a4aaef70794816ef46"
+        },
+        "nativeFunctions": 1922,
+        "nativeTargets": 83,
+        "independentEditorEntries": 5,
+        "removedWaveSpecificNewTests": 1,
+        "originalCaseRowsChanged": false,
+        "artifact": {
+          "path": "build/companion-artifacts/native-root-discovery-cf91e472a5ab/receipt.json",
+          "sha256": "7454002f72a2cd19f92e938edac34b68afdddc1eeefea1e624d7217ef1798687"
+        },
+        "binarySha256": "cf91e472a5ab8335627f5b9a44d757f28f5cc9a39839ba73e9f7b29f3c2f6377",
+        "sourcePatchSha256": "da6d956fd332b8536c9950a32058e812f4b7666b5c58bb5adf8417d4ea953cb3",
+        "decision": {
+          "path": "build/rust-test-logs/root-files-resource-bypass-20261105/decision-receipt.json",
+          "sha256": "e1b89590ddcd85ad1ec9c6294d8016e1bf8824e5c22ca8f13debb700025a0737"
+        },
+        "bypassRequiresOwnedModelAndCompleteResourceMappingRoots": true,
+        "completeRootFixtureResourceInventoryRequests": 0,
+        "completeRootFixtureResourceSnapshotRequests": 0,
+        "sourceResourceRootsRemainModelDerived": true,
+        "unsupportedUnknownPartialProblemRootsRetainSequentialFallback": true,
+        "waveImplementationRemoved": true,
+        "hostApiQuotaDeadlineChanged": false,
         "wholeMigrationVerified": false
       }
     }

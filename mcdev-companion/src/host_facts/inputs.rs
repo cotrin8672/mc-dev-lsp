@@ -23,7 +23,6 @@ const MAX_TOKEN: usize = 4096;
 const MAX_CLASS_BYTES: usize = 16 * 1024 * 1024;
 const MAX_RESOURCE_BYTES: usize = 64 * 1024 * 1024;
 const MAX_CHUNK: usize = 512 * 1024;
-const RESOURCE_INVENTORY_WAVE: usize = 8;
 static NEXT_SCOPE: AtomicU64 = AtomicU64::new(1);
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord)]
@@ -773,100 +772,50 @@ impl<R: FactReader> ScopedInputs<R> {
     }
 
     pub fn resource_inventory(&mut self) -> Result<Inventory<ResourceEntry>, FactsError> {
-        self.resource_inventories(&[None])?
-            .into_iter()
-            .next()
-            .ok_or_else(|| protocol("resource inventory result is missing"))
+        self.resource_inventory_scoped(None)
     }
 
     pub fn resource_inventory_in(
         &mut self,
         scope: &ProjectSourceSet,
     ) -> Result<Inventory<ResourceEntry>, FactsError> {
-        self.resource_inventories(&[Some(scope)])?
-            .into_iter()
-            .next()
-            .ok_or_else(|| protocol("resource inventory result is missing"))
+        self.checked_project_scope(scope)?;
+        self.resource_inventory_scoped(Some(scope))
     }
 
-    pub(crate) fn resource_inventories(
+    fn resource_inventory_scoped(
         &mut self,
-        scopes: &[Option<&ProjectSourceSet>],
-    ) -> Result<Vec<Inventory<ResourceEntry>>, FactsError> {
-        for scope in scopes.iter().flatten() {
-            self.checked_project_scope(scope)?;
-        }
-        let mut entries = (0..scopes.len())
-            .map(|_| Vec::new())
-            .collect::<Vec<Vec<ResourceEntry>>>();
-        let mut after = vec![None; scopes.len()];
-        let mut seen = (0..scopes.len())
-            .map(|_| BTreeSet::new())
-            .collect::<Vec<BTreeSet<String>>>();
-        let mut issued = (0..scopes.len())
-            .map(|_| BTreeSet::new())
-            .collect::<Vec<BTreeSet<String>>>();
-        let mut coverage = (0..scopes.len())
-            .map(|_| None)
-            .collect::<Vec<Option<Fact<Value>>>>();
-        let mut pending = (0..scopes.len()).collect::<Vec<_>>();
-        while !pending.is_empty() {
-            let mut next_pending = Vec::new();
-            for wave in pending.chunks(RESOURCE_INVENTORY_WAVE) {
-                let queries = wave
-                    .iter()
-                    .map(|&index| {
-                        let mut query = json!({
-                            "op":"resourceInventory",
-                            "after":after[index].clone(),
-                        });
-                        if let Some(scope) = scopes[index] {
-                            query["scope"] = json!(scope.descriptor.id);
-                        }
-                        query
-                    })
-                    .collect::<Vec<_>>();
-                let pages = self
-                    .read(InputOp::ResourceInventory, &queries)?
-                    .into_iter()
-                    .map(decode::<ResourcePage>)
-                    .collect::<Result<Vec<_>, _>>()?;
-                if pages.len() != wave.len() {
-                    return Err(protocol("resource inventory response cardinality mismatch"));
-                }
-                for (&index, page) in wave.iter().zip(pages) {
-                    check_coverage(&page.coverage, &page.next, json!(true))?;
-                    if page.next.is_some() && page.resources.is_empty() {
-                        return Err(protocol("nonterminal resource page made no progress"));
-                    }
-                    for descriptor in page.resources {
-                        if !issued[index].insert(descriptor.id.clone()) {
-                            return Err(protocol("duplicate resource identity in inventory"));
-                        }
-                        self.validate_resource_scope(&descriptor, scopes[index])?;
-                        entries[index].push(self.resource_entry(descriptor)?);
-                    }
-                    after[index] = next_cursor(page.next, &mut seen[index])?;
-                    if after[index].is_some() {
-                        next_pending.push(index);
-                    } else {
-                        coverage[index] = Some(page.coverage);
-                    }
-                }
+        scope: Option<&ProjectSourceSet>,
+    ) -> Result<Inventory<ResourceEntry>, FactsError> {
+        let mut entries = Vec::new();
+        let mut after = None;
+        let mut seen = BTreeSet::new();
+        let mut issued = BTreeSet::new();
+        loop {
+            let mut query = json!({"op":"resourceInventory","after":after});
+            if let Some(scope) = scope {
+                query["scope"] = json!(scope.descriptor.id);
             }
-            pending = next_pending;
-        }
-        entries
-            .into_iter()
-            .zip(coverage)
-            .map(|(entries, coverage)| {
-                Ok(Inventory {
+            let page: ResourcePage = self.one(InputOp::ResourceInventory, query)?;
+            check_coverage(&page.coverage, &page.next, json!(true))?;
+            if page.next.is_some() && page.resources.is_empty() {
+                return Err(protocol("nonterminal resource page made no progress"));
+            }
+            for descriptor in page.resources {
+                if !issued.insert(descriptor.id.clone()) {
+                    return Err(protocol("duplicate resource identity in inventory"));
+                }
+                self.validate_resource_scope(&descriptor, scope)?;
+                entries.push(self.resource_entry(descriptor)?);
+            }
+            after = next_cursor(page.next, &mut seen)?;
+            if after.is_none() {
+                return Ok(Inventory {
                     entries,
-                    coverage: coverage
-                        .ok_or_else(|| protocol("resource inventory did not terminate"))?,
-                })
-            })
-            .collect()
+                    coverage: page.coverage,
+                });
+            }
+        }
     }
 
     pub fn resource_lookup(
