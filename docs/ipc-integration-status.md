@@ -75,6 +75,37 @@ an omitted or unsupported list does not establish a zero-parameter callable.
 
 ## Follow-up acceptance checkpoints
 
+### Evaluation-local type reuse and unchanged-source definition retry
+
+The host and MC tasks agreed that an unchanged-source semantic-index Stale can
+start one fresh top-level read-only definition request. The product Neovim
+adapter now does this only for `mcdev.definition` on JSON-RPC `-32801` with
+`data.providerCommandReason: Stale`. It rechecks the same client, logical
+provider/configuration, URI/root, document version, changedtick and full text.
+Cancellation, changed context, another error or the second Stale ends the
+request. Old evaluations, handles, tokens and results are never reused.
+Other commands and legacy routing have no retry. Regression coverage includes
+asynchronous cancellation and duplicate or late callbacks.
+
+The companion memoizes validated positive `resolveType`/`typeJvm` pairs only
+inside one EvaluationIndex. Unknown and absent facts remain uncached, so later
+hydration can supply Found. Cached reads still validate active evaluation.
+The existing Kotlin injector parser does not perform unused source-handler
+lookups, so no extra parser route or new host API was added.
+
+The stable full local check passes 1,926 functions/83 targets, docs, executable
+build and five independent editor entries. All 2,604 original case rows and
+2,748 replacement references resolve to passed native functions. Full logs and
+separate locator proof are in `build/rust-test-logs/20261105-140250838/`.
+Frozen MC SHA256 is
+`436e33392e26ecaf305c349176f272a0e278bcfc7adb306436c33e1688bebd9e`;
+its tested source patch is
+`2c4a55072bb4cc0dcc8b1f6bd56e0e0a1243b91d998fce7d11b1c24fd1a2864e`.
+The new original-entry selection freezes all twenty current product runtime
+files, including the actual retry implementation, while preserving the original
+Java/Kotlin entries, wrappers and assertions. Each next real-host entry has one
+180-second run; results are pending. Full replacement remains unverified.
+
 ### Resource quota fix and host103/105 follow-up
 
 The resource-fix full local check passes 1,906 functions/83 targets, docs/build and
@@ -313,6 +344,28 @@ requests while preserving the original context DTO. The frozen MC is
 cf91e472a5ab8335627f5b9a44d757f28f5cc9a39839ba73e9f7b29f3c2f6377.
 Its original live Java/Kotlin checks are in progress; the earlier failures are
 retained independently.
+
+Commit `578e9fd` passes [CI run41967097021](https://github.com/cotrin8672/mc-dev-lsp/actions/runs/41967097021):
+1,922 Windows/1,921 Linux functions, 83 targets per platform, editor and package
+checks. Full downloaded logs are under `build/rust-test-logs/ci-578e9fd/`.
+
+The CF91 live pair observes zero resourceInventory requests. Java then stops at
+definition evaluation32 with `Stale`: semantic-index125 changes to130 while the
+owner source SHA/version and provider instance stay unchanged. Eight fact reads
+succeed before that guard refuses the result. Its nine observed original
+assertions include eight passes and one failed request assertion.
+
+Kotlin again passes 52 of 53 observed assertions and both completion DTOs retain
+`HAND_WRITTEN_FALLBACK`/`usedCompilationUnit=false`. Diagnostic evaluation63 now
+gets past resource collection, then reaches the MC server's own `MAX_BATCHES`
+guard (`server.rs`, not a ktlsp quota). It records 89 successful facts-stage
+events/101 queries, including continuation requests counted separately from
+initial batches. The operation totals include resolveType35, typeJvm10 and
+jvmCatalog27. Repeated same-evaluation type lookup and unnecessary parser lookup
+are being checked before changing any limit. Hover, definition and Placement
+are still unreached. Both runs stop their owned trees at the 180-second outer
+deadline and leave no owned processes. Receipts are under
+`build/rust-test-logs/host108-mccf91-{java,kotlin}-20261105/`.
 
 ### 2026-11-05 original CEM and Drill acceptance
 

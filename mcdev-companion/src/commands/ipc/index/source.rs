@@ -40,12 +40,18 @@ mod tests {
         source_provenance: bool,
         provenance_unknown: bool,
         provenance_source_mismatch: bool,
+        resolve_type_unknown: bool,
+        resolve_type_unknown_once: Arc<AtomicBool>,
     }
     impl FactReader for Host {
         fn read_facts(&mut self, evaluation: &str, queries: &[Value]) -> Result<Value, FactsError> {
             assert_eq!(evaluation, "evaluation");
             self.calls.lock().unwrap().extend_from_slice(queries);
             let facts = queries.iter().map(|query| match query["op"].as_str().unwrap() {
+                "resolveType" if self.resolve_type_unknown_once.swap(false, Ordering::SeqCst) => {
+                    unknown_fact()
+                }
+                "resolveType" if self.resolve_type_unknown => unknown_fact(),
                 "resolveType" => found(json!({"id":format!("type:{}",query["name"].as_str().unwrap()),
                     "qualifiedName":query["name"],"package":"demo"})),
                 "typeJvm" => {
@@ -97,6 +103,16 @@ mod tests {
             }
         }
     }
+    fn source_index(host: &Host) -> EvaluationIndex<Host> {
+        let ops = InputOps::intersect(&json!({"capabilities":["source-snapshots-v1","source-facts-v2","source-locations-v1","jvm-catalog-v1"],
+            "supportedOps":{"source-snapshots-v1":["sourceInventory","sourceSnapshot"],"source-facts-v2":["sourceFacts"],
+                "source-locations-v1":["sourceLocation"],"jvm-catalog-v1":["jvmCatalog","jvmClass"]}})).unwrap();
+        let inputs = Arc::new(Mutex::new(
+            ScopedInputs::new("evaluation", &ops, host.clone()).unwrap(),
+        ));
+        EvaluationIndex::new(inputs, host.clone()).with_current_source_facts("evaluation")
+    }
+
     fn test_index(inventory_complete: bool) -> (EvaluationIndex<Host>, Host) {
         let host = Host {
             calls: Arc::new(Mutex::new(Vec::new())),
@@ -105,17 +121,10 @@ mod tests {
             source_provenance: false,
             provenance_unknown: false,
             provenance_source_mismatch: false,
+            resolve_type_unknown: false,
+            resolve_type_unknown_once: Arc::new(AtomicBool::new(false)),
         };
-        let ops = InputOps::intersect(&json!({"capabilities":["source-snapshots-v1","source-facts-v2","source-locations-v1","jvm-catalog-v1"],
-            "supportedOps":{"source-snapshots-v1":["sourceInventory","sourceSnapshot"],"source-facts-v2":["sourceFacts"],
-                "source-locations-v1":["sourceLocation"],"jvm-catalog-v1":["jvmCatalog","jvmClass"]}})).unwrap();
-        let inputs = Arc::new(Mutex::new(
-            ScopedInputs::new("evaluation", &ops, host.clone()).unwrap(),
-        ));
-        (
-            EvaluationIndex::new(inputs, host.clone()).with_current_source_facts("evaluation"),
-            host,
-        )
+        (source_index(&host), host)
     }
 
     fn provenance_index(host: &Host) -> EvaluationIndex<Host> {
@@ -165,6 +174,126 @@ mod tests {
     }
 
     #[test]
+    fn selected_type_positive_is_memoized_within_one_evaluation() {
+        let (index, host) = test_index(true);
+        assert!(index.selected_type("demo.Dep").unwrap().is_some());
+        assert!(index.selected_type("demo.Dep").unwrap().is_some());
+        let calls = host.calls.lock().unwrap();
+        assert_eq!(
+            calls
+                .iter()
+                .filter(|query| query["op"] == "resolveType")
+                .count(),
+            1
+        );
+        assert_eq!(
+            calls
+                .iter()
+                .filter(|query| query["op"] == "typeJvm")
+                .count(),
+            1
+        );
+    }
+
+    #[test]
+    fn repeated_current_class_lookup_reuses_selected_type_facts() {
+        let (index, host) = test_index(true);
+        assert_eq!(
+            index
+                .current_class_by_fqn("demo.Dep")
+                .unwrap()
+                .unwrap()
+                .internal_name,
+            "demo/Dep"
+        );
+        assert_eq!(
+            index
+                .current_class_by_fqn("demo.Dep")
+                .unwrap()
+                .unwrap()
+                .internal_name,
+            "demo/Dep"
+        );
+        let calls = host.calls.lock().unwrap();
+        assert_eq!(
+            calls
+                .iter()
+                .filter(|query| query["op"] == "resolveType")
+                .count(),
+            1
+        );
+        assert_eq!(
+            calls
+                .iter()
+                .filter(|query| query["op"] == "typeJvm")
+                .count(),
+            1
+        );
+    }
+
+    #[test]
+    fn selected_type_unknown_is_not_memoized_before_hydration() {
+        let host = Host {
+            calls: Arc::new(Mutex::new(Vec::new())),
+            active: Arc::new(AtomicBool::new(true)),
+            inventory_complete: true,
+            source_provenance: false,
+            provenance_unknown: false,
+            provenance_source_mismatch: false,
+            resolve_type_unknown: false,
+            resolve_type_unknown_once: Arc::new(AtomicBool::new(true)),
+        };
+        let index = source_index(&host);
+        assert!(index.selected_type("demo.Dep").unwrap().is_none());
+        assert!(index.selected_type("demo.Dep").unwrap().is_some());
+        let calls = host.calls.lock().unwrap();
+        assert_eq!(
+            calls
+                .iter()
+                .filter(|query| query["op"] == "resolveType")
+                .count(),
+            2
+        );
+        assert_eq!(
+            calls
+                .iter()
+                .filter(|query| query["op"] == "typeJvm")
+                .count(),
+            1
+        );
+    }
+
+    #[test]
+    fn selected_type_cache_hit_still_requires_active_evaluation_and_fresh_index_reads_again() {
+        let (first, host) = test_index(true);
+        assert!(first.selected_type("demo.Dep").unwrap().is_some());
+        host.active.store(false, Ordering::SeqCst);
+        assert!(matches!(
+            first.selected_type("demo.Dep"),
+            Err(FactsError::Cancelled(_))
+        ));
+
+        let second = source_index(&host);
+        host.active.store(true, Ordering::SeqCst);
+        assert!(second.selected_type("demo.Dep").unwrap().is_some());
+        let calls = host.calls.lock().unwrap();
+        assert_eq!(
+            calls
+                .iter()
+                .filter(|query| query["op"] == "resolveType")
+                .count(),
+            2
+        );
+        assert_eq!(
+            calls
+                .iter()
+                .filter(|query| query["op"] == "typeJvm")
+                .count(),
+            2
+        );
+    }
+
+    #[test]
     fn dependency_members_keep_the_selected_raw_abi_and_do_not_promote_source_current() {
         let (index, host) = test_index(true);
         let methods = index.methods("demo/Dep").unwrap();
@@ -201,6 +330,8 @@ mod tests {
             source_provenance: true,
             provenance_unknown: true,
             provenance_source_mismatch: false,
+            resolve_type_unknown: false,
+            resolve_type_unknown_once: Arc::new(AtomicBool::new(false)),
         };
         let index = provenance_index(&host);
         let methods = index.methods("demo/Dep").unwrap();
@@ -227,6 +358,8 @@ mod tests {
             source_provenance: true,
             provenance_unknown: false,
             provenance_source_mismatch: true,
+            resolve_type_unknown: false,
+            resolve_type_unknown_once: Arc::new(AtomicBool::new(false)),
         };
         let index = provenance_index(&host);
         assert!(matches!(
@@ -298,35 +431,48 @@ impl<R: EvaluationFactReader> EvaluationIndex<R> {
     }
 
     fn selected_type(&self, name: &str) -> Result<Option<(TypeFact, TypeJvm)>, FactsError> {
+        self.facts.check_active()?;
+        if let Some(selected) = self.cache()?.selected_types.get(name).cloned() {
+            self.facts.check_active()?;
+            return Ok(Some(selected));
+        }
         let fact: Fact<TypeFact> = self
             .semantic_read(&[json!({"op":"resolveType","name":name})])?
             .pop()
             .ok_or_else(|| protocol("missing selected type fact"))?;
         fact.validate().map_err(protocol)?;
-        let Fact::Found { value: ty } = fact else {
-            return Ok(None);
+        let selected = match fact {
+            Fact::Found { value: ty } => {
+                if ty.qualified_name.is_empty() || ty.read_only {
+                    return Err(protocol("invalid selected authored type"));
+                }
+                Registry::default()
+                    .register(&ty.id, HandleKind::Type)
+                    .map_err(protocol)?;
+                let jvm: TypeJvm = self
+                    .semantic_read(&[json!({"op":"typeJvm","target":ty.id})])?
+                    .pop()
+                    .ok_or_else(|| protocol("missing selected JVM type fact"))?;
+                jvm.binary_name.validate().map_err(protocol)?;
+                let binary = jvm
+                    .binary_name
+                    .found()
+                    .ok_or_else(|| unknown("selected JVM name is unavailable"))?;
+                if descriptor::parse_field_descriptor(&binary.descriptor).ok()
+                    != Some(JvmType::ObjectType(binary.internal_name.clone()))
+                {
+                    return Err(protocol("selected type has inconsistent JVM identity"));
+                }
+                (ty, jvm)
+            }
+            Fact::Unknown { .. } | Fact::DefinitelyAbsent => return Ok(None),
         };
-        if ty.qualified_name.is_empty() || ty.read_only {
-            return Err(protocol("invalid selected authored type"));
-        }
-        Registry::default()
-            .register(&ty.id, HandleKind::Type)
-            .map_err(protocol)?;
-        let jvm: TypeJvm = self
-            .semantic_read(&[json!({"op":"typeJvm","target":ty.id})])?
-            .pop()
-            .ok_or_else(|| protocol("missing selected JVM type fact"))?;
-        jvm.binary_name.validate().map_err(protocol)?;
-        let binary = jvm
-            .binary_name
-            .found()
-            .ok_or_else(|| unknown("selected JVM name is unavailable"))?;
-        if descriptor::parse_field_descriptor(&binary.descriptor).ok()
-            != Some(JvmType::ObjectType(binary.internal_name.clone()))
-        {
-            return Err(protocol("selected type has inconsistent JVM identity"));
-        }
-        Ok(Some((ty, jvm)))
+        self.facts.check_active()?;
+        self.cache()?
+            .selected_types
+            .insert(name.to_owned(), selected.clone());
+        self.facts.check_active()?;
+        Ok(Some(selected))
     }
 
     /// Complete authored names establish source absence; they do not grant ABI or runtime authority.

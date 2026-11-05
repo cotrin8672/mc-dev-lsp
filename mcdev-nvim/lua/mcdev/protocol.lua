@@ -138,6 +138,15 @@ local function provider_disabled(client)
   return type(initial) == "table" and initial.enabled == false
 end
 
+local function provider_request_identity(client)
+  local provider = provider_config(client)
+  return {
+    command = type(provider) == "table" and vim.deepcopy(provider.command) or nil,
+    executeCommands = type(provider) == "table" and vim.deepcopy(provider.executeCommands) or nil,
+    enabled = not provider_disabled(client),
+  }
+end
+
 local function uses_provider_command(client)
   return client and advertised(client, provider_command) and provider_registered(client)
 end
@@ -286,6 +295,7 @@ function M.request(command, payload, callback, bufnr)
   end
 
   local params = { command = command, arguments = { payload } }
+  local provider_retry
   if uses_provider_command(client) then
     local actual_bufnr = resolved_bufnr(bufnr)
     if type(client.attached_buffers) == "table" and not client.attached_buffers[actual_bufnr] then
@@ -311,6 +321,23 @@ function M.request(command, payload, callback, bufnr)
         return noop_cancel
       end
     end
+    if command == M.commands.definition then
+      provider_retry = {
+        bufnr = actual_bufnr,
+        client = client,
+        client_id = client.id,
+        command = command,
+        route = provider_command,
+        provider = provider_id,
+        document_uri = uri,
+        workspace_root = root,
+        document_version = current_version,
+        changedtick = vim.api.nvim_buf_get_changedtick(actual_bufnr),
+        buffer_text = current_text,
+        provider_config = provider_request_identity(client),
+        payload = vim.deepcopy(payload),
+      }
+    end
     params = {
       command = provider_command,
       arguments = {{
@@ -334,31 +361,92 @@ function M.request(command, payload, callback, bufnr)
     route = params.command,
     provider = params.command == provider_command and provider_id or nil,
   }
-  local status, request_id = client:request("workspace/executeCommand", params, function(err, result, context)
-    if callback then
-      local matches = context == nil or (type(context) == "table"
-        and (context.client_id == nil or context.client_id == origin.client_id))
-      callback(result, err, matches and origin or nil)
-    end
-  end, bufnr)
+  local cancelled = false
+  local completed = false
+  local retry_used = false
+  local attempt = 0
+  local request_id
 
-  if not status or not request_id then
-    local message = "mcdev: failed to start ktlsp request"
-    if callback then
-      callback(nil, message)
-    else
-      vim.notify(message, vim.log.levels.WARN)
-    end
-    return noop_cancel
+  local function finish(result, err, response_origin)
+    if completed or cancelled then return end
+    completed = true
+    if callback then callback(result, err, response_origin) end
   end
 
-  local cancelled = false
+  local function stale_provider_error(err)
+    return type(err) == "table" and err.code == -32801
+      and type(err.data) == "table" and err.data.providerCommandReason == "Stale"
+  end
+
+  local function same_provider_context()
+    local snapshot = provider_retry
+    if not snapshot or not vim.api.nvim_buf_is_valid(snapshot.bufnr) then return false end
+    local current = M.active_ktlsp_client(snapshot.bufnr, snapshot.command)
+    if not current or current ~= snapshot.client or current.id ~= snapshot.client_id
+      or snapshot.route ~= provider_command or snapshot.provider ~= provider_id
+      or not uses_provider_command(current) then return false end
+    if not vim.deep_equal(provider_request_identity(current), snapshot.provider_config) then return false end
+    if document_uri(snapshot.bufnr) ~= snapshot.document_uri
+      or comparable_path(client_root(current)) ~= comparable_path(snapshot.workspace_root)
+      or lsp_version(snapshot.bufnr, current) ~= snapshot.document_version
+      or vim.api.nvim_buf_get_changedtick(snapshot.bufnr) ~= snapshot.changedtick
+      or lsp_text(snapshot.bufnr) ~= snapshot.buffer_text
+    then return false end
+    return true
+  end
+
+  local function send(request_params)
+    attempt = attempt + 1
+    local this_attempt = attempt
+    local status, started_id = client:request("workspace/executeCommand", request_params, function(err, result, context)
+      if completed or cancelled or this_attempt ~= attempt then return end
+      local matches = context == nil or (type(context) == "table"
+        and (context.client_id == nil or context.client_id == origin.client_id))
+      local response_origin = matches and origin or nil
+      if not retry_used and command == M.commands.definition and response_origin
+        and stale_provider_error(err) and same_provider_context()
+      then
+        retry_used = true
+        local fresh = {
+          command = provider_command,
+          arguments = {{
+            provider = provider_id,
+            command = command,
+            context = {
+              workspaceRoot = provider_retry.workspace_root,
+              documentUri = provider_retry.document_uri,
+              bufferText = provider_retry.buffer_text,
+              documentVersion = provider_retry.document_version,
+            },
+            arguments = { provider_retry.payload },
+          }},
+        }
+        send(fresh)
+        return
+      end
+      finish(result, err, response_origin)
+    end, provider_retry and provider_retry.bufnr or bufnr)
+    if status and started_id and this_attempt == attempt then
+      request_id = started_id
+      return true
+    end
+    if not status or not started_id then
+      if this_attempt == attempt then
+        local message = "mcdev: failed to start ktlsp request"
+        if callback then finish(nil, message) else vim.notify(message, vim.log.levels.WARN); completed = true end
+      end
+      return false
+    end
+    return true
+  end
+
+  send(params)
   return function()
     if cancelled then
       return
     end
     cancelled = true
-    client:cancel_request(request_id)
+    if request_id then client:cancel_request(request_id) end
   end
 end
 

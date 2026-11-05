@@ -63462,7 +63462,7 @@
     },
     "resumedIntegration": {
       "date": "2026-11-05",
-      "status": "root-files-resource-selection-implemented; native1922-passed; original-live-Java-Kotlin-checks-in-progress",
+      "status": "native1926-and-editor5-passed; positive-type-reuse-and-definition-fresh-retry-implemented; original-host108-pair-in-progress",
       "hostPin": "5d5059a5868d6e2a3f249d9acbc0b8c4899396cb",
       "hostReceipt": "build/host-artifacts/candidate108-e12eb95f8b0e/main-ready.json",
       "hostSerializerFixture": "mcdev-companion/tests/fixtures/host_inputs/root_files/actual-serializer-sample.json",
@@ -64388,7 +64388,7 @@
         "followup": "Reuse existing complete equivalent root-file discovery rather than enumerating classpath resources later discarded by required_resource. Preserve fallback/Unknown/scope/DTO semantics; no host API/quota/deadline increase."
       },
       "rootFilesResourceBypass": {
-        "status": "implemented; full local checks passed; original live verification pending",
+        "status": "implemented; full native/CI passed; real Java/Kotlin resourceInventory=0; complete original entries still open",
         "fullCheck": {
           "path": "build/rust-test-logs/20261105-131440505/native-summary.json",
           "sha256": "618ae5470dad56144306b3fd2834c2e59f74a86eaf3000a4aaef70794816ef46"
@@ -64415,6 +64415,140 @@
         "unsupportedUnknownPartialProblemRootsRetainSequentialFallback": true,
         "waveImplementationRemoved": true,
         "hostApiQuotaDeadlineChanged": false,
+        "wholeMigrationVerified": false,
+        "ci": {
+          "commit": "578e9fdb51faff922e3afb4cbfa0013912e30f83",
+          "status": "passed",
+          "url": "https://github.com/cotrin8672/mc-dev-lsp/actions/runs/41967097021",
+          "proof": {
+            "path": "build/rust-test-logs/ci-578e9fd/ci-summary.json",
+            "sha256": "5390a854acf3cb8b83eb452acc1b80148e8098b5ddcbecb4f25d0b90841ff9fd"
+          },
+          "windowsFunctions": 1922,
+          "linuxFunctions": 1921,
+          "targetsPerPlatform": 83
+        },
+        "liveResourceInventoryRequests": 0,
+        "liveOriginalWorkflowPassed": false
+      },
+      "originalHost108McCf91": {
+        "java": {
+          "receipt": {
+            "path": "build/rust-test-logs/host108-mccf91-java-20261105/recovery-and-run-receipt.json",
+            "sha256": "7677c0f8107bc108cc976f9dff9e116604c1f11544990e9da076e1fed5b73c8b"
+          },
+          "observedAssertions": 9,
+          "passedAssertions": 8,
+          "failedAssertions": 1,
+          "evaluation": 32,
+          "failure": "Stale semantic-index125->130",
+          "ownerSourceVersionAndShaUnchanged": true,
+          "providerCurrent": true,
+          "factsStageBatches": 8,
+          "factsStageQueries": 28,
+          "resourceInventoryRequests": 0,
+          "fullOriginalEntryPassed": false,
+          "initialReceipt": {
+            "path": "build/rust-test-logs/host108-mccf91-java-20261105/recovery-and-run-receipt.initial.json",
+            "sha256": "d51535764cad72d2316bda127759c581f435adc956446e2c13a51b26218aa052"
+          },
+          "receiptCorrection": "Actual frames distinguish JSON-RPC error/data from result.error; initial bytes preserved."
+        },
+        "kotlin": {
+          "receipt": {
+            "path": "build/rust-test-logs/host108-mccf91-kotlin-20261105/recovery-and-run-receipt.json",
+            "sha256": "57858ec1af718ef071e520726fd7a6b4fe05a06b4baf970069cde947ed9a762a"
+          },
+          "observedAssertions": 53,
+          "passedAssertions": 52,
+          "failedAssertions": 1,
+          "completionParseSource": [
+            "HAND_WRITTEN_FALLBACK",
+            "HAND_WRITTEN_FALLBACK"
+          ],
+          "completionUsedCompilationUnit": [
+            false,
+            false
+          ],
+          "evaluation": 63,
+          "childError": {
+            "code": -32602,
+            "message": "evaluation batch limit"
+          },
+          "guardOwner": "MC server.rs MAX_BATCHES64, continuations separate; not ktlsp quota",
+          "successfulFactsStageEventsIncludingContinuations": 89,
+          "queries": 101,
+          "resolveTypeQueries": 35,
+          "typeJvmQueries": 10,
+          "jvmCatalogQueries": 27,
+          "resourceInventoryRequests": 0,
+          "hoverDefinitionPlacementReached": false,
+          "fullOriginalEntryPassed": false,
+          "initialReceipt": {
+            "path": "build/rust-test-logs/host108-mccf91-kotlin-20261105/recovery-and-run-receipt.initial.json",
+            "sha256": "dff466dc780b58ed3e94c5857e3ba6a88172c51db8507f33cb622a0430a3d987"
+          },
+          "receiptCorrection": "Actual frames distinguish JSON-RPC error/data from result.error; initial bytes preserved."
+        },
+        "hostSha256": "e12eb95f8b0ef3cf42e6e5f0897fbbf42dcdea9d1b86364efc11f1d414612d54",
+        "companionSha256": "cf91e472a5ab8335627f5b9a44d757f28f5cc9a39839ba73e9f7b29f3c2f6377",
+        "eachOuterTimeoutSeconds": 180,
+        "ownedProcessesRemaining": 0,
+        "sameArtifactRerun": false
+      },
+      "requestEconomyAndDefinitionRetry": {
+        "status": "implemented; stable full local checks passed; original real-host pair in progress",
+        "fullCheck": {
+          "path": "build/rust-test-logs/20261105-140250838/native-summary.json",
+          "sha256": "d96c528c96eb443716db790c7afe1ce8fad9caf0be9728c6593fb938dc273a5a"
+        },
+        "originalCaseLocatorProof": {
+          "path": "build/rust-test-logs/20261105-140250838/case-locators.json",
+          "sha256": "59525a7f667643876f3b63e897be1b2b73909d8cfcf2ef2de6741c5d4ae1d4ff"
+        },
+        "nativeFunctions": 1926,
+        "nativeTargets": 83,
+        "independentEditorEntries": 5,
+        "originalCaseRows": 2604,
+        "originalReplacementReferences": 2748,
+        "originalCaseRowsChanged": false,
+        "artifact": {
+          "path": "build/companion-artifacts/native-source-request-436e33392e26/receipt.json",
+          "sha256": "9cc95376e4dd9bbdc3527a528cbc20bd07bd66531ea93dffa2968a18509d230e"
+        },
+        "binarySha256": "436e33392e26ecaf305c349176f272a0e278bcfc7adb306436c33e1688bebd9e",
+        "sourcePatchSha256": "2c4a55072bb4cc0dcc8b1f6bd56e0e0a1243b91d998fce7d11b1c24fd1a2864e",
+        "testedChangedFiles": [
+          {
+            "path": "mcdev-companion/src/commands/ipc/index.rs",
+            "sha256": "a68ea223001d38df9442eed065307d5c895ca2edb111a5db54cc18ec72ee2bf7"
+          },
+          {
+            "path": "mcdev-companion/src/commands/ipc/index/source.rs",
+            "sha256": "a218089f1b9bdb5df133849a055c166aba2b0a9d410448328b531ee4d6f505bb"
+          },
+          {
+            "path": "mcdev-nvim/lua/mcdev/protocol.lua",
+            "sha256": "13add0d03f120c981531d60810892c9d2096e89030ec0f5f581a6b6bee5c4336"
+          },
+          {
+            "path": "mcdev-nvim/tests/backend_contract.lua",
+            "sha256": "574ea93a7210dfc64760dcb467f049f496db375404944db10c88dce1e9a49c4f"
+          }
+        ],
+        "selectedTypesCache": "Validated positive resolveType/typeJvm pairs, per EvaluationIndex only; active check before and after reuse; errors and Unknown/absent not cached.",
+        "definitionRetry": "Product provider route only; JSON-RPC -32801 and data.providerCommandReason Stale; at most one new outer request; same live client/provider/config/URI/root/version/changedtick/full source; cancellation suppresses retry and late callbacks.",
+        "otherCommandsAndLegacyRetry": false,
+        "originalFixtureInputsAndAssertionsChanged": false,
+        "newHostApiForTheseFixes": false,
+        "hostGuardsQuotasAndDeadlinesChanged": false,
+        "selection": {
+          "path": "build/source-request-acceptance-20261105/selection-manifest.json",
+          "sha256": "4ccd3d873df3e8f350edaeb41056bc5dc2731f8e0aeeac01ac8e219589d8b4dc"
+        },
+        "originalEntryDeadlineSeconds": 180,
+        "originalLivePairPassed": false,
+        "ciStatus": "pending source push",
         "wholeMigrationVerified": false
       }
     }

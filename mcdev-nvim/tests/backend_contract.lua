@@ -82,6 +82,153 @@ local invalid, invalid_error = ktlsp.extend_config({}, { companion = { cmd = "sh
 h.assert_nil(invalid)
 h.assert_true(invalid_error:find("argv list", 1, true) ~= nil)
 config.options.companion = configured
+
+local provider_buf = vim.api.nvim_create_buf(false, true)
+local provider_root = vim.fs.normalize(vim.fn.getcwd())
+local provider_name = provider_root .. "/build/mcdev-protocol-provider.java"
+vim.api.nvim_buf_set_name(provider_buf, provider_name)
+vim.bo[provider_buf].filetype = "java"
+local provider_version = 7
+local provider_responses, provider_mutation, provider_deferred
+local provider_frames, provider_handlers, provider_cancelled
+local active_provider
+
+local function make_provider(id)
+  local provider = {
+    id = id,
+    name = "ktlsp",
+    attached_buffers = { [provider_buf] = true },
+    server_capabilities = { executeCommandProvider = { commands = { "ktlsp.providerCommand" } } },
+    config = {
+      root_dir = provider_root,
+      init_options = { analysisProviders = { ["mcdev.mixin"] = {
+        command = { "companion" },
+        executeCommands = { protocol.commands.definition, protocol.commands.info },
+        enabled = true,
+      } } },
+    },
+  }
+  provider.request = function(self, method, params, handler, request_bufnr)
+    h.assert_eq(method, "workspace/executeCommand")
+    h.assert_eq(request_bufnr, provider_buf)
+    provider_frames[#provider_frames + 1] = { params = params, client = self }
+    provider_handlers[#provider_handlers + 1] = handler
+    local index = #provider_frames
+    local response = provider_responses and provider_responses[index]
+    if not provider_deferred and response then
+      if provider_mutation and index == 1 then provider_mutation() end
+      handler(response.err, response.result, { client_id = self.id })
+    end
+    return true, index
+  end
+  provider.cancel_request = function(_, request_id)
+    provider_cancelled[#provider_cancelled + 1] = request_id
+  end
+  return provider
+end
+
+local provider = make_provider(901)
+local replacement_provider = make_provider(902)
+local function reset_provider(client)
+  client.config.root_dir = provider_root
+  client.config.init_options.analysisProviders["mcdev.mixin"] = {
+    command = { "companion" },
+    executeCommands = { protocol.commands.definition, protocol.commands.info },
+    enabled = true,
+  }
+  client.attached_buffers = { [provider_buf] = true }
+  client.server_capabilities.executeCommandProvider.commands = { "ktlsp.providerCommand" }
+end
+
+vim.lsp.get_clients = function()
+  return { active_provider }
+end
+vim.lsp.util.buf_versions[provider_buf] = provider_version
+
+local stale_response = { err = { code = -32801, data = { providerCommandReason = "Stale" } } }
+local function run_provider(command, responses, mutation, deferred)
+  vim.api.nvim_buf_set_name(provider_buf, provider_name)
+  vim.api.nvim_buf_set_lines(provider_buf, 0, -1, false, { "class Provider {}" })
+  vim.lsp.util.buf_versions[provider_buf] = provider_version
+  reset_provider(provider)
+  reset_provider(replacement_provider)
+  active_provider = provider
+  provider_responses, provider_mutation, provider_deferred = responses, mutation, deferred
+  provider_frames, provider_handlers, provider_cancelled = {}, {}, {}
+  local state = {
+    callback_count = 0,
+    result = nil,
+    err = nil,
+    frames = provider_frames,
+    handlers = provider_handlers,
+    cancelled = provider_cancelled,
+  }
+  local cancel = protocol.request(command, { context = protocol.context(provider_buf, { 1, 0 }), marker = "original" }, function(received, received_err)
+    state.callback_count = state.callback_count + 1
+    state.result, state.err = received, received_err
+  end, provider_buf)
+  state.cancel = cancel
+  return state
+end
+
+local state = run_provider(protocol.commands.definition, { stale_response, { result = { ok = true } } })
+h.assert_eq(#state.frames, 2)
+h.assert_eq(state.callback_count, 1)
+h.assert_true(state.result.ok)
+h.assert_nil(state.err)
+h.assert_true(vim.deep_equal(state.frames[1].params.arguments[1].context, state.frames[2].params.arguments[1].context))
+h.assert_eq(state.frames[2].params.arguments[1].arguments[1].marker, "original")
+
+state = run_provider(protocol.commands.definition, { stale_response, stale_response })
+h.assert_eq(#state.frames, 2)
+h.assert_eq(state.callback_count, 1)
+h.assert_eq(state.err.code, -32801)
+
+for _, response in ipairs({
+  { command = protocol.commands.info, response = stale_response },
+  { command = protocol.commands.definition, response = { err = { code = -32801, data = { providerCommandReason = "Other" } } } },
+  { command = protocol.commands.definition, response = { err = { code = -32800, data = { providerCommandReason = "Stale" } } } },
+  { command = protocol.commands.definition, response = { err = { code = -32801, data = {} } } },
+}) do
+  state = run_provider(response.command, { response.response })
+  h.assert_eq(#state.frames, 1)
+  h.assert_eq(state.callback_count, 1)
+end
+
+for _, mutation in ipairs({
+  function() vim.api.nvim_buf_set_lines(provider_buf, 0, -1, false, { "class Changed {}" }) end,
+  function() vim.lsp.util.buf_versions[provider_buf] = provider_version + 1 end,
+  function() active_provider = replacement_provider end,
+  function() provider.config.init_options.analysisProviders["mcdev.mixin"].command[1] = "other" end,
+  function() provider.config.init_options.analysisProviders["mcdev.mixin"].enabled = false end,
+  function() provider.config.root_dir = provider_root .. "/other" end,
+  function() vim.api.nvim_buf_set_name(provider_buf, provider_root .. "/build/other.java") end,
+}) do
+  state = run_provider(protocol.commands.definition, { stale_response }, mutation)
+  h.assert_eq(#state.frames, 1)
+  h.assert_eq(state.callback_count, 1)
+end
+
+state = run_provider(protocol.commands.definition, nil, nil, true)
+state.handlers[1](stale_response.err, nil, { client_id = provider.id })
+h.assert_eq(#state.frames, 2)
+state.handlers[2](nil, { ok = true }, { client_id = provider.id })
+state.handlers[2](nil, { duplicate = true }, { client_id = provider.id })
+state.handlers[1](nil, { late = true }, { client_id = provider.id })
+h.assert_eq(state.callback_count, 1)
+h.assert_eq(#state.cancelled, 0)
+
+state = run_provider(protocol.commands.definition, nil, nil, true)
+state.handlers[1](stale_response.err, nil, { client_id = provider.id })
+h.assert_eq(#state.frames, 2)
+state.cancel()
+h.assert_eq(state.cancelled[#state.cancelled], 2)
+state.handlers[2](nil, { ok = true }, { client_id = provider.id })
+state.handlers[1](nil, { late = true }, { client_id = provider.id })
+h.assert_eq(state.callback_count, 0)
+
+vim.lsp.util.buf_versions[provider_buf] = nil
+vim.api.nvim_buf_delete(provider_buf, { force = true })
 vim.lsp.get_clients, protocol.code_action = saved.clients, saved.request
 vim.notify, vim.lsp.get_client_by_id = saved.notify, saved.get_client
 vim.api.nvim_buf_delete(bufnr, { force = true })

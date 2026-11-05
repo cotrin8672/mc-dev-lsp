@@ -12,7 +12,7 @@ use crate::{
         FactsError,
     },
     provider_commands::CommandFacts,
-    wire::{Fact, HandleKind, Registry},
+    wire::{Fact, HandleKind, Registry, TypeFact},
 };
 use mcdev_core::{
     bytecode::{
@@ -49,6 +49,7 @@ struct Cache {
     selected_origins: BTreeMap<String, String>,
     host_types: BTreeMap<String, EditingView>,
     source_types: BTreeMap<String, Option<EditingView>>,
+    selected_types: BTreeMap<String, (TypeFact, TypeJvm)>,
     source_provenance: BTreeMap<String, Option<SourceProvenance>>,
     runtime_views: BTreeMap<String, EditingView>,
     source_names: Option<BTreeSet<String>>,
