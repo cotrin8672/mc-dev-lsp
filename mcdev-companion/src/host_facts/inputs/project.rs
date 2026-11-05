@@ -67,7 +67,7 @@ pub struct KotlinTarget {
 #[serde(rename_all = "camelCase")]
 pub struct ProjectIndex {
     pub analysis_generation: u64,
-    pub completed_analysis_generation: u64,
+    pub completed_analysis_generation: Option<u64>,
     pub index_revision: u64,
     pub project_refresh_pending: bool,
     pub project_scan_complete: bool,

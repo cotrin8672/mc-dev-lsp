@@ -275,7 +275,7 @@ fn absolute_path(path: &str) -> Result<PathBuf, FactsError> {
 fn observed_index(index: &crate::host_facts::inputs::ProjectIndex) -> ProjectIndexState {
     if index.project_refresh_pending {
         ProjectIndexState::Stale
-    } else if index.completed_analysis_generation == index.analysis_generation
+    } else if index.completed_analysis_generation == Some(index.analysis_generation)
         && index.project_scan_complete
         && index.library_index_complete
         && index.jdk_index_complete
@@ -1379,6 +1379,44 @@ mod tests {
             assert!(!selected.project_complete);
             assert!(!selected.config_selection_complete);
             assert!(!root.exists());
+        }
+    }
+
+    #[test]
+    fn nullable_completed_generation_preserves_in_progress_info_and_numeric_readiness() {
+        for (completed, expected) in [
+            (Value::Null, ProjectIndexState::Building),
+            (json!(9), ProjectIndexState::Ready),
+        ] {
+            let root = unique_root().join("module");
+            let mut replies = model_replies(&root, &[]);
+            replies[0]["facts"][0]["records"][0]["index"]["value"]["completedAnalysisGeneration"] =
+                completed.clone();
+            let raw: crate::host_facts::inputs::ProjectIndex = serde_json::from_value(
+                replies[0]["facts"][0]["records"][0]["index"]["value"].clone(),
+            )
+            .unwrap();
+            assert_eq!(raw.completed_analysis_generation, completed.as_u64());
+            let mut inputs =
+                ScopedInputs::new("eval-1", &project_operations(), Reader(replies)).unwrap();
+            let selected = selected_project(
+                &mut inputs,
+                owning_metadata(&root),
+                &root.parent().unwrap().to_string_lossy(),
+                "eval-1",
+            )
+            .unwrap();
+            let context = &selected.cached_session.context;
+            assert_eq!(context.index_state, expected);
+            assert!(!selected.project_complete);
+            let lines = mcdev_core::project::InfoService::format_lines(context, 1, "test");
+            let state = if completed.is_null() {
+                "building"
+            } else {
+                "ready"
+            };
+            assert!(lines.contains(&format!("Class index: {state}")));
+            assert!(lines.contains(&format!("Bytecode index: {state}")));
         }
     }
 

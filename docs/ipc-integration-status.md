@@ -86,6 +86,14 @@ an omitted or unsupported list does not establish a zero-parameter callable.
 
 ### Original source-query and startup behavior restored
 
+The first project-ready runs exposed a separate consumer DTO bug:
+`completedAnalysisGeneration` is normally null while analysis runs. The consumer
+now retains it as `Option<u64>` and reports Building until it equals the current
+generation; it never substitutes zero. A raw-null/Info Building regression and
+the numeric Ready case pass with17 input,12 project/Info and35 evaluation tests.
+This later two-line adapter correction is separate from the1,941-function full
+checkpoint below; current-source CI is required before calling it fully checked.
+
 The original JDT source query returns individually resolved members with
 `mapNotNull`, retaining positive rows when another declaration is incomplete.
 The Rust adapter now does the same instead of discarding every positive member
