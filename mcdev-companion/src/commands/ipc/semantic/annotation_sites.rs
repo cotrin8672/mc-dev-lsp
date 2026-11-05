@@ -27,6 +27,28 @@ pub(super) fn collect_value_refs(argument: &Argument, refs: &mut BTreeSet<String
 }
 
 impl SiteFacts {
+    pub(super) fn allow_source_kotlin_fallback(
+        &self,
+        source: &str,
+        uri: &str,
+        declarations: &[Declaration],
+        detailed: bool,
+        registry: &mut Registry,
+        identities: &BTreeMap<String, Fact<TypeFact>>,
+    ) -> bool {
+        self.facts
+            .validate_with_types_allow_unknown(
+                source,
+                uri,
+                None,
+                declarations,
+                detailed,
+                registry,
+                identities,
+            )
+            .is_ok()
+    }
+
     pub(super) fn reconcile(
         &mut self,
         source: &str,

@@ -29,7 +29,7 @@ candidate101 and published host102.
 ## Published contract
 
 The current integration pin is ktlsp
-[`a0be6aa14b27be02835ddfaad4189ca99763d90d`](https://github.com/cotrin8672/ktlsp/blob/a0be6aa14b27be02835ddfaad4189ca99763d90d/docs/architecture/extension-ipc.md).
+[`d24ab4d2409405fdf7a55792cb9896f597a0f5df`](https://github.com/cotrin8672/ktlsp/blob/d24ab4d2409405fdf7a55792cb9896f597a0f5df/docs/architecture/extension-ipc.md).
 It adds normalized authored facts, owning-project input records, exact source
 locations and typed binary declaration annotations to source snapshots, owned
 resources, selected runtime bytes, the physical JVM catalog and provider
@@ -37,13 +37,21 @@ commands. The companion negotiates capabilities and individual operations;
 binary annotations are selected by capability alone. Configured command IDs
 are intersected with the implemented domain routes.
 
-The copied published release105 host has SHA-256
-3c26a5208d64ea85209f2c5b9650b43992769cdaa64bdbd986439c0dfa03c4f5
-and 25,348,096 bytes. Its commit was checked independently against origin.
-The copy receipt is build/host-artifacts/candidate105-3c26a5208d64/copy-receipt.json.
+The copied published release107 host has SHA-256
+c926f65583b9fb81ea6ee25ab419d55c5090ae2173f039aa961b5a8bea75a09c
+and 25,459,200 bytes. Its code commit is
+c5b07f1f4356493fa0fb4248e755619efca19341. The independently checked public
+revision above differs only in the IPC and fork-status documents.
+The copy receipt is build/host-artifacts/candidate107-c926f65583b9/copy-receipt.json.
 Release103 adds Java nominal parameterized-reference erasure;105 shares archive
 checks only within one source-preparation batch. Neither adds opcodes or relaxes
-quota/deadline/readguards. Historical102/103 artifacts and receipts remain pinned.
+quota/deadline/readguards. Release106 retains already-indexed library bodies
+only after checking their stamps, epochs, origin and complete symbols. Its
+independent native reproduction does not prove the cause of old evaluation44.
+Release107 shares preparation within a batch for separately allocated library
+resolvers only when all six selected library inputs agree; current input,
+archive, stamp and epoch guards remain in force. Historical102/103/105/106
+artifacts and receipts remain pinned.
 
 The host's evaluation lifetime, accumulated reads and final validation govern
 these inputs. They do not provide the earlier prototype's eight generation
@@ -67,7 +75,7 @@ an omitted or unsupported list does not establish a zero-parameter callable.
 
 ### Resource quota fix and host103/105 follow-up
 
-The current full local check passes 1,906 functions/83 targets, docs/build and
+The resource-fix full local check passes 1,906 functions/83 targets, docs/build and
 all five independent editor entries. Full logs and summary are under
 build/rust-test-logs/resource-needs-full-20261105-064212278/.
 The original2,604 ledger case rows are unchanged.
@@ -109,6 +117,91 @@ That run reaches declarationType and then annotation argument unavailable after
 the official marker requires side, which the original unfinished source omits.
 No normalized type DTO or real compiled Lapis plugin/runtime parity is claimed.
 See build/rust-test-logs/kotlin-lapis-marker-corrected-native-20261105/recovery-and-run-receipt.json.
+
+### Release106 Java and Kotlin connection checkpoint
+
+One Java-only run uses release106, the fixed MC25c artifact and the same
+source/profile as the release105 failure. It lasts 159.6s within the 180s outer
+limit and shuts down cleanly with no owned processes left. Eight assertions
+pass before the definition response times out. Evaluation26 reaches
+`declarationMember` with `read_facts.ok=true` at trace636, but no raw Found,
+handler owner or descriptor DTO is observed. After further dependency-source
+demand it returns `-32800 evaluation deadline exceeded`; final validation is
+Cancelled, `valid=false`, `pending_present=true`, `provider_current=false`.
+This is not an original-handler or definition success.
+
+Definition preparation records 8/17,418,819us, 0/523us, 8/5,732,229us and 0/727us.
+Candidate arrays do not identify the prepared eight sources or explain the
+CPU/wait breakdown. The failed receipt and trace remain at
+`build/rust-test-logs/java-host106-native-20261105/recovery-and-run-receipt.json`
+and `build/java-host106-acceptance-overlay-20261105/build/java-host106-proof/host.trace.jsonl`.
+No second run is credited or requested for the same artifact.
+
+The agreed Kotlin responsibility boundary is recorded in
+[`rust-migration.md`](rust-migration.md#responsibility-decision-2026-11-05).
+Its connection implementation is separate from the Java deadline investigation.
+The original Kotlin completion helper expected `HAND_WRITTEN_FALLBACK` for
+all four calls. That expectation is restored from the frozen baseline; the
+helper matches the original after indentation normalization. Inputs, functional
+assertions and 32 static assertion sites remain intact. The restoration receipt
+is `build/architecture-review-20261105/kotlin-test-provenance-restore.json`.
+This fixture restoration alone supplies no runtime Kotlin acceptance credit.
+
+### Kotlin source connection and release107 checkpoint
+
+The agreed Kotlin connection now reuses the existing MC source parser for
+injector syntax and Lapis interpretation, with selected host target lookup.
+It preserves the current document/scope checks, validates known annotation
+identities and rejects contradictory source/annotation-site/member facts.
+Unknown syntax inputs do not become compiler bindings. The returned model is
+`HAND_WRITTEN_FALLBACK`, low confidence, and never `HOST_NORMALIZED`.
+
+The final source passes 1,913 functions/83 targets, docs/build and all five editor
+entries in `build/rust-test-logs/20261105-102624370/native-summary.json`.
+The source patch remains unchanged throughout the run. Its frozen final MC
+artifact is `build/companion-artifacts/native-kotlin-guard-8a9fab5dbe78/`, SHA256
+8a9fab5dbe782e86eb144441e3ed0ccd21ac9e4f88f50919c5d07b00180b524e.
+This local proof is separate from original live editor acceptance.
+
+Release107 with MC25c completes the original Java request without timeout in
+48.7s, passes nine of ten observed assertions, then returns no definition
+locations. Its actual error is `INCOMPLETE_PROJECT_CONTEXT`: current source
+methods for `DrillBlock` are incomplete. Evaluation27 finishes with valid
+validation and no result error; a successful declarationMember read is not
+proof of a Found handler DTO. The name-only `useItemOn` selector requires a
+complete candidate set. Host source-wide member coverage is deliberately
+Unknown, independently of any one member signature. Receipt:
+`build/rust-test-logs/java-host107-native-20261105/recovery-and-run-receipt.json`.
+
+Both projects agreed to limit the remaining Java bridge to target-bound source
+provenance and its selected dependency identity, checked against the existing
+runtime artifact identity. Current workspace/generated/open sources and Unknown
+targets retain source authority; source locations and runtime ABI remain
+separate facts. The agreed `sourceProvenance(target)` operation extends
+`project-class-facts-v1` through `supportedOps`; host and consumer implementation
+are pending. The existing `typeJvm` DTO is unchanged.
+
+Kotlin MC6c36/release107 with the original Java-only producer profile stops at
+`missing-selected-sdk`; this means the selected JDK, not a missing Minecraft
+jar. A separate Kotlin JVM 2.4.21/JDK21 profile reaches classpath selection but
+fails before the first completion at `selected classpath coverage is unavailable`.
+Its saved model recognizes Kotlin and `:compileKotlin`, but all compiler tasks
+are incomplete, `java_home` is null and classpath entries are empty because the
+isolated cache cannot resolve `kotlin-stdlib:2.4.21` during the offline dump.
+Gradle task/toolchain availability alone does not establish host SDK admission.
+The receipts are under `build/rust-test-logs/kotlin-source-6c36-host107-native-20261105/`
+and `build/rust-test-logs/kotlin-sdk21-6c36-host107-native-20261105/`.
+Neither run proves successful Kotlin parsing or later editor phases. All runs
+retain their failures and finish with no owned processes remaining.
+
+An online preparation follow-up admits a model with complete Kotlin compiler
+metadata, `:compileKotlin`, JDK21 producer claims and no unresolved dependencies.
+Its trace reports complete classpath/JDK indexing. However, the expected stdlib
+and annotations jar paths were not confirmed as physical files, two dependency
+sources remain missing, and the metadata command stops at a preflight Stale
+response. Model admission alone does not verify physical inputs or Kotlin
+editor behavior. Receipt:
+`build/rust-test-logs/kotlin-sdk21-online-resolution-20261105/recovery-and-run-receipt.json`.
 
 ### 2026-11-05 original CEM and Drill acceptance
 

@@ -30,9 +30,10 @@ use mcdev_core::{
     },
     mixin_source::{
         annotations_with_imports, parse_member_declaration, AtSelectorModel, InjectorKind,
-        InjectorModel, JavaModifier, JavaTypeDescriptorResolver, JavaTypeKind, MethodSelector,
-        MixinAnnotation, MixinMemberAnnotationKind, MixinMemberDeclarationParser, MixinTargetRef,
-        ParseConfidence, ParseSource,
+        InjectorModel, JavaModifier, JavaSourceImports, JavaTypeDescriptorResolver, JavaTypeKind,
+        MethodSelector, MixinAnnotation, MixinMemberAnnotationKind, MixinMemberDeclarationParser,
+        MixinSemanticModelParser, MixinTargetRef, MixinTargetResolver, ParseConfidence,
+        ParseSource, SemanticParseDebugInfo,
     },
     offset_to_position, position_to_offset, McTextRange,
 };
@@ -68,6 +69,7 @@ pub struct HostSemanticProvider {
     document_uri: String,
     document_version: Option<i64>,
     index: Option<Arc<super::index::EvaluationIndex>>,
+    class_index: Option<Arc<dyn mcdev_core::model::ClassIndex>>,
     source_facts_v2: bool,
     annotation_sites: bool,
     annotation_completion_position: Option<mcdev_core::McTextPosition>,
@@ -103,6 +105,7 @@ impl HostSemanticProvider {
             document_uri,
             document_version,
             index: None,
+            class_index: None,
             source_facts_v2: false,
             annotation_sites: false,
             annotation_completion_position: None,
@@ -111,6 +114,7 @@ impl HostSemanticProvider {
     }
 
     pub fn with_index(mut self, index: Arc<super::index::EvaluationIndex>) -> Self {
+        self.class_index = Some(index.clone());
         self.index = Some(index);
         self
     }
@@ -337,6 +341,35 @@ impl HostSemanticProvider {
         }
         let source_context = selected.map(|entry| &entry.descriptor);
         let identities = self.resolve_refs(&annotation_refs, &mut registry, source_context)?;
+        let annotation_sites_allow_fallback = self.source_facts_v2
+            && selected.is_none()
+            && imports.is_kotlin
+            && !partial_annotations
+            && sites.as_ref().is_none_or(|sites| {
+                sites.allow_source_kotlin_fallback(
+                    source,
+                    uri,
+                    &e.declarations,
+                    self.source_facts_v2,
+                    &mut registry,
+                    &identities,
+                )
+            });
+        if annotation_sites_allow_fallback
+            && source_kotlin_syntax_can_use_host_index(
+                source,
+                uri,
+                &imports,
+                &e.declarations,
+                &identities,
+                partial_annotations,
+                sites
+                    .as_ref()
+                    .map(|sites| sites.facts.annotations.as_slice()),
+            )
+        {
+            return self.source_kotlin_injector_model(source, uri, started);
+        }
         if let Some(sites) = &mut sites {
             sites.reconcile(
                 source,
@@ -428,18 +461,6 @@ impl HostSemanticProvider {
                 selected.is_none(),
             )?;
         }
-        let owner_fact: Fact<TypeFact> = self
-            .read(&[json!({"op":"declarationType","declaration":owner.id})])?
-            .pop()
-            .ok_or_else(|| FactsError::Protocol("missing owner type".into()))?;
-        let owner_type = require_fact(owner_fact, "Mixin owner type")?;
-        validate_type(&owner_type, &mut registry)?;
-        validate_source_context(
-            owner_type.read_only,
-            owner_type.context_source.as_ref(),
-            source_context,
-        )?;
-
         let relevant = e
             .declarations
             .iter()
@@ -453,6 +474,18 @@ impl HostSemanticProvider {
                 })
             })
             .collect::<Vec<_>>();
+        let source_only_kotlin = source_only_kotlin_injectors(&relevant, &identities);
+        let owner_fact: Fact<TypeFact> = self
+            .read(&[json!({"op":"declarationType","declaration":owner.id})])?
+            .pop()
+            .ok_or_else(|| FactsError::Protocol("missing owner type".into()))?;
+        let owner_type = require_fact(owner_fact, "Mixin owner type")?;
+        validate_type(&owner_type, &mut registry)?;
+        validate_source_context(
+            owner_type.read_only,
+            owner_type.context_source.as_ref(),
+            source_context,
+        )?;
         let mut class_refs = BTreeSet::new();
         for annotation in
             std::iter::once(mixin).chain(relevant.iter().flat_map(|d| d.annotations.iter()))
@@ -525,21 +558,17 @@ impl HostSemanticProvider {
         let mut handler_slices = Vec::new();
         let mut mapped_names = BTreeMap::new();
         for (declaration, fact) in relevant.iter().zip(member_facts) {
+            validate_source_injector_member(&fact, declaration, source_context, &mut registry)?;
+            if self.source_facts_v2
+                && selected.is_none()
+                && imports.is_kotlin
+                && source_only_kotlin
+                && source_injector_member_binding_incomplete(&fact)?
+            {
+                return self.source_kotlin_injector_model(source, uri, started);
+            }
             let item = require_fact(fact, "authored member")?;
             let member = &item.member;
-            validate_source_context(
-                member.read_only,
-                member.context_source.as_ref(),
-                source_context,
-            )?;
-            if member.name != declaration.name.as_deref().unwrap_or("").trim_matches('`') {
-                return Err(FactsError::Protocol(
-                    "authored member name disagrees with declaration".into(),
-                ));
-            }
-            registry
-                .register(&member.id, HandleKind::Member)
-                .map_err(FactsError::Protocol)?;
             let signature = require_fact(member.signature.clone(), "authored member signature")?;
             registry
                 .register(&signature.id, HandleKind::Signature)
@@ -960,6 +989,65 @@ impl HostSemanticProvider {
         }
         Ok(result)
     }
+
+    fn source_kotlin_injector_model(
+        &self,
+        source: &str,
+        uri: &str,
+        started: std::time::Instant,
+    ) -> Result<HostSemanticModel, FactsError> {
+        let index = self.class_index.as_deref().ok_or_else(|| {
+            FactsError::Unknown("Kotlin Mixin target index is unavailable".into())
+        })?;
+        let imports = JavaTypeDescriptorResolver::imports_for_uri(source, uri);
+        let mut model = MixinSemanticModelParser::parse_with_lookup(source, uri, Some(index));
+        if model.targets.is_empty() {
+            return Err(FactsError::Unknown(
+                "Kotlin Mixin target syntax is unavailable".into(),
+            ));
+        }
+        model.targets = model
+            .targets
+            .into_iter()
+            .map(|target| {
+                let internal_name = MixinTargetResolver::resolve_target(
+                    &target.internal_name,
+                    index,
+                    Some(&imports),
+                )
+                .ok_or_else(|| {
+                    FactsError::Unknown(
+                        "Kotlin Mixin target is unresolved or ambiguous in the selected project"
+                            .into(),
+                    )
+                })?;
+                Ok(MixinTargetRef {
+                    internal_name,
+                    range: target.range,
+                })
+            })
+            .collect::<Result<Vec<_>, FactsError>>()?;
+        let reason =
+            "Kotlin source syntax model used; handler JVM declaration facts are not required";
+        model.parse_source = ParseSource::HandWrittenFallback;
+        model.confidence = ParseConfidence::Low;
+        model.warnings.push(reason.into());
+        model.debug_info = SemanticParseDebugInfo {
+            parse_source: ParseSource::HandWrittenFallback,
+            fallback_reason: Some(reason.into()),
+            ..Default::default()
+        };
+        for member in &mut model.members {
+            member.parse_source = ParseSource::HandWrittenFallback;
+            member.confidence = ParseConfidence::Low;
+        }
+        self.facts.check_active()?;
+        Ok(HostSemanticModel {
+            model,
+            availability: SemanticAvailability::StableFallback,
+            parse_ms: u64::try_from(started.elapsed().as_millis()).unwrap_or(u64::MAX),
+        })
+    }
 }
 
 fn validate_source_context(
@@ -1052,6 +1140,326 @@ fn relevant_annotation(fqn: &str) -> bool {
         || fqn.starts_with("com.llamalad7.mixinextras.")
         || fqn == "io.github.diskria.lapis.annotations.MappingName"
 }
+
+fn source_kotlin_syntax_can_use_host_index(
+    source: &str,
+    uri: &str,
+    imports: &JavaSourceImports,
+    declarations: &[Declaration],
+    identities: &BTreeMap<String, Fact<TypeFact>>,
+    partial_annotations: bool,
+    annotation_sites: Option<&[crate::host_facts::inputs::AnnotationSite]>,
+) -> bool {
+    if !imports.is_kotlin || partial_annotations {
+        return false;
+    }
+    let parsed = MixinSemanticModelParser::parse(source, uri);
+    if parsed.targets.is_empty() || parsed.injectors.is_empty() || !parsed.members.is_empty() {
+        return false;
+    }
+    let sites = annotations_with_imports(source, imports);
+    let mixins = sites
+        .iter()
+        .filter(|site| site.annotation == MixinAnnotation::Mixin)
+        .collect::<Vec<_>>();
+    let injectors = sites
+        .iter()
+        .filter(|site| site.annotation.is_injector())
+        .collect::<Vec<_>>();
+    if mixins.len() != 1 || injectors.is_empty() {
+        return false;
+    }
+    let mixin = mixins[0];
+    let Some(owner) = declarations.iter().find(|declaration| {
+        declaration.owner.is_none()
+            && declaration.full_range.as_ref().is_some_and(|range| {
+                contains(
+                    range,
+                    &ByteRange {
+                        start: mixin.start,
+                        end: mixin.end,
+                    },
+                )
+            })
+    }) else {
+        return false;
+    };
+    let injector_ranges = injectors
+        .iter()
+        .map(|site| (site.start, site.end))
+        .collect::<BTreeSet<_>>();
+    let mut matched_injectors = BTreeSet::new();
+    let mut owner_mixin_count = 0;
+    let mut incomplete_type = false;
+    let mut incomplete_arguments = false;
+    if !kotlin_annotation_types_allow_fallback(
+        &sites,
+        declarations,
+        identities,
+        annotation_sites,
+        &mut incomplete_type,
+    ) {
+        return false;
+    }
+    for declaration in declarations.iter().filter(|declaration| {
+        declaration.id == owner.id || declaration.owner.as_deref() == Some(owner.id.as_str())
+    }) {
+        for annotation in &declaration.annotations {
+            let Some(site) = sites.iter().find(|site| {
+                site.start == annotation.range.start && site.end == annotation.range.end
+            }) else {
+                return false;
+            };
+            if declaration.id == owner.id {
+                if site.annotation != MixinAnnotation::Mixin {
+                    return false;
+                }
+                owner_mixin_count += 1;
+            } else {
+                if !site.annotation.is_injector() {
+                    return false;
+                }
+                matched_injectors.insert((site.start, site.end));
+            }
+            match identities.get(&annotation.type_ref) {
+                Some(Fact::Found { value }) => {
+                    if MixinAnnotation::from_official_fqn(&value.qualified_name)
+                        != Some(site.annotation)
+                    {
+                        return false;
+                    }
+                }
+                Some(Fact::Unknown { .. } | Fact::DefinitelyAbsent) => {
+                    incomplete_type = true;
+                }
+                None => return false,
+            }
+            incomplete_arguments |= annotation_arguments_unavailable(annotation);
+        }
+    }
+    owner_mixin_count == 1
+        && matched_injectors == injector_ranges
+        && (incomplete_type || incomplete_arguments)
+}
+
+fn kotlin_annotation_types_allow_fallback(
+    source_sites: &[mcdev_core::mixin_source::AnnotationSite],
+    declarations: &[Declaration],
+    identities: &BTreeMap<String, Fact<TypeFact>>,
+    annotation_sites: Option<&[crate::host_facts::inputs::AnnotationSite]>,
+    incomplete_type: &mut bool,
+) -> bool {
+    for declaration in declarations {
+        for annotation in &declaration.annotations {
+            if !kotlin_annotation_type_binding_matches(
+                annotation,
+                source_sites,
+                identities,
+                incomplete_type,
+            ) {
+                return false;
+            }
+        }
+        for parameter in declaration
+            .parameters
+            .as_ref()
+            .and_then(Fact::found)
+            .into_iter()
+            .flatten()
+        {
+            for annotation in &parameter.annotations {
+                if !kotlin_annotation_type_binding_matches(
+                    annotation,
+                    source_sites,
+                    identities,
+                    incomplete_type,
+                ) {
+                    return false;
+                }
+            }
+        }
+    }
+    if let Some(annotation_sites) = annotation_sites {
+        for site in annotation_sites {
+            if !kotlin_annotation_type_binding_matches(
+                &site.annotation,
+                source_sites,
+                identities,
+                incomplete_type,
+            ) {
+                return false;
+            }
+        }
+    }
+    true
+}
+
+fn kotlin_annotation_type_binding_matches(
+    annotation: &Annotation,
+    source_sites: &[mcdev_core::mixin_source::AnnotationSite],
+    identities: &BTreeMap<String, Fact<TypeFact>>,
+    incomplete_type: &mut bool,
+) -> bool {
+    if let Some(site) = source_sites
+        .iter()
+        .find(|site| site.start == annotation.range.start && site.end == annotation.range.end)
+    {
+        match identities.get(&annotation.type_ref) {
+            Some(Fact::Found { value }) => {
+                if MixinAnnotation::from_official_fqn(&value.qualified_name)
+                    != Some(site.annotation)
+                {
+                    return false;
+                }
+            }
+            Some(Fact::Unknown { .. } | Fact::DefinitelyAbsent) => *incomplete_type = true,
+            None => return false,
+        }
+    }
+    annotation.arguments.iter().all(|argument| {
+        kotlin_annotation_argument_type_binding_matches(
+            argument,
+            source_sites,
+            identities,
+            incomplete_type,
+        )
+    })
+}
+
+fn kotlin_annotation_argument_type_binding_matches(
+    argument: &Argument,
+    source_sites: &[mcdev_core::mixin_source::AnnotationSite],
+    identities: &BTreeMap<String, Fact<TypeFact>>,
+    incomplete_type: &mut bool,
+) -> bool {
+    match argument.value.found() {
+        Some(AnnotationValue::Annotation { annotation }) => kotlin_annotation_type_binding_matches(
+            annotation,
+            source_sites,
+            identities,
+            incomplete_type,
+        ),
+        Some(AnnotationValue::Array { values }) => values.iter().all(|value| {
+            kotlin_annotation_argument_type_binding_matches(
+                value,
+                source_sites,
+                identities,
+                incomplete_type,
+            )
+        }),
+        _ => true,
+    }
+}
+
+fn source_only_kotlin_injectors(
+    declarations: &[&Declaration],
+    identities: &BTreeMap<String, Fact<TypeFact>>,
+) -> bool {
+    !declarations.is_empty()
+        && declarations.iter().all(|declaration| {
+            declaration.annotations.iter().all(|annotation| {
+                identities
+                    .get(&annotation.type_ref)
+                    .and_then(Fact::found)
+                    .and_then(|ty| MixinAnnotation::from_official_fqn(&ty.qualified_name))
+                    .is_some_and(MixinAnnotation::is_injector)
+            })
+        })
+}
+
+fn annotation_arguments_unavailable(annotation: &Annotation) -> bool {
+    fn value_unavailable(argument: &Argument) -> bool {
+        match &argument.value {
+            Fact::Found {
+                value: AnnotationValue::Array { values },
+            } => values.iter().any(value_unavailable),
+            Fact::Found {
+                value: AnnotationValue::Annotation { annotation },
+            } => annotation_arguments_unavailable(annotation),
+            Fact::Found { .. } => false,
+            Fact::Unknown { .. } | Fact::DefinitelyAbsent => true,
+        }
+    }
+    annotation.arguments.iter().any(value_unavailable)
+}
+
+fn source_injector_member_binding_incomplete(
+    fact: &Fact<EditingMember>,
+) -> Result<bool, FactsError> {
+    fact.validate().map_err(FactsError::Protocol)?;
+    let Fact::Found { value } = fact else {
+        return Ok(true);
+    };
+    if !value.mismatches.is_empty() {
+        return Ok(false);
+    }
+    Ok(value.member.signature.found().is_none()
+        || value.member.dispatch.found().is_none()
+        || value.visibility.found().is_none()
+        || value.synthetic.found().is_none())
+}
+
+fn validate_source_injector_member(
+    fact: &Fact<EditingMember>,
+    declaration: &Declaration,
+    source_context: Option<&SourceDescriptor>,
+    registry: &mut Registry,
+) -> Result<(), FactsError> {
+    fact.validate().map_err(FactsError::Protocol)?;
+    let Fact::Found { value } = fact else {
+        return Ok(());
+    };
+    let member = &value.member;
+    validate_source_context(
+        member.read_only,
+        member.context_source.as_ref(),
+        source_context,
+    )?;
+    if member.name != declaration.name.as_deref().unwrap_or("").trim_matches('`') {
+        return Err(FactsError::Protocol(
+            "authored member name disagrees with declaration".into(),
+        ));
+    }
+    registry
+        .register(&member.id, HandleKind::Member)
+        .map_err(FactsError::Protocol)?;
+    member.signature.validate().map_err(FactsError::Protocol)?;
+    if let Some(signature) = member.signature.found() {
+        registry
+            .register(&signature.id, HandleKind::Signature)
+            .map_err(FactsError::Protocol)?;
+        if signature.kind != member.kind {
+            return Err(FactsError::Protocol(
+                "editing member signature kind mismatch".into(),
+            ));
+        }
+        match member.kind.as_str() {
+            "method" => {
+                descriptor::parse_method_descriptor(&signature.descriptor)
+                    .map_err(|error| FactsError::Protocol(error.to_string()))?;
+            }
+            "field" => {
+                descriptor::parse_field_descriptor(&signature.descriptor)
+                    .map_err(|error| FactsError::Protocol(error.to_string()))?;
+            }
+            _ => return Err(FactsError::Protocol("unknown editing member kind".into())),
+        }
+    } else if !matches!(member.kind.as_str(), "method" | "field") {
+        return Err(FactsError::Protocol("unknown editing member kind".into()));
+    }
+    member.dispatch.validate().map_err(FactsError::Protocol)?;
+    if member
+        .dispatch
+        .found()
+        .is_some_and(|value| value != "instance" && value != "static")
+    {
+        return Err(FactsError::Protocol("unknown dispatch value".into()));
+    }
+    value.visibility.validate().map_err(FactsError::Protocol)?;
+    value.synthetic.validate().map_err(FactsError::Protocol)?;
+    Ok(())
+}
+
 fn validate_type(ty: &TypeFact, registry: &mut Registry) -> Result<(), FactsError> {
     if ty.qualified_name.is_empty() {
         return Err(FactsError::Protocol("empty host type name".into()));
@@ -1480,6 +1888,455 @@ fn convert_expression(
 
 fn contains(parent: &ByteRange, child: &ByteRange) -> bool {
     parent.start <= child.start && child.start <= child.end && child.end <= parent.end
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use mcdev_core::{
+        host_source::{
+            HostFact, HostSemanticEnvironment, HostSemanticModelProvider, HostSemanticRequest,
+        },
+        model::{ClassIndex, ClassIndexEntry, FieldIndexEntry, MethodIndexEntry},
+    };
+    use sha2::Digest;
+    use std::sync::Mutex;
+
+    fn found(value: Value) -> Value {
+        json!({"state":"found","value":value})
+    }
+    fn unknown() -> Value {
+        json!({"state":"unknown","reasons":[{"code":"MissingFacts"}]})
+    }
+    fn span(source: &str, text: &str) -> Value {
+        let start = source.find(text).unwrap();
+        json!({"start":start,"end":start+text.len()})
+    }
+    fn modifiers(visibility: &str) -> Value {
+        json!({"visibility":found(json!(visibility)),"static":found(json!(false)),
+            "final":found(json!(false)),"abstract":found(json!(false))})
+    }
+    fn annotation(
+        source: &str,
+        text: &str,
+        name: &str,
+        reference: &str,
+        arguments: Value,
+    ) -> Value {
+        let start = source.find(text).unwrap();
+        let name_start = start + text.find(name).unwrap();
+        json!({"typeRef":reference,"useSiteTarget":null,"range":span(source,text),
+            "nameRange":{"start":name_start,"end":name_start+name.len()},"arguments":arguments})
+    }
+    fn kotlin_fixture(target_known: bool) -> (String, Value) {
+        let source = r#"import io.github.diskria.lapis.annotations.KMixin
+import org.spongepowered.asm.mixin.injection.Inject
+import org.spongepowered.asm.mixin.injection.At as AtAlias
+import fixture.DrillTarget as Drill
+
+@KMixin(target = Drill::class)
+class DrillMixin {
+    @Inject(method = ["useIt"], at = [AtAlias("HEAD")], cancellable = true)
+    fun Drill.onUse(cir: CallbackInfoReturnable<ItemInteractionResult>) {}
+}"#
+        .to_owned();
+        let mixin_text = "@KMixin(target = Drill::class)";
+        let inject_text =
+            "@Inject(method = [\"useIt\"], at = [AtAlias(\"HEAD\")], cancellable = true)";
+        let mixin = annotation(
+            &source,
+            mixin_text,
+            "KMixin",
+            "mixin-ref",
+            json!([{"name":"target","range":span(&source,"Drill::class"),"value":if target_known {
+                found(json!({"kind":"class","typeRef":"target-ref"}))
+            } else {
+                unknown()
+            }}]),
+        );
+        let at = annotation(
+            &source,
+            "AtAlias(\"HEAD\")",
+            "AtAlias",
+            "at-ref",
+            json!([{"name":null,"range":span(&source,"\"HEAD\""),
+                "value":found(json!({"kind":"string","value":"HEAD",
+                    "contentRange":span(&source,"HEAD")}))}]),
+        );
+        let inject = annotation(
+            &source,
+            inject_text,
+            "Inject",
+            "inject-ref",
+            json!([
+                {"name":"at","range":span(&source,"AtAlias(\"HEAD\")"),
+                    "value":found(json!({"kind":"annotation","annotation":at}))}
+            ]),
+        );
+        let class_start = source.find(mixin_text).unwrap();
+        let class_body = source.find("class DrillMixin {").unwrap() + "class DrillMixin".len();
+        let method_start = source.find(inject_text).unwrap();
+        let method_body = source.find("{}").unwrap();
+        let declarations = json!([
+            {"id":"class-declaration","owner":null,"name":"DrillMixin","range":span(&source,"DrillMixin"),
+                "annotations":[mixin],"sourceKind":"Class","fullRange":{"start":class_start,"end":source.len()},
+                "headerRange":{"start":class_start,"end":class_body},"nameRange":span(&source,"DrillMixin"),
+                "bodyRange":{"start":class_body,"end":source.len()},"modifiers":modifiers("Package")},
+            {"id":"method-declaration","owner":"class-declaration","name":"onUse","range":span(&source,"onUse"),
+                "annotations":[inject],"sourceKind":"Function","fullRange":{"start":method_start,"end":method_body+2},
+                "headerRange":{"start":method_start,"end":method_body},"nameRange":span(&source,"onUse"),
+                "bodyRange":{"start":method_body,"end":method_body+2},"modifiers":modifiers("Package")}
+        ]);
+        (source, declarations)
+    }
+
+    struct Host {
+        source: String,
+        declarations: Value,
+        queries: Mutex<Vec<Value>>,
+        member_unknown: bool,
+        member_foreign: bool,
+        annotation_types_unknown: bool,
+        annotation_site_mode: u8,
+    }
+    impl SemanticFactClient for Host {
+        fn check_active(&self) -> Result<(), FactsError> {
+            Ok(())
+        }
+        fn read_facts(&self, evaluation: &str, queries: &[Value]) -> Result<Value, FactsError> {
+            assert_eq!(evaluation, "evaluation");
+            self.queries.lock().unwrap().extend_from_slice(queries);
+            let facts = queries
+                .iter()
+                .map(|query| match query["op"].as_str().unwrap() {
+                    "sourceFacts" => json!({"declarations":self.declarations}),
+                    "annotationSites" => {
+                        assert_ne!(self.annotation_site_mode, 0);
+                        let declarations = self.declarations.as_array().unwrap();
+                        let mut mixin = declarations[0]["annotations"][0].clone();
+                        if self.annotation_site_mode == 2 {
+                            mixin["typeRef"] = json!("wrong-ref");
+                        }
+                        let inject = declarations[1]["annotations"][0].clone();
+                        let at = inject["arguments"][0]["value"]["value"]["annotation"].clone();
+                        let site = |owner: Option<&str>, annotation: Value| {
+                            let mut site = json!({"owner":owner});
+                            site.as_object_mut()
+                                .unwrap()
+                                .extend(annotation.as_object().unwrap().clone());
+                            site
+                        };
+                        json!({
+                            "source": {
+                                "documentUri": found(json!("file:///project/DrillMixin.kt")),
+                                "identity": {"kind":"source","revision":"test"},
+                                "sha256": format!("{:x}", sha2::Sha256::digest(self.source.as_bytes()))
+                            },
+                            "annotations": [
+                                site(Some("class-declaration"), mixin),
+                                site(Some("method-declaration"), inject),
+                                site(None, at)
+                            ],
+                            "coverage": found(Value::Null)
+                        })
+                    }
+                    "resolveTypeRef" => {
+                        let (id, name) = match query["reference"].as_str().unwrap() {
+                            "mixin-ref" => {
+                                ("type-mixin", "io.github.diskria.lapis.annotations.KMixin")
+                            }
+                            "inject-ref" => (
+                                "type-inject",
+                                "org.spongepowered.asm.mixin.injection.Inject",
+                            ),
+                            "at-ref" => ("type-at", "org.spongepowered.asm.mixin.injection.At"),
+                            "target-ref" => ("type-target", "fixture.DrillTarget"),
+                            "wrong-ref" => ("type-wrong", "fixture.NotMixin"),
+                            other => panic!("unexpected Kotlin source type reference {other}"),
+                        };
+                        if self.annotation_types_unknown
+                            && query["reference"] != "target-ref"
+                            && query["reference"] != "wrong-ref"
+                        {
+                            unknown()
+                        } else {
+                            found(json!({"id":id,"qualifiedName":name,"package":"fixture"}))
+                        }
+                    }
+                    "declarationType" => found(json!({
+                        "id":"owner-type","qualifiedName":"fixture.DrillMixin","package":"fixture"
+                    })),
+                    "declarationMember" if self.member_unknown => unknown(),
+                    "declarationMember" if self.member_foreign => found(json!({
+                        "id":"member-id","name":"onUse","kind":"method",
+                        "signature":unknown(),"dispatch":unknown(),"readOnly":true,
+                        "contextSource":null,"visibility":unknown(),"synthetic":unknown(),
+                        "mismatches":[]
+                    })),
+                    "declarationMember" => {
+                        panic!("source-only Kotlin injector must not query {query}")
+                    }
+                    "typeJvm" => json!({
+                        "binaryName":found(json!({"internalName":"fixture/DrillTarget",
+                            "descriptor":"Lfixture/DrillTarget;"})),
+                        "classFlags":unknown(),
+                        "declaredMembers":{"members":[],"coverage":unknown()},
+                        "abi":unknown(),"jvmAbiCoverage":unknown()
+                    }),
+                    other => panic!("unexpected Kotlin source fact operation {other}"),
+                })
+                .collect::<Vec<_>>();
+            Ok(json!({"facts":facts}))
+        }
+    }
+
+    struct TargetIndex {
+        target: Option<ClassIndexEntry>,
+        alternatives: Vec<ClassIndexEntry>,
+    }
+    impl ClassIndex for TargetIndex {
+        fn find_classes(&self, prefix: &str, limit: usize) -> Vec<ClassIndexEntry> {
+            self.alternatives
+                .iter()
+                .filter(|entry| {
+                    entry.internal_name.starts_with(prefix)
+                        || entry.fqn().starts_with(prefix)
+                        || entry.simple_name.starts_with(prefix)
+                })
+                .take(limit)
+                .cloned()
+                .collect()
+        }
+        fn find_class(&self, internal_name: &str) -> Option<ClassIndexEntry> {
+            self.target
+                .as_ref()
+                .filter(|entry| entry.internal_name == internal_name)
+                .cloned()
+        }
+        fn find_class_by_fqn(&self, fqn: &str) -> Option<ClassIndexEntry> {
+            self.target
+                .as_ref()
+                .filter(|entry| entry.fqn() == fqn)
+                .cloned()
+        }
+        fn get_methods(&self, _: &str) -> Vec<MethodIndexEntry> {
+            vec![]
+        }
+        fn get_fields(&self, _: &str) -> Vec<FieldIndexEntry> {
+            vec![]
+        }
+    }
+
+    fn provider(
+        index: Option<TargetIndex>,
+        target_known: bool,
+        member_unknown: bool,
+        member_foreign: bool,
+        annotation_types_unknown: bool,
+        annotation_site_mode: u8,
+    ) -> (HostSemanticProvider, Arc<Host>, String) {
+        let (source, declarations) = kotlin_fixture(target_known);
+        let host = Arc::new(Host {
+            source: source.clone(),
+            declarations,
+            queries: Mutex::new(Vec::new()),
+            member_unknown,
+            member_foreign,
+            annotation_types_unknown,
+            annotation_site_mode,
+        });
+        let evaluation: Evaluation = serde_json::from_value(json!({
+            "evaluation":"evaluation","owner":"owner","source":source,
+            "configuration":{},"declarations":[]
+        }))
+        .unwrap();
+        let mut provider = HostSemanticProvider::with_client(
+            evaluation,
+            host.clone(),
+            "file:///project/DrillMixin.kt".into(),
+            Some(3),
+        )
+        .unwrap()
+        .with_source_facts(true)
+        .with_annotation_sites(annotation_site_mode != 0, None);
+        if let Some(index) = index {
+            provider.class_index = Some(Arc::new(index));
+        }
+        (provider, host, source)
+    }
+
+    fn target_index() -> TargetIndex {
+        TargetIndex {
+            target: Some(ClassIndexEntry {
+                simple_name: "DrillTarget".into(),
+                package_name: "fixture".into(),
+                internal_name: "fixture/DrillTarget".into(),
+            }),
+            alternatives: vec![],
+        }
+    }
+
+    fn parse(provider: &HostSemanticProvider, source: &str) -> HostFact<HostSemanticModel> {
+        provider
+            .parse(&HostSemanticRequest {
+                source,
+                source_uri: "file:///project/DrillMixin.kt",
+                document_version: Some(3),
+                environment: &HostSemanticEnvironment::default(),
+                project: None,
+            })
+            .unwrap()
+            .fact
+    }
+
+    #[test]
+    fn kotlin_injector_uses_source_model_without_unused_argument_or_handler_facts() {
+        let (provider, host, source) = provider(Some(target_index()), false, true, false, false, 0);
+        let answer = parse(&provider, &source);
+        let HostFact::Known(result) = answer else {
+            panic!("expected source-level Kotlin model: {answer:?}")
+        };
+        assert_eq!(result.availability, SemanticAvailability::StableFallback);
+        assert_eq!(result.model.parse_source, ParseSource::HandWrittenFallback);
+        assert_eq!(result.model.targets[0].internal_name, "fixture/DrillTarget");
+        assert_eq!(result.model.injectors[0].method_selectors[0].name, "useIt");
+        assert_eq!(result.model.injectors[0].at_selectors[0].value, "HEAD");
+        let queries = host.queries.lock().unwrap();
+        let operations = queries
+            .iter()
+            .filter_map(|query| query["op"].as_str())
+            .collect::<Vec<_>>();
+        assert!(operations.contains(&"sourceFacts"));
+        assert!(operations.contains(&"resolveTypeRef"));
+        assert!(!operations
+            .iter()
+            .any(|op| matches!(*op, "declarationMember" | "typeJvm")));
+    }
+
+    #[test]
+    fn kotlin_injector_falls_back_when_only_its_handler_member_fact_is_unknown() {
+        let (provider, host, source) = provider(Some(target_index()), true, true, false, false, 0);
+        let HostFact::Known(result) = parse(&provider, &source) else {
+            panic!("expected source-level Kotlin model")
+        };
+        assert_eq!(result.model.parse_source, ParseSource::HandWrittenFallback);
+        assert_eq!(result.model.targets[0].internal_name, "fixture/DrillTarget");
+        let queries = host.queries.lock().unwrap();
+        let operations = queries
+            .iter()
+            .filter_map(|query| query["op"].as_str())
+            .collect::<Vec<_>>();
+        assert!(operations.contains(&"typeJvm"));
+        assert!(operations.contains(&"declarationMember"));
+    }
+
+    #[test]
+    fn kotlin_injector_falls_back_when_mc_annotation_type_facts_are_unknown() {
+        let (provider, host, source) = provider(Some(target_index()), false, true, false, true, 1);
+        let HostFact::Known(result) = parse(&provider, &source) else {
+            panic!("expected source-level Kotlin model")
+        };
+        assert_eq!(result.model.parse_source, ParseSource::HandWrittenFallback);
+        assert_eq!(result.model.targets[0].internal_name, "fixture/DrillTarget");
+        let queries = host.queries.lock().unwrap();
+        assert!(queries.iter().any(|query| query["op"] == "resolveTypeRef"));
+        assert!(!queries
+            .iter()
+            .any(|query| query["op"] == "declarationMember"));
+    }
+
+    #[test]
+    fn kotlin_injector_does_not_hide_known_non_mc_annotation_site() {
+        let (provider, _, source) = provider(Some(target_index()), false, true, false, true, 2);
+        let answer = parse(&provider, &source);
+        assert!(matches!(
+            answer,
+            HostFact::Unavailable { reason }
+                if reason.contains("annotation reference alias")
+        ));
+    }
+
+    #[test]
+    fn source_only_kotlin_injectors_accepts_wrap_operation() {
+        let declaration = Declaration {
+            id: "method-declaration".into(),
+            owner: Some("class-declaration".into()),
+            range: ByteRange { start: 0, end: 1 },
+            name: Some("onPlace".into()),
+            annotations: vec![Annotation {
+                type_ref: "wrap-ref".into(),
+                use_site_target: None,
+                range: ByteRange { start: 0, end: 1 },
+                name_range: None,
+                arguments: vec![],
+            }],
+            source_kind: Some("Function".into()),
+            full_range: None,
+            header_range: None,
+            name_range: None,
+            body_range: None,
+            modifiers: None,
+            parameters: None,
+        };
+        let mut identities = BTreeMap::new();
+        identities.insert(
+            "wrap-ref".into(),
+            Fact::Found {
+                value: TypeFact {
+                    id: "wrap-type".into(),
+                    qualified_name:
+                        "com.llamalad7.mixinextras.injector.wrapoperation.WrapOperation".into(),
+                    package: "com.llamalad7.mixinextras.injector.wrapoperation".into(),
+                    read_only: false,
+                    context_source: None,
+                },
+            },
+        );
+        assert!(source_only_kotlin_injectors(&[&declaration], &identities));
+    }
+
+    #[test]
+    fn kotlin_injector_does_not_bypass_foreign_found_member_context() {
+        let (provider, _, source) = provider(Some(target_index()), true, false, true, false, 0);
+        let answer = parse(&provider, &source);
+        assert!(matches!(
+            answer,
+            HostFact::Unavailable { reason } if reason.contains("foreign source context")
+        ));
+    }
+
+    #[test]
+    fn kotlin_injector_requires_a_unique_selected_target_index() {
+        for index in [
+            None,
+            Some(TargetIndex {
+                target: None,
+                alternatives: vec![
+                    ClassIndexEntry {
+                        simple_name: "DrillTarget".into(),
+                        package_name: "fixture".into(),
+                        internal_name: "fixture/DrillTarget".into(),
+                    },
+                    ClassIndexEntry {
+                        simple_name: "DrillTarget".into(),
+                        package_name: "other".into(),
+                        internal_name: "other/DrillTarget".into(),
+                    },
+                ],
+            }),
+        ] {
+            let (provider, _, source) = provider(index, false, true, false, false, 0);
+            let answer = parse(&provider, &source);
+            assert!(
+                matches!(
+                    &answer,
+                    HostFact::Unavailable { reason }
+                        if reason.contains("Kotlin Mixin target")
+                ),
+                "unexpected answer: {answer:?}"
+            );
+        }
+    }
 }
 fn collect_targets(
     argument: &Argument,

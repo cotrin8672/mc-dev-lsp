@@ -63462,9 +63462,9 @@
     },
     "resumedIntegration": {
       "date": "2026-11-05",
-      "status": "source-resource-quota-fixed; original-drill-stale-on-host105; original-kotlin-annotation-argument-unavailable",
-      "hostPin": "a0be6aa14b27be02835ddfaad4189ca99763d90d",
-      "hostReceipt": "build/host-artifacts/candidate105-3c26a5208d64/main-ready.json",
+      "status": "kotlin-source-parser-connected; native-1913-passed; Java107-name-only-definition-incomplete; Kotlin-model-prepared-physical-artifacts-unverified",
+      "hostPin": "d24ab4d2409405fdf7a55792cb9896f597a0f5df",
+      "hostReceipt": "build/host-artifacts/candidate107-c926f65583b9/main-ready.json",
       "hostSerializerFixture": "mcdev-companion/tests/fixtures/host_inputs/root_files/actual-serializer-sample.json",
       "nativePipeline": "build/rust-test-logs/native-pipeline-proof-20261105-011949083",
       "optimizedPackage": {
@@ -63850,8 +63850,8 @@
         "liveExactOriginalItemSetPassed": true
       },
       "latestNativeCheck": {
-        "path": "build/rust-test-logs/resource-needs-full-20261105-064212278/native-summary.json",
-        "sha256": "da2369f3d48aa53f874abced98133263d382799b5b9640deb1df64987bfac0aa"
+        "path": "build/rust-test-logs/20261105-102624370/native-summary.json",
+        "sha256": "5db306b0f8d89c6249982c80e52f5e1989e4f3a58546198097f0bbbaddf757ad"
       },
       "originalDrillKotlinAttempt": {
         "path": "build/rust-test-logs/kotlin-drill-native-20261105/recovery-and-run-receipt.json",
@@ -63960,6 +63960,198 @@
         "passedBeforeFailure": 8,
         "originalKotlinInputOrAssertionsChanged": false,
         "oldFailuresPreserved": true
+      },
+      "host106": {
+        "codeCommit": "7327a042982f6b8e30b508c981a75ea369dbfd80",
+        "binarySha256": "a2b883b5896a1eb1707ffa54de777edb25debf85918d21d2f8b182559661e168",
+        "bytes": 25458176,
+        "copyReceipt": {
+          "path": "build/host-artifacts/candidate106-a2b883b5896a/copy-receipt.json",
+          "sha256": "d374288e0483734d7796973e51a3e667c2960b0a11172f11d087264570ccb52b"
+        },
+        "scope": "Retains already-indexed library source bodies after stamp/epoch/origin/symbol validation; historical Java deadline failure remains."
+      },
+      "host107": {
+        "codeCommit": "c5b07f1f4356493fa0fb4248e755619efca19341",
+        "documentationPin": "d24ab4d2409405fdf7a55792cb9896f597a0f5df",
+        "binarySha256": "c926f65583b9fb81ea6ee25ab419d55c5090ae2173f039aa961b5a8bea75a09c",
+        "bytes": 25459200,
+        "copyReceipt": {
+          "path": "build/host-artifacts/candidate107-c926f65583b9/copy-receipt.json",
+          "sha256": "b40b57af2929a08b2a21ea925958faadcf89ca9542bff7ea9b2fb36ed7517c21"
+        },
+        "scope": "Batch-only proof sharing for separate resolver instances with all six selected library inputs equal; current materialization/stamp/epoch/origin guards unchanged."
+      },
+      "nativeCheckHistory": [
+        {
+          "path": "build/rust-test-logs/resource-needs-full-20261105-064212278/native-summary.json",
+          "sha256": "da2369f3d48aa53f874abced98133263d382799b5b9640deb1df64987bfac0aa"
+        }
+      ],
+      "kotlinSourceParserConnection": {
+        "status": "implemented; full local native and editor checks passed; original live Kotlin acceptance not yet passed",
+        "decision": "docs/rust-migration.md#responsibility-decision-2026-11-05",
+        "sourcePatchSha256": "4a3ba43df60a3dc86968508c7ebe26f446a1fda541f94d30910ab2817f0bea4d",
+        "buildInputs": {
+          "path": "build/rust-test-logs/kotlin-source-guard-build-20261105-102607137/build-inputs.json",
+          "sha256": "1a0eb40521926f6b8c604300d706749ea4449fb5a591a436ca161edcfc3ab45a"
+        },
+        "artifact": {
+          "path": "build/companion-artifacts/native-kotlin-guard-8a9fab5dbe78/receipt.json",
+          "sha256": "78ec173ee190b8a8f63f03983981d7897957297e590d03d734811451f2de9c97"
+        },
+        "binarySha256": "8a9fab5dbe782e86eb144441e3ed0ccd21ac9e4f88f50919c5d07b00180b524e",
+        "nativeFunctions": 1913,
+        "nativeTargets": 83,
+        "independentEditorEntries": 5,
+        "parseSource": "HAND_WRITTEN_FALLBACK",
+        "confidence": "LOW",
+        "hostNormalizedClaimed": false,
+        "sourceDocumentAndScopeGuardsPreserved": true,
+        "knownAnnotationAndMemberContradictionsRejected": true,
+        "newKotlinHostOperationRequired": false,
+        "fixtureProvenanceRestore": {
+          "path": "build/architecture-review-20261105/kotlin-test-provenance-restore.json",
+          "sha256": "88e7ada0f20268ebceebabc92ca7ce5e7e49ad59624d6d0032e6230bc481c5ca"
+        },
+        "fixtureSha256": "c9430836ee9ecf1b64aff6186a4c3904a6e383944df79b2bac2c0d4c2be7354f",
+        "scope": "Reuse existing MC parser for source syntax and Lapis interpretation; selected host ClassIndex still resolves target identities. Syntax Unknown is not promoted to compiler binding."
+      },
+      "originalDrillHost106": {
+        "receipt": {
+          "path": "build/rust-test-logs/java-host106-native-20261105/recovery-and-run-receipt.json",
+          "sha256": "81f64b681e358cea8132d20cd1aa5d48924bc10bd3f8609d53701d7ba9247e33"
+        },
+        "seconds": 159.6,
+        "outerTimeoutSeconds": 180,
+        "passedBeforeFailure": 8,
+        "failure": "definition request deadline; host evaluation cancelled and validation false",
+        "handlerFoundClaimed": false,
+        "cleanShutdown": true,
+        "ownedProcessesRemaining": 0
+      },
+      "originalDrillHost107": {
+        "receipt": {
+          "path": "build/rust-test-logs/java-host107-native-20261105/recovery-and-run-receipt.json",
+          "sha256": "ffa58c196e09ecd0b72c9fe5e769f98751233948b73fc463aa7b9eb54a6f05bf"
+        },
+        "seconds": 48.7,
+        "timedOut": false,
+        "observedAssertions": 10,
+        "passedBeforeFailure": 9,
+        "failure": "INCOMPLETE_PROJECT_CONTEXT: current source methods for com/simibubi/create/content/kinetics/drill/DrillBlock are incomplete",
+        "nameOnlySelector": "useItemOn",
+        "definitionLocations": 0,
+        "evaluation": 27,
+        "validationValid": true,
+        "handlerFoundClaimed": false,
+        "completeSourceCoverageClaimed": false,
+        "partialCandidateUniquenessAssumed": false,
+        "cleanShutdown": true,
+        "ownedProcessesRemaining": 0,
+        "scope": "Valid response proves request completion, not original Java definition acceptance; source-wide coverage is always Unknown, not evidence of a particular bad signature."
+      },
+      "originalKotlinHost107": {
+        "receipt": {
+          "path": "build/rust-test-logs/kotlin-source-6c36-host107-native-20261105/recovery-and-run-receipt.json",
+          "sha256": "abcff6d5bb76ae151fe0de01e569cd25e063895a56f3bb90ebd4dff0a777068c"
+        },
+        "companionSha256": "6c3644055fd6315320bc1c91c982bad877ee274008fd76c6848ea07231590f77",
+        "seconds": 46.1,
+        "observedAssertions": 9,
+        "passedBeforeFailure": 8,
+        "failure": "MissingFacts: missing-selected-sdk",
+        "sdkMeaning": "Selected JDK, not Minecraft jar",
+        "sourceParserSuccessClaimed": false,
+        "laterPhasesReached": false,
+        "ownedProcessesRemaining": 0
+      },
+      "originalKotlinSdk21Host107": {
+        "receipt": {
+          "path": "build/rust-test-logs/kotlin-sdk21-6c36-host107-native-20261105/recovery-and-run-receipt.json",
+          "sha256": "3a12ca8f3116d7befad8d86832b858bf583f76dd01ad753b0c7682bbe37de55b"
+        },
+        "companionSha256": "6c3644055fd6315320bc1c91c982bad877ee274008fd76c6848ea07231590f77",
+        "seconds": 67.5,
+        "timedOut": false,
+        "observedAssertions": 9,
+        "passedBeforeFailure": 8,
+        "failure": "INCOMPLETE_PROJECT_CONTEXT: selected classpath coverage is unavailable",
+        "profile": {
+          "gradle": "9.6.1",
+          "kotlinJvmPlugin": "2.4.21",
+          "jvmToolchain": 21,
+          "lapisMarkerAdded": false,
+          "originalSourceAndSemanticAssertionsChanged": false,
+          "isolatedCaches": true
+        },
+        "actualModel": {
+          "path": "build/rust-test-logs/kotlin-sdk21-6c36-host107-native-20261105/ktlsp-cache/classpath/54fb5da31c1fc09c.json",
+          "sha256": "b6ba62ce16a37a13a17115d80dce25b51dc0edf9d860832e4bf37372339743fb"
+        },
+        "actualModelFacts": {
+          "version": 16,
+          "kotlinPresent": true,
+          "kotlinTarget": "jvm",
+          "kotlinTask": ":compileKotlin",
+          "classpathIncomplete": true,
+          "compilerMetadataIncomplete": true,
+          "compilerTaskComplete": false,
+          "javaHome": null,
+          "classpathEntries": 0,
+          "unresolved": "org.jetbrains.kotlin:kotlin-stdlib:2.4.21",
+          "dumpOffline": true
+        },
+        "sdkAdmissionClaimed": false,
+        "scope": "Task/toolchain availability does not establish host SDK admission. Saved model recognizes Kotlin; offline stdlib resolution is the first concrete blocker, not proven KGP incompatibility.",
+        "sourceParserSuccessClaimed": false,
+        "laterPhasesReached": false,
+        "ownedProcessesRemaining": 0,
+        "globalKtlspCacheTouched": false
+      },
+      "targetSourceProvenanceDecision": {
+        "status": "wire contract agreed; host and consumer implementation pending",
+        "knowledge": [
+          "target-bound CurrentWorkspaceSource (including generated/open overlay), SelectedDependencySource, or Unknown",
+          "selected dependency opaque identity joinable to existing runtimeClass origin/selection"
+        ],
+        "sourceWideCoverageChanged": false,
+        "compilerOrAnnotationFeaturesRequested": false,
+        "fallbackForUnknownOrCurrentWorkspace": false,
+        "scope": "Only proven selected dependency source with matching selected runtime artifact can use complete runtime ABI for name-only selection. Checked source locations remain separate from runtime/source completeness.",
+        "operation": "sourceProvenance",
+        "capability": "project-class-facts-v1",
+        "negotiation": "supportedOps",
+        "existingTypeJvmDtoChanged": false
+      },
+      "originalKotlinSdk21OnlinePreparation": {
+        "receipt": {
+          "path": "build/rust-test-logs/kotlin-sdk21-online-resolution-20261105/recovery-and-run-receipt.json",
+          "sha256": "ab00941f45f2c15c2b7174936cb70b68d3a009e17531726340a10e8e918d5246"
+        },
+        "actualModel": "build/rust-test-logs/kotlin-sdk21-online-metadata-host107-20261105/ktlsp-cache/classpath/3de9a707d025143f.json",
+        "actualModelSha256": "6fdf0bb199d4ffc9da583b461316a01d9bac21cb6a91bc3a90e489d412c3d247",
+        "kotlinPresent": true,
+        "compileKotlinComplete": true,
+        "kotlinSdkProducerClaimsComplete": true,
+        "javaHome": "C:/Program Files/Java/jdk-21",
+        "release": null,
+        "sdkSelectionField": null,
+        "classpathIncomplete": false,
+        "compilerMetadataIncomplete": false,
+        "unresolved": 0,
+        "classpathEntries": 7,
+        "traceClasspathComplete": true,
+        "traceJdkComplete": true,
+        "traceJdkFiles": 14398,
+        "physicalStdlibJarConfirmed": false,
+        "physicalAnnotationsJarConfirmed": false,
+        "missingSources": 2,
+        "metadataProbeStatus": "Stale before metadata JSON; no fresh accepted evaluation within deadline",
+        "mcFeatureE2ERun": false,
+        "ownedProcessesRemaining": 0,
+        "globalCacheTouched": false,
+        "scope": "Model/task/JDK producer claims are admitted. Physical jar paths and full source readiness remain unverified; no functional Kotlin acceptance credit."
       }
     }
   }

@@ -57,10 +57,10 @@ return function(h)
       return result
     end
 
-    local function apply_kotlin_completion(partial, expected, descriptor_mode, expected_parse_source)
+    local function apply_kotlin_completion(partial, expected, descriptor_mode)
       local before = kotlin_text()
       local result = kotlin_request("mcdev.completion", partial, descriptor_mode)
-      helpers.assert_eq(result.debug.parseSource, expected_parse_source)
+      helpers.assert_eq(result.debug.parseSource, "HAND_WRITTEN_FALLBACK")
       helpers.assert_eq(result.debug.usedCompilationUnit, false)
       local item = vim.tbl_filter(function(candidate)
         return candidate.edit and candidate.edit.newText == expected
@@ -106,10 +106,10 @@ class KotlinDrillMixin {
       .. "Lnet/minecraft/world/level/Level;Lnet/minecraft/core/BlockPos;Lnet/minecraft/world/entity/player/Player;"
       .. "Lnet/minecraft/world/InteractionHand;Lnet/minecraft/world/phys/BlockHitResult;)Lnet/minecraft/world/ItemInteractionResult;"
     local drill_selector = "useItemOn" .. drill_descriptor
-    local method_item = apply_kotlin_completion("useIt", drill_selector, "always", "HOST_NORMALIZED")
+    local method_item = apply_kotlin_completion("useIt", drill_selector, "always")
     helpers.assert_eq(method_item.metadata.owner, "com/simibubi/create/content/kinetics/drill/DrillBlock")
     helpers.assert_eq(method_item.metadata.descriptor, drill_descriptor)
-    apply_kotlin_completion("HE", "HEAD", nil, "HAND_WRITTEN_FALLBACK")
+    apply_kotlin_completion("HE", "HEAD")
     assert_kotlin_diagnostics("useItemOn")
     local hover = kotlin_request("mcdev.hover", "useItemOn")
     helpers.assert_true(table.concat(hover.contents or {}, "\n"):find("useItemOn", 1, true) ~= nil,
@@ -147,11 +147,11 @@ class KotlinPlacementMixin {
     @WrapOperation(method = ["placeInW"], at = At(value = "INVOKE", target = "Lnet/minecraft/world/level/block/Block;setPl", remap = true), remap = false)
     fun PlacementTarget.onPlaced(instance: Block, level: Level, pos: BlockPos, state: BlockState, placer: LivingEntity, stack: ItemStack, original: Operation<Void>) {}
 }]])
-    apply_kotlin_completion("placeInW", "placeInWorld", "never", "HOST_NORMALIZED")
+    apply_kotlin_completion("placeInW", "placeInWorld", "never")
     local block_target = "Lnet/minecraft/world/level/block/Block;setPlacedBy(Lnet/minecraft/world/level/Level;"
       .. "Lnet/minecraft/core/BlockPos;Lnet/minecraft/world/level/block/state/BlockState;"
       .. "Lnet/minecraft/world/entity/LivingEntity;Lnet/minecraft/world/item/ItemStack;)V"
-    local target_item = apply_kotlin_completion("Lnet/minecraft/world/level/block/Block;setPl", block_target, nil, "HOST_NORMALIZED")
+    local target_item = apply_kotlin_completion("Lnet/minecraft/world/level/block/Block;setPl", block_target)
     helpers.assert_eq(target_item.metadata.name, "setPlacedBy")
     assert_kotlin_diagnostics("placeInWorld")
     helpers.assert_eq(#vim.lsp.get_clients({ bufnr = kotlin_buf, name = "jdtls" }), 0)

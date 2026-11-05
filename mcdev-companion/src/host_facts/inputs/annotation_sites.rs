@@ -63,7 +63,16 @@ impl AnnotationSites {
         detailed: bool,
         registry: &mut Registry,
     ) -> Result<Vec<&'a Annotation>, FactsError> {
-        self.reconcile(text, uri, expected, declarations, detailed, registry, None)
+        self.reconcile(
+            text,
+            uri,
+            expected,
+            declarations,
+            detailed,
+            registry,
+            None,
+            false,
+        )
     }
 
     /// Resolve both reference sets in this evaluation before comparing aliases.
@@ -86,6 +95,29 @@ impl AnnotationSites {
             detailed,
             registry,
             Some(types),
+            false,
+        )
+    }
+
+    pub(crate) fn validate_with_types_allow_unknown<'a>(
+        &'a self,
+        text: &str,
+        uri: &str,
+        expected: Option<&SourceDescriptor>,
+        declarations: &[Declaration],
+        detailed: bool,
+        registry: &mut Registry,
+        types: &BTreeMap<String, Fact<TypeFact>>,
+    ) -> Result<Vec<&'a Annotation>, FactsError> {
+        self.reconcile(
+            text,
+            uri,
+            expected,
+            declarations,
+            detailed,
+            registry,
+            Some(types),
+            true,
         )
     }
 
@@ -148,6 +180,7 @@ impl AnnotationSites {
         detailed: bool,
         registry: &mut Registry,
         types: Option<&BTreeMap<String, Fact<TypeFact>>>,
+        allow_unknown: bool,
     ) -> Result<Vec<&'a Annotation>, FactsError> {
         self.validate_source(text, uri, expected)?;
         self.validate_values(text, registry)?;
@@ -194,7 +227,14 @@ impl AnnotationSites {
             match known.get(&key) {
                 Some((previous, owner)) => {
                     if site.owner.as_deref() != *owner
-                        || !compatible_annotation(previous, annotation, detailed, types).map_err(|error| {
+                        || !compatible_annotation(
+                            previous,
+                            annotation,
+                            detailed,
+                            types,
+                            allow_unknown,
+                        )
+                        .map_err(|error| {
                             alias_context(error, "annotation", json!({
                                 "knownOwner":owner,"siteOwner":site.owner,
                                 "knownRange":previous.range,"siteRange":annotation.range,
@@ -337,6 +377,7 @@ fn compatible_annotation(
     next: &Annotation,
     detailed: bool,
     types: Option<&BTreeMap<String, Fact<TypeFact>>>,
+    allow_unknown: bool,
 ) -> Result<bool, FactsError> {
     if previous.range != next.range
         || previous.use_site_target != next.use_site_target
@@ -349,19 +390,21 @@ fn compatible_annotation(
                 .as_ref()
                 .is_some_and(|range| Some(range) != next.name_range.as_ref())
         }
-        || !compatible_reference(&previous.type_ref, &next.type_ref, types).map_err(|error| {
-            alias_context(
-                error,
-                "field",
-                json!({"kind":"annotationType",
+        || !compatible_reference(&previous.type_ref, &next.type_ref, types, allow_unknown).map_err(
+            |error| {
+                alias_context(
+                    error,
+                    "field",
+                    json!({"kind":"annotationType",
                 "knownRange":previous.range,"siteRange":next.range}),
-            )
-        })?
+                )
+            },
+        )?
     {
         return Ok(false);
     }
     for (a, b) in previous.arguments.iter().zip(&next.arguments) {
-        if !compatible_argument(a, b, detailed, types)? {
+        if !compatible_argument(a, b, detailed, types, allow_unknown)? {
             return Ok(false);
         }
     }
@@ -372,6 +415,7 @@ fn compatible_reference(
     a: &str,
     b: &str,
     types: Option<&BTreeMap<String, Fact<TypeFact>>>,
+    allow_unknown: bool,
 ) -> Result<bool, FactsError> {
     if a == b {
         return Ok(true);
@@ -379,6 +423,12 @@ fn compatible_reference(
     let Some(types) = types else {
         return Ok(false);
     };
+    if allow_unknown
+        && matches!(types.get(a), Some(Fact::Unknown { .. }))
+        && matches!(types.get(b), Some(Fact::Unknown { .. }))
+    {
+        return Ok(true);
+    }
     let (Some(a), Some(b)) = (
         types.get(a).and_then(Fact::found),
         types.get(b).and_then(Fact::found),
@@ -488,11 +538,13 @@ fn compatible_argument(
     b: &Argument,
     detailed: bool,
     types: Option<&BTreeMap<String, Fact<TypeFact>>>,
+    allow_unknown: bool,
 ) -> Result<bool, FactsError> {
     if a.name != b.name || a.range != b.range {
         return Ok(false);
     }
     Ok(match (&a.value, &b.value) {
+        (Fact::Unknown { .. }, Fact::Unknown { .. }) if allow_unknown => true,
         (Fact::Unknown { .. }, _) if !detailed => true,
         (
             Fact::Found {
@@ -501,7 +553,7 @@ fn compatible_argument(
             Fact::Found {
                 value: AnnotationValue::Class { type_ref: b_ref },
             },
-        ) => compatible_reference(a_ref, b_ref, types).map_err(|error| {
+        ) => compatible_reference(a_ref, b_ref, types, allow_unknown).map_err(|error| {
             alias_context(
                 error,
                 "field",
@@ -526,7 +578,7 @@ fn compatible_argument(
             },
         ) => {
             an == bn
-                && compatible_reference(a_ref, b_ref, types).map_err(|error| {
+                && compatible_reference(a_ref, b_ref, types, allow_unknown).map_err(|error| {
                     alias_context(
                         error,
                         "field",
@@ -542,7 +594,7 @@ fn compatible_argument(
             Fact::Found {
                 value: AnnotationValue::Annotation { annotation: b },
             },
-        ) => compatible_annotation(a, b, detailed, types)?,
+        ) => compatible_annotation(a, b, detailed, types, allow_unknown)?,
         (
             Fact::Found {
                 value: AnnotationValue::Array { values: a },
@@ -555,7 +607,7 @@ fn compatible_argument(
                 return Ok(false);
             }
             for (a, b) in a.iter().zip(b) {
-                if !compatible_argument(a, b, detailed, types)? {
+                if !compatible_argument(a, b, detailed, types, allow_unknown)? {
                     return Ok(false);
                 }
             }
