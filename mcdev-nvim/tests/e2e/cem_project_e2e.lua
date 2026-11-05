@@ -334,12 +334,9 @@ return function(h)
       local received, cached
       local start = #'    @Inject(method = "'
       local blink_utils = require('blink.cmp.lib.utils')
-      local pos
-      if blink_utils.get_vim_pos and vim.pos then
-        pos = blink_utils.get_vim_pos(bufnr, inject_row - 1, start + #prefix)
-        h.helpers.assert_true(vim.deep_equal(blink_utils.vim_pos_to_cursor(pos), {inject_row, start + #prefix}),
-          'Blink context position must preserve the provider cursor')
-      end
+      local pos = blink_utils.get_vim_pos(bufnr, inject_row - 1, start + #prefix)
+      h.helpers.assert_true(vim.deep_equal(blink_utils.vim_pos_to_cursor(pos), {inject_row, start + #prefix}),
+        'Blink context position must preserve the provider cursor')
       local context = {id=1,bufnr=bufnr,mode='default',line=line,cursor={inject_row,start+#prefix},
         bounds={start_col=start+1,length=#prefix},trigger={kind=1,initial_kind='manual'},pos=pos}
       provider:get_completions(context,function(value,is_cached) received,cached=value,is_cached end)

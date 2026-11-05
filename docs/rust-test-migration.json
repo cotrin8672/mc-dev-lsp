@@ -63463,9 +63463,9 @@
     },
     "resumedIntegration": {
       "date": "2026-11-05",
-      "status": "native1937-and-editor5-passed; recovered-current-Mixin-owner-fixed; full-original-editor-acceptance-in-progress",
-      "hostPin": "46c96783757398f4120940bb5a2c756df801ce16",
-      "hostReceipt": "build/host-artifacts/candidate110-be4265a0e307/copy-receipt.json",
+      "status": "native-and-distribution-CI-passed; original-Create-and-CEM-whole-entries-passed; seven-whole-editor-gates-incomplete",
+      "hostPin": "b04f13bba142d40c764622252aa4b9a328099710",
+      "hostReceipt": "build/host-artifacts/candidate113-04ce9199ce8c/copy-receipt.json",
       "hostSerializerFixture": "mcdev-companion/tests/fixtures/host_inputs/root_files/actual-serializer-sample.json",
       "nativePipeline": "build/rust-test-logs/native-pipeline-proof-20261105-011949083",
       "optimizedPackage": {
@@ -64865,7 +64865,7 @@
         },
         {
           "fixture": "create-drill-definition-diagnostics",
-          "status": "selected Java53/native-extract/lifecycle passed; original Java-Placement-Kotlin chain pending"
+          "status": "passed original full Java-Placement-Kotlin chain with original clean lifecycle on host113/MC05f"
         },
         {
           "fixture": "real-sodium",
@@ -64873,7 +64873,7 @@
         },
         {
           "fixture": "real-cem",
-          "status": "component proofs passed; whole original CEM entry pending"
+          "status": "passed whole original CEM825assert/membercomparison/Blink/cache/snippets and originalcleanlifecycle after minimal BlinkAPIcallerport"
         }
       ],
       "currentNative": {
@@ -64892,9 +64892,114 @@
         "sourceFingerprint": "237532b063f7178726e97f879f57b14081f3f79a2c9462eb00b89e4fa867717e",
         "focusedAnnotationSiteTests": 13,
         "currentOwnerRecovery": "Positive official source-scoped Mixin site inside one Class header; unknown/foreign/stale/outside/ambiguous rejected",
-        "fabricWholeRun": "newMC/host110/verifiedCorretto running",
-        "ci": "pending current source push",
+        "fabricWholeRun": "failed at65 assertions with same current-owner coverage error; actual failing DTO capture in progress, synthetic recovery alone did not fix production",
+        "ci": {
+          "status": "passed",
+          "commit": "3debf0da339389507533189eb6e0c6ead91be86c",
+          "run": 42001106053,
+          "windowsFunctions": 1937,
+          "linuxFunctions": 1936,
+          "targetsPerPlatform": 83,
+          "originalCases": 2604,
+          "replacementReferences": 2748,
+          "editorEntriesPerPlatform": 5,
+          "payloadFilesPerPlatform": 24,
+          "optimizedStdioSmokePassed": true,
+          "summary": "build/rust-test-logs/ci-3debf0d/ci-summary.json",
+          "sha256": "cebbd4bc5b2cb17ed3a9212b8c26c35488d560ca4a90e8fc76e6e01ffc965f83"
+        },
         "wholeMigrationVerified": false
+      },
+      "latestOriginalWholeEntries": {
+        "pins": {
+          "host": "04ce9199ce8c2cce7f9bb642942623c63b98ebb166b4ef0817aa916e580442f9",
+          "companion": "05f950ec78d9956fb3f3e5a5200ce68cab3a781aa07035b91acfcadb5a2908ef"
+        },
+        "create": {
+          "status": "passed-original-full-chain",
+          "phases": [
+            "Java Drill",
+            "PlacementOffset",
+            "Kotlin Drill"
+          ],
+          "recordedAssertions": 158,
+          "recorderScope": "Java/Placement helper assertions are not included in originalAssertions; unchanged branch completion, accepted trace owners and exit0 prove execution",
+          "originalLifecycleExit": 0,
+          "ownedProcessesAfter": 0,
+          "receipt": "build/rust-test-logs/host113-mc05f-create-full-20261105/recovery-and-run-receipt.json",
+          "sha256": "66c3928e6b7a8732f2a56da2cd14c8867db251169fe7138cd227e65e6a8b3fd8"
+        },
+        "fabric": {
+          "status": "failed",
+          "hostPin": "host110",
+          "recordedAssertions": 65,
+          "reason": "annotation coverage does not establish a current Mixin owner",
+          "receipt": "build/fabric-basic-acceptance-20261105-e1937-native-owner-site-corretto/build/acceptance-receipt.json",
+          "sha256": "658c6af78f4ecda5768c8605f301f78a2ba3caf43355c3e6c9c8c5891dcd2b24"
+        },
+        "extras": {
+          "status": "failed",
+          "recordedAssertions": 17,
+          "reason": "authored member is unavailable",
+          "expressionSugarReached": false,
+          "receipt": "build/rust-test-logs/host113-mc05f-extras-20261105/actual-recovery-and-run-receipt.json",
+          "sha256": "720213c97a93571c29923368b2a57547550a32a5122287501e6604ec70e20875"
+        },
+        "matrix": {
+          "receipt": "build/matrix-whole-20261105/execution-113-05f-20261105/summary.json",
+          "fabric-aw-at": {
+            "status": "failed",
+            "assertionsIncludingFailure": 12,
+            "reason": "AT mapped method completion: SimpleTarget current source methods Incomplete"
+          },
+          "multi-source-set": {
+            "status": "failed",
+            "assertionsIncludingFailure": 17,
+            "reason": "annotation alias has no positive same-view identity"
+          },
+          "forge-basic": {
+            "status": "failed",
+            "assertionsIncludingFailure": 17,
+            "reason": "annotation alias has no positive same-view identity"
+          },
+          "aliasIdentityEvidence": {
+            "path": "build/matrix-whole-20261105/multi-source-set/build/diagnostic-alias-20261105-183321606-faceebd8393d4261b3b44df28d5caa7a/alias-identity-evidence.json",
+            "sha256": "3c6b2de36ef8951532ed4454f6ff26b0f61e014c88ca22fa8eb1627e82388a11",
+            "normalAnnotationIdentity": "Mixin Found; Unknown is class literal SimpleTarget, not the official annotation",
+            "scope": "project:/main token15:4 compilecoverageFound unresolved0",
+            "failure": "host nominal binary intake omits class-directory classfile despite selected physical directory input",
+            "hostDiscussion": "Existing producer responsibility under discussion; no MC name-only authority or guard weakening"
+          }
+        },
+        "loom": {
+          "status": "failed-after-positive-accepted-readiness",
+          "reason": "selected project scope is unavailable",
+          "definitionReached": false,
+          "proof": "C:/tmp/mc-h113-mc05f-loom-ready/editor-proof.json",
+          "sha256": "819b148379afac937797a312c461e2e6fcf744c0e31f328f79db47190a96967e",
+          "ownedProcessesAfter": 0
+        },
+        "cem": {
+          "status": "passed-original-whole-entry",
+          "recordedAssertions": 825,
+          "cemAssertionCalls": 723,
+          "featureSnippetAssertionCalls": 102,
+          "fullMemberSetComparisonSkipped": false,
+          "commands": 20,
+          "acceptances": 40,
+          "completions": 15,
+          "originalLifecycleExit": 0,
+          "ownedProcessesAfter": 0,
+          "receipt": "build/cem-whole-entry-h113-mc05f-cemfix/overlay/build/rust-test-logs/cem-project-20261105-183817300-eee169c2/receipt.json",
+          "sha256": "dd371fc6bdddf1cedd878383fe0312951a7b0628b60e7797513adae50efb48c5",
+          "editorProofSha256": "cad6f85afdb606690df524320d5b40b31e50763190ae147dc39f2b3f44172ab3",
+          "callerAdaptation": "Always obtain real Blink v2 context.pos via published get_vim_pos; preserve original cursor assertion and all30s waits"
+        },
+        "sodium": {
+          "status": "whole-entry-incomplete",
+          "qualifiedHostProbe": "model/source installation accepted and generated init script notifications no longer trigger refresh; library readiness and shutdown still fail",
+          "hostDiagnosis": "selected cached Maven JAR change starts another refresh; saved-trace diagnosis pending"
+        }
       }
     }
   }

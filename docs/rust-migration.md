@@ -48,12 +48,14 @@ Mixin binding counts include positively resolved type-literal targets. A
 recovered declaration may omit `@Mixin` while accepted annotation sites retain
 its positive official identity. The current owner can now use that site only
 inside one matching Class header; outside or ambiguous headers remain Unknown.
-This fixes the first Fabric failure at65 original assertions. A new whole
-Fabric run verifies the correction; its result is pending.
+The synthetic recovery regression passes, but the actual Fabric run still fails
+at65 original assertions. Its exact failing wire facts are being captured;
+the production failure is not fixed by that regression alone.
 Published CI41996124186 verifies the preceding checkpoint on Windows (1,935 functions)
 and Linux (1,934), including all original case locators, editor checks, both
-24-file optimized packages and their stdio smoke checks. CI for the later
-owner-site correction is pending.
+24-file optimized packages and their stdio smoke checks. CI42001106053 also
+verifies the later owner-site checkpoint:1,937 Windows/1,936 Linux functions,
+all original locators, editor checks and both optimized packages.
 
 One original test observation was specific to actual JDT CompilationUnit and
 JavaProject objects. Its native port checks their truthful absence together with
@@ -81,8 +83,14 @@ The finite original whole-editor gates are `fabric-basic`, `fabric-mixinextras`
 (including expression and sugar), `fabric-aw-at`, `multi-source-set`,
 `forge-basic`, standalone Loom, the Java/Placement/Kotlin Create chain,
 `real-sodium` and `real-cem`. Component proofs do not replace these whole entries.
-Java's selected entry has passed; the remaining gates still require complete
-success receipts. No additional functional entry was found in the original
+The complete Java/Placement/Kotlin Create chain now passes on host113/MC05f,
+including clean original lifecycle teardown. The original complete CEM entry
+also passes825 assertions, its independent full-member comparison, Blink/cache
+and four snippet scenarios, followed by clean shutdown. Its sole caller port
+always obtains the actual Blink v2 position rather than passing nil when the
+optional `vim.pos` check fails. The cursor assertion and all original waits
+remain. The other seven gates still
+require complete success receipts. No additional functional entry was found in the original
 27-file editor/support inventory.
 
 ## Authoritative baseline

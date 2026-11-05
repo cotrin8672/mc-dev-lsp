@@ -29,7 +29,7 @@ candidate101 and published host102.
 ## Published contract
 
 The current integration pin is ktlsp
-[`46c96783757398f4120940bb5a2c756df801ce16`](https://github.com/cotrin8672/ktlsp/blob/46c96783757398f4120940bb5a2c756df801ce16/docs/architecture/extension-ipc.md).
+[`b04f13bba142d40c764622252aa4b9a328099710`](https://github.com/cotrin8672/ktlsp/blob/b04f13bba142d40c764622252aa4b9a328099710/docs/architecture/extension-ipc.md).
 It adds normalized authored facts, owning-project input records, exact source
 locations and typed binary declaration annotations to source snapshots, owned
 resources, selected runtime bytes, the physical JVM catalog and provider
@@ -37,13 +37,15 @@ commands. The companion negotiates capabilities and individual operations;
 binary annotations are selected by capability alone. Configured command IDs
 are intersected with the implemented domain routes.
 
-The copied published release110 host has SHA-256
-be4265a0e3079ba7cb0ddd71b914b5a98e2a67ce4d7f7c6da774f31cf70a2504
-and 25,497,088 bytes. Its code commit is the independently checked public pin
+The copied published release113 host has SHA-256
+04ce9199ce8c2cce7f9bb642942623c63b98ebb166b4ef0817aa916e580442f9
+and 25,593,344 bytes. Its code commit is the independently checked public pin
 above, published on `codex/java-kotlin-analysis`.
-The copy receipt is build/host-artifacts/candidate110-be4265a0e307/copy-receipt.json.
+The copy receipt is build/host-artifacts/candidate113-04ce9199ce8c/copy-receipt.json.
 Release109 adds standard Java extract-local edits;110 waits for the initial
 local source publication for workspace symbols. Both use existing LSP paths.
+Release112 filters operational Gradle watcher events;113 connects checked
+selected binary ABI to normal stub types without adding source authority.
 Release103 adds Java nominal parameterized-reference erasure;105 shares archive
 checks only within one source-preparation batch. Neither adds opcodes or relaxes
 quota/deadline/readguards. Release106 retains already-indexed library bodies
@@ -76,6 +78,48 @@ when that selection is unproven. Callable parameter facts are optional knowledge
 an omitted or unsupported list does not establish a zero-parameter callable.
 
 ## Follow-up acceptance checkpoints
+
+### Actual whole-entry results on published host113
+
+Public host113 is commit `b04f13bba142d40c764622252aa4b9a328099710`, SHA256
+`04ce9199ce8c2cce7f9bb642942623c63b98ebb166b4ef0817aa916e580442f9`
+(25,593,344 bytes). GitHub commit/remote HEAD and all16 copied files were checked.
+It adds selected normal binary ABI inputs and corrects generated Gradle-script
+watcher scope, preserving source provenance and semantic coverage Unknowns.
+
+The original full Java Drill/PlacementOffset/Kotlin Drill chain passes on this
+host and MC05f, with original source bytes and lifecycle teardown unchanged.
+The proof records158 assertions; Java/Placement helper assertions are outside
+that recorder, while unchanged sequential branch completion, accepted target
+owners and exit0 confirm their execution. Receipt:
+`build/rust-test-logs/host113-mc05f-create-full-20261105/recovery-and-run-receipt.json`,
+SHA256 `66c3928e6b7a8732f2a56da2cd14c8867db251169fe7138cd227e65e6a8b3fd8`.
+
+The original full CEM entry also passes825 actual assertion calls, full independent
+member comparison, Blink/cache and four snippets, with clean exit0 and no owned
+processes. Its minimal Blink v2 caller adaptation always supplies the position
+from `get_vim_pos`; the existing cursor assertion and30s waits remain unchanged.
+Receipt:
+`build/cem-whole-entry-h113-mc05f-cemfix/overlay/build/rust-test-logs/cem-project-20261105-183817300-eee169c2/receipt.json`,
+SHA256 `dd371fc6bdddf1cedd878383fe0312951a7b0628b60e7797513adae50efb48c5`.
+
+Two of nine whole-editor gates pass; seven remain incomplete. Extras stops on
+unavailable authored members, AW/AT on incomplete current source methods, Fabric
+still on current-owner coverage, and Loom on unavailable selected project scope.
+Multi-source-set/Forge's alias failure is specifically the binary-only
+`SimpleTarget.class`, not the official Mixin annotation. The selected class
+directory is present, but host113's nominal binary intake accepts JARs only.
+The exact same-evaluation evidence is saved under
+`build/matrix-whole-20261105/multi-source-set/build/diagnostic-alias-20261105-183321606-faceebd8393d4261b3b44df28d5caa7a/alias-identity-evidence.json`.
+Sodium's generated-script cancellation is fixed, but library readiness and
+shutdown remain failed; same-byte selected Maven JAR notifications are under
+producer investigation. None of these failures is counted as parity.
+
+MC commit3debf0d passes CI42001106053 on Windows (1,937 functions) and Linux
+(1,936),83 targets each, all2,604 original locators/2,748 references, editor5,
+both24-file optimized packages and stdio smoke checks. Downloaded proof:
+`build/rust-test-logs/ci-3debf0d/ci-summary.json`, SHA256
+`cebbd4bc5b2cb17ed3a9212b8c26c35488d560ca4a90e8fc76e6e01ffc965f83`.
 
 ### Recovered current Mixin owner from accepted annotation sites
 
