@@ -1,0 +1,7 @@
+[
+{"label":"local","fact":{"state":"found","value":{"jvmOwner":"arrayfixture/Item","kind":"selectedDependencySource","originId":"file:C:/Users/gummy/AppData/Local/Temp/ktlsp-library-hydration-62220-17/fixture.jar#1793844423234151700:920|source:C:/Users/gummy/AppData/Local/Temp/ktlsp-library-hydration-62220-17/fixture-sources.jar#1793844423235153800:551","source":{"identity":{"kind":"source","revision":"10"},"sha256":"a067967101b13cba77e67cbbb965e4fdb4e87e9cb327e4d8c304fe2b70ffb8c4"},"target":"9:0"}}},
+{"label":"variant-mismatch","fact":{"reasons":[{"code":"MissingFacts"}],"state":"unknown"}},
+{"label":"maven","fact":{"state":"found","value":{"jvmOwner":"arrayfixture/Item","kind":"selectedDependencySource","originId":"file:C:/Users/gummy/AppData/Local/Temp/ktlsp-library-hydration-62220-18/fixture.jar#1793844423284633200:920|source:C:/Users/gummy/AppData/Local/Temp/ktlsp-library-hydration-62220-18/fixture-sources.jar#1793844423286149000:551","source":{"identity":{"kind":"source","revision":"10"},"sha256":"a067967101b13cba77e67cbbb965e4fdb4e87e9cb327e4d8c304fe2b70ffb8c4"},"target":"11:0"}}},
+{"label":"variant-mismatch","fact":{"reasons":[{"code":"MissingFacts"}],"state":"unknown"}},
+{"label":"workspace","fact":{"state":"found","value":{"kind":"currentWorkspaceSource","source":{"identity":{"kind":"source","revision":"23"},"sha256":"f04561ea34a9c7719ead8a44d95af9a37a7cc56bb96c2be0c3b6c9e0d545c6f3"},"target":"23:0"}}}
+]

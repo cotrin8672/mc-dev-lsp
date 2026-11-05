@@ -254,6 +254,7 @@ fn execute_inner(
     }
 
     let ops = InputOps::intersect(&initialization)?;
+    let source_provenance_enabled = ops.supports(InputOp::SourceProvenance);
     let source_facts_enabled = ops.supports(InputOp::SourceFacts);
     let annotation_sites_enabled = ops.supports(InputOp::AnnotationSites);
     let annotation_completion_position =
@@ -294,6 +295,7 @@ fn execute_inner(
     let references_complete = project.references_complete;
     let inputs = Arc::new(Mutex::new(inputs));
     let mut index = index::EvaluationIndex::new(inputs, facts.clone());
+    index = index.with_source_provenance(source_provenance_enabled);
     if source_facts_enabled && source_locations_enabled {
         index = index
             .with_current_source_facts(&validated.evaluation.evaluation)

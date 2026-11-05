@@ -615,7 +615,11 @@ impl<R: EvaluationFactReader + Clone> CurrentDefinitions<R> {
                     .coverage
                     .validate()
                     .map_err(FactsError::Protocol)?;
-                if inventory.coverage.found().is_none() {
+                let exact_descriptor = target
+                    .descriptor
+                    .as_deref()
+                    .filter(|value| !value.is_empty());
+                if inventory.coverage.found().is_none() && exact_descriptor.is_none() {
                     return Err(unknown("target member inventory is incomplete"));
                 }
                 let mut matches = Vec::new();
@@ -653,12 +657,7 @@ impl<R: EvaluationFactReader + Clone> CurrentDefinitions<R> {
                     if signature.kind != member.kind {
                         return Err(protocol("target member signature kind mismatch"));
                     }
-                    if target
-                        .descriptor
-                        .as_deref()
-                        .filter(|value| !value.is_empty())
-                        .is_none_or(|expected| expected == signature.descriptor)
-                    {
+                    if exact_descriptor.is_none_or(|expected| expected == signature.descriptor) {
                         matches.push(member.id);
                     }
                 }
@@ -939,7 +938,37 @@ mod tests {
             backend.checked_resolve(&target()),
             Err(FactsError::Unknown(_))
         ));
+        let mut name_only = target();
+        name_only.descriptor = None;
         let (backend, _) = remote_backend(remote_location(), unknown_fact(), vec![]);
+        assert!(matches!(
+            backend.checked_resolve(&name_only),
+            Err(FactsError::Unknown(_))
+        ));
+    }
+
+    #[test]
+    fn exact_descriptor_uses_known_member_from_partial_inventory() {
+        let (backend, _) = remote_backend(remote_location(), unknown_fact(), vec![]);
+        assert!(backend.checked_resolve(&target()).is_ok());
+    }
+
+    #[test]
+    fn unrelated_unknown_member_does_not_block_exact_partial_lookup() {
+        let mut unrelated = member()["value"].clone();
+        unrelated["id"] = json!("unknown:unrelated");
+        unrelated["name"] = json!("other");
+        unrelated["signature"] = unknown_fact();
+        let (backend, _) = remote_backend(remote_location(), unknown_fact(), vec![unrelated]);
+        assert!(backend.checked_resolve(&target()).is_ok());
+    }
+
+    #[test]
+    fn unknown_same_name_member_still_blocks_exact_partial_lookup() {
+        let mut overload = member()["value"].clone();
+        overload["id"] = json!("unknown:overload");
+        overload["signature"] = unknown_fact();
+        let (backend, _) = remote_backend(remote_location(), unknown_fact(), vec![overload]);
         assert!(matches!(
             backend.checked_resolve(&target()),
             Err(FactsError::Unknown(_))

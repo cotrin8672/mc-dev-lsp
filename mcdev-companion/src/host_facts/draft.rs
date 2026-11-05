@@ -14,12 +14,14 @@ pub const CAPABILITY: &str = "project-class-facts-v1";
 pub enum Operation {
     ProjectContext,
     TypeJvm,
+    SourceProvenance,
 }
 impl Operation {
     pub fn name(self) -> &'static str {
         match self {
             Self::ProjectContext => "projectContext",
             Self::TypeJvm => "typeJvm",
+            Self::SourceProvenance => "sourceProvenance",
         }
     }
 }
@@ -55,6 +57,9 @@ impl SupportedOps {
                 }
                 "typeJvm" => {
                     accepted.insert(Operation::TypeJvm);
+                }
+                "sourceProvenance" => {
+                    accepted.insert(Operation::SourceProvenance);
                 }
                 _ => (),
             }

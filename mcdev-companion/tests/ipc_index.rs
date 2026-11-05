@@ -109,6 +109,7 @@ fn runtime_class(bytes: &[u8]) -> Class {
 struct HostState {
     classes: Vec<Class>,
     requests: Vec<Vec<Value>>,
+    source_provenance: bool,
     catalog_unknown: bool,
     catalog_problems: Vec<String>,
     abi_unknown: BTreeSet<String>,
@@ -154,6 +155,33 @@ impl FactReader for Host {
                 self.active.store(false, Ordering::Release);
             }
             let value = match op {
+                "resolveType" => {
+                    let name = query["name"].as_str().unwrap();
+                    found(
+                        json!({"id":format!("type:{name}"),"qualifiedName":name,"package":"fixture"}),
+                    )
+                }
+                "typeJvm" => {
+                    let target = query["target"].as_str().unwrap();
+                    let class = state
+                        .classes
+                        .iter()
+                        .find(|class| format!("type:{}", class.owner.replace('/', ".")) == target)
+                        .expect("foreign type target");
+                    serde_json::to_value(host_type(class, &["sum"], false)).unwrap()
+                }
+                "sourceLocation" => {
+                    let target = query["target"].as_str().unwrap();
+                    found(json!({"target":target,
+                        "documentUri":mcdev_core::project::path_to_uri(&std::env::temp_dir().join("mcdev-source/Annotated.java")),
+                        "range":{"start":{"line":1,"character":0},"end":{"line":1,"character":18}},
+                        "source":{"identity":{"kind":"source","revision":"23"},"sha256":digest(b"source")}}))
+                }
+                "sourceProvenance" if state.source_provenance => found(json!({
+                    "target":query["target"],"kind":"selectedDependencySource",
+                    "source":{"identity":{"kind":"source","revision":"23"},"sha256":digest(b"source")},
+                    "jvmOwner":"fixture/Annotated","originId":"jar:runtime"
+                })),
                 "jvmCatalog" => {
                     let prefix = query["prefix"].as_str().unwrap_or("");
                     let candidates: Vec<_> = state
@@ -284,6 +312,22 @@ fn make_index(host: &Host) -> EvaluationIndex<Host> {
     })).unwrap();
     let inputs = ScopedInputs::new("evaluation:42", &ops, host.clone()).unwrap();
     EvaluationIndex::new(Arc::new(Mutex::new(inputs)), host.clone())
+}
+
+fn make_source_provenance_index(host: &Host) -> EvaluationIndex<Host> {
+    let ops = InputOps::intersect(&json!({
+        "capabilities":["source-locations-v1","project-class-facts-v1","jvm-catalog-v1","runtime-class-bytes-v1"],
+        "supportedOps":{
+            "source-locations-v1":["sourceLocation"],
+            "project-class-facts-v1":["sourceProvenance"],
+            "jvm-catalog-v1":["jvmCatalog","jvmClass"],
+            "runtime-class-bytes-v1":["runtimeClass","classBytes"]
+        }
+    })).unwrap();
+    let inputs = ScopedInputs::new("evaluation:42", &ops, host.clone()).unwrap();
+    EvaluationIndex::new(Arc::new(Mutex::new(inputs)), host.clone())
+        .with_current_source_facts("evaluation:42")
+        .with_source_provenance(true)
 }
 
 fn class_entry(owner: &str) -> ClassIndexEntry {
@@ -734,6 +778,33 @@ fn runtime_bytes_and_real_core_preserve_code_locals_and_annotations() {
         index.physical_methods("fixture/Annotated").unwrap(),
         expected_members.methods_by_owner["fixture/Annotated"]
     );
+}
+
+#[test]
+fn selected_dependency_provenance_indexes_real_runtime_bytes_when_header_is_unknown() {
+    let mut dependency = runtime_class(ANNOTATED);
+    dependency.origin = "jar:runtime".into();
+    dependency.entry = "entry:fixture/Annotated:jar:runtime".into();
+    dependency.association = "compileClasspath";
+    dependency.abi["identity"]["originId"] = json!("jar:runtime");
+    let host = Host::new(vec![dependency]);
+    host.state.lock().unwrap().source_provenance = true;
+    let index = make_source_provenance_index(&host);
+
+    let methods = index.get_methods("fixture/Annotated");
+    assert!(methods.iter().any(|method| method.name == "<init>"));
+    assert!(methods.iter().any(|method| method.name == "sum"));
+    assert!(index.get_fields("fixture/Annotated").is_empty());
+
+    let requests = host.state.lock().unwrap().requests.clone();
+    let operations: Vec<_> = requests
+        .iter()
+        .flat_map(|batch| batch.iter().map(|query| query["op"].as_str().unwrap()))
+        .collect();
+    assert!(operations.contains(&"sourceProvenance"));
+    assert!(operations.contains(&"runtimeClass"));
+    assert!(operations.contains(&"classBytes"));
+    assert!(!operations.contains(&"jvmClass"));
 }
 
 #[test]

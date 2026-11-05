@@ -49,6 +49,14 @@ fn ops() -> InputOps {
     })).unwrap()
 }
 
+fn provenance_ops() -> InputOps {
+    InputOps::intersect(&json!({
+        "capabilities":["project-class-facts-v1"],
+        "supportedOps":{"project-class-facts-v1":["sourceProvenance"]}
+    }))
+    .unwrap()
+}
+
 fn facts(values: Vec<Value>) -> Value {
     json!({"facts":values})
 }
@@ -159,6 +167,93 @@ fn negotiation_is_per_capability_and_operation() {
         Err(FactsError::Unsupported(_))
     ));
     assert!(reader.requests.is_empty());
+}
+
+#[test]
+fn source_provenance_reader_is_strict_and_does_not_accept_absence() {
+    let source = json!({
+        "identity":{"kind":"source","revision":"host:7"},
+        "sha256":digest(b"source")
+    });
+    let current = found(json!({
+        "target":"type:demo.Dep",
+        "kind":"currentWorkspaceSource",
+        "source":source
+    }));
+    let mut reader = Reader::returning([facts(vec![current])]);
+    let operations = provenance_ops();
+    let mut scoped = ScopedInputs::new("42", &operations, &mut reader).unwrap();
+    assert!(matches!(
+        scoped.source_provenance("type:demo.Dep").unwrap(),
+        Fact::Found { value } if value.source().identity.revision == "host:7"
+    ));
+
+    let mut extra = found(json!({
+        "target":"type:demo.Dep",
+        "kind":"currentWorkspaceSource",
+        "source":{
+            "identity":{"kind":"source","revision":"host:7"},
+            "sha256":digest(b"source")
+        },
+        "jvmOwner":"demo/Dep"
+    }));
+    let mut reader = Reader::returning([facts(vec![extra.take()])]);
+    let mut scoped = ScopedInputs::new("42", &operations, &mut reader).unwrap();
+    assert!(matches!(
+        scoped.source_provenance("type:demo.Dep"),
+        Err(FactsError::Protocol(message)) if message.contains("extra or missing")
+    ));
+
+    let mut reader = Reader::returning([facts(vec![json!({"state":"definitelyAbsent"})])]);
+    let mut scoped = ScopedInputs::new("42", &operations, &mut reader).unwrap();
+    assert!(matches!(
+        scoped.source_provenance("type:demo.Dep"),
+        Err(FactsError::Protocol(message)) if message.contains("cannot certify absence")
+    ));
+}
+
+#[test]
+fn source_provenance_reads_actual_serializer_variants() {
+    let samples: Vec<Value> = serde_json::from_slice(include_bytes!(
+        "fixtures/host_inputs/source_provenance/actual-serializer-sample.json"
+    ))
+    .unwrap();
+    let targets = ["9:0", "variant:0", "11:0", "variant:1", "23:0"];
+    let responses = samples
+        .iter()
+        .map(|sample| facts(vec![sample["fact"].clone()]))
+        .collect::<Vec<_>>();
+    let mut reader = Reader::returning(responses);
+    let mut scoped = ScopedInputs::new("42", &provenance_ops(), &mut reader).unwrap();
+
+    for (sample, target) in samples.iter().zip(targets) {
+        let fact = scoped.source_provenance(target).unwrap();
+        match (sample["label"].as_str().unwrap(), fact) {
+            ("local" | "maven", Fact::Found { value }) => {
+                let (owner, origin) = value.selected_dependency().unwrap();
+                assert_eq!(owner, "arrayfixture/Item");
+                assert_eq!(
+                    origin,
+                    sample["fact"]["value"]["originId"].as_str().unwrap()
+                );
+                assert!(value.source().identity.revision == "10");
+            }
+            ("workspace", Fact::Found { value }) => {
+                assert!(value.selected_dependency().is_none());
+                assert_eq!(value.source().identity.revision, "23");
+            }
+            ("variant-mismatch", Fact::Unknown { .. }) => {}
+            (label, other) => panic!("unexpected {label} source provenance fact: {other:?}"),
+        }
+    }
+    assert_eq!(
+        reader
+            .requests
+            .iter()
+            .map(|(_, queries)| queries[0]["target"].as_str().unwrap())
+            .collect::<Vec<_>>(),
+        targets
+    );
 }
 
 #[test]
@@ -593,8 +688,13 @@ fn issued_handles_cannot_cross_evaluation_scopes_or_be_modified() {
 
 #[test]
 fn unknown_coverage_is_never_successful_absence_and_bad_pages_fail() {
-    let mut reader = Reader::returning([catalog_page(vec![], None, false)]);
+    let mut reader = Reader::returning([resource_page(vec![], None, false)]);
     let operations = ops();
+    let mut scoped = ScopedInputs::new("42", &operations, &mut reader).unwrap();
+    let inventory = scoped.resource_inventory().unwrap();
+    assert!(matches!(inventory.coverage, Fact::Unknown { .. }));
+
+    let mut reader = Reader::returning([catalog_page(vec![], None, false)]);
     let mut scoped = ScopedInputs::new("42", &operations, &mut reader).unwrap();
     let catalog = scoped.jvm_catalog("missing/").unwrap();
     assert!(catalog.entries.is_empty());

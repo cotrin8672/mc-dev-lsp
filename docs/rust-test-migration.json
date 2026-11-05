@@ -63462,9 +63462,9 @@
     },
     "resumedIntegration": {
       "date": "2026-11-05",
-      "status": "kotlin-source-parser-connected; native-1913-passed; Java107-name-only-definition-incomplete; Kotlin-model-prepared-physical-artifacts-unverified",
-      "hostPin": "d24ab4d2409405fdf7a55792cb9896f597a0f5df",
-      "hostReceipt": "build/host-artifacts/candidate107-c926f65583b9/main-ready.json",
+      "status": "parser-and-target-origin-bridge-implemented; exact-member-and-resource-pagination-followup-native1923-passed; live-original-cases-in-progress",
+      "hostPin": "5d5059a5868d6e2a3f249d9acbc0b8c4899396cb",
+      "hostReceipt": "build/host-artifacts/candidate108-e12eb95f8b0e/main-ready.json",
       "hostSerializerFixture": "mcdev-companion/tests/fixtures/host_inputs/root_files/actual-serializer-sample.json",
       "nativePipeline": "build/rust-test-logs/native-pipeline-proof-20261105-011949083",
       "optimizedPackage": {
@@ -63850,8 +63850,8 @@
         "liveExactOriginalItemSetPassed": true
       },
       "latestNativeCheck": {
-        "path": "build/rust-test-logs/20261105-102624370/native-summary.json",
-        "sha256": "5db306b0f8d89c6249982c80e52f5e1989e4f3a58546198097f0bbbaddf757ad"
+        "path": "build/rust-test-logs/20261105-123902323/native-summary.json",
+        "sha256": "669df3cf53800a944e093f961b411372a403899e58bfbbccd7b741b9a37fbbf5"
       },
       "originalDrillKotlinAttempt": {
         "path": "build/rust-test-logs/kotlin-drill-native-20261105/recovery-and-run-receipt.json",
@@ -63986,6 +63986,14 @@
         {
           "path": "build/rust-test-logs/resource-needs-full-20261105-064212278/native-summary.json",
           "sha256": "da2369f3d48aa53f874abced98133263d382799b5b9640deb1df64987bfac0aa"
+        },
+        {
+          "path": "build/rust-test-logs/20261105-102624370/native-summary.json",
+          "sha256": "5db306b0f8d89c6249982c80e52f5e1989e4f3a58546198097f0bbbaddf757ad"
+        },
+        {
+          "path": "build/rust-test-logs/20261105-113117544/native-summary.json",
+          "sha256": "a3576103b01489cf28bb588d5ee6c064a45a6aa2d12fb63203e12b47b1fd729d"
         }
       ],
       "kotlinSourceParserConnection": {
@@ -64015,7 +64023,21 @@
           "sha256": "88e7ada0f20268ebceebabc92ca7ce5e7e49ad59624d6d0032e6230bc481c5ca"
         },
         "fixtureSha256": "c9430836ee9ecf1b64aff6186a4c3904a6e383944df79b2bac2c0d4c2be7354f",
-        "scope": "Reuse existing MC parser for source syntax and Lapis interpretation; selected host ClassIndex still resolves target identities. Syntax Unknown is not promoted to compiler binding."
+        "scope": "Reuse existing MC parser for source syntax and Lapis interpretation; selected host ClassIndex still resolves target identities. Syntax Unknown is not promoted to compiler binding.",
+        "ci": {
+          "status": "passed",
+          "commit": "984760c75106734789c351df5843b53af3dc73c2",
+          "url": "https://github.com/cotrin8672/mc-dev-lsp/actions/runs/41949812694",
+          "summary": {
+            "path": "build/rust-test-logs/ci-984760c/ci-summary.json",
+            "sha256": "552c2dc11ac4fe954d25146522cfe4f76e0b3760b495747809ec26fb709d9d3f"
+          },
+          "windowsFunctions": 1913,
+          "linuxFunctions": 1912,
+          "targetsPerPlatform": 83,
+          "editorAndPackageChecksPassed": true,
+          "originalLiveAcceptanceClaimed": false
+        }
       },
       "originalDrillHost106": {
         "receipt": {
@@ -64110,7 +64132,7 @@
         "globalKtlspCacheTouched": false
       },
       "targetSourceProvenanceDecision": {
-        "status": "wire contract agreed; host and consumer implementation pending",
+        "status": "host108 published and MC consumer locally verified; original live acceptance pending",
         "knowledge": [
           "target-bound CurrentWorkspaceSource (including generated/open overlay), SelectedDependencySource, or Unknown",
           "selected dependency opaque identity joinable to existing runtimeClass origin/selection"
@@ -64122,7 +64144,9 @@
         "operation": "sourceProvenance",
         "capability": "project-class-facts-v1",
         "negotiation": "supportedOps",
-        "existingTypeJvmDtoChanged": false
+        "existingTypeJvmDtoChanged": false,
+        "runtimeMemberSource": "Existing checked classBytes parsed by existing ClassMemberIndex; runtime classHeader remains Unknown.",
+        "hostTypeJvmAndRuntimeDtosChanged": false
       },
       "originalKotlinSdk21OnlinePreparation": {
         "receipt": {
@@ -64144,14 +64168,173 @@
         "traceClasspathComplete": true,
         "traceJdkComplete": true,
         "traceJdkFiles": 14398,
-        "physicalStdlibJarConfirmed": false,
-        "physicalAnnotationsJarConfirmed": false,
         "missingSources": 2,
         "metadataProbeStatus": "Stale before metadata JSON; no fresh accepted evaluation within deadline",
         "mcFeatureE2ERun": false,
         "ownedProcessesRemaining": 0,
         "globalCacheTouched": false,
-        "scope": "Model/task/JDK producer claims are admitted. Physical jar paths and full source readiness remain unverified; no functional Kotlin acceptance credit."
+        "scope": "Model/task/JDK producer claims are admitted. The initial missing-file conclusion is superseded: extended paths confirm the original jars and short run-owned cache preserves all seven physical classpath files. Historical preflight Stale/missingSources2 and absence of functional Kotlin acceptance remain.",
+        "initialUnprefixedStdlibCheckFound": false,
+        "initialUnprefixedAnnotationsCheckFound": false,
+        "physicalArtifactCorrection": {
+          "path": "build/rust-test-logs/kotlin-sdk21-materialize-20261105/physical-materialization-corrected-receipt.json",
+          "sha256": "4f634d353677b2fb74fc4e7ccff476c1ef7995200d62d005a12cb6f12d01b780"
+        },
+        "physicalStdlibJarConfirmed": true,
+        "physicalAnnotationsJarConfirmed": true,
+        "runOwnedGradleUserHome": "C:/tmp/mcdev-kg-20261105-01a168cf",
+        "physicalClasspathFiles": 7,
+        "physicalClasspathMaxPathLength": 201,
+        "cacheCopiedFiles": 1098,
+        "cacheCopiedBytes": 402388165,
+        "physicalStdlibSha256": "bd8250210584cb659847dce9cda660f8e9906e5def7fbebcea93dc6dcb6a88a3",
+        "physicalAnnotationsSha256": "ace2a10dc8e2d5fd34925ecac03e4988b2c0f851650c94b8cef49ba1bd111478"
+      },
+      "host108": {
+        "publicCommit": "5d5059a5868d6e2a3f249d9acbc0b8c4899396cb",
+        "publicRef": "refs/heads/codex/java-kotlin-analysis",
+        "binarySha256": "e12eb95f8b0ef3cf42e6e5f0897fbbf42dcdea9d1b86364efc11f1d414612d54",
+        "bytes": 25431552,
+        "copyReceipt": {
+          "path": "build/host-artifacts/candidate108-e12eb95f8b0e/copy-receipt.json",
+          "sha256": "ce73db01971d0ce9898f9a45f87a9c03ae937432cb17a584c94a4a99e04244fe"
+        },
+        "serializerSamples": {
+          "path": "build/host-artifacts/candidate108-e12eb95f8b0e/wire-samples.json",
+          "sha256": "a41c9154027c2b0e9c1b26109e167beb1f59c7ce6fdf9dac8380821dad758526"
+        },
+        "producerFocusedTests": 17,
+        "producerSourceGuards": 416,
+        "producerSourceGuardsStable": true,
+        "mcAcceptanceClaimed": false,
+        "scope": "Target-bound sourceProvenance only; typeJvm, classHeader, runtimeClass/classBytes and sourceCurrent contracts unchanged."
+      },
+      "sourceProvenanceConsumer": {
+        "status": "implemented; full native/editor checks passed; live original cases pending",
+        "nativeFunctions": 1919,
+        "nativeTargets": 83,
+        "editorEntries": 5,
+        "fullCheck": {
+          "path": "build/rust-test-logs/20261105-113117544/native-summary.json",
+          "sha256": "a3576103b01489cf28bb588d5ee6c064a45a6aa2d12fb63203e12b47b1fd729d"
+        },
+        "artifact": {
+          "path": "build/companion-artifacts/native-source-provenance-6200e7b7d1d7/receipt.json",
+          "sha256": "f785e5e12f489cd47dd05c6514a22aedaa6abe1915a175136947b249111f42ec"
+        },
+        "binarySha256": "6200e7b7d1d7c152eda46a230de40e3987eef2bbcce37b66531fbec84d2d867a",
+        "sourcePatchSha256": "4e2db79ee531286fe7871c800e08043239cb751fcbcf03aa9bcff2e77e0b91dc",
+        "sourceInputsStable": true,
+        "actualSerializerFixture": {
+          "path": "mcdev-companion/tests/fixtures/host_inputs/source_provenance/actual-serializer-sample.json",
+          "sha256": "a41c9154027c2b0e9c1b26109e167beb1f59c7ce6fdf9dac8380821dad758526"
+        },
+        "actualSerializerSamples": 5,
+        "runtimeMemberSource": "Existing runtimeClass/classBytes validation and ClassMemberIndex parser",
+        "runtimeDtosChanged": false,
+        "newHeaderRequirementAdded": false,
+        "binaryOnlyIndependentRawAbiPathPreserved": true,
+        "unknownSourceProvenanceAddsDependencyAuthority": false,
+        "exactSourceMemberLocationChecksRelaxed": false,
+        "wholeMigrationVerified": false
+      },
+      "originalDrillHost108": {
+        "receipt": {
+          "path": "build/rust-test-logs/host108-mc6200-java-20261105/recovery-and-run-receipt.json",
+          "sha256": "ae148918a5a0bc7620e01d8e69e9ba7d43190345556c9a142b115c5f1c113a8a"
+        },
+        "initialReceipt": {
+          "path": "build/rust-test-logs/host108-mc6200-java-20261105/recovery-and-run-receipt.initial.json",
+          "sha256": "bb98f35deff9d97b4913c4eb0401f88d9817eaa472e0fec0e2b7c3ec930235da"
+        },
+        "hostSha256": "e12eb95f8b0ef3cf42e6e5f0897fbbf42dcdea9d1b86364efc11f1d414612d54",
+        "companionSha256": "6200e7b7d1d7c152eda46a230de40e3987eef2bbcce37b66531fbec84d2d867a",
+        "observedAssertions": 10,
+        "passedAssertions": 9,
+        "failedAssertions": 1,
+        "failure": "INCOMPLETE_PROJECT_CONTEXT: target member inventory is incomplete",
+        "runtimeClassAndClassBytesReached": true,
+        "postRuntimeDeclaredMembersReached": true,
+        "actualSourceProvenanceFoundDtoCaptured": false,
+        "fullOriginalEntryPassed": false,
+        "followup": "MC exact-descriptor lookup no longer requires complete unrelated member coverage; same-name Unknown/ambiguity and source location checks preserved. Definition13/ipc_commands8 pass, live verification pending new artifact.",
+        "ownedProcessesRemaining": 0
+      },
+      "originalKotlinHost108": {
+        "receipt": {
+          "path": "build/rust-test-logs/host108-mc6200-kotlin-20261105/recovery-and-run-receipt.json",
+          "sha256": "9f26ac13d1ac99e3f1679babe9100a302fb1fd7528ae44de4c312d846ff06bac"
+        },
+        "initialReceipt": {
+          "path": "build/rust-test-logs/host108-mc6200-kotlin-20261105/recovery-and-run-receipt.initial.json",
+          "sha256": "a127240a96514c4097e3b12527a396c10a87cbc72a53c48ee7d4247163d31eaa"
+        },
+        "hostSha256": "e12eb95f8b0ef3cf42e6e5f0897fbbf42dcdea9d1b86364efc11f1d414612d54",
+        "companionSha256": "6200e7b7d1d7c152eda46a230de40e3987eef2bbcce37b66531fbec84d2d867a",
+        "observedAssertions": 53,
+        "passedAssertions": 52,
+        "failedAssertions": 1,
+        "completionDtos": [
+          {
+            "evaluation": 27,
+            "parseSource": "HAND_WRITTEN_FALLBACK",
+            "usedCompilationUnit": false
+          },
+          {
+            "evaluation": 56,
+            "parseSource": "HAND_WRITTEN_FALLBACK",
+            "usedCompilationUnit": false
+          }
+        ],
+        "firstFailure": "diagnostics",
+        "childError": {
+          "evaluation": 63,
+          "instance": 2,
+          "code": -32602,
+          "message": "evaluation batch limit"
+        },
+        "outerError": {
+          "code": -32603,
+          "reason": "CommandFailed"
+        },
+        "compilerDiagnosticEventIsMcDtoProof": false,
+        "hoverDefinitionPlacementReached": false,
+        "fullOriginalEntryPassed": false,
+        "followup": "MC resource collection request economy under unchanged scope/coverage/quotas/deadlines; no new host API.",
+        "ownedProcessesRemaining": 0
+      },
+      "exactMemberAndResourceFollowup": {
+        "status": "implemented; full local native/editor checks passed; original live follow-up in progress",
+        "fullCheck": {
+          "path": "build/rust-test-logs/20261105-123902323/native-summary.json",
+          "sha256": "669df3cf53800a944e093f961b411372a403899e58bfbbccd7b741b9a37fbbf5"
+        },
+        "nativeFunctions": 1923,
+        "nativeTargets": 83,
+        "editorEntries": 5,
+        "artifact": {
+          "path": "build/companion-artifacts/native-post-e2e-fixes-14b147b27efb/receipt.json",
+          "sha256": "4c98400010b8d182e17c8adc0812f2ec362339457fa7ba76aea5fe74803499fd"
+        },
+        "binarySha256": "14b147b27efb290f5bceb1b1f95ff4c0e361b3759f0bdfcbcf00b97eacdd2f71",
+        "sourcePatchSha256": "b639cedd3a7bd3b4c9cd6982144e6584717c862d8e31b933adf82386782706d1",
+        "sourceInputsStable": true,
+        "exactDescriptorPartialSourceBindingAllowed": true,
+        "sameNameUnknownAmbiguityAndLocationGuardsPreserved": true,
+        "resourceInventoryMaxScopesPerWave": 8,
+        "perScopeSequentialCursorAndCoverageGuardsPreserved": true,
+        "multiScopeMultiPageRegressionPassed": true,
+        "failedRunBatchEvidence": {
+          "path": "build/rust-test-logs/kotlin-resource-wave-20261105-v3/trace-resource-batch-receipt.json",
+          "sha256": "28abbee749c867b0291456189703c20eb9833f1a829367b6dc9490fad8572633"
+        },
+        "observedPriorBatches": 64,
+        "observedPriorQueries": 70,
+        "observedPriorResourceInventoryQueries": 56,
+        "postChangeLiveBatchReductionVerified": false,
+        "newHostApiOrQuotaIncrease": false,
+        "originalAssertionsChanged": false,
+        "wholeMigrationVerified": false
       }
     }
   }

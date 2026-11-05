@@ -101,7 +101,10 @@ fn negotiate(params: &Value) -> Result<(Value, BTreeSet<String>), String> {
         return Err("supportedOps must be an object".into());
     }
     for (capability, known) in [
-        ("project-class-facts-v1", &["projectContext", "typeJvm"][..]),
+        (
+            "project-class-facts-v1",
+            &["projectContext", "typeJvm", "sourceProvenance"][..],
+        ),
         (
             "source-snapshots-v1",
             &["sourceInventory", "sourceSnapshot"][..],
@@ -772,6 +775,25 @@ mod tests {
             reply["capabilities"],
             json!(["semantic-v1", "binary-annotations-v1"])
         );
+        assert!(reply.get("supportedOps").is_none());
+    }
+
+    #[test]
+    fn source_provenance_is_optional_and_negotiated_with_project_class_facts() {
+        let params = json!({
+            "protocol":{"major":1,"minor":0},
+            "provider":"mcdev",
+            "capabilities":["semantic-v1","project-class-facts-v1"],
+            "supportedOps":{"project-class-facts-v1":["sourceProvenance","future"]}
+        });
+        let (reply, _) = negotiate(&params).unwrap();
+        assert_eq!(
+            reply["supportedOps"]["project-class-facts-v1"],
+            json!(["sourceProvenance"])
+        );
+        let mut legacy = params;
+        legacy["capabilities"] = json!(["semantic-v1"]);
+        let (reply, _) = negotiate(&legacy).unwrap();
         assert!(reply.get("supportedOps").is_none());
     }
 

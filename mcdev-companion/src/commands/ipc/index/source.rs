@@ -37,6 +37,9 @@ mod tests {
         calls: Arc<Mutex<Vec<Value>>>,
         active: Arc<AtomicBool>,
         inventory_complete: bool,
+        source_provenance: bool,
+        provenance_unknown: bool,
+        provenance_source_mismatch: bool,
     }
     impl FactReader for Host {
         fn read_facts(&mut self, evaluation: &str, queries: &[Value]) -> Result<Value, FactsError> {
@@ -60,7 +63,21 @@ mod tests {
                     "documentUri":mcdev_core::project::path_to_uri(&std::env::temp_dir().join("mcdev-current/Live.java")),
                     "range":{"start":{"line":1,"character":6},"end":{"line":1,"character":10}},
                     "source":{"identity":{"kind":"source","revision":"8"},"sha256":"b".repeat(64)}})),
+                "sourceLocation" if self.source_provenance
+                    && !self.provenance_unknown
+                    && query["target"] == "type:demo.Dep" => found(json!({
+                    "target":query["target"],
+                    "documentUri":mcdev_core::project::path_to_uri(&std::env::temp_dir().join("mcdev-current/Dep.java")),
+                    "range":{"start":{"line":1,"character":6},"end":{"line":1,"character":10}},
+                    "source":{"identity":{"kind":"source","revision":"8"},"sha256":"b".repeat(64)}})),
                 "sourceLocation" => unknown_fact(),
+                "sourceProvenance" if self.source_provenance && self.provenance_unknown => unknown_fact(),
+                "sourceProvenance" if self.source_provenance => found(json!({
+                    "target":query["target"],
+                    "kind":"selectedDependencySource",
+                    "source":{"identity":{"kind":"source","revision":"8"},"sha256":if self.provenance_source_mismatch {"c".repeat(64)} else {"b".repeat(64)}},
+                    "jvmOwner":"demo/Dep","originId":"compile:dep"
+                })),
                 "sourceInventory" => json!({"sources":[],"next":null,"coverage":if self.inventory_complete {found(Value::Null)} else {unknown_fact()}}),
                 "jvmCatalog" => json!({"view":"selectedPhysicalJvmInputs","classes":[{"entry":"entry:dep","internalName":"demo/Dep","originId":"compile:dep",
                     "association":"compileClasspath","classpathOrder":0,"authority":"compiled-input"}],"next":null,
@@ -85,6 +102,9 @@ mod tests {
             calls: Arc::new(Mutex::new(Vec::new())),
             active: Arc::new(AtomicBool::new(true)),
             inventory_complete,
+            source_provenance: false,
+            provenance_unknown: false,
+            provenance_source_mismatch: false,
         };
         let ops = InputOps::intersect(&json!({"capabilities":["source-snapshots-v1","source-facts-v2","source-locations-v1","jvm-catalog-v1"],
             "supportedOps":{"source-snapshots-v1":["sourceInventory","sourceSnapshot"],"source-facts-v2":["sourceFacts"],
@@ -96,6 +116,28 @@ mod tests {
             EvaluationIndex::new(inputs, host.clone()).with_current_source_facts("evaluation"),
             host,
         )
+    }
+
+    fn provenance_index(host: &Host) -> EvaluationIndex<Host> {
+        let ops = InputOps::intersect(&json!({
+            "capabilities":["source-snapshots-v1","source-facts-v2","source-locations-v1",
+                "project-class-facts-v1","jvm-catalog-v1","runtime-class-bytes-v1"],
+            "supportedOps":{
+                "source-snapshots-v1":["sourceInventory","sourceSnapshot"],
+                "source-facts-v2":["sourceFacts"],
+                "source-locations-v1":["sourceLocation"],
+                "project-class-facts-v1":["sourceProvenance"],
+                "jvm-catalog-v1":["jvmCatalog","jvmClass"],
+                "runtime-class-bytes-v1":["runtimeClass"]
+            }
+        }))
+        .unwrap();
+        let inputs = Arc::new(Mutex::new(
+            ScopedInputs::new("evaluation", &ops, host.clone()).unwrap(),
+        ));
+        EvaluationIndex::new(inputs, host.clone())
+            .with_current_source_facts("evaluation")
+            .with_source_provenance(true)
     }
 
     #[test]
@@ -148,6 +190,49 @@ mod tests {
                 .map(String::as_str),
             Some("compile:dep")
         );
+    }
+
+    #[test]
+    fn unknown_provenance_preserves_independent_binary_only_abi() {
+        let host = Host {
+            calls: Arc::new(Mutex::new(Vec::new())),
+            active: Arc::new(AtomicBool::new(true)),
+            inventory_complete: true,
+            source_provenance: true,
+            provenance_unknown: true,
+            provenance_source_mismatch: false,
+        };
+        let index = provenance_index(&host);
+        let methods = index.methods("demo/Dep").unwrap();
+        assert_eq!(
+            methods
+                .iter()
+                .map(|member| member.name.as_str())
+                .collect::<Vec<_>>(),
+            ["compiled", "compiledBridge"]
+        );
+        let calls = host.calls.lock().unwrap();
+        assert!(calls.iter().any(|query| query["op"] == "sourceProvenance"));
+        assert!(calls.iter().any(|query| query["op"] == "jvmClass"));
+        assert!(!calls.iter().any(|query| query["op"] == "runtimeClass"));
+        assert!(!calls.iter().any(|query| query["op"] == "classBytes"));
+    }
+
+    #[test]
+    fn selected_dependency_provenance_rejects_source_identity_mismatch() {
+        let host = Host {
+            calls: Arc::new(Mutex::new(Vec::new())),
+            active: Arc::new(AtomicBool::new(true)),
+            inventory_complete: true,
+            source_provenance: true,
+            provenance_unknown: false,
+            provenance_source_mismatch: true,
+        };
+        let index = provenance_index(&host);
+        assert!(matches!(
+            index.methods("demo/Dep"),
+            Err(FactsError::Protocol(message)) if message.contains("identities differ")
+        ));
     }
 
     #[test]
@@ -375,6 +460,17 @@ impl<R: EvaluationFactReader> EvaluationIndex<R> {
             ));
         }
         let location = self.with_inputs(|inputs| inputs.source_location(&ty.id))?;
+        let provenance = self.read_source_provenance(&ty.id, owner)?;
+        if let Some(provenance) = &provenance {
+            if let Fact::Found { value } = &location {
+                if provenance.source() != &value.source {
+                    return Err(protocol("source location and provenance identities differ"));
+                }
+            }
+            if let Some((_, origin_id)) = provenance.selected_dependency() {
+                self.selected_dependency_entry(owner, origin_id)?;
+            }
+        }
         match location {
             Fact::Found { value } => {
                 super::super::definition::checked_location_range(&value, &ty.id)?;
@@ -390,6 +486,14 @@ impl<R: EvaluationFactReader> EvaluationIndex<R> {
                     return Err(unknown(format!(
                         "current source location for {owner} is unavailable"
                     )));
+                }
+                // A provenance `Unknown` fact adds no dependency authority. Preserve
+                // the independent raw-ABI path for binary-only types; only a
+                // positive source-backed provenance result suppresses it.
+                if self.source_provenance_enabled && provenance.is_some() {
+                    self.facts.check_active()?;
+                    self.cache()?.source_types.insert(owner.into(), None);
+                    return Ok(None);
                 }
                 self.bind_host_type(&jvm)?;
                 self.check_dependency_origin(owner)?;

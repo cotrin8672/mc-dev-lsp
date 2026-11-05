@@ -5,7 +5,10 @@ use crate::{
     host_facts::{
         bridge::FactReader,
         draft::{RawAbi, TypeJvm},
-        inputs::{CatalogEntry, Inventory, ScopedInputs, SourceEntry, SourceFacts, SourceSnapshot},
+        inputs::{
+            CatalogAssociation, CatalogEntry, Inventory, ScopedInputs, SourceEntry, SourceFacts,
+            SourceProvenance, SourceSnapshot,
+        },
         FactsError,
     },
     provider_commands::CommandFacts,
@@ -46,6 +49,8 @@ struct Cache {
     selected_origins: BTreeMap<String, String>,
     host_types: BTreeMap<String, EditingView>,
     source_types: BTreeMap<String, Option<EditingView>>,
+    source_provenance: BTreeMap<String, Option<SourceProvenance>>,
+    runtime_views: BTreeMap<String, EditingView>,
     source_names: Option<BTreeSet<String>>,
 }
 
@@ -74,6 +79,7 @@ pub struct EvaluationIndex<R: EvaluationFactReader = CommandFacts> {
     source: Option<Arc<dyn ProjectSourceQuery>>,
     source_evaluation: Option<String>,
     source_inputs: Option<source::CurrentSourceInputs>,
+    source_provenance_enabled: bool,
     owned_output_origins: BTreeSet<String>,
 }
 
@@ -91,6 +97,7 @@ impl<R: EvaluationFactReader> EvaluationIndex<R> {
             source: None,
             source_evaluation: None,
             source_inputs: None,
+            source_provenance_enabled: false,
             owned_output_origins: BTreeSet::new(),
         }
     }
@@ -104,6 +111,11 @@ impl<R: EvaluationFactReader> EvaluationIndex<R> {
     /// Enable current authored queries only after sourceFacts and sourceLocation negotiation.
     pub fn with_current_source_facts(mut self, evaluation: &str) -> Self {
         self.source_evaluation = Some(evaluation.to_owned());
+        self
+    }
+
+    pub fn with_source_provenance(mut self, enabled: bool) -> Self {
+        self.source_provenance_enabled = enabled;
         self
     }
 
@@ -207,6 +219,51 @@ impl<R: EvaluationFactReader> EvaluationIndex<R> {
             .filter(|entry| entry.descriptor.internal_name == owner)
             .collect();
         self.select_candidate(owner, candidates)
+    }
+
+    fn selected_dependency_entry(
+        &self,
+        owner: &str,
+        origin_id: &str,
+    ) -> Result<CatalogEntry, FactsError> {
+        let candidates: Vec<_> = self
+            .physical_catalog(owner)?
+            .into_iter()
+            .filter(|entry| {
+                entry.descriptor.internal_name == owner && entry.descriptor.origin_id == origin_id
+            })
+            .collect();
+        let [entry] = candidates.as_slice() else {
+            return Err(unknown(format!(
+                "source provenance does not select one JVM input for {owner}"
+            )));
+        };
+        if entry.descriptor.association == CatalogAssociation::Output
+            || self
+                .owned_output_origins
+                .contains(&entry.descriptor.origin_id)
+        {
+            return Err(unknown(format!(
+                "current source authority for project output {owner} is unavailable"
+            )));
+        }
+        self.facts.check_active()?;
+        let mut cache = self.cache()?;
+        if cache
+            .selected_origins
+            .get(owner)
+            .is_some_and(|previous| previous != origin_id)
+        {
+            return Err(FactsError::Stale(
+                "host type selection changed within an evaluation".into(),
+            ));
+        }
+        cache
+            .selected_origins
+            .insert(owner.to_owned(), origin_id.to_owned());
+        drop(cache);
+        self.facts.check_active()?;
+        Ok(entry.clone())
     }
 
     fn select_candidate(
@@ -347,6 +404,121 @@ impl<R: EvaluationFactReader> EvaluationIndex<R> {
         self.facts.check_active()
     }
 
+    fn cached_source_provenance(
+        &self,
+        owner: &str,
+    ) -> Result<Option<Option<SourceProvenance>>, FactsError> {
+        self.facts.check_active()?;
+        let value = self.cache()?.source_provenance.get(owner).cloned();
+        self.facts.check_active()?;
+        Ok(value)
+    }
+
+    fn selected_origin_bound(&self, owner: &str) -> Result<bool, FactsError> {
+        self.facts.check_active()?;
+        let value = self.cache()?.selected_origins.contains_key(owner);
+        self.facts.check_active()?;
+        Ok(value)
+    }
+
+    fn read_source_provenance(
+        &self,
+        target: &str,
+        owner: &str,
+    ) -> Result<Option<SourceProvenance>, FactsError> {
+        if !self.source_provenance_enabled {
+            return Ok(None);
+        }
+        if let Some(value) = self.cached_source_provenance(owner)? {
+            return Ok(value);
+        }
+        let fact = self.with_inputs(|inputs| inputs.source_provenance(target))?;
+        let value = match fact {
+            Fact::Found { value } => {
+                if let Some((jvm_owner, _)) = value.selected_dependency() {
+                    if jvm_owner != owner {
+                        return Err(protocol(
+                            "source provenance owner differs from checked JVM type",
+                        ));
+                    }
+                }
+                Some(value)
+            }
+            Fact::Unknown { .. } => None,
+            Fact::DefinitelyAbsent => {
+                return Err(protocol("source provenance cannot certify absence"))
+            }
+        };
+        self.facts.check_active()?;
+        self.cache()?
+            .source_provenance
+            .insert(owner.to_owned(), value.clone());
+        self.facts.check_active()?;
+        Ok(value)
+    }
+
+    fn selected_dependency_view(
+        &self,
+        owner: &str,
+        provenance: &SourceProvenance,
+    ) -> Result<EditingView, FactsError> {
+        let Some((jvm_owner, origin_id)) = provenance.selected_dependency() else {
+            return Err(protocol("current workspace source cannot use runtime ABI"));
+        };
+        if jvm_owner != owner {
+            return Err(protocol(
+                "source provenance owner differs from runtime JVM owner",
+            ));
+        }
+        self.selected_dependency_entry(owner, origin_id)?;
+        if let Some(view) = self.cache()?.runtime_views.get(owner).cloned() {
+            self.facts.check_active()?;
+            return Ok(view);
+        }
+        let runtime = self.runtime_bytes(owner)?;
+        if runtime.origin != origin_id {
+            return Err(unknown(format!(
+                "runtime class and selected dependency differ for {owner}"
+            )));
+        }
+        let index = ClassMemberIndex::index_class(&runtime.bytes, None, None)
+            .map_err(|error| FactsError::BytecodeUnavailable(error.to_string()))?;
+        if !index.classes.contains_key(owner) || index.classes.len() != 1 {
+            return Err(protocol("runtime bytes contain a different JVM class"));
+        }
+        let view = EditingView {
+            methods: Some(
+                index
+                    .methods_by_owner
+                    .get(owner)
+                    .cloned()
+                    .unwrap_or_default(),
+            ),
+            fields: Some(
+                index
+                    .fields_by_owner
+                    .get(owner)
+                    .cloned()
+                    .unwrap_or_default(),
+            ),
+        };
+        self.facts.check_active()?;
+        let mut cache = self.cache()?;
+        if cache
+            .runtime_views
+            .get(owner)
+            .is_some_and(|previous| previous != &view)
+        {
+            return Err(FactsError::Stale(
+                "runtime ABI changed within an evaluation".into(),
+            ));
+        }
+        cache.runtime_views.insert(owner.to_owned(), view.clone());
+        drop(cache);
+        self.facts.check_active()?;
+        Ok(view)
+    }
+
     fn source_class(&self, owner: &str) -> Result<Option<ClassIndexEntry>, FactsError> {
         if self.source.is_none() && self.source_evaluation.is_some() {
             return self.current_source_class(owner);
@@ -373,6 +545,17 @@ impl<R: EvaluationFactReader> EvaluationIndex<R> {
             if let Some(entry) = self.source_class(owner)? {
                 return Ok(Some(entry));
             }
+            if let Some(provenance) = self.cached_source_provenance(owner)? {
+                if (provenance.is_none() && !self.selected_origin_bound(owner)?)
+                    || provenance
+                        .as_ref()
+                        .is_some_and(|value| value.selected_dependency().is_none())
+                {
+                    return Err(unknown(format!(
+                        "source authority for {owner} is unavailable"
+                    )));
+                }
+            }
             if self
                 .source
                 .as_ref()
@@ -397,7 +580,28 @@ impl<R: EvaluationFactReader> EvaluationIndex<R> {
     }
 
     fn methods(&self, owner: &str) -> Result<Vec<MethodIndexEntry>, FactsError> {
-        if self.source_class(owner)?.is_some() {
+        let source_class = self.source_class(owner)?;
+        if let Some(provenance) = self.cached_source_provenance(owner)? {
+            if let Some(provenance) = provenance {
+                if provenance.selected_dependency().is_some() {
+                    return self
+                        .selected_dependency_view(owner, &provenance)?
+                        .methods
+                        .ok_or_else(|| {
+                            unknown(format!("runtime methods for {owner} are incomplete"))
+                        });
+                } else if source_class.is_none() {
+                    return Err(unknown(format!(
+                        "current workspace source for {owner} is unavailable"
+                    )));
+                }
+            } else if source_class.is_none() && !self.selected_origin_bound(owner)? {
+                return Err(unknown(format!(
+                    "source provenance for {owner} is unavailable"
+                )));
+            }
+        }
+        if source_class.is_some() {
             if self.source.is_none() {
                 return self.current_source_members(owner, |view| view.methods.clone(), "methods");
             }
@@ -425,7 +629,28 @@ impl<R: EvaluationFactReader> EvaluationIndex<R> {
     }
 
     fn fields(&self, owner: &str) -> Result<Vec<FieldIndexEntry>, FactsError> {
-        if self.source_class(owner)?.is_some() {
+        let source_class = self.source_class(owner)?;
+        if let Some(provenance) = self.cached_source_provenance(owner)? {
+            if let Some(provenance) = provenance {
+                if provenance.selected_dependency().is_some() {
+                    return self
+                        .selected_dependency_view(owner, &provenance)?
+                        .fields
+                        .ok_or_else(|| {
+                            unknown(format!("runtime fields for {owner} are incomplete"))
+                        });
+                } else if source_class.is_none() {
+                    return Err(unknown(format!(
+                        "current workspace source for {owner} is unavailable"
+                    )));
+                }
+            } else if source_class.is_none() && !self.selected_origin_bound(owner)? {
+                return Err(unknown(format!(
+                    "source provenance for {owner} is unavailable"
+                )));
+            }
+        }
+        if source_class.is_some() {
             if self.source.is_none() {
                 return self.current_source_members(owner, |view| view.fields.clone(), "fields");
             }

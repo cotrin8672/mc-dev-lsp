@@ -130,8 +130,38 @@ independently demonstrated host gaps. The Java library-body `Stale` fix remains
 an independent host bug fix. Raw Kotlin DTO capture is diagnostic evidence,
 not a prerequisite for this responsibility decision or the MC implementation.
 
-This records an agreed design, not a completed Kotlin integration. The earlier
-native/CI results cover the existing runtime; full replacement remains unverified.
+MC commit `984760c` implements this Kotlin connection and restores the original
+completion helper's `HAND_WRITTEN_FALLBACK` assertion. Its local verification
+passes 1,913 native functions/83 targets and five editor entries. Original live
+Kotlin acceptance and the complete replacement remain unverified; model/SDK
+admission is not a successful editor workflow.
+
+### Dependency source authority, 2026-11-05
+
+The original Java Drill case independently exposes a narrower host gap. Its
+name-only selector needs a complete method set, while a Found source location
+does not distinguish a workspace source from an attached dependency source.
+Host source-wide member coverage intentionally remains Unknown. A parser cannot
+establish the selected dependency variant or whether an unsaved/generated source
+owns that resolved type; those are host facts.
+
+Both projects therefore chose one generic `sourceProvenance(target)` operation,
+negotiated through `project-class-facts-v1` and `supportedOps`. It distinguishes
+current workspace source, selected dependency source and Unknown for an issued
+TypeId. A dependency result additionally carries its checked JVM owner and
+selected physical origin. MC compares them with the existing selected compile
+origin and runtime class, then parses the existing runtime class bytes only when
+all identities and runtime ABI coverage agree. Exact source member locations retain
+their separate checks. Unknown source provenance cannot justify a new runtime
+fallback. This does not add Kotlin annotation normalization, compiler recipe
+features or a second MC parser. Host release108 publishes the operation and its
+actual serializer samples. The MC consumer passes 1,923 native functions/83
+targets and five editor entries, including the unchanged actual serializer
+samples and real runtime class bytes. Original live editor acceptance remains
+pending. Live evidence already confirms two Kotlin source-parser completions;
+the follow-up removes an unnecessary complete-inventory prerequisite from exact
+source-member navigation and batches resource inventory pages without changing
+their scope or completeness requirements.
 
 ## Work and acceptance record
 

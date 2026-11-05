@@ -29,7 +29,7 @@ candidate101 and published host102.
 ## Published contract
 
 The current integration pin is ktlsp
-[`d24ab4d2409405fdf7a55792cb9896f597a0f5df`](https://github.com/cotrin8672/ktlsp/blob/d24ab4d2409405fdf7a55792cb9896f597a0f5df/docs/architecture/extension-ipc.md).
+[`5d5059a5868d6e2a3f249d9acbc0b8c4899396cb`](https://github.com/cotrin8672/ktlsp/blob/5d5059a5868d6e2a3f249d9acbc0b8c4899396cb/docs/architecture/extension-ipc.md).
 It adds normalized authored facts, owning-project input records, exact source
 locations and typed binary declaration annotations to source snapshots, owned
 resources, selected runtime bytes, the physical JVM catalog and provider
@@ -37,12 +37,11 @@ commands. The companion negotiates capabilities and individual operations;
 binary annotations are selected by capability alone. Configured command IDs
 are intersected with the implemented domain routes.
 
-The copied published release107 host has SHA-256
-c926f65583b9fb81ea6ee25ab419d55c5090ae2173f039aa961b5a8bea75a09c
-and 25,459,200 bytes. Its code commit is
-c5b07f1f4356493fa0fb4248e755619efca19341. The independently checked public
-revision above differs only in the IPC and fork-status documents.
-The copy receipt is build/host-artifacts/candidate107-c926f65583b9/copy-receipt.json.
+The copied published release108 host has SHA-256
+e12eb95f8b0ef3cf42e6e5f0897fbbf42dcdea9d1b86364efc11f1d414612d54
+and 25,431,552 bytes. Its code commit is the independently checked public pin
+above, published on `codex/java-kotlin-analysis`.
+The copy receipt is build/host-artifacts/candidate108-e12eb95f8b0e/copy-receipt.json.
 Release103 adds Java nominal parameterized-reference erasure;105 shares archive
 checks only within one source-preparation batch. Neither adds opcodes or relaxes
 quota/deadline/readguards. Release106 retains already-indexed library bodies
@@ -50,7 +49,10 @@ only after checking their stamps, epochs, origin and complete symbols. Its
 independent native reproduction does not prove the cause of old evaluation44.
 Release107 shares preparation within a batch for separately allocated library
 resolvers only when all six selected library inputs agree; current input,
-archive, stamp and epoch guards remain in force. Historical102/103/105/106
+archive, stamp and epoch guards remain in force. Release108 adds only the agreed
+target-bound `sourceProvenance` operation. Its producer passes 17 focused checks
+with 416 source guards stable; this is not MC editor acceptance. Its five actual
+serializer samples are retained beside the copied host. Historical102/103/105/106/107
 artifacts and receipts remain pinned.
 
 The host's evaluation lifetime, accumulated reads and final validation govern
@@ -162,6 +164,11 @@ The source patch remains unchanged throughout the run. Its frozen final MC
 artifact is `build/companion-artifacts/native-kotlin-guard-8a9fab5dbe78/`, SHA256
 8a9fab5dbe782e86eb144441e3ed0ccd21ac9e4f88f50919c5d07b00180b524e.
 This local proof is separate from original live editor acceptance.
+Commit `984760c` also passes [CI run41949812694](https://github.com/cotrin8672/mc-dev-lsp/actions/runs/41949812694):
+1,913 Windows/1,912 Linux functions across 83 targets per platform, with no
+failed, ignored or filtered native tests. Both editor and package checks pass.
+Downloaded complete logs and their summary are in
+`build/rust-test-logs/ci-984760c/`.
 
 Release107 with MC25c completes the original Java request without timeout in
 48.7s, passes nine of ten observed assertions, then returns no definition
@@ -178,8 +185,12 @@ provenance and its selected dependency identity, checked against the existing
 runtime artifact identity. Current workspace/generated/open sources and Unknown
 targets retain source authority; source locations and runtime ABI remain
 separate facts. The agreed `sourceProvenance(target)` operation extends
-`project-class-facts-v1` through `supportedOps`; host and consumer implementation
-are pending. The existing `typeJvm` DTO is unchanged.
+`project-class-facts-v1` through `supportedOps`; release108 publishes the host
+operation. The consumer passes the local full check below; original live
+acceptance remains pending.
+The existing `typeJvm` and runtime DTOs are unchanged. Normal runtime members
+come from checked `classBytes` and the existing class parser; `classHeader`
+remains an SDK-header fact rather than a new runtime member source.
 
 Kotlin MC6c36/release107 with the original Java-only producer profile stops at
 `missing-selected-sdk`; this means the selected JDK, not a missing Minecraft
@@ -196,12 +207,74 @@ retain their failures and finish with no owned processes remaining.
 
 An online preparation follow-up admits a model with complete Kotlin compiler
 metadata, `:compileKotlin`, JDK21 producer claims and no unresolved dependencies.
-Its trace reports complete classpath/JDK indexing. However, the expected stdlib
-and annotations jar paths were not confirmed as physical files, two dependency
-sources remain missing, and the metadata command stops at a preflight Stale
-response. Model admission alone does not verify physical inputs or Kotlin
-editor behavior. Receipt:
+Its trace reports complete classpath/JDK indexing. Its two missing dependency
+sources and preflight Stale response remain historical failures. The later
+claim that stdlib/annotations jars disappeared was incorrect: their 304/289
+character Windows paths fail ordinary existence checks but extended paths read
+both exact files and hashes. The existing isolated cache was copied to
+`C:/tmp/mcdev-kg-20261105-01a168cf`; all seven saved Kotlin classpath files exist
+there, with a maximum path length of 201. Both caches retain 1,098 files and
+402,388,165 bytes. No Gradle or editor command was rerun during the copy.
+This prepares physical inputs without granting Kotlin editor acceptance.
+The correction is in
+`build/rust-test-logs/kotlin-sdk21-materialize-20261105/physical-materialization-corrected-receipt.json`.
+The preceding model/preflight receipt is
 `build/rust-test-logs/kotlin-sdk21-online-resolution-20261105/recovery-and-run-receipt.json`.
+
+### SourceProvenance consumer on release108
+
+The consumer negotiates the new operation, checks the exact target/source
+identity, joins dependency JVM owner/origin with the selected physical input,
+and parses checked runtime bytes through the existing class index. Source
+coverage and runtime/source-current authority remain separate. Binary-only
+types retain the independent checked raw-ABI path; Unknown provenance supplies
+no new dependency authority. Existing exact member/location validation is kept.
+
+All five actual producer samples are preserved without editing in
+`mcdev-companion/tests/fixtures/host_inputs/source_provenance/actual-serializer-sample.json`
+(SHA256 a41c9154027c2b0e9c1b26109e167beb1f59c7ce6fdf9dac8380821dad758526).
+The full local check passes 1,919 functions/83 targets, docs/build and five editor
+entries, with no failures, ignored or filtered tests. Summary:
+`build/rust-test-logs/20261105-113117544/native-summary.json`.
+Inputs remain unchanged throughout verification. The frozen MC artifact is
+`build/companion-artifacts/native-source-provenance-6200e7b7d1d7/`, SHA256
+6200e7b7d1d7c152eda46a230de40e3987eef2bbcce37b66531fbec84d2d867a.
+The one Java run on this pair passes nine of ten observed original assertions.
+It reaches `sourceProvenance`, `runtimeClass` and `classBytes`, then fails after
+`declaredMembers` at the MC resolver's blanket coverage check: `target member
+inventory is incomplete`. This is a later boundary than release107. Exact
+descriptor lookup now permits a known unique source member under incomplete
+coverage, while name-only and same-name Unknown/ambiguous candidates retain
+their refusal. Thirteen definition and eight IPC command checks pass; that
+follow-up is not part of the frozen MC6200 artifact.
+
+The one Kotlin run passes 52 of 53 observed original assertions. Both actual
+completion DTOs (evaluations27 and56) report `HAND_WRITTEN_FALLBACK` and
+`usedCompilationUnit=false`. The diagnostic request fails at evaluation63 with
+child error `-32602: evaluation batch limit`, mapped by the host to outer
+`-32603/CommandFailed`. The separate `kotlin_diagnostics_finish` compiler event
+does not establish an MC diagnostic result. Hover, definition and Placement
+remain unreached. Resource request collection is being corrected on the MC side;
+host quotas, deadlines and APIs are unchanged.
+
+The corrected receipts are under
+`build/rust-test-logs/host108-mc6200-java-20261105/` and
+`build/rust-test-logs/host108-mc6200-kotlin-20261105/`. Initial receipt versions
+are preserved byte for byte. Complete logs use short owned directories under
+`C:/tmp/mc-e108-6200e7b7-*`; both runs finish with no owned processes remaining.
+
+The combined consumer follow-up passes 1,923 functions/83 targets, docs/build
+and all five editor entries in
+`build/rust-test-logs/20261105-123902323/native-summary.json`.
+The frozen MC is `build/companion-artifacts/native-post-e2e-fixes-14b147b27efb/`,
+SHA256 14b147b27efb290f5bceb1b1f95ff4c0e361b3759f0bdfcbcf00b97eacdd2f71.
+The source patch is unchanged through this check. Resource inventories now
+share read batches across at most eight scopes while each scope retains its
+own sequential cursor and all coverage/membership/duplicate checks. A two-scope,
+two-page regression preserves all entries and terminal coverage in two batches.
+The old trace's 56 resource queries do not establish 56 independent scopes or a
+seven-batch replacement; pagination and response splitting determine the actual
+reduction. Original live acceptance on this follow-up artifact is in progress.
 
 ### 2026-11-05 original CEM and Drill acceptance
 

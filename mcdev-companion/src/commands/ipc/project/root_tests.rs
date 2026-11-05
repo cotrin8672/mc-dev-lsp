@@ -88,6 +88,7 @@ struct RootReader {
     reads: Arc<Mutex<Vec<String>>>,
     compiler_reads: Arc<Mutex<Vec<String>>>,
     resource_reads: Arc<Mutex<Vec<String>>>,
+    resource_inventory_batches: Arc<Mutex<Vec<usize>>>,
     forbid_compiler_sources: bool,
 }
 
@@ -135,6 +136,7 @@ impl RootReader {
             reads: Arc::new(Mutex::new(vec![])),
             compiler_reads: Arc::new(Mutex::new(vec![])),
             resource_reads: Arc::new(Mutex::new(vec![])),
+            resource_inventory_batches: Arc::new(Mutex::new(vec![])),
             forbid_compiler_sources: false,
         }
     }
@@ -169,6 +171,16 @@ impl FactReader for RootReader {
             if matches!(op, "resourceInventory" | "resourceSnapshot") {
                 self.resource_reads.lock().unwrap().push(op.into());
             }
+        }
+        let resource_inventory_count = queries
+            .iter()
+            .filter(|query| query["op"] == "resourceInventory")
+            .count();
+        if resource_inventory_count != 0 {
+            self.resource_inventory_batches
+                .lock()
+                .unwrap()
+                .push(resource_inventory_count);
         }
         if queries
             .first()
@@ -503,6 +515,7 @@ fn root_files_restore_workspace_discovery_without_broadening_compiler_inputs() {
     let workspace = unique_root();
     let reader = RootReader::new(&workspace);
     let reads = reader.reads.clone();
+    let resource_inventory_batches = reader.resource_inventory_batches.clone();
     let selected = project(reader).unwrap();
     let context = &selected.cached_session.context;
     assert_eq!(context.root, workspace);
@@ -525,6 +538,7 @@ fn root_files_restore_workspace_discovery_without_broadening_compiler_inputs() {
         .mixin_configs
         .iter()
         .any(|config| config.path.to_string_lossy().contains("ignored")));
+    assert_eq!(*resource_inventory_batches.lock().unwrap(), [2]);
     assert!(context
         .access_wideners
         .iter()
