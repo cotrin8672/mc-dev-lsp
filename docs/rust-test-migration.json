@@ -63462,7 +63462,7 @@
     },
     "resumedIntegration": {
       "date": "2026-11-05",
-      "status": "native1926-and-editor5-passed; positive-type-reuse-and-definition-fresh-retry-implemented; original-host108-pair-in-progress",
+      "status": "native1927-and-editor5-passed; internal-API-and-external-navigation-wire-contract-corrected; original-host108-new-pair-in-progress",
       "hostPin": "5d5059a5868d6e2a3f249d9acbc0b8c4899396cb",
       "hostReceipt": "build/host-artifacts/candidate108-e12eb95f8b0e/main-ready.json",
       "hostSerializerFixture": "mcdev-companion/tests/fixtures/host_inputs/root_files/actual-serializer-sample.json",
@@ -64497,7 +64497,7 @@
         "sameArtifactRerun": false
       },
       "requestEconomyAndDefinitionRetry": {
-        "status": "implemented; stable full local checks passed; original real-host pair in progress",
+        "status": "native/editor/cross-platform CI passed; fresh Java definition and Kotlin diagnostics/hover/definition verified live; complete entries stop on local resolution casing",
         "fullCheck": {
           "path": "build/rust-test-logs/20261105-140250838/native-summary.json",
           "sha256": "d96c528c96eb443716db790c7afe1ce8fad9caf0be9728c6593fb938dc273a5a"
@@ -64548,7 +64548,119 @@
         },
         "originalEntryDeadlineSeconds": 180,
         "originalLivePairPassed": false,
+        "ciStatus": "passed",
+        "wholeMigrationVerified": false,
+        "ci": {
+          "status": "passed",
+          "commit": "dac60d117ac05ecf893b8feb60b0d414c624f27a",
+          "url": "https://github.com/cotrin8672/mc-dev-lsp/actions/runs/41972167888",
+          "proof": {
+            "path": "build/rust-test-logs/ci-dac60d1/ci-summary.json",
+            "sha256": "ccb29ee54148702f9d3e4fac36365f19bd0140f607f3e510a56f4f54bfbed26f"
+          },
+          "originalLocators": {
+            "path": "build/rust-test-logs/ci-dac60d1/case-locators.json",
+            "sha256": "7b62c83f36b0bfcf4e17f38c1b6ea00f77eca226b3146886648939b61a0b36e9"
+          },
+          "windowsFunctions": 1926,
+          "linuxFunctions": 1925,
+          "targetsPerPlatform": 83,
+          "editorEntriesPerPlatform": 5,
+          "packagePayloadFilesPerPlatform": 24,
+          "currentProtocolIncluded": true,
+          "optimizedStdioSmoke": true
+        }
+      },
+      "originalHost108Mc436e": {
+        "java": {
+          "receipt": {
+            "path": "build/rust-test-logs/host108-mc436e-java-20261105/recovery-and-run-receipt.json",
+            "sha256": "8b8b98da510915867286738cf687df0a47df45b658f13df697e3249b133cab3d"
+          },
+          "observedAssertions": 13,
+          "passedAssertions": 12,
+          "failedAssertions": 1,
+          "freshDefinitionVerified": true,
+          "initialStaleEvaluation": 34,
+          "freshSuccessfulEvaluation": 44,
+          "sameDocumentVersionAndSha": true,
+          "terminalFailure": "original line87: expected source, got SOURCE",
+          "fullOriginalEntryPassed": false
+        },
+        "kotlin": {
+          "receipt": {
+            "path": "build/rust-test-logs/host108-mc436e-kotlin-20261105/recovery-and-run-receipt.json",
+            "sha256": "bc75d67bb2711f5c360b79bc2d01caa3da8cbbec9e22ac6339d3825c745cafa2"
+          },
+          "observedAssertions": 85,
+          "passedAssertions": 84,
+          "failedAssertions": 1,
+          "actualSourceParserCompletions": 2,
+          "completionParseSource": [
+            "HAND_WRITTEN_FALLBACK",
+            "HAND_WRITTEN_FALLBACK"
+          ],
+          "completionUsedCompilationUnit": [
+            false,
+            false
+          ],
+          "actualDiagnosticsHoverDefinitionReplies": true,
+          "ownBatchGuardHit": false,
+          "terminalFailure": "original line123: expected source, got SOURCE",
+          "placementReached": false,
+          "fullOriginalEntryPassed": false
+        },
+        "hostSha256": "e12eb95f8b0ef3cf42e6e5f0897fbbf42dcdea9d1b86364efc11f1d414612d54",
+        "companionSha256": "436e33392e26ecaf305c349176f272a0e278bcfc7adb306436c33e1688bebd9e",
+        "resourceInventoryRequests": 0,
+        "eachOuterTimeoutSeconds": 180,
+        "ownedProcessesRemaining": 0,
+        "sameArtifactRerun": false,
+        "newHostRequirement": false
+      },
+      "navigationWireContract": {
+        "status": "corrected at actual IPC boundary; full check passed; unchanged original pair in progress",
+        "fullCheck": {
+          "path": "build/rust-test-logs/20261105-143849454/native-summary.json",
+          "sha256": "2d2d46c2fd461e144b9eeb5ca315b10e198decaa4e49bb1fe2c9750f482c2a90"
+        },
+        "nativeFunctions": 1927,
+        "nativeTargets": 83,
+        "independentEditorEntries": 5,
+        "originalCaseLocators": 2604,
+        "replacementReferences": 2748,
+        "legacyCommandReplays": 135,
+        "focusedCoreCommandFunctions": 14,
+        "focusedIpcUnitFunctions": 4,
+        "originalFixturesChanged": false,
+        "internalApiResolution": "SOURCE/UNRESOLVED",
+        "wireResolution": "source/unresolved",
+        "implementation": "Rehydrate definition/reference response envelopes only at actual IPC boundary and use existing protocol adapter; internal dispatcher representation unchanged.",
+        "testedFiles": [
+          {
+            "path": "mcdev-companion/src/commands/ipc.rs",
+            "sha256": "803fcdada9564ce2eb69efd629c767508385e4f90752199c8f03cecae18aa1b6"
+          },
+          {
+            "path": "mcdev-companion/tests/core_commands.rs",
+            "sha256": "3b8161ed97f26ebaa96c2a77dc4c6e72d5b2b6d01e2806a5a104942f7c1a934c"
+          }
+        ],
+        "artifact": {
+          "path": "build/companion-artifacts/native-navigation-wire-9eb630a61e5c/receipt.json",
+          "sha256": "bde8d7467029f0786aa3698a504f6bcd7601b44fcd4e9141202a66fac59f9358"
+        },
+        "binarySha256": "9eb630a61e5c1d3adec8efaafbd6110cb0a27f8bce9800827c65c3921c6d80de",
+        "sourcePatchSha256": "ba2ddb285226c552b0cbfb02b8854f2d25e2fc5137fd3f1c44db6537c2974cfa",
+        "failedInitialFullCheck": "build/rust-test-logs/20261105-142811343",
+        "failedInitialReason": "Applying external JSON adapter inside internal API changed recorded enum names; preserved fixtures and moved adaptation to wire boundary.",
+        "selection": {
+          "path": "build/navigation-wire-acceptance-20261105/selection-manifest.json",
+          "sha256": "dae17727ada1696cc0b6984a550b8fedbae1a1321f19b84ad72874a79adc38c3"
+        },
+        "originalPairPassed": false,
         "ciStatus": "pending source push",
+        "hostApiGuardQuotaDeadlineChanged": false,
         "wholeMigrationVerified": false
       }
     }

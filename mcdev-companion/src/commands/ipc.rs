@@ -21,7 +21,8 @@ use mcdev_core::{
     project::{normalize_path, uri_to_path},
 };
 use mcdev_protocol::{
-    Command, DecodedCommand, McdevError, McdevResponseEnvelope, ProtocolPayloadDecoder,
+    Command, DecodedCommand, McdevDefinitionResponse, McdevError, McdevReferencesResponse,
+    McdevResponseEnvelope, ProtocolPayloadDecoder,
 };
 use serde_json::Value;
 use sha2::{Digest, Sha256};
@@ -171,10 +172,30 @@ fn validated_command(
 }
 
 fn encode_envelope(value: &McdevResponseEnvelope<Value>) -> Result<Value, FactsError> {
+    let encoded = if value.capabilities.contains("definition") {
+        encode_navigation_envelope::<McdevDefinitionResponse>(value)
+    } else if value.capabilities.contains("references") {
+        encode_navigation_envelope::<McdevReferencesResponse>(value)
+    } else {
+        ProtocolPayloadDecoder
+            .encode_to_map(value)
+            .map(Value::Object)
+            .map_err(|error| error.to_string())
+    };
+    encoded.map_err(|error| FactsError::Protocol(format!("invalid command response: {error}")))
+}
+
+fn encode_navigation_envelope<T>(value: &McdevResponseEnvelope<Value>) -> Result<Value, String>
+where
+    T: serde::de::DeserializeOwned + serde::Serialize,
+{
+    let raw = serde_json::to_value(value).map_err(|error| error.to_string())?;
+    let typed: McdevResponseEnvelope<T> =
+        serde_json::from_value(raw).map_err(|error| error.to_string())?;
     ProtocolPayloadDecoder
-        .encode_to_map(value)
+        .encode_to_map(&typed)
         .map(Value::Object)
-        .map_err(|error| FactsError::Protocol(format!("invalid command response: {error}")))
+        .map_err(|error| error.to_string())
 }
 
 fn domain_failure(error: McdevError) -> Result<Value, FactsError> {
@@ -241,8 +262,8 @@ fn execute_inner(
                 character,
                 facts.clone(),
             )? {
-                let result = serde_json::to_value(response).map_err(|e| {
-                    FactsError::Protocol(format!("invalid definition response: {e}"))
+                let result = serde_json::to_value(response).map_err(|error| {
+                    FactsError::Protocol(format!("invalid definition response: {error}"))
                 })?;
                 facts.check_active()?;
                 return encode_envelope(&McdevResponseEnvelope::success(
@@ -516,5 +537,26 @@ mod tests {
             requests.try_recv(),
             Err(std::sync::mpsc::TryRecvError::Empty | std::sync::mpsc::TryRecvError::Disconnected)
         ));
+    }
+
+    #[test]
+    fn navigation_wire_serializes_internal_resolution_names_lowercase() {
+        for capability in ["definition", "references"] {
+            let envelope = McdevResponseEnvelope::success(
+                json!({
+                    "locations": [
+                        {"documentUri":"file:///Target.java","range":{"start":{"line":0,"character":0},"end":{"line":0,"character":1}},"metadata":{},"resolution":"SOURCE"},
+                        {"documentUri":"","range":{"start":{"line":0,"character":0},"end":{"line":0,"character":1}},"metadata":{},"resolution":"UNRESOLVED"}
+                    ]
+                }),
+                [capability.to_owned()],
+            );
+            let encoded = encode_envelope(&envelope).unwrap();
+            assert_eq!(encoded["result"]["locations"][0]["resolution"], "source");
+            assert_eq!(
+                encoded["result"]["locations"][1]["resolution"],
+                "unresolved"
+            );
+        }
     }
 }

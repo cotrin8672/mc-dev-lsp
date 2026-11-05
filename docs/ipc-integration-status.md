@@ -75,6 +75,28 @@ an omitted or unsupported list does not establish a zero-parameter callable.
 
 ## Follow-up acceptance checkpoints
 
+### Navigation JSON contract correction
+
+The complete check first rejected applying protocol serialization inside the
+internal command dispatcher: recorded legacy API observations require enum
+names such as `SOURCE`, while the actual JSON protocol requires `source`.
+The failed full-check log is retained in
+`build/rust-test-logs/20261105-142811343/`; original fixtures were not changed.
+The corrected implementation rehydrates only definition/reference envelopes at
+the IPC boundary, then uses the existing protocol adapter. Internal command
+results keep their original representation. Paired regressions check both.
+
+All 135 legacy command replays,14 core commands and4 IPC unit tests pass. The
+new stable whole check passes1,927 functions/83 targets, all2,604 original case
+locators, docs/build and five editor entries. Its full summary is
+`build/rust-test-logs/20261105-143849454/native-summary.json`.
+Frozen MC SHA256 is
+`9eb630a61e5c1d3adec8efaafbd6110cb0a27f8bce9800827c65c3921c6d80de`;
+tested source patch is
+`ba2ddb285226c552b0cbfb02b8854f2d25e2fc5137fd3f1c44db6537c2974cfa`.
+The unchanged original Java/Kotlin entries have one new180-second run each
+with host108; results are pending. No host API, guard, quota or deadline changed.
+
 ### Evaluation-local type reuse and unchanged-source definition retry
 
 The host and MC tasks agreed that an unchanged-source semantic-index Stale can
@@ -103,8 +125,25 @@ its tested source patch is
 `2c4a55072bb4cc0dcc8b1f6bd56e0e0a1243b91d998fce7d11b1c24fd1a2864e`.
 The new original-entry selection freezes all twenty current product runtime
 files, including the actual retry implementation, while preserving the original
-Java/Kotlin entries, wrappers and assertions. Each next real-host entry has one
-180-second run; results are pending. Full replacement remains unverified.
+Java/Kotlin entries, wrappers and assertions. Each real-host entry has one
+180-second run. Java's first definition (evaluation34) is Stale; its one fresh
+request (evaluation44), with unchanged source/version, returns the actual
+definition DTO. Kotlin returns actual source-parser completion, diagnostics,
+hover and definition DTOs. It no longer hits MC's batch guard. Both entries then
+fail an original assertion because the response uses `SOURCE`, while the legacy
+wire contract expects `source` (Java line87, Kotlin line123). Java observes
+13 assertions/12 passes and Kotlin85/84. Both owned trees stop at the deadline,
+with zero processes remaining. Receipts are in
+`build/rust-test-logs/host108-mc436e-{java,kotlin}-20261105/`.
+The wire mismatch is a local fix; no new host operation is required.
+
+Published MC commit `dac60d117ac05ecf893b8feb60b0d414c624f27a` passes
+[CI41972167888](https://github.com/cotrin8672/mc-dev-lsp/actions/runs/41972167888):
+Windows1,926 and Linux1,925 functions,83 targets each, all2,604 original case
+locators, five editor entries,24 package payload hashes and optimized stdio
+smoke. Both archives contain the current product retry implementation. Full
+logs and separate locator proof are retained in
+`build/rust-test-logs/ci-dac60d1/`. Full replacement remains unverified.
 
 ### Resource quota fix and host103/105 follow-up
 

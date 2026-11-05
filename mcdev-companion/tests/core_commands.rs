@@ -626,6 +626,10 @@ fn definition_direct_source_is_resolved_without_host_lookup() {
         "definition error: {:?}",
         response.error
     );
+    assert_eq!(
+        response.result.as_ref().unwrap()["locations"][0]["resolution"].as_str(),
+        Some("SOURCE")
+    );
     let response: McdevDefinitionResponse =
         serde_json::from_value(response.result.unwrap()).unwrap();
     let id_start = DIRECT_DEFINITION_SOURCE.find("drawCall").unwrap();
@@ -677,6 +681,10 @@ fn definition_missing_host_location_is_an_unresolved_location() {
         response.error.is_none(),
         "definition error: {:?}",
         response.error
+    );
+    assert_eq!(
+        response.result.as_ref().unwrap()["locations"][0]["resolution"].as_str(),
+        Some("UNRESOLVED")
     );
     let response: McdevDefinitionResponse =
         serde_json::from_value(response.result.unwrap()).unwrap();
