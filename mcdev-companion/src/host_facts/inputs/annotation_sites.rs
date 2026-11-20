@@ -230,6 +230,7 @@ impl AnnotationSites {
                         || !compatible_annotation(
                             previous,
                             annotation,
+                            text,
                             detailed,
                             types,
                             allow_unknown,
@@ -317,6 +318,24 @@ fn contains(outer: &crate::wire::ByteRange, inner: &crate::wire::ByteRange) -> b
     outer.start <= inner.start && inner.start <= inner.end && inner.end <= outer.end
 }
 
+pub(crate) fn primitive_class_literal(
+    text: &str,
+) -> Option<mcdev_core::host_source::HostPrimitive> {
+    use mcdev_core::host_source::HostPrimitive;
+    Some(match text.strip_suffix(".class")? {
+        "boolean" => HostPrimitive::Boolean,
+        "byte" => HostPrimitive::Byte,
+        "char" => HostPrimitive::Char,
+        "double" => HostPrimitive::Double,
+        "float" => HostPrimitive::Float,
+        "int" => HostPrimitive::Int,
+        "long" => HostPrimitive::Long,
+        "short" => HostPrimitive::Short,
+        "void" => HostPrimitive::Void,
+        _ => return None,
+    })
+}
+
 fn same_file_uri(left: &str, right: &str) -> Result<bool, FactsError> {
     use mcdev_core::project::{normalize_path, uri_to_path};
     if !left.starts_with("file://") || !right.starts_with("file://") {
@@ -375,6 +394,7 @@ fn known_argument<'a>(
 fn compatible_annotation(
     previous: &Annotation,
     next: &Annotation,
+    text: &str,
     detailed: bool,
     types: Option<&BTreeMap<String, Fact<TypeFact>>>,
     allow_unknown: bool,
@@ -404,7 +424,7 @@ fn compatible_annotation(
         return Ok(false);
     }
     for (a, b) in previous.arguments.iter().zip(&next.arguments) {
-        if !compatible_argument(a, b, detailed, types, allow_unknown)? {
+        if !compatible_argument(a, b, text, detailed, types, allow_unknown)? {
             return Ok(false);
         }
     }
@@ -464,6 +484,38 @@ fn compatible_reference(
 
 const ALIAS_DIAGNOSTIC: &str =
     "annotation reference alias has no positive same-view identity; annotationAlias=";
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn primitive_literal_in_a_shared_source_range_needs_no_class_alias_identity() {
+        let literal = |type_ref| {
+            serde_json::from_value::<Argument>(json!({
+                "range": {"start": 0, "end": 9},
+                "name": null,
+                "value": {"state": "found", "value": {"kind": "class", "typeRef": type_ref}}
+            }))
+            .unwrap()
+        };
+        let types = ["decl", "site"]
+            .into_iter()
+            .map(|reference| {
+                (
+                    reference.to_owned(),
+                    Fact::Unknown {
+                        reasons: vec![json!({"code": "IncompleteScope"})],
+                    },
+                )
+            })
+            .collect();
+        let a = literal("decl");
+        let b = literal("site");
+        assert!(compatible_argument(&a, &b, "int.class", true, Some(&types), false).unwrap());
+        assert!(compatible_argument(&a, &b, "Foo.class", true, Some(&types), false).is_err());
+    }
+}
 
 fn diagnostic_text(value: &str) -> String {
     let mut end = value.len().min(256);
@@ -536,6 +588,7 @@ fn alias_context(error: FactsError, key: &str, value: Value) -> FactsError {
 fn compatible_argument(
     a: &Argument,
     b: &Argument,
+    text: &str,
     detailed: bool,
     types: Option<&BTreeMap<String, Fact<TypeFact>>>,
     allow_unknown: bool,
@@ -553,14 +606,25 @@ fn compatible_argument(
             Fact::Found {
                 value: AnnotationValue::Class { type_ref: b_ref },
             },
-        ) => compatible_reference(a_ref, b_ref, types, allow_unknown).map_err(|error| {
-            alias_context(
-                error,
-                "field",
-                json!({"kind":"classLiteral",
-                "knownRange":a.range,"siteRange":b.range}),
-            )
-        })?,
+        ) => {
+            // The validated source supplies an intrinsic literal at this exact range.
+            let intrinsic = a
+                .range
+                .text(text)
+                .ok()
+                .and_then(primitive_class_literal)
+                .is_some();
+            compatible_reference(a_ref, b_ref, types, allow_unknown || intrinsic).map_err(
+                |error| {
+                    alias_context(
+                        error,
+                        "field",
+                        json!({"kind":"classLiteral",
+                    "knownRange":a.range,"siteRange":b.range}),
+                    )
+                },
+            )?
+        }
         (
             Fact::Found {
                 value:
@@ -594,7 +658,7 @@ fn compatible_argument(
             Fact::Found {
                 value: AnnotationValue::Annotation { annotation: b },
             },
-        ) => compatible_annotation(a, b, detailed, types, allow_unknown)?,
+        ) => compatible_annotation(a, b, text, detailed, types, allow_unknown)?,
         (
             Fact::Found {
                 value: AnnotationValue::Array { values: a },
@@ -607,7 +671,7 @@ fn compatible_argument(
                 return Ok(false);
             }
             for (a, b) in a.iter().zip(b) {
-                if !compatible_argument(a, b, detailed, types, allow_unknown)? {
+                if !compatible_argument(a, b, text, detailed, types, allow_unknown)? {
                     return Ok(false);
                 }
             }

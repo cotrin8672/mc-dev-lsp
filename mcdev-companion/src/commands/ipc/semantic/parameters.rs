@@ -53,7 +53,7 @@ impl HostSemanticProvider {
         for parameter in parameters {
             for annotation in &parameter.annotations {
                 for argument in &annotation.arguments {
-                    collect_class_refs(argument, &mut references)?;
+                    collect_class_refs(argument, source, &mut references)?;
                 }
             }
         }

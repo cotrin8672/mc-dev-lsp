@@ -10,7 +10,9 @@ pub use registered::RegisteredSourceProvider;
 use crate::{
     host_facts::{
         draft::EditingMember,
-        inputs::{SourceDescriptor, SourceEntry, SourceFacts, SourceSnapshot},
+        inputs::{
+            primitive_class_literal, SourceDescriptor, SourceEntry, SourceFacts, SourceSnapshot,
+        },
         FactsError,
     },
     provider_commands::CommandFacts,
@@ -567,7 +569,7 @@ impl HostSemanticProvider {
             if relevant_annotation(&require_type(&identities, &annotation.type_ref)?.qualified_name)
             {
                 for argument in &annotation.arguments {
-                    collect_class_refs(argument, &mut class_refs)?;
+                    collect_class_refs(argument, source, &mut class_refs)?;
                 }
             }
         }
@@ -1615,10 +1617,17 @@ fn text_range(source: &str, range: &ByteRange) -> Result<McTextRange, FactsError
 }
 fn collect_class_refs(
     argument: &Argument,
+    source: &str,
     output: &mut BTreeSet<String>,
 ) -> Result<(), FactsError> {
     argument.value.validate().map_err(FactsError::Protocol)?;
     match &argument.value {
+        Fact::Found {
+            value: AnnotationValue::Class { .. },
+        } if primitive_class_literal(
+            argument.range.text(source).map_err(FactsError::Protocol)?,
+        )
+        .is_some() => {}
         Fact::Found {
             value: AnnotationValue::Class { type_ref } | AnnotationValue::Enum { type_ref, .. },
         } => {
@@ -1628,14 +1637,14 @@ fn collect_class_refs(
             value: AnnotationValue::Array { values },
         } => {
             for value in values {
-                collect_class_refs(value, output)?;
+                collect_class_refs(value, source, output)?;
             }
         }
         Fact::Found {
             value: AnnotationValue::Annotation { annotation },
         } => {
             for argument in &annotation.arguments {
-                collect_class_refs(argument, output)?;
+                collect_class_refs(argument, source, output)?;
             }
         }
         Fact::Found { .. } => {}
@@ -1966,11 +1975,18 @@ fn convert_expression(
         )?)),
         Fact::Found {
             value: AnnotationValue::Class { type_ref },
-        } => HostExpressionKind::TypeLiteral(HostTypeFact::Class {
-            internal_name: binaries.get(type_ref).cloned().ok_or_else(|| {
-                FactsError::Unknown("class literal JVM identity is unavailable".into())
-            })?,
-        }),
+        } => {
+            let ty = if let Some(primitive) = primitive_class_literal(text) {
+                HostTypeFact::Primitive(primitive)
+            } else {
+                HostTypeFact::Class {
+                    internal_name: binaries.get(type_ref).cloned().ok_or_else(|| {
+                        FactsError::Unknown("class literal JVM identity is unavailable".into())
+                    })?,
+                }
+            };
+            HostExpressionKind::TypeLiteral(ty)
+        }
         Fact::Found {
             value: AnnotationValue::Array { values },
         } => {
@@ -2328,6 +2344,29 @@ class DrillMixin {
         assert!(!operations
             .iter()
             .any(|op| matches!(*op, "declarationMember" | "typeJvm")));
+    }
+
+    #[test]
+    fn primitive_literal_projects_without_a_jvm_class_lookup() {
+        for (source, primitive) in [
+            ("int.class", HostPrimitive::Int),
+            ("float.class", HostPrimitive::Float),
+        ] {
+            let argument: Argument = serde_json::from_value(json!({
+                "range": {"start": 0, "end": source.len()},
+                "name": null,
+                "value": {"state": "found", "value": {"kind": "class", "typeRef": "literal"}}
+            }))
+            .unwrap();
+            let mut references = BTreeSet::new();
+            collect_class_refs(&argument, source, &mut references).unwrap();
+            assert!(references.is_empty());
+            let expression =
+                convert_expression(&argument, &BTreeMap::new(), &BTreeMap::new(), source).unwrap();
+            assert!(
+                matches!(expression.kind, HostExpressionKind::TypeLiteral(HostTypeFact::Primitive(actual)) if actual == primitive)
+            );
+        }
     }
 
     #[test]
