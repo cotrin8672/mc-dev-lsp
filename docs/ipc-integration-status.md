@@ -189,6 +189,13 @@ editor expands the snippet. No later evaluation for that owner appears
 before the AW entry.
 See `build/fabric-basic-source-recovery-20261121/build/live-20261121-022524355-0f1f356df28c41008419a51630d7c4a7/aw-inventory-facts.json`.
 
+Host119 (`0c6dc6ca`) preserves the source snapshot when Java recovery
+produces a declaration with an empty name. With MC `42b0155`, the original
+Fabric basic entry now passes all 147 recorded assertions and 24 commands,
+including the AW unresolved-class diagnostic. Input hashes stayed stable
+and the host exited cleanly. Seven of the nine original entries have passed.
+See `build/fabric-basic-source-recovery-20261121/build/live-20261121-023757176-4df1412fceb341f1b0bd7f2d9eb99e01/receipt.json`.
+
 MC `3fc0b87` recovers the Java `Operation<Integer>` type argument from the
 same checked handler source. MixinExtras reports the original wrong-return
 diagnostic, offers the signature fix, and reaches handler-less WrapMethod
@@ -212,6 +219,12 @@ The last publication for `MixinExtrasExample.java` is evaluation 150
 in evaluation 154. Later publications 155–162 are for JDK sources, and the
 subsequent stale evaluation 163 is for JDK `MethodHandles.java`. The saved
 trace contains no new evaluation for the edited mixin after command 154.
+
+On host119, the original MixinExtras entry again records 234 assertions,
+18 commands and a clean host exit. The last command for the mixin reaches
+child response in evaluation 161. The next source revision still receives
+no accepted publication before the readiness deadline at
+`jdtls_bundle_e2e.lua:1359`. See `build/rust-test-logs/fabric-mixinextras-h119-42b0155/editor-proof.json`.
 
 On Windows, `42b0155` passes 1,948 Rust tests across 86 targets including
 doc tests. Formatting, the companion build and the Neovim suite also pass.

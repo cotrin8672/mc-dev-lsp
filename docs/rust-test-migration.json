@@ -65239,6 +65239,35 @@
               }
             }
           }
+        },
+        "host119Acceptance": {
+          "host": "0c6dc6cad534d014281a2706261751b1c808cdf3",
+          "hostSha256": "090991e854cb0f83f2155c887ae45307bd5a5246fd4c9b35ab5af48e9de83d1f",
+          "hostBuildReceipt": "build/host-artifacts/candidate119-0c6dc6ca/receipt.json",
+          "companion": "42b015530ec9b81ad66b3a8019730ae4fd2ab059",
+          "companionSha256": "c0596ccf372e4d90997f6c02d0424d738d9066f77894565c583f36d23b3671e7",
+          "entries": {
+            "fabric-basic": {
+              "passed": true,
+              "assertions": 147,
+              "commands": 24,
+              "inputHashesStable": true,
+              "cleanHostShutdown": true,
+              "receipt": "build/fabric-basic-source-recovery-20261121/build/live-20261121-023757176-4df1412fceb341f1b0bd7f2d9eb99e01/receipt.json",
+              "receiptSha256": "71ee8612e4bd8252ce67ca87e5521fb3dcb8f2cf0bf4d296581be4d9efac1ef6",
+              "proofSha256": "0c9404ec69cf903b4146b67ffc94031ac12c545df19eaf2feace73ff90269c54"
+            },
+            "fabric-mixinextras": {
+              "passed": false,
+              "assertionsBeforeFailure": 234,
+              "commands": 18,
+              "cleanHostShutdown": true,
+              "lastMixinCommandChildResponseEvaluation": 161,
+              "proof": "build/rust-test-logs/fabric-mixinextras-h119-42b0155/editor-proof.json",
+              "proofSha256": "f99652dfcd2480593a9c22dd1d1d0ed5e87e97ac1765e85498e73976ac1af15a",
+              "failure": "The exact next edited mixin source is not accepted by the host before the readiness gate; the next original command is not sent."
+            }
+          }
         }
       }
     }
