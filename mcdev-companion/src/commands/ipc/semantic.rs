@@ -562,10 +562,12 @@ impl HostSemanticProvider {
             owner_type.context_source.as_ref(),
             source_context,
         )?;
-        let mut class_refs = BTreeSet::new();
-        for annotation in
-            std::iter::once(mixin).chain(relevant.iter().flat_map(|d| d.annotations.iter()))
-        {
+        let mut mixin_class_refs = BTreeSet::new();
+        for argument in &mixin.arguments {
+            collect_class_refs(argument, source, &mut mixin_class_refs)?;
+        }
+        let mut class_refs = mixin_class_refs.clone();
+        for annotation in relevant.iter().flat_map(|d| d.annotations.iter()) {
             if relevant_annotation(&require_type(&identities, &annotation.type_ref)?.qualified_name)
             {
                 for argument in &annotation.arguments {
@@ -596,7 +598,12 @@ impl HostSemanticProvider {
                     "host JVM name and descriptor disagree".into(),
                 ));
             }
-            if let Some(index) = self.index.as_ref().filter(|_| selected.is_none()) {
+            // Handler annotation literals only contribute type identities to the model.
+            if let Some(index) = self
+                .index
+                .as_ref()
+                .filter(|_| selected.is_none() && mixin_class_refs.contains(reference))
+            {
                 match index.bind_host_type(&ty) {
                     Ok(())
                     | Err(
