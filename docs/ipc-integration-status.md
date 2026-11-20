@@ -434,6 +434,15 @@ The runner terminates the owned process tree after the graceful shutdown
 deadline. See `build/rust-test-logs/sodium-gradle-source-only-20261121-051447371/`
 and `build/rust-test-logs/real-sodium-h123-host-only-81d0b3bd/`.
 
+Host `0883a396` prioritizes queued open documents when the provider worker
+becomes available. The original Sodium entry with that host and MC
+`199d74d` still stops before the first command, waiting for GuiMixin's
+exact source digest. The trace has semantic-index invalidations, no IPC
+source selection or acceptance events, and 41.214 seconds of workspace lock
+wait in the oshi-core dependency install. The runner terminates its owned
+process tree after the graceful shutdown deadline. See
+`build/rust-test-logs/sodium-open-owner-0883a396-199d74d/`.
+
 The Windows x86_64 release archive built from `7afcdd1` passes the native
 capability and stdio smoke checks. Independent ZIP inspection verifies all
 24 manifest payload entries. The archive is
