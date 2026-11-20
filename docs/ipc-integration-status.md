@@ -401,6 +401,15 @@ lock wait, and the Gradle source query ends after 62.930 seconds. The span
 data identifies the wait, while the lock holder remains unverified. The host
 exits cleanly. See `build/rust-test-logs/real-sodium-h123-81d0b3bd-199d74d/`.
 
+A separate startup probe with the same binaries waits for both project and
+library indexing within the existing 180-second startup limit. The project
+notification arrives. The library notification is still missing at the
+deadline, before the original test opens GuiMixin or sends a command. The
+Gradle source-query span ends at shutdown after 191.842 seconds. The host
+misses the graceful shutdown deadline and the runner terminates its owned
+process tree. See
+`build/rust-test-logs/real-sodium-h123-indexed-81d0b3bd-199d74d/`.
+
 On Windows, `42b0155` passes 1,948 Rust tests across 86 targets including
 doc tests. Formatting, the companion build and the Neovim suite also pass.
 See `build/rust-test-logs/20261121-021831690/summary.txt`.
