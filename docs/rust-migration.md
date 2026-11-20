@@ -89,9 +89,9 @@ also passes825 assertions, its independent full-member comparison, Blink/cache
 and four snippet scenarios, followed by clean shutdown. Its sole caller port
 always obtains the actual Blink v2 position rather than passing nil when the
 optional `vim.pos` check fails. The cursor assertion and all original waits
-remain. The other seven gates still
-require complete success receipts. No additional functional entry was found in the original
-27-file editor/support inventory.
+remain. Fabric basic, the dedicated AW/AT workflow, multi-source-set, Forge
+and standalone Loom also have whole-entry passes. MixinExtras and real Sodium
+remain open in the [integration status](ipc-integration-status.md).
 
 ## Authoritative baseline
 

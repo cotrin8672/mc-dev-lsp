@@ -365,6 +365,23 @@ Loom mappings and selects only the `srg`, `tiny` and `tsrg` extensions.
 The lock file belongs to neither inventory. See
 `build/rust-test-logs/fabric-mixinextras-h121-sugar-preflight-199d74d/root-file-stale-evidence.json`.
 
+Host `81d0b3bd` applies the incoming basename and extension filter to native
+root-file monitoring. A first focused sugar launch returns ordinal candidates
+0 and 1, then exits without a diagnostic reply or a structured shutdown
+record. A diagnostics-only replay uses the original applied ordinal source
+(SHA-256 `df2fd131063da768ae093bc88516a9d97afeb51dac1bf4fe33dbb17ffe07b2cc`)
+with MC `199d74d`. The host accepts it, the original diagnostic assertions
+pass with zero diagnostics, and the host exits cleanly. See
+`build/rust-test-logs/fabric-mixinextras-h123-ordinal-diagnostics-199d74d/`.
+
+The whole entry with the same binaries stops earlier, after 277 assertions
+and 19 commands. The next code action at `jdtls_bundle_e2e.lua:1359` waits for
+editor source version 21 and reaches the original readiness deadline.
+The host starts three forced refreshes after the fixture writes class
+outputs. Generation 21 spends 48.308 seconds in the Gradle model dump. The
+test runner reports forced cleanup after the graceful shutdown deadline.
+See `build/rust-test-logs/fabric-mixinextras-h123-81d0b3bd-199d74d-full/`.
+
 The host122 Sodium diagnostic reaches the blocking worker in about 2 ms.
 In evaluation 3, the source plan lock waits 1.123 seconds and the plan is
 unavailable. The worker exits with Stale during resource capture after about
@@ -374,6 +391,15 @@ further refreshes. This run does not reproduce the earlier 69.793-second
 gap. The exact GuiMixin snapshot still receives no acceptance, the original
 test sends no commands, and the host exits cleanly. See
 `build/rust-test-logs/host122-sodium-dispatch-diagnostic/`.
+
+The same Sodium entry on released host `81d0b3bd` and MC `199d74d` also
+reaches the source-acceptance deadline without sending a command. The host
+publishes `BlockEntityRenderHandler.java` about 66.6 seconds after startup.
+The open `GuiMixin.java` JDK seed span lasts 63.036 seconds with zero files.
+During startup, a dependency install records 46.096 seconds of workspace
+lock wait, and the Gradle source query ends after 62.930 seconds. The span
+data identifies the wait, while the lock holder remains unverified. The host
+exits cleanly. See `build/rust-test-logs/real-sodium-h123-81d0b3bd-199d74d/`.
 
 On Windows, `42b0155` passes 1,948 Rust tests across 86 targets including
 doc tests. Formatting, the companion build and the Neovim suite also pass.
