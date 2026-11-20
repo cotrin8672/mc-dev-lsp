@@ -410,6 +410,16 @@ misses the graceful shutdown deadline and the runner terminates its owned
 process tree. See
 `build/rust-test-logs/real-sodium-h123-indexed-81d0b3bd-199d74d/`.
 
+The same Gradle wrapper, init script and `ktlspDumpSources` arguments
+complete in 13.4 seconds when run directly against the Sodium fixture. A
+separate ktlsp start with all analysis providers disabled also misses the
+180-second library-indexing deadline. In that run the Gradle source query
+completes in 14.951 seconds, the dependency binary-preview span lasts
+146.582 seconds for 41,204 files, and the trace contains no IPC evaluations.
+The runner terminates the owned process tree after the graceful shutdown
+deadline. See `build/rust-test-logs/sodium-gradle-source-only-20261121-051447371/`
+and `build/rust-test-logs/real-sodium-h123-host-only-81d0b3bd/`.
+
 The Windows x86_64 release archive built from `7afcdd1` passes the native
 capability and stdio smoke checks. Independent ZIP inspection verifies all
 24 manifest payload entries. The archive is
