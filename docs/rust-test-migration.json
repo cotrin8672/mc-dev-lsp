@@ -65303,6 +65303,47 @@
               }
             }
           }
+        },
+        "host120SourceDiagnostic": {
+          "hostBase": "0c6dc6cad534d014281a2706261751b1c808cdf3",
+          "hostSha256": "b4eae01f77a63095cbce58c5b297a7e48ecac0a1876e8fac29c3ae03f6738dfd",
+          "diffSha256": "f1df85f263ff0cb995841431bfa5ee89c7a15cb6eefc373cc06216efde59d147",
+          "hostReceipt": "build/rust-test-logs/host120-source-diagnostic/receipt.json",
+          "hostReceiptSha256": "ccd7274c5412f3a75b1cb819c353c2abaeb4c3dac2b05a49cef5ed28646df18a",
+          "companion": "42b015530ec9b81ad66b3a8019730ae4fd2ab059",
+          "entries": {
+            "fabric-mixinextras": {
+              "passed": false,
+              "assertionsBeforeFailure": 234,
+              "commands": 18,
+              "cleanHostShutdown": true,
+              "expectedVersion": 18,
+              "expectedAndAppliedSha256": "cca5cb2bd6aeaa28ee995f4a319554dc226643fe865dbc74f7aeef023ca86c2d",
+              "refreshGenerationCompleted": 17,
+              "failedTake": "store-begin-failed for java.util.stream.Stream",
+              "stillQueued": 12,
+              "failureTraceLine": 5390,
+              "proof": "build/rust-test-logs/host120-source-diagnostic/extras/editor-proof.json",
+              "proofSha256": "6dd40497f10bf644c2c4a726ae25fd1bacab5f9e8a57a445787d23780079864a",
+              "traceSha256": "e2bd0147d80c84f5fc8256fa0384a24b5a060963b198e8f3cf3bab19e4aa989d"
+            },
+            "real-sodium": {
+              "passed": false,
+              "commands": 0,
+              "sourceAcceptanceTimeoutMs": 60000,
+              "cleanHostShutdown": true,
+              "requestedOwnerQueued": true,
+              "firstDispatchedOwner": "BlockEntityRenderHandler.java",
+              "secondsFromWorkCreationToFirstBatch": 69.792672,
+              "firstReadFactsUs": 2347719,
+              "firstFactsLockWaitUs": 1703337,
+              "firstIpcBatchUs": 55,
+              "concurrentDependencyInstallLockWaitUs": 50663469,
+              "proof": "build/rust-test-logs/host120-source-diagnostic/sodium/editor-proof.json",
+              "proofSha256": "9256852da584966461160e6c73cff98473054bb7b062cccc66ec7ee38de301c4",
+              "traceSha256": "3afc684530533ef740d1f0d85861f1d0d09adf602c432e76024f71e1e4a91ac5"
+            }
+          }
         }
       }
     }

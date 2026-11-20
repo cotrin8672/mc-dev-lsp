@@ -249,6 +249,31 @@ edited initial mixin. They record transport and host state for diagnostics
 while the prepared host119 entry above remains the whole-entry result.
 See `build/rust-test-logs/fabric-mixinextras-lsp-input-20261121-025107662/lsp-input-summary.json`.
 
+A trace-only build of host119 records the failed, freshly prepared
+MixinExtras entry. Neovim's expected version 18 digest matches both the
+received and applied source. Refresh generation 17 completes, diagnostics
+reach the scheduler for the mixin, and the scheduler pops JDK
+`Stream.java`. Opening that snapshot fails with 12 owners still queued
+and no provider work running. The scheduler reaches no further eligible
+take before shutdown. On this host revision, the scheduler pops one
+source per provider call and leaves that provider's remaining items
+queued when the popped source cannot start.
+
+The same diagnostic build exercises the original 60-second Sodium source
+readiness gate. The `GuiMixin.java` owner is queued. The sole dispatched
+source is `BlockEntityRenderHandler.java`, which reaches its first
+`resolveTypeRef` batch about 69.793 seconds after work creation. The
+batch takes 2.348 seconds, including 1.703 seconds acquiring the facts
+lock and 55 microseconds processing the batch. During the preceding gap,
+a dependency install batch records 50.663 seconds waiting for the
+workspace lock. The trace leaves the lock holder unidentified. The source
+evaluation becomes
+stale during semantic indexing. A Loom `mappings.jar` watcher event starts
+another refresh, and the provider remains suspended through the remaining
+observation. The editor reaches zero original Sodium commands. The
+diagnostic receipt and both traces are saved under
+`build/rust-test-logs/host120-source-diagnostic/`.
+
 On Windows, `42b0155` passes 1,948 Rust tests across 86 targets including
 doc tests. Formatting, the companion build and the Neovim suite also pass.
 See `build/rust-test-logs/20261121-021831690/summary.txt`.
