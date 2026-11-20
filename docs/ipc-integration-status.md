@@ -165,6 +165,41 @@ the unfinished `@Mixin(SourceOnlyT` buffer finds no current Mixin owner.
 The MixinExtras entry also finishes indexing and passes 71 original assertions
 before WrapOperation diagnostics report unavailable generic type facts.
 
+The selected-project index now supplies candidates for the unfinished Java
+Mixin class value, using the explicit official annotation spelling to find the
+current completion position. Fabric basic passes the original SourceOnlyTarget
+assertions and reaches handler snippet completion after 121 assertions.
+The IPC annotation test reuses a captured positive unattached injector to
+verify completion at the end of its range. MC `6426071` reuses the existing
+handler generator for that same-source, checked annotation. The Fabric basic
+run passes the original handler snippet and reaches 141 assertions. Its
+remaining AW unresolved-class check receives incomplete current-source
+inventory coverage. A definite missing-class diagnostic requires source
+absence in the selected project.
+
+MC `3fc0b87` recovers the Java `Operation<Integer>` type argument from the
+same checked handler source. MixinExtras reports the original wrong-return
+diagnostic, offers the signature fix, and reaches handler-less WrapMethod
+generation after 154 assertions. That action is still restricted by partial
+annotation coverage. Both Windows and Linux passed CI44777233504 on this
+revision.
+
+The host118 wire capture for the WrapMethod action confirms the current
+source digest, the enclosing Mixin declaration, and the unattached official
+WrapMethod annotation with a resolved method selector. MC `42b0155` uses
+these facts to invoke the existing generator for that annotation. The
+diagnostics sweep still requires complete coverage.
+
+The original MixinExtras entry on `42b0155` returns the WrapMethod action,
+applies generated edits and compiles the fixture. It records 234 assertions
+and 18 command replies before waiting for the next edited source revision.
+The host never accepts the exact owner/source digest for the next generation
+command before the editor deadline. The editor records a clean host exit.
+
+On Windows, `42b0155` passes 1,948 Rust tests across 86 targets including
+doc tests. Formatting, the companion build and the Neovim suite also pass.
+See `build/rust-test-logs/20261121-021831690/summary.txt`.
+
 ### Original source-query and startup behavior restored
 
 The first project-ready runs exposed a separate consumer DTO bug:

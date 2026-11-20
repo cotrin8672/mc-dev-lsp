@@ -65134,6 +65134,20 @@
           "host": "b5a9b5e3a6ef458bfa1a873fcb25b01d76b90179",
           "hostSha256": "7aad8aa85e029c4cdb7252db88e69a3b7f76a437e60fd4d3e6f012cf6325926f",
           "companion": "a2a4d6d604c213ea6a774803ce5bb84ec9bce19f",
+          "nativeCi3fc0b87": {
+            "run": 44777233504,
+            "source": "3fc0b874f5a59e45390d7f8185d6291a2ae9f589",
+            "windows": "success",
+            "linux": "success"
+          },
+          "nativeWindows42b0155": {
+            "source": "42b015530ec9b81ad66b3a8019730ae4fd2ab059",
+            "passed": true,
+            "functionsIncludingDoc": 1948,
+            "targetsIncludingDoc": 86,
+            "summary": "build/rust-test-logs/20261121-021831690/summary.txt",
+            "summarySha256": "b869d37b2c9655de0ddab8ca3b8d2e29ad6683906f908af1ba01db151ba53232"
+          },
           "entries": {
             "fabric-basic": {
               "passed": false,
@@ -65142,7 +65156,29 @@
               "wholeIndexReady": true,
               "receipt": "build/fabric-basic-source-recovery-20261121/build/live-20261121-012505833-b0717490ae3f47baaff195307068fb17/receipt.json",
               "receiptSha256": "5e3c221de5f28b4105b1ef79d3e324187f7d44f3831c8f020a510aab90e24189",
-              "failure": "Class completion in unfinished SourceOnlyMixin has no current Mixin owner."
+              "failure": "Class completion in unfinished SourceOnlyMixin has no current Mixin owner.",
+              "handlerFollowUp": {
+                "passed": false,
+                "companion": "d994da1",
+                "companionSha256": "c079a062d876ca0df188b51b0d3377aa5546238f0b03a2bb7e53085660340a1c",
+                "assertionsBeforeFailure": 121,
+                "commands": 17,
+                "cleanHostShutdown": true,
+                "receipt": "build/fabric-basic-source-recovery-20261121/build/live-20261121-015651789-714eead5d4244c3b8e5960835d237fb8/receipt.json",
+                "receiptSha256": "8acb115c3dbe59e3755d489de51e2d039da5a9da74c8e3d6384c27159b84d4c6",
+                "failure": "SourceOnlyTarget completion succeeds. The checked unattached injector reaches handler snippet completion, where whole annotation coverage is unavailable."
+              },
+              "snippetFollowUp": {
+                "passed": false,
+                "companion": "64260719ef336dfb3d720403b24cee582132a320",
+                "companionSha256": "df916c2f63b39fa62f6e95e59d0732498aeb2a21e93b0f4ae9789ae3e04c183a",
+                "assertionsBeforeFailure": 141,
+                "commands": 20,
+                "cleanHostShutdown": true,
+                "receipt": "build/fabric-basic-source-recovery-20261121/build/live-20261121-021002088-5e70dcf870014aeb8f9a698ec2e06b6d/receipt.json",
+                "receiptSha256": "fa6ad9e4548dc79681608ac596ccd24a9697dd1374902382cc3cfdfd7b729e3c",
+                "failure": "Handler snippet passes. The AW unresolved-class check cannot prove absence because the host current-source inventory coverage is incomplete."
+              }
             },
             "fabric-mixinextras": {
               "passed": false,
@@ -65151,7 +65187,36 @@
               "wholeIndexReady": true,
               "proof": "build/rust-test-logs/fabric-mixinextras-h118-a2a4d6d/editor-proof.json",
               "proofSha256": "ba3d356bf41e182f578638a95c6c5e56d578be5dfcb8da35c466b4a7a601a487",
-              "failure": "WrapOperation diagnostics report unavailable generic type facts."
+              "failure": "WrapOperation diagnostics report unavailable generic type facts.",
+              "handlerFollowUp": {
+                "passed": false,
+                "companion": "3fc0b874f5a59e45390d7f8185d6291a2ae9f589",
+                "companionSha256": "8dde85471936cfcb81b21c271353ea0c717803e50ac298f72b08c501afc6fec0",
+                "assertionsBeforeFailure": 154,
+                "commands": 17,
+                "cleanHostShutdown": true,
+                "proof": "build/rust-test-logs/fabric-mixinextras-h118-3fc0b87/editor-proof.json",
+                "proofSha256": "f67dac305ccb1eb3c1903fff726f865b844b5812ebb00374aa816c786ce5b96e",
+                "failure": "WrapOperation wrong-return diagnostic and the signature fix succeed. Partial annotation coverage blocks the handler-less WrapMethod action."
+              },
+              "handlerActionWire": {
+                "receipt": "build/rust-test-logs/fabric-mixinextras-codeaction-wire-20261121-021253986/capture-receipt.json",
+                "receiptSha256": "e3c20cf76d7e219e4d79cdbd10270ed45f9413f35f849724a6d23635b8c4d432",
+                "evaluation": 144,
+                "sourceSha256": "8a92732802cee84d48bf7ee12e0e1854f5f055ac61ede90d0cfd0a6eabee7dd7",
+                "positiveUnattachedWrapMethod": true
+              },
+              "handlerActionFollowUp": {
+                "passed": false,
+                "companion": "42b015530ec9b81ad66b3a8019730ae4fd2ab059",
+                "companionSha256": "c0596ccf372e4d90997f6c02d0424d738d9066f77894565c583f36d23b3671e7",
+                "assertionsBeforeFailure": 234,
+                "commands": 18,
+                "cleanHostShutdown": true,
+                "proof": "build/rust-test-logs/fabric-mixinextras-h118-42b0155/editor-proof.json",
+                "proofSha256": "23d73d6fc26e1be1abd71a4eb48129ec4b542485f5e0762c09436277d7ca5d6a",
+                "failure": "Handler-less WrapMethod generation, edits and fixture compilation succeed. The next generated-handler action cannot start before the exact current owner/source revision is accepted."
+              }
             }
           }
         }
