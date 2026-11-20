@@ -64,6 +64,7 @@ impl HostSemanticProvider {
         if imports.is_kotlin {
             return None;
         }
+        let index = self.class_index.as_deref()?;
         let position = self.annotation_completion_position?;
         let cursor = position_to_offset(source, position)?;
         let context = AnnotationContextExtractor::extract_at_offset(source, cursor)?;
@@ -132,7 +133,14 @@ impl HostSemanticProvider {
                             Some(HandlerParameterSugarSpec::Local(_))
                         ) && parameter.sugar_annotation_range == Some(local_range)
                     })
-                    .then_some((declaration, handler))
+                    .then(|| {
+                        let handler = HandlerSignatureService::enrich_handler_types(
+                            &handler,
+                            index,
+                            Some(source),
+                        );
+                        (declaration, handler)
+                    })
             })
     }
 
