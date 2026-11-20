@@ -226,6 +226,16 @@ child response in evaluation 161. The next source revision still receives
 no accepted publication before the readiness deadline at
 `jdtls_bundle_e2e.lua:1359`. See `build/rust-test-logs/fabric-mixinextras-h119-42b0155/editor-proof.json`.
 
+An editor transport capture on the same host and companion pins observes
+Neovim sending the full version 19 source with `@WrapWithCondition`.
+Replaying the notification yields the same SHA-256 as the source the
+readiness check is waiting for. The host requests workspace refresh generation
+18, rejects an evaluation for the same owner as `Stale`, and reports a
+watcher creation event for that source before starting generation 19.
+There is no accepted publication of the sent digest in the capture. The
+diagnostic runner reaches its outer timeout. See
+`build/rust-test-logs/fabric-mixinextras-lsp-input-20261121-024429573/lsp-input-summary.json`.
+
 On Windows, `42b0155` passes 1,948 Rust tests across 86 targets including
 doc tests. Formatting, the companion build and the Neovim suite also pass.
 See `build/rust-test-logs/20261121-021831690/summary.txt`.

@@ -65265,7 +65265,21 @@
               "lastMixinCommandChildResponseEvaluation": 161,
               "proof": "build/rust-test-logs/fabric-mixinextras-h119-42b0155/editor-proof.json",
               "proofSha256": "f99652dfcd2480593a9c22dd1d1d0ed5e87e97ac1765e85498e73976ac1af15a",
-              "failure": "The exact next edited mixin source is not accepted by the host before the readiness gate; the next original command is not sent."
+              "failure": "The exact next edited mixin source is not accepted by the host before the readiness gate; the next original command is not sent.",
+              "editorInputCapture": {
+                "documentVersion": 19,
+                "notification": "textDocument/didChange",
+                "fullSync": true,
+                "sentSha256": "76b2968076d747ef93d9e47c7fd61f5cda3b306bf304073a5ba5810a9bdf8bad",
+                "matchesReadinessDigest": true,
+                "acceptedWithinCapture": false,
+                "sameOwnerStaleEvaluation": 197,
+                "outerTimedOut": true,
+                "summary": "build/rust-test-logs/fabric-mixinextras-lsp-input-20261121-024429573/lsp-input-summary.json",
+                "summarySha256": "ef802979467c6646fef92c89debeb42d061bfdeec0162889d1c61a524dfe7b3b",
+                "receipt": "build/rust-test-logs/fabric-mixinextras-lsp-input-20261121-024429573/capture-receipt.json",
+                "receiptSha256": "01d38aaf2b9499b22956ab6ee822070d15a71a17ca7c48fdaf0ad3f103994c00"
+              }
             }
           }
         }
