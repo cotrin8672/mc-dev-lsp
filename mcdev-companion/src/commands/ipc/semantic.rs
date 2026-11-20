@@ -30,10 +30,11 @@ use mcdev_core::{
     },
     mixin_source::{
         annotations_with_imports, parse_member_declaration, AnnotationContextExtractor,
-        AtSelectorModel, InjectorKind, InjectorModel, JavaModifier, JavaSourceImports,
-        JavaTypeDescriptorResolver, JavaTypeKind, MethodSelector, MixinAnnotation,
-        MixinMemberAnnotationKind, MixinMemberDeclarationParser, MixinSemanticModelParser,
-        MixinTargetRef, MixinTargetResolver, ParseConfidence, ParseSource, SemanticParseDebugInfo,
+        AnnotationSlot, AtSelectorModel, InjectorKind, InjectorModel, JavaModifier,
+        JavaSourceImports, JavaTypeDescriptorResolver, JavaTypeKind, MethodSelector,
+        MixinAnnotation, MixinMemberAnnotationKind, MixinMemberDeclarationParser,
+        MixinSemanticModelParser, MixinTargetRef, MixinTargetResolver, ParseConfidence,
+        ParseSource, SemanticParseDebugInfo,
     },
     offset_to_position, position_to_offset, McTextPosition, McTextRange,
 };
@@ -487,10 +488,31 @@ impl HostSemanticProvider {
                 selected.is_none(),
             )?;
         }
+        // Target/class completion consumes only the Mixin target identities.  Do not
+        // make an unrelated authored handler member a prerequisite for that result:
+        // its declaration can be incomplete while the current annotation context is
+        // fully host-normalized.
+        let target_completion = selected.is_none()
+            && self
+                .annotation_completion_position
+                .and_then(|position| {
+                    position_to_offset(source, position).and_then(|offset| {
+                        AnnotationContextExtractor::extract_at_offset(source, offset)
+                    })
+                })
+                .is_some_and(|context| {
+                    context.annotation == MixinAnnotation::Mixin
+                        && matches!(
+                            context.slot,
+                            AnnotationSlot::Class | AnnotationSlot::Targets
+                        )
+                });
         let relevant = e
             .declarations
             .iter()
-            .filter(|declaration| declaration.owner.as_deref() == Some(owner.id.as_str()))
+            .filter(|declaration| {
+                !target_completion && declaration.owner.as_deref() == Some(owner.id.as_str())
+            })
             .filter(|declaration| {
                 declaration.annotations.iter().any(|a| {
                     identities
@@ -2235,6 +2257,25 @@ class DrillMixin {
         assert!(!operations
             .iter()
             .any(|op| matches!(*op, "declarationMember" | "typeJvm")));
+    }
+
+    #[test]
+    fn mixin_target_completion_does_not_require_unrelated_handler_member() {
+        let (provider, host, source) = provider(Some(target_index()), true, true, false, false, 0);
+        let target_offset = source.find("Drill::class").unwrap() + "Drill".len();
+        let completion_position = offset_to_position(&source, target_offset).unwrap();
+        let provider = provider.with_annotation_sites(false, Some(completion_position));
+        let HostFact::Known(result) = parse(&provider, &source) else {
+            panic!("expected normalized target completion")
+        };
+        assert_eq!(result.availability, SemanticAvailability::Normalized);
+        assert_eq!(result.model.parse_source, ParseSource::HostNormalized);
+        assert_eq!(result.model.targets[0].internal_name, "fixture/DrillTarget");
+        assert!(result.model.debug_info.binding_resolved_count > 0);
+        let queries = host.queries.lock().unwrap();
+        assert!(!queries
+            .iter()
+            .any(|query| query["op"] == "declarationMember"));
     }
 
     #[test]

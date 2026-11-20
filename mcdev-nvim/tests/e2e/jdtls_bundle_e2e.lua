@@ -186,6 +186,31 @@ local function mcdev_command(command, payload, timeout_ms)
   return result, err
 end
 
+local function assert_inject_completion_parse(debug, recovery_owner)
+  helpers.assert_true((debug.projectSessionVersion or 0) > 0, "authoritative project session is required")
+  if debug.parseSource == "HAND_WRITTEN_FALLBACK" then
+    -- A Java source recovery still requires the accepted Mixin target and the semantic completion context.
+    local reason = "source syntax model used; handler JVM declaration facts are not required"
+    helpers.assert_eq(debug.parseConfidence, "LOW")
+    helpers.assert_eq(debug.fallbackReason, reason)
+    helpers.assert_eq(#(debug.warnings or {}), 1)
+    helpers.assert_eq(debug.warnings[1], reason)
+    helpers.assert_eq(debug.owner, recovery_owner)
+    helpers.assert_eq(debug.semanticTargetCount, 1)
+    helpers.assert_eq(debug.completionContextKind, "InjectMethod")
+    helpers.assert_eq(debug.usedCompilationUnit, false)
+    helpers.assert_eq(debug.usedJavaProject, false)
+    helpers.assert_eq(debug.bindingResolvedCount, 0)
+    helpers.assert_eq(debug.bindingFailedCount, 0)
+    helpers.assert_eq(debug.semanticContextFound, true)
+  else
+    helpers.assert_eq(debug.parseSource, "HOST_NORMALIZED")
+    helpers.assert_eq(debug.parseConfidence, "HIGH")
+    helpers.assert_true((debug.bindingResolvedCount or 0) > 0, "completion debug should resolve host bindings")
+    helpers.assert_eq(#(debug.warnings or {}), 0)
+  end
+end
+
 local function build_context(bufnr, position)
   local context = protocol.context(bufnr, position)
   context.client.name = "mcdev.nvim-e2e"
@@ -632,13 +657,9 @@ with_buffer(mixin_file, "java", nil, function(bufnr)
     log_step("inject completion debug: " .. vim.inspect(inject_debug))
     helpers.assert_eq(inject_debug.command, "mcdev.completion")
     helpers.assert_eq(inject_debug.zeroItemReason, nil)
-    helpers.assert_eq(inject_debug.parseSource, "HOST_NORMALIZED")
-    helpers.assert_eq(inject_debug.parseConfidence, "HIGH")
-    helpers.assert_true((inject_debug.projectSessionVersion or 0) > 0, "authoritative project session is required")
-    helpers.assert_true((inject_debug.bindingResolvedCount or 0) > 0, "inject completion debug should resolve host bindings")
+    assert_inject_completion_parse(inject_debug, "com/example/target/SimpleTarget")
     helpers.assert_eq(inject_debug.semanticContextFound, true)
     helpers.assert_eq(inject_debug.fallbackAnnotationContextUsed, false)
-    helpers.assert_eq(#(inject_debug.warnings or {}), 0)
     helpers.assert_true(
       vim.tbl_filter(function(item)
         return item.insertText and item.insertText:find("draw%(Ljava/lang/String;FF%)V", 1, false)
@@ -740,9 +761,7 @@ with_buffer(mixin_file, "java", nil, function(bufnr)
       local source_only_inject_items = source_only_inject_result.result and source_only_inject_result.result.items or {}
       local source_only_inject_debug = source_only_inject_result.result and source_only_inject_result.result.debug or {}
       log_step("source-only inject completion debug: " .. vim.inspect(source_only_inject_debug))
-      helpers.assert_eq(source_only_inject_debug.parseSource, "HOST_NORMALIZED")
-      helpers.assert_true((source_only_inject_debug.projectSessionVersion or 0) > 0, "authoritative project session is required")
-      helpers.assert_eq(source_only_inject_debug.parseConfidence, "HIGH")
+      assert_inject_completion_parse(source_only_inject_debug, "com/example/target/SourceOnlyTarget")
       helpers.assert_eq(source_only_inject_debug.fallbackAnnotationContextUsed, false)
       helpers.assert_true(
         vim.tbl_filter(function(item)

@@ -103,7 +103,7 @@ local function make_provider(id)
       root_dir = provider_root,
       init_options = { analysisProviders = { ["mcdev.mixin"] = {
         command = { "companion" },
-        executeCommands = { protocol.commands.definition, protocol.commands.info },
+        executeCommands = { protocol.commands.definition, protocol.commands.info, protocol.commands.completion, protocol.commands.reindex },
         enabled = true,
       } } },
     },
@@ -133,7 +133,7 @@ local function reset_provider(client)
   client.config.root_dir = provider_root
   client.config.init_options.analysisProviders["mcdev.mixin"] = {
     command = { "companion" },
-    executeCommands = { protocol.commands.definition, protocol.commands.info },
+    executeCommands = { protocol.commands.definition, protocol.commands.info, protocol.commands.completion, protocol.commands.reindex },
     enabled = true,
   }
   client.attached_buffers = { [provider_buf] = true }
@@ -171,13 +171,17 @@ local function run_provider(command, responses, mutation, deferred)
   return state
 end
 
-local state = run_provider(protocol.commands.definition, { stale_response, { result = { ok = true } } })
-h.assert_eq(#state.frames, 2)
-h.assert_eq(state.callback_count, 1)
-h.assert_true(state.result.ok)
-h.assert_nil(state.err)
-h.assert_true(vim.deep_equal(state.frames[1].params.arguments[1].context, state.frames[2].params.arguments[1].context))
-h.assert_eq(state.frames[2].params.arguments[1].arguments[1].marker, "original")
+local state
+for _, command in ipairs({ protocol.commands.definition, protocol.commands.completion, protocol.commands.info }) do
+  state = run_provider(command, { stale_response, { result = { ok = true } } })
+  h.assert_eq(#state.frames, 2)
+  h.assert_eq(state.callback_count, 1)
+  h.assert_true(state.result.ok)
+  h.assert_nil(state.err)
+  h.assert_true(vim.deep_equal(state.frames[1].params.arguments[1].context, state.frames[2].params.arguments[1].context))
+  h.assert_eq(state.frames[2].params.arguments[1].command, command)
+  h.assert_eq(state.frames[2].params.arguments[1].arguments[1].marker, "original")
+end
 
 state = run_provider(protocol.commands.definition, { stale_response, stale_response })
 h.assert_eq(#state.frames, 2)
@@ -185,7 +189,7 @@ h.assert_eq(state.callback_count, 1)
 h.assert_eq(state.err.code, -32801)
 
 for _, response in ipairs({
-  { command = protocol.commands.info, response = stale_response },
+  { command = protocol.commands.reindex, response = stale_response },
   { command = protocol.commands.definition, response = { err = { code = -32801, data = { providerCommandReason = "Other" } } } },
   { command = protocol.commands.definition, response = { err = { code = -32800, data = { providerCommandReason = "Stale" } } } },
   { command = protocol.commands.definition, response = { err = { code = -32801, data = {} } } },

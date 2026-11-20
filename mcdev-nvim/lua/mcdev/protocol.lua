@@ -321,7 +321,7 @@ function M.request(command, payload, callback, bufnr)
         return noop_cancel
       end
     end
-    if command == M.commands.definition then
+    if command == M.commands.definition or command == M.commands.completion or command == M.commands.info then
       provider_retry = {
         bufnr = actual_bufnr,
         client = client,
@@ -403,7 +403,7 @@ function M.request(command, payload, callback, bufnr)
       local matches = context == nil or (type(context) == "table"
         and (context.client_id == nil or context.client_id == origin.client_id))
       local response_origin = matches and origin or nil
-      if not retry_used and command == M.commands.definition and response_origin
+      if not retry_used and response_origin
         and stale_provider_error(err) and same_provider_context()
       then
         retry_used = true

@@ -84,7 +84,7 @@ an omitted or unsupported list does not establish a zero-parameter callable.
 
 ## Follow-up acceptance checkpoints
 
-### November 21 resume on host115
+### November 21 original editor acceptance
 
 CI42015884348 verifies MC commit `ed89ab4` on Windows (1,942 functions) and
 Linux (1,941 functions), with 83 targets, all 2,604 original case locators,
@@ -100,13 +100,29 @@ reaches the original Inject completion before a later Stale. AW/AT, Forge and
 MixinExtras also stop on Stale in their saved runs. Real Sodium reaches project
 readiness but has no accepted GuiMixin source publication before the deadline.
 
-The original Loom definition still returns no location with host115 and
-MC `ed89ab4`, after the project's libraries finish indexing. Its saved error's
-`annotationType` field and the reason payload digest identify `@Mixin` itself as
-`unsupportedType`. This is a distinct finding from the class-literal failure
-in the source-set matrix. See `build/rust-test-logs/loom-mixin-wire-20261121-003019306/`.
-The transport recorder did not attach in that run. The definition error is
-recorded in the editor proof.
+Host116 (`e9b46c3`) fixes the filtered watcher. With MC `ed89ab4`, the whole
+multi-source-set, Forge and dedicated AW/AT entries pass 54, 43 and 13 assertions,
+respectively, with stable inputs and clean exit. Their receipts are in the test
+ledger. Together with Create and CEM, five whole original workflows have passed.
+
+The Loom wire capture with host116 and MC `ed89ab4` shows `unsupportedType`
+for the annotation `Mixin` (references `13:9` and `13:17`) even though the
+compile classpath includes `org.spongepowered:mixin:0.8.7`. The class literal
+`SimpleTarget` resolves in the same evaluation. The original definition returns
+no location. See `build/rust-test-logs/loom-mixin-wire-20261121-004021685/`.
+
+In the Fabric Inject completion response, the scoped lookup finds all five
+target method descriptors including `draw(Ljava/lang/String;FF)V`, with the
+correct owner and semantic context. The host has no declaration facts for the
+unfinished buffer. The port checks the Rust parser's recovery metadata for the
+two unfinished Inject inputs and retains the original candidate assertions.
+Complete-input class completions still require positive host bindings.
+
+Background indexing can invalidate an Info or completion request on an
+unchanged buffer. Those two read-only commands reuse the existing single fresh
+request used by definition. The Neovim adapter verifies the same buffer,
+document version, workspace, provider, and client before sending it. The
+transport test covers one fresh delivery and no retry for explicit reindex.
 
 ### Original source-query and startup behavior restored
 

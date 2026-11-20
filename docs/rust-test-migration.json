@@ -63463,7 +63463,7 @@
     },
     "resumedIntegration": {
       "date": "2026-11-05",
-      "status": "Original Rust cases pass on Windows and Linux; Create and CEM whole editor entries pass; seven original whole editor entries remain unverified.",
+      "status": "Original Rust cases pass on Windows and Linux; five original whole editor entries pass, four remain unverified.",
       "hostPin": "8ea5de1b65acbf396474f1ac2b225f7da2d9ca8f",
       "hostReceipt": "build/host-artifacts/candidate115-814daeb5dd26/copy-receipt.json",
       "hostSerializerFixture": "mcdev-companion/tests/fixtures/host_inputs/root_files/actual-serializer-sample.json",
@@ -64849,15 +64849,15 @@
         },
         {
           "fixture": "fabric-aw-at",
-          "status": "dedicated AW/AT document completion/diagnostic/descriptor workflow pending"
+          "status": "Passed original whole entry with host116 and MC ed89ab4"
         },
         {
           "fixture": "multi-source-set",
-          "status": "main/client source-set workflow pending"
+          "status": "Passed original whole entry with host116 and MC ed89ab4"
         },
         {
           "fixture": "forge-basic",
-          "status": "platform-specific common Mixin workflow pending"
+          "status": "Passed original whole entry with host116 and MC ed89ab4"
         },
         {
           "fixture": "fabric-loom-e2e",
@@ -65029,14 +65029,50 @@
           "trace": "build/matrix-whole-20261105/multi-source-set-final-adapter-20261105/build/live-20261105-200704430-04c06317b90c47ef9971dce604ae2b85/host.trace.jsonl"
         },
         "loom": {
-          "failure": "Post-index definition receives unsupportedType for annotation Mixin; original definition location assertion fails",
+          "failure": "TypeRef 13:9 and 13:17 return UnsupportedType Mixin with the Maven Mixin artifact on compile classpath; the SimpleTarget class literal resolves.",
           "proof": "build/rust-test-logs/loom-mixin-wire-20261121-003019306/editor-proof.json",
           "reasonPayloadSha256": "a19ceb190542ef1b52416efbc88d91983b4ad3fc773552ae66bae4a0203e0016",
-          "wireCaptured": false
+          "wireCaptured": true,
+          "wireSummary": "build/rust-test-logs/loom-mixin-wire-20261121-004021685/wire-summary.json",
+          "wireExtract": "build/rust-test-logs/loom-mixin-wire-20261121-004021685/wire-extract.json",
+          "wireHost": "e9b46c3fd6e3540f16dbba25ba4ccafb1345a8ba"
         },
         "sodium": {
           "failure": "No accepted GuiMixin source before first command",
           "receipt": "build/rust-test-logs/h115-mca61/recovery-and-run-receipt.json"
+        },
+        "host116": {
+          "commit": "e9b46c3fd6e3540f16dbba25ba4ccafb1345a8ba",
+          "sha256": "43fde6e8d5d9ddec5eddfc9988ee875603c9e7b817d639bb7133d8de39189c78",
+          "wholeEditorPasses": {
+            "multi-source-set": {
+              "passed": true,
+              "assertions": 54,
+              "commands": 10,
+              "receipt": "build/matrix-whole-20261105/multi-source-set-final-adapter-20261105/build/live-20261121-003547505-ed83445674ae458b91e8f2fdb1899ad8/receipt.json",
+              "receiptSha256": "569eb06c5dafaccbc26430dcc051af0bb659cf56fd09c14e687e34be87f5e6d0",
+              "proofSha256": "bb0d5a62f411060c5ce42f382b336f5aa1655258ef6877ba8c9e4e893b4ea3fb",
+              "cleanShutdown": true
+            },
+            "forge-basic": {
+              "passed": true,
+              "assertions": 43,
+              "commands": 8,
+              "receipt": "build/matrix-whole-20261105/forge-basic-final-adapter-20261105/build/live-20261121-003547507-c55149bdd66c4d2e9a89f4410e028dc1/receipt.json",
+              "receiptSha256": "b835fde29b090cb224728e1bc8ce906d003c79bc47e09a18d5e5c72676e75b9b",
+              "proofSha256": "10edf726c86fa960524c81acd505af68dc2ac0e99ab4a3bdae63968d66ec8c5e",
+              "cleanShutdown": true
+            },
+            "fabric-aw-at": {
+              "passed": true,
+              "assertions": 13,
+              "commands": 7,
+              "receipt": "build/final-two-h115-prepared-20261105/fabric-aw-at/build/live-20261121-003801505-3b03264e8a5e4471a62983606b569ba3/receipt.json",
+              "receiptSha256": "5fbe5d2be2e09a0fef4a722e046833605cc3aa51355f8d0180a2306e297f103b",
+              "proofSha256": "f395991f8f7151175cd5455cdd7afc8c856d147402d89e727ab5a4ab46d42e5b",
+              "cleanShutdown": true
+            }
+          }
         }
       }
     }
