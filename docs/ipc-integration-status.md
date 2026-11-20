@@ -353,6 +353,18 @@ Windows passes all 1,950 Rust tests across 86 targets, the companion build
 and the Neovim suite on `199d74d`. See
 `build/rust-test-logs/20261121-043432051/summary.txt`.
 
+A focused sugar run with the existing readiness preflight before diagnostics
+gets past the transient `CommandUnavailable` responses and dispatches
+diagnostics as evaluation 35. The command keeps document version 5 and the
+same source digest. The child returns Stale after validation of a
+`ktlsp::root_files::Guard` fails (expected 1, current 0). About 58 ms before
+the first failure, the native watcher records Windows `Modify(Any)` on
+`.gradle/9.6.1/fileHashes/fileHashes.lock`. The configuration filter
+excludes `.gradle`. The mapping filter includes that directory to discover
+Loom mappings and selects only the `srg`, `tiny` and `tsrg` extensions.
+The lock file belongs to neither inventory. See
+`build/rust-test-logs/fabric-mixinextras-h121-sugar-preflight-199d74d/root-file-stale-evidence.json`.
+
 The host122 Sodium diagnostic reaches the blocking worker in about 2 ms.
 In evaluation 3, the source plan lock waits 1.123 seconds and the plan is
 unavailable. The worker exits with Stale during resource capture after about
