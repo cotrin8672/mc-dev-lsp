@@ -443,6 +443,15 @@ wait in the oshi-core dependency install. The runner terminates its owned
 process tree after the graceful shutdown deadline. See
 `build/rust-test-logs/sodium-open-owner-0883a396-199d74d/`.
 
+The subsequent ktlsp diagnostic build opens the same GuiMixin source and
+records the Workspace lock acquisition and release. One fast-diagnostics
+job holds the lock for 40.442 seconds (sequence 150), overlapping the
+41.309 seconds spent waiting in the oshi-core dependency install. During
+this one-document run ktlsp completes 231 fast-diagnostics jobs. The host
+reaches IPC fact reads and the semantic index invalidates the evaluation
+before source acceptance. See
+`build/rust-test-logs/sodium-0883a396-workspace-lock-diagnostic/`.
+
 The Windows x86_64 release archive built from `7afcdd1` passes the native
 capability and stdio smoke checks. Independent ZIP inspection verifies all
 24 manifest payload entries. The archive is
