@@ -588,6 +588,11 @@ fn checked_unattached_injector_allows_completion_at_its_end() {
             .len(),
         1
     );
+    let start = SOURCE.find("@Inject").unwrap();
+    let position = mcdev_core::offset_to_position(SOURCE, start).unwrap();
+    let provider =
+        provider(Arc::new(Host::new()), true, None).with_handler_action_position(Some(position));
+    assert!(matches!(parse(&provider).unwrap().fact, HostFact::Known(_)));
 }
 
 #[test]

@@ -74,6 +74,7 @@ pub struct HostSemanticProvider {
     source_facts_v2: bool,
     annotation_sites: bool,
     annotation_completion_position: Option<mcdev_core::McTextPosition>,
+    handler_action_position: Option<McTextPosition>,
     project_sources: BTreeMap<std::path::PathBuf, (SourceEntry, SourceSnapshot)>,
 }
 
@@ -110,6 +111,7 @@ impl HostSemanticProvider {
             source_facts_v2: false,
             annotation_sites: false,
             annotation_completion_position: None,
+            handler_action_position: None,
             project_sources: BTreeMap::new(),
         })
     }
@@ -125,8 +127,7 @@ impl HostSemanticProvider {
         self
     }
 
-    /// A partial inventory can serve only the exact current completion position.
-    /// Other commands retain typed unavailability instead of inferring absence.
+    /// A partial inventory can serve the exact current completion position.
     pub fn with_annotation_sites(
         mut self,
         enabled: bool,
@@ -134,6 +135,11 @@ impl HostSemanticProvider {
     ) -> Self {
         self.annotation_sites = enabled;
         self.annotation_completion_position = completion_position;
+        self
+    }
+
+    pub fn with_handler_action_position(mut self, position: Option<McTextPosition>) -> Self {
+        self.handler_action_position = position;
         self
     }
 

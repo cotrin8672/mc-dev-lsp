@@ -300,6 +300,15 @@ fn execute_inner(
         } else {
             None
         };
+    let handler_action_position = match &validated.decoded {
+        DecodedCommand::CodeAction(request) if request.range.start == request.range.end => {
+            usize::try_from(request.range.start.line)
+                .ok()
+                .zip(usize::try_from(request.range.start.character).ok())
+                .map(|(line, character)| mcdev_core::McTextPosition { line, character })
+        }
+        _ => None,
+    };
     let source_locations_enabled = ops.supports(InputOp::SourceLocation);
     let mut inputs = ScopedInputs::new(&validated.evaluation.evaluation, &ops, facts.clone())?;
     let project_ops = SupportedOps::intersect(&initialization)?;
@@ -397,6 +406,7 @@ fn execute_inner(
         .with_index(index.clone())
         .with_source_facts(source_facts_enabled)
         .with_annotation_sites(annotation_sites_enabled, annotation_completion_position)
+        .with_handler_action_position(handler_action_position)
         .with_project_sources(project.source_snapshots)?,
     );
     let source_provider = Arc::new(semantic::RegisteredSourceProvider::new(

@@ -241,6 +241,7 @@ fn partial_positive_wrapmethod_handler_uses_lexical_generation_without_global_si
     let source = "@Mixin(Target.class) class Patch { @WrapMethod(method = \"tick\") }";
     let annotation_start = source.find("@WrapMethod").unwrap();
     let annotation_end = annotation_start + source[annotation_start..].find(')').unwrap() + 1;
+    let selector_start = source.find("tick").unwrap();
     let uri = "file:///Mixin.java";
     let mut model = MixinSemanticModelParser::parse(source, uri);
     model.targets[0].internal_name = "game/Target".into();
@@ -249,7 +250,12 @@ fn partial_positive_wrapmethod_handler_uses_lexical_generation_without_global_si
         injectors: vec![InjectorModel {
             annotation: MixinAnnotation::WrapMethod,
             annotation_kind: InjectorKind::WrapMethod,
-            method_selectors: vec![],
+            method_selectors: vec![MethodSelector {
+                value: "tick".into(),
+                name: "tick".into(),
+                descriptor: None,
+                range: source_range(source, selector_start, selector_start + "tick".len()),
+            }],
             at_selectors: vec![],
             handler_method_descriptor: None,
             range: source_range(source, annotation_start, annotation_end),
@@ -290,6 +296,13 @@ fn partial_positive_wrapmethod_handler_uses_lexical_generation_without_global_si
         .items
         .iter()
         .any(|item| item.label == "Generate WrapMethod handler"));
+
+    let mut action_request = request;
+    action_request.character = annotation_start as i32;
+    let fixes = MixinServiceFacade::new(&facts, &facts)
+        .code_actions(&action_request, Some("JAVA_UNRELATED_DIAGNOSTIC"))
+        .unwrap();
+    assert!(matches!(fixes.as_slice(), [McFix::WorkspaceEditFix { .. }]));
 }
 
 #[test]

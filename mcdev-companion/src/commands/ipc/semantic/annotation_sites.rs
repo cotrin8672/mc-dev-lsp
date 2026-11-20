@@ -339,6 +339,15 @@ impl HostSemanticProvider {
     ) -> Result<(), FactsError> {
         if current_owner
             && (owned_selector
+                || self.handler_action_position.is_some_and(|position| {
+                    selectors.is_some_and(|sites| {
+                        sites.injectors.iter().any(|injector| {
+                            !injector.method_selectors.is_empty()
+                                && injector.range.start <= position
+                                && position <= injector.range.end
+                        })
+                    })
+                })
                 || self.annotation_completion_position.is_some_and(|position| {
                     selectors.is_some_and(|sites| {
                         sites.injectors.iter().any(|injector| {

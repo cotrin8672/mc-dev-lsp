@@ -171,26 +171,9 @@ impl<'a> MixinServiceFacade<'a> {
         request: &MixinFacadeRequest,
         context: &AnnotationContext,
     ) -> bool {
-        let Some(model) = request.semantic_model.as_ref() else {
+        let Some((_, injectors)) = self.partial_handler_generation_sites(request) else {
             return false;
         };
-        let Some(selectors) = model.host_selector_completions.as_ref() else {
-            return false;
-        };
-        if !matches!(
-            selectors.coverage,
-            crate::host_source::HostFact::Unavailable { .. }
-        ) {
-            return false;
-        }
-        let Some(source) = model.normalized_handler_source.as_ref() else {
-            return false;
-        };
-        if source.document_uri != request.document_uri
-            || source.validate_source(&request.buffer_text).is_err()
-        {
-            return false;
-        }
         let Some(kind) = InjectorKind::from_annotation(context.annotation) else {
             return false;
         };
@@ -199,11 +182,29 @@ impl<'a> MixinServiceFacade<'a> {
             context.annotation_start_offset,
             context.annotation_end_offset,
         );
-        selectors.injectors.iter().any(|injector| {
+        injectors.iter().any(|injector| {
             injector.annotation == context.annotation
                 && injector.annotation_kind == kind
                 && injector.range == annotation_range
         })
+    }
+
+    fn partial_handler_generation_sites<'b>(
+        &self,
+        request: &'b MixinFacadeRequest,
+    ) -> Option<(
+        &'b crate::extras_model::HostHandlerSource,
+        &'b [crate::mixin_source::InjectorModel],
+    )> {
+        let model = request.semantic_model.as_ref()?;
+        let selectors = model.host_selector_completions.as_ref()?;
+        let source = model.normalized_handler_source.as_ref()?;
+        (matches!(
+            selectors.coverage,
+            crate::host_source::HostFact::Unavailable { .. }
+        ) && source.document_uri == request.document_uri
+            && source.validate_source(&request.buffer_text).is_ok())
+        .then_some((source, &selectors.injectors))
     }
     fn extras_actions(&self, request: &MixinFacadeRequest) -> MixinExtrasCodeActionService<'a> {
         MixinExtrasCodeActionService::new(self.class_index)
@@ -633,6 +634,28 @@ impl<'a> MixinServiceFacade<'a> {
         if JavaTypeDescriptorResolver::is_kotlin_source(&request.buffer_text, &request.document_uri)
         {
             return Ok(vec![]);
+        }
+        if let Some((source, injectors)) = self.partial_handler_generation_sites(request) {
+            if let Some(position) = position(request).filter(|position| {
+                injectors.iter().any(|injector| {
+                    !injector.method_selectors.is_empty()
+                        && injector.range.start <= *position
+                        && *position <= injector.range.end
+                })
+            }) {
+                // The exact current annotation can produce a handler edit.
+                // Partial inventory does not authorize a diagnostics sweep.
+                let service = MixinExtrasCodeActionService::new(self.class_index)
+                    .with_signature_service(self.lexical_handler());
+                return Ok(service.generate_handler_fixes_at_position(
+                    &request.document_uri,
+                    &request.buffer_text,
+                    position.line,
+                    position.character,
+                    &source.targets,
+                    resolved_contexts(request),
+                ));
+            }
         }
         let diagnostics: Vec<_> = self
             .diagnose_inner(
