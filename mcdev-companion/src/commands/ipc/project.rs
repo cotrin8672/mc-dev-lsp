@@ -28,6 +28,10 @@ use mcdev_core::{
     },
 };
 pub(crate) use roots::DiscoveryNeeds;
+
+pub(crate) fn workspace_reference_filter() -> crate::host_facts::inputs::RootFileFilter {
+    roots::reference_filter()
+}
 use std::{
     collections::{BTreeMap, BTreeSet},
     path::{Path, PathBuf},
@@ -153,7 +157,7 @@ fn required_resource(entry: &ResourceEntry, root: &Path) -> Result<bool, FactsEr
     Ok(ordinary && !is_under_excluded_directory(relative.parent().unwrap_or(Path::new(""))))
 }
 
-fn workspace_relative(root: &Path, path: &Path) -> Option<PathBuf> {
+pub(crate) fn workspace_relative(root: &Path, path: &Path) -> Option<PathBuf> {
     if let Ok(relative) = path.strip_prefix(root) {
         return Some(relative.to_owned());
     }

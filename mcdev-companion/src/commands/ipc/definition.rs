@@ -3,7 +3,7 @@ use super::index::EvaluationFactReader;
 use crate::{
     host_facts::{
         draft::{DeclaredMembers, TypeJvm},
-        inputs::{read_split, SourceLocation},
+        inputs::{read_split, ScopedInputs, SourceLocation},
         FactsError,
     },
     wire::{
@@ -24,7 +24,11 @@ use mcdev_core::{
 };
 use serde::de::DeserializeOwned;
 use serde_json::{json, Value};
-use std::{collections::BTreeMap, sync::Mutex};
+use std::{
+    collections::{BTreeMap, BTreeSet},
+    path::{Path, PathBuf},
+    sync::{Arc, Mutex},
+};
 
 /// Resolve a positive local Expression reference only when the host confirms both
 /// annotations, their arguments, and their common declaration in this evaluation.
@@ -250,6 +254,8 @@ pub struct CurrentDefinitions<R: EvaluationFactReader + Clone> {
     members: Mutex<BTreeMap<String, MemberInventory>>,
     source_locations: bool,
     selected_types: Mutex<BTreeMap<String, TypeFact>>,
+    workspace_root: Option<PathBuf>,
+    scoped_inputs: Option<Arc<Mutex<ScopedInputs<R>>>>,
 }
 
 impl<R: EvaluationFactReader + Clone> CurrentDefinitions<R> {
@@ -270,11 +276,23 @@ impl<R: EvaluationFactReader + Clone> CurrentDefinitions<R> {
             members: Mutex::new(BTreeMap::new()),
             source_locations: false,
             selected_types: Mutex::new(BTreeMap::new()),
+            workspace_root: None,
+            scoped_inputs: None,
         })
     }
 
     pub fn with_source_locations(mut self, enabled: bool) -> Self {
         self.source_locations = enabled;
+        self
+    }
+
+    pub fn with_workspace_source_lookup(
+        mut self,
+        workspace_root: PathBuf,
+        inputs: Arc<Mutex<ScopedInputs<R>>>,
+    ) -> Self {
+        self.workspace_root = Some(mcdev_core::project::normalize_path(&workspace_root));
+        self.scoped_inputs = Some(inputs);
         self
     }
 
@@ -693,15 +711,111 @@ impl<R: EvaluationFactReader + Clone> CurrentDefinitions<R> {
                 ));
             }
         }
+        let document_uri = self.preferred_source_uri(&location)?;
         self.reader.check_active()?;
         Ok(ResolvedDefinition {
             target: target.clone(),
-            document_uri: location.document_uri,
+            document_uri,
             range,
             resolution: DefinitionResolution::Source,
             resolution_message: None,
         })
     }
+
+    fn preferred_source_uri(&self, location: &SourceLocation) -> Result<String, FactsError> {
+        let target_path = mcdev_core::project::uri_to_path(&location.document_uri)
+            .map_err(FactsError::Protocol)?;
+        let Some(root) = self.workspace_root.as_ref() else {
+            return Ok(location.document_uri.clone());
+        };
+        if super::project::workspace_relative(root, &target_path).is_some() {
+            return Ok(location.document_uri.clone());
+        }
+        let Some(scoped_inputs) = self.scoped_inputs.as_ref() else {
+            return Ok(location.document_uri.clone());
+        };
+        let mut inputs = scoped_inputs
+            .lock()
+            .map_err(|_| protocol("scoped input lookup poisoned"))?;
+        let Some(basename) = target_path.file_name().and_then(|name| name.to_str()) else {
+            return Ok(location.document_uri.clone());
+        };
+        let mut filter = super::project::workspace_reference_filter();
+        filter.basenames = BTreeSet::from([basename.to_ascii_lowercase()]);
+        filter.extensions.clear();
+        let inventory = match inputs.root_file_inventory(&filter) {
+            Ok(inventory) => inventory,
+            Err(FactsError::Unsupported(_)) => return Ok(location.document_uri.clone()),
+            Err(error) => return Err(error),
+        };
+        let Some(domain) = inventory.root else {
+            return Ok(location.document_uri.clone());
+        };
+        let domain_path =
+            mcdev_core::project::uri_to_path(&domain.uri).map_err(FactsError::Protocol)?;
+        if super::project::workspace_relative(root, &domain_path).is_none()
+            || super::project::workspace_relative(&domain_path, root).is_none()
+        {
+            return Ok(location.document_uri.clone());
+        }
+        let mapped_root = root.join("mapped-sources");
+        let entries = inventory
+            .entries
+            .into_iter()
+            .filter(|entry| {
+                let Ok(path) = mcdev_core::project::uri_to_path(&entry.descriptor.uri) else {
+                    return false;
+                };
+                super::project::workspace_relative(&mapped_root, &path)
+                    .is_some_and(|relative| path_suffix_matches(&target_path, &relative))
+            })
+            .collect::<Vec<_>>();
+        if entries.is_empty() {
+            return Ok(location.document_uri.clone());
+        }
+        let snapshots = match inputs.root_file_snapshots(&entries) {
+            Ok(snapshots) => snapshots,
+            Err(FactsError::Unsupported(_)) => return Ok(location.document_uri.clone()),
+            Err(error) => return Err(error),
+        };
+        let matches = entries
+            .iter()
+            .zip(snapshots)
+            .filter_map(|(entry, snapshot)| match snapshot {
+                Fact::Found { value }
+                    if value.identity.sha256 == location.source.sha256
+                        && value.uri == entry.descriptor.uri =>
+                {
+                    Some(value.uri)
+                }
+                _ => None,
+            })
+            .collect::<Vec<_>>();
+        if matches.len() == 1 {
+            return Ok(matches[0].clone());
+        }
+        Ok(location.document_uri.clone())
+    }
+}
+
+fn path_suffix_matches(path: &Path, suffix: &Path) -> bool {
+    let path = path.components().collect::<Vec<_>>();
+    let suffix = suffix.components().collect::<Vec<_>>();
+    if suffix.is_empty() || suffix.len() > path.len() {
+        return false;
+    }
+    path[path.len() - suffix.len()..]
+        .iter()
+        .zip(suffix)
+        .all(|(actual, expected)| {
+            let actual = actual.as_os_str().to_string_lossy();
+            let expected = expected.as_os_str().to_string_lossy();
+            if cfg!(windows) {
+                actual.eq_ignore_ascii_case(&expected)
+            } else {
+                actual == expected
+            }
+        })
 }
 
 pub(super) fn checked_location_range(
@@ -763,6 +877,7 @@ impl<R: EvaluationFactReader + Clone> DefinitionBackend for CurrentDefinitions<R
 mod tests {
     use super::*;
     use crate::host_facts::bridge::FactReader;
+    use crate::host_facts::inputs::InputOps;
     use mcdev_core::{model::McTextPosition, MappingNamespace};
     use std::{
         collections::VecDeque,
@@ -888,6 +1003,93 @@ mod tests {
             "range":{"start":{"line":4,"character":17},"end":{"line":4,"character":21}},
             "source":{"identity":{"kind":"source","revision":"314"},"sha256":"a".repeat(64)}}),
         )
+    }
+
+    #[test]
+    fn mapped_source_preference_requires_relative_path_and_digest() {
+        let workspace = std::env::temp_dir().join("mcdev-mapped-source-workspace");
+        let mapped = workspace.join("mapped-sources/com/example/target/SimpleTarget.java");
+        let extracted = std::env::temp_dir()
+            .join("mcdev-mapped-source-cache/hash/com/example/target/SimpleTarget.java");
+        let text = "class SimpleTarget {}";
+        use sha2::{Digest, Sha256};
+        let digest = format!("{:x}", Sha256::digest(text.as_bytes()));
+        let root = json!({
+            "identity":"root-domain",
+            "uri":mcdev_core::project::path_to_uri(&workspace),
+            "rootKind":"workspace",
+            "revision":"1"
+        });
+        let file = "mapped-simple";
+        let mut root_filter = super::super::project::workspace_reference_filter();
+        root_filter.basenames = BTreeSet::from(["simpletarget.java".into()]);
+        root_filter.extensions.clear();
+        let filter = serde_json::to_value(root_filter).unwrap();
+        let inventory = json!({
+            "root":root,
+            "filter":filter,
+            "files":[{"file":file,"uri":mcdev_core::project::path_to_uri(&mapped),
+                "relativePath":"mapped-sources/com/example/target/SimpleTarget.java"}],
+            "next":null,"coverage":found(json!(true)),"problems":[]
+        });
+        let snapshot = found(json!({
+            "file":file,
+            "root":root,
+            "uri":mcdev_core::project::path_to_uri(&mapped),
+            "relativePath":"mapped-sources/com/example/target/SimpleTarget.java",
+            "identity":{"kind":"rootFile","revision":"1","sha256":digest},
+            "documentVersion":7,"size":text.len(),"offset":0,"text":text,"next":null
+        }));
+        let root_reader = || {
+            Reader(Arc::new(Mutex::new(VecDeque::from(vec![
+                json!({"facts":[inventory.clone()]}),
+                json!({"facts":[snapshot.clone()]}),
+            ]))))
+        };
+        let input_ops = InputOps::intersect(&json!({
+            "capabilities":["root-files-v1"],
+            "supportedOps":{"root-files-v1":["rootFileInventory","rootFileSnapshot"]}
+        }))
+        .unwrap();
+        let backend_for = || {
+            let inputs = ScopedInputs::new("eval-1", &input_ops, root_reader()).unwrap();
+            CurrentDefinitions::new(
+                evaluation("class Owner { void tick() {} }", false),
+                mcdev_core::project::path_to_uri(&workspace.join("src/main/java/Owner.java")),
+                Reader(Arc::new(Mutex::new(VecDeque::new()))),
+            )
+            .unwrap()
+            .with_workspace_source_lookup(workspace.clone(), Arc::new(Mutex::new(inputs)))
+        };
+        let location: SourceLocation = serde_json::from_value(json!({
+            "target":"member:1",
+            "documentUri":mcdev_core::project::path_to_uri(&extracted),
+            "range":{"start":{"line":1,"character":2},"end":{"line":1,"character":8}},
+            "source":{"identity":{"kind":"source","revision":"1"},"sha256":digest}
+        }))
+        .unwrap();
+        let backend = backend_for();
+        assert_eq!(
+            backend.preferred_source_uri(&location).unwrap(),
+            mcdev_core::project::path_to_uri(&mapped)
+        );
+
+        let mut stale = location.clone();
+        stale.source.sha256 = "b".repeat(64);
+        let backend = backend_for();
+        assert_eq!(
+            backend.preferred_source_uri(&stale).unwrap(),
+            location.document_uri
+        );
+
+        let mut regular = location;
+        regular.document_uri = mcdev_core::project::path_to_uri(
+            &workspace.join("src/main/java/com/example/target/SimpleTarget.java"),
+        );
+        assert_eq!(
+            backend.preferred_source_uri(&regular).unwrap(),
+            regular.document_uri
+        );
     }
 
     #[test]

@@ -328,6 +328,7 @@ fn execute_inner(
     let config_complete = project.config_selection_complete;
     let references_complete = project.references_complete;
     let inputs = Arc::new(Mutex::new(inputs));
+    let definition_inputs = inputs.clone();
     let mut index = index::EvaluationIndex::new(inputs, facts.clone());
     index = index.with_source_provenance(source_provenance_enabled);
     if source_facts_enabled && source_locations_enabled {
@@ -380,7 +381,11 @@ fn execute_inner(
             validated.document_uri.clone(),
             facts.clone(),
         )?
-        .with_source_locations(source_locations_enabled),
+        .with_source_locations(source_locations_enabled)
+        .with_workspace_source_lookup(
+            project.cached_session.context.root.clone(),
+            definition_inputs,
+        ),
     );
     let semantic = Arc::new(
         semantic::HostSemanticProvider::new(
