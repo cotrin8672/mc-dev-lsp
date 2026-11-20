@@ -303,6 +303,79 @@ fn fixture(kotlin: bool) -> Host {
         calls: Arc::new(Mutex::new(Vec::new())),
     }
 }
+
+fn operation_fixture() -> Host {
+    let source = "//😀\n@Mixin(Target.class)\npublic abstract class 雪Mixin {\n @WrapOperation(method=\"tick()V\", at=@At(\"INVOKE\"))\n private int hook(String instance, Operation<Integer> original) {}\n}";
+    let at = annotation(
+        source,
+        "@At(\"INVOKE\")",
+        "At",
+        "at",
+        json!([scalar(
+            source,
+            "value",
+            "\"INVOKE\"",
+            string_value(source, "INVOKE")
+        )]),
+    );
+    let wrap = annotation(
+        source,
+        "@WrapOperation(method=\"tick()V\", at=@At(\"INVOKE\"))",
+        "WrapOperation",
+        "wrapoperation",
+        json!([
+            scalar(
+                source,
+                "method",
+                "\"tick()V\"",
+                string_value(source, "tick()V")
+            ),
+            scalar(
+                source,
+                "at",
+                "@At(\"INVOKE\")",
+                json!({"kind":"annotation","annotation":at})
+            )
+        ]),
+    );
+    let mixin = annotation(
+        source,
+        "@Mixin(Target.class)",
+        "Mixin",
+        "mixin",
+        json!([scalar(
+            source,
+            "value",
+            "Target.class",
+            json!({"kind":"class","typeRef":"target"})
+        )]),
+    );
+    let class_start = source.find("@Mixin").unwrap();
+    let class_body = source.find('{').unwrap();
+    let method_start = source.find("@WrapOperation").unwrap();
+    let method_body = source.rfind("{}").unwrap();
+    let declarations = json!([
+        {"id":"class","owner":null,"name":"雪Mixin","range":span(source,"雪Mixin"),"annotations":[mixin],"sourceKind":"Class",
+            "fullRange":{"start":class_start,"end":source.len()},"headerRange":{"start":class_start,"end":class_body},
+            "nameRange":span(source,"雪Mixin"),"bodyRange":{"start":class_body,"end":source.len()},"modifiers":modifiers(true)},
+        {"id":"method","owner":"class","name":"hook","range":span(source,"hook"),"annotations":[wrap],"sourceKind":"Function",
+            "fullRange":{"start":method_start,"end":method_body+2},"headerRange":{"start":method_start,"end":method_body},
+            "nameRange":span(source,"hook"),"bodyRange":{"start":method_body,"end":method_body+2},"modifiers":modifiers(true),
+            "parameters":found(json!([
+                {"name":"instance","range":span(source,"String instance"),"nameRange":span(source,"instance"),"typeRef":"parameter:0","annotations":[]},
+                {"name":"original","range":span(source,"Operation<Integer> original"),"nameRange":span(source,"original"),"typeRef":"parameter:1","annotations":[]}
+            ]))}
+    ]);
+    Host {
+        source: source.into(),
+        declarations,
+        signature:
+            "(Ljava/lang/String;Lcom/llamalad7/mixinextras/injector/wrapoperation/Operation;)I"
+                .into(),
+        active: Arc::new(AtomicBool::new(true)),
+        calls: Arc::new(Mutex::new(Vec::new())),
+    }
+}
 fn answer(host: &Host, kotlin: bool) -> HostFact<mcdev_core::host_source::HostSemanticModel> {
     let uri = if kotlin {
         "file:///project/雪Mixin.kt"
@@ -461,6 +534,21 @@ fn unavailable_or_absent_parameter_metadata_is_not_a_zero_argument_handler() {
         }
         assert!(matches!(answer(&host, false), HostFact::Unavailable { .. }));
     }
+}
+
+#[test]
+fn java_operation_generic_is_recovered_from_checked_source_parameter() {
+    let host = operation_fixture();
+    let model = parse(&host, false);
+    let facts = model.model.normalized_handler_source.unwrap();
+    let sites = facts.checked_sites(&host.source).unwrap();
+    let parameter = &sites[0].handler_method.as_ref().unwrap().parameters[1];
+    assert!(parameter.is_operation);
+    assert_eq!(parameter.operation_generic_name.as_deref(), Some("Integer"));
+    assert_eq!(
+        parameter.operation_generic_descriptor.as_deref(),
+        Some("Ljava/lang/Integer;")
+    );
 }
 
 #[test]

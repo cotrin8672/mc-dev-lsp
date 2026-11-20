@@ -2,6 +2,8 @@ use super::*;
 use mcdev_core::{
     extras_model::*,
     host_source::{project_host_handler_parameter, HostFact},
+    mixin_source::{ClassIndexJavaTypeLookup, JavaTypeLookup, JavaTypeResolutionContext},
+    mixinextras_handler::HandlerSignatureService,
 };
 mod selectors;
 use selectors::project_sites;
@@ -79,6 +81,8 @@ impl HostSemanticProvider {
             binaries.insert(reference.clone(), binary.internal_name.clone());
         }
         let mut projected = Vec::new();
+        let source_operation_generics =
+            self.java_operation_generics(source, declaration, parameters.len());
         // Both lists describe this checked authored declaration; no JVM index or local slot is issued.
         for (parameter, ty) in parameters.iter().zip(parameter_types) {
             let annotations = parameter
@@ -104,7 +108,26 @@ impl HostSemanticProvider {
                 &(parameter.range.start..parameter.range.end),
                 &annotations,
             ) {
-                HostFact::Known(parameter) => projected.push(parameter),
+                HostFact::Known(mut projected_parameter) => {
+                    if projected_parameter.is_operation {
+                        if let Some((name, descriptor)) = source_operation_generics
+                            .as_ref()
+                            .and_then(|generics| {
+                                generics.iter().find(|(parameter_name, start, end, _, _)| {
+                                    parameter_name == &parameter.name
+                                        && *start == parameter.range.start
+                                        && *end == parameter.range.end
+                                })
+                            })
+                            .map(|(_, _, _, name, descriptor)| (name, descriptor))
+                        {
+                            projected_parameter.operation_generic_name = Some(name.clone());
+                            projected_parameter.operation_generic_descriptor =
+                                Some(descriptor.clone());
+                        }
+                    }
+                    projected.push(projected_parameter)
+                }
                 HostFact::Unavailable { reason } => return Err(FactsError::Unknown(reason)),
                 HostFact::Missing => {
                     return Err(FactsError::Unknown(
@@ -157,6 +180,60 @@ impl HostSemanticProvider {
             sites.extend(project_sites(kind, &normalized, &handler, source)?);
         }
         Ok(sites)
+    }
+}
+
+impl HostSemanticProvider {
+    fn java_operation_generics(
+        &self,
+        source: &str,
+        declaration: &Declaration,
+        parameter_count: usize,
+    ) -> Option<Vec<(String, usize, usize, String, String)>> {
+        let imports = JavaTypeDescriptorResolver::imports_for(source);
+        if imports.is_kotlin {
+            return None;
+        }
+        let start = declaration
+            .full_range
+            .as_ref()
+            .or(declaration.header_range.as_ref())?
+            .start;
+        let handler = HandlerSignatureService::parse_handler_method(source, start, Some(&imports))?;
+        if declaration
+            .name
+            .as_deref()
+            .is_none_or(|name| handler.method_name == name.trim_matches('`'))
+            && handler.parameters.len() == parameter_count
+        {
+            let class_lookup = self
+                .class_index
+                .as_deref()
+                .map(|class_index| ClassIndexJavaTypeLookup { class_index });
+            let context = JavaTypeResolutionContext {
+                imports: &imports,
+                lookup: class_lookup
+                    .as_ref()
+                    .map(|lookup| lookup as &dyn JavaTypeLookup),
+            };
+            Some(
+                handler
+                    .parameters
+                    .into_iter()
+                    .filter_map(|parameter| {
+                        let generic = parameter.operation_generic_name?;
+                        let range = parameter.range?;
+                        let start = position_to_offset(source, range.start)?;
+                        let end = position_to_offset(source, range.end)?;
+                        let descriptor =
+                            JavaTypeDescriptorResolver::descriptor_or_null(&generic, &context)?;
+                        Some((parameter.name, start, end, generic, descriptor))
+                    })
+                    .collect(),
+            )
+        } else {
+            None
+        }
     }
 }
 
