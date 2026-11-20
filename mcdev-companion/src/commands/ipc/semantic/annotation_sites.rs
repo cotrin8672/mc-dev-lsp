@@ -342,9 +342,14 @@ impl HostSemanticProvider {
                 || self.annotation_completion_position.is_some_and(|position| {
                     selectors.is_some_and(|sites| {
                         sites.injectors.iter().any(|injector| {
-                            injector.method_selectors.iter().any(|selector| {
-                                selector.range.start <= position && position <= selector.range.end
-                            })
+                            // At the end of a checked, unattached injector,
+                            // completion can offer the existing handler snippet.
+                            (injector.range.end == position
+                                && !injector.method_selectors.is_empty())
+                                || injector.method_selectors.iter().any(|selector| {
+                                    selector.range.start <= position
+                                        && position <= selector.range.end
+                                })
                         })
                     })
                 }))

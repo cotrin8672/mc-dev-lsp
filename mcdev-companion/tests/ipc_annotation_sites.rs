@@ -568,6 +568,29 @@ fn unnegotiated_or_missing_sites_still_leave_the_orphan_incomplete() {
 }
 
 #[test]
+fn checked_unattached_injector_allows_completion_at_its_end() {
+    let end = SOURCE.find("\"is\")").unwrap() + "\"is\")".len();
+    let position = mcdev_core::offset_to_position(SOURCE, end).unwrap();
+    let result = parse(&provider(Arc::new(Host::new()), true, Some(position))).unwrap();
+    let HostFact::Known(result) = result.fact else {
+        panic!(
+            "checked injector completion was unavailable: {:?}",
+            result.fact
+        );
+    };
+    assert!(result.model.members.is_empty());
+    assert_eq!(
+        result
+            .model
+            .host_selector_completions
+            .unwrap()
+            .injectors
+            .len(),
+        1
+    );
+}
+
+#[test]
 fn unknown_coverage_is_not_a_successful_empty_model_for_diagnostics_or_other_positions() {
     for completion_position in [
         None,
