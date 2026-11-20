@@ -299,6 +299,51 @@ The Windows full Rust suite for `d8414e4` passes 1,950 tests across 86
 targets including doc tests. Formatting, the companion build, and the
 Neovim suite also pass. See `build/rust-test-logs/20261121-033300853/summary.txt`.
 
+The focused original expression test captures both views for the same
+`String.class` argument of `@Definition(local = @Local(...))` in evaluation 69.
+Both have a verified JVM name and unknown member coverage and ABI. The first
+has 128 resolved methods and 10 resolved fields. After the host fetches JDK
+sources, the second resolves signatures for 9 more methods and 1 more field
+from the same list of 172 declarations. The scoped capture
+reproduces the failure after 136 assertions and 9 commands. See
+`build/rust-test-logs/fabric-mixinextras-h121-expression-wire-d8414e4/type-members-diff.json`.
+MC `7cd771f` uses verified JVM identities for handler annotation literals and
+binds editing members only for the Mixin class annotation. The IPC semantic,
+annotation-site and index suites pass all 41 tests.
+The original whole entry returns exactly one `length()` completion at the
+formerly failing command. The 300-second outer limit stops the whole run
+after 539 recorded assertions and 31 recorded commands. The separate run of
+the original expression test then passes all 302 scoped assertions and 18
+commands, including applying the completion to the buffer. The host exits
+cleanly. See `build/rust-test-logs/fabric-mixinextras-h121-target-bind-7cd771f/`
+and `build/rust-test-logs/fabric-mixinextras-h121-expression-target-bind-7cd771f/`.
+Windows passes 1,950 tests across 86 targets including doc tests on
+`7cd771f`. Formatting, the companion build and the Neovim suite also pass.
+See `build/rust-test-logs/20261121-040003420/summary.txt`.
+
+With a 600-second outer deadline and the original per-source waits, the
+whole MixinExtras entry passes the expression workflow and stops after
+712 assertions and 42 commands. The companion returns incomplete project
+context for the `@Local(ordinal = )` completion with a `LocalFloatRef`
+parameter. The host accepts the command's source snapshot and exits
+cleanly. See
+`build/rust-test-logs/fabric-mixinextras-h121-target-bind-7cd771f-full/`.
+The focused original sugar run captures the same edit buffer. On the checked
+snapshot, `sourceFacts` finds `mcdev$localOrdinal` with unknown parameter
+facts. `annotationSites` reports `UnsupportedSource` coverage and returns
+only `@Mixin`, `@ModifyExpressionValue`, and `@At`. See
+`build/rust-test-logs/fabric-mixinextras-h121-sugar-wire-7cd771f/local-ordinal-facts.json`.
+
+The host122 Sodium diagnostic reaches the blocking worker in about 2 ms.
+In evaluation 3, the source plan lock waits 1.123 seconds and the plan is
+unavailable. The worker exits with Stale during resource capture after about
+7.03 seconds. Dependency indexing invalidates the semantic index, and watch
+events from `common/build/resources/boot/META-INF` and `buildSrc.jar` request
+further refreshes. This run does not reproduce the earlier 69.793-second
+gap. The exact GuiMixin snapshot still receives no acceptance, the original
+test sends no commands, and the host exits cleanly. See
+`build/rust-test-logs/host122-sodium-dispatch-diagnostic/`.
+
 On Windows, `42b0155` passes 1,948 Rust tests across 86 targets including
 doc tests. Formatting, the companion build and the Neovim suite also pass.
 See `build/rust-test-logs/20261121-021831690/summary.txt`.
