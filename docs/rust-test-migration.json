@@ -65268,10 +65268,13 @@
               "failure": "The exact next edited mixin source is not accepted by the host before the readiness gate; the next original command is not sent.",
               "editorInputCapture": {
                 "documentVersion": 19,
+                "previousAcceptedHandlerlessVersion": 18,
+                "previousActionReplyEvaluation": 195,
+                "containsGeneratedHandler": true,
                 "notification": "textDocument/didChange",
                 "fullSync": true,
                 "sentSha256": "76b2968076d747ef93d9e47c7fd61f5cda3b306bf304073a5ba5810a9bdf8bad",
-                "matchesReadinessDigest": true,
+                "matchesEditorFlushDigest": true,
                 "acceptedWithinCapture": false,
                 "sameOwnerStaleEvaluation": 197,
                 "outerTimedOut": true,
@@ -65279,6 +65282,24 @@
                 "summarySha256": "ef802979467c6646fef92c89debeb42d061bfdeec0162889d1c61a524dfe7b3b",
                 "receipt": "build/rust-test-logs/fabric-mixinextras-lsp-input-20261121-024429573/capture-receipt.json",
                 "receiptSha256": "01d38aaf2b9499b22956ab6ee822070d15a71a17ca7c48fdaf0ad3f103994c00"
+              },
+              "editorInputOriginalDeadlineCapture": {
+                "diagnosticReusedEditedOverlay": true,
+                "documentVersion": 27,
+                "notification": "textDocument/didChange",
+                "sentSha256": "344c721d76a96dfe532541a4b2c12fe134b4e4b632cad39b350a255845f7ebd0",
+                "matchesEditorFlushDigest": true,
+                "acceptedWithinCapture": false,
+                "refreshGenerationCompleted": 29,
+                "secondsBetweenRefreshFinishAndClose": 44.949,
+                "assertions": 363,
+                "commands": 21,
+                "outerTimedOut": false,
+                "cleanHostShutdown": true,
+                "summary": "build/rust-test-logs/fabric-mixinextras-lsp-input-20261121-025107662/lsp-input-summary.json",
+                "summarySha256": "73f8a0f6050f5bab2d716e605803785039160ba38e7f0e4aef1356c2d1897c92",
+                "receipt": "build/rust-test-logs/fabric-mixinextras-lsp-input-20261121-025107662/capture-receipt.json",
+                "receiptSha256": "a37e8a67286e313efc73ddb3604e397ac670a474bf9bfb9e2188c63c99b6f30a"
               }
             }
           }

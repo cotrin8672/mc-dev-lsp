@@ -226,15 +226,28 @@ child response in evaluation 161. The next source revision still receives
 no accepted publication before the readiness deadline at
 `jdtls_bundle_e2e.lua:1359`. See `build/rust-test-logs/fabric-mixinextras-h119-42b0155/editor-proof.json`.
 
-An editor transport capture on the same host and companion pins observes
-Neovim sending the full version 19 source with `@WrapWithCondition`.
-Replaying the notification yields the same SHA-256 as the source the
-readiness check is waiting for. The host requests workspace refresh generation
+An editor transport capture on the same host and companion pins reaches
+the `@WrapWithCondition` action. The host accepts the handler-less version
+18 and replies to the generation command. Neovim then sends the full
+version 19 source with the generated handler. Replaying the notification
+matches the editor's flush digest. The host requests refresh generation
 18, rejects an evaluation for the same owner as `Stale`, and reports a
 watcher creation event for that source before starting generation 19.
-There is no accepted publication of the sent digest in the capture. The
-diagnostic runner reaches its outer timeout. See
+The diagnostic runner reaches its outer timeout before it observes an
+accepted publication of version 19 or reaches the next original command. See
 `build/rust-test-logs/fabric-mixinextras-lsp-input-20261121-024429573/lsp-input-summary.json`.
+
+With the original 300-second outer deadline, a second transport capture
+records 363 assertions and 21 commands. Neovim sends the full handler-less
+`@WrapOperation` source at version 27, and the replayed bytes match the
+editor flush digest. In the same run, generation 29 finishes with a
+complete classpath and zero missing sources. The digest still has no
+accepted publication during the 44.949 seconds from refresh completion to
+server close. The editor fails at the original source readiness check and
+the host exits cleanly. These captures reused the working overlay with an
+edited initial mixin. They record transport and host state for diagnostics
+while the prepared host119 entry above remains the whole-entry result.
+See `build/rust-test-logs/fabric-mixinextras-lsp-input-20261121-025107662/lsp-input-summary.json`.
 
 On Windows, `42b0155` passes 1,948 Rust tests across 86 targets including
 doc tests. Formatting, the companion build and the Neovim suite also pass.
