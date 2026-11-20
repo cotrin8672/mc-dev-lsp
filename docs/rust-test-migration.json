@@ -65344,6 +65344,25 @@
               "traceSha256": "3afc684530533ef740d1f0d85861f1d0d09adf602c432e76024f71e1e4a91ac5"
             }
           }
+        },
+        "host121Acceptance": {
+          "host": "380cde6d00a403879520b3b6783abc9be08d66c8",
+          "hostSha256": "3dbc7add5803abc5f360803db2047fa2a48aba92a6a122543de3ebd2fa4d4933",
+          "companion": "42b015530ec9b81ad66b3a8019730ae4fd2ab059",
+          "entries": {
+            "fabric-mixinextras": {
+              "passed": false,
+              "assertionsBeforeFailure": 541,
+              "commands": 31,
+              "cleanHostShutdown": true,
+              "generatedHandlersPassed": true,
+              "failure": "Expression completion reaches a same-source int.class whose two opaque class references both return IncompleteScope.",
+              "sourceSha256": "c2abad188647aab77768e063dcbdcc442294ee75e25087a8316f9d9a10b042c6",
+              "proof": "build/rust-test-logs/fabric-mixinextras-h121-42b0155/editor-proof.json",
+              "proofSha256": "4997f0e69b00ff03d450c30a8a2a51df6bf4f234af256b94ee5de42a08eb1e55",
+              "traceSha256": "dea3ff28b123e25e67583dab3a371b2d1a33ff825f80058d6200302d882d10eb"
+            }
+          }
         }
       }
     }

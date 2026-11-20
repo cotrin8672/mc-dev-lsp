@@ -274,6 +274,16 @@ observation. The editor reaches zero original Sodium commands. The
 diagnostic receipt and both traces are saved under
 `build/rust-test-logs/host120-source-diagnostic/`.
 
+Host121 (`380cde6d`) continues taking owners from the same provider queue
+after a rejected snapshot. The original MixinExtras entry on that release
+passes the generated-handler loop and records 541 assertions and 31
+commands. The next expression completion stops at the primitive class
+literal in `@Definition(id = "primitive", type = int.class)`. The
+compiler and annotation-site references have the same source and byte
+range, and both report `IncompleteScope`. The source digest confirms
+the exact CRLF fixture bytes. See
+`build/rust-test-logs/fabric-mixinextras-h121-42b0155/editor-proof.json`.
+
 On Windows, `42b0155` passes 1,948 Rust tests across 86 targets including
 doc tests. Formatting, the companion build and the Neovim suite also pass.
 See `build/rust-test-logs/20261121-021831690/summary.txt`.
