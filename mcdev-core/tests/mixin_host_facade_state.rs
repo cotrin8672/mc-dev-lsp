@@ -1,6 +1,8 @@
 use mcdev_core::{
-    bytecode::*, host_source::*, mixin_completion::*, mixin_facade::*, mixin_source::*, *,
+    bytecode::*, extras_model::HostHandlerSource, host_source::*, mixin_completion::*,
+    mixin_facade::*, mixin_source::*, *,
 };
+use sha2::{Digest, Sha256};
 use std::sync::atomic::{AtomicU64, AtomicU8, AtomicUsize, Ordering};
 struct Facts {
     parses: AtomicUsize,
@@ -231,6 +233,63 @@ fn handwritten_selector_completion_retains_its_partial_injector_fallback() {
         .unwrap();
     assert_eq!(result.items[0].insert_text, "tick");
     assert!(result.debug.semantic_context_found);
+}
+
+#[test]
+fn partial_positive_wrapmethod_handler_uses_lexical_generation_without_global_sites() {
+    let facts = Facts::new();
+    let source = "@Mixin(Target.class) class Patch { @WrapMethod(method = \"tick\") }";
+    let annotation_start = source.find("@WrapMethod").unwrap();
+    let annotation_end = annotation_start + source[annotation_start..].find(')').unwrap() + 1;
+    let uri = "file:///Mixin.java";
+    let mut model = MixinSemanticModelParser::parse(source, uri);
+    model.targets[0].internal_name = "game/Target".into();
+    model.injectors.clear();
+    model.host_selector_completions = Some(HostSelectorCompletions {
+        injectors: vec![InjectorModel {
+            annotation: MixinAnnotation::WrapMethod,
+            annotation_kind: InjectorKind::WrapMethod,
+            method_selectors: vec![],
+            at_selectors: vec![],
+            handler_method_descriptor: None,
+            range: source_range(source, annotation_start, annotation_end),
+        }],
+        coverage: HostFact::Unavailable {
+            reason: "unrelated member is incomplete".into(),
+        },
+    });
+    model.normalized_handler_source = Some(HostHandlerSource {
+        document_uri: uri.into(),
+        sha256: format!("{:x}", Sha256::digest(source.as_bytes())),
+        qualified_name: "Patch".into(),
+        targets: vec!["game/Target".into()],
+        sites: HostFact::Unavailable {
+            reason: "unrelated member is incomplete".into(),
+        },
+        slice_selections: vec![],
+    });
+    let request = MixinFacadeRequest {
+        buffer_text: source.into(),
+        line: 0,
+        character: annotation_end as i32,
+        document_uri: uri.into(),
+        semantic_model: Some(model),
+        ..Default::default()
+    };
+    let context = AnnotationContextExtractor::extract_at_offset(source, annotation_end).unwrap();
+    assert_eq!(context.slot, AnnotationSlot::Handler, "{context:?}");
+    let result = MixinServiceFacade::new(&facts, &facts)
+        .complete_with_debug(
+            &request,
+            &MixinCompletionOptions::default(),
+            "mcdev.completion",
+            "java",
+        )
+        .unwrap();
+    assert!(result
+        .items
+        .iter()
+        .any(|item| item.label == "Generate WrapMethod handler"));
 }
 
 #[test]

@@ -143,11 +143,15 @@ impl<'a> MixinServiceFacade<'a> {
         self.expression_members.reachable_members_cache = cache;
         self
     }
-    fn handler(&self, request: &MixinFacadeRequest) -> HandlerSignatureService<'a> {
+    fn lexical_handler(&self) -> HandlerSignatureService<'a> {
         let mut handler = HandlerSignatureService::new(self.class_index, Some(self.bytecode_index));
         if let Some(reference_types) = self.reference_types {
             handler = handler.with_reference_types(reference_types);
         }
+        handler
+    }
+    fn handler(&self, request: &MixinFacadeRequest) -> HandlerSignatureService<'a> {
+        let mut handler = self.lexical_handler();
         if let Some(source) = request
             .semantic_model
             .as_ref()
@@ -161,6 +165,45 @@ impl<'a> MixinServiceFacade<'a> {
             handler = handler.with_host_source(source.clone());
         }
         handler
+    }
+    fn partial_handler_completion_authorized(
+        &self,
+        request: &MixinFacadeRequest,
+        context: &AnnotationContext,
+    ) -> bool {
+        let Some(model) = request.semantic_model.as_ref() else {
+            return false;
+        };
+        let Some(selectors) = model.host_selector_completions.as_ref() else {
+            return false;
+        };
+        if !matches!(
+            selectors.coverage,
+            crate::host_source::HostFact::Unavailable { .. }
+        ) {
+            return false;
+        }
+        let Some(source) = model.normalized_handler_source.as_ref() else {
+            return false;
+        };
+        if source.document_uri != request.document_uri
+            || source.validate_source(&request.buffer_text).is_err()
+        {
+            return false;
+        }
+        let Some(kind) = InjectorKind::from_annotation(context.annotation) else {
+            return false;
+        };
+        let annotation_range = crate::mixin_source::source_range(
+            &request.buffer_text,
+            context.annotation_start_offset,
+            context.annotation_end_offset,
+        );
+        selectors.injectors.iter().any(|injector| {
+            injector.annotation == context.annotation
+                && injector.annotation_kind == kind
+                && injector.range == annotation_range
+        })
     }
     fn extras_actions(&self, request: &MixinFacadeRequest) -> MixinExtrasCodeActionService<'a> {
         MixinExtrasCodeActionService::new(self.class_index)
@@ -326,11 +369,19 @@ impl<'a> MixinServiceFacade<'a> {
                     .map(|i| normalize_snippet(source, context, i))
                     .collect());
             }
-            return Ok(self.extras_actions(request).complete_handler(
+            let targets = self.resolve_targets(request, context);
+            let contexts = resolved_contexts(request);
+            let service = if self.partial_handler_completion_authorized(request, context) {
+                MixinExtrasCodeActionService::new(self.class_index)
+                    .with_signature_service(self.lexical_handler())
+            } else {
+                self.extras_actions(request)
+            };
+            return Ok(service.complete_handler(
                 source,
                 context.annotation_start_offset,
-                &self.resolve_targets(request, context),
-                resolved_contexts(request),
+                &targets,
+                contexts,
                 Some(context.value_end_offset),
             ));
         }
