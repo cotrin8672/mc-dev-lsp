@@ -65349,6 +65349,14 @@
           "host": "380cde6d00a403879520b3b6783abc9be08d66c8",
           "hostSha256": "3dbc7add5803abc5f360803db2047fa2a48aba92a6a122543de3ebd2fa4d4933",
           "companion": "42b015530ec9b81ad66b3a8019730ae4fd2ab059",
+          "nativeWindowsD8414e4": {
+            "source": "d8414e481b1534545721d3920a5f22c7f06c0ddf",
+            "passed": true,
+            "functionsIncludingDoc": 1950,
+            "targetsIncludingDoc": 86,
+            "summary": "build/rust-test-logs/20261121-033300853/summary.txt",
+            "summarySha256": "487457ab65a141e267b0bc7c3f2714e4cdaf7868203d0fdf8c1efb605ca5a518"
+          },
           "entries": {
             "fabric-mixinextras": {
               "passed": false,
@@ -65360,7 +65368,18 @@
               "sourceSha256": "c2abad188647aab77768e063dcbdcc442294ee75e25087a8316f9d9a10b042c6",
               "proof": "build/rust-test-logs/fabric-mixinextras-h121-42b0155/editor-proof.json",
               "proofSha256": "4997f0e69b00ff03d450c30a8a2a51df6bf4f234af256b94ee5de42a08eb1e55",
-              "traceSha256": "dea3ff28b123e25e67583dab3a371b2d1a33ff825f80058d6200302d882d10eb"
+              "traceSha256": "dea3ff28b123e25e67583dab3a371b2d1a33ff825f80058d6200302d882d10eb",
+              "primitiveLiteralFollowUp": {
+                "passed": false,
+                "companion": "d8414e481b1534545721d3920a5f22c7f06c0ddf",
+                "companionSha256": "73015827920792fbb5781216f0a5cf76af8575aa0b2ba69940fb1d9622fb3006",
+                "assertionsBeforeFailure": 541,
+                "commands": 31,
+                "cleanHostShutdown": true,
+                "failure": "The expression completion now stops at disagreeing host editing member views for one type within the evaluation.",
+                "proof": "build/rust-test-logs/fabric-mixinextras-h121-primitive-d8414e4/editor-proof.json",
+                "proofSha256": "64109a3951a0b9f6206c3bec269c8b24c465127fee325f35859410d318abc1a3"
+              }
             }
           }
         }

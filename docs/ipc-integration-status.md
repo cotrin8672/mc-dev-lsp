@@ -284,6 +284,21 @@ range, and both report `IncompleteScope`. The source digest confirms
 the exact CRLF fixture bytes. See
 `build/rust-test-logs/fabric-mixinextras-h121-42b0155/editor-proof.json`.
 
+MC `d8414e4` projects primitive class literals directly from their exact,
+validated source slices. Distinct opaque references to the same primitive
+literal can reconcile when both references are unknown. The named class
+alias path still requires its existing identity proof. Twelve alias tests
+and both primitive regressions pass. The original entry with this
+companion reaches the host editing member view for the same expression
+completion. Two projected member views disagree within the evaluation and
+the command returns incomplete project context. The trace records the
+operation names, and the differing TypeJvm member payloads remain needed
+to distinguish order, membership, and coverage. See
+`build/rust-test-logs/fabric-mixinextras-h121-primitive-d8414e4/editor-proof.json`.
+The Windows full Rust suite for `d8414e4` passes 1,950 tests across 86
+targets including doc tests. Formatting, the companion build, and the
+Neovim suite also pass. See `build/rust-test-logs/20261121-033300853/summary.txt`.
+
 On Windows, `42b0155` passes 1,948 Rust tests across 86 targets including
 doc tests. Formatting, the companion build and the Neovim suite also pass.
 See `build/rust-test-logs/20261121-021831690/summary.txt`.
