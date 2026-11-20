@@ -124,6 +124,47 @@ request used by definition. The Neovim adapter verifies the same buffer,
 document version, workspace, provider, and client before sending it. The
 transport test covers one fresh delivery and no retry for explicit reindex.
 
+CI44768516723 verifies MC commit `a2a4d6d` on Windows (1,943 functions) and
+Linux (1,942 functions), with 83 targets on each platform. It checks the same
+2,604 case locators and 2,748 replacement references, five Neovim entries,
+release stdio requests, and two 24-file native packages. See
+`build/rust-test-logs/ci-a2a4d6d/ci-summary.json`.
+
+Host117 (`e50788c9`) resolves the Mixin annotation and SimpleTarget in the
+original Loom entry. Its definition selects the right type and source range in
+the extracted JAR. The next original assertion requires the equivalent
+`mapped-sources` file, which has the same SHA-256 as the extracted source.
+MC commit `067e435` checks that relative path and digest through the existing
+root-file facts when a definition resolves to an external source. The full
+Loom entry passes on host117 with the workspace URI, four editor commands,
+and exit code zero. Six of the nine original editor entries have now passed.
+
+The Sodium trace on host117 reaches the first provider evaluation. The
+semantic index advances from 2614 to 3267 before publication and the host
+rejects the pending evaluation. The editor sees no accepted GuiMixin source
+and sends no original commands before the deadline.
+Using 120 seconds for the test-only source-acceptance wait still reaches
+no original commands. In that run, two type-reference reads complete after
+40.9 seconds, exceeding the host's 30-second evaluation limit. The host
+continues dependency indexing without recording a publication. The trace
+does not establish where the evaluation stopped after those reads.
+
+The Fabric basic diagnostic waited for full-library readiness and reached its
+180-second deadline without sending editor commands. Fourteen dependency
+archive validations detect one change among two inputs. The selected
+`classpath` class directory is fingerprinted during staging, while final
+validation returns no fingerprint for a directory key with no trailing slash.
+The MixinExtras entry on host116 passes the first seven replies, then receives
+`CommandUnavailable` while the project is ready and libraries are still
+indexing.
+
+Host118 (`b5a9b5e3`) uses the same class-directory fingerprint during staging
+and validation. The Fabric basic run verifies both inputs without changes and
+finishes indexing. It passes 88 original assertions before class completion in
+the unfinished `@Mixin(SourceOnlyT` buffer finds no current Mixin owner.
+The MixinExtras entry also finishes indexing and passes 71 original assertions
+before WrapOperation diagnostics report unavailable generic type facts.
+
 ### Original source-query and startup behavior restored
 
 The first project-ready runs exposed a separate consumer DTO bug:

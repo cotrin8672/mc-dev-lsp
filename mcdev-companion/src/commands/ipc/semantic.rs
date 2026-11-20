@@ -419,6 +419,27 @@ impl HostSemanticProvider {
             }
         }
         if owners.is_empty() && self.source_facts_v2 {
+            if selected.is_none() && partial_annotations && !imports.is_kotlin {
+                let index = self.class_index.as_deref().filter(|index| {
+                    self.annotation_completion_position.is_some_and(|position| {
+                        unfinished_mixin_class_value(source, &imports, position)
+                    }) && index
+                        .find_class_by_fqn("org.spongepowered.asm.mixin.Mixin")
+                        .is_some()
+                });
+                if let Some(index) = index {
+                    let mut model =
+                        MixinSemanticModelParser::parse_with_lookup(source, uri, Some(index));
+                    // The selector at the cursor is a prefix, so it does not
+                    // establish a Mixin target or an authored handler.
+                    model.targets.clear();
+                    return self.finish_source_syntax_model(
+                        model,
+                        started,
+                        "unfinished Mixin class value uses source syntax and the selected class index",
+                    );
+                }
+            }
             if partial_annotations
                 || sites.is_some() && self.annotation_completion_position.is_some()
             {
@@ -1074,7 +1095,19 @@ impl HostSemanticProvider {
                 })
             })
             .collect::<Result<Vec<_>, FactsError>>()?;
-        let reason = "source syntax model used; handler JVM declaration facts are not required";
+        self.finish_source_syntax_model(
+            model,
+            started,
+            "source syntax model used; handler JVM declaration facts are not required",
+        )
+    }
+
+    fn finish_source_syntax_model(
+        &self,
+        mut model: mcdev_core::mixin_source::MixinClassModel,
+        started: std::time::Instant,
+        reason: &str,
+    ) -> Result<HostSemanticModel, FactsError> {
         model.parse_source = ParseSource::HandWrittenFallback;
         model.confidence = ParseConfidence::Low;
         model.warnings.push(reason.into());
@@ -1094,6 +1127,39 @@ impl HostSemanticProvider {
             parse_ms: u64::try_from(started.elapsed().as_millis()).unwrap_or(u64::MAX),
         })
     }
+}
+
+fn unfinished_mixin_class_value(
+    source: &str,
+    imports: &JavaSourceImports,
+    position: McTextPosition,
+) -> bool {
+    let Some(offset) = position_to_offset(source, position) else {
+        return false;
+    };
+    let Some(context) = AnnotationContextExtractor::extract_at_offset(source, offset) else {
+        return false;
+    };
+    if context.annotation != MixinAnnotation::Mixin || context.slot != AnnotationSlot::Class {
+        return false;
+    }
+    const MIXIN: &str = "org.spongepowered.asm.mixin.Mixin";
+    annotations_with_imports(source, imports)
+        .iter()
+        .any(|site| {
+            site.start == context.annotation_start_offset
+                && site.body_start <= offset
+                && site.body_end == source.len()
+                && site.resolved_fqn.as_deref() == Some(MIXIN)
+                && (imports
+                    .explicit
+                    .get("Mixin")
+                    .is_some_and(|fqn| fqn == MIXIN)
+                    || source
+                        .get(site.start..site.name_end)
+                        .and_then(|text| text.strip_prefix('@'))
+                        .is_some_and(|name| name.trim() == MIXIN))
+        })
 }
 
 fn validate_source_context(
@@ -2257,6 +2323,25 @@ class DrillMixin {
         assert!(!operations
             .iter()
             .any(|op| matches!(*op, "declarationMember" | "typeJvm")));
+    }
+
+    #[test]
+    fn unfinished_mixin_class_recovery_requires_a_bound_annotation_spelling() {
+        let open = "import org.spongepowered.asm.mixin.Mixin;\n\n@Mixin(SourceOnlyT\npublic abstract class SourceOnlyMixin {}";
+        let check = |source: &str| {
+            let imports = JavaTypeDescriptorResolver::imports_for_uri(source, "file:///Mixin.java");
+            let offset = source.find("SourceOnlyT").unwrap() + "SourceOnlyT".len();
+            unfinished_mixin_class_value(
+                source,
+                &imports,
+                offset_to_position(source, offset).unwrap(),
+            )
+        };
+        assert!(check(open));
+        assert!(!check(
+            &open.replace("org.spongepowered.asm.mixin.Mixin", "example.Mixin")
+        ));
+        assert!(!check(&open.replace("SourceOnlyT", "SourceOnlyT.class)")));
     }
 
     #[test]

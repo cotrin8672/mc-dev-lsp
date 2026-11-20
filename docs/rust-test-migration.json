@@ -65073,6 +65073,87 @@
               "cleanShutdown": true
             }
           }
+        },
+        "host117Acceptance": {
+          "companion": "a2a4d6d604c213ea6a774803ce5bb84ec9bce19f",
+          "nativeCi": {
+            "run": 44768516723,
+            "summary": "build/rust-test-logs/ci-a2a4d6d/ci-summary.json",
+            "sha256": "95745554787c479f7395a926761de84cf4c554e1e66ac6f1c89232cdd39f927e",
+            "windowsFunctions": 1943,
+            "linuxFunctions": 1942
+          },
+          "host117": {
+            "commit": "e50788c9c3c751f04104eb30f4708ad16cf7f6d9",
+            "sha256": "581ae329759685509503326835d499a9d4499abb75498432ed0793af843072dd"
+          },
+          "entries": {
+            "loom-mixin": {
+              "passed": false,
+              "receipt": "build/rust-test-logs/loom-mixin-current-20261121-010036124/receipt.json",
+              "receiptSha256": "acb4292e813da786e7f62b93fd85566c2e044e81cbc2b4c24d5a4ba78f6de80c",
+              "failure": "Type resolution succeeds; original definition expects the equal-content workspace mapped-sources URI.",
+              "mappedSourceRun": {
+                "passed": true,
+                "companion": "067e43508800370159f5e0582f0ecf1903d78133",
+                "companionSha256": "28ce80bbb9d7c49ec65312bff2ae43049e12bcc7bbb6c3156b2bb632b02e7aaa",
+                "commands": 4,
+                "exitCode": 0,
+                "receipt": "build/rust-test-logs/loom-mixin-mapped-20261120163121365/receipt.json",
+                "receiptSha256": "187060ed0ad48b9fe4fd7c8fd06312ef2202eb8a1c4a10758c07f62c3e730d35"
+              }
+            },
+            "real-sodium": {
+              "passed": false,
+              "receipt": "build/rust-test-logs/h117-mca178-pwsh7/receipt.json",
+              "receiptSha256": "f9f808777a6bbac86c24721cd4049f40f625ac0e379a1b491c5a3fcf202a5029",
+              "failure": "First provider evaluation invalidated by a semantic index change before acceptance.",
+              "accept120Diagnostic": {
+                "passed": false,
+                "receipt": "build/rust-test-logs/h117-mca178-accept120/receipt.json",
+                "receiptSha256": "84ca0e097bbe1edce8c3c33aca46e0dde2d552076f6bb36625540f9cd8dc3ce5",
+                "failure": "No accepted source. Two type-reference facts return in 40.9 seconds; dependency indexing continues with no publication or rejection before deadline."
+              }
+            },
+            "fabric-basic": {
+              "passed": false,
+              "receipt": "build/fabric-basic-source-recovery-20261121/build/live-20261121-010458393-3ba1bb53db7344f9b385a16b3e255b9b/receipt.json",
+              "receiptSha256": "524441b32438df14dea6e2495ae022700f39f3999361cd6db61b28cfc760aa31",
+              "failure": "Full-library readiness diagnostic times out; selected class directory fingerprint is discarded by final validation."
+            },
+            "fabric-mixinextras": {
+              "passed": false,
+              "host": "e9b46c3fd6e3540f16dbba25ba4ccafb1345a8ba",
+              "receipt": "build/fabric-mixinextras-source-recovery-20261121/run-h116-a2a4d6d-receipt.json",
+              "receiptSha256": "e9bf8c38c0524b974fd4ba1094113ce29f06452938644f371f7319bb267e855d",
+              "failure": "First seven commands return successfully; eighth reports CommandUnavailable."
+            }
+          }
+        },
+        "host118Acceptance": {
+          "host": "b5a9b5e3a6ef458bfa1a873fcb25b01d76b90179",
+          "hostSha256": "7aad8aa85e029c4cdb7252db88e69a3b7f76a437e60fd4d3e6f012cf6325926f",
+          "companion": "a2a4d6d604c213ea6a774803ce5bb84ec9bce19f",
+          "entries": {
+            "fabric-basic": {
+              "passed": false,
+              "assertionsBeforeFailure": 88,
+              "commands": 14,
+              "wholeIndexReady": true,
+              "receipt": "build/fabric-basic-source-recovery-20261121/build/live-20261121-012505833-b0717490ae3f47baaff195307068fb17/receipt.json",
+              "receiptSha256": "5e3c221de5f28b4105b1ef79d3e324187f7d44f3831c8f020a510aab90e24189",
+              "failure": "Class completion in unfinished SourceOnlyMixin has no current Mixin owner."
+            },
+            "fabric-mixinextras": {
+              "passed": false,
+              "assertionsBeforeFailure": 71,
+              "commands": 13,
+              "wholeIndexReady": true,
+              "proof": "build/rust-test-logs/fabric-mixinextras-h118-a2a4d6d/editor-proof.json",
+              "proofSha256": "ba3d356bf41e182f578638a95c6c5e56d578be5dfcb8da35c466b4a7a601a487",
+              "failure": "WrapOperation diagnostics report unavailable generic type facts."
+            }
+          }
         }
       }
     }

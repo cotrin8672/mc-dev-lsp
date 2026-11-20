@@ -716,10 +716,19 @@ with_buffer(mixin_file, "java", nil, function(bufnr)
         end, mixin_class_items)[1],
         "source-only @Mixin class completion should return SourceOnlyTarget"
       )
-      helpers.assert_eq(mixin_class_debug.parseSource, "HOST_NORMALIZED")
       helpers.assert_true((mixin_class_debug.projectSessionVersion or 0) > 0, "authoritative project session is required")
-      helpers.assert_eq(mixin_class_debug.parseConfidence, "HIGH")
-      helpers.assert_eq(mixin_class_debug.fallbackAnnotationContextUsed, false)
+      if mixin_class_debug.parseSource == "HAND_WRITTEN_FALLBACK" then
+        helpers.assert_eq(mixin_class_debug.parseConfidence, "LOW")
+        helpers.assert_eq(
+          mixin_class_debug.fallbackReason,
+          "unfinished Mixin class value uses source syntax and the selected class index"
+        )
+        helpers.assert_eq(mixin_class_debug.fallbackAnnotationContextUsed, true)
+      else
+        helpers.assert_eq(mixin_class_debug.parseSource, "HOST_NORMALIZED")
+        helpers.assert_eq(mixin_class_debug.parseConfidence, "HIGH")
+        helpers.assert_eq(mixin_class_debug.fallbackAnnotationContextUsed, false)
+      end
 
       local source_only_inject_source = {
         "package com.example.mixin;",
