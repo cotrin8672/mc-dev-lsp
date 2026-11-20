@@ -509,7 +509,14 @@ impl HostSemanticProvider {
         } else {
             false
         };
-        if partial_annotations {
+        let recovered_local =
+            if self.source_facts_v2 && partial_annotations && selected.is_none() && sites.is_some()
+            {
+                self.recovered_local_handler(&e.declarations, owner, &identities, source, &imports)
+            } else {
+                None
+            };
+        if partial_annotations && recovered_local.is_none() {
             self.require_local_annotation_completion(
                 selector_completions.as_ref(),
                 owned_selector,
@@ -539,7 +546,11 @@ impl HostSemanticProvider {
             .declarations
             .iter()
             .filter(|declaration| {
-                !target_completion && declaration.owner.as_deref() == Some(owner.id.as_str())
+                !target_completion
+                    && declaration.owner.as_deref() == Some(owner.id.as_str())
+                    && recovered_local
+                        .as_ref()
+                        .is_none_or(|(handler, _)| handler.id == declaration.id)
             })
             .filter(|declaration| {
                 declaration.annotations.iter().any(|a| {
@@ -627,6 +638,52 @@ impl HostSemanticProvider {
             ) {
                 collect_targets(argument, source, &binary_types, &mut targets)?;
             }
+        }
+        if let Some((declaration, handler)) = recovered_local {
+            let (sites, slices) = parameters::project_handler_sites(
+                declaration,
+                &handler,
+                &identities,
+                &binary_types,
+                source,
+            )?
+            .into_iter()
+            .unzip::<_, _, Vec<_>, Vec<_>>();
+            let mut handler_source = parameters::source_facts(
+                source,
+                uri,
+                &owner_type.qualified_name,
+                &targets
+                    .iter()
+                    .map(|target| target.internal_name.clone())
+                    .collect::<Vec<_>>(),
+                HostFact::Known(sites),
+            );
+            handler_source.slice_selections = slices
+                .into_iter()
+                .enumerate()
+                .filter_map(|(site_index, slice)| {
+                    slice.map(|slice| mcdev_core::extras_model::HostSliceSelection {
+                        site_index,
+                        slice,
+                    })
+                })
+                .collect();
+            let model = mcdev_core::mixin_source::MixinClassModel {
+                source_uri: uri.to_owned(),
+                package_name: owner_type.package,
+                qualified_name: owner_type.qualified_name,
+                type_kind: declaration_type_kind(owner),
+                targets,
+                host_selector_completions: selector_completions,
+                normalized_handler_source: Some(handler_source),
+                ..Default::default()
+            };
+            return self.finish_source_syntax_model(
+                model,
+                started,
+                "Local completion uses the current source parameter and normalized injector",
+            );
         }
         let queries = relevant
             .iter()

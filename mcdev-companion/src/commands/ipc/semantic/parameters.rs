@@ -6,7 +6,6 @@ use mcdev_core::{
     mixinextras_handler::HandlerSignatureService,
 };
 mod selectors;
-use selectors::project_sites;
 
 pub(super) fn source_facts(
     source: &str,
@@ -26,7 +25,117 @@ pub(super) fn source_facts(
     }
 }
 
+pub(super) fn project_handler_sites(
+    declaration: &Declaration,
+    handler: &HandlerMethodDeclaration,
+    identities: &BTreeMap<String, Fact<TypeFact>>,
+    method_binaries: &BTreeMap<String, String>,
+    source: &str,
+) -> Result<Vec<(MixinExtrasAnnotationSite, Option<HostMethodSlice>)>, FactsError> {
+    let mut sites = Vec::new();
+    for annotation in &declaration.annotations {
+        let ty = require_type(identities, &annotation.type_ref)?;
+        let Some(kind) = MixinAnnotation::from_official_fqn(&ty.qualified_name)
+            .and_then(MixinExtrasAnnotation::from_mixin_annotation)
+            .filter(|kind| kind.is_sugar_handler_injector())
+        else {
+            continue;
+        };
+        let normalized = convert_annotation(annotation, identities, method_binaries, source)?;
+        sites.extend(selectors::project_sites(
+            kind,
+            &normalized,
+            handler,
+            source,
+        )?);
+    }
+    Ok(sites)
+}
+
 impl HostSemanticProvider {
+    pub(super) fn recovered_local_handler<'a>(
+        &self,
+        declarations: &'a [Declaration],
+        owner: &Declaration,
+        identities: &BTreeMap<String, Fact<TypeFact>>,
+        source: &str,
+        imports: &JavaSourceImports,
+    ) -> Option<(&'a Declaration, HandlerMethodDeclaration)> {
+        if imports.is_kotlin {
+            return None;
+        }
+        let position = self.annotation_completion_position?;
+        let cursor = position_to_offset(source, position)?;
+        let context = AnnotationContextExtractor::extract_at_offset(source, cursor)?;
+        if context.annotation != MixinAnnotation::Local
+            || context.slot != AnnotationSlot::Value
+            || context.resolved_annotation_fqn.as_deref()
+                != Some("com.llamalad7.mixinextras.sugar.Local")
+            || !matches!(
+                context.attribute_name.as_deref(),
+                Some("ordinal" | "index" | "name")
+            )
+        {
+            return None;
+        }
+        declarations
+            .iter()
+            .filter(|declaration| {
+                declaration.owner.as_deref() == Some(owner.id.as_str())
+                    && declaration.source_kind.as_deref() == Some("Function")
+                    && declaration
+                        .parameters
+                        .as_ref()
+                        .is_none_or(|parameters| matches!(parameters, Fact::Unknown { .. }))
+            })
+            .find_map(|declaration| {
+                let header = declaration.header_range.as_ref()?;
+                if !(header.start <= cursor && cursor < header.end) {
+                    return None;
+                }
+                let has_injector = declaration.annotations.iter().any(|annotation| {
+                    identities
+                        .get(&annotation.type_ref)
+                        .and_then(Fact::found)
+                        .and_then(|ty| MixinAnnotation::from_official_fqn(&ty.qualified_name))
+                        .and_then(MixinExtrasAnnotation::from_mixin_annotation)
+                        .is_some_and(|kind| {
+                            kind.is_sugar_handler_injector()
+                                && kind != MixinExtrasAnnotation::WrapMethod
+                        })
+                });
+                if !has_injector {
+                    return None;
+                }
+                let handler = HandlerSignatureService::parse_handler_method(
+                    source,
+                    header.start,
+                    Some(imports),
+                )?;
+                if declaration.range.text(source).ok()? != handler.method_name
+                    || text_range(source, header).ok()?.end < handler.range.end
+                    || context.annotation_end_offset > header.end
+                {
+                    return None;
+                }
+                let local_range = mcdev_core::mixin_source::source_range(
+                    source,
+                    context.annotation_start_offset,
+                    context.annotation_end_offset,
+                );
+                handler
+                    .parameters
+                    .iter()
+                    .any(|parameter| {
+                        matches!(
+                            parameter.sugar_spec,
+                            Some(HandlerParameterSugarSpec::Local(_))
+                        ) && parameter.sugar_annotation_range == Some(local_range)
+                    })
+                    .then_some((declaration, handler))
+            })
+    }
+
     pub(super) fn normalized_handler_sites(
         &self,
         declaration: &Declaration,
@@ -167,19 +276,7 @@ impl HostSemanticProvider {
                         })
                 }),
             };
-        let mut sites = Vec::new();
-        for annotation in &declaration.annotations {
-            let ty = require_type(identities, &annotation.type_ref)?;
-            let Some(kind) = MixinAnnotation::from_official_fqn(&ty.qualified_name)
-                .and_then(MixinExtrasAnnotation::from_mixin_annotation)
-                .filter(|kind| kind.is_sugar_handler_injector())
-            else {
-                continue;
-            };
-            let normalized = convert_annotation(annotation, identities, method_binaries, source)?;
-            sites.extend(project_sites(kind, &normalized, &handler, source)?);
-        }
-        Ok(sites)
+        project_handler_sites(declaration, &handler, identities, method_binaries, source)
     }
 }
 
