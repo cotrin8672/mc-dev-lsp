@@ -374,6 +374,20 @@ with MC `199d74d`. The host accepts it, the original diagnostic assertions
 pass with zero diagnostics, and the host exits cleanly. See
 `build/rust-test-logs/fabric-mixinextras-h123-ordinal-diagnostics-199d74d/`.
 
+A continuation of the original sugar module from its second case passes
+all eight later cases on host `81d0b3bd` and MC `199d74d`. The original edits,
+Gradle compile steps and diagnostic assertions run in order. The editor
+records 333 assertions and 20 commands with a clean shutdown. This covers
+Local index and name, Share, and all five Cancellable cases. See
+`build/rust-test-logs/fabric-mixinextras-h123-sugar-tail-199d74d/`.
+
+A subsequent original MixinExtras whole entry uses the same host and
+companion and passes 1,085 assertions, 54 commands and 61 source acceptances,
+including expression, sugar, generated handlers and the original compile
+steps. The editor and host exit cleanly. Eight of the nine original whole
+entries now have passing evidence. See
+`build/rust-test-logs/fabric-mixinextras-h123-81d0b3bd-199d74d-pass/receipt.json`.
+
 The whole entry with the same binaries stops earlier, after 277 assertions
 and 19 commands. The next code action at `jdtls_bundle_e2e.lua:1359` waits for
 editor source version 21 and reaches the original readiness deadline.

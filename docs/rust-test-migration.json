@@ -64841,11 +64841,11 @@
       "remainingWholeEditorGates": [
         {
           "fixture": "fabric-basic",
-          "status": "65 original assertions pass; Inject owner-coverage failure under investigation"
+          "status": "Passed original whole entry with host119 and MC 42b0155"
         },
         {
           "fixture": "fabric-mixinextras",
-          "status": "whole expression/sugar compile/edit workflow pending"
+          "status": "Passed original whole entry with host 81d0b3bd and MC 199d74d"
         },
         {
           "fixture": "fabric-aw-at",
@@ -64861,7 +64861,7 @@
         },
         {
           "fixture": "fabric-loom-e2e",
-          "status": "mapped source definition URI/owner/range whole entry pending"
+          "status": "Passed original whole entry with host117"
         },
         {
           "fixture": "create-drill-definition-diagnostics",
@@ -64869,7 +64869,7 @@
         },
         {
           "fixture": "real-sodium",
-          "status": "materialized; original GuiMixin workflow awaiting host112 self-watch correction"
+          "status": "Original GuiMixin entry awaiting stable ktlsp library indexing and source acceptance"
         },
         {
           "fixture": "real-cem",
@@ -65380,6 +65380,24 @@
                 "proof": "build/rust-test-logs/fabric-mixinextras-h121-primitive-d8414e4/editor-proof.json",
                 "proofSha256": "64109a3951a0b9f6206c3bec269c8b24c465127fee325f35859410d318abc1a3"
               }
+            }
+          }
+        },
+        "host123MixinExtrasAcceptance": {
+          "host": "81d0b3bd9525e7d63af16f23f4b44f876c3bcd70",
+          "hostSha256": "1a518188495171a297946e92c3334a334a9815422ae6015c98940dac5ea105a0",
+          "companion": "199d74d60c74dfd2bda6e1a91488d2cef58bf1f7",
+          "companionSha256": "0f16c2468bd020eb0afb94a57fb278d5158b942d8f0b2f099783f0c95b2a1488",
+          "entries": {
+            "fabric-mixinextras": {
+              "passed": true,
+              "recordedAssertions": 1085,
+              "commands": 54,
+              "acceptances": 61,
+              "cleanHostShutdown": true,
+              "proof": "build/rust-test-logs/fabric-mixinextras-h123-81d0b3bd-199d74d-pass/editor-proof.json",
+              "proofSha256": "4f9f98cc22c7bebbe3a57990189f683ca1f6a37e5469a5c9f8274ec2ce282aa3",
+              "traceSha256": "cd05b3edd6de5cb57482e657b83c80edf675c31bb5eda85c66bfeba028e23a06"
             }
           }
         }
