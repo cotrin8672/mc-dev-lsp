@@ -334,6 +334,25 @@ facts. `annotationSites` reports `UnsupportedSource` coverage and returns
 only `@Mixin`, `@ModifyExpressionValue`, and `@At`. See
 `build/rust-test-logs/fabric-mixinextras-h121-sugar-wire-7cd771f/local-ordinal-facts.json`.
 
+MC `199d74d` recovers the edited parameter with the existing Java handler
+parser and descriptor resolver. The cursor, parameter annotation and
+method header must match the current host-owned Mixin handler.
+The projected site uses the host's injector and target selectors.
+On the captured buffer, the restored parameter has the LocalFloatRef
+descriptor and the ordinal remains unset. The focused original sugar test
+returns ordinal candidates 0 and 1, applies 0 and compiles the changed
+fixture. The host accepts the changed source at evaluation 18. The next
+diagnostics command receives `CommandUnavailable` before companion
+dispatch, ending that run after 43 assertions and 3 commands. See
+`build/rust-test-logs/fabric-mixinextras-h121-sugar-recovery-199d74d/`.
+The unchanged whole entry also returns candidates 0 and 1 at command 42.
+Its 600-second outer limit ends the run after 708 recorded assertions and
+42 commands. The editor proof ends before the following diagnostics command.
+See `build/rust-test-logs/fabric-mixinextras-h121-local-recovery-199d74d-full/`.
+Windows passes all 1,950 Rust tests across 86 targets, the companion build
+and the Neovim suite on `199d74d`. See
+`build/rust-test-logs/20261121-043432051/summary.txt`.
+
 The host122 Sodium diagnostic reaches the blocking worker in about 2 ms.
 In evaluation 3, the source plan lock waits 1.123 seconds and the plan is
 unavailable. The worker exits with Stale during resource capture after about
