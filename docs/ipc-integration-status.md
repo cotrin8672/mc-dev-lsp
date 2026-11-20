@@ -410,6 +410,13 @@ misses the graceful shutdown deadline and the runner terminates its owned
 process tree. See
 `build/rust-test-logs/real-sodium-h123-indexed-81d0b3bd-199d74d/`.
 
+The Windows x86_64 release archive built from `7afcdd1` passes the native
+capability and stdio smoke checks. Independent ZIP inspection verifies all
+24 manifest payload entries. The archive is
+`build/release/native-verification-7afcdd1/mcdev-companion-0.7.7-windows-x86_64.zip`
+with SHA-256 `89d6687be8be00aa1e3ed4d1f29ebc00ca81d9ed57209aa71ec379ac41d9621c`.
+See `build/rust-test-logs/native-release-20261121-051146328/summary.txt`.
+
 On Windows, `42b0155` passes 1,948 Rust tests across 86 targets including
 doc tests. Formatting, the companion build and the Neovim suite also pass.
 See `build/rust-test-logs/20261121-021831690/summary.txt`.
