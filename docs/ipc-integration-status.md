@@ -84,6 +84,30 @@ an omitted or unsupported list does not establish a zero-parameter callable.
 
 ## Follow-up acceptance checkpoints
 
+### November 21 resume on host115
+
+CI42015884348 verifies MC commit `ed89ab4` on Windows (1,942 functions) and
+Linux (1,941 functions), with 83 targets, all 2,604 original case locators,
+2,748 replacement references, five editor entries and both native packages.
+See `build/rust-test-logs/ci-ed89ab4/ci-summary.json`.
+
+The saved multi-source-set run on host115 and MC `ed89ab4` reaches
+`rootFileInventory`, where an excluded `.gradle/9.6.1/fileChanges` Windows
+`Modify(Any)` event invalidates the resource inventory. The requested source,
+document version and analysis generation are unchanged. ktlsp is correcting
+this event handling in its existing root watcher. Fabric basic passes Info and
+reaches the original Inject completion before a later Stale. AW/AT, Forge and
+MixinExtras also stop on Stale in their saved runs. Real Sodium reaches project
+readiness but has no accepted GuiMixin source publication before the deadline.
+
+The original Loom definition still returns no location with host115 and
+MC `ed89ab4`, after the project's libraries finish indexing. Its saved error's
+`annotationType` field and the reason payload digest identify `@Mixin` itself as
+`unsupportedType`. This is a distinct finding from the class-literal failure
+in the source-set matrix. See `build/rust-test-logs/loom-mixin-wire-20261121-003019306/`.
+The transport recorder did not attach in that run. The definition error is
+recorded in the editor proof.
+
 ### Original source-query and startup behavior restored
 
 The first project-ready runs exposed a separate consumer DTO bug:

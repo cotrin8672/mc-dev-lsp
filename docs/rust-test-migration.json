@@ -63463,7 +63463,7 @@
     },
     "resumedIntegration": {
       "date": "2026-11-05",
-      "status": "native-and-distribution-CI-passed; original-Create-and-CEM-whole-entries-passed; seven-whole-editor-gates-incomplete",
+      "status": "Original Rust cases pass on Windows and Linux; Create and CEM whole editor entries pass; seven original whole editor entries remain unverified.",
       "hostPin": "8ea5de1b65acbf396474f1ac2b225f7da2d9ca8f",
       "hostReceipt": "build/host-artifacts/candidate115-814daeb5dd26/copy-receipt.json",
       "hostSerializerFixture": "mcdev-companion/tests/fixtures/host_inputs/root_files/actual-serializer-sample.json",
@@ -65011,6 +65011,33 @@
         "allOriginalCasesPassed": true,
         "editorEntries": 5,
         "verifiedPackageFilesPerPlatform": 24
+      },
+      "publishedProjectIndexCi": {
+        "commit": "ed89ab42668e06073825d7ce12885c2253583904",
+        "run": 42015884348,
+        "summary": "build/rust-test-logs/ci-ed89ab4/ci-summary.json",
+        "sha256": "b467482d9b893d767ed1f5b626fcacde2f28979f53f2f6205b2fd32e0a0f4fc5",
+        "windowsFunctions": 1942,
+        "linuxFunctions": 1941,
+        "originalCases": 2604
+      },
+      "resume20261121": {
+        "host": "8ea5de1b65acbf396474f1ac2b225f7da2d9ca8f",
+        "companion": "ed89ab42668e06073825d7ce12885c2253583904",
+        "rootInventory": {
+          "failure": "Windows Modify(Any) under the resource filter's excluded .gradle/9.6.1/fileChanges invalidates root-capture-attach; unchanged document and analysis generation",
+          "trace": "build/matrix-whole-20261105/multi-source-set-final-adapter-20261105/build/live-20261105-200704430-04c06317b90c47ef9971dce604ae2b85/host.trace.jsonl"
+        },
+        "loom": {
+          "failure": "Post-index definition receives unsupportedType for annotation Mixin; original definition location assertion fails",
+          "proof": "build/rust-test-logs/loom-mixin-wire-20261121-003019306/editor-proof.json",
+          "reasonPayloadSha256": "a19ceb190542ef1b52416efbc88d91983b4ad3fc773552ae66bae4a0203e0016",
+          "wireCaptured": false
+        },
+        "sodium": {
+          "failure": "No accepted GuiMixin source before first command",
+          "receipt": "build/rust-test-logs/h115-mca61/recovery-and-run-receipt.json"
+        }
       }
     }
   }

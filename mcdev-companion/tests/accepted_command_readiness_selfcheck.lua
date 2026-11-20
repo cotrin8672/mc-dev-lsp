@@ -297,6 +297,25 @@ local ok, failure = xpcall(function()
   end
   _G.mcdev_record_assertion = outer_record
   assert(flushes > 0 and #waits > 0)
+
+  local function check_indexing(project, libraries)
+    clock, scheduled = 0, {}
+    local probe = readiness.start({ trace = 'mock.trace', proof = 'mock-proof.json', timeout = 1, fixture = 'real-cem' })
+    if project then probe:log_message('ktlsp indexed 1 project files') end
+    if libraries then probe:log_message('ktlsp indexed 2 library files') end
+    local passed, err = pcall(probe.wait_indexed, probe)
+    local indexing = vim.deepcopy(probe.proof.indexing)
+    probe:close()
+    vim.api.nvim_del_autocmd(probe.leave_autocmd)
+    return passed, indexing, err
+  end
+  local project_ok, project_indexing = check_indexing(true, false)
+  assert(project_ok and project_indexing.projectReady and not project_indexing.libraries
+    and not project_indexing.wholeIndexReady,
+    'project readiness must not require the background library index')
+  local no_project_ok, _, no_project_error = check_indexing(false, false)
+  assert(not no_project_ok and tostring(no_project_error):find('host project indexing did not finish', 1, true),
+    'missing project readiness must fail closed')
   assert(vim.fn.filereadable('mock-proof.json') == 0, 'mock output cannot become live-host evidence')
 end, debug.traceback)
 for _, state in ipairs(states) do
