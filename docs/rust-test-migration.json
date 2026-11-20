@@ -65178,6 +65178,23 @@
                 "receipt": "build/fabric-basic-source-recovery-20261121/build/live-20261121-021002088-5e70dcf870014aeb8f9a698ec2e06b6d/receipt.json",
                 "receiptSha256": "fa6ad9e4548dc79681608ac596ccd24a9697dd1374902382cc3cfdfd7b729e3c",
                 "failure": "Handler snippet passes. The AW unresolved-class check cannot prove absence because the host current-source inventory coverage is incomplete."
+              },
+              "awInventoryWire": {
+                "passed": false,
+                "companion": "42b015530ec9b81ad66b3a8019730ae4fd2ab059",
+                "host": "b5a9b5e3a6ef458bfa1a873fcb25b01d76b90179",
+                "assertionsBeforeFailure": 141,
+                "commands": 20,
+                "inputHashesStable": true,
+                "cleanHostShutdown": true,
+                "evaluation": 105,
+                "lastMixinPublicationEvaluation": 86,
+                "mixinSnippetCompletionEvaluation": 91,
+                "receipt": "build/fabric-basic-source-recovery-20261121/build/live-20261121-022524355-0f1f356df28c41008419a51630d7c4a7/receipt.json",
+                "receiptSha256": "46a9b8b2f69ba09b5bdcc538e7949185e53e50cf88cd561e75dc28698e281418",
+                "facts": "build/fabric-basic-source-recovery-20261121/build/live-20261121-022524355-0f1f356df28c41008419a51630d7c4a7/aw-inventory-facts.json",
+                "factsSha256": "0ba6849e211f1c4c26585f390d03ca3477f77bd901fc35219582ad6d31bb5eee",
+                "failure": "The complete main compile task lists ExampleMixin.java, but the main inventory omits that file and cannot establish class absence."
               }
             },
             "fabric-mixinextras": {
@@ -65215,6 +65232,9 @@
                 "cleanHostShutdown": true,
                 "proof": "build/rust-test-logs/fabric-mixinextras-h118-42b0155/editor-proof.json",
                 "proofSha256": "23d73d6fc26e1be1abd71a4eb48129ec4b542485f5e0762c09436277d7ca5d6a",
+                "lastMixinPublicationEvaluation": 150,
+                "lastMixinPublicationRevision": 140,
+                "lastMixinCommandChildResponseEvaluation": 154,
                 "failure": "Handler-less WrapMethod generation, edits and fixture compilation succeed. The next generated-handler action cannot start before the exact current owner/source revision is accepted."
               }
             }

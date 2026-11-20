@@ -177,6 +177,18 @@ remaining AW unresolved-class check receives incomplete current-source
 inventory coverage. A definite missing-class diagnostic requires source
 absence in the selected project.
 
+A wire capture with MC `42b0155` and host118 reproduces the same AW
+failure with stable fixture hashes. The main source inventory includes
+`ExampleMixin.java` at evaluation 76. It omits that file at evaluations
+101 and 105, although the complete `:compileJava` task at evaluation
+105 still lists it. The final main inventory page reports `MissingFacts`,
+and the requested missing class resolves to `IncompleteScope`.
+The last `ExampleMixin.java` publication is evaluation 86. Its handler
+completion returns in evaluation 91 at document version 8, before the
+editor expands the snippet. No later evaluation for that owner appears
+before the AW entry.
+See `build/fabric-basic-source-recovery-20261121/build/live-20261121-022524355-0f1f356df28c41008419a51630d7c4a7/aw-inventory-facts.json`.
+
 MC `3fc0b87` recovers the Java `Operation<Integer>` type argument from the
 same checked handler source. MixinExtras reports the original wrong-return
 diagnostic, offers the signature fix, and reaches handler-less WrapMethod
@@ -195,10 +207,17 @@ applies generated edits and compiles the fixture. It records 234 assertions
 and 18 command replies before waiting for the next edited source revision.
 The host never accepts the exact owner/source digest for the next generation
 command before the editor deadline. The editor records a clean host exit.
+The last publication for `MixinExtrasExample.java` is evaluation 150
+(publication 140). The command using that same source reaches child response
+in evaluation 154. Later publications 155–162 are for JDK sources, and the
+subsequent stale evaluation 163 is for JDK `MethodHandles.java`. The saved
+trace contains no new evaluation for the edited mixin after command 154.
 
 On Windows, `42b0155` passes 1,948 Rust tests across 86 targets including
 doc tests. Formatting, the companion build and the Neovim suite also pass.
 See `build/rust-test-logs/20261121-021831690/summary.txt`.
+The published `9d3926f` also passes both Windows and Linux jobs in
+[CI44782938521](https://github.com/cotrin8672/mc-dev-lsp/actions/runs/44782938521).
 
 ### Original source-query and startup behavior restored
 
