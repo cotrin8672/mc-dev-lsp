@@ -562,6 +562,26 @@ continuation speedup from the refresh. The host exits cleanly with no
 original completion assertions reached.
 See `build/rust-test-logs/sodium-original-889bdb0-7dd526d/editor-proof.json`.
 
+The published host `c1baeec3` reaches exact GuiMixin acceptance and repeats
+the overly broad resource guard invalidation from a Gradle HTML report
+removal. Only one root inventory request precedes the failure. The
+companion always reads the resource inventory first and excludes `build`
+from it. The mapping inventory has not started at that point. Host pins
+`03f320af` and `3499402d` restrict filtering of ambiguous removal and
+creation events to strict descendants of already excluded directories,
+preserving directory boundary, exact-input, rename and rescan handling.
+A Windows native test observes real notifications for both events.
+
+The original entry using `3499402d` has no native-watch invalidation,
+project refresh or root guard failure. Exact source acceptance and
+`mcdev.info` dispatch succeed. Reading two root inventories and 35
+snapshots then exhausts the first request's time budget. Cached continuation
+spans have a median of 655.586 ms while dependency installation is active.
+The separate captured-command replay returns all 36 info lines after 91
+snapshot queries in 3.228 s (debug) and 1.434 s (release). The remaining
+live bottleneck is retrieving pages while dependency indexing holds the
+workspace lock. See `build/rust-test-logs/sodium-original-3499402d-7dd526d/`.
+
 A captured Sodium command replay feeds the same recorded host responses for
 evaluation 444 to both companions. MC `e280fc7` reproduces the extension handle
 error after 1,653 source-fact queries. MC `a1f77b9` reads two source facts and
