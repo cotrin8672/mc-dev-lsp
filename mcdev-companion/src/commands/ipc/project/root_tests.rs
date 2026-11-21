@@ -564,7 +564,16 @@ fn root_files_restore_workspace_discovery_without_broadening_compiler_inputs() {
             || source.document_uri.ends_with(".JAVA")
             || source.document_uri.ends_with("/outside.aw")));
     assert_eq!(selected.source_snapshots.len(), 2);
-    assert_eq!(selected.owner_sources.inventory.entries.len(), 1);
+    assert_eq!(
+        selected
+            .owner_sources
+            .as_ref()
+            .unwrap()
+            .inventory
+            .entries
+            .len(),
+        1
+    );
     assert!(!reads
         .lock()
         .unwrap()
@@ -847,6 +856,25 @@ fn full_context_commands_use_attested_root_data_without_inventing_type_or_code_a
 }
 
 #[test]
+fn java_injector_method_completion_defers_compiler_snapshots() {
+    let workspace = unique_root();
+    let request = command(
+        &workspace,
+        "mcdev.completion",
+        r#"@Mixin(game.Target.class) class Patch { @Redirect(method = "ren|", at = @At("HEAD")) void handler() {} }"#,
+        "module/src/main/java/Patch.java",
+        "java",
+        &[],
+    );
+    let reader = RootReader::new(&workspace).metadata_only();
+    let reads = reader.compiler_reads.clone();
+    let project = project_for_command(reader, &request).unwrap();
+    assert!(reads.lock().unwrap().is_empty());
+    assert!(project.owner_sources.is_none() && project.source_snapshots.is_empty());
+    assert!(project.owner_source_scope.is_some());
+}
+
+#[test]
 fn metadata_commands_skip_compiler_capture_without_changing_dtos_or_refresh_authority() {
     use mcdev_core::expression_engine::NO_CANCELLATION;
     let workspace = unique_root();
@@ -873,14 +901,8 @@ fn metadata_commands_skip_compiler_capture_without_changing_dtos_or_refresh_auth
             let reader = RootReader::new(&workspace).metadata_only();
             let reads = reader.compiler_reads.clone();
             let selected = project_for_command(reader, &request).unwrap();
-            assert!(
-                selected.source_snapshots.is_empty() && selected.owner_sources.snapshots.is_empty()
-            );
-            assert!(selected.owner_sources.inventory.entries.is_empty());
-            assert!(
-                matches!(selected.owner_sources.inventory.coverage,Fact::Unknown {ref reasons}
-                if reasons[0]["code"]=="NotRequested")
-            );
+            assert!(selected.source_snapshots.is_empty());
+            assert!(selected.owner_sources.is_none());
             assert!(matches!(selected.sources, HostFact::Unavailable { .. }));
             assert!(matches!(
                 selected
@@ -938,10 +960,25 @@ fn non_metadata_commands_keep_all_compiler_inventory_and_snapshot_reads() {
             ]
         );
         assert_eq!(selected.source_snapshots.len(), 2);
-        assert_eq!(selected.owner_sources.snapshots.len(), 1);
-        assert_eq!(selected.owner_sources.inventory.entries.len(), 1);
+        assert_eq!(selected.owner_sources.as_ref().unwrap().snapshots.len(), 1);
         assert_eq!(
-            selected.owner_sources.inventory.coverage.found(),
+            selected
+                .owner_sources
+                .as_ref()
+                .unwrap()
+                .inventory
+                .entries
+                .len(),
+            1
+        );
+        assert_eq!(
+            selected
+                .owner_sources
+                .as_ref()
+                .unwrap()
+                .inventory
+                .coverage
+                .found(),
             Some(&Value::Null)
         );
     }

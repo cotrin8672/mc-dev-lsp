@@ -52,7 +52,8 @@ pub(crate) struct SelectedProject {
     pub references_complete: bool,
     /// Positive accepted snapshots retain their host-issued descriptor for sourceFacts.
     pub source_snapshots: Vec<(SourceEntry, SourceSnapshot)>,
-    pub owner_sources: CapturedSources,
+    pub owner_sources: Option<CapturedSources>,
+    pub owner_source_scope: Option<ProjectSourceSet>,
 }
 
 pub(crate) struct CapturedSources {
@@ -594,22 +595,15 @@ fn selected_project_inner<R: FactReader>(
         || vec![None],
         |model| model.scopes.iter().map(Some).collect(),
     );
+    let owner_source_scope = scopes
+        .iter()
+        .copied()
+        .flatten()
+        .find(|candidate| candidate.descriptor.name == scope.source_set)
+        .cloned();
     let mut provider = SnapshotProvider::default();
     let mut source_snapshots = vec![];
-    let mut owner_sources = if needs.compiler_sources {
-        None
-    } else {
-        Some(CapturedSources {
-            inventory: Inventory {
-                entries: vec![],
-                coverage: Fact::Unknown {
-                    reasons: vec![serde_json::json!({"code":"NotRequested",
-                        "detail":"metadata command does not request compiler source capture"})],
-                },
-            },
-            snapshots: vec![],
-        })
-    };
+    let mut owner_sources = None;
     let mut source_paths = BTreeSet::new();
     // projectContext.module is a Gradle path; issued memberships use semantic module identities.
     let mut compiler_module = None;
@@ -1026,6 +1020,11 @@ fn selected_project_inner<R: FactReader>(
         cache_hit: false,
         fingerprint: evaluation.to_owned(),
     };
+    if needs.compiler_sources && owner_sources.is_none() {
+        return Err(FactsError::Protocol(
+            "evaluation owner source inventory is unavailable".into(),
+        ));
+    }
     Ok(SelectedProject {
         cached_session,
         sources: if references_complete {
@@ -1051,9 +1050,8 @@ fn selected_project_inner<R: FactReader>(
         mapping_complete,
         references_complete,
         source_snapshots,
-        owner_sources: owner_sources.ok_or_else(|| {
-            FactsError::Protocol("evaluation owner source inventory is unavailable".into())
-        })?,
+        owner_sources,
+        owner_source_scope,
     })
 }
 
@@ -1373,12 +1371,23 @@ mod tests {
                 [root.join("libs/minecraft-mapped.jar")]
             );
             assert_eq!(selected.source_snapshots.len(), 2);
-            assert_eq!(selected.owner_sources.inventory.entries.len(), 1);
             assert_eq!(
-                selected.owner_sources.inventory.entries[0].descriptor.id,
+                selected
+                    .owner_sources
+                    .as_ref()
+                    .unwrap()
+                    .inventory
+                    .entries
+                    .len(),
+                1
+            );
+            assert_eq!(
+                selected.owner_sources.as_ref().unwrap().inventory.entries[0]
+                    .descriptor
+                    .id,
                 "source-main"
             );
-            assert_eq!(selected.owner_sources.snapshots.len(), 1);
+            assert_eq!(selected.owner_sources.as_ref().unwrap().snapshots.len(), 1);
             assert!(matches!(selected.sources, HostFact::Unavailable { .. }));
             assert!(!selected.project_complete);
             assert!(!selected.config_selection_complete);
@@ -1471,7 +1480,14 @@ mod tests {
             assert_eq!(selected.source_snapshots.len(), 2);
             assert!(!selected.project_complete);
             assert_eq!(
-                selected.owner_sources.inventory.coverage.found().is_some(),
+                selected
+                    .owner_sources
+                    .as_ref()
+                    .unwrap()
+                    .inventory
+                    .coverage
+                    .found()
+                    .is_some(),
                 missing_model
             );
             assert_eq!(selected.cached_session.context.source_sets.len(), 2);
@@ -1575,7 +1591,16 @@ mod tests {
             assert_eq!(selected.cached_session.context.project_id, ":demo");
             assert_eq!(selected.cached_session.context.source_sets.len(), 2);
             assert_eq!(selected.source_snapshots.len(), 3);
-            assert_eq!(selected.owner_sources.inventory.entries.len(), 2);
+            assert_eq!(
+                selected
+                    .owner_sources
+                    .as_ref()
+                    .unwrap()
+                    .inventory
+                    .entries
+                    .len(),
+                2
+            );
             let shared = selected
                 .source_snapshots
                 .iter()

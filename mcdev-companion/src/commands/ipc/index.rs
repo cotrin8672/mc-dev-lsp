@@ -6,8 +6,8 @@ use crate::{
         bridge::FactReader,
         draft::{RawAbi, TypeJvm},
         inputs::{
-            CatalogAssociation, CatalogEntry, Inventory, ScopedInputs, SourceEntry, SourceFacts,
-            SourceProvenance, SourceSnapshot,
+            CatalogAssociation, CatalogEntry, Inventory, ProjectSourceSet, ScopedInputs,
+            SourceEntry, SourceFacts, SourceProvenance, SourceSnapshot,
         },
         FactsError,
     },
@@ -80,6 +80,7 @@ pub struct EvaluationIndex<R: EvaluationFactReader = CommandFacts> {
     source: Option<Arc<dyn ProjectSourceQuery>>,
     source_evaluation: Option<String>,
     source_inputs: Option<source::CurrentSourceInputs>,
+    owner_source_scope: Option<ProjectSourceSet>,
     source_provenance_enabled: bool,
     owned_output_origins: BTreeSet<String>,
 }
@@ -98,6 +99,7 @@ impl<R: EvaluationFactReader> EvaluationIndex<R> {
             source: None,
             source_evaluation: None,
             source_inputs: None,
+            owner_source_scope: None,
             source_provenance_enabled: false,
             owned_output_origins: BTreeSet::new(),
         }
@@ -117,6 +119,12 @@ impl<R: EvaluationFactReader> EvaluationIndex<R> {
 
     pub fn with_source_provenance(mut self, enabled: bool) -> Self {
         self.source_provenance_enabled = enabled;
+        self
+    }
+
+    /// Use the issued owner source-set scope when its compiler inventory is deferred.
+    pub fn with_owner_source_scope(mut self, scope: Option<ProjectSourceSet>) -> Self {
+        self.owner_source_scope = scope;
         self
     }
 

@@ -343,11 +343,6 @@ fn execute_inner(
     if source_facts_enabled && source_locations_enabled {
         index = index
             .with_current_source_facts(&validated.evaluation.evaluation)
-            .with_current_source_inventory(
-                project.owner_sources.inventory,
-                project.owner_sources.snapshots,
-                None,
-            )
             .with_owned_output_origins(
                 selected_classpath
                     .into_iter()
@@ -366,6 +361,12 @@ fn execute_inner(
                     .map(|entry| entry.id)
                     .collect(),
             );
+        index = match project.owner_sources {
+            Some(sources) => {
+                index.with_current_source_inventory(sources.inventory, sources.snapshots, None)
+            }
+            None => index.with_owner_source_scope(project.owner_source_scope),
+        };
     }
     let index = Arc::new(index);
     let runtime_index = Arc::new(index.physical_view());

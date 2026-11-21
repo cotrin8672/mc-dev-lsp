@@ -43,6 +43,10 @@ impl DiscoveryNeeds {
         references: false,
         compiler_sources: true,
     };
+    const METHOD_SELECTOR: Self = Self {
+        compiler_sources: false,
+        ..Self::NONE
+    };
     const CONTEXT: Self = Self {
         resources: true,
         mappings: true,
@@ -130,17 +134,25 @@ impl DiscoveryNeeds {
                         Self::NONE
                     }
                 }
-                None => {
-                    if site.is_some_and(|c| {
-                        c.annotation == MixinAnnotation::Share
-                            && c.slot == AnnotationSlot::Value
-                            && c.attribute_name.as_deref() != Some("namespace")
-                    }) {
+                None => match site {
+                    Some(site)
+                        if site.annotation == MixinAnnotation::Share
+                            && site.slot == AnnotationSlot::Value
+                            && site.attribute_name.as_deref() != Some("namespace") =>
+                    {
                         Self::RESOURCES
-                    } else {
-                        Self::NONE
                     }
-                }
+                    Some(site)
+                        if context.language_id == "java"
+                            && site.annotation.is_injector()
+                            && site.slot == AnnotationSlot::Method =>
+                    {
+                        // The owner is already supplied as an exact host evaluation. Defer
+                        // other sources until the index needs to disambiguate a target.
+                        Self::METHOD_SELECTOR
+                    }
+                    _ => Self::NONE,
+                },
             },
             DecodedCommand::Definition(_) | DecodedCommand::Hover(_) => match file_type {
                 Some(AwAtFileType::AccessWidener) => {

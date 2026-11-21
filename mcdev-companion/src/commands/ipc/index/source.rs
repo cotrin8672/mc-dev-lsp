@@ -655,7 +655,10 @@ impl<R: EvaluationFactReader> EvaluationIndex<R> {
         }
         let inventory = match &self.source_inputs {
             Some(inputs) => inputs.inventory.clone(),
-            None => self.with_inputs(|inputs| inputs.source_inventory())?,
+            None => self.with_inputs(|inputs| match &self.owner_source_scope {
+                Some(scope) => inputs.source_inventory_in(scope),
+                None => inputs.source_inventory(),
+            })?,
         };
         if !matches!(inventory.coverage, Fact::Found { value: Value::Null }) {
             return Err(unknown("current source inventory coverage is incomplete"));
