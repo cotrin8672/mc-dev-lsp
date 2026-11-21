@@ -515,6 +515,15 @@ semantic-index validation failures, and the host exits cleanly. The original
 Sodium entry remains pending. See
 `build/rust-test-logs/sodium-original-2d9cf009-a1f77b9/`.
 
+A captured Sodium command replay feeds the same recorded host responses for
+evaluation 444 to both companions. MC `e280fc7` reproduces the extension handle
+error after 1,653 source-fact queries. MC `a1f77b9` reads two source facts and
+returns the single `renderCameraOverlays` completion with a host-normalized
+context. Headless Neovim applies its UTF-16 edit through the plugin's normal
+item conversion and restores the original buffer. Live startup acceptance
+still depends on ktlsp accepting the owner snapshot before the first command.
+See `build/rust-test-logs/sodium-captured-command-a1f77b9/`.
+
 The Windows x86_64 release archive built from `7afcdd1` passes the native
 capability and stdio smoke checks. Independent ZIP inspection verifies all
 24 manifest payload entries. The archive is

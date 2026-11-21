@@ -65430,6 +65430,27 @@
             }
           }
         },
+        "sodiumCapturedCommandReplay": {
+          "mode": "recorded-host-fact-replay",
+          "evaluation": "444",
+          "sourceSha256": "f5e6f89d0ec0f589a09cf35b21b549afe9b3da4e24ee59a2b4b097f33fe52d4e",
+          "comparison": {
+            "e280fc7": {
+              "sourceFactQueries": 1653,
+              "result": "extension-handle-limit"
+            },
+            "a1f77b9": {
+              "sourceFactQueries": 2,
+              "result": "renderCameraOverlays",
+              "neovimEditRestoredOriginal": true
+            }
+          },
+          "receipts": {
+            "sodium-captured-command-e280fc7/receipt.json": "e6f436b124f3c4631dcc3f48356901870274ba0b6440574182deb27f8b54c13c",
+            "sodium-captured-command-a1f77b9/receipt.json": "3c6c15053aec6103b65f624b024d4e7f8cf39f1c05c004c4f04a4b870b7e1e00",
+            "sodium-captured-command-a1f77b9/edit-proof.json": "a1b5a1c487489384fc8c7a140ff593b7a598b43c7c496e4c6af47974d7e47b34"
+          }
+        },
         "host123MixinExtrasAcceptance": {
           "host": "81d0b3bd9525e7d63af16f23f4b44f876c3bcd70",
           "hostSha256": "1a518188495171a297946e92c3334a334a9815422ae6015c98940dac5ea105a0",
