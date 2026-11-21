@@ -566,6 +566,13 @@ item conversion and restores the original buffer. Live startup acceptance
 still depends on ktlsp accepting the owner snapshot before the first command.
 See `build/rust-test-logs/sodium-captured-command-a1f77b9/`.
 
+The Windows x86_64 package rebuilt from `48bc80c` incorporates the
+source-publication optimization. Its 24 payload hashes, capability smoke
+and stdio smoke pass. The extracted executable passes both the recorded
+Sodium source evaluation and command replays. Archive SHA-256
+`8091e2701fc4dacc77d6ab8aec13a169ba95529e03997227c7039239d43697ce`.
+See `build/rust-test-logs/native-release-20261121-104157589/summary.txt`.
+
 The Windows x86_64 package from `c7155d0` advertises the negotiated
 `sourceProvenance` operation in its manifest. Capability and stdio smoke
 tests pass. Independent ZIP verification checks all 24 payload hashes and
