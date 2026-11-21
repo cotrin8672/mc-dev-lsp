@@ -548,6 +548,11 @@ original completion and editing assertions remain outstanding.
 See `build/rust-test-logs/sodium-original-f64fdc1-7dd526d/timing-summary.json`
 and `build/rust-test-logs/sodium-original-6a11da1-7dd526d/editor-proof.json`.
 
+ktlsp integrated the three source-publication changes in published commit
+`c1baeec3be918675ef8aab3b2bfd697b0de10b89`. The production source diff from
+the tested host `6a11da1` is one whitespace change. The ktlsp library
+suite passes 802 tests. Root-file watch behavior remains as before.
+
 The root-continuation probe `889bdb0` processes 29 of 47 snapshot
 queries through the cached single-lock continuation path. That startup
 also sees a forced dependency refresh for `common/build/resources/boot/META-INF`.
