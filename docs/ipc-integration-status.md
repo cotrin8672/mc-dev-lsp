@@ -1762,3 +1762,17 @@ The completion received one provider reply and returned zero items after
 its readiness timeout. Info still reported incomplete project context, and
 the host exited cleanly.
 See `build/rust-test-logs/external-mod-promotion/lithium-public-ea026cf5/`.
+
+In the previous run, the first command looked up `@Mixin` at 22.328 s.
+The selected `sponge-mixin` library installed its 465 files at 45.013 s,
+and a later source publication resolved Mixin and Shadow in the same
+edited buffer. MC `4b6d0a0` preserves the type checks and uses the existing
+ktlsp index progress end to retry the pending completion command. It keeps
+the original project-only startup gate and the existing deadlines.
+The single rerun with ktlsp `ea026cf5` and companion `f90eee5` passed all
+18 assertions. The initial annotation type remained Unknown. The same
+version and source hash returned a positive completion at 63.223 s after
+indexing ended. The warm completion and both edit round trips also passed,
+as did Java hover and clean shutdown. The startup info call still returned
+`INCOMPLETE_PROJECT_CONTEXT`.
+See `build/rust-test-logs/external-mod-promotion/lithium-index-end-4b6d0a0/`.
