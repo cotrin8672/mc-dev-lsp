@@ -531,6 +531,23 @@ suite reports 1,953 passing tests including doc tests; the companion build
 and Neovim suite pass. See `build/rust-test-logs/20261121-095757872/summary.txt`
 and `build/rust-test-logs/sodium-publication-7dd526d/receipt.json`.
 
+Two ktlsp lock-reduction probes (`b160f44`, `f64fdc1`) retain the
+original startup gate. The latter sends the first fact reply after a median
+0.529 ms, while the finish lock waits a median 414.698 ms, with 0 of 26
+finishes succeeding. This separates reply delivery from publication.
+
+Adding a one-time 20-ms dependency installation handoff for a current
+open-source evaluation in ktlsp `6a11da1` yields six handoffs and six
+successful commits. The finish-lock median drops to 0 ms. The original
+startup first publishes exact GuiMixin at evaluation 3 (+11.878 s); the
+Neovim receipt observes the next exact publication at evaluation 4
+(+11.894 s). Nine `mcdev.info` requests reach the host. The preflight
+still times out. The first dispatched read loses the root-file input guard,
+and a later dispatch reads 34 root file pages before cancellation. The
+original completion and editing assertions remain outstanding.
+See `build/rust-test-logs/sodium-original-f64fdc1-7dd526d/timing-summary.json`
+and `build/rust-test-logs/sodium-original-6a11da1-7dd526d/editor-proof.json`.
+
 A captured Sodium command replay feeds the same recorded host responses for
 evaluation 444 to both companions. MC `e280fc7` reproduces the extension handle
 error after 1,653 source-fact queries. MC `a1f77b9` reads two source facts and
