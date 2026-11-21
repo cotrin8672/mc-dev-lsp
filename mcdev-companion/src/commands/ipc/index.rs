@@ -47,6 +47,7 @@ struct Cache {
     abis: BTreeMap<String, RawAbi>,
     bytes: BTreeMap<String, RuntimeBytes>,
     selected_origins: BTreeMap<String, String>,
+    bound_abi_entries: BTreeMap<String, CatalogEntry>,
     host_types: BTreeMap<String, EditingView>,
     source_types: BTreeMap<String, Option<EditingView>>,
     selected_types: BTreeMap<String, (TypeFact, TypeJvm)>,
@@ -177,6 +178,14 @@ impl<R: EvaluationFactReader> EvaluationIndex<R> {
     }
 
     fn physical_catalog(&self, prefix: &str) -> Result<Vec<CatalogEntry>, FactsError> {
+        self.catalog_entries(prefix, true)
+    }
+
+    fn catalog_entries(
+        &self,
+        prefix: &str,
+        require_complete: bool,
+    ) -> Result<Vec<CatalogEntry>, FactsError> {
         self.facts.check_active()?;
         if prefix.len() > 4096
             || prefix.starts_with('/')
@@ -202,26 +211,34 @@ impl<R: EvaluationFactReader> EvaluationIndex<R> {
             return Ok(entries);
         }
         let catalog = self.with_inputs(|inputs| inputs.jvm_catalog(prefix))?;
+        self.facts.check_active()?;
         match catalog.coverage {
-            Fact::Found { value: Value::Null } => (),
-            Fact::Unknown { reasons } => {
+            Fact::Found { value: Value::Null } => {
+                self.cache()?
+                    .catalogs
+                    .insert(prefix.to_owned(), catalog.entries.clone());
+            }
+            Fact::Unknown { reasons } if require_complete => {
                 return Err(unknown_catalog_fact(
                     "JVM catalog coverage",
                     reasons,
                     &catalog.problems,
-                ))
+                ));
             }
+            Fact::Unknown { .. } => {}
             _ => return Err(protocol("JVM catalog has invalid terminal coverage")),
         }
-        self.facts.check_active()?;
-        self.cache()?
-            .catalogs
-            .insert(prefix.to_owned(), catalog.entries.clone());
         self.facts.check_active()?;
         Ok(catalog.entries)
     }
 
     fn selected_entry(&self, owner: &str) -> Result<Option<CatalogEntry>, FactsError> {
+        self.facts.check_active()?;
+        let bound = self.cache()?.bound_abi_entries.get(owner).cloned();
+        if bound.is_some() {
+            self.facts.check_active()?;
+            return Ok(bound);
+        }
         let candidates: Vec<_> = self
             .physical_catalog(owner)?
             .into_iter()
@@ -377,20 +394,39 @@ impl<R: EvaluationFactReader> EvaluationIndex<R> {
         if abi.identity.internal_name != binary.internal_name {
             return Err(protocol("host type name and ABI identity disagree"));
         }
-        let matches: Vec<_> = self
-            .physical_catalog(&binary.internal_name)?
-            .into_iter()
-            .filter(|entry| {
-                entry.descriptor.internal_name == binary.internal_name
-                    && entry.descriptor.origin_id == abi.identity.origin_id
-            })
-            .collect();
-        let [entry] = matches.as_slice() else {
-            return Err(unknown(
-                "host origin does not identify one selected JVM entry",
-            ));
+        let bound = self
+            .cache()?
+            .bound_abi_entries
+            .get(&binary.internal_name)
+            .cloned();
+        let entry = match bound {
+            Some(entry) if entry.descriptor.origin_id != abi.identity.origin_id => {
+                return Err(FactsError::Stale(
+                    "host type selection changed within an evaluation".into(),
+                ));
+            }
+            Some(entry) => entry,
+            None => {
+                // Exact host type resolution already identifies the origin. An incomplete
+                // catalog can still supply that entry for independent ABI verification.
+                let mut matches = self
+                    .catalog_entries(&binary.internal_name, false)?
+                    .into_iter()
+                    .filter(|entry| {
+                        entry.descriptor.internal_name == binary.internal_name
+                            && entry.descriptor.origin_id == abi.identity.origin_id
+                    });
+                match (matches.next(), matches.next()) {
+                    (Some(entry), None) => entry,
+                    _ => {
+                        return Err(unknown(
+                            "host origin does not identify one selected JVM entry",
+                        ));
+                    }
+                }
+            }
         };
-        if self.class_abi(entry)?.identity != abi.identity {
+        if self.class_abi(&entry)?.identity != abi.identity {
             return Err(unknown(
                 "host type and selected physical class content differ",
             ));
@@ -409,6 +445,9 @@ impl<R: EvaluationFactReader> EvaluationIndex<R> {
         cache
             .selected_origins
             .insert(binary.internal_name.clone(), abi.identity.origin_id.clone());
+        cache
+            .bound_abi_entries
+            .insert(binary.internal_name.clone(), entry);
         drop(cache);
         self.facts.check_active()
     }

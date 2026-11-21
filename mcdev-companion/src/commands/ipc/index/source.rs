@@ -174,6 +174,7 @@ mod tests {
         calls: Arc<Mutex<Vec<Value>>>,
         active: Arc<AtomicBool>,
         inventory_complete: bool,
+        catalog_complete: bool,
         binary_only: bool,
         source_provenance: bool,
         provenance_unknown: bool,
@@ -228,7 +229,8 @@ mod tests {
                 "sourceInventory" => json!({"sources":[],"next":null,"coverage":if self.inventory_complete {found(Value::Null)} else {unknown_fact()}}),
                 "jvmCatalog" => json!({"view":"selectedPhysicalJvmInputs","classes":[{"entry":"entry:dep","internalName":"demo/Dep","originId":"compile:dep",
                     "association":"compileClasspath","classpathOrder":0,"authority":"compiled-input"}],"next":null,
-                    "coverage":found(Value::Null),"problems":[],"sourceCurrent":unknown_fact()}),
+                    "coverage":if self.catalog_complete {found(Value::Null)} else {unknown_fact()},
+                    "problems":[],"sourceCurrent":unknown_fact()}),
                 "jvmClass" => found(json!({"entry":"entry:dep","authority":"compiled-input","abi":abi(),"sourceCurrent":unknown_fact()})),
                 other => panic!("unexpected query {other}"),
             }).collect::<Vec<_>>();
@@ -259,6 +261,7 @@ mod tests {
             calls: Arc::new(Mutex::new(Vec::new())),
             active: Arc::new(AtomicBool::new(true)),
             inventory_complete,
+            catalog_complete: true,
             binary_only: false,
             source_provenance: false,
             provenance_unknown: false,
@@ -379,6 +382,7 @@ mod tests {
             calls: Arc::new(Mutex::new(Vec::new())),
             active: Arc::new(AtomicBool::new(true)),
             inventory_complete: true,
+            catalog_complete: true,
             binary_only: false,
             source_provenance: false,
             provenance_unknown: false,
@@ -470,6 +474,7 @@ mod tests {
             calls: Arc::new(Mutex::new(Vec::new())),
             active: Arc::new(AtomicBool::new(true)),
             inventory_complete: true,
+            catalog_complete: true,
             binary_only: false,
             source_provenance: true,
             provenance_unknown: true,
@@ -499,6 +504,7 @@ mod tests {
             calls: Arc::new(Mutex::new(Vec::new())),
             active: Arc::new(AtomicBool::new(true)),
             inventory_complete: true,
+            catalog_complete: true,
             binary_only: false,
             source_provenance: true,
             provenance_unknown: false,
@@ -538,6 +544,38 @@ mod tests {
             output_index.methods("demo/Dep"),
             Err(FactsError::Unknown(reason)) if reason.contains("project output")
         ));
+    }
+
+    #[test]
+    fn bound_target_can_use_exact_entry_from_partial_catalog() {
+        let (_, mut host) = test_index(false);
+        host.source_provenance = true;
+        host.provenance_unknown = true;
+        host.binary_only = true;
+        host.catalog_complete = false;
+        let index = provenance_index(&host);
+        assert!(matches!(
+            index.selected_entry("demo/Dep"),
+            Err(FactsError::Unknown(reason)) if reason.contains("JVM catalog coverage")
+        ));
+
+        let (_, target) = index.selected_type("demo.Dep").unwrap().unwrap();
+        index.bind_host_type(&target).unwrap();
+        let methods = index.methods("demo/Dep").unwrap();
+        assert!(methods.iter().any(|method| method.name == "compiled"));
+        assert!(matches!(
+            index.physical_catalog("demo/Dep"),
+            Err(FactsError::Unknown(reason)) if reason.contains("JVM catalog coverage")
+        ));
+        let calls = host.calls.lock().unwrap();
+        assert_eq!(
+            calls
+                .iter()
+                .filter(|query| query["op"] == "jvmClass")
+                .count(),
+            1
+        );
+        assert!(!calls.iter().any(|query| query["op"] == "sourceInventory"));
     }
 
     #[test]
