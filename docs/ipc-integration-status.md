@@ -582,6 +582,24 @@ snapshot queries in 3.228 s (debug) and 1.434 s (release). The remaining
 live bottleneck is retrieving pages while dependency indexing holds the
 workspace lock. See `build/rust-test-logs/sodium-original-3499402d-7dd526d/`.
 
+Host candidate `48dc090` lets a dependency install yield once during an active
+cached root continuation. It retains the workspace checks, stream quotas
+and command deadline. The original Sodium entry returns all 91 snapshots
+for `mcdev.info` and passes standard Java hover. The median cached continuation
+span is 2.015 ms. The next live Java method-selector completion loses its
+semantic index after attempting 388 source snapshots while libraries are
+still indexing. The editor records eight original assertions before that
+failure, and the host exits cleanly.
+See `build/rust-test-logs/sodium-original-48dc090-7dd526d/`.
+
+MC `803d1fa` defers compiler source discovery for Java injector method selectors.
+The accepted buffer and host type facts drive the ordinary bound-target
+path. If the selected target needs disambiguation, lookup can still request
+the owner source-set inventory. Recorded Sodium traffic yields the same
+`renderCameraOverlays` completion with two source-fact queries and zero
+source inventories or snapshots.
+See `build/rust-test-logs/sodium-completion-method-selector-replay/receipt.json`.
+
 A captured Sodium command replay feeds the same recorded host responses for
 evaluation 444 to both companions. MC `e280fc7` reproduces the extension handle
 error after 1,653 source-fact queries. MC `a1f77b9` reads two source facts and
