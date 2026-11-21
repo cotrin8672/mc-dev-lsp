@@ -65430,6 +65430,50 @@
             }
           }
         },
+        "sodiumStartupAndRootProbes": {
+          "mcCommit": "7dd526dfa20793c450eb2ae9009fb61022d95775",
+          "mcRustTests": 1953,
+          "sourceHandoffHost": "6a11da13a52222e85fa5a405d4b9d06f47500b0b",
+          "sourceHandoffHostLibTests": 802,
+          "originalEntryAttempts": {
+            "b160f44": {
+              "path": "build/rust-test-logs/sodium-original-b160f44-7dd526d/editor-proof.json",
+              "sha256": "b4fe17eca4360143a6cb543c80646cd3e193b7b67b9b373cedc1ca3ecc430fce",
+              "acceptances": 0,
+              "commandRequests": 0,
+              "originalAssertionsReached": 0,
+              "result": "host did not accept the exact current owner/source hash before the command",
+              "cleanShutdown": true
+            },
+            "f64fdc1": {
+              "path": "build/rust-test-logs/sodium-original-f64fdc1-7dd526d/editor-proof.json",
+              "sha256": "d0538f9d0bfa14fd379425125a59c4bcb4d343dbaabf3f1667eb4987f0116439",
+              "acceptances": 0,
+              "commandRequests": 0,
+              "originalAssertionsReached": 0,
+              "result": "host did not accept the exact current owner/source hash before the command",
+              "cleanShutdown": true
+            },
+            "6a11da1": {
+              "path": "build/rust-test-logs/sodium-original-6a11da1-7dd526d/editor-proof.json",
+              "sha256": "afdecfee458b95504c62955bb5eef5504734602e004df72a23c79add4c497de3",
+              "acceptances": 10,
+              "commandRequests": 9,
+              "originalAssertionsReached": 0,
+              "result": "provider readiness exceeded its 60s deadline",
+              "cleanShutdown": true
+            },
+            "889bdb0": {
+              "path": "build/rust-test-logs/sodium-original-889bdb0-7dd526d/editor-proof.json",
+              "sha256": "013b332615c0073bf541538c61a03da78793a159ce860ee77c7d3e411ac5cfe1",
+              "acceptances": 2,
+              "commandRequests": 1,
+              "originalAssertionsReached": 0,
+              "result": "provider readiness request timed out",
+              "cleanShutdown": true
+            }
+          }
+        },
         "sodiumCapturedCommandReplay": {
           "mode": "recorded-host-fact-replay",
           "evaluation": "444",

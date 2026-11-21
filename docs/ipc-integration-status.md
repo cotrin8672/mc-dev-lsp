@@ -548,6 +548,15 @@ original completion and editing assertions remain outstanding.
 See `build/rust-test-logs/sodium-original-f64fdc1-7dd526d/timing-summary.json`
 and `build/rust-test-logs/sodium-original-6a11da1-7dd526d/editor-proof.json`.
 
+The root-continuation probe `889bdb0` processes 29 of 47 snapshot
+queries through the cached single-lock continuation path. That startup
+also sees a forced dependency refresh for `common/build/resources/boot/META-INF`.
+The editor sees exact source acceptance in the original entry and then
+cancels a timed-out `mcdev.info` preflight. This run cannot isolate the
+continuation speedup from the refresh. The host exits cleanly with no
+original completion assertions reached.
+See `build/rust-test-logs/sodium-original-889bdb0-7dd526d/editor-proof.json`.
+
 A captured Sodium command replay feeds the same recorded host responses for
 evaluation 444 to both companions. MC `e280fc7` reproduces the extension handle
 error after 1,653 source-fact queries. MC `a1f77b9` reads two source facts and
