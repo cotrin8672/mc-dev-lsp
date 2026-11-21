@@ -524,6 +524,15 @@ item conversion and restores the original buffer. Live startup acceptance
 still depends on ktlsp accepting the owner snapshot before the first command.
 See `build/rust-test-logs/sodium-captured-command-a1f77b9/`.
 
+The Windows x86_64 package from `c7155d0` advertises the negotiated
+`sourceProvenance` operation in its manifest. Capability and stdio smoke
+tests pass. Independent ZIP verification checks all 24 payload hashes and
+runs the captured Sodium completion with the extracted executable. The
+archive is `build/release/native-verification-c7155d0/mcdev-companion-0.7.7-windows-x86_64.zip`
+with SHA-256 `a7f80785923be84fbaf90f71d8d7d372b9f389557b49defd16d2a4c23b389a1a`.
+See `build/rust-test-logs/native-release-20261121-095030365/summary.txt`
+and `build/rust-test-logs/sodium-captured-command-c7155d0-release/package-proof.json`.
+
 The Windows x86_64 release archive built from `7afcdd1` passes the native
 capability and stdio smoke checks. Independent ZIP inspection verifies all
 24 manifest payload entries. The archive is
