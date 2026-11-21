@@ -1741,3 +1741,13 @@ indexing advanced the semantic generation. MoreCulling `7a1b55d` could not
 reach project readiness because its Gradle build timed out fetching
 Conditional-Mixin dependencies from JitPack. Evidence for both projects is
 under `build/rust-test-logs/external-mod-promotion/`.
+
+The project-only check with published ktlsp `567beb47` and MC `f90eee5` used
+the existing project-ready and exact-document barriers. The host accepted the
+original and unfinished buffer hashes at 10.803 s and 24.266 s, respectively.
+Both completion attempts reached `resolveTypeRef` and requested
+`RemoveBlockGoal.java`. Each received one full 2 s command handoff before a
+semantic-index revision invalidated its pending reads. Neither produced a
+project-aware completion. The info reply still reported
+`INCOMPLETE_PROJECT_CONTEXT`, and the host shut down cleanly.
+See `build/rust-test-logs/external-mod-promotion/lithium-public-567beb47/`.
