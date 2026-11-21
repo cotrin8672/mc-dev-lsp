@@ -1751,3 +1751,14 @@ semantic-index revision invalidated its pending reads. Neither produced a
 project-aware completion. The info reply still reported
 `INCOMPLETE_PROJECT_CONTEXT`, and the host shut down cleanly.
 See `build/rust-test-logs/external-mod-promotion/lithium-public-567beb47/`.
+
+The project-only run with ktlsp `ea026cf5` and MC `f90eee5` accepted the
+original and unfinished buffers at 6.054 s and 20.448 s. The first completion
+committed without a stale validation failure after a 633 ms command handoff.
+It returned `INCOMPLETE_PROJECT_CONTEXT` because both references for the
+`@Mixin` annotation type were unknown with reason `unsupportedType`.
+The library index finished at about 58 s with incomplete classpath coverage.
+The completion received one provider reply and returned zero items after
+its readiness timeout. Info still reported incomplete project context, and
+the host exited cleanly.
+See `build/rust-test-logs/external-mod-promotion/lithium-public-ea026cf5/`.
