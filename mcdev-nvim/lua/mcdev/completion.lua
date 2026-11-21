@@ -304,6 +304,7 @@ function M.complete(callback, bufnr, position, opts)
   end
 
   local wait_for_project
+  local jdt_started = false
   local function on_jdt(envelope, err, origin)
     if operation.cancelled or active_requests[bufnr] ~= operation or operation.completed then
       M.stale_dropped_count = M.stale_dropped_count + 1
@@ -320,6 +321,11 @@ function M.complete(callback, bufnr, position, opts)
       -- Import readiness is temporary. Finalizing the helper's empty subset
       -- here cancels the listener that could deliver real target members.
       if wait_for_project() then
+        if origin and origin.route == "ktlsp.providerCommand" and origin.provider == "mcdev.mixin"
+          and origin.command == protocol.commands.completion then
+          -- The completed provider request can be sent again after fresh indexing progress.
+          jdt_started = false
+        end
         if helper_stream then
           callback({ isProvisional = true, isIncomplete = true, items = vim.deepcopy(helper_items) })
         end
@@ -359,7 +365,6 @@ function M.complete(callback, bufnr, position, opts)
   if request_is_stale() or operation.completed then
     return cancel
   end
-  local jdt_started = false
   local function start_jdt_request()
     if jdt_started or request_is_stale() or operation.completed then
       return

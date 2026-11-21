@@ -77,6 +77,39 @@ helpers.assert_eq(#standard_results,2)
 helpers.assert_eq(standard_results[2].items[1].insertText,'getEnchantmentValue')
 helpers.assert_nil(completion.last_project_transport_error)
 
+-- The external ktlsp may only expose providerCommand. An incomplete response
+-- can be retried in the new view without acquiring a loopback endpoint.
+local command_calls = 0
+local command_origin = {
+  route = 'ktlsp.providerCommand',
+  provider = 'mcdev.mixin',
+  command = protocol.commands.completion,
+}
+transport.request = function() return nil, 'endpoint not available' end
+protocol.completion = function(callback)
+  command_calls = command_calls + 1
+  jdt_callback = callback
+  return function() end
+end
+local command_results = {}
+completion.complete(function(value) command_results[#command_results+1]=value end,buf,{2,18},{stream=true})
+jdt_callback({error={code='INCOMPLETE_PROJECT_CONTEXT',message='annotation identity is unavailable'}},
+  nil, command_origin)
+helpers.assert_eq(command_calls,1)
+helpers.assert_eq(#command_results,1)
+helpers.assert_true(command_results[1].isProvisional)
+on_ready()
+helpers.assert_eq(command_calls,2)
+jdt_callback({result={items={{label='canUse',insertText='canUse',metadata={source='mixin.injectMethod'}}}}},
+  nil, command_origin)
+helpers.assert_eq(#command_results,2)
+helpers.assert_eq(command_results[2].items[1].insertText,'canUse')
+helpers.assert_true(not command_results[2].isProvisional)
+helpers.assert_nil(completion.last_project_transport_error)
+helpers.assert_true(timer_closed)
+transport.request = request_project
+protocol.completion = function(callback) jdt_callback=callback; return function() end end
+
 local silent_results = {}
 completion.complete(function(value) silent_results[#silent_results+1]=value end,buf,{2,18})
 project_callback({error={code='incomplete_project_context',message='dependencies not ready'}})

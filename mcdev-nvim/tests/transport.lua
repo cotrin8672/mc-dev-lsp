@@ -105,6 +105,30 @@ cancel_raced()
 vim.wait(20, function() return false end)
 helpers.assert_eq(project_ready, 2, "cancelled late readiness must not resume a request")
 
+-- Only a ktlsp index end wakes listeners for that client.
+local original_get_client_by_id = vim.lsp.get_client_by_id
+vim.lsp.get_client_by_id = function(id)
+  if id == active_client.id then return active_client end
+  if id == 75 then return { id = 75, name = "other-lsp" } end
+end
+local function progress(id, token, kind)
+  vim.api.nvim_exec_autocmds("LspProgress", {
+    pattern = kind,
+    data = { client_id = id, params = { token = token, value = { kind = kind } } },
+  })
+end
+local indexed = 0
+transport.when_ready(0, function() indexed = indexed + 1 end)
+progress(active_client.id, "ktlsp/index", "report")
+progress(active_client.id, "other", "end")
+progress(75, "ktlsp/index", "end")
+helpers.assert_eq(transport.ready_generation(0), generation + 1)
+helpers.assert_eq(indexed, 0)
+progress(active_client.id, "ktlsp/index", "end")
+progress(active_client.id, "ktlsp/index", "end")
+helpers.assert_eq(indexed, 1, "ktlsp index end must wake a pending completion once")
+vim.lsp.get_client_by_id = original_get_client_by_id
+
 -- Exercise libuv's real fast-event callback: completion consumers call Neovim APIs.
 local server = assert(vim.uv.new_tcp())
 assert(server:bind("127.0.0.1", 0))

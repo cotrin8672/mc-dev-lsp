@@ -160,6 +160,18 @@ function M.setup()
     if previous_status then previous_status(err, params, ctx) end
   end
   autocmd_group = vim.api.nvim_create_augroup("McdevCompletionTransport", { clear = true })
+  vim.api.nvim_create_autocmd("LspProgress", {
+    group = autocmd_group,
+    pattern = "end",
+    callback = function(args)
+      local event = args.data
+      if not event or not event.params or event.params.token ~= "ktlsp/index" then return end
+      local client = vim.lsp.get_client_by_id(event.client_id)
+      if client and client.name == "ktlsp" then
+        notify_ready(client.id)
+      end
+    end,
+  })
   vim.api.nvim_create_autocmd("LspDetach", {
     group = autocmd_group,
     callback = function(args)
