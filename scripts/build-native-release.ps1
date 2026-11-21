@@ -200,7 +200,7 @@ try {
             'root-files-v1'
         )
         supportedOps = [ordered]@{
-            'project-class-facts-v1' = @('projectContext', 'typeJvm')
+            'project-class-facts-v1' = @('projectContext', 'typeJvm', 'sourceProvenance')
             'source-snapshots-v1' = @('sourceInventory', 'sourceSnapshot')
             'owned-resources-v1' = @('resourceInventory', 'resourceLookup', 'resourceSnapshot')
             'runtime-class-bytes-v1' = @('runtimeClass', 'classBytes')
