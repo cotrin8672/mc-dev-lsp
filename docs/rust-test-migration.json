@@ -65383,6 +65383,53 @@
             }
           }
         },
+        "sodiumCurrentAcceptance": {
+          "host": "2d9cf0096395b6904b85dd895cd42d23aa83c2e1",
+          "hostSha256": "93b2f382d9b86250a4593ffd12481247826b8c7bd900143bf19e1796591207ed",
+          "companion": "a1f77b9de91c141c94e0c2bad498cd9ceac13a5d",
+          "companionSha256": "49af2304b324354145d0c845109045c053be2375c153279f469782dc46604e05",
+          "rustTests": 1952,
+          "rustTargetsIncludingDocTests": 86,
+          "entries": {
+            "hoverReplay": {
+              "receipt": "build/rust-test-logs/sodium-wire-2d9cf009-e280fc7/editor-proof.json",
+              "receiptSha256": "7f28c15236836ee26e036b3f196a932c43c45681f8acb583f582f1fdee2f719b",
+              "originalAssertionsReached": 8,
+              "providerCommands": 2,
+              "shutdown": {
+                "code": 0,
+                "signal": 0,
+                "exited": true
+              },
+              "result": "passed-original-hover-assertions; completion-hit-extension-handle-limit",
+              "companion": "e280fc7"
+            },
+            "indexedStartup": {
+              "receipt": "build/rust-test-logs/sodium-wire-2d9cf009-a1f77b9/editor-proof.json",
+              "receiptSha256": "92ae4cccbd42148cb452597e7d974205f8f3880c22a1e3358689d5868fc53d2a",
+              "originalAssertionsReached": 0,
+              "providerCommands": 0,
+              "shutdown": {
+                "code": 0,
+                "exited": true,
+                "signal": 0
+              },
+              "result": "library-indexing-deadline-after-watch-refresh"
+            },
+            "originalEntry": {
+              "receipt": "build/rust-test-logs/sodium-original-2d9cf009-a1f77b9/editor-proof.json",
+              "receiptSha256": "c7bad12d00f026898ecc3f80886c80351b293ce0a255ccaeb303de9f1e594f59",
+              "originalAssertionsReached": 0,
+              "providerCommands": 0,
+              "shutdown": {
+                "code": 0,
+                "exited": true,
+                "signal": 0
+              },
+              "result": "no-exact-GuiMixin-acceptance-before-first-command"
+            }
+          }
+        },
         "host123MixinExtrasAcceptance": {
           "host": "81d0b3bd9525e7d63af16f23f4b44f876c3bcd70",
           "hostSha256": "1a518188495171a297946e92c3334a334a9815422ae6015c98940dac5ea105a0",

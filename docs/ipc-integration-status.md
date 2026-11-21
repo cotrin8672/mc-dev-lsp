@@ -452,6 +452,69 @@ reaches IPC fact reads and the semantic index invalidates the evaluation
 before source acceptance. See
 `build/rust-test-logs/sodium-0883a396-workspace-lock-diagnostic/`.
 
+Host `94883119` applies the configured diagnostics scope to automatic
+extension-triggered notifications. Its focused Sodium open run publishes
+one diagnostic notification for GuiMixin and zero for other documents.
+Across 93 dependency installs, the maximum lock wait is 51.316 ms. The
+provider repeatedly evaluates GuiMixin, records 73 semantic-index guard
+failures and two model guard failures, and reaches the source-acceptance
+deadline. The run exits cleanly with zero original commands. See
+`build/rust-test-logs/sodium-94883119-focused-open/`.
+
+An indexed-startup probe on the same host and MC `199d74d` sees both
+project and library readiness and accepts GuiMixin's original source digest
+at evaluation 250. Its first `mcdev.info` preflight dispatch reaches the
+companion at evaluation 318 and returns `evaluation continuation limit`.
+The five selected mapping files contain 27,954,560 bytes. Streaming them
+with 96-KiB pages requires more than 256 continuations. Oversized batches
+and their split retries consume additional requests. See
+`build/rust-test-logs/sodium-indexed-94883119-199d74d/`.
+
+Host `0a131ead` retains the 96-KiB initial page and emits up to 384 KiB in
+a root-file continuation. MC `e280fc7` reads one continuation at a time and
+still batches initial reads. The 256-continuation and 64-MiB stream limits,
+file identities, content digests and coverage checks remain in place.
+The companion's Windows suite passes 1,951 tests across 86 targets including
+doc tests, plus the Neovim suite and build. See
+`build/rust-test-logs/20261121-091230497/summary.txt`.
+
+The indexed-startup run with these two pins accepts the initial and edited
+GuiMixin digests at evaluations 398 and 511. The preflight mcdev.info
+succeeds at evaluation 468 after 91 root snapshot queries and 81 readFacts
+requests. Neovim observes a clean host shutdown. The original assertion for
+standard textDocument/hover at Gui.class receives no result. The concurrent
+mcdev.completion evaluation hits the extension handle limit during source
+fact collection. The run ends after six assertions with exit 1. See
+`build/rust-test-logs/sodium-indexed-0a131ead-e280fc7/`.
+
+Host `2d9cf009` fixes Java class-literal hover. The Sodium Neovim replay
+passes the original hover assertions on `Gui.class` and shuts down cleanly.
+The companion's same-evaluation ABI matches the selected compile-classpath
+JAR's class identity and content SHA-256. The host reports
+`UnsupportedSource` for its source location and provenance. The companion
+then issues 1,653 source-fact queries per completion attempt and hits the
+extension handle limit. See
+`build/rust-test-logs/sodium-wire-2d9cf009-e280fc7/`.
+
+MC `a1f77b9` reuses the checked JVM ABI for an already bound target when
+the host reports `UnsupportedSource` and the selected origin is a dependency.
+The regression covers incomplete source inventory and rejection of a sibling
+output. Windows passes 1,952 Rust tests across 86 targets including doc tests,
+the companion build and Neovim suite. The first indexed-startup replay with
+this companion did not reach command dispatch. A Loom mapping JAR watch
+notification at +50.44 s triggered a second refresh and libraries were not
+ready by the 180-second startup deadline. The host shuts down cleanly. See
+`build/rust-test-logs/20261121-093134604/summary.txt` and
+`build/rust-test-logs/sodium-wire-2d9cf009-a1f77b9/`.
+
+The original project-only Sodium entry with the same pins sees project
+readiness. It does not get a matching GuiMixin source acceptance within its
+original 60-second window and dispatches zero provider commands. No watch
+refresh occurs in that run. Dependency indexing in generation 1 triggers 59
+semantic-index validation failures, and the host exits cleanly. The original
+Sodium entry remains pending. See
+`build/rust-test-logs/sodium-original-2d9cf009-a1f77b9/`.
+
 The Windows x86_64 release archive built from `7afcdd1` passes the native
 capability and stdio smoke checks. Independent ZIP inspection verifies all
 24 manifest payload entries. The archive is
