@@ -3,7 +3,7 @@ use super::*;
 
 const MAX_ROOT_FILES: usize = 16_000;
 const MAX_ROOT_BODY: usize = 16 * 1024 * 1024;
-const MAX_ROOT_CHUNK: usize = 96 * 1024;
+const MAX_ROOT_CHUNK: usize = 384 * 1024;
 
 #[derive(Debug, Clone, Default, PartialEq, Eq, Serialize, Deserialize)]
 #[serde(rename_all = "camelCase", deny_unknown_fields)]
@@ -451,9 +451,18 @@ impl<R: FactReader> ScopedInputs<R> {
                 "file":entries[index].descriptor.file,"after":states[index].after})
                 })
                 .collect();
-            let values = self.read(InputOp::RootFileSnapshot, &queries)?;
-            for (index, value) in pending.into_iter().zip(values) {
-                states[index].push(&entries[index], decode(value)?)?;
+            // Continuation pages can fill the host's response budget by themselves.
+            // Send them separately to avoid charging for a rejected oversized batch.
+            let batch_size = if states[pending[0]].after.is_some() {
+                1
+            } else {
+                queries.len()
+            };
+            for (indices, queries) in pending.chunks(batch_size).zip(queries.chunks(batch_size)) {
+                let values = self.read(InputOp::RootFileSnapshot, queries)?;
+                for (&index, value) in indices.iter().zip(values) {
+                    states[index].push(&entries[index], decode(value)?)?;
+                }
             }
             let bytes = states
                 .iter()

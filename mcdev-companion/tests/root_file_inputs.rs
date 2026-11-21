@@ -455,6 +455,41 @@ fn root_file_snapshot_reassembles_scalar_safe_utf8_bytes_and_distinct_overlay_ve
 }
 
 #[test]
+fn root_file_snapshot_reads_large_continuations_one_at_a_time() {
+    let filter = RootFileFilter::default();
+    let tail = "x".repeat(384 * 1024);
+    let body = format!("a{tail}");
+    let mut reader = Reader::with([
+        facts(vec![page(
+            &filter,
+            vec![file("a", "a.tiny"), file("b", "b.tiny")],
+            None,
+            true,
+        )]),
+        facts(vec![
+            chunk("a", "a.tiny", &body, 0, "a", Some("a:1")),
+            chunk("b", "b.tiny", &body, 0, "a", Some("b:1")),
+        ]),
+        facts(vec![chunk("a", "a.tiny", &body, 1, &tail, None)]),
+        facts(vec![chunk("b", "b.tiny", &body, 1, &tail, None)]),
+    ]);
+
+    let mut inputs = ScopedInputs::new("e", &operations(), &mut reader).unwrap();
+    let entries = inputs.root_file_inventory(&filter).unwrap().entries;
+    let snapshots = inputs.root_file_snapshots(&entries).unwrap();
+    assert_eq!(snapshots[0].found().unwrap().text, body);
+    assert_eq!(snapshots[1].found().unwrap().text, body);
+    assert_eq!(reader.queries[1].len(), 2);
+    assert_eq!(
+        reader.queries[2..],
+        [
+            vec![json!({"op":"rootFileSnapshot","file":"a","after":"a:1"})],
+            vec![json!({"op":"rootFileSnapshot","file":"b","after":"b:1"})],
+        ]
+    );
+}
+
+#[test]
 fn root_file_stream_requires_unchanged_identity_offsets_full_hash_and_terminal_length() {
     let filter = RootFileFilter::default();
     let body = "a😀猫";
