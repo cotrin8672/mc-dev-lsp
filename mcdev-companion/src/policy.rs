@@ -149,6 +149,19 @@ pub(crate) fn analyze(e: &Evaluation, host: &mut impl Host) -> Result<Contributi
             );
             continue;
         }
+        let declarations = e
+            .declarations
+            .iter()
+            .filter(|d| {
+                d.owner.as_ref() == Some(&owner.id)
+                    && d.annotations.iter().any(|a| {
+                        identities.get(&a.type_ref) == Some(&Some(MixinAnnotation::Shadow))
+                    })
+            })
+            .collect::<Vec<_>>();
+        if declarations.is_empty() {
+            continue;
+        }
         let target_query = match values[0] {
             AnnotationValue::Class { type_ref } => {
                 registry.require(type_ref, HandleKind::TypeRef)?;
@@ -161,16 +174,6 @@ pub(crate) fn analyze(e: &Evaluation, host: &mut impl Host) -> Result<Contributi
             read(host, &e.evaluation, vec![target_query])?.remove(0),
             &mut registry,
         )?;
-        let declarations = e
-            .declarations
-            .iter()
-            .filter(|d| {
-                d.owner.as_ref() == Some(&owner.id)
-                    && d.annotations.iter().any(|a| {
-                        identities.get(&a.type_ref) == Some(&Some(MixinAnnotation::Shadow))
-                    })
-            })
-            .collect::<Vec<_>>();
         let mut authored_members = BTreeMap::new();
         for batch in declarations.chunks(MAX_BATCH) {
             let queries = batch

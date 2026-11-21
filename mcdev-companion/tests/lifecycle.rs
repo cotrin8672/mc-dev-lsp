@@ -36,6 +36,50 @@ fn stock_f595_array_configuration_enters_fact_queries_instead_of_rejecting_evalu
     assert!(p.wait().success());
 }
 #[test]
+fn mixin_without_shadow_does_not_resolve_the_target_for_publication() {
+    let mut p = Process::new();
+    p.initialize();
+    p.request(
+        "mixin",
+        "analysis/evaluate",
+        json!({
+            "evaluation":"mixin","owner":"Example.java",
+            "source":"@Mixin(Target.class) class Example {}","configuration":{},
+            "declarations":[{
+                "id":"owner","owner":null,"name":"Example","range":{"start":27,"end":34},
+                "annotations":[{
+                    "typeRef":"mixin-ref","range":{"start":0,"end":20},
+                    "arguments":[{
+                        "range":{"start":7,"end":19},
+                        "value":{"state":"found","value":{"kind":"class","typeRef":"target-ref"}}
+                    }]
+                }]
+            }]
+        }),
+    );
+    let request = p.receive();
+    assert_eq!(request["method"], "analysis/readFacts");
+    assert_eq!(
+        request["params"]["queries"],
+        json!([{"op":"resolveTypeRef","reference":"mixin-ref"}])
+    );
+    p.send(json!({
+        "jsonrpc":"2.0","id":request["id"],
+        "result":{"facts":[{
+            "state":"found","value":{
+                "id":"mixin-type","qualifiedName":"org.spongepowered.asm.mixin.Mixin",
+                "package":"org.spongepowered.asm.mixin"
+            }
+        }]}
+    }));
+    let result = p.receive();
+    assert_eq!(result["id"], "mixin", "{result}");
+    assert_eq!(result["result"], json!({"sites":[],"diagnostics":[]}));
+    p.eof();
+    assert!(p.wait().success());
+}
+
+#[test]
 fn opaque_provider_configuration_preserves_every_json_value_kind() {
     let mut p = Process::new();
     p.initialize();
