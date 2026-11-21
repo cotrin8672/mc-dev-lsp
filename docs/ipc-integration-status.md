@@ -1709,3 +1709,29 @@ and executable hashes are retained in `rust-test-migration.json` under
 This validates the published-input checkpoint, before the follow-up six command
 routes, package capability metadata and editor-harness changes. It does not
 establish full Minecraft host integration.
+
+## Independent MOD check before promoting main
+
+Lithium `749edb8` is outside the original fixture set. Its standard Java hover
+worked on ktlsp `7213f777` and the released companion. The first completion
+failed when a partial catalog included the exact selected compile dependency
+while reporting `missing-selected-sdk`. The later source inventory had 515
+entries and unknown coverage. MC `f90eee5` binds the exact issued catalog entry
+against the host-selected owner, origin and ABI digest. Catalog scans and
+negative lookups still require complete coverage.
+
+A later attempt lost 30 seconds waiting for the extension transport before
+the request reached the companion. Local ktlsp candidate `3819347` joins the
+transport lock queue in the existing 10 ms cancellation intervals. With both
+changes and library indexing complete, Lithium passed 18 editor assertions,
+including Java hover, two authentic `canUse` completions, both edit applications
+restoring the source, and clean host exit. Each completion used one exact
+catalog entry and one class ABI with zero compiler source inventory reads.
+
+The project-ready startup run using the same binaries remains incomplete.
+`mcdev.info` reported incomplete project source-set and resource inventory.
+Both completion attempts reached the child and returned `Stale` while library
+indexing advanced the semantic generation. MoreCulling `7a1b55d` could not
+reach project readiness because its Gradle build timed out fetching
+Conditional-Mixin dependencies from JitPack. Evidence for both projects is
+under `build/rust-test-logs/external-mod-promotion/`.
