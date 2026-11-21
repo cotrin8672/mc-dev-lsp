@@ -515,6 +515,22 @@ semantic-index validation failures, and the host exits cleanly. The original
 Sodium entry remains pending. See
 `build/rust-test-logs/sodium-original-2d9cf009-a1f77b9/`.
 
+The original entry trace shows 144 semantic-index invalidations and 26
+stale rejections, all for GuiMixin. During the rejection window, the index
+changes 123 times at a median interval of 0.430 seconds. Installing JDK
+sources takes 23.784 seconds, including 23.102 seconds in 57 index-revision
+flushes. Ordinary indexing takes 0.605 seconds for that install. The first
+annotation fact batch typically succeeds before the next validation sees a
+new semantic index generation.
+
+MC `7dd526d` skips target type resolution when an owner has no resolved
+Shadow declarations. Replaying the accepted original GuiMixin publication
+(evaluation 250) drops its type-reference facts from three to two queries
+and returns the identical diagnostic and site arrays. The Windows Rust
+suite reports 1,953 passing tests including doc tests; the companion build
+and Neovim suite pass. See `build/rust-test-logs/20261121-095757872/summary.txt`
+and `build/rust-test-logs/sodium-publication-7dd526d/receipt.json`.
+
 A captured Sodium command replay feeds the same recorded host responses for
 evaluation 444 to both companions. MC `e280fc7` reproduces the extension handle
 error after 1,653 source-fact queries. MC `a1f77b9` reads two source facts and
