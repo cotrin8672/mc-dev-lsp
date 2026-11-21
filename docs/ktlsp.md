@@ -19,8 +19,9 @@ rtk cargo build --release --locked -p mcdev-companion
 ```
 
 Use a separately installed ktlsp binary built from
-[`ea8be67`](https://github.com/cotrin8672/ktlsp/commit/ea8be671ed4a876a5d5514fb63daa043e953c08f)
-or a compatible revision of its experimental extension protocol.
+[7213f777](https://github.com/cotrin8672/ktlsp/commit/7213f7774893b7af977bbbd4d9c2eaea28b2c30e)
+or a compatible revision of its extension protocol. This commit passed the
+original Sodium editor workflow with companion `803d1fa`.
 [Native installation](native-distribution.md) and
 [Neovim configuration](lazy-nvim.md) show explicit executable argv arrays and
 `mcdev.ktlsp.extend_config` integration with an existing client configuration.
@@ -74,6 +75,5 @@ rtk proxy pwsh -NoProfile -File scripts/run-rust-tests-compact.ps1
 This runs the native workspace, process and Neovim checks with finite deadlines
 and full logs. The companion process tests fake only explicit host facts; they
 do not contain a host language parser. The separate real-host editor proof
-checks applied buffers and fresh accepted evaluations. The latest proof scope
-and incomplete original editor workflows remain in the
-[migration record](rust-migration.md).
+checks applied buffers and fresh accepted evaluations. The [migration record](rust-migration.md) lists the pins and scope of the
+original editor workflow passes.

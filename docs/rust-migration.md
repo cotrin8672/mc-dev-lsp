@@ -10,7 +10,16 @@ Kotlin subprocess can count as a completed Rust port. The current published-host
 connection work and concrete input differences are tracked in
 [the IPC integration checkpoint](ipc-integration-status.md).
 
-The latest 2026-11-05 full check passes 1,941 native functions across 83
+The 2026-11-21 Windows workspace check passes 1,954 Rust tests across 83
+targets, three doc-test entries, the companion build and all five Neovim
+suite entries. Its audit matches all 2,748 executable replacement references
+for the 2,604 original JUnit cases. All nine original live editor workflows
+have passing runs with their recorded pins. The final Sodium entry passes 18
+assertions using ktlsp `7213f777` and companion `803d1fa`, including
+Java hover, startup and warm completion, and applying both edits to restore
+the source. See `build/rust-test-logs/20261121-113233875/latest-case-audit.json` and `build/rust-test-logs/sodium-original-7213f777-803d1fa/editor-proof.json`.
+
+The 2026-11-05 full check passes 1,941 native functions across 83
 targets and verifies all 2,604 original case locators, doc tests, the executable
 and five independent editor entries. Published host93 and the fixed companion
 also pass 1,065 checks across 25 live cases, including positive results for all
@@ -39,7 +48,7 @@ The selected original Java entry now passes all 53 observed assertions, includin
 the native extract-local WorkspaceEdit and original clean lifecycle teardown.
 It does not cover the separate Placement entry.
 
-The latest full proof is
+The historical 2026-11-05 proof is
 `build/rust-test-logs/20261105-194547668/native-summary.json`: 1,941 functions,
 83 targets, all 2,604 original case locators and 2,748 replacement references,
 docs/build and five editor entries. Typed failures raised during IPC setup now

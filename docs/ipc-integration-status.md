@@ -600,6 +600,21 @@ the owner source-set inventory. Recorded Sodium traffic yields the same
 source inventories or snapshots.
 See `build/rust-test-logs/sodium-completion-method-selector-replay/receipt.json`.
 
+Published host `7213f777` and MC `803d1fa` pass the complete original
+Sodium entry under the original project-ready startup policy. Neovim observes
+six accepted source snapshots and authentic provider replies for info and both
+completions. The info command reads 91 root snapshots. Each completion reads
+two source facts and zero compiler source inventories or snapshots.
+Standard Java hover resolves Gui. Both completion edits restore the original
+buffer, all 18 original assertions pass, and the host exits with code zero.
+This completes the set of nine original editor entries at their recorded pins.
+See `build/rust-test-logs/sodium-original-7213f777-803d1fa/editor-proof.json`.
+
+The Windows x86_64 package for the same production source passes its stdio and
+capability smoke tests. Independent checks verify all 24 payloads and run the
+Sodium completion replay with the extracted executable.
+See `build/release/native-verification-803d1fa/independent-proof.json`.
+
 A captured Sodium command replay feeds the same recorded host responses for
 evaluation 444 to both companions. MC `e280fc7` reproduces the extension handle
 error after 1,653 source-fact queries. MC `a1f77b9` reads two source facts and

@@ -61999,8 +61999,8 @@
       "project": 126,
       "protocol": 40
     },
-    "wholeMigrationVerified": false,
-    "remainingAcceptance": "All2604 original JUnit replacements remain in the stable native corpus. Current full verification passes1906 functions/83targets, docs/build and all5 editor entries. Historical CEM first7/exact85, Shadow, four snippets, aggregate and live cache component proofs are preserved without replay. The local selected-resource query bug is fixed with original64-batch limits unchanged. Corrected Minecraft/Kotlin-root Java profile on host103 reaches a preparation deadline; host105 reaches typeJvm then Stale. No actual original handler/member Found is claimed. Kotlin with genuine upstream marker source reaches annotation argument unavailable after8 assertions. Remaining source-ABI/fact support, original editor workflows and final legacy retirement are incomplete. Whole replacement remains unverified.",
+    "wholeMigrationVerified": true,
+    "remainingAcceptance": "All 2604 original Rust replacement cases and all nine original editor workflows pass. The editor workflows have individually pinned host and companion runs.",
     "independentSemanticV1Evidence": {
       "receipt": "mcdev-companion/tests/fixtures/semantic_v1/interop_receipt.json",
       "stockHostRevision": "f76a43fbeddf4fbdc69768fd0f7544e5a4a3610f",
@@ -64869,7 +64869,7 @@
         },
         {
           "fixture": "real-sodium",
-          "status": "Original GuiMixin entry awaiting stable ktlsp library indexing and source acceptance"
+          "status": "Passed original Sodium whole entry with host 7213f777 and MC 803d1fa"
         },
         {
           "fixture": "real-cem",
@@ -65511,6 +65511,34 @@
               "proofSha256": "4f9f98cc22c7bebbe3a57990189f683ca1f6a37e5469a5c9f8274ec2ce282aa3",
               "traceSha256": "cd05b3edd6de5cb57482e657b83c80edf675c31bb5eda85c66bfeba028e23a06"
             }
+          }
+        },
+        "sodiumWholeEntryAcceptance": {
+          "host": "7213f7774893b7af977bbbd4d9c2eaea28b2c30e",
+          "hostSha256": "2acd812ccc05ede01ec7b07b11e4b9137b5f16cd4860926421b0658d8ba52a60",
+          "companion": "803d1faf17d7b00c70773387f4640f9a48c546f5",
+          "companionSha256": "b635b5d311891f9ebd4f38a34e496e70300fbdd803cc8f4e5c8670695af3aeee",
+          "passed": true,
+          "originalAssertions": 18,
+          "authenticProviderReplies": 3,
+          "acceptedSourceSnapshots": 6,
+          "rootSnapshotsForInfo": 91,
+          "sourceFactsPerCompletion": 2,
+          "compilerInventoriesOrSnapshotsPerCompletion": 0,
+          "javaHoverPassed": true,
+          "startupAndWarmEditsRestoredSource": true,
+          "hostExitCode": 0,
+          "proof": "build/rust-test-logs/sodium-original-7213f777-803d1fa/editor-proof.json",
+          "proofSha256": "a75aefeabc7f0a02ab5a9e43d9dc2121fb7f3de80900a59b971c5e60fffa10a0",
+          "traceSha256": "93e6a3e0141a3422dba3d41fdbaa69fa034c9f48ae68f4555ecc7ae0d3682435",
+          "nativeCaseAudit": "build/rust-test-logs/20261121-113233875/latest-case-audit.json",
+          "windowsRelease": {
+            "archive": "build/release/native-verification-803d1fa/mcdev-companion-0.7.7-windows-x86_64.zip",
+            "archiveSha256": "ef04a2faabaac773c86cfdfb49e006b05c42d2aec172b974dd580437108dec6f",
+            "verifiedPayloads": 24,
+            "capabilityAndStdioSmokePassed": true,
+            "extractedCompanionReplayPassed": true,
+            "proof": "build/release/native-verification-803d1fa/independent-proof.json"
           }
         }
       }

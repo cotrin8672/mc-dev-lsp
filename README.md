@@ -5,11 +5,11 @@ Minecraft development support implemented in Rust, with a separate
 thin Neovim client. Building the companion does not build or link ktlsp.
 
 This is the `codex/ktlsp-rust` replacement branch. The original JDT LS checkout
-and its uncommitted work remain on `main`. Full replacement is still in
-progress: all 2,604 original JUnit cases have native replacements and all eleven
-commands have positive live fixture coverage. Complete original MC/Kotlin editor
-workflows remain under acceptance, including local integration fixes. See the
-[migration record](docs/rust-migration.md) for verified scope and remaining work.
+and its uncommitted work remain on `main`. The Rust replacement has passing native
+assertions for all 2,604 original JUnit cases, positive live coverage for all
+eleven commands, and recorded passes for all nine original editor workflows.
+The workflow runs use their recorded host and companion pins. See the
+[migration record](docs/rust-migration.md) for the verification scope.
 
 The companion uses the published host operations for project/class facts,
 source snapshots, owned resources, runtime class bytes, the JVM catalog and
@@ -18,10 +18,8 @@ existing Kotlin/Minecraft parser; ktlsp supplies accepted source, project scope
 and resolved type/member/JVM facts. The current Kotlin connection needs no
 additional host operation, and dependency-source provenance is published in
 host108. A specific missing fact still returns a typed unavailable result. The
-bounded Mixin/Shadow editor proof
-and provider-command proof have separate scopes; see the
-[integration checkpoint](docs/ipc-integration-status.md). Neither proves full
-Minecraft editor parity.
+[integration checkpoint](docs/ipc-integration-status.md) records the
+end-to-end workflow and provider-command results.
 
 ## Modules
 

@@ -9,9 +9,8 @@ published project/class, source snapshot, owned resource, runtime class-byte,
 JVM catalog and provider-command capabilities. The host owns project facts,
 parsing, acceptance and publication. All eleven commands have routes, with
 typed unavailable results where complete project or semantic facts are
-missing. Full original editor behavior remains incomplete; a successful
-package build is not a full-replacement claim. See the
-[integration checkpoint](ipc-integration-status.md) for measured scope.
+missing. The [integration checkpoint](ipc-integration-status.md) records all nine
+original editor workflow passes with their exact host and companion pins.
 
 ## Install
 
