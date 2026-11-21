@@ -174,6 +174,7 @@ mod tests {
         calls: Arc<Mutex<Vec<Value>>>,
         active: Arc<AtomicBool>,
         inventory_complete: bool,
+        binary_only: bool,
         source_provenance: bool,
         provenance_unknown: bool,
         provenance_source_mismatch: bool,
@@ -213,6 +214,9 @@ mod tests {
                     "documentUri":mcdev_core::project::path_to_uri(&std::env::temp_dir().join("mcdev-current/Dep.java")),
                     "range":{"start":{"line":1,"character":6},"end":{"line":1,"character":10}},
                     "source":{"identity":{"kind":"source","revision":"8"},"sha256":"b".repeat(64)}})),
+                "sourceLocation" | "sourceProvenance" if self.binary_only => {
+                    json!({"state":"unknown","reasons":[{"code":"UnsupportedSource"}]})
+                }
                 "sourceLocation" => unknown_fact(),
                 "sourceProvenance" if self.source_provenance && self.provenance_unknown => unknown_fact(),
                 "sourceProvenance" if self.source_provenance => found(json!({
@@ -255,6 +259,7 @@ mod tests {
             calls: Arc::new(Mutex::new(Vec::new())),
             active: Arc::new(AtomicBool::new(true)),
             inventory_complete,
+            binary_only: false,
             source_provenance: false,
             provenance_unknown: false,
             provenance_source_mismatch: false,
@@ -374,6 +379,7 @@ mod tests {
             calls: Arc::new(Mutex::new(Vec::new())),
             active: Arc::new(AtomicBool::new(true)),
             inventory_complete: true,
+            binary_only: false,
             source_provenance: false,
             provenance_unknown: false,
             provenance_source_mismatch: false,
@@ -464,6 +470,7 @@ mod tests {
             calls: Arc::new(Mutex::new(Vec::new())),
             active: Arc::new(AtomicBool::new(true)),
             inventory_complete: true,
+            binary_only: false,
             source_provenance: true,
             provenance_unknown: true,
             provenance_source_mismatch: false,
@@ -492,6 +499,7 @@ mod tests {
             calls: Arc::new(Mutex::new(Vec::new())),
             active: Arc::new(AtomicBool::new(true)),
             inventory_complete: true,
+            binary_only: false,
             source_provenance: true,
             provenance_unknown: false,
             provenance_source_mismatch: true,
@@ -502,6 +510,33 @@ mod tests {
         assert!(matches!(
             index.methods("demo/Dep"),
             Err(FactsError::Protocol(message)) if message.contains("identities differ")
+        ));
+    }
+
+    #[test]
+    fn bound_binary_target_uses_its_checked_abi_without_loading_project_sources() {
+        let (_, mut host) = test_index(false);
+        host.source_provenance = true;
+        host.provenance_unknown = true;
+        host.binary_only = true;
+        let index = provenance_index(&host);
+        let (_, target) = index.selected_type("demo.Dep").unwrap().unwrap();
+        index.bind_host_type(&target).unwrap();
+
+        let methods = index.methods("demo/Dep").unwrap();
+        assert!(methods.iter().any(|method| method.name == "compiled"));
+        let calls = host.calls.lock().unwrap();
+        assert!(calls.iter().any(|query| query["op"] == "sourceLocation"));
+        assert!(calls.iter().any(|query| query["op"] == "sourceProvenance"));
+        assert!(!calls.iter().any(|query| query["op"] == "sourceInventory"));
+        drop(calls);
+
+        let output_index = provenance_index(&host)
+            .with_owned_output_origins(BTreeSet::from(["compile:dep".into()]));
+        output_index.bind_host_type(&target).unwrap();
+        assert!(matches!(
+            output_index.methods("demo/Dep"),
+            Err(FactsError::Unknown(reason)) if reason.contains("project output")
         ));
     }
 
@@ -764,8 +799,16 @@ impl<R: EvaluationFactReader> EvaluationIndex<R> {
                     .insert(owner.into(), Some(editing));
                 Ok(Some(class_entry(owner)))
             }
-            Fact::Unknown { .. } => {
-                if self.current_source_names()?.contains(&ty.qualified_name) {
+            Fact::Unknown { reasons } => {
+                // A target already bound to a checked binary can lack a source location.
+                // Revalidate its ABI and dependency origin below before using its members.
+                let bound_binary = matches!(
+                    reasons.as_slice(),
+                    [reason] if reason["code"] == "UnsupportedSource"
+                ) && provenance.is_none()
+                    && jvm.abi.found().is_some()
+                    && self.selected_origin_bound(owner)?;
+                if !bound_binary && self.current_source_names()?.contains(&ty.qualified_name) {
                     return Err(unknown(format!(
                         "current source location for {owner} is unavailable"
                     )));
