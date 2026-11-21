@@ -1728,6 +1728,12 @@ including Java hover, two authentic `canUse` completions, both edit applications
 restoring the source, and clean host exit. Each completion used one exact
 catalog entry and one class ABI with zero compiler source inventory reads.
 
+ktlsp published this transport queue change as
+`55f53116b740f965ec29c726afdd41c03a5cc0d8` with 41 focused tests passing.
+The release executable SHA-256 is
+`76981c51a2f75fc5d520b468a7b88b94fea109479816ad33a447defed0188116`.
+The Lithium results here use local candidate `3819347`.
+
 The project-ready startup run using the same binaries remains incomplete.
 `mcdev.info` reported incomplete project source-set and resource inventory.
 Both completion attempts reached the child and returned `Stale` while library
